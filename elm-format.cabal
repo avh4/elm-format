@@ -1,0 +1,43 @@
+Name: elm-format
+Version: 0.1
+
+Synopsis:
+    A source code formatter for Elm
+Description:
+    A simple way to format your Elm code according to the official
+    style guide.
+
+Homepage:
+    http://elm-lang.org
+
+License: BSD3
+License-file: LICENSE
+
+Author:     Aaron VonderHaar
+Maintainer: info@elm-lang.org
+Copyright:  Copyright (c) 2015 Aaron VonderHaar
+
+Category: Build Tool
+
+Build-type: Simple
+Cabal-version: >=1.9
+
+Extra-source-files: README.md
+
+source-repository head
+    type:     git
+    location: git://github.com/avh4/elm-format.git
+
+Executable elm-format
+
+    ghc-options:
+        -threaded -O2 -W
+
+    hs-source-dirs:
+        src
+
+    Main-is:
+        Main.hs
+
+    Build-depends:
+        base >=4.2 && <5
