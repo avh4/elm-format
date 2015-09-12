@@ -1,2 +1,3 @@
-dist/
-cabal.sandbox.config
+/dist/
+/cabal.sandbox.config
+/formatted.elm
