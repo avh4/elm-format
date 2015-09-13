@@ -94,9 +94,6 @@ makeRepos artifactDirectory version repos =
     cabal ([ "install", "-j", "--only-dependencies", "--ghc-options=\"-w\"" ] ++ map fst repos)
     cabal ([ "install", "-j", "--ghc-options=\"-XFlexibleContexts\"" ] ++ filter (/= "elm-reactor") (map fst repos))
 
-    -- elm-reactor needs to be installed last because of a post-build dependency on elm-make
-    cabal ([ "install", "-j", "elm-reactor" ] ++ if version <= "0.15.1" then [ "--constraint=fsnotify<0.2" ] else [])
-
     return ()
 
 makeRepo :: FilePath -> String -> (String, String) -> IO ()
