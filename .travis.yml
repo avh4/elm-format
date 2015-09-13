@@ -19,9 +19,8 @@ before_install:
 
 install:
  - travis_retry cabal update
- - curl -O https://raw.githubusercontent.com/elm-lang/elm-platform/master/installers/BuildFromSource.hs
- - runhaskell BuildFromSource.hs 0.15.1
- - cabal sandbox init --sandbox="`pwd`"/Elm-Platform/0.15.1/.cabal-sandbox
+ - runhaskell BuildFromSource.hs build
+ - cabal sandbox init --sandbox="`pwd`"/Elm-Platform/build/.cabal-sandbox
  - cabal install --only-dependencies --enable-tests
 
 
@@ -29,4 +28,4 @@ script:
  - cabal configure
  - cabal build
  - cabal install
- - ELM_FORMAT="./Elm-Platform/0.15.1/.cabal-sandbox/bin/elm-format" ./tests/run-tests.sh
+ - ./tests/run-tests.sh

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ELM_FORMAT="${ELM_FORMAT:=../bin/elm-format}"
+ELM_FORMAT="./Elm-Platform/build/.cabal-sandbox/bin/elm-format"
 MD5="md5"
 
 function check() {

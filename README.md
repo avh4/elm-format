@@ -19,11 +19,12 @@ elm-format Main.elm
 Install the Elm platform from source using the BuildFromSource.hs script, then:
 
 ```bash
-cd Elm-Platform/master
 git clone https://github.com/avh4/elm-format.git
 cd elm-format
-cabal sandbox init --sandbox=..
+runhaskell BuildFromSource.hs build
+cabal sandbox init --sandbox=Elm-Platform/build/.cabal-sandbox
 cabal install -j
+./Elm-Platform/build/.cabal-sandbox/bin/elm-format --help
 ```
 
 ### Running tests
