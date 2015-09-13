@@ -10,5 +10,6 @@ main :: IO ()
 main =
     do  config <- Flags.parse
 
-        LazyText.readFile (Flags._file config)
-        >>= LazyText.writeFile "formatted.elm"
+        input <- LazyText.readFile (Flags._file config)
+
+        LazyText.writeFile (Flags._output config) input
