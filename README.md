@@ -14,9 +14,7 @@ elm-format Main.elm
 
 ## Development info
 
-### Building
-
-Install the Elm platform from source using the BuildFromSource.hs script, then:
+### Building from source
 
 ```bash
 git clone https://github.com/avh4/elm-format.git
