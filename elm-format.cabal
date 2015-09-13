@@ -40,6 +40,8 @@ Executable elm-format
         Main.hs
 
     Build-depends:
+        ansi-wl-pprint,
         base >=4.2 && <5,
         elm-compiler >= 0.15.1 && < 0.16,
+        optparse-applicative >=0.11 && <0.12,
         text

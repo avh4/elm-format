@@ -7,7 +7,7 @@ function check() {
 	OUTPUT="formatted.elm"
 	echo
 	echo "## $1"
-	$ELM_FORMAT "$INPUT" --output "$OUTPUT"
+	$ELM_FORMAT "$INPUT" --output "$OUTPUT" || exit 1
 	diff -u "$OUTPUT" "$INPUT" || exit 1
 }
 
@@ -16,6 +16,7 @@ echo
 echo "# elm-format test suite"
 
 check Simple.elm
+check Imports.elm
 
 echo
 echo "# GREAT SUCCESS!"
