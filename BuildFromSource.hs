@@ -47,12 +47,12 @@ import           System.Process     (rawSystem)
 
 (=:) = (,)
 
-configs :: Map.Map String [(String, String)]
+configs :: Map.Map String [(String, (String, String))]
 configs =
   Map.fromList
     [
       "build" =:
-        [ "elm-compiler" =: "300838716b4b29078fc3e3d0e6df56f7f03c0c25"
+        [ "elm-compiler" =: ("avh4", "elm-format")
         ]
     ]
 
@@ -74,7 +74,7 @@ main =
            exitFailure
 
 
-makeRepos :: FilePath -> String -> [(String, String)] -> IO ()
+makeRepos :: FilePath -> String -> [(String, (String, String))] -> IO ()
 makeRepos artifactDirectory version repos =
  do createDirectoryIfMissing True artifactDirectory
     setCurrentDirectory artifactDirectory
@@ -99,10 +99,10 @@ makeRepos artifactDirectory version repos =
 
     return ()
 
-makeRepo :: FilePath -> String -> String -> IO ()
-makeRepo root projectName version =
+makeRepo :: FilePath -> String -> (String, String) -> IO ()
+makeRepo root projectName (user,version) =
   do  -- get the right version of the repo
-    git [ "clone", "https://github.com/elm-lang/" ++ projectName ++ ".git" ]
+    git [ "clone", "https://github.com/" ++ user ++ "/" ++ projectName ++ ".git" ]
     setCurrentDirectory projectName
     git [ "checkout", version, "--quiet" ]
 
