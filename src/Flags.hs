@@ -7,7 +7,7 @@ import Data.Version (showVersion)
 import qualified Elm.Compiler as Compiler
 import qualified Elm.Package as Pkg
 import qualified Options.Applicative as Opt
-import qualified Paths_elm_make as This
+import qualified Paths_elm_format as This
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
 
 
