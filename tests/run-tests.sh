@@ -1,7 +1,11 @@
 #!/bin/bash
 
 ELM_FORMAT="./Elm-Platform/build/.cabal-sandbox/bin/elm-format"
-MD5="md5"
+if which md5 > /dev/null; then
+	MD5="md5"
+else
+	MD5="md5sum"
+fi
 
 function check() {
 	INPUT="tests/test-files/good/$1"
