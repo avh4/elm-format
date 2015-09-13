@@ -9,6 +9,10 @@ addons:
     - ghc-7.10.1
 
 
+before_install:
+ - export PATH=/opt/ghc/7.10.1/bin:/opt/cabal/1.22/bin:$PATH
+
+
 install:
  - travis_retry cabal update
  - runhaskell BuildFromSource.hs build
