@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
+![experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
 
 # elm-format
 
