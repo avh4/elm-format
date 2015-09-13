@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
+
 # elm-format
 
 `elm-format` is the official source code formatter for Elm.

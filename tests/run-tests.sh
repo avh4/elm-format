@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ELM_FORMAT="../bin/elm-format"
+ELM_FORMAT="${ELM_FORMAT:=../bin/elm-format}"
 MD5="md5"
 
 function check() {
