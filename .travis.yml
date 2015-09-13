@@ -19,7 +19,7 @@ before_install:
 
 install:
  - travis_retry cabal update
- - curl -O https://github.com/elm-lang/elm-platform/blob/master/installers/BuildFromSource.hs
+ - curl -O https://raw.githubusercontent.com/elm-lang/elm-platform/master/installers/BuildFromSource.hs
  - runhaskell BuildFromSource.hs 0.15.1
  - cabal sandbox init --sandbox="`pwd`"/Elm-Platform/master
  - cabal install --only-dependencies --enable-tests
