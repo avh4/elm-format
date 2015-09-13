@@ -1,5 +1,6 @@
 language: haskell
 sudo: false
+ghc: 7.10
 
 script:
  - cabal configure
