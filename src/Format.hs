@@ -75,20 +75,28 @@ formatDeclaration decl =
         D.Comment s -> "<comment>"
         D.Decl adecl ->
             case RA.drop adecl of
-                D.Definition def -> formatDefinition def
+                D.Definition def -> formatDefinition def (flip (++)) ""
                 D.Datatype _ _ _ -> "<datatype>"
                 D.TypeAlias _ _ _ -> "<typealias>"
                 D.Port port -> "<port>"
                 D.Fixity _ _ _ -> "<fixity>"
 
 
-formatDefinition :: E.Def -> String
-formatDefinition adef =
+formatDefinition :: E.Def -> (String -> a -> a) -> a -> a
+formatDefinition adef write =
     case RA.drop adef of
         E.Definition pattern expr ->
-            (formatPattern pattern) ++ " =\n    " ++ (formatExpression expr) ++ "\n"
+            write (formatPattern pattern)
+            >> write " =\n    "
+            >> write (formatExpression expr)
+            >> write "\n"
         E.TypeAnnotation name typ ->
-            name ++ " : " ++ (formatType typ) ++ "\n"
+            write name
+            >> write " : "
+            >> write (formatType typ)
+            >> write "\n"
+    where
+        (>>) = flip (.)
 
 
 formatPattern :: P.RawPattern -> String
