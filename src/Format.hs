@@ -17,11 +17,20 @@ import qualified Reporting.Annotation as RA
 import qualified Data.List as List
 
 
-formatModule :: M.SourceModule -> String
-formatModule mod =
-    "module " ++ (formatName $ M.name mod) ++ " where\n\n"
-    ++ imports
-    ++ foldl (flip $ formatDeclaration $ flip (++)) "" (M.body mod)
+(>-) = flip (.)
+
+
+foldw tx write list =
+    flip (foldl $ flip $ tx write) list
+
+
+formatModule :: (String -> a -> a) -> M.SourceModule -> a -> a
+formatModule write mod =
+    write "module "
+    >- write (formatName $ M.name mod)
+    >- write " where\n\n"
+    >- write imports
+    >- foldw formatDeclaration write (M.body mod)
     where
         imports =
             case M.imports mod of
@@ -87,16 +96,14 @@ formatDefinition write adef =
     case RA.drop adef of
         E.Definition pattern expr ->
             write (formatPattern pattern)
-            >> write " =\n    "
-            >> write (formatExpression expr)
-            >> write "\n"
+            >- write " =\n    "
+            >- write (formatExpression expr)
+            >- write "\n"
         E.TypeAnnotation name typ ->
             write name
-            >> write " : "
-            >> write (formatType typ)
-            >> write "\n"
-    where
-        (>>) = flip (.)
+            >- write " : "
+            >- write (formatType typ)
+            >- write "\n"
 
 
 formatPattern :: P.RawPattern -> String
