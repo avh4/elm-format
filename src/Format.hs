@@ -21,7 +21,7 @@ formatModule :: M.SourceModule -> String
 formatModule mod =
     "module " ++ (formatName $ M.name mod) ++ " where\n\n"
     ++ imports
-    ++ (M.body mod |> map formatDeclaration |> List.intercalate "")
+    ++ foldl (flip $ formatDeclaration $ flip (++)) "" (M.body mod)
     where
         imports =
             case M.imports mod of
@@ -69,21 +69,21 @@ formatVarValue aval =
         V.Union _ _ -> "<union>"
 
 
-formatDeclaration :: D.SourceDecl -> String
-formatDeclaration decl =
+formatDeclaration :: (String -> a -> a) -> D.SourceDecl -> a -> a
+formatDeclaration write decl =
     case decl of
-        D.Comment s -> "<comment>"
+        D.Comment s -> write "<comment>"
         D.Decl adecl ->
             case RA.drop adecl of
-                D.Definition def -> formatDefinition def (flip (++)) ""
-                D.Datatype _ _ _ -> "<datatype>"
-                D.TypeAlias _ _ _ -> "<typealias>"
-                D.Port port -> "<port>"
-                D.Fixity _ _ _ -> "<fixity>"
+                D.Definition def -> formatDefinition write def
+                D.Datatype _ _ _ -> write "<datatype>"
+                D.TypeAlias _ _ _ -> write "<typealias>"
+                D.Port port -> write "<port>"
+                D.Fixity _ _ _ -> write "<fixity>"
 
 
-formatDefinition :: E.Def -> (String -> a -> a) -> a -> a
-formatDefinition adef write =
+formatDefinition :: (String -> a -> a) -> E.Def -> a -> a
+formatDefinition write adef =
     case RA.drop adef of
         E.Definition pattern expr ->
             write (formatPattern pattern)
