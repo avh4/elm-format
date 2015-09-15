@@ -28,7 +28,7 @@ formatResult config result =
     case result of
         Result.Result _ (Result.Ok mod) ->
             LazyText.writeFile (Flags._output config)
-                $ LazyText.pack $ Format.formatModule (flip (++)) mod ""
+                $ LazyText.pack $ Format.formatModule mod
         Result.Result _ (Result.Err errs) ->
             do
                 LazyText.writeFile (Flags._output config)

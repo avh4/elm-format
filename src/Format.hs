@@ -17,20 +17,11 @@ import qualified Reporting.Annotation as RA
 import qualified Data.List as List
 
 
-(>-) = flip (.)
-
-
-foldw tx write list =
-    flip (foldl $ flip $ tx write) list
-
-
-formatModule :: (String -> a -> a) -> M.SourceModule -> a -> a
-formatModule write mod =
-    write "module "
-    >- write (formatName $ M.name mod)
-    >- write " where\n\n"
-    >- write imports
-    >- foldw formatDeclaration write (M.body mod)
+formatModule :: M.SourceModule -> String
+formatModule mod =
+    "module " ++ (formatName $ M.name mod) ++ " where\n\n"
+    ++ imports
+    ++ (M.body mod |> map formatDeclaration |> List.intercalate "")
     where
         imports =
             case M.imports mod of
@@ -78,86 +69,80 @@ formatVarValue aval =
         V.Union _ _ -> "<union>"
 
 
-formatDeclaration :: (String -> a -> a) -> D.SourceDecl -> a -> a
-formatDeclaration write decl =
+formatDeclaration :: D.SourceDecl -> String
+formatDeclaration decl =
     case decl of
-        D.Comment s -> write "<comment>"
+        D.Comment s -> "<comment>"
         D.Decl adecl ->
             case RA.drop adecl of
-                D.Definition def -> formatDefinition write def
-                D.Datatype _ _ _ -> write "<datatype>"
-                D.TypeAlias _ _ _ -> write "<typealias>"
-                D.Port port -> write "<port>"
-                D.Fixity _ _ _ -> write "<fixity>"
+                D.Definition def -> formatDefinition def
+                D.Datatype _ _ _ -> "<datatype>"
+                D.TypeAlias _ _ _ -> "<typealias>"
+                D.Port port -> "<port>"
+                D.Fixity _ _ _ -> "<fixity>"
 
 
-formatDefinition :: (String -> a -> a) -> E.Def -> a -> a
-formatDefinition write adef =
+formatDefinition :: E.Def -> String
+formatDefinition adef =
     case RA.drop adef of
         E.Definition pattern expr ->
-            formatPattern write pattern
-            >- write " =\n    "
-            >- formatExpression write expr
-            >- write "\n"
+            (formatPattern pattern) ++ " =\n    " ++ (formatExpression expr) ++ "\n"
         E.TypeAnnotation name typ ->
-            write name
-            >- write " : "
-            >- formatType write typ
-            >- write "\n"
+            name ++ " : " ++ (formatType typ) ++ "\n"
 
 
-formatPattern :: (String -> a -> a) -> P.RawPattern -> a -> a
-formatPattern write apattern =
+formatPattern :: P.RawPattern -> String
+formatPattern apattern =
     case RA.drop apattern of
-        P.Data _ _ -> write "<data>"
-        P.Record _ -> write "<record>"
-        P.Alias _ _ -> write "<alias>"
-        P.Var var -> write var
-        P.Anything -> write "<anything>"
-        P.Literal _ -> write "<literal>"
+        P.Data _ _ -> "<data>"
+        P.Record _ -> "<record>"
+        P.Alias _ _ -> "<alias>"
+        P.Var var -> var
+        P.Anything -> "<anything>"
+        P.Literal _ -> "<literal>"
 
 
-formatExpression :: (String -> a -> a) -> E.Expr -> a -> a
-formatExpression write aexpr =
+formatExpression :: E.Expr -> String
+formatExpression aexpr =
     case RA.drop aexpr of
-        EG.Literal lit -> formatLiteral write lit
-        EG.Var _ -> write "<var>"
-        EG.Range _ _ -> write "<range>"
-        EG.ExplicitList _ -> write "<list>"
-        EG.Binop _ _ _ -> write "<binop>"
-        EG.Lambda _ _ -> write "<lambda>"
-        EG.App _ _ -> write "<app>"
-        EG.If _ _ -> write "<if>"
-        EG.Let _ _ -> write "<let>"
-        EG.Case _ _ -> write "<case>"
-        EG.Data _ _ -> write "<data>"
-        EG.Access _ _ -> write "<access>"
-        EG.Update _ _ -> write "<update>"
-        EG.Record _ -> write "<record>"
-        EG.Port _ -> write "<port>"
-        EG.GLShader _ _ _ -> write "<glshader>"
+        EG.Literal lit -> formatLiteral lit
+        EG.Var _ -> "<var>"
+        EG.Range _ _ -> "<range>"
+        EG.ExplicitList _ -> "<list>"
+        EG.Binop _ _ _ -> "<binop>"
+        EG.Lambda _ _ -> "<lambda>"
+        EG.App _ _ -> "<app>"
+        EG.If _ _ -> "<if>"
+        EG.Let _ _ -> "<let>"
+        EG.Case _ _ -> "<case>"
+        EG.Data _ _ -> "<data>"
+        EG.Access _ _ -> "<access>"
+        EG.Update _ _ -> "<update>"
+        EG.Record _ -> "<record>"
+        EG.Port _ -> "<port>"
+        EG.GLShader _ _ _ -> "<glshader>"
 
 
-formatLiteral :: (String -> a -> a) -> L.Literal -> a -> a
-formatLiteral write lit =
+formatLiteral :: L.Literal -> String
+formatLiteral lit =
     case lit of
-        L.IntNum _ -> write "<int>"
-        L.FloatNum _ -> write "<float>"
-        L.Chr _ -> write "<char>"
-        L.Str s -> write $ "\"" ++ s ++ "\"" -- TODO: quoting
-        L.Boolean _ -> write "<boolean>"
+        L.IntNum _ -> "<int>"
+        L.FloatNum _ -> "<float>"
+        L.Chr _ -> "<char>"
+        L.Str s -> "\"" ++ s ++ "\"" -- TODO: quoting
+        L.Boolean _ -> "<boolean>"
 
 
-formatType :: (String -> a -> a) -> T.Raw -> a -> a
-formatType write atype =
+formatType :: T.Raw -> String
+formatType atype =
     case RA.drop atype of
-        T.RLambda _ _ -> write "<lambda>"
-        T.RVar var -> write var -- TODO: not tested
-        T.RType var -> formatVar write var
-        T.RApp _ _ -> write "<app>"
-        T.RRecord _ _ -> write "<record>"
+        T.RLambda _ _ -> "<lambda>"
+        T.RVar var -> var -- TODO: not tested
+        T.RType var -> formatVar var
+        T.RApp _ _ -> "<app>"
+        T.RRecord _ _ -> "<record>"
 
 
-formatVar :: (String -> a -> a) -> V.Raw -> a -> a
-formatVar write (V.Raw var) =
-    write var
+formatVar :: V.Raw -> String
+formatVar (V.Raw var) =
+    var
