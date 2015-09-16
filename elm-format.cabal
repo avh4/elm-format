@@ -41,7 +41,8 @@ Executable elm-format
 
     Build-depends:
         ansi-wl-pprint,
-        base >=4.2 && <5,
+        base >= 4.2 && < 5,
+        boxes >= 0.1.4 && < 0.2,
         containers >= 0.3 && < 0.6,
         elm-compiler >= 0.15.1 && < 0.16,
         optparse-applicative >=0.11 && <0.12,

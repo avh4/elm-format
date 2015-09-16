@@ -12,12 +12,13 @@ import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Data.Text.Lazy as LazyText
 import qualified Data.Text.Lazy.IO as LazyText
+import qualified Parse.Parse as Parse
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Error as Error
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Report as Report
 import qualified Reporting.Result as Result
-import qualified Parse.Parse as Parse
+import qualified Text.PrettyPrint.Boxes as Box
 
 
 formatResult
@@ -27,8 +28,11 @@ formatResult
 formatResult config result =
     case result of
         Result.Result _ (Result.Ok mod) ->
-            LazyText.writeFile (Flags._output config)
-                $ LazyText.pack $ Format.formatModule mod
+            Format.formatModule mod
+                |> Box.render
+                |> LazyText.pack
+                |> trimSpaces
+                |> LazyText.writeFile (Flags._output config)
         Result.Result _ (Result.Err errs) ->
             do
                 LazyText.writeFile (Flags._output config)
@@ -37,6 +41,8 @@ formatResult config result =
                 putStrLn "ERRORS"
                 sequence $ map printError errs
                 exitFailure
+    where
+        trimSpaces = LazyText.unlines . (map LazyText.stripEnd) . LazyText.lines
 
 
 printError :: RA.Located Syntax.Error -> IO ()
