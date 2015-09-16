@@ -57,6 +57,7 @@ hjoin :: Box -> [Box] -> Box
 hjoin sep list =
     hbox (List.intersperse sep list)
 
+
 indent :: Box -> Box
 indent box =
     hbox2 (hspace 4) box
