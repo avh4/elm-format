@@ -23,7 +23,7 @@ echo
 echo "# elm-format test suite"
 
 check Simple.elm
-check Imports.elm
+check AllSyntax.elm
 
 echo
 echo "# GREAT SUCCESS!"

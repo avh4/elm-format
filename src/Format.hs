@@ -2,7 +2,7 @@
 module Format where
 
 import Elm.Utils ((|>))
-import Text.PrettyPrint.Boxes (Box, (<>), (//))
+import Box
 
 import qualified AST.Declaration as D
 import qualified AST.Expression.General as EG
@@ -14,32 +14,25 @@ import qualified AST.Pattern as P
 import qualified AST.Type as T
 import qualified AST.Variable as V
 import qualified Data.List as List
-import qualified Data.Map as Map
 import qualified Reporting.Annotation as RA
-import qualified Text.PrettyPrint.Boxes as Box
-
-
-indent :: Box -> Box
-indent box =
-    Box.text "    " <> box
 
 
 formatModule :: M.SourceModule -> Box
 formatModule mod =
-    Box.vcat Box.top
-        [ Box.hcat Box.left
-            [ Box.text "module "
+    vbox
+        [ hbox
+            [ text "module "
             , formatName $ M.name mod
-            , Box.text " where"
+            , text " where"
             ]
-        , Box.emptyBox 1 0
+            |> margin 1
         , case M.imports mod of
             [] ->
-                Box.nullBox
+                empty
             imports ->
-                Box.vcat Box.top (map formatImport imports)
-                // Box.emptyBox 1 0
-        , Box.vcat Box.top (map formatDeclaration $ M.body mod)
+                vbox (map formatImport imports)
+                |> margin 2
+        , vbox (map formatDeclaration $ M.body mod)
         ]
 
 
@@ -49,15 +42,15 @@ formatName name = formatRawName $ MN._module name
 
 formatRawName :: MN.Raw -> Box
 formatRawName name =
-    Box.punctuateH Box.left (Box.char '.') (map Box.text name)
+    text (List.intercalate "." name)
 
 
 formatImport :: M.UserImport -> Box
 formatImport aimport =
     case RA.drop aimport of
         (name,method) ->
-            Box.hcat Box.left
-                [ Box.text "import "
+            hbox
+                [ text "import "
                 , formatRawName name
                 , as
                 , exposing
@@ -65,60 +58,62 @@ formatImport aimport =
             where
                 as =
                     if (M.alias method) == (Just $ List.intercalate "." name)
-                        then Box.nullBox
+                        then empty
                     else
                         case M.alias method of
-                            Nothing -> Box.text "<nothing>"
-                            Just name -> Box.text $ " as " ++ name
+                            Nothing -> text "<nothing>"
+                            Just name -> text $ " as " ++ name
                 exposing =
                     case M.exposedVars method of
-                        V.Listing [] False -> Box.nullBox
-                        V.Listing [] True -> Box.text " exposing (..)"
+                        V.Listing [] False -> empty
+                        V.Listing [] True -> text " exposing (..)"
                         V.Listing vars False ->
-                            Box.hcat Box.left
-                                [ Box.text " exposing ("
-                                , Box.punctuateH Box.left (Box.text ", ") (map formatVarValue vars)
-                                , Box.text ")"
+                            hbox
+                                [ text " exposing ("
+                                , hjoin (text ", ") (map formatVarValue vars)
+                                , text ")"
                                 ]
-                        V.Listing _ True -> Box.text "<NOT POSSIBLE?>"
+                        V.Listing _ True -> text "<NOT POSSIBLE?>"
 
 
 formatVarValue :: V.Value -> Box
 formatVarValue aval =
     case aval of
-        V.Value val -> Box.text val
-        V.Alias _ -> Box.text "<alias>"
-        V.Union _ _ -> Box.text "<union>"
+        V.Value val -> text val
+        V.Alias _ -> text "<alias>"
+        V.Union _ _ -> text "<union>"
 
 
 formatDeclaration :: D.SourceDecl -> Box
 formatDeclaration decl =
     case decl of
-        D.Comment s -> Box.text "<comment>"
+        D.Comment s -> text "<comment>"
         D.Decl adecl ->
             case RA.drop adecl of
                 D.Definition def -> formatDefinition def
-                D.Datatype _ _ _ -> Box.text "<datatype>"
-                D.TypeAlias _ _ _ -> Box.text "<typealias>"
-                D.Port port -> Box.text "<port>"
-                D.Fixity _ _ _ -> Box.text "<fixity>"
+                D.Datatype _ _ _ -> text "<datatype>"
+                D.TypeAlias _ _ _ -> text "<typealias>"
+                D.Port port -> text "<port>"
+                D.Fixity _ _ _ -> text "<fixity>"
 
 
 formatDefinition :: E.Def -> Box
 formatDefinition adef =
     case RA.drop adef of
         E.Definition pattern expr ->
-            Box.vcat Box.top
-                [ Box.hcat Box.left
+            vbox
+                [ hbox
                     [ formatPattern pattern
-                    , Box.text " ="
+                    , text " ="
                     ]
-                , indent $ formatExpression expr
+                , formatExpression expr
+                    |> indent
+                    |> margin 2
                 ]
         E.TypeAnnotation name typ ->
-            Box.hcat Box.left
-                [ Box.text name
-                , Box.text " : "
+            hbox
+                [ text name
+                , text " : "
                 , formatType typ
                 ]
 
@@ -126,55 +121,55 @@ formatDefinition adef =
 formatPattern :: P.RawPattern -> Box
 formatPattern apattern =
     case RA.drop apattern of
-        P.Data _ _ -> Box.text "<data>"
-        P.Record _ -> Box.text "<record>"
-        P.Alias _ _ -> Box.text "<alias>"
-        P.Var var -> Box.text var
-        P.Anything -> Box.text "<anything>"
-        P.Literal _ -> Box.text "<literal>"
+        P.Data _ _ -> text "<data>"
+        P.Record _ -> text "<record>"
+        P.Alias _ _ -> text "<alias>"
+        P.Var var -> text var
+        P.Anything -> text "<anything>"
+        P.Literal _ -> text "<literal>"
 
 
 formatExpression :: E.Expr -> Box
 formatExpression aexpr =
     case RA.drop aexpr of
         EG.Literal lit -> formatLiteral lit
-        EG.Var _ -> Box.text "<var>"
-        EG.Range _ _ -> Box.text "<range>"
-        EG.ExplicitList _ -> Box.text "<list>"
-        EG.Binop _ _ _ -> Box.text "<binop>"
-        EG.Lambda _ _ -> Box.text "<lambda>"
-        EG.App _ _ -> Box.text "<app>"
-        EG.If _ _ -> Box.text "<if>"
-        EG.Let _ _ -> Box.text "<let>"
-        EG.Case _ _ -> Box.text "<case>"
-        EG.Data _ _ -> Box.text "<data>"
-        EG.Access _ _ -> Box.text "<access>"
-        EG.Update _ _ -> Box.text "<update>"
-        EG.Record _ -> Box.text "<record>"
-        EG.Port _ -> Box.text "<port>"
-        EG.GLShader _ _ _ -> Box.text "<glshader>"
+        EG.Var _ -> text "<var>"
+        EG.Range _ _ -> text "<range>"
+        EG.ExplicitList _ -> text "<list>"
+        EG.Binop _ _ _ -> text "<binop>"
+        EG.Lambda _ _ -> text "<lambda>"
+        EG.App _ _ -> text "<app>"
+        EG.If _ _ -> text "<if>"
+        EG.Let _ _ -> text "<let>"
+        EG.Case _ _ -> text "<case>"
+        EG.Data _ _ -> text "<data>"
+        EG.Access _ _ -> text "<access>"
+        EG.Update _ _ -> text "<update>"
+        EG.Record _ -> text "<record>"
+        EG.Port _ -> text "<port>"
+        EG.GLShader _ _ _ -> text "<glshader>"
 
 
 formatLiteral :: L.Literal -> Box
 formatLiteral lit =
     case lit of
-        L.IntNum _ -> Box.text "<int>"
-        L.FloatNum _ -> Box.text "<float>"
-        L.Chr _ -> Box.text "<char>"
-        L.Str s -> Box.text $ "\"" ++ s ++ "\"" -- TODO: quoting
-        L.Boolean _ -> Box.text "<boolean>"
+        L.IntNum _ -> text "<int>"
+        L.FloatNum _ -> text "<float>"
+        L.Chr _ -> text "<char>"
+        L.Str s -> text $ "\"" ++ s ++ "\"" -- TODO: quoting
+        L.Boolean _ -> text "<boolean>"
 
 
 formatType :: T.Raw -> Box
 formatType atype =
     case RA.drop atype of
-        T.RLambda _ _ -> Box.text "<lambda>"
-        T.RVar var -> Box.text var -- TODO: not tested
+        T.RLambda _ _ -> text "<lambda>"
+        T.RVar var -> text var -- TODO: not tested
         T.RType var -> formatVar var
-        T.RApp _ _ -> Box.text "<app>"
-        T.RRecord _ _ -> Box.text "<record>"
+        T.RApp _ _ -> text "<app>"
+        T.RRecord _ _ -> text "<record>"
 
 
 formatVar :: V.Raw -> Box
 formatVar (V.Raw var) =
-    Box.text var
+    text var

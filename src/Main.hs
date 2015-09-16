@@ -5,6 +5,7 @@ import Elm.Utils ((|>))
 import System.Exit (exitFailure)
 
 import qualified AST.Module as M
+import qualified Box
 import qualified Elm.Package
 import qualified Flags
 import qualified Format
@@ -18,7 +19,6 @@ import qualified Reporting.Error as Error
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Report as Report
 import qualified Reporting.Result as Result
-import qualified Text.PrettyPrint.Boxes as Box
 
 
 formatResult

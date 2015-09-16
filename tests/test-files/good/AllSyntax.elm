@@ -1,9 +1,15 @@
-module Imports where
+module AllSyntax where
 
 import String
 import Signal exposing (foldp, map)
 import Json.Decode as Json
 import List exposing (..)
 
-token =
+
+fn =
+    "XYZZY"
+
+
+annotatedFn : String
+annotatedFn =
     "XYZZY"
