@@ -137,7 +137,7 @@ formatExpression aexpr =
         EG.Range _ _ -> text "<range>"
         EG.ExplicitList _ -> text "<list>"
         EG.Binop _ _ _ -> text "<binop>"
-        EG.Lambda _ _ -> text "<lambda>"
+        EG.Lambda _ _ -> text "<lambda expression>"
         EG.App _ _ -> text "<app>"
         EG.If _ _ -> text "<if>"
         EG.Let _ _ -> text "<let>"
@@ -156,14 +156,15 @@ formatLiteral lit =
         L.IntNum _ -> text "<int>"
         L.FloatNum _ -> text "<float>"
         L.Chr _ -> text "<char>"
-        L.Str s -> text $ "\"" ++ s ++ "\"" -- TODO: quoting
+        L.Str s ->
+            text $ "\"" ++ s ++ "\"" -- TODO: quoting
         L.Boolean _ -> text "<boolean>"
 
 
 formatType :: T.Raw -> Box
 formatType atype =
     case RA.drop atype of
-        T.RLambda _ _ -> text "<lambda>"
+        T.RLambda _ _ -> text "<lambda type>"
         T.RVar var -> text var -- TODO: not tested
         T.RType var -> formatVar var
         T.RApp _ _ -> text "<app>"
