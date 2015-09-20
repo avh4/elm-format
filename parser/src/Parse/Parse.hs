@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wall #-}
-module Parse.Parse (program, parse) where
+module Parse.Parse (program, parse, parseSource) where
 
 import Control.Applicative ((<$>), (<*>))
 import qualified Data.Map as Map
@@ -20,6 +20,11 @@ import qualified Reporting.Error.Syntax as Error
 import qualified Reporting.Result as Result
 import qualified Validate
 
+
+parseSource :: String -> Result.Result () Error.Error M.SourceModule
+parseSource src =
+  parseWithTable Map.empty src
+      $ programParser $ Package.Name "example" "example"
 
 program
     :: Package.Name
