@@ -17,16 +17,6 @@ newtype Var = Var String
     deriving (Eq, Ord, Show)
 
 
--- TOP LEVEL NAMES
-
-data TopLevel = TopLevelVar
-    { topHome :: ModuleName.Canonical
-    , topName :: String
-    }
-    deriving (Eq, Ord, Show)
-
-
-
 -- VARIABLE TO STRING
 
 class ToString a where
