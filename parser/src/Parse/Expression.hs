@@ -104,10 +104,8 @@ parensTerm =
     opFn =
       do  (start, op, end) <- located anyOp
           return $
-            lambda start end "x" $
-              lambda start end "y" $
-                A.at start end $
-                  E.Binop (Var.Var op) (var start end "x") (var start end "y")
+            A.at start end $
+              E.Var (Var.OpRef op)
 
     tupleFn =
       do  (start, commas, end) <-

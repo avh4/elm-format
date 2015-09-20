@@ -13,3 +13,7 @@ fn =
 annotatedFn : String
 annotatedFn =
     "XYZZY"
+
+
+pipeline =
+    1 |> (+) 2

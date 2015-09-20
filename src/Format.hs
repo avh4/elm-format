@@ -11,7 +11,7 @@ import qualified AST.Module
 import qualified AST.Module.Name as MN
 import qualified AST.Pattern
 import qualified AST.Type
-import qualified AST.Variable as V
+import qualified AST.Variable
 import qualified Data.List as List
 import qualified Reporting.Annotation as RA
 
@@ -64,23 +64,23 @@ formatImport aimport =
                             Just name -> text $ " as " ++ name
                 exposing =
                     case AST.Module.exposedVars method of
-                        V.Listing [] False -> empty
-                        V.Listing [] True -> text " exposing (..)"
-                        V.Listing vars False ->
+                        AST.Variable.Listing [] False -> empty
+                        AST.Variable.Listing [] True -> text " exposing (..)"
+                        AST.Variable.Listing vars False ->
                             hbox
                                 [ text " exposing ("
                                 , hjoin (text ", ") (map formatVarValue vars)
                                 , text ")"
                                 ]
-                        V.Listing _ True -> text "<NOT POSSIBLE?>"
+                        AST.Variable.Listing _ True -> text "<NOT POSSIBLE?>"
 
 
-formatVarValue :: V.Value -> Box
+formatVarValue :: AST.Variable.Value -> Box
 formatVarValue aval =
     case aval of
-        V.Value val -> text val
-        V.Alias _ -> text "<alias>"
-        V.Union _ _ -> text "<union>"
+        AST.Variable.Value val -> text val
+        AST.Variable.Alias _ -> text "<alias>"
+        AST.Variable.Union _ _ -> text "<union>"
 
 
 formatDeclaration :: AST.Declaration.Decl -> Box
@@ -133,12 +133,32 @@ formatExpression :: AST.Expression.Expr -> Box
 formatExpression aexpr =
     case RA.drop aexpr of
         AST.Expression.Literal lit -> formatLiteral lit
-        AST.Expression.Var _ -> text "<var>"
+        AST.Expression.Var v ->
+            formatVar v
         AST.Expression.Range _ _ -> text "<range>"
         AST.Expression.ExplicitList _ -> text "<list>"
-        AST.Expression.Binop _ _ _ -> text "<binop>"
-        AST.Expression.Lambda _ _ -> text "<lambda expression>"
-        AST.Expression.App _ _ -> text "<app>"
+        AST.Expression.Binop op l r ->
+            hbox
+                [ formatExpression l
+                , hspace 1
+                , formatVar op
+                , hspace 1
+                , formatExpression r
+                ]
+        AST.Expression.Lambda pat exp ->
+            hbox
+                [ text "(\\"
+                , formatPattern pat
+                , text " -> "
+                , formatExpression exp
+                , text ")"
+                ]
+        AST.Expression.App l r ->
+            hbox
+                [ formatExpression l
+                , hspace 1
+                , formatExpression r
+                ]
         AST.Expression.If _ _ -> text "<if>"
         AST.Expression.Let _ _ -> text "<let>"
         AST.Expression.Case _ _ -> text "<case>"
@@ -153,7 +173,8 @@ formatExpression aexpr =
 formatLiteral :: L.Literal -> Box
 formatLiteral lit =
     case lit of
-        L.IntNum _ -> text "<int>"
+        L.IntNum i ->
+            text $ show i
         L.FloatNum _ -> text "<float>"
         L.Chr _ -> text "<char>"
         L.Str s ->
@@ -171,6 +192,10 @@ formatType atype =
         AST.Type.RRecord _ _ -> text "<record>"
 
 
-formatVar :: V.Var -> Box
-formatVar (V.Var var) =
-    text var
+formatVar :: AST.Variable.Var -> Box
+formatVar var =
+    case var of
+        AST.Variable.Var name ->
+            text name
+        AST.Variable.OpRef name ->
+            text $ "(" ++ name ++ ")"

@@ -13,7 +13,9 @@ import qualified Reporting.PrettyPrint as P
 
 -- RAW NAMES
 
-newtype Var = Var String
+data Var
+    = Var String
+    | OpRef String
     deriving (Eq, Ord, Show)
 
 
