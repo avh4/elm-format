@@ -27,128 +27,6 @@ data TopLevel = TopLevelVar
 
 
 
--- CANONICAL NAMES
-
-data Home
-    = BuiltIn
-    | Module ModuleName.Canonical
-    | TopLevel ModuleName.Canonical
-    | Local
-    deriving (Eq, Ord, Show)
-
-
-data Canonical = Canonical
-    { home :: !Home
-    , name :: !String
-    }
-    deriving (Eq, Ord, Show)
-
-
-local :: String -> Canonical
-local x =
-    Canonical Local x
-
-
-topLevel :: ModuleName.Canonical -> String -> Canonical
-topLevel home x =
-    Canonical (TopLevel home) x
-
-
-builtin :: String -> Canonical
-builtin x =
-    Canonical BuiltIn x
-
-
-fromModule :: ModuleName.Canonical -> String -> Canonical
-fromModule home name =
-    Canonical (Module home) name
-
-
-inCore :: ModuleName.Raw -> String -> Canonical
-inCore home name =
-    Canonical (Module (ModuleName.inCore home)) name
-
-
--- VARIABLE RECOGNIZERS
-
-isLocalHome :: Home -> Bool
-isLocalHome home =
-  case home of
-    BuiltIn ->
-        False
-
-    Module _ ->
-        False
-
-    TopLevel _ ->
-        True
-
-    Local ->
-        True
-
-
-is :: ModuleName.Raw -> String -> Canonical -> Bool
-is home name var =
-    var == inCore home name
-
-
-isJson :: Canonical -> Bool
-isJson =
-    is ["Json", "Encode"] "Value"
-
-
-isMaybe :: Canonical -> Bool
-isMaybe =
-    is ["Maybe"] "Maybe"
-
-isArray :: Canonical -> Bool
-isArray =
-    is ["Array"] "Array"
-
-
-isTask :: Canonical -> Bool
-isTask =
-    is ["Task"] "Task"
-
-
-isSignal :: Canonical -> Bool
-isSignal =
-    is ["Signal"] "Signal"
-
-
-isList :: Canonical -> Bool
-isList v =
-    v == Canonical BuiltIn "List"
-
-
-isTuple :: Canonical -> Bool
-isTuple v =
-    case v of
-      Canonical BuiltIn name -> Help.isTuple name
-      _ -> False
-
-
-isPrimitive :: Canonical -> Bool
-isPrimitive v =
-    case v of
-      Canonical BuiltIn name ->
-          name `elem` ["Int","Float","String","Bool"]
-      _ ->
-          False
-
-
-isPrim :: String -> Canonical -> Bool
-isPrim prim v =
-    case v of
-      Canonical BuiltIn name -> name == prim
-      _ -> False
-
-
-isText :: Canonical -> Bool
-isText =
-    is ["Text"] "Text"
-
-
 -- VARIABLE TO STRING
 
 class ToString a where
@@ -158,22 +36,6 @@ class ToString a where
 instance ToString Raw where
   toString (Raw name) =
       name
-
-
-instance ToString Canonical where
-  toString (Canonical home name) =
-      case home of
-        BuiltIn ->
-            name
-
-        Module moduleName ->
-            ModuleName.canonicalToString moduleName ++ "." ++ name
-
-        TopLevel _ ->
-            name
-
-        Local ->
-            name
 
 
 -- LISTINGS
@@ -259,14 +121,6 @@ instance P.Pretty Raw where
         else P.text name
 
 
-instance P.Pretty Canonical where
-  pretty dealiaser _ var =
-      let
-        name = toString var
-      in
-        P.text (maybe name id (Map.lookup name dealiaser))
-
-
 instance P.Pretty a => P.Pretty (Listing a) where
   pretty dealiaser _ (Listing explicits open) =
       let dots = [if open then P.text ".." else P.empty]
@@ -285,58 +139,3 @@ instance P.Pretty Value where
 
       Union name ctors ->
           P.text name <> P.pretty dealiaser False ctors
-
-
--- BINARY SERIALIZATION
-
-instance Binary Canonical where
-    put (Canonical home name) =
-        case home of
-          BuiltIn ->
-              putWord8 0 >> put name
-
-          Module path ->
-              putWord8 1 >> put path >> put name
-
-          TopLevel path ->
-              putWord8 2 >> put path >> put name
-
-          Local ->
-              putWord8 3 >> put name
-
-    get =
-      do  tag <- getWord8
-          case tag of
-            0 -> Canonical BuiltIn <$> get
-            1 -> Canonical . Module <$> get <*> get
-            2 -> Canonical . TopLevel <$> get <*> get
-            3 -> Canonical Local <$> get
-            _ -> error "Unexpected tag when deserializing canonical variable"
-
-
-instance Binary Value where
-    put portable =
-        case portable of
-          Value name ->
-              putWord8 0 >> put name
-
-          Alias name ->
-              putWord8 1 >> put name
-
-          Union name ctors ->
-              putWord8 2 >> put name >> put ctors
-
-    get =
-      do  tag <- getWord8
-          case tag of
-            0 -> Value <$> get
-            1 -> Alias <$> get
-            2 -> Union <$> get <*> get
-            _ -> error "Error reading valid import/export information from serialized string"
-
-
-instance (Binary a) => Binary (Listing a) where
-    put (Listing explicits open) =
-        put explicits >> put open
-
-    get = Listing <$> get <*> get
