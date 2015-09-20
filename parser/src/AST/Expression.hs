@@ -33,11 +33,11 @@ data Expr'
     | Range Expr Expr
     | ExplicitList [Expr]
     | Binop Var.Raw Expr Expr
-    | Lambda (Pattern.Pattern R.Region Var.Raw) Expr
+    | Lambda (Pattern.Pattern Var.Raw) Expr
     | App Expr Expr
     | If [(Expr, Expr)] Expr
     | Let [Def] Expr
-    | Case Expr [(Pattern.Pattern R.Region Var.Raw, Expr)]
+    | Case Expr [(Pattern.Pattern Var.Raw, Expr)]
     | Data String [Expr]
     | Access Expr String
     | Update Expr [(String, Expr)]
