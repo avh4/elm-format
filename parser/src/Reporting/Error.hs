@@ -8,7 +8,6 @@ import Prelude hiding (print)
 
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Docs as Docs
-import qualified Reporting.Error.Pattern as Pattern
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.PrettyPrint as P
 import qualified Reporting.Report as Report
@@ -18,7 +17,6 @@ import qualified Reporting.Report as Report
 
 data Error
     = Syntax Syntax.Error
-    | Pattern Pattern.Error
     | Docs Docs.Error
 
 
@@ -29,9 +27,6 @@ toReport dealiaser err =
   case err of
     Syntax syntaxError ->
         Syntax.toReport dealiaser syntaxError
-
-    Pattern patternError ->
-        Pattern.toReport dealiaser patternError
 
     Docs docsError ->
         Docs.toReport docsError
@@ -58,9 +53,6 @@ toJson dealiaser filePath (A.A region err) =
         case err of
           Syntax syntaxError ->
               Report.toJson [] (Syntax.toReport dealiaser syntaxError)
-
-          Pattern patternError ->
-              Report.toJson [] (Pattern.toReport dealiaser patternError)
 
           Docs docsError ->
               Report.toJson [] (Docs.toReport docsError)

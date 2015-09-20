@@ -34,10 +34,6 @@ type RawPattern' =
     Pattern' R.Region Var.Raw
 
 
-type CanonicalPattern =
-    Pattern R.Region Var.Canonical
-
-
 list :: R.Position -> [RawPattern] -> RawPattern
 list end patterns =
   case patterns of
