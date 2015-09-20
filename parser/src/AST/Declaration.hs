@@ -3,19 +3,18 @@ module AST.Declaration where
 
 import Data.Binary
 
-import qualified AST.Expression.General as General
-import qualified AST.Expression.Source as Source
+import qualified AST.Expression.Source as Expression
 import qualified AST.Type as Type
 import qualified Reporting.Annotation as A
 
 
 -- DECLARATIONS
 
-data Declaration' port def tipe expr
-    = Definition def
-    | Datatype String [String] [(String, [tipe])]
-    | TypeAlias String [String] tipe
-    | Port port
+data Declaration
+    = Definition Expression.Def
+    | Datatype String [String] [(String, [Type.Raw])]
+    | TypeAlias String [String] Type.Raw
+    | Port SourcePort
     | Fixity Assoc Int String
 
 
@@ -35,17 +34,14 @@ assocToString assoc =
 
 -- DECLARATION PHASES
 
-type SourceDecl' =
-  Declaration' SourcePort Source.Def Type.Raw Source.Expr
-
 
 data SourceDecl
     = Comment String
-    | Decl (A.Located SourceDecl')
+    | Decl (A.Located Declaration)
 
 
 -- PORTS
 
 data SourcePort
     = PortAnnotation String Type.Raw
-    | PortDefinition String Source.Expr
+    | PortDefinition String Expression.Expr
