@@ -12,13 +12,13 @@ import qualified Reporting.Annotation as A
 import qualified Reporting.Region as R
 
 
-tvar :: IParser Type.Raw
+tvar :: IParser Type.Type
 tvar =
   addLocation
     (Type.RVar <$> lowVar <?> "a type variable")
 
 
-tuple :: IParser Type.Raw
+tuple :: IParser Type.Type
 tuple =
   do  (start, types, end) <- located (parens (commaSep expr))
       case types of
@@ -26,7 +26,7 @@ tuple =
         _   -> return (Type.tuple (R.Region start end) types)
 
 
-record :: IParser Type.Raw
+record :: IParser Type.Type
 record =
   addLocation $
   do  char '{'
@@ -56,19 +56,19 @@ capTypeVar =
   intercalate "." <$> dotSep1 capVar
 
 
-constructor0 :: IParser Type.Raw
+constructor0 :: IParser Type.Type
 constructor0 =
   addLocation $
   do  name <- capTypeVar
       return (Type.RType (Var.Var name))
 
 
-term :: IParser Type.Raw
+term :: IParser Type.Type
 term =
   tuple <|> record <|> tvar <|> constructor0
 
 
-app :: IParser Type.Raw
+app :: IParser Type.Type
 app =
   do  start <- getMyPosition
       f <- constructor0 <|> try tupleCtor <?> "a type constructor"
@@ -85,7 +85,7 @@ app =
           return (Type.RType (Var.Var ctor))
 
 
-expr :: IParser Type.Raw
+expr :: IParser Type.Type
 expr =
   do  start <- getMyPosition
       t1 <- app <|> term
@@ -100,7 +100,7 @@ expr =
                 return (A.A (R.Region start end) (Type.RLambda t1 t2))
 
 
-constructor :: IParser (String, [Type.Raw])
+constructor :: IParser (String, [Type.Type])
 constructor =
   (,) <$> (capTypeVar <?> "another type constructor")
       <*> spacePrefix term

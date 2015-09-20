@@ -10,7 +10,7 @@ import qualified AST.Literal as L
 import qualified AST.Module
 import qualified AST.Module.Name as MN
 import qualified AST.Pattern
-import qualified AST.Type as T
+import qualified AST.Type
 import qualified AST.Variable as V
 import qualified Data.List as List
 import qualified Reporting.Annotation as RA
@@ -160,14 +160,14 @@ formatLiteral lit =
         L.Boolean _ -> text "<boolean>"
 
 
-formatType :: T.Raw -> Box
+formatType :: AST.Type.Type -> Box
 formatType atype =
     case RA.drop atype of
-        T.RLambda _ _ -> text "<lambda type>"
-        T.RVar var -> text var -- TODO: not tested
-        T.RType var -> formatVar var
-        T.RApp _ _ -> text "<app>"
-        T.RRecord _ _ -> text "<record>"
+        AST.Type.RLambda _ _ -> text "<lambda type>"
+        AST.Type.RVar var -> text var -- TODO: not tested
+        AST.Type.RType var -> formatVar var
+        AST.Type.RApp _ _ -> text "<app>"
+        AST.Type.RRecord _ _ -> text "<record>"
 
 
 formatVar :: V.Var -> Box

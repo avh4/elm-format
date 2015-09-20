@@ -1,5 +1,5 @@
 module AST.Type
-    ( Raw, Raw'(..)
+    ( Type, Type'(..)
     , Port(..), getPortType
     , fieldMap
     , tuple
@@ -21,16 +21,16 @@ import qualified Reporting.Region as R
 
 -- DEFINITION
 
-type Raw =
-    A.Located Raw'
+type Type =
+    A.Located Type'
 
 
-data Raw'
-    = RLambda Raw Raw
+data Type'
+    = RLambda Type Type
     | RVar String
     | RType Var.Var
-    | RApp Raw [Raw]
-    | RRecord [(String, Raw)] (Maybe Raw)
+    | RApp Type [Type]
+    | RRecord [(String, Type)] (Maybe Type)
     deriving (Show)
 
 
@@ -55,7 +55,7 @@ fieldMap fields =
       foldl add Map.empty fields
 
 
-tuple :: R.Region -> [Raw] -> Raw
+tuple :: R.Region -> [Type] -> Type
 tuple region types =
   let name = Var.Var ("_Tuple" ++ show (length types))
   in
@@ -69,11 +69,11 @@ instance (P.Pretty t) => P.Pretty (Port t) where
     P.pretty dealiaser needsParens (getPortType portType)
 
 
-instance P.Pretty Raw' where
+instance P.Pretty Type' where
   pretty dealiaser needsParens tipe =
     case tipe of
       RLambda arg body ->
-          P.parensIf needsParens (prettyLambda dealiaser getRawLambda arg body)
+          P.parensIf needsParens (prettyLambda dealiaser getLambda arg body)
 
       RVar x ->
           P.text x
@@ -89,7 +89,7 @@ instance P.Pretty Raw' where
             prettyApp dealiaser needsParens isTuple func args
 
       RRecord fields ext ->
-          prettyRecord dealiaser (flattenRawRecord fields ext)
+          prettyRecord dealiaser (flattenRecord fields ext)
 
 
 -- PRETTY HELPERS
@@ -123,8 +123,8 @@ prettyLambda dealiaser getLambda arg body =
       ]
 
 
-getRawLambda :: Raw -> Maybe (Raw, Raw)
-getRawLambda (A.A _ tipe) =
+getLambda :: Type -> Maybe (Type, Type)
+getLambda (A.A _ tipe) =
   case tipe of
     RLambda arg body -> Just (arg, body)
     _ -> Nothing
@@ -191,11 +191,11 @@ prettyRecord dealiaser recordInfo =
             )
 
 
-flattenRawRecord
-    :: [(String, Raw)]
-    -> Maybe Raw
-    -> ( [(String, Raw)], Maybe String )
-flattenRawRecord fields ext =
+flattenRecord
+    :: [(String, Type)]
+    -> Maybe Type
+    -> ( [(String, Type)], Maybe String )
+flattenRecord fields ext =
   case ext of
     Nothing ->
         (fields, Nothing)
@@ -204,7 +204,7 @@ flattenRawRecord fields ext =
         (fields, Just x)
 
     Just (A.A _ (RRecord fields' ext')) ->
-        flattenRawRecord (fields' ++ fields) ext'
+        flattenRecord (fields' ++ fields) ext'
 
     _ ->
         error "Trying to flatten ill-formed record."

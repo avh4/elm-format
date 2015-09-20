@@ -12,8 +12,8 @@ import qualified Reporting.Annotation as A
 
 data Declaration
     = Definition Expression.Def
-    | Datatype String [String] [(String, [Type.Raw])]
-    | TypeAlias String [String] Type.Raw
+    | Datatype String [String] [(String, [Type.Type])]
+    | TypeAlias String [String] Type.Type
     | Port Port
     | Fixity Assoc Int String
 
@@ -43,5 +43,5 @@ data Decl
 -- PORTS
 
 data Port
-    = PortAnnotation String Type.Raw
+    = PortAnnotation String Type.Type
     | PortDefinition String Expression.Expr

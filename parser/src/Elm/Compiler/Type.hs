@@ -175,7 +175,7 @@ fromObject obj =
             fail $ "Error when decoding type with tag: " ++ tag
 
 
-fromRawType :: Type.Raw -> Type
+fromRawType :: Type.Type -> Type
 fromRawType (A.A _ astType) =
     case astType of
       Type.RLambda t1 t2 ->

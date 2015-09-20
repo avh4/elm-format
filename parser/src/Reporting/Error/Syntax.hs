@@ -22,8 +22,8 @@ data Error
     | DuplicateValueDeclaration String
     | DuplicateTypeDeclaration String
     | DuplicateDefinition String
-    | UnboundTypeVarsInAlias String [String] String [String] Type.Raw
-    | UnboundTypeVarsInUnion String [String] String [String] [(String, [Type.Raw])]
+    | UnboundTypeVarsInAlias String [String] String [String] Type.Type
+    | UnboundTypeVarsInUnion String [String] String [String] [(String, [Type.Type])]
 
 
 -- TO REPORT

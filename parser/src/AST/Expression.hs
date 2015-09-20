@@ -19,7 +19,7 @@ type Def =
 
 data Def'
     = Definition Pattern.Pattern Expr
-    | TypeAnnotation String Type.Raw
+    | TypeAnnotation String Type.Type
     deriving (Show)
 
 
@@ -51,9 +51,9 @@ data Expr'
 -- PORTS
 
 data PortImpl
-    = In String (Type.Port Type.Raw)
-    | Out String Expr (Type.Port Type.Raw)
-    | Task String Expr (Type.Port Type.Raw)
+    = In String (Type.Port Type.Type)
+    | Out String Expr (Type.Port Type.Type)
+    | Task String Expr (Type.Port Type.Type)
     deriving (Show)
 
 
