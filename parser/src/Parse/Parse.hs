@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wall #-}
-module Parse.Parse (program, parse, parseSource) where
+module Parse.Parse (parse, parseSource) where
 
 import Control.Applicative ((<$>), (<*>))
 import qualified Data.Map as Map
@@ -25,26 +25,6 @@ parseSource :: String -> Result.Result () Error.Error M.SourceModule
 parseSource src =
   parseWithTable Map.empty src
       $ programParser $ Package.Name "example" "example"
-
-program
-    :: Package.Name
-    -> Bool
-    -> OpTable
-    -> String
-    -> Result.Result wrn Error.Error M.ValidModule
-program pkgName isRoot table src =
-  do  (M.Module name filePath docs exports imports sourceDecls) <-
-          parseWithTable table src (programParser pkgName)
-
-      validDecls <- Validate.declarations isRoot sourceDecls
-
-      -- determine if default imports should be added, only elm-lang/core is exempt
-      let ammendedImports =
-            ( if pkgName == Package.coreName then [] else Imports.defaults
-            , imports
-            )
-
-      return (M.Module name filePath docs exports ammendedImports validDecls)
 
 
 -- HEADERS AND DECLARATIONS

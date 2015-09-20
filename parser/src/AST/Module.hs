@@ -2,10 +2,9 @@ module AST.Module
     ( Interfaces
     , Types, Aliases, ADTs
     , AdtInfo, CanonicalAdt
-    , SourceModule, ValidModule, CanonicalModule, Optimized
+    , SourceModule
     , Module(..), Body(..)
     , Header(..)
-    , Interface(..), toInterface
     , UserImport, DefaultImport, ImportMethod(..)
     ) where
 
@@ -44,22 +43,6 @@ type SourceModule =
       [UserImport]
       (Var.Listing (A.Located Var.Value))
       [Decl.SourceDecl]
-
-
-type ValidModule =
-    Module
-      String
-      ([DefaultImport], [UserImport])
-      (Var.Listing (A.Located Var.Value))
-      [Decl.ValidDecl]
-
-
-type CanonicalModule =
-    Module Docs.Centralized [Name.Raw] [Var.Value] (Body Canonical.Expr)
-
-
-type Optimized =
-    Module Docs.Centralized [Name.Raw] [Var.Value] (Body [Optimized.Def])
 
 
 data Module docs imports exports body = Module
@@ -121,33 +104,3 @@ data Interface = Interface
     , iFixities :: [(Decl.Assoc, Int, String)]
     , iPorts    :: [String]
     }
-
-
-toInterface :: Package.Name -> Optimized -> Interface
-toInterface pkgName modul =
-    let body' = body modul in
-    Interface
-    { iVersion  = Package.Version 0 15 1
-    , iPackage  = pkgName
-    , iExports  = exports modul
-    , iTypes    = types body'
-    , iImports  = imports modul
-    , iAdts     = datatypes body'
-    , iAliases  = aliases body'
-    , iFixities = fixities body'
-    , iPorts    = ports body'
-    }
-
-
-instance Binary Interface where
-  get = Interface <$> get <*> get <*> get <*> get <*> get <*> get <*> get <*> get <*> get
-  put modul = do
-      put (iVersion modul)
-      put (iPackage modul)
-      put (iExports modul)
-      put (iTypes modul)
-      put (iImports modul)
-      put (iAdts modul)
-      put (iAliases modul)
-      put (iFixities modul)
-      put (iPorts modul)
