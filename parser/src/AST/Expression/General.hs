@@ -34,41 +34,41 @@ move through the compilation process. The type holes are used to represent:
        with information about what module a variable came from.
 
 -}
-type Expr definition variable tipe =
-    A.Annotated R.Region (Expr' definition variable tipe)
+type Expr definition variable =
+    A.Annotated R.Region (Expr' definition variable)
 
 
-data Expr' def var typ
+data Expr' def var
     = Literal Literal.Literal
     | Var var
-    | Range (Expr def var typ) (Expr def var typ)
-    | ExplicitList [Expr def var typ]
-    | Binop var (Expr def var typ) (Expr def var typ)
-    | Lambda (Pattern.Pattern R.Region var) (Expr def var typ)
-    | App (Expr def var typ) (Expr def var typ)
-    | If [(Expr def var typ, Expr def var typ)] (Expr def var typ)
-    | Let [def] (Expr def var typ)
-    | Case (Expr def var typ) [(Pattern.Pattern R.Region var, Expr def var typ)]
-    | Data String [Expr def var typ]
-    | Access (Expr def var typ) String
-    | Update (Expr def var typ) [(String, Expr def var typ)]
-    | Record [(String, Expr def var typ)]
+    | Range (Expr def var) (Expr def var)
+    | ExplicitList [Expr def var]
+    | Binop var (Expr def var) (Expr def var)
+    | Lambda (Pattern.Pattern R.Region var) (Expr def var)
+    | App (Expr def var) (Expr def var)
+    | If [(Expr def var, Expr def var)] (Expr def var)
+    | Let [def] (Expr def var)
+    | Case (Expr def var) [(Pattern.Pattern R.Region var, Expr def var)]
+    | Data String [Expr def var]
+    | Access (Expr def var) String
+    | Update (Expr def var) [(String, Expr def var)]
+    | Record [(String, Expr def var)]
     -- for type checking and code gen only
-    | Port (PortImpl (Expr def var typ) typ)
+    | Port (PortImpl (Expr def var))
     | GLShader String String Literal.GLShaderTipe
     deriving (Show)
 
 
 -- PORTS
 
-data PortImpl expr tipe
-    = In String (Type.Port tipe)
-    | Out String expr (Type.Port tipe)
-    | Task String expr (Type.Port tipe)
+data PortImpl expr
+    = In String (Type.Port Type.Raw)
+    | Out String expr (Type.Port Type.Raw)
+    | Task String expr (Type.Port Type.Raw)
     deriving (Show)
 
 
-portName :: PortImpl expr tipe -> String
+portName :: PortImpl expr -> String
 portName impl =
   case impl of
     In name _ -> name
@@ -78,17 +78,12 @@ portName impl =
 
 ---- UTILITIES ----
 
-rawVar :: String -> Expr' def Var.Raw typ
+rawVar :: String -> Expr' def Var.Raw
 rawVar x =
   Var (Var.Raw x)
 
 
-localVar :: String -> Expr' def Var.Canonical typ
-localVar x =
-  Var (Var.Canonical Var.Local x)
-
-
-tuple :: [Expr def var typ] -> Expr' def var typ
+tuple :: [Expr def var] -> Expr' def var
 tuple expressions =
   Data ("_Tuple" ++ show (length expressions)) expressions
 
@@ -98,17 +93,9 @@ saveEnvName =
   "_save_the_environment!!!"
 
 
-dummyLet :: (P.Pretty def) => [def] -> Expr def Var.Canonical typ
-dummyLet defs =
-  let body =
-        A.A undefined (Var (Var.builtin saveEnvName))
-  in
-      A.A undefined (Let defs body)
-
-
 -- PRETTY PRINTING
 
-instance (P.Pretty def, P.Pretty var, Var.ToString var) => P.Pretty (Expr' def var typ) where
+instance (P.Pretty def, P.Pretty var, Var.ToString var) => P.Pretty (Expr' def var) where
   pretty dealiaser needsParens expression =
     case expression of
       Literal literal ->
@@ -246,12 +233,12 @@ instance (P.Pretty def, P.Pretty var, Var.ToString var) => P.Pretty (Expr' def v
           P.pretty dealiaser needsParens portImpl
 
 
-instance P.Pretty (PortImpl expr tipe) where
+instance P.Pretty (PortImpl expr) where
   pretty _ _ impl =
       P.text ("<port:" ++ portName impl ++ ">")
 
 
-collectApps :: Expr def var typ -> [Expr def var typ]
+collectApps :: Expr def var -> [Expr def var]
 collectApps annExpr@(A.A _ expr) =
   case expr of
     App a b -> collectApps a ++ [b]
@@ -259,8 +246,8 @@ collectApps annExpr@(A.A _ expr) =
 
 
 collectLambdas
-    :: Expr def var typ
-    -> ([Pattern.Pattern R.Region var], Expr def var typ)
+    :: Expr def var
+    -> ([Pattern.Pattern R.Region var], Expr def var)
 collectLambdas lexpr@(A.A _ expr) =
   case expr of
     Lambda pattern body ->
