@@ -170,6 +170,6 @@ formatType atype =
         T.RRecord _ _ -> text "<record>"
 
 
-formatVar :: V.Raw -> Box
-formatVar (V.Raw var) =
+formatVar :: V.Var -> Box
+formatVar (V.Var var) =
     text var

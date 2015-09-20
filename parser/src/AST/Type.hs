@@ -28,7 +28,7 @@ type Raw =
 data Raw'
     = RLambda Raw Raw
     | RVar String
-    | RType Var.Raw
+    | RType Var.Var
     | RApp Raw [Raw]
     | RRecord [(String, Raw)] (Maybe Raw)
     deriving (Show)
@@ -54,20 +54,10 @@ fieldMap fields =
   in
       foldl add Map.empty fields
 
-{--
-recordOf :: [(String, Type var)] -> Type var
-recordOf fields =
-  Record fields Nothing
-
-
-listOf :: RawType -> RawType
-listOf tipe =
-  App (Type (Var.Raw "List")) [tipe]
---}
 
 tuple :: R.Region -> [Raw] -> Raw
 tuple region types =
-  let name = Var.Raw ("_Tuple" ++ show (length types))
+  let name = Var.Var ("_Tuple" ++ show (length types))
   in
       A.A region (RApp (A.A region (RType name)) types)
 

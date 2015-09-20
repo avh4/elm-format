@@ -17,7 +17,7 @@ type Pattern =
 
 
 data Pattern'
-    = Data Var.Raw [Pattern]
+    = Data Var.Var [Pattern]
     | Record [String]
     | Alias String Pattern
     | Var String
@@ -30,23 +30,23 @@ list :: R.Position -> [Pattern] -> Pattern
 list end patterns =
   case patterns of
     [] ->
-        A.at end end (Data (Var.Raw "[]") [])
+        A.at end end (Data (Var.Var "[]") [])
 
     pattern@(A.A (R.Region start _) _) : rest ->
-        A.at start end (Data (Var.Raw "::") [pattern, list end rest])
+        A.at start end (Data (Var.Var "::") [pattern, list end rest])
 
 
 consMany :: R.Position -> [Pattern] -> Pattern
 consMany end patterns =
   let cons hd@(A.A (R.Region start _) _) tl =
-          A.at start end (Data (Var.Raw "::") [hd, tl])
+          A.at start end (Data (Var.Var "::") [hd, tl])
   in
       foldr1 cons patterns
 
 
 tuple :: [Pattern] -> Pattern'
 tuple patterns =
-  Data (Var.Raw ("_Tuple" ++ show (length patterns))) patterns
+  Data (Var.Var ("_Tuple" ++ show (length patterns))) patterns
 
 
 -- FIND VARIABLES

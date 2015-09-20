@@ -16,7 +16,7 @@ import qualified AST.Declaration as Decl
 import qualified AST.Expression
 import qualified AST.Helpers as Help
 import qualified AST.Literal as L
-import qualified AST.Variable as Variable
+import qualified AST.Variable
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Region as R
@@ -295,7 +295,7 @@ accessible exprParser =
                 end <- getMyPosition
                 return . A.at start end $
                     case rootExpr of
-                      AST.Expression.Var (Variable.Raw name@(c:_))
+                      AST.Expression.Var (AST.Variable.Var name@(c:_))
                         | isUpper c ->
                             AST.Expression.rawVar (name ++ '.' : v)
                       _ ->

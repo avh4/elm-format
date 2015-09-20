@@ -13,7 +13,7 @@ import qualified Reporting.PrettyPrint as P
 
 -- RAW NAMES
 
-newtype Raw = Raw String
+newtype Var = Var String
     deriving (Eq, Ord, Show)
 
 
@@ -33,8 +33,8 @@ class ToString a where
   toString :: a -> String
 
 
-instance ToString Raw where
-  toString (Raw name) =
+instance ToString Var where
+  toString (Var name) =
       name
 
 
@@ -114,8 +114,8 @@ getUnion value =
 
 -- PRETTY VARIABLES
 
-instance P.Pretty Raw where
-  pretty _ _ (Raw name) =
+instance P.Pretty Var where
+  pretty _ _ (Var name) =
       if Help.isOp name
         then P.parens (P.text name)
         else P.text name

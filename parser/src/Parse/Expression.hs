@@ -65,7 +65,7 @@ negative =
 
       return $
         E.Binop
-          (Var.Raw "-")
+          (Var.Var "-")
           (ann (E.Literal (L.IntNum 0)))
           nTerm
 
@@ -107,7 +107,7 @@ parensTerm =
             lambda start end "x" $
               lambda start end "y" $
                 A.at start end $
-                  E.Binop (Var.Raw op) (var start end "x") (var start end "y")
+                  E.Binop (Var.Var op) (var start end "x") (var start end "y")
 
     tupleFn =
       do  (start, commas, end) <-
