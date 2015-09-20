@@ -1,8 +1,5 @@
 module AST.Module
-    ( Interfaces
-    , Types, Aliases, ADTs
-    , AdtInfo, CanonicalAdt
-    , Module(..), Body(..)
+    ( Module(..), Body(..)
     , Header(..)
     , UserImport, DefaultImport, ImportMethod(..)
     ) where
@@ -20,18 +17,6 @@ import qualified Elm.Package as Package
 import qualified Reporting.Annotation as A
 
 
--- HELPFUL TYPE ALIASES
-
-type Interfaces = Map.Map Name.Canonical Interface
-
-type Types   = Map.Map String Type.Canonical
-type Aliases = Map.Map String ([String], Type.Canonical)
-type ADTs    = Map.Map String (AdtInfo String)
-
-type AdtInfo v = ( [String], [(v, [Type.Canonical])] )
-type CanonicalAdt = (Var.Canonical, AdtInfo Var.Canonical)
-
-
 -- MODULES
 
 
@@ -47,10 +32,7 @@ data Module = Module
 
 data Body expr = Body
     { program   :: expr
-    , types     :: Types
     , fixities  :: [(Decl.Assoc, Int, String)]
-    , aliases   :: Aliases
-    , datatypes :: ADTs
     , ports     :: [String]
     }
 
@@ -77,20 +59,4 @@ type DefaultImport = (Name.Raw, ImportMethod)
 data ImportMethod = ImportMethod
     { alias :: Maybe String
     , exposedVars :: !(Var.Listing Var.Value)
-    }
-
-
--- INTERFACES
-
-{-| Key facts about a module, used when reading info from .elmi files. -}
-data Interface = Interface
-    { iVersion  :: Package.Version
-    , iPackage  :: Package.Name
-    , iExports  :: [Var.Value]
-    , iTypes    :: Types
-    , iImports  :: [Name.Raw]
-    , iAdts     :: ADTs
-    , iAliases  :: Aliases
-    , iFixities :: [(Decl.Assoc, Int, String)]
-    , iPorts    :: [String]
     }

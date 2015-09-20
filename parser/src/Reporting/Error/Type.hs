@@ -15,23 +15,6 @@ import qualified Reporting.Report as Report
 
 data Error
     = Mismatch Mismatch
-    | InfiniteType InfiniteType
-    | BadMain Type.Canonical
-
-
-data Mismatch = MismatchInfo
-    { _hint :: Hint
-    , _leftType :: Type.Canonical
-    , _rightType :: Type.Canonical
-    , _note :: Maybe String
-    }
-
-
-data InfiniteType = InfiniteTypeInfo
-    { _name :: String
-    , _var :: Type.Canonical
-    , _type :: Type.Canonical
-    }
 
 
 data Hint

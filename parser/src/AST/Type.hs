@@ -1,9 +1,6 @@
 module AST.Type
     ( Raw, Raw'(..)
-    , Canonical(..), Aliased(..)
     , Port(..), getPortType
-    , deepDealias, dealias
-    , collectLambdas
     , fieldMap
     , tuple
     ) where
@@ -35,22 +32,6 @@ data Raw'
     | RApp Raw [Raw]
     | RRecord [(String, Raw)] (Maybe Raw)
     deriving (Show)
-
-
-data Canonical
-    = Lambda Canonical Canonical
-    | Var String
-    | Type Var.Canonical
-    | App Canonical [Canonical]
-    | Record [(String, Canonical)] (Maybe Canonical)
-    | Aliased Var.Canonical [(String, Canonical)] (Aliased Canonical)
-    deriving (Eq, Ord, Show)
-
-
-data Aliased t
-    = Holey t
-    | Filled t
-    deriving (Eq, Ord, Show)
 
 
 data Port t
@@ -91,64 +72,6 @@ tuple region types =
       A.A region (RApp (A.A region (RType name)) types)
 
 
--- DEALIASING
-
-deepDealias :: Canonical -> Canonical
-deepDealias tipe =
-  let go = deepDealias in
-  case tipe of
-    Lambda a b ->
-          Lambda (go a) (go b)
-
-    Var _ ->
-        tipe
-
-    Record fields ext ->
-        Record (map (second go) fields) (fmap go ext)
-
-    Aliased _name args tipe' ->
-        deepDealias (dealias args tipe')
-
-    Type _ ->
-        tipe
-
-    App f args ->
-        App (go f) (map go args)
-
-
-dealias :: [(String, Canonical)] -> Aliased Canonical -> Canonical
-dealias args aliasType =
-  case aliasType of
-    Holey tipe ->
-        dealiasHelp (Map.fromList args) tipe
-
-    Filled tipe ->
-        tipe
-
-
-dealiasHelp :: Map.Map String Canonical -> Canonical -> Canonical
-dealiasHelp typeTable tipe =
-    let go = dealiasHelp typeTable in
-    case tipe of
-      Lambda a b ->
-          Lambda (go a) (go b)
-
-      Var x ->
-          Map.findWithDefault tipe x typeTable
-
-      Record fields ext ->
-          Record (map (second go) fields) (fmap go ext)
-
-      Aliased original args t' ->
-          Aliased original (map (second go) args) t'
-
-      Type _ ->
-          tipe
-
-      App f args ->
-          App (go f) (map go args)
-
-
 -- PRETTY PRINTING
 
 instance (P.Pretty t) => P.Pretty (Port t) where
@@ -177,36 +100,6 @@ instance P.Pretty Raw' where
 
       RRecord fields ext ->
           prettyRecord dealiaser (flattenRawRecord fields ext)
-
-
-instance P.Pretty Canonical where
-  pretty dealiaser needsParens tipe =
-    case tipe of
-      Lambda arg body ->
-          P.parensIf needsParens (prettyLambda dealiaser getCanLambda arg body)
-
-      Var x ->
-          P.text x
-
-      Type var ->
-          prettyType dealiaser var
-
-      App func args ->
-          let
-            isTuple (Type name) = Help.isTuple (Var.toString name)
-            isTuple _ = False
-          in
-            prettyApp dealiaser needsParens isTuple func args
-
-      Record fields ext ->
-          prettyRecord dealiaser (flattenCanRecord fields ext)
-
-      Aliased name args _ ->
-          P.parensIf (needsParens && not (null args)) $
-            P.hang
-              (P.pretty dealiaser False name)
-              2
-              (P.sep (map (P.pretty dealiaser True . snd) args))
 
 
 -- PRETTY HELPERS
@@ -247,13 +140,6 @@ getRawLambda (A.A _ tipe) =
     _ -> Nothing
 
 
-getCanLambda :: Canonical -> Maybe (Canonical, Canonical)
-getCanLambda tipe =
-  case tipe of
-    Lambda arg body -> Just (arg, body)
-    _ -> Nothing
-
-
 gatherLambda :: (t -> Maybe (t,t)) -> t -> [t]
 gatherLambda get tipe =
   case get tipe of
@@ -262,11 +148,6 @@ gatherLambda get tipe =
 
     Nothing ->
         [tipe]
-
-
-collectLambdas :: Canonical -> [Canonical]
-collectLambdas tipe =
-  gatherLambda getCanLambda tipe
 
 
 -- PRETTY APP
@@ -337,77 +218,3 @@ flattenRawRecord fields ext =
 
     _ ->
         error "Trying to flatten ill-formed record."
-
-
-flattenCanRecord
-    :: [(String, Canonical)]
-    -> Maybe Canonical
-    -> ( [(String, Canonical)], Maybe String )
-flattenCanRecord fields ext =
-  case ext of
-    Nothing ->
-        (fields, Nothing)
-
-    Just (Var x) ->
-        (fields, Just x)
-
-    Just (Record fields' ext') ->
-        flattenCanRecord (fields' ++ fields) ext'
-
-    Just (Aliased _ args tipe) ->
-        flattenCanRecord fields (Just (dealias args tipe))
-
-    _ ->
-        error "Trying to flatten ill-formed record."
-
-
--- BINARY
-
-instance Binary Canonical where
-  put tipe =
-      case tipe of
-        Lambda t1 t2 ->
-            putWord8 0 >> put t1 >> put t2
-
-        Var x ->
-            putWord8 1 >> put x
-
-        Type name ->
-            putWord8 2 >> put name
-
-        App t1 t2 ->
-            putWord8 3 >> put t1 >> put t2
-
-        Record fs ext ->
-            putWord8 4 >> put fs >> put ext
-
-        Aliased var args t ->
-            putWord8 5 >> put var >> put args >> put t
-
-  get = do
-      n <- getWord8
-      case n of
-        0 -> Lambda <$> get <*> get
-        1 -> Var <$> get
-        2 -> Type <$> get
-        3 -> App <$> get <*> get
-        4 -> Record <$> get <*> get
-        5 -> Aliased <$> get <*> get <*> get
-        _ -> error "Error reading a valid type from serialized string"
-
-
-instance Binary t => Binary (Aliased t) where
-  put aliasType =
-      case aliasType of
-        Holey tipe ->
-            putWord8 0 >> put tipe
-
-        Filled tipe ->
-            putWord8 1 >> put tipe
-
-  get = do
-      n <- getWord8
-      case n of
-        0 -> Holey <$> get
-        1 -> Filled <$> get
-        _ -> error "Error reading a valid type from serialized string"

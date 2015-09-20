@@ -7,11 +7,9 @@ import qualified Data.Aeson as Json
 import Prelude hiding (print)
 
 import qualified Reporting.Annotation as A
-import qualified Reporting.Error.Canonicalize as Canonicalize
 import qualified Reporting.Error.Docs as Docs
 import qualified Reporting.Error.Pattern as Pattern
 import qualified Reporting.Error.Syntax as Syntax
-import qualified Reporting.Error.Type as Type
 import qualified Reporting.PrettyPrint as P
 import qualified Reporting.Report as Report
 
@@ -20,8 +18,6 @@ import qualified Reporting.Report as Report
 
 data Error
     = Syntax Syntax.Error
-    | Canonicalize Canonicalize.Error
-    | Type Type.Error
     | Pattern Pattern.Error
     | Docs Docs.Error
 
@@ -33,12 +29,6 @@ toReport dealiaser err =
   case err of
     Syntax syntaxError ->
         Syntax.toReport dealiaser syntaxError
-
-    Canonicalize canonicalizeError ->
-        Canonicalize.toReport dealiaser canonicalizeError
-
-    Type typeError ->
-        Type.toReport dealiaser typeError
 
     Pattern patternError ->
         Pattern.toReport dealiaser patternError
@@ -68,18 +58,6 @@ toJson dealiaser filePath (A.A region err) =
         case err of
           Syntax syntaxError ->
               Report.toJson [] (Syntax.toReport dealiaser syntaxError)
-
-          Canonicalize canonicalizeError ->
-              let
-                suggestions =
-                  maybe []
-                      (\s -> ["suggestions" .= s])
-                      (Canonicalize.extractSuggestions canonicalizeError)
-              in
-                Report.toJson suggestions (Canonicalize.toReport dealiaser canonicalizeError)
-
-          Type typeError ->
-              Report.toJson [] (Type.toReport dealiaser typeError)
 
           Pattern patternError ->
               Report.toJson [] (Pattern.toReport dealiaser patternError)
