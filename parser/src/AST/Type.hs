@@ -34,13 +34,13 @@ data Type'
     deriving (Show)
 
 
-data Port t
-    = Normal t
-    | Signal { root :: t, arg :: t }
+data Port
+    = Normal Type
+    | Signal { root :: Type, arg :: Type }
     deriving (Show)
 
 
-getPortType :: Port tipe -> tipe
+getPortType :: Port -> Type
 getPortType portType =
   case portType of
     Normal tipe -> tipe
@@ -64,7 +64,7 @@ tuple region types =
 
 -- PRETTY PRINTING
 
-instance (P.Pretty t) => P.Pretty (Port t) where
+instance P.Pretty Port where
   pretty dealiaser needsParens portType =
     P.pretty dealiaser needsParens (getPortType portType)
 

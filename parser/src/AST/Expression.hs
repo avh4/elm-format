@@ -51,9 +51,9 @@ data Expr'
 -- PORTS
 
 data PortImpl
-    = In String (Type.Port Type.Type)
-    | Out String Expr (Type.Port Type.Type)
-    | Task String Expr (Type.Port Type.Type)
+    = In String Type.Port
+    | Out String Expr Type.Port
+    | Task String Expr Type.Port
     deriving (Show)
 
 
