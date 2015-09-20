@@ -18,7 +18,6 @@ import qualified Parse.Declaration as Decl
 import qualified Reporting.Region as R
 import qualified Reporting.Error.Syntax as Error
 import qualified Reporting.Result as Result
-import qualified Validate
 
 
 parseSource :: String -> Result.Result () Error.Error AST.Module.Module
