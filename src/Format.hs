@@ -8,7 +8,7 @@ import qualified AST.Declaration as D
 import qualified AST.Expression.General as EG
 import qualified AST.Expression.Source as E
 import qualified AST.Literal as L
-import qualified AST.Module as M
+import qualified AST.Module
 import qualified AST.Module.Name as MN
 import qualified AST.Pattern as P
 import qualified AST.Type as T
@@ -17,22 +17,22 @@ import qualified Data.List as List
 import qualified Reporting.Annotation as RA
 
 
-formatModule :: M.SourceModule -> Box
+formatModule :: AST.Module.Module -> Box
 formatModule mod =
     vbox
         [ hbox
             [ text "module "
-            , formatName $ M.name mod
+            , formatName $ AST.Module.name mod
             , text " where"
             ]
             |> margin 1
-        , case M.imports mod of
+        , case AST.Module.imports mod of
             [] ->
                 empty
             imports ->
                 vbox (map formatImport imports)
                 |> margin 2
-        , vbox (map formatDeclaration $ M.body mod)
+        , vbox (map formatDeclaration $ AST.Module.body mod)
         ]
 
 
@@ -45,7 +45,7 @@ formatRawName name =
     text (List.intercalate "." name)
 
 
-formatImport :: M.UserImport -> Box
+formatImport :: AST.Module.UserImport -> Box
 formatImport aimport =
     case RA.drop aimport of
         (name,method) ->
@@ -57,14 +57,14 @@ formatImport aimport =
                 ]
             where
                 as =
-                    if (M.alias method) == (Just $ List.intercalate "." name)
+                    if (AST.Module.alias method) == (Just $ List.intercalate "." name)
                         then empty
                     else
-                        case M.alias method of
+                        case AST.Module.alias method of
                             Nothing -> text "<nothing>"
                             Just name -> text $ " as " ++ name
                 exposing =
-                    case M.exposedVars method of
+                    case AST.Module.exposedVars method of
                         V.Listing [] False -> empty
                         V.Listing [] True -> text " exposing (..)"
                         V.Listing vars False ->

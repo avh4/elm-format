@@ -4,7 +4,7 @@ module Main where
 import Elm.Utils ((|>))
 import System.Exit (exitFailure)
 
-import qualified AST.Module as M
+import qualified AST.Module
 import qualified Box
 import qualified Elm.Package
 import qualified Flags
@@ -23,7 +23,7 @@ import qualified Reporting.Result as Result
 
 formatResult
     :: Flags.Config
-    -> Result.Result () Syntax.Error M.SourceModule
+    -> Result.Result () Syntax.Error AST.Module.Module
     -> IO ()
 formatResult config result =
     case result of

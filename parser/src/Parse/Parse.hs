@@ -8,7 +8,7 @@ import Text.Parsec (char, eof, letter, many, optional, putState, (<|>))
 import qualified Text.Parsec.Error as Parsec
 
 import qualified AST.Declaration as D
-import qualified AST.Module as M
+import qualified AST.Module
 import qualified AST.Module.Name as ModuleName
 import qualified Elm.Compiler.Imports as Imports
 import qualified Elm.Package as Package
@@ -21,7 +21,7 @@ import qualified Reporting.Result as Result
 import qualified Validate
 
 
-parseSource :: String -> Result.Result () Error.Error M.SourceModule
+parseSource :: String -> Result.Result () Error.Error AST.Module.Module
 parseSource src =
   parseWithTable Map.empty src
       $ programParser $ Package.Name "example" "example"
@@ -29,9 +29,9 @@ parseSource src =
 
 -- HEADERS AND DECLARATIONS
 
-programParser :: Package.Name -> IParser M.SourceModule
+programParser :: Package.Name -> IParser AST.Module.Module
 programParser pkgName =
-  do  (M.Header name docs exports imports) <- Module.header
+  do  (AST.Module.Header name docs exports imports) <- Module.header
       decls <- declarations
       optional freshLine
       optional spaces
@@ -40,7 +40,7 @@ programParser pkgName =
       let canonicalName =
             ModuleName.Canonical pkgName name
 
-      return $ M.Module canonicalName "" docs exports imports decls
+      return $ AST.Module.Module canonicalName "" docs exports imports decls
 
 
 declarations :: IParser [D.SourceDecl]

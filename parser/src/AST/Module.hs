@@ -2,7 +2,6 @@ module AST.Module
     ( Interfaces
     , Types, Aliases, ADTs
     , AdtInfo, CanonicalAdt
-    , SourceModule
     , Module(..), Body(..)
     , Header(..)
     , UserImport, DefaultImport, ImportMethod(..)
@@ -13,8 +12,6 @@ import Data.Binary
 import qualified Data.Map as Map
 
 import qualified AST.Declaration as Decl
-import qualified AST.Expression.Canonical as Canonical
-import qualified AST.Expression.Optimized as Optimized
 import qualified AST.Module.Name as Name
 import qualified AST.Type as Type
 import qualified AST.Variable as Var
@@ -37,21 +34,14 @@ type CanonicalAdt = (Var.Canonical, AdtInfo Var.Canonical)
 
 -- MODULES
 
-type SourceModule =
-    Module
-      String
-      [UserImport]
-      (Var.Listing (A.Located Var.Value))
-      [Decl.SourceDecl]
 
-
-data Module docs imports exports body = Module
+data Module = Module
     { name    :: Name.Canonical
     , path    :: FilePath
-    , docs    :: A.Located (Maybe docs)
-    , exports :: exports
-    , imports :: imports
-    , body    :: body
+    , docs    :: A.Located (Maybe String)
+    , exports :: (Var.Listing (A.Located Var.Value))
+    , imports :: [UserImport]
+    , body    :: [Decl.SourceDecl]
     }
 
 
