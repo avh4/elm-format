@@ -1,4 +1,4 @@
 /dist/
 /cabal.sandbox.config
 /formatted.elm
-/Elm-Platform/
+/.cabal-sandbox/

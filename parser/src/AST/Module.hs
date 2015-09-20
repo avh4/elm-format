@@ -21,7 +21,6 @@ import qualified AST.Type as Type
 import qualified AST.Variable as Var
 import qualified Docs.AST as Docs
 import qualified Elm.Package as Package
-import qualified Elm.Compiler.Version as Compiler
 import qualified Reporting.Annotation as A
 
 
@@ -128,7 +127,7 @@ toInterface :: Package.Name -> Optimized -> Interface
 toInterface pkgName modul =
     let body' = body modul in
     Interface
-    { iVersion  = Compiler.version
+    { iVersion  = Package.Version 0 15 1
     , iPackage  = pkgName
     , iExports  = exports modul
     , iTypes    = types body'

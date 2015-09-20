@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ELM_FORMAT="./Elm-Platform/build/.cabal-sandbox/bin/elm-format"
+ELM_FORMAT=".cabal-sandbox/bin/elm-format"
 if which md5 > /dev/null; then
 	MD5="md5"
 else

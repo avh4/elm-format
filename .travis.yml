@@ -15,8 +15,7 @@ before_install:
 
 install:
  - travis_retry cabal update
- - runhaskell BuildFromSource.hs build
- - cabal sandbox init --sandbox="`pwd`"/Elm-Platform/build/.cabal-sandbox
+ - cabal sandbox init --sandbox="`pwd`"/.cabal-sandbox
  - cabal install --only-dependencies --enable-tests
 
 

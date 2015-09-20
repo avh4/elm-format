@@ -4,7 +4,6 @@ module Flags where
 import Control.Applicative ((<$>), (<*>))
 import Data.Monoid ((<>), mconcat, mempty)
 import Data.Version (showVersion)
-import qualified Elm.Compiler as Compiler
 import qualified Elm.Package as Pkg
 import qualified Options.Applicative as Opt
 import qualified Paths_elm_format as This
@@ -55,8 +54,7 @@ helpInfo =
         ]
   where
     top =
-        "elm-format " ++ showVersion This.version
-        ++ " (Elm Platform " ++ (Pkg.versionToString Compiler.version) ++ ")\n"
+        "elm-format " ++ showVersion This.version ++ "\n"
 
     examples =
         linesToDoc
