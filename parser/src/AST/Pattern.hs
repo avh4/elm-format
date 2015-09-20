@@ -26,15 +26,7 @@ data Pattern'
     deriving (Show)
 
 
-type RawPattern =
-    Pattern
-
-
-type RawPattern' =
-    Pattern'
-
-
-list :: R.Position -> [RawPattern] -> RawPattern
+list :: R.Position -> [Pattern] -> Pattern
 list end patterns =
   case patterns of
     [] ->
@@ -44,7 +36,7 @@ list end patterns =
         A.at start end (Data (Var.Raw "::") [pattern, list end rest])
 
 
-consMany :: R.Position -> [RawPattern] -> RawPattern
+consMany :: R.Position -> [Pattern] -> Pattern
 consMany end patterns =
   let cons hd@(A.A (R.Region start _) _) tl =
           A.at start end (Data (Var.Raw "::") [hd, tl])
@@ -52,7 +44,7 @@ consMany end patterns =
       foldr1 cons patterns
 
 
-tuple :: [RawPattern] -> RawPattern'
+tuple :: [Pattern] -> Pattern'
 tuple patterns =
   Data (Var.Raw ("_Tuple" ++ show (length patterns))) patterns
 

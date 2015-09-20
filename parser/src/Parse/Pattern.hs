@@ -14,7 +14,7 @@ import qualified Reporting.Annotation as A
 import qualified Reporting.Region as R
 
 
-basic :: IParser P.RawPattern
+basic :: IParser P.Pattern
 basic =
   addLocation $
     choice
@@ -38,7 +38,7 @@ basic =
               P.Var str
 
 
-asPattern :: IParser P.RawPattern -> IParser P.RawPattern
+asPattern :: IParser P.Pattern -> IParser P.Pattern
 asPattern patternParser =
   do  pattern <- patternParser
 
@@ -60,13 +60,13 @@ asPattern patternParser =
           lowVar
 
 
-record :: IParser P.RawPattern
+record :: IParser P.Pattern
 record =
   addLocation
     (P.Record <$> brackets (commaSep1 lowVar))
 
 
-tuple :: IParser P.RawPattern
+tuple :: IParser P.Pattern
 tuple =
   do  (start, patterns, end) <-
           located (parens (commaSep expr))
@@ -79,20 +79,20 @@ tuple =
             return (A.at start end (P.tuple patterns))
 
 
-list :: IParser P.RawPattern
+list :: IParser P.Pattern
 list =
   braces $
     do  (_, patterns, end) <- located (commaSep expr)
         return (P.list end patterns)
 
 
-term :: IParser P.RawPattern
+term :: IParser P.Pattern
 term =
   choice [ record, tuple, list, basic ]
     <?> "a pattern"
 
 
-patternConstructor :: IParser P.RawPattern
+patternConstructor :: IParser P.Pattern
 patternConstructor =
   addLocation $
     do  v <- List.intercalate "." <$> dotSep1 capVar
@@ -102,7 +102,7 @@ patternConstructor =
           _       -> P.Data (Var.Raw v) <$> spacePrefix term
 
 
-expr :: IParser P.RawPattern
+expr :: IParser P.Pattern
 expr =
     asPattern subPattern <?> "a pattern"
   where

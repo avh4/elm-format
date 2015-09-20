@@ -9,7 +9,7 @@ import qualified AST.Expression
 import qualified AST.Literal as L
 import qualified AST.Module
 import qualified AST.Module.Name as MN
-import qualified AST.Pattern as P
+import qualified AST.Pattern
 import qualified AST.Type as T
 import qualified AST.Variable as V
 import qualified Data.List as List
@@ -117,15 +117,15 @@ formatDefinition adef =
                 ]
 
 
-formatPattern :: P.RawPattern -> Box
+formatPattern :: AST.Pattern.Pattern -> Box
 formatPattern apattern =
     case RA.drop apattern of
-        P.Data _ _ -> text "<data>"
-        P.Record _ -> text "<record>"
-        P.Alias _ _ -> text "<alias>"
-        P.Var var -> text var
-        P.Anything -> text "<anything>"
-        P.Literal _ -> text "<literal>"
+        AST.Pattern.Data _ _ -> text "<data>"
+        AST.Pattern.Record _ -> text "<record>"
+        AST.Pattern.Alias _ _ -> text "<alias>"
+        AST.Pattern.Var var -> text var
+        AST.Pattern.Anything -> text "<anything>"
+        AST.Pattern.Literal _ -> text "<literal>"
 
 
 formatExpression :: AST.Expression.Expr -> Box

@@ -301,12 +301,12 @@ definition =
         return . E.Definition name $ makeFunction args body
 
 
-makeFunction :: [P.RawPattern] -> E.Expr -> E.Expr
+makeFunction :: [P.Pattern] -> E.Expr -> E.Expr
 makeFunction args body@(A.A ann _) =
     foldr (\arg body' -> A.A ann $ E.Lambda arg body') body args
 
 
-defStart :: IParser [P.RawPattern]
+defStart :: IParser [P.Pattern]
 defStart =
     choice
       [ do  pattern <- try Pattern.term
