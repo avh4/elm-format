@@ -16,7 +16,7 @@ import System.FilePath ((</>))
 import System.IO.Error (tryIOError)
 import System.Process (readProcessWithExitCode)
 
-import qualified AST.Expression.Source as Source
+import qualified AST.Expression.General as Expression
 import qualified AST.Pattern as Pattern
 import qualified Elm.Package as Pkg
 import qualified Parse.Helpers as Parse
@@ -96,7 +96,7 @@ missingExe command =
 isDeclaration :: String -> Maybe String
 isDeclaration string =
   case Parse.iParse Parse.definition string of
-    Right (A.A _ (Source.Definition pattern _)) ->
+    Right (A.A _ (Expression.Definition pattern _)) ->
         Just (List.intercalate "$" (Pattern.boundVarList pattern))
 
     _ ->

@@ -14,18 +14,10 @@ annotations and definitions, which is how they appear in source code and how
 they are parsed.
 -}
 type Expr =
-  General.Expr Def
+  General.Expr
 
 
 type Expr' =
-  General.Expr' Def
+  General.Expr'
 
 
-type Def =
-  A.Located Def'
-
-
-data Def'
-    = Definition Pattern.RawPattern Expr
-    | TypeAnnotation String Type.Raw
-    deriving (Show)

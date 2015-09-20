@@ -5,8 +5,7 @@ import Elm.Utils ((|>))
 import Box
 
 import qualified AST.Declaration as D
-import qualified AST.Expression.General as EG
-import qualified AST.Expression.Source as E
+import qualified AST.Expression.General as E
 import qualified AST.Literal as L
 import qualified AST.Module
 import qualified AST.Module.Name as MN
@@ -132,22 +131,22 @@ formatPattern apattern =
 formatExpression :: E.Expr -> Box
 formatExpression aexpr =
     case RA.drop aexpr of
-        EG.Literal lit -> formatLiteral lit
-        EG.Var _ -> text "<var>"
-        EG.Range _ _ -> text "<range>"
-        EG.ExplicitList _ -> text "<list>"
-        EG.Binop _ _ _ -> text "<binop>"
-        EG.Lambda _ _ -> text "<lambda expression>"
-        EG.App _ _ -> text "<app>"
-        EG.If _ _ -> text "<if>"
-        EG.Let _ _ -> text "<let>"
-        EG.Case _ _ -> text "<case>"
-        EG.Data _ _ -> text "<data>"
-        EG.Access _ _ -> text "<access>"
-        EG.Update _ _ -> text "<update>"
-        EG.Record _ -> text "<record>"
-        EG.Port _ -> text "<port>"
-        EG.GLShader _ _ _ -> text "<glshader>"
+        E.Literal lit -> formatLiteral lit
+        E.Var _ -> text "<var>"
+        E.Range _ _ -> text "<range>"
+        E.ExplicitList _ -> text "<list>"
+        E.Binop _ _ _ -> text "<binop>"
+        E.Lambda _ _ -> text "<lambda expression>"
+        E.App _ _ -> text "<app>"
+        E.If _ _ -> text "<if>"
+        E.Let _ _ -> text "<let>"
+        E.Case _ _ -> text "<case>"
+        E.Data _ _ -> text "<data>"
+        E.Access _ _ -> text "<access>"
+        E.Update _ _ -> text "<update>"
+        E.Record _ -> text "<record>"
+        E.Port _ -> text "<port>"
+        E.GLShader _ _ _ -> text "<glshader>"
 
 
 formatLiteral :: L.Literal -> Box

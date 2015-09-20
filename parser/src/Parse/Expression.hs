@@ -13,7 +13,6 @@ import qualified Parse.Pattern as Pattern
 import qualified Parse.Type as Type
 
 import qualified AST.Expression.General as E
-import qualified AST.Expression.Source as Source
 import qualified AST.Literal as L
 import qualified AST.Pattern as P
 import qualified AST.Variable as Var
@@ -22,12 +21,12 @@ import qualified Reporting.Annotation as A
 
 --------  Basic Terms  --------
 
-varTerm :: IParser Source.Expr'
+varTerm :: IParser E.Expr'
 varTerm =
   toVar <$> var
 
 
-toVar :: String -> Source.Expr'
+toVar :: String -> E.Expr'
 toVar v =
   case v of
     "True" ->
@@ -40,7 +39,7 @@ toVar v =
         E.rawVar v
 
 
-accessor :: IParser Source.Expr'
+accessor :: IParser E.Expr'
 accessor =
   do  (start, lbl, end) <- located (try (string "." >> rLabel))
 
@@ -53,7 +52,7 @@ accessor =
             (ann (E.Access (ann (E.rawVar "_")) lbl))
 
 
-negative :: IParser Source.Expr'
+negative :: IParser E.Expr'
 negative =
   do  (start, nTerm, end) <-
           located $ try $
@@ -73,7 +72,7 @@ negative =
 
 --------  Complex Terms  --------
 
-listTerm :: IParser Source.Expr'
+listTerm :: IParser E.Expr'
 listTerm =
     shader' <|> braces (try range <|> E.ExplicitList <$> commaSep expr)
   where
@@ -89,7 +88,7 @@ listTerm =
           return $ E.GLShader uid (filter (/='\r') rawSrc) tipe
 
 
-parensTerm :: IParser Source.Expr
+parensTerm :: IParser E.Expr
 parensTerm =
   choice
     [ try (parens opFn)
@@ -132,7 +131,7 @@ parensTerm =
                   A.at start end (E.tuple expressions)
 
 
-recordTerm :: IParser Source.Expr
+recordTerm :: IParser E.Expr
 recordTerm =
   addLocation $ brackets $ choice $
     [ do  starter <- try (addLocation rLabel)
@@ -170,7 +169,7 @@ recordTerm =
           return (key, value)
 
 
-term :: IParser Source.Expr
+term :: IParser E.Expr
 term =
   addLocation (choice [ E.Literal <$> Literal.literal, listTerm, accessor, negative ])
     <|> accessible (addLocation varTerm <|> parensTerm <|> recordTerm)
@@ -179,7 +178,7 @@ term =
 
 --------  Applications  --------
 
-appExpr :: IParser Source.Expr
+appExpr :: IParser E.Expr
 appExpr =
   expecting "an expression" $
   do  t <- term
@@ -193,7 +192,7 @@ appExpr =
 
 --------  Normal Expressions  --------
 
-expr :: IParser Source.Expr
+expr :: IParser E.Expr
 expr =
   addLocation (choice [ letExpr, caseExpr, ifExpr ])
     <|> lambdaExpr
@@ -201,7 +200,7 @@ expr =
     <?> "an expression"
 
 
-binaryExpr :: IParser Source.Expr
+binaryExpr :: IParser E.Expr
 binaryExpr =
     Binop.binops appExpr lastExpr anyOp
   where
@@ -211,12 +210,12 @@ binaryExpr =
         <?> "an expression"
 
 
-ifExpr :: IParser Source.Expr'
+ifExpr :: IParser E.Expr'
 ifExpr =
   ifHelp []
 
 
-ifHelp :: [(Source.Expr, Source.Expr)] -> IParser Source.Expr'
+ifHelp :: [(E.Expr, E.Expr)] -> IParser E.Expr'
 ifHelp branches =
   do  try (reserved "if")
       whitespace
@@ -233,7 +232,7 @@ ifHelp branches =
         ]
 
 
-lambdaExpr :: IParser Source.Expr
+lambdaExpr :: IParser E.Expr
 lambdaExpr =
   do  char '\\' <|> char '\x03BB' <?> "an anonymous function"
       whitespace
@@ -243,7 +242,7 @@ lambdaExpr =
       return (makeFunction args body)
 
 
-caseExpr :: IParser Source.Expr'
+caseExpr :: IParser E.Expr'
 caseExpr =
   do  try (reserved "case")
       e <- padded expr
@@ -265,7 +264,7 @@ caseExpr =
 
 -- LET
 
-letExpr :: IParser Source.Expr'
+letExpr :: IParser E.Expr'
 letExpr =
   do  try (reserved "let")
       whitespace
@@ -280,9 +279,9 @@ letExpr =
 
 -- TYPE ANNOTATION
 
-typeAnnotation :: IParser Source.Def
+typeAnnotation :: IParser E.Def
 typeAnnotation =
-    addLocation (Source.TypeAnnotation <$> try start <*> Type.expr)
+    addLocation (E.TypeAnnotation <$> try start <*> Type.expr)
   where
     start =
       do  v <- lowVar <|> parens symOp
@@ -292,17 +291,17 @@ typeAnnotation =
 
 -- DEFINITION
 
-definition :: IParser Source.Def
+definition :: IParser E.Def
 definition =
   addLocation $
   withPos $
     do  (name:args) <- defStart
         padded equals
         body <- expr
-        return . Source.Definition name $ makeFunction args body
+        return . E.Definition name $ makeFunction args body
 
 
-makeFunction :: [P.RawPattern] -> Source.Expr -> Source.Expr
+makeFunction :: [P.RawPattern] -> E.Expr -> E.Expr
 makeFunction args body@(A.A ann _) =
     foldr (\arg body' -> A.A ann $ E.Lambda arg body') body args
 
