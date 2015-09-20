@@ -14,11 +14,11 @@ annotations and definitions, which is how they appear in source code and how
 they are parsed.
 -}
 type Expr =
-  General.Expr R.Region Def Var.Raw Type.Raw
+  General.Expr Def Var.Raw Type.Raw
 
 
 type Expr' =
-  General.Expr' R.Region Def Var.Raw Type.Raw
+  General.Expr' Def Var.Raw Type.Raw
 
 
 type Def =

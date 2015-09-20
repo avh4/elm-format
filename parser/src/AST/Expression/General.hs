@@ -17,6 +17,7 @@ import qualified AST.Type as Type
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
 import qualified Reporting.PrettyPrint as P
+import qualified Reporting.Region as R
 
 
 ---- GENERAL AST ----
@@ -24,9 +25,6 @@ import qualified Reporting.PrettyPrint as P
 {-| This is a fully general Abstract Syntax Tree (AST) for expressions. It has
 "type holes" that allow us to enrich the AST with additional information as we
 move through the compilation process. The type holes are used to represent:
-
-  ann: Annotations for arbitrary expressions. Allows you to add information
-       to the AST like position in source code or inferred types.
 
   def: Definition style. The source syntax separates type annotations and
        definitions, but after parsing we check that they are well formed and
@@ -36,27 +34,27 @@ move through the compilation process. The type holes are used to represent:
        with information about what module a variable came from.
 
 -}
-type Expr annotation definition variable tipe =
-    A.Annotated annotation (Expr' annotation definition variable tipe)
+type Expr definition variable tipe =
+    A.Annotated R.Region (Expr' definition variable tipe)
 
 
-data Expr' ann def var typ
+data Expr' def var typ
     = Literal Literal.Literal
     | Var var
-    | Range (Expr ann def var typ) (Expr ann def var typ)
-    | ExplicitList [Expr ann def var typ]
-    | Binop var (Expr ann def var typ) (Expr ann def var typ)
-    | Lambda (Pattern.Pattern ann var) (Expr ann def var typ)
-    | App (Expr ann def var typ) (Expr ann def var typ)
-    | If [(Expr ann def var typ, Expr ann def var typ)] (Expr ann def var typ)
-    | Let [def] (Expr ann def var typ)
-    | Case (Expr ann def var typ) [(Pattern.Pattern ann var, Expr ann def var typ)]
-    | Data String [Expr ann def var typ]
-    | Access (Expr ann def var typ) String
-    | Update (Expr ann def var typ) [(String, Expr ann def var typ)]
-    | Record [(String, Expr ann def var typ)]
+    | Range (Expr def var typ) (Expr def var typ)
+    | ExplicitList [Expr def var typ]
+    | Binop var (Expr def var typ) (Expr def var typ)
+    | Lambda (Pattern.Pattern R.Region var) (Expr def var typ)
+    | App (Expr def var typ) (Expr def var typ)
+    | If [(Expr def var typ, Expr def var typ)] (Expr def var typ)
+    | Let [def] (Expr def var typ)
+    | Case (Expr def var typ) [(Pattern.Pattern R.Region var, Expr def var typ)]
+    | Data String [Expr def var typ]
+    | Access (Expr def var typ) String
+    | Update (Expr def var typ) [(String, Expr def var typ)]
+    | Record [(String, Expr def var typ)]
     -- for type checking and code gen only
-    | Port (PortImpl (Expr ann def var typ) typ)
+    | Port (PortImpl (Expr def var typ) typ)
     | GLShader String String Literal.GLShaderTipe
     deriving (Show)
 
@@ -80,17 +78,17 @@ portName impl =
 
 ---- UTILITIES ----
 
-rawVar :: String -> Expr' ann def Var.Raw typ
+rawVar :: String -> Expr' def Var.Raw typ
 rawVar x =
   Var (Var.Raw x)
 
 
-localVar :: String -> Expr' ann def Var.Canonical typ
+localVar :: String -> Expr' def Var.Canonical typ
 localVar x =
   Var (Var.Canonical Var.Local x)
 
 
-tuple :: [Expr ann def var typ] -> Expr' ann def var typ
+tuple :: [Expr def var typ] -> Expr' def var typ
 tuple expressions =
   Data ("_Tuple" ++ show (length expressions)) expressions
 
@@ -100,7 +98,7 @@ saveEnvName =
   "_save_the_environment!!!"
 
 
-dummyLet :: (P.Pretty def) => [def] -> Expr ann def Var.Canonical typ
+dummyLet :: (P.Pretty def) => [def] -> Expr def Var.Canonical typ
 dummyLet defs =
   let body =
         A.A undefined (Var (Var.builtin saveEnvName))
@@ -110,7 +108,7 @@ dummyLet defs =
 
 -- PRETTY PRINTING
 
-instance (P.Pretty def, P.Pretty var, Var.ToString var) => P.Pretty (Expr' ann def var typ) where
+instance (P.Pretty def, P.Pretty var, Var.ToString var) => P.Pretty (Expr' def var typ) where
   pretty dealiaser needsParens expression =
     case expression of
       Literal literal ->
@@ -253,7 +251,7 @@ instance P.Pretty (PortImpl expr tipe) where
       P.text ("<port:" ++ portName impl ++ ">")
 
 
-collectApps :: Expr ann def var typ -> [Expr ann def var typ]
+collectApps :: Expr def var typ -> [Expr def var typ]
 collectApps annExpr@(A.A _ expr) =
   case expr of
     App a b -> collectApps a ++ [b]
@@ -261,8 +259,8 @@ collectApps annExpr@(A.A _ expr) =
 
 
 collectLambdas
-    :: Expr ann def var typ
-    -> ([Pattern.Pattern ann var], Expr ann def var typ)
+    :: Expr def var typ
+    -> ([Pattern.Pattern R.Region var], Expr def var typ)
 collectLambdas lexpr@(A.A _ expr) =
   case expr of
     Lambda pattern body ->
