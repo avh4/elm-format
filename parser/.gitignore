@@ -1,0 +1,6 @@
+dist
+cabal-dev
+.cabal-sandbox/
+cabal.sandbox.config
+.DS_Store
+*~
