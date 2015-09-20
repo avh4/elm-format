@@ -12,14 +12,14 @@ import qualified Reporting.PrettyPrint as P
 import qualified Reporting.Region as R
 
 
-type Pattern var =
-    A.Annotated R.Region (Pattern' var)
+type Pattern =
+    A.Annotated R.Region Pattern'
 
 
-data Pattern' var
-    = Data var [Pattern var]
+data Pattern'
+    = Data Var.Raw [Pattern]
     | Record [String]
-    | Alias String (Pattern var)
+    | Alias String Pattern
     | Var String
     | Anything
     | Literal L.Literal
@@ -27,11 +27,11 @@ data Pattern' var
 
 
 type RawPattern =
-    Pattern Var.Raw
+    Pattern
 
 
 type RawPattern' =
-    Pattern' Var.Raw
+    Pattern'
 
 
 list :: R.Position -> [RawPattern] -> RawPattern
@@ -59,7 +59,7 @@ tuple patterns =
 
 -- FIND VARIABLES
 
-boundVars :: Pattern var -> [A.Annotated R.Region String]
+boundVars :: Pattern -> [A.Annotated R.Region String]
 boundVars (A.A ann pattern) =
   case pattern of
     Var x ->
@@ -81,24 +81,24 @@ boundVars (A.A ann pattern) =
         []
 
 
-member :: String -> Pattern var -> Bool
+member :: String -> Pattern -> Bool
 member name pattern =
   any (name==) (map A.drop (boundVars pattern))
 
 
-boundVarSet :: Pattern var -> Set.Set String
+boundVarSet :: Pattern -> Set.Set String
 boundVarSet pattern =
   Set.fromList (map A.drop (boundVars pattern))
 
 
-boundVarList :: Pattern var -> [String]
+boundVarList :: Pattern -> [String]
 boundVarList pattern =
   Set.toList (boundVarSet pattern)
 
 
 -- PRETTY PRINTING
 
-instance Var.ToString var => P.Pretty (Pattern' var) where
+instance P.Pretty Pattern' where
   pretty dealiaser needsParens pattern =
     case pattern of
       Var name ->
