@@ -4,7 +4,7 @@ module Format where
 import Elm.Utils ((|>))
 import Box
 
-import qualified AST.Declaration as D
+import qualified AST.Declaration
 import qualified AST.Expression
 import qualified AST.Literal as L
 import qualified AST.Module
@@ -83,17 +83,17 @@ formatVarValue aval =
         V.Union _ _ -> text "<union>"
 
 
-formatDeclaration :: D.SourceDecl -> Box
+formatDeclaration :: AST.Declaration.Decl -> Box
 formatDeclaration decl =
     case decl of
-        D.Comment s -> text "<comment>"
-        D.Decl adecl ->
+        AST.Declaration.Comment s -> text "<comment>"
+        AST.Declaration.Decl adecl ->
             case RA.drop adecl of
-                D.Definition def -> formatDefinition def
-                D.Datatype _ _ _ -> text "<datatype>"
-                D.TypeAlias _ _ _ -> text "<typealias>"
-                D.Port port -> text "<port>"
-                D.Fixity _ _ _ -> text "<fixity>"
+                AST.Declaration.Definition def -> formatDefinition def
+                AST.Declaration.Datatype _ _ _ -> text "<datatype>"
+                AST.Declaration.TypeAlias _ _ _ -> text "<typealias>"
+                AST.Declaration.Port port -> text "<port>"
+                AST.Declaration.Fixity _ _ _ -> text "<fixity>"
 
 
 formatDefinition :: AST.Expression.Def -> Box

@@ -8,7 +8,7 @@ import Control.Applicative ((<$>),(<*>))
 import Data.Binary
 import qualified Data.Map as Map
 
-import qualified AST.Declaration as Decl
+import qualified AST.Declaration as Declaration
 import qualified AST.Module.Name as Name
 import qualified AST.Type as Type
 import qualified AST.Variable as Var
@@ -26,13 +26,13 @@ data Module = Module
     , docs    :: A.Located (Maybe String)
     , exports :: (Var.Listing (A.Located Var.Value))
     , imports :: [UserImport]
-    , body    :: [Decl.SourceDecl]
+    , body    :: [Declaration.Decl]
     }
 
 
 data Body expr = Body
     { program   :: expr
-    , fixities  :: [(Decl.Assoc, Int, String)]
+    , fixities  :: [(Declaration.Assoc, Int, String)]
     , ports     :: [String]
     }
 

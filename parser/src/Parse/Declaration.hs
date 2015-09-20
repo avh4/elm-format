@@ -10,7 +10,7 @@ import Parse.Helpers as Help
 import qualified Parse.Type as Type
 
 
-declaration :: IParser AST.Declaration.SourceDecl
+declaration :: IParser AST.Declaration.Decl
 declaration =
   choice
     [ AST.Declaration.Comment <$> Help.docComment

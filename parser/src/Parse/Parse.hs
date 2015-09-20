@@ -7,7 +7,7 @@ import qualified Data.Traversable as T
 import Text.Parsec (char, eof, letter, many, optional, putState, (<|>))
 import qualified Text.Parsec.Error as Parsec
 
-import qualified AST.Declaration as D
+import qualified AST.Declaration
 import qualified AST.Module
 import qualified AST.Module.Name as ModuleName
 import qualified Elm.Compiler.Imports as Imports
@@ -42,13 +42,13 @@ programParser pkgName =
       return $ AST.Module.Module canonicalName "" docs exports imports decls
 
 
-declarations :: IParser [D.SourceDecl]
+declarations :: IParser [AST.Declaration.Decl]
 declarations =
   (:) <$> Decl.declaration
       <*> many freshDef
 
 
-freshDef :: IParser D.SourceDecl
+freshDef :: IParser AST.Declaration.Decl
 freshDef =
     commitIf (freshLine >> (letter <|> char '_')) $
       do  _ <- freshLine
@@ -89,9 +89,9 @@ parseWithTable table source parser =
 -- INFIX INFO
 
 makeInfixTable
-    :: Map.Map String (Int, D.Assoc)
+    :: Map.Map String (Int, AST.Declaration.Assoc)
     -> [(String, InfixInfo)]
-    -> Result.Result wrn Error.Error (Map.Map String (Int, D.Assoc))
+    -> Result.Result wrn Error.Error (Map.Map String (Int, AST.Declaration.Assoc))
 makeInfixTable table newInfo =
   let add (op, info) dict =
         Map.insertWith (++) op [info] dict
@@ -121,12 +121,12 @@ parseFixities =
   where
     infics =
       do  start <- getMyPosition
-          (D.Fixity assoc level op) <- Decl.infixDecl
+          (AST.Declaration.Fixity assoc level op) <- Decl.infixDecl
           end <- getMyPosition
           return (op, InfixInfo (R.Region start end) (level, assoc))
 
 
 data InfixInfo = InfixInfo
     { _region :: R.Region
-    , _info :: (Int, D.Assoc)
+    , _info :: (Int, AST.Declaration.Assoc)
     }
