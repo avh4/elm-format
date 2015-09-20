@@ -29,10 +29,10 @@ type Expr =
 
 data Expr'
     = Literal Literal.Literal
-    | Var Var.Var
+    | Var Var.Ref
     | Range Expr Expr
     | ExplicitList [Expr]
-    | Binop Var.Var Expr Expr
+    | Binop Var.Ref Expr Expr
     | Lambda Pattern.Pattern Expr
     | App Expr Expr
     | If [(Expr, Expr)] Expr
@@ -69,7 +69,7 @@ portName impl =
 
 rawVar :: String -> Expr'
 rawVar x =
-  Var (Var.Var x)
+  Var (Var.VarRef x)
 
 
 tuple :: [Expr] -> Expr'

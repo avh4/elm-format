@@ -32,7 +32,7 @@ basic =
               P.Literal (L.Boolean False)
 
           c:_ | isUpper c ->
-              P.Data (Var.Var str) []
+              P.Data (Var.VarRef str) []
 
           _ ->
               P.Var str
@@ -99,7 +99,7 @@ patternConstructor =
         case v of
           "True"  -> return $ P.Literal (L.Boolean True)
           "False" -> return $ P.Literal (L.Boolean False)
-          _       -> P.Data (Var.Var v) <$> spacePrefix term
+          _       -> P.Data (Var.VarRef v) <$> spacePrefix term
 
 
 expr :: IParser P.Pattern

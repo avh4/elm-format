@@ -22,8 +22,6 @@ data Error
     | DuplicateValueDeclaration String
     | DuplicateTypeDeclaration String
     | DuplicateDefinition String
-    | UnboundTypeVarsInAlias String [String] String [String] Type.Type
-    | UnboundTypeVarsInUnion String [String] String [String] [(String, [Type.Type])]
 
 
 -- TO REPORT
@@ -104,47 +102,6 @@ toReport dealiaser err =
           ("Find all the values named `" ++ name ++ "` in this let-expression and\n"
             ++ "do some renaming. Make sure the names are distinct!"
           )
-
-    UnboundTypeVarsInAlias typeName givenVars tvar tvars tipe ->
-        unboundTypeVars typeName tvar tvars $ P.render $
-            P.hang
-              (P.text "type alias" <+> P.text typeName <+> P.hsep vars <+> P.equals)
-              4
-              (P.pretty dealiaser False tipe)
-      where
-        vars = map P.text (givenVars ++ tvar : tvars)
-
-
-    UnboundTypeVarsInUnion typeName givenVars tvar tvars ctors ->
-        unboundTypeVars typeName tvar tvars $ P.render $
-            P.vcat
-              [ P.text "type" <+> P.text typeName <+> P.hsep vars
-              , map toDoc ctors
-                  |> zipWith (<+>) (P.text "=" : repeat (P.text "|"))
-                  |> P.vcat
-                  |> P.nest 4
-              ]
-      where
-        (|>) = flip ($)
-        vars = map P.text (givenVars ++ tvar : tvars)
-        toDoc (ctor, args) =
-            P.text ctor <+> P.hsep (map (P.pretty dealiaser True) args)
-
-
-unboundTypeVars :: String -> String -> [String] -> String -> Report.Report
-unboundTypeVars typeName tvar tvars revisedDeclaration =
-  Report.simple
-    "UNBOUND TYPE VARS"
-    ( "Not all type variables in `" ++ typeName ++ "` are listed, making sneaky\n"
-      ++ "type errors possible. Unbound type variables include: "
-      ++ List.intercalate ", " (tvar:tvars)
-    )
-    ( "You probably want this definition instead:\n"
-      ++ concatMap ("\n    "++) (lines revisedDeclaration) ++ "\n\n"
-      ++ "Here's why. Imagine one `" ++ typeName ++ "` where `" ++ tvar ++ "` is an Int and\n"
-      ++ "another where it is a Bool. When we explicitly list the type variables, type\n"
-      ++ "checker can see that they are actually different types."
-    )
 
 
 -- TAGGING PARSE ERRORS

@@ -17,7 +17,7 @@ type Pattern =
 
 
 data Pattern'
-    = Data Var.Var [Pattern]
+    = Data Var.Ref [Pattern]
     | Record [String]
     | Alias String Pattern
     | Var String
@@ -30,23 +30,23 @@ list :: R.Position -> [Pattern] -> Pattern
 list end patterns =
   case patterns of
     [] ->
-        A.at end end (Data (Var.Var "[]") [])
+        A.at end end (Data (Var.OpRef "[]") [])
 
     pattern@(A.A (R.Region start _) _) : rest ->
-        A.at start end (Data (Var.Var "::") [pattern, list end rest])
+        A.at start end (Data (Var.OpRef "::") [pattern, list end rest])
 
 
 consMany :: R.Position -> [Pattern] -> Pattern
 consMany end patterns =
   let cons hd@(A.A (R.Region start _) _) tl =
-          A.at start end (Data (Var.Var "::") [hd, tl])
+          A.at start end (Data (Var.OpRef "::") [hd, tl])
   in
       foldr1 cons patterns
 
 
 tuple :: [Pattern] -> Pattern'
 tuple patterns =
-  Data (Var.Var ("_Tuple" ++ show (length patterns))) patterns
+  Data (Var.VarRef ("_Tuple" ++ show (length patterns))) patterns
 
 
 -- FIND VARIABLES
@@ -86,46 +86,3 @@ boundVarSet pattern =
 boundVarList :: Pattern -> [String]
 boundVarList pattern =
   Set.toList (boundVarSet pattern)
-
-
--- PRETTY PRINTING
-
-instance P.Pretty Pattern' where
-  pretty dealiaser needsParens pattern =
-    case pattern of
-      Var name ->
-          P.text name
-
-      Literal literal ->
-          P.pretty dealiaser needsParens literal
-
-      Record fields ->
-          P.braces (P.commaCat (map P.text fields))
-
-      Alias x ptrn ->
-          P.parensIf needsParens $
-              P.pretty dealiaser True ptrn <+> P.text "as" <+> P.text x
-
-      Anything ->
-          P.text "_"
-
-      Data name [A.A _ hd, A.A _ tl]
-          | Var.toString name == "::" ->
-              P.parensIf isCons (P.pretty dealiaser False hd)
-              <+> P.text "::"
-              <+> P.pretty dealiaser False tl
-          where
-            isCons =
-              case hd of
-                Data ctor _ -> Var.toString ctor == "::"
-                _ -> False
-
-      Data name patterns ->
-          let name' = Var.toString name
-          in
-            if Help.isTuple name'
-              then
-                P.parens (P.commaCat (map (P.pretty dealiaser False) patterns))
-              else
-                P.parensIf needsParens $
-                    P.hsep (P.text name' : map (P.pretty dealiaser True) patterns)

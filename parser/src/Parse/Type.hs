@@ -60,7 +60,7 @@ constructor0 :: IParser Type.Type
 constructor0 =
   addLocation $
   do  name <- capTypeVar
-      return (Type.RType (Var.Var name))
+      return (Type.RType (Var.VarRef name))
 
 
 term :: IParser Type.Type
@@ -82,7 +82,7 @@ app =
       addLocation $
       do  n <- length <$> parens (many (char ','))
           let ctor = "_Tuple" ++ show (if n == 0 then 0 else n+1)
-          return (Type.RType (Var.Var ctor))
+          return (Type.RType (Var.VarRef ctor))
 
 
 expr :: IParser Type.Type

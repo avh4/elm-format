@@ -141,11 +141,11 @@ formatExpression aexpr =
             hbox
                 [ formatExpression l
                 , hspace 1
-                , formatVar op
+                , formatInfixVar op
                 , hspace 1
                 , formatExpression r
                 ]
-        AST.Expression.Lambda pat exp ->
+        AST.Expression.Lambda pat exp -> -- TODO: not tested
             hbox
                 [ text "(\\"
                 , formatPattern pat
@@ -192,10 +192,19 @@ formatType atype =
         AST.Type.RRecord _ _ -> text "<record>"
 
 
-formatVar :: AST.Variable.Var -> Box
+formatVar :: AST.Variable.Ref -> Box
 formatVar var =
     case var of
-        AST.Variable.Var name ->
+        AST.Variable.VarRef name ->
             text name
         AST.Variable.OpRef name ->
             text $ "(" ++ name ++ ")"
+
+
+formatInfixVar :: AST.Variable.Ref -> Box
+formatInfixVar var =
+    case var of
+        AST.Variable.VarRef name ->
+            text $ "`" ++ name ++ "`" -- TODO: not tested
+        AST.Variable.OpRef name ->
+            text name

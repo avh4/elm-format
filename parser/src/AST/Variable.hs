@@ -11,23 +11,10 @@ import qualified AST.Module.Name as ModuleName
 import qualified Reporting.PrettyPrint as P
 
 
--- RAW NAMES
-
-data Var
-    = Var String
+data Ref
+    = VarRef String
     | OpRef String
     deriving (Eq, Ord, Show)
-
-
--- VARIABLE TO STRING
-
-class ToString a where
-  toString :: a -> String
-
-
-instance ToString Var where
-  toString (Var name) =
-      name
 
 
 -- LISTINGS
@@ -102,32 +89,3 @@ getUnion value =
     Value _ -> Nothing
     Alias _ -> Nothing
     Union name ctors -> Just (name, ctors)
-
-
--- PRETTY VARIABLES
-
-instance P.Pretty Var where
-  pretty _ _ (Var name) =
-      if Help.isOp name
-        then P.parens (P.text name)
-        else P.text name
-
-
-instance P.Pretty a => P.Pretty (Listing a) where
-  pretty dealiaser _ (Listing explicits open) =
-      let dots = [if open then P.text ".." else P.empty]
-      in
-          P.parens (P.commaCat (map (P.pretty dealiaser False) explicits ++ dots))
-
-
-instance P.Pretty Value where
-  pretty dealiaser _ portable =
-    case portable of
-      Value name ->
-          P.text name
-
-      Alias name ->
-          P.text name
-
-      Union name ctors ->
-          P.text name <> P.pretty dealiaser False ctors

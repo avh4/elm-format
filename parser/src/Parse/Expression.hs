@@ -65,7 +65,7 @@ negative =
 
       return $
         E.Binop
-          (Var.Var "-")
+          (Var.OpRef "-")
           (ann (E.Literal (L.IntNum 0)))
           nTerm
 

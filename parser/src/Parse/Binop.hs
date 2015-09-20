@@ -90,7 +90,7 @@ joinL exprs ops =
         return expr
 
     (a:b:remainingExprs, op:remainingOps) ->
-        let binop = A.merge a b (Binop (Var.Var op) a b)
+        let binop = A.merge a b (Binop (Var.OpRef op) a b)
         in
             joinL (binop : remainingExprs) remainingOps
 
@@ -106,7 +106,7 @@ joinR exprs ops =
 
     (a:b:remainingExprs, op:remainingOps) ->
         do  e <- joinR (b:remainingExprs) remainingOps
-            return (A.merge a e (Binop (Var.Var op) a e))
+            return (A.merge a e (Binop (Var.OpRef op) a e))
 
     (_, _) ->
         failure "Ill-formed binary expression. Report a compiler bug."
