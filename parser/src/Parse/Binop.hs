@@ -6,8 +6,8 @@ import qualified Data.Map as Map
 import Text.Parsec ((<|>), choice, getState, try)
 
 import AST.Declaration (Assoc(L, N, R))
-import AST.Expression.General (Expr'(Binop))
-import qualified AST.Expression.Source as Source
+import AST.Expression (Expr'(Binop))
+import qualified AST.Expression as E
 import qualified AST.Variable as Var
 import Parse.Helpers (IParser, OpTable, commitIf, failure, whitespace)
 import qualified Reporting.Annotation as A
@@ -23,16 +23,16 @@ opAssoc table op =
   snd $ Map.findWithDefault (9,L) op table
 
 
-hasLevel :: OpTable -> Int -> (String, Source.Expr) -> Bool
+hasLevel :: OpTable -> Int -> (String, E.Expr) -> Bool
 hasLevel table n (op,_) =
   opLevel table op == n
 
 
 binops
-    :: IParser Source.Expr
-    -> IParser Source.Expr
+    :: IParser E.Expr
+    -> IParser E.Expr
     -> IParser String
-    -> IParser Source.Expr
+    -> IParser E.Expr
 binops term last anyOp =
   do  e <- term
       table <- getState
@@ -55,9 +55,9 @@ binops term last anyOp =
 split
     :: OpTable
     -> Int
-    -> Source.Expr
-    -> [(String, Source.Expr)]
-    -> IParser Source.Expr
+    -> E.Expr
+    -> [(String, E.Expr)]
+    -> IParser E.Expr
 split _ _ e [] = return e
 split table n e eops =
   do  assoc <- getAssoc table n eops
@@ -71,9 +71,9 @@ split table n e eops =
 splitLevel
     :: OpTable
     -> Int
-    -> Source.Expr
-    -> [(String, Source.Expr)]
-    -> [IParser Source.Expr]
+    -> E.Expr
+    -> [(String, E.Expr)]
+    -> [IParser E.Expr]
 splitLevel table n e eops =
   case break (hasLevel table n) eops of
     (lops, (_op,e'):rops) ->
@@ -83,7 +83,7 @@ splitLevel table n e eops =
         [ split table (n+1) e lops ]
 
 
-joinL :: [Source.Expr] -> [String] -> IParser Source.Expr
+joinL :: [E.Expr] -> [String] -> IParser E.Expr
 joinL exprs ops =
   case (exprs, ops) of
     ([expr], []) ->
@@ -98,7 +98,7 @@ joinL exprs ops =
         failure "Ill-formed binary expression. Report a compiler bug."
 
 
-joinR :: [Source.Expr] -> [String] -> IParser Source.Expr
+joinR :: [E.Expr] -> [String] -> IParser E.Expr
 joinR exprs ops =
   case (exprs, ops) of
     ([expr], []) ->
@@ -112,7 +112,7 @@ joinR exprs ops =
         failure "Ill-formed binary expression. Report a compiler bug."
 
 
-getAssoc :: OpTable -> Int -> [(String,Source.Expr)] -> IParser Assoc
+getAssoc :: OpTable -> Int -> [(String,E.Expr)] -> IParser Assoc
 getAssoc table n eops
     | all (==L) assocs = return L
     | all (==R) assocs = return R

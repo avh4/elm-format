@@ -5,7 +5,7 @@ import Elm.Utils ((|>))
 import Box
 
 import qualified AST.Declaration as D
-import qualified AST.Expression.General as E
+import qualified AST.Expression
 import qualified AST.Literal as L
 import qualified AST.Module
 import qualified AST.Module.Name as MN
@@ -96,10 +96,10 @@ formatDeclaration decl =
                 D.Fixity _ _ _ -> text "<fixity>"
 
 
-formatDefinition :: E.Def -> Box
+formatDefinition :: AST.Expression.Def -> Box
 formatDefinition adef =
     case RA.drop adef of
-        E.Definition pattern expr ->
+        AST.Expression.Definition pattern expr ->
             vbox
                 [ hbox
                     [ formatPattern pattern
@@ -109,7 +109,7 @@ formatDefinition adef =
                     |> indent
                     |> margin 2
                 ]
-        E.TypeAnnotation name typ ->
+        AST.Expression.TypeAnnotation name typ ->
             hbox
                 [ text name
                 , text " : "
@@ -128,25 +128,25 @@ formatPattern apattern =
         P.Literal _ -> text "<literal>"
 
 
-formatExpression :: E.Expr -> Box
+formatExpression :: AST.Expression.Expr -> Box
 formatExpression aexpr =
     case RA.drop aexpr of
-        E.Literal lit -> formatLiteral lit
-        E.Var _ -> text "<var>"
-        E.Range _ _ -> text "<range>"
-        E.ExplicitList _ -> text "<list>"
-        E.Binop _ _ _ -> text "<binop>"
-        E.Lambda _ _ -> text "<lambda expression>"
-        E.App _ _ -> text "<app>"
-        E.If _ _ -> text "<if>"
-        E.Let _ _ -> text "<let>"
-        E.Case _ _ -> text "<case>"
-        E.Data _ _ -> text "<data>"
-        E.Access _ _ -> text "<access>"
-        E.Update _ _ -> text "<update>"
-        E.Record _ -> text "<record>"
-        E.Port _ -> text "<port>"
-        E.GLShader _ _ _ -> text "<glshader>"
+        AST.Expression.Literal lit -> formatLiteral lit
+        AST.Expression.Var _ -> text "<var>"
+        AST.Expression.Range _ _ -> text "<range>"
+        AST.Expression.ExplicitList _ -> text "<list>"
+        AST.Expression.Binop _ _ _ -> text "<binop>"
+        AST.Expression.Lambda _ _ -> text "<lambda expression>"
+        AST.Expression.App _ _ -> text "<app>"
+        AST.Expression.If _ _ -> text "<if>"
+        AST.Expression.Let _ _ -> text "<let>"
+        AST.Expression.Case _ _ -> text "<case>"
+        AST.Expression.Data _ _ -> text "<data>"
+        AST.Expression.Access _ _ -> text "<access>"
+        AST.Expression.Update _ _ -> text "<update>"
+        AST.Expression.Record _ -> text "<record>"
+        AST.Expression.Port _ -> text "<port>"
+        AST.Expression.GLShader _ _ _ -> text "<glshader>"
 
 
 formatLiteral :: L.Literal -> Box

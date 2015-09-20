@@ -3,7 +3,7 @@ module AST.Declaration where
 
 import Data.Binary
 
-import qualified AST.Expression.General as Expression
+import qualified AST.Expression as Expression
 import qualified AST.Type as Type
 import qualified Reporting.Annotation as A
 

@@ -12,7 +12,7 @@ import qualified Parse.Literal as Literal
 import qualified Parse.Pattern as Pattern
 import qualified Parse.Type as Type
 
-import qualified AST.Expression.General as E
+import qualified AST.Expression as E
 import qualified AST.Literal as L
 import qualified AST.Pattern as P
 import qualified AST.Variable as Var

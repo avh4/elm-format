@@ -13,8 +13,7 @@ import Text.Parsec.Indent (indented, runIndent)
 import qualified Text.Parsec.Token as T
 
 import qualified AST.Declaration as Decl
-import qualified AST.Expression.General as E
-import qualified AST.Expression.Source as Source
+import qualified AST.Expression
 import qualified AST.Helpers as Help
 import qualified AST.Literal as L
 import qualified AST.Variable as Variable
@@ -278,7 +277,7 @@ located parser =
       return (start, value, end)
 
 
-accessible :: IParser Source.Expr -> IParser Source.Expr
+accessible :: IParser AST.Expression.Expr -> IParser AST.Expression.Expr
 accessible exprParser =
   do  start <- getMyPosition
 
@@ -296,11 +295,11 @@ accessible exprParser =
                 end <- getMyPosition
                 return . A.at start end $
                     case rootExpr of
-                      E.Var (Variable.Raw name@(c:_))
+                      AST.Expression.Var (Variable.Raw name@(c:_))
                         | isUpper c ->
-                            E.rawVar (name ++ '.' : v)
+                            AST.Expression.rawVar (name ++ '.' : v)
                       _ ->
-                        E.Access annotatedRootExpr v
+                        AST.Expression.Access annotatedRootExpr v
 
 
 dot :: IParser ()
