@@ -92,7 +92,8 @@ formatDeclaration decl =
                 AST.Declaration.Definition def -> formatDefinition def
                 AST.Declaration.Datatype _ _ _ -> text "<datatype>"
                 AST.Declaration.TypeAlias _ _ _ -> text "<typealias>"
-                AST.Declaration.Port port -> text "<port>"
+                AST.Declaration.PortAnnotation _ _ -> text "<port annotation>"
+                AST.Declaration.PortDefinition _ _ -> text "<port definition>"
                 AST.Declaration.Fixity _ _ _ -> text "<fixity>"
 
 

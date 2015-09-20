@@ -81,11 +81,11 @@ port =
       do  try hasType
           whitespace
           tipe <- Type.expr <?> "a type"
-          return (AST.Declaration.Port (AST.Declaration.PortAnnotation name tipe))
+          return (AST.Declaration.PortAnnotation name tipe)
 
     portDefinition name =
       do  try equals
           whitespace
           expr <- Expr.expr
-          return (AST.Declaration.Port (AST.Declaration.PortDefinition name expr))
+          return (AST.Declaration.PortDefinition name expr)
 

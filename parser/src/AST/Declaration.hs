@@ -14,7 +14,8 @@ data Declaration
     = Definition Expression.Def
     | Datatype String [String] [(String, [Type.Type])]
     | TypeAlias String [String] Type.Type
-    | Port Port
+    | PortAnnotation String Type.Type
+    | PortDefinition String Expression.Expr
     | Fixity Assoc Int String
 
 
@@ -38,10 +39,3 @@ assocToString assoc =
 data Decl
     = Comment String
     | Decl (A.Located Declaration)
-
-
--- PORTS
-
-data Port
-    = PortAnnotation String Type.Type
-    | PortDefinition String Expression.Expr
