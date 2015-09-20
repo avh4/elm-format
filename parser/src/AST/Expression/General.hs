@@ -30,31 +30,28 @@ move through the compilation process. The type holes are used to represent:
        definitions, but after parsing we check that they are well formed and
        collapse them.
 
-  var: Representation of variables. Starts as strings, but is later enriched
-       with information about what module a variable came from.
-
 -}
-type Expr definition variable =
-    A.Annotated R.Region (Expr' definition variable)
+type Expr definition =
+    A.Annotated R.Region (Expr' definition)
 
 
-data Expr' def var
+data Expr' def
     = Literal Literal.Literal
-    | Var var
-    | Range (Expr def var) (Expr def var)
-    | ExplicitList [Expr def var]
-    | Binop var (Expr def var) (Expr def var)
-    | Lambda (Pattern.Pattern R.Region var) (Expr def var)
-    | App (Expr def var) (Expr def var)
-    | If [(Expr def var, Expr def var)] (Expr def var)
-    | Let [def] (Expr def var)
-    | Case (Expr def var) [(Pattern.Pattern R.Region var, Expr def var)]
-    | Data String [Expr def var]
-    | Access (Expr def var) String
-    | Update (Expr def var) [(String, Expr def var)]
-    | Record [(String, Expr def var)]
+    | Var Var.Raw
+    | Range (Expr def) (Expr def)
+    | ExplicitList [Expr def]
+    | Binop Var.Raw (Expr def) (Expr def)
+    | Lambda (Pattern.Pattern R.Region Var.Raw) (Expr def)
+    | App (Expr def) (Expr def)
+    | If [(Expr def, Expr def)] (Expr def)
+    | Let [def] (Expr def)
+    | Case (Expr def) [(Pattern.Pattern R.Region Var.Raw, Expr def)]
+    | Data String [Expr def]
+    | Access (Expr def) String
+    | Update (Expr def) [(String, Expr def)]
+    | Record [(String, Expr def)]
     -- for type checking and code gen only
-    | Port (PortImpl (Expr def var))
+    | Port (PortImpl (Expr def))
     | GLShader String String Literal.GLShaderTipe
     deriving (Show)
 
@@ -78,12 +75,12 @@ portName impl =
 
 ---- UTILITIES ----
 
-rawVar :: String -> Expr' def Var.Raw
+rawVar :: String -> Expr' def
 rawVar x =
   Var (Var.Raw x)
 
 
-tuple :: [Expr def var] -> Expr' def var
+tuple :: [Expr def] -> Expr' def
 tuple expressions =
   Data ("_Tuple" ++ show (length expressions)) expressions
 
@@ -95,7 +92,7 @@ saveEnvName =
 
 -- PRETTY PRINTING
 
-instance (P.Pretty def, P.Pretty var, Var.ToString var) => P.Pretty (Expr' def var) where
+instance (P.Pretty def) => P.Pretty (Expr' def) where
   pretty dealiaser needsParens expression =
     case expression of
       Literal literal ->
@@ -238,7 +235,7 @@ instance P.Pretty (PortImpl expr) where
       P.text ("<port:" ++ portName impl ++ ">")
 
 
-collectApps :: Expr def var -> [Expr def var]
+collectApps :: Expr def -> [Expr def]
 collectApps annExpr@(A.A _ expr) =
   case expr of
     App a b -> collectApps a ++ [b]
@@ -246,8 +243,8 @@ collectApps annExpr@(A.A _ expr) =
 
 
 collectLambdas
-    :: Expr def var
-    -> ([Pattern.Pattern R.Region var], Expr def var)
+    :: Expr def
+    -> ([Pattern.Pattern R.Region Var.Raw], Expr def)
 collectLambdas lexpr@(A.A _ expr) =
   case expr of
     Lambda pattern body ->
