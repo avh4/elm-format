@@ -1,4 +1,4 @@
-module Parse.Binop (binops, OpTable) where
+module Parse.Binop (binops) where
 
 import Control.Applicative ((<$>))
 import qualified Data.List as List
@@ -9,23 +9,9 @@ import AST.Declaration (Assoc(L, N, R))
 import AST.Expression (Expr'(Binop))
 import qualified AST.Expression as E
 import qualified AST.Variable as Var
-import Parse.Helpers (IParser, OpTable, commitIf, failure, whitespace)
+import qualified Parse.OpTable as OpTable
+import Parse.Helpers (IParser, commitIf, failure, whitespace)
 import qualified Reporting.Annotation as A
-
-
-opLevel :: OpTable -> String -> Int
-opLevel table op =
-  fst $ Map.findWithDefault (9,L) op table
-
-
-opAssoc :: OpTable -> String -> Assoc
-opAssoc table op =
-  snd $ Map.findWithDefault (9,L) op table
-
-
-hasLevel :: OpTable -> Int -> (String, E.Expr) -> Bool
-hasLevel table n (op,_) =
-  opLevel table op == n
 
 
 binops
@@ -53,7 +39,7 @@ binops term last anyOp =
 
 
 split
-    :: OpTable
+    :: OpTable.OpTable
     -> Int
     -> E.Expr
     -> [(String, E.Expr)]
@@ -62,20 +48,20 @@ split _ _ e [] = return e
 split table n e eops =
   do  assoc <- getAssoc table n eops
       es <- sequence (splitLevel table n e eops)
-      let ops = map fst (filter (hasLevel table n) eops)
+      let ops = map fst (filter (OpTable.hasLevel table n) eops)
       case assoc of
         R -> joinR es ops
         _ -> joinL es ops
 
 
 splitLevel
-    :: OpTable
+    :: OpTable.OpTable
     -> Int
     -> E.Expr
     -> [(String, E.Expr)]
     -> [IParser E.Expr]
 splitLevel table n e eops =
-  case break (hasLevel table n) eops of
+  case break (OpTable.hasLevel table n) eops of
     (lops, (_op,e'):rops) ->
         split table (n+1) e lops : splitLevel table n e' rops
 
@@ -112,7 +98,7 @@ joinR exprs ops =
         failure "Ill-formed binary expression. Report a compiler bug."
 
 
-getAssoc :: OpTable -> Int -> [(String,E.Expr)] -> IParser Assoc
+getAssoc :: OpTable.OpTable -> Int -> [(String,E.Expr)] -> IParser Assoc
 getAssoc table n eops
     | all (==L) assocs = return L
     | all (==R) assocs = return R
@@ -122,8 +108,8 @@ getAssoc table n eops
           _   -> failure (msg "precedence")
     | otherwise = failure (msg "associativity")
   where
-    levelOps = filter (hasLevel table n) eops
-    assocs = map (opAssoc table . fst) levelOps
+    levelOps = filter (OpTable.hasLevel table n) eops
+    assocs = map (OpTable.assoc table . fst) levelOps
     msg problem =
         concat
           [ "Conflicting " ++ problem ++ " for binary operators ("

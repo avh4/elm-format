@@ -12,6 +12,7 @@ import qualified AST.Module
 import qualified AST.Module.Name as ModuleName
 import qualified Elm.Compiler.Imports as Imports
 import qualified Elm.Package as Package
+import qualified Parse.OpTable as OpTable
 import Parse.Helpers
 import qualified Parse.Module as Module
 import qualified Parse.Declaration as Decl
@@ -71,7 +72,7 @@ parse source parser =
 
 
 parseWithTable
-    :: OpTable
+    :: OpTable.OpTable
     -> String
     -> IParser a
     -> Result.Result wrn Error.Error a

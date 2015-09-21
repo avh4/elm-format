@@ -17,6 +17,7 @@ import qualified AST.Expression
 import qualified AST.Helpers as Help
 import qualified AST.Literal as L
 import qualified AST.Variable
+import qualified Parse.State
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Region as R
@@ -43,19 +44,18 @@ expecting = flip (<?>)
 
 -- SETUP
 
-type OpTable = Map.Map String (Int, Decl.Assoc)
 type SourceM = State SourcePos
-type IParser a = ParsecT String OpTable SourceM a
+type IParser a = ParsecT String Parse.State.State SourceM a
 
 
 iParse :: IParser a -> String -> Either ParseError a
 iParse parser source =
-  iParseWithTable "" Map.empty parser source
+  iParseWithState "" Parse.State.init parser source
 
 
-iParseWithTable :: SourceName -> OpTable -> IParser a -> String -> Either ParseError a
-iParseWithTable sourceName table aParser input =
-  runIndent sourceName $ runParserT aParser table sourceName input
+iParseWithState :: SourceName -> Parse.State.State -> IParser a -> String -> Either ParseError a
+iParseWithState sourceName state aParser input =
+  runIndent sourceName $ runParserT aParser state sourceName input
 
 
 -- VARIABLES
