@@ -3,8 +3,20 @@ module Parse.State where
 import qualified Parse.OpTable as OpTable
 
 
-type State = OpTable.OpTable
+data State = State
+	{ ops :: OpTable.OpTable
+	}
 
 
 init :: State
-init = OpTable.empty
+init =
+	State
+		{ ops = OpTable.empty
+		}
+
+
+setOps :: OpTable.OpTable -> State -> State
+setOps table _ =
+	State
+		{ ops = table
+		}

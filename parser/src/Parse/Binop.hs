@@ -9,8 +9,9 @@ import AST.Declaration (Assoc(L, N, R))
 import AST.Expression (Expr'(Binop))
 import qualified AST.Expression as E
 import qualified AST.Variable as Var
-import qualified Parse.OpTable as OpTable
 import Parse.Helpers (IParser, commitIf, failure, whitespace)
+import qualified Parse.OpTable as OpTable
+import qualified Parse.State as State
 import qualified Reporting.Annotation as A
 
 
@@ -21,8 +22,8 @@ binops
     -> IParser E.Expr
 binops term last anyOp =
   do  e <- term
-      table <- getState
-      split table 0 e =<< nextOps
+      state <- getState
+      split (State.ops state) 0 e =<< nextOps
   where
     nextOps =
       choice

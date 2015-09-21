@@ -4,7 +4,7 @@ module Parse.Parse (parse, parseSource) where
 import Control.Applicative ((<$>), (<*>))
 import qualified Data.Map as Map
 import qualified Data.Traversable as T
-import Text.Parsec (char, eof, letter, many, optional, putState, (<|>))
+import Text.Parsec (char, eof, letter, many, optional, updateState, (<|>))
 import qualified Text.Parsec.Error as Parsec
 
 import qualified AST.Declaration
@@ -12,10 +12,11 @@ import qualified AST.Module
 import qualified AST.Module.Name as ModuleName
 import qualified Elm.Compiler.Imports as Imports
 import qualified Elm.Package as Package
-import qualified Parse.OpTable as OpTable
+import qualified Parse.Declaration as Decl
 import Parse.Helpers
 import qualified Parse.Module as Module
-import qualified Parse.Declaration as Decl
+import qualified Parse.OpTable as OpTable
+import qualified Parse.State as State
 import qualified Reporting.Region as R
 import qualified Reporting.Error.Syntax as Error
 import qualified Reporting.Result as Result
@@ -82,7 +83,7 @@ parseWithTable table source parser =
       infixTable <- makeInfixTable table infixInfoList
 
       parse source $
-          do  putState infixTable
+          do  updateState (State.setOps infixTable)
               parser
 
 
