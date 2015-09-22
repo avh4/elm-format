@@ -210,10 +210,10 @@ constrainedSpacePrefix :: IParser a -> IParser [a]
 constrainedSpacePrefix parser =
   constrainedSpacePrefix' parser constraint
   where
-    constraint str = if null str then notFollowedBy (char '-') else return ()
+    constraint empty = if empty then notFollowedBy (char '-') else return ()
 
 
-constrainedSpacePrefix' :: IParser a -> (String -> IParser b) -> IParser [a]
+constrainedSpacePrefix' :: IParser a -> (Bool -> IParser b) -> IParser [a]
 constrainedSpacePrefix' parser constraint =
     many $ choice
       [ try (spacing >> lookAhead (oneOf "[({")) >> parser
@@ -222,7 +222,7 @@ constrainedSpacePrefix' parser constraint =
     where
       spacing = do
         n <- whitespace
-        constraint n <?> Syntax.whitespace
+        constraint (not n) <?> Syntax.whitespace
         indented
 
 
@@ -327,57 +327,61 @@ padded p =
       return out
 
 
-spaces :: IParser String
+spaces :: IParser ()
 spaces =
   let space = string " " <|> multiComment <?> Syntax.whitespace
   in
-      concat <$> many1 space
+      many1 space >> return ()
 
 
-forcedWS :: IParser String
+forcedWS :: IParser ()
 forcedWS =
   choice
-    [ (++) <$> spaces <*> (concat <$> many nl_space)
-    , concat <$> many1 nl_space
+    [ spaces >> many nl_space
+    , many1 nl_space
     ]
+  >> return ()
   where
     nl_space =
-      try ((++) <$> (concat <$> many1 newline) <*> spaces)
+      try (many1 newline >> spaces)
 
 
 -- Just eats whitespace until the next meaningful character.
-dumbWhitespace :: IParser String
+dumbWhitespace :: IParser ()
 dumbWhitespace =
-  concat <$> many (spaces <|> newline)
+  many (spaces <|> newline) >> return ()
 
 
-whitespace :: IParser String
+whitespace :: IParser Bool
 whitespace =
-  option "" forcedWS
+  option False (forcedWS >> return True)
 
 
-freshLine :: IParser [[String]]
+freshLine :: IParser ()
 freshLine =
-    try (many1 newline >> many space_nl) <|> try (many1 space_nl) <?> Syntax.freshLine
+    do  try (many1 newline >> many space_nl) <|> try (many1 space_nl) <?> Syntax.freshLine
+        return ()
   where
     space_nl = try $ spaces >> many1 newline
 
 
-newline :: IParser String
+newline :: IParser ()
 newline =
   simpleNewline <|> lineComment <?> Syntax.newline
 
 
-simpleNewline :: IParser String
+simpleNewline :: IParser ()
 simpleNewline =
-  try (string "\r\n") <|> string "\n"
+  do  try (string "\r\n") <|> string "\n"
+      return ()
 
 
-lineComment :: IParser String
+lineComment :: IParser ()
 lineComment =
   do  try (string "--")
-      comment <- anyUntil $ simpleNewline <|> (eof >> return "\n")
+      comment <- anyUntil $ simpleNewline <|> eof
       return ("--" ++ comment)
+      return ()
 
 
 docComment :: IParser String
@@ -417,12 +421,12 @@ until p end =
     go = end <|> (p >> go)
 
 
-anyUntil :: IParser String -> IParser String
+anyUntil :: IParser a -> IParser String
 anyUntil end =
     go
   where
     go =
-      end <|> (:) <$> anyChar <*> go
+      (end >> return "") <|> (:) <$> anyChar <*> go
 
 
 ignoreUntil :: IParser a -> IParser (Maybe a)
