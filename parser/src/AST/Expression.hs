@@ -2,6 +2,7 @@
 
 module AST.Expression where
 
+import AST.V0_15
 import qualified AST.Helpers as Help
 import qualified AST.Literal as Literal
 import qualified AST.Pattern as Pattern
@@ -28,7 +29,7 @@ type Expr =
 
 
 data Expr'
-    = Literal Literal.Literal
+    = Literal (Commented Literal.Literal)
     | Var Var.Ref
     | Range Expr Expr
     | ExplicitList [Expr]

@@ -15,5 +15,9 @@ annotatedFn =
     "XYZZY"
 
 
-pipeline =
+inlinePipeline =
     1 |> (+) 2
+
+
+commentedLiterals =
+    {- one -} 1 + {- two -} 2

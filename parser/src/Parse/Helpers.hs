@@ -12,12 +12,13 @@ import Text.Parsec hiding (newline, spaces, State)
 import Text.Parsec.Indent (indented, runIndent)
 import qualified Text.Parsec.Token as T
 
+import AST.V0_15
 import qualified AST.Declaration as Decl
 import qualified AST.Expression
 import qualified AST.Helpers as Help
 import qualified AST.Literal as L
 import qualified AST.Variable
-import qualified Parse.State
+import qualified Parse.State as State
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Region as R
@@ -45,15 +46,15 @@ expecting = flip (<?>)
 -- SETUP
 
 type SourceM = State SourcePos
-type IParser a = ParsecT String Parse.State.State SourceM a
+type IParser a = ParsecT String State.State SourceM a
 
 
 iParse :: IParser a -> String -> Either ParseError a
 iParse parser source =
-  iParseWithState "" Parse.State.init parser source
+  iParseWithState "" State.init parser source
 
 
-iParseWithState :: SourceName -> Parse.State.State -> IParser a -> String -> Either ParseError a
+iParseWithState :: SourceName -> State.State -> IParser a -> String -> Either ParseError a
 iParseWithState sourceName state aParser input =
   runIndent sourceName $ runParserT aParser state sourceName input
 
@@ -272,6 +273,14 @@ getMyPosition =
   R.fromSourcePos <$> getPosition
 
 
+addComments :: IParser a -> IParser (Commented a)
+addComments parser =
+  do  value <- parser
+      state <- getState
+      updateState State.clearComments
+      return $ Commented (reverse $ State.comments state) value
+
+
 addLocation :: IParser a -> IParser (A.Located a)
 addLocation expr =
   do  (start, e, end) <- located expr
@@ -329,7 +338,7 @@ padded p =
 
 spaces :: IParser ()
 spaces =
-  let space = string " " <|> multiComment <?> Syntax.whitespace
+  let space = (string " " >> return ()) <|> multiComment <?> Syntax.whitespace
   in
       many1 space >> return ()
 
@@ -391,16 +400,20 @@ docComment =
       return (init (init contents))
 
 
-multiComment :: IParser String
+multiComment :: IParser ()
 multiComment =
-  (++) <$> try (string "{-" <* notFollowedBy (string "|")) <*> closeComment
+  do  try (string "{-" <* notFollowedBy (string "|") )
+      many (string " ")
+      b <- closeComment
+      updateState $ State.addComment $ b
+      return ()
 
 
 closeComment :: IParser String
 closeComment =
     anyUntil $
       choice $
-        [ try (string "-}") <?> "the end of a comment -}"
+        [ try (many (string " ") >> string "-}") <?> "the end of a comment -}"
         , concat <$> sequence [ try (string "{-"), closeComment, closeComment ]
         ]
 

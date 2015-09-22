@@ -12,6 +12,7 @@ import qualified Parse.Literal as Literal
 import qualified Parse.Pattern as Pattern
 import qualified Parse.Type as Type
 
+import AST.V0_15
 import qualified AST.Expression as E
 import qualified AST.Literal as L
 import qualified AST.Pattern as P
@@ -30,10 +31,10 @@ toVar :: String -> E.Expr'
 toVar v =
   case v of
     "True" ->
-        E.Literal (L.Boolean True)
+        E.Literal $ Commented [] $ L.Boolean True
 
     "False" ->
-        E.Literal (L.Boolean False)
+        E.Literal $ Commented [] $ L.Boolean False
 
     _ ->
         E.rawVar v
@@ -66,7 +67,7 @@ negative =
       return $
         E.Binop
           (Var.OpRef "-")
-          (ann (E.Literal (L.IntNum 0)))
+          (ann $ E.Literal $ Commented [] $ L.IntNum 0)
           nTerm
 
 
@@ -169,7 +170,7 @@ recordTerm =
 
 term :: IParser E.Expr
 term =
-  addLocation (choice [ E.Literal <$> Literal.literal, listTerm, accessor, negative ])
+  addLocation (choice [ E.Literal <$> addComments Literal.literal, listTerm, accessor, negative ])
     <|> accessible (addLocation varTerm <|> parensTerm <|> recordTerm)
     <?> "an expression"
 

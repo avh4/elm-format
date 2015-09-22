@@ -4,6 +4,7 @@ module Format where
 import Elm.Utils ((|>))
 import Box
 
+import AST.V0_15
 import qualified AST.Declaration
 import qualified AST.Expression
 import qualified AST.Literal as L
@@ -132,7 +133,7 @@ formatPattern apattern =
 formatExpression :: AST.Expression.Expr -> Box
 formatExpression aexpr =
     case RA.drop aexpr of
-        AST.Expression.Literal lit -> formatLiteral lit
+        AST.Expression.Literal lit -> formatCommented formatLiteral lit
         AST.Expression.Var v ->
             formatVar v
         AST.Expression.Range _ _ -> text "<range>"
@@ -168,6 +169,21 @@ formatExpression aexpr =
         AST.Expression.Record _ -> text "<record>"
         AST.Expression.Port _ -> text "<port>"
         AST.Expression.GLShader _ _ _ -> text "<glshader>"
+
+
+formatCommented :: (a -> Box) -> Commented a -> Box
+formatCommented format commented =
+    case commented of
+        Commented comments inner ->
+            hbox
+                [ hbox (map formatComment comments)
+                , format inner
+                ]
+
+
+formatComment :: String -> Box
+formatComment comment =
+    text $ "{- " ++ comment ++ " -} "
 
 
 formatLiteral :: L.Literal -> Box
