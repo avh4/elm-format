@@ -180,8 +180,7 @@ appExpr :: IParser E.Expr
 appExpr =
   expecting "an expression" $
   do  t <- term
-      ts <- constrainedSpacePrefix term $ \str ->
-                if null str then notFollowedBy (char '-') else return ()
+      ts <- constrainedSpacePrefix term
       return $
           case ts of
             [] -> t

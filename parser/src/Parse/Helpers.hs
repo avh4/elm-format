@@ -201,11 +201,20 @@ spaceSep1 p =
   (:) <$> p <*> spacePrefix p
 
 
+spacePrefix :: IParser a -> IParser [a]
 spacePrefix p =
-  constrainedSpacePrefix p (\_ -> return ())
+  constrainedSpacePrefix' p (\_ -> return ())
 
 
-constrainedSpacePrefix parser constraint =
+constrainedSpacePrefix :: IParser a -> IParser [a]
+constrainedSpacePrefix parser =
+  constrainedSpacePrefix' parser constraint
+  where
+    constraint str = if null str then notFollowedBy (char '-') else return ()
+
+
+constrainedSpacePrefix' :: IParser a -> (String -> IParser b) -> IParser [a]
+constrainedSpacePrefix' parser constraint =
     many $ choice
       [ try (spacing >> lookAhead (oneOf "[({")) >> parser
       , try (spacing >> parser)
