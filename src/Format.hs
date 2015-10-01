@@ -79,7 +79,7 @@ formatImport aimport =
 formatVarValue :: AST.Variable.Value -> Box
 formatVarValue aval =
     case aval of
-        AST.Variable.Value val -> text val
+        AST.Variable.Value val -> formatVar val
         AST.Variable.Alias _ -> text "<alias>"
         AST.Variable.Union _ _ -> text "<union>"
 
@@ -111,9 +111,9 @@ formatDefinition adef =
                     |> indent
                     |> margin 2
                 ]
-        AST.Expression.TypeAnnotation name typ ->
+        AST.Expression.TypeAnnotation var typ ->
             hbox
-                [ text name
+                [ formatVar var
                 , text " : "
                 , formatType typ
                 ]
@@ -125,7 +125,7 @@ formatPattern apattern =
         AST.Pattern.Data _ _ -> text "<data>"
         AST.Pattern.Record _ -> text "<record>"
         AST.Pattern.Alias _ _ -> text "<alias>"
-        AST.Pattern.Var var -> text var
+        AST.Pattern.Var var -> formatVar var
         AST.Pattern.Anything -> text "<anything>"
         AST.Pattern.Literal _ -> text "<literal>"
 

@@ -1,6 +1,5 @@
 module Parse.Pattern (term, expr) where
 
-import Control.Applicative ((<$>))
 import Data.Char (isUpper)
 import qualified Data.List as List
 import Text.Parsec ((<|>), (<?>), char, choice, optionMaybe, try)
@@ -35,7 +34,7 @@ basic =
               P.Data (Var.VarRef str) []
 
           _ ->
-              P.Var str
+              P.Var (Var.VarRef str)
 
 
 asPattern :: IParser P.Pattern -> IParser P.Pattern

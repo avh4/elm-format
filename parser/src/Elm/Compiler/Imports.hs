@@ -13,7 +13,7 @@ import qualified AST.Variable as Var
 defaults :: [Module.DefaultImport]
 defaults =
     [ ["Basics"] ==> Module.ImportMethod Nothing Var.openListing
-    , ["List"] ==> exposing [Var.Value "::"]
+    , ["List"] ==> exposing [Var.Value (Var.OpRef "::")]
     , ["Maybe"] ==> exposing [Var.Union "Maybe" Var.openListing]
     , ["Result"] ==> exposing [Var.Union "Result" Var.openListing]
     , ["Signal"] ==> exposing [Var.Alias "Signal"]

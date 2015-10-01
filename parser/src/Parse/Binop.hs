@@ -18,7 +18,7 @@ import qualified Reporting.Annotation as A
 binops
     :: IParser E.Expr
     -> IParser E.Expr
-    -> IParser String
+    -> IParser Var.Ref
     -> IParser E.Expr
 binops term last anyOp =
   do  e <- term
@@ -43,7 +43,7 @@ split
     :: OpTable.OpTable
     -> Int
     -> E.Expr
-    -> [(String, E.Expr)]
+    -> [(Var.Ref, E.Expr)]
     -> IParser E.Expr
 split _ _ e [] = return e
 split table n e eops =
@@ -59,7 +59,7 @@ splitLevel
     :: OpTable.OpTable
     -> Int
     -> E.Expr
-    -> [(String, E.Expr)]
+    -> [(Var.Ref, E.Expr)]
     -> [IParser E.Expr]
 splitLevel table n e eops =
   case break (OpTable.hasLevel table n) eops of
@@ -70,14 +70,14 @@ splitLevel table n e eops =
         [ split table (n+1) e lops ]
 
 
-joinL :: [E.Expr] -> [String] -> IParser E.Expr
+joinL :: [E.Expr] -> [Var.Ref] -> IParser E.Expr
 joinL exprs ops =
   case (exprs, ops) of
     ([expr], []) ->
         return expr
 
     (a:b:remainingExprs, op:remainingOps) ->
-        let binop = A.merge a b (Binop (Var.OpRef op) a b)
+        let binop = A.merge a b (Binop op a b)
         in
             joinL (binop : remainingExprs) remainingOps
 
@@ -85,7 +85,7 @@ joinL exprs ops =
         failure "Ill-formed binary expression. Report a compiler bug."
 
 
-joinR :: [E.Expr] -> [String] -> IParser E.Expr
+joinR :: [E.Expr] -> [Var.Ref] -> IParser E.Expr
 joinR exprs ops =
   case (exprs, ops) of
     ([expr], []) ->
@@ -93,13 +93,13 @@ joinR exprs ops =
 
     (a:b:remainingExprs, op:remainingOps) ->
         do  e <- joinR (b:remainingExprs) remainingOps
-            return (A.merge a e (Binop (Var.OpRef op) a e))
+            return (A.merge a e (Binop op a e))
 
     (_, _) ->
         failure "Ill-formed binary expression. Report a compiler bug."
 
 
-getAssoc :: OpTable.OpTable -> Int -> [(String,E.Expr)] -> IParser Assoc
+getAssoc :: OpTable.OpTable -> Int -> [(Var.Ref,E.Expr)] -> IParser Assoc
 getAssoc table n eops
     | all (==L) assocs = return L
     | all (==R) assocs = return R
@@ -114,6 +114,6 @@ getAssoc table n eops
     msg problem =
         concat
           [ "Conflicting " ++ problem ++ " for binary operators ("
-          , List.intercalate ", " (map fst eops), "). "
+          , List.intercalate ", " (map (show . fst) eops), "). "
           , "Consider adding parentheses to disambiguate."
           ]

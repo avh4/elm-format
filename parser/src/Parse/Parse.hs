@@ -1,7 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 module Parse.Parse (parse, parseSource) where
 
-import Control.Applicative ((<$>), (<*>))
 import qualified Data.Map as Map
 import qualified Data.Traversable as T
 import Text.Parsec (char, eof, letter, many, optional, updateState, (<|>))
@@ -10,7 +9,7 @@ import qualified Text.Parsec.Error as Parsec
 import qualified AST.Declaration
 import qualified AST.Module
 import qualified AST.Module.Name as ModuleName
-import qualified Elm.Compiler.Imports as Imports
+import qualified AST.Variable as Var
 import qualified Elm.Package as Package
 import qualified Parse.Declaration as Decl
 import Parse.Helpers
@@ -91,9 +90,9 @@ parseWithTable table source parser =
 -- INFIX INFO
 
 makeInfixTable
-    :: Map.Map String (Int, AST.Declaration.Assoc)
-    -> [(String, InfixInfo)]
-    -> Result.Result wrn Error.Error (Map.Map String (Int, AST.Declaration.Assoc))
+    :: OpTable.OpTable
+    -> [(Var.Ref, InfixInfo)]
+    -> Result.Result wrn Error.Error OpTable.OpTable
 makeInfixTable table newInfo =
   let add (op, info) dict =
         Map.insertWith (++) op [info] dict
@@ -117,7 +116,7 @@ makeInfixTable table newInfo =
       Map.union table <$> T.sequenceA (Map.mapWithKey check infoTable)
 
 
-parseFixities :: IParser [(String, InfixInfo)]
+parseFixities :: IParser [(Var.Ref, InfixInfo)]
 parseFixities =
     onFreshLines (:) [] infics
   where

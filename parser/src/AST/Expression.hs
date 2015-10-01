@@ -20,7 +20,7 @@ type Def =
 
 data Def'
     = Definition Pattern.Pattern Expr
-    | TypeAnnotation String Type.Type
+    | TypeAnnotation Var.Ref Type.Type
     deriving (Show)
 
 

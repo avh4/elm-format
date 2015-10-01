@@ -5,17 +5,10 @@ module AST.Type
     , tuple
     ) where
 
-import Control.Applicative ((<$>), (<*>))
-import Control.Arrow (second)
-import Data.Binary
 import qualified Data.Map as Map
-import qualified Data.Maybe as Maybe
-import Text.PrettyPrint as P
 
 import qualified AST.Variable as Var
-import qualified AST.Helpers as Help
 import qualified Reporting.Annotation as A
-import qualified Reporting.PrettyPrint as P
 import qualified Reporting.Region as R
 
 

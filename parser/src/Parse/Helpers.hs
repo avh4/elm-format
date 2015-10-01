@@ -77,10 +77,11 @@ capVar =
   makeVar upper <?> "an upper case name"
 
 
-qualifiedVar :: IParser String
+qualifiedVar :: IParser AST.Variable.Ref
 qualifiedVar =
   do  vars <- many ((++) <$> capVar <*> string ".")
-      (++) (concat vars) <$> lowVar
+      var <- (++) (concat vars) <$> lowVar
+      return $ AST.Variable.VarRef var
 
 
 rLabel :: IParser String
@@ -110,20 +111,20 @@ reserved word =
 
 -- INFIX OPERATORS
 
-anyOp :: IParser String
+anyOp :: IParser AST.Variable.Ref
 anyOp =
   betwixt '`' '`' qualifiedVar
   <|> symOp
   <?> "an infix operator like (+)"
 
 
-symOp :: IParser String
+symOp :: IParser AST.Variable.Ref
 symOp =
   do  op <- many1 (satisfy Help.isSymbol)
       guard (op `notElem` [ "=", "..", "->", "--", "|", "\8594", ":" ])
       case op of
-        "." -> notFollowedBy lower >> return op
-        _   -> return op
+        "." -> notFollowedBy lower >> (return $ AST.Variable.OpRef op)
+        _   -> return $ AST.Variable.OpRef op
 
 
 -- COMMON SYMBOLS

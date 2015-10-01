@@ -1,10 +1,9 @@
 {-# OPTIONS_GHC -Wall #-}
 module AST.Declaration where
 
-import Data.Binary
-
 import qualified AST.Expression as Expression
 import qualified AST.Type as Type
+import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
 
 
@@ -16,7 +15,7 @@ data Declaration
     | TypeAlias String [String] Type.Type
     | PortAnnotation String Type.Type
     | PortDefinition String Expression.Expr
-    | Fixity Assoc Int String
+    | Fixity Assoc Int Var.Ref
 
 
 -- INFIX STUFF

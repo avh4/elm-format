@@ -2,13 +2,10 @@
 module AST.Pattern where
 
 import qualified Data.Set as Set
-import Text.PrettyPrint as P
 
-import qualified AST.Helpers as Help
 import qualified AST.Literal as L
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
-import qualified Reporting.PrettyPrint as P
 import qualified Reporting.Region as R
 
 
@@ -20,7 +17,7 @@ data Pattern'
     = Data Var.Ref [Pattern]
     | Record [String]
     | Alias String Pattern
-    | Var String
+    | Var Var.Ref
     | Anything
     | Literal L.Literal
     deriving (Show)
@@ -51,20 +48,20 @@ tuple patterns =
 
 -- FIND VARIABLES
 
-boundVars :: Pattern -> [A.Annotated R.Region String]
+boundVars :: Pattern -> [A.Annotated R.Region Var.Ref]
 boundVars (A.A ann pattern) =
   case pattern of
     Var x ->
         [A.A ann x]
 
     Alias name realPattern ->
-        A.A ann name : boundVars realPattern
+        A.A ann (Var.VarRef name) : boundVars realPattern
 
     Data _ patterns ->
         concatMap boundVars patterns
 
     Record fields ->
-        map (A.A ann) fields
+        map (A.A ann . Var.VarRef) fields
 
     Anything ->
         []
@@ -73,16 +70,16 @@ boundVars (A.A ann pattern) =
         []
 
 
-member :: String -> Pattern -> Bool
+member :: Var.Ref -> Pattern -> Bool
 member name pattern =
   any (name==) (map A.drop (boundVars pattern))
 
 
-boundVarSet :: Pattern -> Set.Set String
+boundVarSet :: Pattern -> Set.Set Var.Ref
 boundVarSet pattern =
   Set.fromList (map A.drop (boundVars pattern))
 
 
-boundVarList :: Pattern -> [String]
+boundVarList :: Pattern -> [Var.Ref]
 boundVarList pattern =
   Set.toList (boundVarSet pattern)

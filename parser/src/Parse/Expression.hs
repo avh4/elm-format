@@ -1,6 +1,5 @@
 module Parse.Expression (term, typeAnnotation, definition, expr) where
 
-import Control.Applicative ((<$>), (<*>))
 import qualified Data.List as List
 import Text.Parsec hiding (newline, spaces)
 import Text.Parsec.Indent (block, withPos)
@@ -49,7 +48,7 @@ accessor =
 
       return $
         E.Lambda
-            (ann (P.Var "_"))
+            (ann (P.Var Var.WildcardRef))
             (ann (E.Access (ann (E.rawVar "_")) lbl))
 
 
@@ -97,7 +96,7 @@ parensTerm =
     ]
   where
     lambda start end x body =
-        A.at start end (E.Lambda (A.at start end (P.Var x)) body)
+        A.at start end (E.Lambda (A.at start end (P.Var $ Var.VarRef x)) body)
 
     var start end x =
         A.at start end (E.rawVar x)
@@ -106,7 +105,7 @@ parensTerm =
       do  (start, op, end) <- located anyOp
           return $
             A.at start end $
-              E.Var (Var.OpRef op)
+              E.Var op
 
     tupleFn =
       do  (start, commas, end) <-
@@ -132,7 +131,7 @@ parensTerm =
 
 recordTerm :: IParser E.Expr
 recordTerm =
-  addLocation $ brackets $ choice $
+  addLocation $ brackets $ choice
     [ do  starter <- try (addLocation rLabel)
           whitespace
           choice
@@ -282,7 +281,7 @@ typeAnnotation =
     addLocation (E.TypeAnnotation <$> try start <*> Type.expr)
   where
     start =
-      do  v <- lowVar <|> parens symOp
+      do  v <- (Var.VarRef <$> lowVar) <|> parens symOp
           padded hasType
           return v
 
@@ -323,8 +322,6 @@ defStart =
               return [pattern]
 
     infics p1 =
-      do  (start, o:p, end) <- try (whitespace >> located anyOp)
+      do  (start, op, end) <- try (whitespace >> located anyOp)
           p2 <- (whitespace >> Pattern.term)
-          let opName =
-                if o == '`' then takeWhile (/='`') p else o:p
-          return [ A.at start end (P.Var opName), p1, p2 ]
+          return [ A.at start end (P.Var op), p1, p2 ]

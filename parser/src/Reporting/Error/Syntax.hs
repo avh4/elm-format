@@ -4,18 +4,15 @@ module Reporting.Error.Syntax where
 import qualified Data.List as List
 import qualified Data.Set as Set
 import qualified Text.Parsec.Error as Parsec
-import qualified Text.PrettyPrint as P
-import Text.PrettyPrint ((<+>))
 
-import qualified AST.Helpers as Help
-import qualified AST.Type as Type
+import qualified AST.Variable as Var
 import qualified Reporting.PrettyPrint as P
 import qualified Reporting.Report as Report
 
 
 data Error
     = Parse [Parsec.Message]
-    | InfixDuplicate String
+    | InfixDuplicate Var.Ref
     | TypeWithoutDefinition String
     | PortWithoutAnnotation String
     | UnexpectedPort
@@ -32,7 +29,7 @@ toReport dealiaser err =
     Parse messages ->
         parseErrorReport messages
 
-    InfixDuplicate opName ->
+    InfixDuplicate op ->
         Report.simple
           "INFIX OVERLAP"
           ("The infix declarations for " ++ operator ++ " must be removed.")
@@ -41,9 +38,10 @@ toReport dealiaser err =
           )
       where
         operator =
-            if Help.isOp opName
-              then "(" ++ opName ++ ")"
-              else "`" ++ opName ++ "`"
+            case op of
+              Var.VarRef name -> "`" ++ name ++ "`"
+              Var.OpRef name -> "(" ++ name ++ ")"
+              Var.WildcardRef -> "_"
 
     TypeWithoutDefinition valueName ->
         Report.simple
