@@ -218,6 +218,8 @@ formatVar var =
             text name
         AST.Variable.OpRef name ->
             text $ "(" ++ name ++ ")"
+        AST.Variable.WildcardRef ->
+            text "_" -- TODO: not tested
 
 
 formatInfixVar :: AST.Variable.Ref -> Box
@@ -227,3 +229,5 @@ formatInfixVar var =
             text $ "`" ++ name ++ "`" -- TODO: not tested
         AST.Variable.OpRef name ->
             text name
+        AST.Variable.WildcardRef ->
+            text "_" -- TODO: should never happen
