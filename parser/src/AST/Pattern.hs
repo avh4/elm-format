@@ -15,6 +15,7 @@ type Pattern =
 
 data Pattern'
     = Data Var.Ref [Pattern]
+    | Tuple [Pattern]
     | Record [String]
     | Alias String Pattern
     | Var Var.Ref
@@ -43,7 +44,7 @@ consMany end patterns =
 
 tuple :: [Pattern] -> Pattern'
 tuple patterns =
-  Data (Var.VarRef ("_Tuple" ++ show (length patterns))) patterns
+  Tuple patterns
 
 
 -- FIND VARIABLES
@@ -58,6 +59,9 @@ boundVars (A.A ann pattern) =
         A.A ann (Var.VarRef name) : boundVars realPattern
 
     Data _ patterns ->
+        concatMap boundVars patterns
+
+    Tuple patterns ->
         concatMap boundVars patterns
 
     Record fields ->

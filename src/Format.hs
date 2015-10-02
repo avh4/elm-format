@@ -122,7 +122,8 @@ formatDefinition adef =
 formatPattern :: AST.Pattern.Pattern -> Box
 formatPattern apattern =
     case RA.drop apattern of
-        AST.Pattern.Data _ _ -> text "<data>"
+        AST.Pattern.Data _ _ -> text "<pattern data>"
+        AST.Pattern.Tuple _ -> text "<pattern tuple>"
         AST.Pattern.Record _ -> text "<record>"
         AST.Pattern.Alias _ _ -> text "<alias>"
         AST.Pattern.Var var -> formatVar var
@@ -163,7 +164,8 @@ formatExpression aexpr =
         AST.Expression.If _ _ -> text "<if>"
         AST.Expression.Let _ _ -> text "<let>"
         AST.Expression.Case _ _ -> text "<case>"
-        AST.Expression.Data _ _ -> text "<data>"
+        AST.Expression.Data _ _ -> text "<expression data>"
+        AST.Expression.Tuple _ -> text "<expression tuple>"
         AST.Expression.Access _ _ -> text "<access>"
         AST.Expression.Update _ _ -> text "<update>"
         AST.Expression.Record _ -> text "<record>"
@@ -205,6 +207,7 @@ formatType atype =
         AST.Type.RVar var -> text var -- TODO: not tested
         AST.Type.RType var -> formatVar var
         AST.Type.RApp _ _ -> text "<app>"
+        AST.Type.RTuple _ -> text "<tuple>"
         AST.Type.RRecord _ _ -> text "<record>"
 
 

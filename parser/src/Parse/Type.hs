@@ -1,9 +1,8 @@
 {-# OPTIONS_GHC -Wall -fno-warn-unused-do-bind #-}
 module Parse.Type where
 
-import Control.Applicative ((<$>),(<*>),(<*))
 import Data.List (intercalate)
-import Text.Parsec ((<|>), (<?>), char, many, optionMaybe, string, try)
+import Text.Parsec ((<|>), (<?>), char, many1, optionMaybe, string, try)
 
 import qualified AST.Type as Type
 import qualified AST.Variable as Var
@@ -80,8 +79,7 @@ app =
   where
     tupleCtor =
       addLocation $
-      do  n <- length <$> parens (many (char ','))
-          let ctor = "_Tuple" ++ show (if n == 0 then 0 else n+1)
+      do  ctor <- parens (many1 (char ','))
           return (Type.RType (Var.VarRef ctor))
 
 

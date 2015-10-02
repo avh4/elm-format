@@ -23,6 +23,7 @@ data Type'
     | RVar String
     | RType Var.Ref
     | RApp Type [Type]
+    | RTuple [Type]
     | RRecord [(String, Type)] (Maybe Type)
     deriving (Show)
 
@@ -50,6 +51,4 @@ fieldMap fields =
 
 tuple :: R.Region -> [Type] -> Type
 tuple region types =
-  let name = Var.VarRef ("_Tuple" ++ show (length types))
-  in
-      A.A region (RApp (A.A region (RType name)) types)
+  A.A region (RTuple types)

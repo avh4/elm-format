@@ -4,16 +4,9 @@ module AST.Module
     , UserImport, DefaultImport, ImportMethod(..)
     ) where
 
-import Control.Applicative ((<$>),(<*>))
-import Data.Binary
-import qualified Data.Map as Map
-
 import qualified AST.Declaration as Declaration
 import qualified AST.Module.Name as Name
-import qualified AST.Type as Type
 import qualified AST.Variable as Var
-import qualified Docs.AST as Docs
-import qualified Elm.Package as Package
 import qualified Reporting.Annotation as A
 
 

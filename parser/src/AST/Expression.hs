@@ -3,7 +3,6 @@
 module AST.Expression where
 
 import AST.V0_15
-import qualified AST.Helpers as Help
 import qualified AST.Literal as Literal
 import qualified AST.Pattern as Pattern
 import qualified AST.Type as Type
@@ -40,6 +39,7 @@ data Expr'
     | Let [Def] Expr
     | Case Expr [(Pattern.Pattern, Expr)]
     | Data String [Expr]
+    | Tuple [Expr]
     | Access Expr String
     | Update Expr [(String, Expr)]
     | Record [(String, Expr)]
@@ -75,9 +75,4 @@ rawVar x =
 
 tuple :: [Expr] -> Expr'
 tuple expressions =
-  Data ("_Tuple" ++ show (length expressions)) expressions
-
-
-saveEnvName :: String
-saveEnvName =
-  "_save_the_environment!!!"
+  Tuple expressions
