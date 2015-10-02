@@ -1,6 +1,5 @@
 module Elm.Package where
 
-import Control.Applicative ((<$>), (<*>))
 import Data.Aeson
 import Data.Binary
 import qualified Data.List as List
@@ -186,4 +185,3 @@ instance FromJSON Version where
 instance ToJSON Version where
     toJSON version =
         toJSON (versionToString version)
-

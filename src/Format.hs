@@ -197,11 +197,16 @@ formatLiteral lit =
     case lit of
         L.IntNum i ->
             text $ show i
-        L.FloatNum _ -> text "<float>"
-        L.Chr _ -> text "<char>"
+        L.FloatNum f ->
+            text $ show f
+        L.Chr c ->
+            text ['\'', c, '\''] -- TODO: escape specials
         L.Str s ->
-            text $ "\"" ++ s ++ "\"" -- TODO: quoting
-        L.Boolean _ -> text "<boolean>"
+            text $ "\"" ++ s ++ "\"" -- TODO: escaping
+        L.Boolean True ->
+            text "True"
+        L.Boolean False ->
+            text "False" -- TODO: not tested
 
 
 formatType :: AST.Type.Type -> Box

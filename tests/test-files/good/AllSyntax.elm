@@ -24,4 +24,4 @@ tuple =
 
 
 commentedLiterals =
-    {- one -} 1 + {- two -} 2
+    ({- int -} 1, {- float -} 0.1, {- char -} 'c', {- string -} "str", {- boolean -} True)

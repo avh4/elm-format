@@ -23,7 +23,15 @@ import qualified Reporting.Annotation as A
 
 varTerm :: IParser E.Expr'
 varTerm =
-  toVar <$> var
+  boolean <|> (toVar <$> var)
+
+
+boolean :: IParser E.Expr'
+boolean =
+  let t = const (L.Boolean True) <$> string "True"
+      f = const (L.Boolean False) <$> string "False"
+  in
+    E.Literal <$> addComments (t <|> f)
 
 
 toVar :: String -> E.Expr'
