@@ -165,7 +165,11 @@ formatExpression aexpr =
         AST.Expression.Let _ _ -> text "<let>"
         AST.Expression.Case _ _ -> text "<case>"
         AST.Expression.Data _ _ -> text "<expression data>"
-        AST.Expression.Tuple _ -> text "<expression tuple>"
+        AST.Expression.Tuple exprs ->
+            hbox $
+                [ text "(" ]
+                ++ (List.map formatExpression exprs |> List.intersperse (text ", ")) ++
+                [ text ")" ]
         AST.Expression.Access _ _ -> text "<access>"
         AST.Expression.Update _ _ -> text "<update>"
         AST.Expression.Record _ -> text "<record>"
