@@ -1,25 +1,16 @@
 module Parse.State where
 
-import qualified Parse.OpTable as OpTable
-
 
 data State = State
-  { ops :: OpTable.OpTable
-  , comments :: [String]
+  { comments :: [String]
   }
 
 
 init :: State
 init =
   State
-    { ops = OpTable.empty
-    , comments = []
+    { comments = []
     }
-
-
-setOps :: OpTable.OpTable -> State -> State
-setOps table state =
-  state { ops = table }
 
 
 addComment :: String -> State -> State

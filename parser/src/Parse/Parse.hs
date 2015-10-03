@@ -1,21 +1,16 @@
 {-# OPTIONS_GHC -Wall #-}
 module Parse.Parse (parse, parseSource) where
 
-import qualified Data.Map as Map
-import qualified Data.Traversable as T
-import Text.Parsec (char, eof, letter, many, optional, updateState, (<|>))
+import Text.Parsec (char, eof, letter, many, optional, (<|>))
 import qualified Text.Parsec.Error as Parsec
 
 import qualified AST.Declaration
 import qualified AST.Module
 import qualified AST.Module.Name as ModuleName
-import qualified AST.Variable as Var
 import qualified Elm.Package as Package
 import qualified Parse.Declaration as Decl
 import Parse.Helpers
 import qualified Parse.Module as Module
-import qualified Parse.OpTable as OpTable
-import qualified Parse.State as State
 import qualified Reporting.Region as R
 import qualified Reporting.Error.Syntax as Error
 import qualified Reporting.Result as Result
@@ -23,7 +18,7 @@ import qualified Reporting.Result as Result
 
 parseSource :: String -> Result.Result () Error.Error AST.Module.Module
 parseSource src =
-  parseWithTable Map.empty src
+  parse src
       $ programParser $ Package.Name "example" "example"
 
 
@@ -69,65 +64,3 @@ parse source parser =
             msgs = Parsec.errorMessages err
         in
             Result.throw (R.Region pos pos) (Error.Parse msgs)
-
-
-parseWithTable
-    :: OpTable.OpTable
-    -> String
-    -> IParser a
-    -> Result.Result wrn Error.Error a
-parseWithTable table source parser =
-  do  infixInfoList <- parse source parseFixities
-
-      infixTable <- makeInfixTable table infixInfoList
-
-      parse source $
-          do  updateState (State.setOps infixTable)
-              parser
-
-
-
--- INFIX INFO
-
-makeInfixTable
-    :: OpTable.OpTable
-    -> [(Var.Ref, InfixInfo)]
-    -> Result.Result wrn Error.Error OpTable.OpTable
-makeInfixTable table newInfo =
-  let add (op, info) dict =
-        Map.insertWith (++) op [info] dict
-
-      infoTable =
-        foldr add Map.empty newInfo
-
-      check op infoList =
-        case infoList of
-          [] ->
-              error "problem parsing infix declarations, this should never happen"
-
-          [InfixInfo region info] ->
-              if Map.member op table
-                then Result.throw region (Error.InfixDuplicate op)
-                else return info
-
-          InfixInfo region _ : _ ->
-              Result.throw region (Error.InfixDuplicate op)
-  in
-      Map.union table <$> T.sequenceA (Map.mapWithKey check infoTable)
-
-
-parseFixities :: IParser [(Var.Ref, InfixInfo)]
-parseFixities =
-    onFreshLines (:) [] infics
-  where
-    infics =
-      do  start <- getMyPosition
-          (AST.Declaration.Fixity assoc level op) <- Decl.infixDecl
-          end <- getMyPosition
-          return (op, InfixInfo (R.Region start end) (level, assoc))
-
-
-data InfixInfo = InfixInfo
-    { _region :: R.Region
-    , _info :: (Int, AST.Declaration.Assoc)
-    }
