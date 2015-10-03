@@ -139,14 +139,15 @@ formatExpression aexpr =
             formatVar v
         AST.Expression.Range _ _ -> text "<range>"
         AST.Expression.ExplicitList _ -> text "<list>"
-        AST.Expression.Binop op l r ->
-            hbox
-                [ formatExpression l
-                , hspace 1
-                , formatInfixVar op
-                , hspace 1
-                , formatExpression r
-                ]
+        AST.Expression.Binops l ops ->
+            let opBoxes (op,e) =
+                  [ hspace 1, formatInfixVar op
+                  , hspace 1, formatExpression e
+                  ]
+            in
+                hbox $
+                    formatExpression l
+                    : concatMap opBoxes ops
         AST.Expression.Lambda pat expr -> -- TODO: not tested
             hbox
                 [ text "(\\"

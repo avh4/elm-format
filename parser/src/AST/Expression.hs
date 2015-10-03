@@ -32,7 +32,7 @@ data Expr'
     | Var Var.Ref
     | Range Expr Expr
     | ExplicitList [Expr]
-    | Binop Var.Ref Expr Expr
+    | Binops Expr [(Var.Ref,Expr)]
     | Lambda Pattern.Pattern Expr
     | App Expr Expr
     | If [(Expr, Expr)] Expr

@@ -1,15 +1,11 @@
 module Parse.Binop (binops) where
 
 import qualified Data.List as List
-import Text.Parsec ((<|>), choice, getState, try)
+import Text.Parsec ((<|>), choice, try)
 
-import AST.Declaration (Assoc(L, N, R))
-import AST.Expression (Expr'(Binop))
 import qualified AST.Expression as E
 import qualified AST.Variable as Var
-import Parse.Helpers (IParser, commitIf, failure, whitespace)
-import qualified Parse.OpTable as OpTable
-import qualified Parse.State as State
+import Parse.Helpers (IParser, commitIf, whitespace)
 import qualified Reporting.Annotation as A
 
 
@@ -20,8 +16,7 @@ binops
     -> IParser E.Expr
 binops term last anyOp =
   do  e <- term
-      state <- getState
-      split (State.ops state) 0 e =<< nextOps
+      split e =<< nextOps
   where
     nextOps =
       choice
@@ -36,82 +31,32 @@ binops term last anyOp =
         , return []
         ]
 
-
 split
-    :: OpTable.OpTable
-    -> Int
-    -> E.Expr
+    :: E.Expr
     -> [(Var.Ref, E.Expr)]
     -> IParser E.Expr
-split _ _ e [] = return e
-split table n e eops =
-  do  assoc <- getAssoc table n eops
-      es <- sequence (splitLevel table n e eops)
-      let ops = map fst (filter (OpTable.hasLevel table n) eops)
-      case assoc of
-        R -> joinR es ops
-        _ -> joinL es ops
+split e0 [] = return e0
+split e0 ops =
+    let
+        init :: A.Located (E.Expr,[(Var.Ref,E.Expr)])
+        init = A.sameAs e0 (e0,[])
 
+        merge'
+          :: (Var.Ref, E.Expr)
+          -> A.Located x
+          -> (E.Expr,[(Var.Ref,E.Expr)])
+          -> A.Located (E.Expr,[(Var.Ref,E.Expr)])
+        merge' (o,e) loc (e0,ops) =
+          A.merge e loc (e0,(o,e):ops)
 
-splitLevel
-    :: OpTable.OpTable
-    -> Int
-    -> E.Expr
-    -> [(Var.Ref, E.Expr)]
-    -> [IParser E.Expr]
-splitLevel table n e eops =
-  case break (OpTable.hasLevel table n) eops of
-    (lops, (_op,e'):rops) ->
-        split table (n+1) e lops : splitLevel table n e' rops
+        merge
+          :: (Var.Ref, E.Expr)
+          -> A.Located (E.Expr,[(Var.Ref,E.Expr)])
+          -> A.Located (E.Expr,[(Var.Ref,E.Expr)])
+        merge (o,e) loc =
+          merge' (o,e) loc (A.drop loc)
 
-    (lops, []) ->
-        [ split table (n+1) e lops ]
-
-
-joinL :: [E.Expr] -> [Var.Ref] -> IParser E.Expr
-joinL exprs ops =
-  case (exprs, ops) of
-    ([expr], []) ->
-        return expr
-
-    (a:b:remainingExprs, op:remainingOps) ->
-        let binop = A.merge a b (Binop op a b)
-        in
-            joinL (binop : remainingExprs) remainingOps
-
-    (_, _) ->
-        failure "Ill-formed binary expression. Report a compiler bug."
-
-
-joinR :: [E.Expr] -> [Var.Ref] -> IParser E.Expr
-joinR exprs ops =
-  case (exprs, ops) of
-    ([expr], []) ->
-        return expr
-
-    (a:b:remainingExprs, op:remainingOps) ->
-        do  e <- joinR (b:remainingExprs) remainingOps
-            return (A.merge a e (Binop op a e))
-
-    (_, _) ->
-        failure "Ill-formed binary expression. Report a compiler bug."
-
-
-getAssoc :: OpTable.OpTable -> Int -> [(Var.Ref,E.Expr)] -> IParser Assoc
-getAssoc table n eops
-    | all (==L) assocs = return L
-    | all (==R) assocs = return R
-    | all (==N) assocs =
-        case assocs of
-          [_] -> return N
-          _   -> failure (msg "precedence")
-    | otherwise = failure (msg "associativity")
-  where
-    levelOps = filter (OpTable.hasLevel table n) eops
-    assocs = map (OpTable.assoc table . fst) levelOps
-    msg problem =
-        concat
-          [ "Conflicting " ++ problem ++ " for binary operators ("
-          , List.intercalate ", " (map (show . fst) eops), "). "
-          , "Consider adding parentheses to disambiguate."
-          ]
+        wrap :: (E.Expr,[(Var.Ref,E.Expr)]) -> E.Expr'
+        wrap (e',ops) = E.Binops e' ops
+    in
+      return $ A.map wrap $ List.foldr merge init ops

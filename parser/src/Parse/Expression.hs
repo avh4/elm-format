@@ -72,10 +72,9 @@ negative =
             A.at start end e
 
       return $
-        E.Binop
-          (Var.OpRef "-")
+        E.Binops -- TODO: replace with unary
           (ann $ E.Literal $ Commented [] $ L.IntNum 0)
-          nTerm
+          [(Var.OpRef "-", nTerm)]
 
 
 --------  Complex Terms  --------
