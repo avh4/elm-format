@@ -6,16 +6,12 @@ import System.Exit (exitFailure)
 
 import qualified AST.Module
 import qualified Box
-import qualified Elm.Package
 import qualified Flags
 import qualified Format
-import qualified Data.List as List
-import qualified Data.Map as Map
 import qualified Data.Text.Lazy as LazyText
 import qualified Data.Text.Lazy.IO as LazyText
 import qualified Parse.Parse as Parse
 import qualified Reporting.Annotation as RA
-import qualified Reporting.Error as Error
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Report as Report
 import qualified Reporting.Result as Result
@@ -27,8 +23,8 @@ formatResult
     -> IO ()
 formatResult config result =
     case result of
-        Result.Result _ (Result.Ok mod) ->
-            Format.formatModule mod
+        Result.Result _ (Result.Ok modu) ->
+            Format.formatModule modu
                 |> Box.render
                 |> LazyText.pack
                 |> trimSpaces
@@ -39,7 +35,7 @@ formatResult config result =
                     $ LazyText.pack ""
 
                 putStrLn "ERRORS"
-                sequence $ map printError errs
+                _ <- sequence $ map printError errs
                 exitFailure
     where
         trimSpaces = LazyText.unlines . (map LazyText.stripEnd) . LazyText.lines
@@ -47,7 +43,7 @@ formatResult config result =
 
 printError :: RA.Located Syntax.Error -> IO ()
 printError (RA.A range err) =
-    Report.printError "<location>" range (Syntax.toReport Map.empty err) ""
+    Report.printError "<location>" range (Syntax.toReport err) ""
 
 
 main :: IO ()

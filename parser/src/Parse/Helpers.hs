@@ -2,7 +2,6 @@
 module Parse.Helpers where
 
 import Prelude hiding (until)
-import Control.Applicative ((<$>),(<*>),(<*))
 import Control.Monad (guard, join)
 import Control.Monad.State (State)
 import Data.Char (isUpper)
@@ -14,7 +13,6 @@ import Text.Parsec.Indent (indented, runIndent)
 import qualified Text.Parsec.Token as T
 
 import AST.V0_15
-import qualified AST.Declaration as Decl
 import qualified AST.Expression
 import qualified AST.Helpers as Help
 import qualified AST.Literal as L

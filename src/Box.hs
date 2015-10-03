@@ -59,15 +59,15 @@ hjoin sep list =
 
 
 indent :: Box -> Box
-indent box =
-    hbox2 (hspace 4) box
+indent child =
+    hbox2 (hspace 4) child
 
 
 margin :: Int -> Box -> Box
-margin m (Box box _) =
-    Box box m
+margin m (Box child _) =
+    Box child m
 
 
 render :: Box -> String
-render (Box box _) =
-    B.render box
+render (Box child _) =
+    B.render child

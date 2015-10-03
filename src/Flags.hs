@@ -1,10 +1,8 @@
 {-# OPTIONS_GHC -Wall #-}
 module Flags where
 
-import Control.Applicative ((<$>), (<*>))
-import Data.Monoid ((<>), mconcat, mempty)
+import Data.Monoid ((<>))
 import Data.Version (showVersion)
-import qualified Elm.Package as Pkg
 import qualified Options.Applicative as Opt
 import qualified Paths_elm_format as This
 import qualified Text.PrettyPrint.ANSI.Leijen as PP

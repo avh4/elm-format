@@ -36,4 +36,3 @@ maybeYouWant suggestions =
     _:_ ->
         "Maybe you want one of the following?\n"
         ++ concatMap ("\n    "++) (take 4 suggestions)
-

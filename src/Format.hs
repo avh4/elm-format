@@ -18,21 +18,21 @@ import qualified Reporting.Annotation as RA
 
 
 formatModule :: AST.Module.Module -> Box
-formatModule mod =
+formatModule modu =
     vbox
         [ hbox
             [ text "module "
-            , formatName $ AST.Module.name mod
+            , formatName $ AST.Module.name modu
             , text " where"
             ]
             |> margin 1
-        , case AST.Module.imports mod of
+        , case AST.Module.imports modu of
             [] ->
                 empty
             imports ->
                 vbox (map formatImport imports)
                 |> margin 2
-        , vbox (map formatDeclaration $ AST.Module.body mod)
+        , vbox (map formatDeclaration $ AST.Module.body modu)
         ]
 
 
@@ -62,7 +62,7 @@ formatImport aimport =
                     else
                         case AST.Module.alias method of
                             Nothing -> text "<nothing>"
-                            Just name -> text $ " as " ++ name
+                            Just alias -> text $ " as " ++ alias
                 exposing =
                     case AST.Module.exposedVars method of
                         AST.Variable.Listing [] False -> empty
@@ -87,7 +87,7 @@ formatVarValue aval =
 formatDeclaration :: AST.Declaration.Decl -> Box
 formatDeclaration decl =
     case decl of
-        AST.Declaration.Comment s -> text "<comment>"
+        AST.Declaration.Comment _ -> text "<comment>"
         AST.Declaration.Decl adecl ->
             case RA.drop adecl of
                 AST.Declaration.Definition def -> formatDefinition def
@@ -147,12 +147,12 @@ formatExpression aexpr =
                 , hspace 1
                 , formatExpression r
                 ]
-        AST.Expression.Lambda pat exp -> -- TODO: not tested
+        AST.Expression.Lambda pat expr -> -- TODO: not tested
             hbox
                 [ text "(\\"
                 , formatPattern pat
                 , text " -> "
-                , formatExpression exp
+                , formatExpression expr
                 , text ")"
                 ]
         AST.Expression.App l r ->

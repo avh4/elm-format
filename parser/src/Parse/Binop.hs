@@ -1,8 +1,6 @@
 module Parse.Binop (binops) where
 
-import Control.Applicative ((<$>))
 import qualified Data.List as List
-import qualified Data.Map as Map
 import Text.Parsec ((<|>), choice, getState, try)
 
 import AST.Declaration (Assoc(L, N, R))

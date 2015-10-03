@@ -6,7 +6,6 @@ import qualified Data.Set as Set
 import qualified Text.Parsec.Error as Parsec
 
 import qualified AST.Variable as Var
-import qualified Reporting.PrettyPrint as P
 import qualified Reporting.Report as Report
 
 
@@ -23,8 +22,8 @@ data Error
 
 -- TO REPORT
 
-toReport :: P.Dealiaser -> Error -> Report.Report
-toReport dealiaser err =
+toReport :: Error -> Report.Report
+toReport err =
   case err of
     Parse messages ->
         parseErrorReport messages

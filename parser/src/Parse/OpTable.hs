@@ -10,7 +10,7 @@ type OpTable = Map.Map Var.Ref (Int, AST.Declaration.Assoc)
 
 empty :: OpTable
 empty =
-	Map.empty
+  Map.empty
 
 
 level :: OpTable -> Var.Ref -> Int
