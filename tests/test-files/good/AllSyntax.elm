@@ -25,3 +25,7 @@ tuple =
 
 commentedLiterals =
     ({- int -} 1, {- float -} 0.1, {- char -} 'c', {- string -} "str", {- boolean -} True)
+
+
+infixOperator =
+    1 + 2 * 3 / 4 // 5 |> (+) 0
