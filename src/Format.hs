@@ -151,11 +151,9 @@ formatExpression aexpr =
                 hbox $
                     formatExpression l
                     : concatMap opBoxes ops
-        AST.Expression.Lambda pat expr ->
+        AST.Expression.Lambda patterns expr ->
             hbox
-                [ text "\\"
-                , formatPattern pat
-                , text " -> "
+                [ hboxlist "\\" " " " -> " formatPattern patterns
                 , formatExpression expr
                 ]
         AST.Expression.App l r ->

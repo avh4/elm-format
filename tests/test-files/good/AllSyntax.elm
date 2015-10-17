@@ -47,5 +47,9 @@ fnAsUnparenthesizedLambda =
     \arg -> arg
 
 
+multiArgLambda =
+    \a b (t,s) {x,y} _ -> \c -> (\d -> ())
+
+
 parenthesizedExpressions =
     (1 + (2 * 3) / 4) |> ((+) 0)

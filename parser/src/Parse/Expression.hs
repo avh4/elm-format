@@ -56,7 +56,7 @@ accessor =
 
       return $
         E.Lambda
-            (ann (P.Var Var.WildcardRef))
+            [(ann (P.Var Var.WildcardRef))]
             (ann (E.Access (ann (E.rawVar "_")) lbl))
 
 
@@ -103,7 +103,7 @@ parensTerm =
     ]
   where
     lambda start end x body =
-        A.at start end (E.Lambda (A.at start end (P.Var $ Var.VarRef x)) body)
+        A.at start end (E.Lambda [A.at start end (P.Var $ Var.VarRef x)] body)
 
     var start end x =
         A.at start end (E.rawVar x)
@@ -238,12 +238,13 @@ ifHelp branches =
 
 lambdaExpr :: IParser E.Expr
 lambdaExpr =
+  addLocation $
   do  char '\\' <|> char '\x03BB' <?> "an anonymous function"
       whitespace
       args <- spaceSep1 Pattern.term
       padded rightArrow
       body <- expr
-      return (makeFunction args body)
+      return $ E.Lambda args body
 
 
 caseExpr :: IParser E.Expr'
@@ -303,11 +304,6 @@ definition =
         padded equals
         body <- expr
         return $ E.Definition name args body
-
-
-makeFunction :: [P.Pattern] -> E.Expr -> E.Expr
-makeFunction args body@(A.A ann _) =
-    foldr (\arg body' -> A.A ann $ E.Lambda arg body') body args
 
 
 defStart :: IParser [P.Pattern]
