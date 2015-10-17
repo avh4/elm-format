@@ -37,3 +37,11 @@ fnParam a =
 
 fnAsLambda =
     (\a -> a)
+
+
+fnAsUnparenthesizedLambda =
+    \arg -> arg
+
+
+parenthesizedExpressions =
+    (1 + (2 * 3) / 4) |> ((+) 0)

@@ -149,13 +149,12 @@ formatExpression aexpr =
                 hbox $
                     formatExpression l
                     : concatMap opBoxes ops
-        AST.Expression.Lambda pat expr -> -- TODO: not tested
+        AST.Expression.Lambda pat expr ->
             hbox
-                [ text "(\\"
+                [ text "\\"
                 , formatPattern pat
                 , text " -> "
                 , formatExpression expr
-                , text ")"
                 ]
         AST.Expression.App l r ->
             hbox
@@ -175,6 +174,12 @@ formatExpression aexpr =
         AST.Expression.Access _ _ -> text "<access>"
         AST.Expression.Update _ _ -> text "<update>"
         AST.Expression.Record _ -> text "<record>"
+        AST.Expression.Parens expr ->
+            hbox
+                [ text "("
+                , formatExpression expr
+                , text ")"
+                ]
         AST.Expression.Port _ -> text "<port>"
         AST.Expression.GLShader _ _ _ -> text "<glshader>"
 

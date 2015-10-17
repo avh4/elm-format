@@ -43,6 +43,7 @@ data Expr'
     | Access Expr String
     | Update Expr [(String, Expr)]
     | Record [(String, Expr)]
+    | Parens Expr
     -- for type checking and code gen only
     | Port PortImpl
     | GLShader String String Literal.GLShaderTipe
