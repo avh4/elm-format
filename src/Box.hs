@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 module Box where
 
+import Elm.Utils ((|>))
 import Text.PrettyPrint.Boxes ((<>), (//))
 
 import qualified Data.List as List
@@ -51,6 +52,14 @@ hbox2 (Box a aMargin) (Box b bMargin) =
 hbox :: [Box] -> Box
 hbox =
     foldl hbox2 empty
+
+
+hboxlist :: String -> String -> String -> (a -> Box) -> [a] -> Box
+hboxlist start mid end format items =
+  hbox $
+      [ text start ]
+      ++ (List.map format items |> List.intersperse (text mid)) ++
+      [ text end ]
 
 
 hjoin :: Box -> [Box] -> Box

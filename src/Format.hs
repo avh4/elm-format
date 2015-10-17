@@ -124,11 +124,13 @@ formatPattern :: AST.Pattern.Pattern -> Box
 formatPattern apattern =
     case RA.drop apattern of
         AST.Pattern.Data _ _ -> text "<pattern data>"
-        AST.Pattern.Tuple _ -> text "<pattern tuple>"
-        AST.Pattern.Record _ -> text "<record>"
+        AST.Pattern.Tuple patterns ->
+            hboxlist "(" "," ")" formatPattern patterns
+        AST.Pattern.Record fields ->
+            hboxlist "{" "," "}" text fields
         AST.Pattern.Alias _ _ -> text "<alias>"
         AST.Pattern.Var var -> formatVar var
-        AST.Pattern.Anything -> text "<anything>"
+        AST.Pattern.Anything -> text "_"
         AST.Pattern.Literal _ -> text "<literal>"
 
 
@@ -167,10 +169,7 @@ formatExpression aexpr =
         AST.Expression.Case _ _ -> text "<case>"
         AST.Expression.Data _ _ -> text "<expression data>"
         AST.Expression.Tuple exprs ->
-            hbox $
-                [ text "(" ]
-                ++ (List.map formatExpression exprs |> List.intersperse (text ", ")) ++
-                [ text ")" ]
+            hboxlist "(" ", " ")" formatExpression exprs
         AST.Expression.Access _ _ -> text "<access>"
         AST.Expression.Update _ _ -> text "<update>"
         AST.Expression.Record _ -> text "<record>"
