@@ -57,12 +57,11 @@ formatImport aimport =
                 ]
             where
                 as =
-                    if (AST.Module.alias method) == (Just $ List.intercalate "." name)
-                        then empty
-                    else
-                        case AST.Module.alias method of
-                            Nothing -> text "<nothing>"
-                            Just alias -> text $ " as " ++ alias
+                    case AST.Module.alias method of
+                        Nothing ->
+                            empty
+                        Just alias ->
+                            text $ " as " ++ alias
                 exposing =
                     case AST.Module.exposedVars method of
                         AST.Variable.Listing [] False ->

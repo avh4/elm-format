@@ -66,9 +66,9 @@ import' =
       (,) names <$> method (ModuleName.toString names)
   where
     method :: String -> IParser Module.ImportMethod
-    method defaultAlias =
+    method originalName =
       Module.ImportMethod
-          <$> option (Just defaultAlias) (Just <$> as' defaultAlias)
+          <$> option Nothing (Just <$> as' originalName)
           <*> option Var.closedListing exposing
 
     as' :: String -> IParser String
