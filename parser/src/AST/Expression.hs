@@ -13,8 +13,12 @@ import qualified Reporting.Region as R
 
 ---- GENERAL AST ----
 
+data UnaryOperator =
+    Negative
+    deriving (Show)
+
 type Def =
-  A.Located Def'
+    A.Located Def'
 
 
 data Def'
@@ -33,6 +37,7 @@ data Expr'
     | Range Expr Expr
     | ExplicitList [Expr]
     | Binops Expr [(Var.Ref,Expr)]
+    | Unary UnaryOperator Expr
     | Lambda [Pattern.Pattern] Expr
     | App Expr Expr
     | If [(Expr, Expr)] Expr
@@ -71,9 +76,9 @@ portName impl =
 
 rawVar :: String -> Expr'
 rawVar x =
-  Var (Var.VarRef x)
+    Var (Var.VarRef x)
 
 
 tuple :: [Expr] -> Expr'
 tuple expressions =
-  Tuple expressions
+    Tuple expressions

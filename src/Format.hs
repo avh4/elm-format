@@ -163,6 +163,11 @@ formatExpression aexpr =
                 [ hboxlist "\\" " " " -> " formatPattern patterns
                 , formatExpression expr
                 ]
+        AST.Expression.Unary AST.Expression.Negative e ->
+            hbox
+                [ text "-"
+                , formatExpression e
+                ]
         AST.Expression.App l r ->
             hbox
                 [ formatExpression l

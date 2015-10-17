@@ -62,19 +62,13 @@ accessor =
 
 negative :: IParser E.Expr'
 negative =
-  do  (start, nTerm, end) <-
-          located $ try $
+  do  nTerm <-
+          try $
             do  char '-'
                 notFollowedBy (char '.' <|> char '-')
                 term
 
-      let ann e =
-            A.at start end e
-
-      return $
-        E.Binops -- TODO: replace with unary
-          (ann $ E.Literal $ Commented [] $ L.IntNum 0)
-          [(Var.OpRef "-", nTerm)]
+      return $ E.Unary E.Negative nTerm
 
 
 --------  Complex Terms  --------
