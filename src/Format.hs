@@ -65,21 +65,25 @@ formatImport aimport =
                             Just alias -> text $ " as " ++ alias
                 exposing =
                     case AST.Module.exposedVars method of
-                        AST.Variable.Listing [] False -> empty
-                        AST.Variable.Listing [] True -> text " exposing (..)"
+                        AST.Variable.Listing [] False ->
+                            empty
+                        AST.Variable.Listing [] True ->
+                            text " exposing (..)"
                         AST.Variable.Listing vars False ->
                             hbox
                                 [ text " exposing ("
                                 , hjoin (text ", ") (map formatVarValue vars)
                                 , text ")"
                                 ]
-                        AST.Variable.Listing _ True -> text "<NOT POSSIBLE?>"
+                        AST.Variable.Listing _ True ->
+                            text "<NOT POSSIBLE?>"
 
 
 formatVarValue :: AST.Variable.Value -> Box
 formatVarValue aval =
     case aval of
-        AST.Variable.Value val -> formatVar val
+        AST.Variable.Value val ->
+            formatVar val
         AST.Variable.Alias _ -> text "<alias>"
         AST.Variable.Union _ _ -> text "<union>"
 
@@ -90,7 +94,8 @@ formatDeclaration decl =
         AST.Declaration.Comment _ -> text "<comment>"
         AST.Declaration.Decl adecl ->
             case RA.drop adecl of
-                AST.Declaration.Definition def -> formatDefinition def
+                AST.Declaration.Definition def ->
+                    formatDefinition def
                 AST.Declaration.Datatype _ _ _ -> text "<datatype>"
                 AST.Declaration.TypeAlias _ _ _ -> text "<typealias>"
                 AST.Declaration.PortAnnotation _ _ -> text "<port annotation>"
@@ -129,15 +134,18 @@ formatPattern apattern =
         AST.Pattern.Record fields ->
             hboxlist "{" "," "}" text fields
         AST.Pattern.Alias _ _ -> text "<alias>"
-        AST.Pattern.Var var -> formatVar var
-        AST.Pattern.Anything -> text "_"
+        AST.Pattern.Var var ->
+            formatVar var
+        AST.Pattern.Anything ->
+            text "_"
         AST.Pattern.Literal _ -> text "<literal>"
 
 
 formatExpression :: AST.Expression.Expr -> Box
 formatExpression aexpr =
     case RA.drop aexpr of
-        AST.Expression.Literal lit -> formatCommented formatLiteral lit
+        AST.Expression.Literal lit ->
+            formatCommented formatLiteral lit
         AST.Expression.Var v ->
             formatVar v
         AST.Expression.Range _ _ -> text "<range>"
@@ -217,8 +225,10 @@ formatType :: AST.Type.Type -> Box
 formatType atype =
     case RA.drop atype of
         AST.Type.RLambda _ _ -> text "<lambda type>"
-        AST.Type.RVar var -> text var -- TODO: not tested
-        AST.Type.RType var -> formatVar var
+        AST.Type.RVar var ->
+            text var -- TODO: not tested
+        AST.Type.RType var ->
+            formatVar var
         AST.Type.RApp _ _ -> text "<app>"
         AST.Type.RTuple _ -> text "<tuple>"
         AST.Type.RRecord _ _ -> text "<record>"
