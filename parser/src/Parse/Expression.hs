@@ -302,7 +302,7 @@ definition =
     do  (name:args) <- defStart
         padded equals
         body <- expr
-        return . E.Definition name $ makeFunction args body
+        return $ E.Definition name args body
 
 
 makeFunction :: [P.Pattern] -> E.Expr -> E.Expr

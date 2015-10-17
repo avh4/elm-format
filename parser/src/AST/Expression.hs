@@ -18,7 +18,7 @@ type Def =
 
 
 data Def'
-    = Definition Pattern.Pattern Expr
+    = Definition Pattern.Pattern [Pattern.Pattern] Expr
     | TypeAnnotation Var.Ref Type.Type
     deriving (Show)
 

@@ -101,10 +101,11 @@ formatDeclaration decl =
 formatDefinition :: AST.Expression.Def -> Box
 formatDefinition adef =
     case RA.drop adef of
-        AST.Expression.Definition pattern expr ->
+        AST.Expression.Definition name args expr ->
             vbox
                 [ hbox
-                    [ formatPattern pattern
+                    [ formatPattern name
+                    , hbox $ List.map (\arg -> hbox [ text " ", formatPattern arg]) args
                     , text " ="
                     ]
                 , formatExpression expr
