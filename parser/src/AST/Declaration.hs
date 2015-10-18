@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 module AST.Declaration where
 
+import AST.V0_15
 import qualified AST.Expression as Expression
 import qualified AST.Type as Type
 import qualified AST.Variable as Var
@@ -15,7 +16,7 @@ data Declaration
     | TypeAlias String [String] Type.Type
     | PortAnnotation String Type.Type
     | PortDefinition String Expression.Expr
-    | Fixity Assoc Int Var.Ref
+    | Fixity Assoc Int (Commented Var.Ref)
 
 
 -- INFIX STUFF

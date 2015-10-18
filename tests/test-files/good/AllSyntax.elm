@@ -31,6 +31,10 @@ infixOperator =
     1 + 2 * 3 / 4 // 5 |> (+) 0
 
 
+commentedInfixOperator =
+    1 {- plus -} + 2
+
+
 unaryOperator a =
     -(1) + -2 + -a
 

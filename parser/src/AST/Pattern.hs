@@ -1,8 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 module AST.Pattern where
 
-import qualified Data.Set as Set
-
+import AST.V0_15
 import qualified AST.Literal as L
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
@@ -18,7 +17,7 @@ data Pattern'
     | Tuple [Pattern]
     | Record [String]
     | Alias String Pattern
-    | Var Var.Ref
+    | Var (Commented Var.Ref)
     | Anything
     | Literal L.Literal
     deriving (Show)
@@ -45,45 +44,3 @@ consMany end patterns =
 tuple :: [Pattern] -> Pattern'
 tuple patterns =
   Tuple patterns
-
-
--- FIND VARIABLES
-
-boundVars :: Pattern -> [A.Annotated R.Region Var.Ref]
-boundVars (A.A ann pattern) =
-  case pattern of
-    Var x ->
-        [A.A ann x]
-
-    Alias name realPattern ->
-        A.A ann (Var.VarRef name) : boundVars realPattern
-
-    Data _ patterns ->
-        concatMap boundVars patterns
-
-    Tuple patterns ->
-        concatMap boundVars patterns
-
-    Record fields ->
-        map (A.A ann . Var.VarRef) fields
-
-    Anything ->
-        []
-
-    Literal _ ->
-        []
-
-
-member :: Var.Ref -> Pattern -> Bool
-member name pattern =
-  any (name==) (map A.drop (boundVars pattern))
-
-
-boundVarSet :: Pattern -> Set.Set Var.Ref
-boundVarSet pattern =
-  Set.fromList (map A.drop (boundVars pattern))
-
-
-boundVarList :: Pattern -> [Var.Ref]
-boundVarList pattern =
-  Set.toList (boundVarSet pattern)

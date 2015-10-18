@@ -109,16 +109,16 @@ reserved word =
 
 -- INFIX OPERATORS
 
-anyOp :: IParser AST.Variable.Ref
+anyOp :: IParser (Commented AST.Variable.Ref)
 anyOp =
-  betwixt '`' '`' qualifiedVar
+  addComments (betwixt '`' '`' qualifiedVar <?> "an infix operator like `andThen`")
   <|> symOp
-  <?> "an infix operator like (+)"
 
 
-symOp :: IParser AST.Variable.Ref
+symOp :: IParser (Commented AST.Variable.Ref)
 symOp =
-  do  op <- many1 (satisfy Help.isSymbol)
+  addComments $
+  do  op <- many1 (satisfy Help.isSymbol) <?> "an infix operator like +"
       guard (op `notElem` [ "=", "..", "->", "--", "|", "\8594", ":" ])
       case op of
         "." -> notFollowedBy lower >> (return $ AST.Variable.OpRef op)
@@ -313,7 +313,7 @@ accessible exprParser =
                 end <- getMyPosition
                 return . A.at start end $
                     case rootExpr of
-                      AST.Expression.Var (AST.Variable.VarRef name@(c:_))
+                      AST.Expression.Var (Commented _ (AST.Variable.VarRef name@(c:_)))
                         | isUpper c ->
                             AST.Expression.rawVar (name ++ '.' : v)
                       _ ->

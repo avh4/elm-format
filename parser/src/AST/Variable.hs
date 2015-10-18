@@ -1,5 +1,7 @@
 module AST.Variable where
 
+import AST.V0_15
+
 
 data Ref
     = VarRef String
@@ -35,7 +37,7 @@ listing xs =
 
 -- | A value that can be imported or exported
 data Value
-    = Value !Ref
+    = Value !(Commented Ref)
     | Alias !String
     | Union !String !(Listing String)
-    deriving (Eq, Ord, Show)
+    deriving (Show)

@@ -104,7 +104,7 @@ value =
     val <|> tipe <?> "a value or type to expose"
   where
     val =
-      Var.Value <$> ((Var.VarRef <$> lowVar) <|> parens symOp)
+      Var.Value <$> (addComments (Var.VarRef <$> lowVar) <|> parens symOp)
 
     tipe =
       do  name <- capVar

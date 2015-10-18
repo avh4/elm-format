@@ -23,7 +23,7 @@ type Def =
 
 data Def'
     = Definition Pattern.Pattern [Pattern.Pattern] Expr
-    | TypeAnnotation Var.Ref Type.Type
+    | TypeAnnotation (Commented Var.Ref) Type.Type
     deriving (Show)
 
 
@@ -33,10 +33,10 @@ type Expr =
 
 data Expr'
     = Literal (Commented Literal.Literal)
-    | Var Var.Ref
+    | Var (Commented Var.Ref)
     | Range Expr Expr
     | ExplicitList [Expr]
-    | Binops Expr [(Var.Ref,Expr)]
+    | Binops Expr [(Commented Var.Ref,Expr)]
     | Unary UnaryOperator Expr
     | Lambda [Pattern.Pattern] Expr
     | App Expr Expr
@@ -76,7 +76,7 @@ portName impl =
 
 rawVar :: String -> Expr'
 rawVar x =
-    Var (Var.VarRef x)
+    Var $ Commented [] $ Var.VarRef x
 
 
 tuple :: [Expr] -> Expr'

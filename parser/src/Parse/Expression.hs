@@ -56,7 +56,7 @@ accessor =
 
       return $
         E.Lambda
-            [(ann (P.Var Var.WildcardRef))]
+            [(ann (P.Var $ Commented [] Var.WildcardRef))]
             (ann (E.Access (ann (E.rawVar "_")) lbl))
 
 
@@ -97,7 +97,7 @@ parensTerm =
     ]
   where
     lambda start end x body =
-        A.at start end (E.Lambda [A.at start end (P.Var $ Var.VarRef x)] body)
+        A.at start end (E.Lambda [A.at start end (P.Var $ Commented [] $ Var.VarRef x)] body)
 
     var start end x =
         A.at start end (E.rawVar x)
@@ -283,7 +283,7 @@ typeAnnotation =
     addLocation (E.TypeAnnotation <$> try start <*> Type.expr)
   where
     start =
-      do  v <- (Var.VarRef <$> lowVar) <|> parens symOp
+      do  v <- addComments (Var.VarRef <$> lowVar) <|> parens symOp
           padded hasType
           return v
 

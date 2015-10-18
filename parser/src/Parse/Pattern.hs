@@ -4,6 +4,7 @@ import Data.Char (isUpper)
 import qualified Data.List as List
 import Text.Parsec ((<|>), (<?>), char, choice, optionMaybe, try)
 
+import AST.V0_15
 import qualified AST.Literal as L
 import qualified AST.Pattern as P
 import qualified AST.Variable as Var
@@ -34,7 +35,7 @@ basic =
               P.Data (Var.VarRef str) []
 
           _ ->
-              P.Var (Var.VarRef str)
+              P.Var (Commented [] $ Var.VarRef str)
 
 
 asPattern :: IParser P.Pattern -> IParser P.Pattern

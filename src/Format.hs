@@ -82,7 +82,7 @@ formatVarValue :: AST.Variable.Value -> Box
 formatVarValue aval =
     case aval of
         AST.Variable.Value val ->
-            formatVar val
+            formatCommented formatVar val -- TODO: comments not tested
         AST.Variable.Alias _ -> text "<alias>"
         AST.Variable.Union _ _ -> text "<union>"
 
@@ -118,7 +118,7 @@ formatDefinition adef =
                 ]
         AST.Expression.TypeAnnotation var typ ->
             hbox
-                [ formatVar var
+                [ formatCommented formatVar var -- TODO: comments not tested
                 , text " : "
                 , formatType typ
                 ]
@@ -134,7 +134,7 @@ formatPattern apattern =
             hboxlist "{" "," "}" text fields
         AST.Pattern.Alias _ _ -> text "<alias>"
         AST.Pattern.Var var ->
-            formatVar var
+            formatCommented formatVar var -- TODO: comments not tested
         AST.Pattern.Anything ->
             text "_"
         AST.Pattern.Literal _ -> text "<literal>"
@@ -146,12 +146,12 @@ formatExpression aexpr =
         AST.Expression.Literal lit ->
             formatCommented formatLiteral lit
         AST.Expression.Var v ->
-            formatVar v
+            formatCommented formatVar v -- TODO: comments not tested
         AST.Expression.Range _ _ -> text "<range>"
         AST.Expression.ExplicitList _ -> text "<list>"
         AST.Expression.Binops l ops ->
             let opBoxes (op,e) =
-                  [ hspace 1, formatInfixVar op
+                  [ hspace 1, formatCommented formatInfixVar op
                   , hspace 1, formatExpression e
                   ]
             in
