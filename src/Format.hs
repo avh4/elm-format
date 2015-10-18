@@ -101,7 +101,8 @@ formatVarValue aval =
     case aval of
         AST.Variable.Value val ->
             formatCommented formatVar val -- TODO: comments not tested
-        AST.Variable.Alias _ -> text "<alias>"
+        AST.Variable.Alias name ->
+            text name
         AST.Variable.Union _ _ -> text "<union>"
 
 
