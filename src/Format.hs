@@ -311,7 +311,7 @@ formatType atype =
             hboxlist "" " " "" formatType (ctor:args)
         AST.Type.RTuple args ->
             hboxlist "(" ", " ")" formatType args
-        AST.Type.RRecord fields ext ->
+        AST.Type.RRecord ext fields multiline ->
             let
                 start =
                     case ext of
@@ -323,6 +323,12 @@ formatType atype =
                                 , formatType base
                                 , text " | "
                                 ]
+                (vStart,vPrefix) =
+                    case ext of
+                        Nothing ->
+                            (empty, "{ ")
+                        Just base ->
+                            (hbox2 (text "{ ") (formatType base), "| ")
                 pair (k,v) =
                     hbox
                         [ text k
@@ -330,7 +336,11 @@ formatType atype =
                         , formatType v
                         ]
             in
-                hbox2 start $ hboxlist "" ", " " }" pair fields
+                case multiline of
+                    False ->
+                        hbox2 start $ hboxlist "" ", " " }" pair fields
+                    True ->
+                        vbox2 vStart $ vboxlist vPrefix ", " "}" pair fields
 
 
 formatVar :: AST.Variable.Ref -> Box

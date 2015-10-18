@@ -43,6 +43,17 @@ vbox :: [Box] -> Box
 vbox =
     foldl vbox2 empty
 
+vboxlist :: String -> String -> String -> (a -> Box) -> [a] -> Box
+vboxlist start mid end format items =
+    case items of
+        [] ->
+            hbox2 (text start) (text end)
+        (first:rest) ->
+            vbox $
+                [ hbox2 (text start) (format first) ]
+                ++ (List.map (hbox2 (text mid) . format) rest) ++
+                [ text end ]
+
 
 hbox2 :: Box -> Box -> Box
 hbox2 (Box a aMargin) (Box b bMargin) =
@@ -56,10 +67,10 @@ hbox =
 
 hboxlist :: String -> String -> String -> (a -> Box) -> [a] -> Box
 hboxlist start mid end format items =
-  hbox $
-      [ text start ]
-      ++ (List.map format items |> List.intersperse (text mid)) ++
-      [ text end ]
+    hbox $
+        [ text start ]
+        ++ (List.map format items |> List.intersperse (text mid)) ++
+        [ text end ]
 
 
 hjoin :: Box -> [Box] -> Box

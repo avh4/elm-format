@@ -24,6 +24,20 @@ type alias MoreTypes x y z =
     { x | field : y, rec : { z : z }, fn : (y -> (String -> x)) }
 
 
+type alias MultilineRecordType =
+    { x : Int
+    , y : Int
+    , z : Int
+    }
+
+
+type alias MultilineRecordExtension a =
+    { a
+    | b : Bool
+    , c : Char
+    }
+
+
 {-| A function.
 -}
 fn =

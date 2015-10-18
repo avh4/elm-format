@@ -376,7 +376,9 @@ freshLine =
 
 newline :: IParser ()
 newline =
-  simpleNewline <|> lineComment <?> Syntax.newline
+  do  result <- simpleNewline <|> lineComment <?> Syntax.newline
+      updateState $ State.setNewline
+      return result
 
 
 simpleNewline :: IParser ()
@@ -406,7 +408,7 @@ multiComment =
   do  try (string "{-" <* notFollowedBy (string "|") )
       many (string " ")
       b <- closeComment
-      updateState $ State.addComment $ b
+      updateState $ State.addComment b
       return ()
 
 

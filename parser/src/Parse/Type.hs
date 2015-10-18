@@ -2,11 +2,12 @@
 module Parse.Type where
 
 import Data.List (intercalate)
-import Text.Parsec ((<|>), (<?>), char, many1, optionMaybe, string, try)
+import Text.Parsec ((<|>), (<?>), char, many1, optionMaybe, string, try, getState, updateState)
 
 import qualified AST.Type as Type
 import qualified AST.Variable as Var
 import Parse.Helpers
+import qualified Parse.State as State
 import qualified Reporting.Annotation as A
 import qualified Reporting.Region as R
 
@@ -29,20 +30,23 @@ record :: IParser Type.Type
 record =
   addLocation $
   do  char '{'
+      updateState State.clearNewline
       whitespace
-      rcrd <- extended <|> normal
+      (ext, fields) <- extended <|> normal
       dumbWhitespace
       char '}'
-      return rcrd
+      state <- getState
+      return $ Type.RRecord ext fields (State.newline state)
   where
-    normal = flip Type.RRecord Nothing <$> commaSep field
+    normal =
+      do  (\fields -> (Nothing, fields) ) <$> commaSep field
 
     -- extended record types require at least one field
     extended =
       do  ext <- try (addLocation lowVar <* (whitespace >> string "|"))
           whitespace
           fields <- commaSep1 field
-          return (Type.RRecord fields (Just (A.map Type.RVar ext)))
+          return ((Just (A.map Type.RVar ext)), fields)
 
     field =
       do  lbl <- rLabel
