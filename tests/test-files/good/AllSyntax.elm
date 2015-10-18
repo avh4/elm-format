@@ -39,7 +39,7 @@ functionWithParam a =
     a
 
 
-functionParameters a (t,s,_,(t',{x',y'})) {x,y} _ =
+functionParameters a b (t,s,_,(t',s',_,(t'',s''),{x',y'})) {x,y} _ =
     ()
 
 
@@ -52,7 +52,7 @@ fnAsUnparenthesizedLambda =
 
 
 multiArgLambda =
-    \a b (t,s) {x,y} _ -> \c -> (\d -> ())
+    \a b (t,s,_,(t',s',_,(t'',s''),{x',y'})) {x,y} _ -> \c -> (\d -> ())
 
 
 parenthesizedExpressions =
