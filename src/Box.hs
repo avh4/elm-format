@@ -78,9 +78,9 @@ hjoin sep list =
     hbox (List.intersperse sep list)
 
 
-indent :: Box -> Box
-indent child =
-    hbox2 (hspace 4) child
+indent :: Int -> Box -> Box
+indent i child =
+    hbox2 (hspace i) child
 
 
 margin :: Int -> Box -> Box

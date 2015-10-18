@@ -161,7 +161,7 @@ formatDeclaration decl =
                     vbox
                         [ hboxlist "type alias " " " " =" text (name:args)
                         , formatType typ
-                            |> indent
+                            |> indent 4
                         ]
                     |> margin 2
                 AST.Declaration.PortAnnotation _ _ -> text "<port annotation>"
@@ -180,7 +180,7 @@ formatDefinition adef =
                     , text " ="
                     ]
                 , formatExpression expr
-                    |> indent
+                    |> indent 4
                     |> margin 2
                 ]
         AST.Expression.TypeAnnotation var typ ->
@@ -329,16 +329,26 @@ formatType atype =
                             (empty, "{ ")
                         Just base ->
                             (hbox2 (text "{ ") (formatType base), "| ")
-                pair (k,v) =
-                    hbox
-                        [ text k
-                        , text " : "
-                        , formatType v
-                        ]
+                pair (k,v,multiline') =
+                    case multiline' of
+                        False ->
+                            hbox
+                                [ text k
+                                , text " : "
+                                , formatType v
+                                ]
+                        True ->
+                            vbox2
+                                (hbox2 (text k) (text " :"))
+                                (formatType v |> indent 2)
             in
                 case multiline of
                     False ->
-                        hbox2 start $ hboxlist "" ", " " }" pair fields
+                        case fields of
+                            [] ->
+                                text "{}"
+                            _ ->
+                                hbox2 start $ hboxlist "" ", " " }" pair fields
                     True ->
                         vbox2 vStart $ vboxlist vPrefix ", " "}" pair fields
 

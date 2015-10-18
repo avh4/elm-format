@@ -3,7 +3,7 @@ module Parse.State where
 
 data State = State
   { comments :: [String]
-  , newline :: Bool
+  , newline :: [Bool]
   }
 
 
@@ -11,7 +11,7 @@ init :: State
 init =
   State
     { comments = []
-    , newline = False
+    , newline = []
     }
 
 
@@ -27,9 +27,25 @@ clearComments state =
 
 setNewline :: State -> State
 setNewline state =
-    state { newline = True }
+    case newline state of
+        [] -> state
+        (_:rest) -> state { newline = (True:rest) }
 
 
-clearNewline :: State -> State
-clearNewline state =
-    state { newline = False }
+pushNewlineContext :: State -> State
+pushNewlineContext state =
+    state { newline = (False:(newline state)) }
+
+
+popNewlineContext :: State -> State
+popNewlineContext state =
+    case newline state of
+        [] -> state
+        (_:rest) -> state { newline = rest }
+
+
+sawNewline :: State -> Bool
+sawNewline state =
+    case newline state of
+        [] -> False
+        (b:_) -> b

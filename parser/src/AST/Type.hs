@@ -24,7 +24,7 @@ data Type'
     | RType Var.Ref
     | RApp Type [Type]
     | RTuple [Type]
-    | RRecord (Maybe Type) [(String, Type)] Bool
+    | RRecord (Maybe Type) [(String, Type, Bool)] Bool
     deriving (Show)
 
 

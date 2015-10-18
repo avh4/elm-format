@@ -38,6 +38,24 @@ type alias MultilineRecordExtension a =
     }
 
 
+type alias NestedRecords a =
+    { f1 : Int
+    , f2 : { singleLine : () }
+    , f3 :
+        { multiline1 : ((), ())
+        , multiline2 : { inner : List Char }
+        , multiline3 :
+            { a
+            | multiline' : Bool
+            }
+        }
+    , f4 :
+        { single : {} }
+    , f5 :
+        MoreTypes Int Float Bool
+    }
+
+
 {-| A function.
 -}
 fn =

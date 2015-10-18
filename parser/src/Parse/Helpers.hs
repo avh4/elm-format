@@ -387,6 +387,18 @@ simpleNewline =
       return ()
 
 
+pushNewlineContext :: IParser ()
+pushNewlineContext =
+    updateState State.pushNewlineContext
+
+
+popNewlineContext :: IParser Bool
+popNewlineContext =
+  do  state <- getState
+      updateState State.popNewlineContext
+      return $ State.sawNewline state
+
+
 lineComment :: IParser ()
 lineComment =
   do  try (string "--")

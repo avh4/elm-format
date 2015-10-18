@@ -30,13 +30,13 @@ record :: IParser Type.Type
 record =
   addLocation $
   do  char '{'
-      updateState State.clearNewline
+      pushNewlineContext
       whitespace
       (ext, fields) <- extended <|> normal
       dumbWhitespace
       char '}'
-      state <- getState
-      return $ Type.RRecord ext fields (State.newline state)
+      sawNewline <- popNewlineContext
+      return $ Type.RRecord ext fields sawNewline
   where
     normal =
       do  (\fields -> (Nothing, fields) ) <$> commaSep field
@@ -49,9 +49,12 @@ record =
           return ((Just (A.map Type.RVar ext)), fields)
 
     field =
-      do  lbl <- rLabel
+      do  pushNewlineContext
+          lbl <- rLabel
           whitespace >> hasType >> whitespace
-          (,) lbl <$> expr
+          val <- expr
+          sawNewline <- popNewlineContext
+          return (lbl, val, sawNewline)
 
 
 capTypeVar :: IParser String
