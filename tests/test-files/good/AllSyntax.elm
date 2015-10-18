@@ -1,5 +1,12 @@
 module AllSyntax (fn, tuple, Type, Union(A,B,C), Union2(..)) where
 
+{-| An example of all valid Elm syntax.
+
+# Section
+@docs fn
+
+-}
+
 import String
 import Signal exposing (foldp, map)
 import Json.Decode as Json

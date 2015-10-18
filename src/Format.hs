@@ -27,6 +27,7 @@ formatModule modu =
             , text " where"
             ]
             |> margin 1
+            , formatModuleDocs $ AST.Module.docs modu
         , case AST.Module.imports modu of
             [] ->
                 empty
@@ -35,6 +36,20 @@ formatModule modu =
                 |> margin 2
         , vbox (map formatDeclaration $ AST.Module.body modu)
         ]
+
+
+formatModuleDocs :: RA.Located (Maybe String) -> Box
+formatModuleDocs adocs =
+    case RA.drop adocs of
+        Nothing ->
+            empty
+        Just docs ->
+            hbox
+                [ text "{-| "
+                , text $ docs
+                , text "\n\n-}"
+                ]
+            |> margin 1
 
 
 formatName :: MN.Canonical -> Box
