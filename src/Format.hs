@@ -96,6 +96,23 @@ formatListing listing =
             text "<NOT POSSIBLE?>"
 
 
+formatStringListing :: AST.Variable.Listing String -> Box
+formatStringListing listing =
+    case listing of
+        AST.Variable.Listing [] False ->
+            empty
+        AST.Variable.Listing [] True ->
+            text "(..)"
+        AST.Variable.Listing vars False ->
+            hbox
+                [ text "("
+                , hjoin (text ",") (map text vars)
+                , text ")"
+                ]
+        AST.Variable.Listing _ True ->
+            text "<NOT POSSIBLE?>"
+
+
 formatVarValue :: AST.Variable.Value -> Box
 formatVarValue aval =
     case aval of
@@ -103,7 +120,11 @@ formatVarValue aval =
             formatCommented formatVar val -- TODO: comments not tested
         AST.Variable.Alias name ->
             text name
-        AST.Variable.Union _ _ -> text "<union>"
+        AST.Variable.Union name listing ->
+            hbox
+                [ text name
+                , formatStringListing listing
+                ]
 
 
 formatDeclaration :: AST.Declaration.Decl -> Box

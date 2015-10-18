@@ -1,4 +1,4 @@
-module AllSyntax (fn, tuple, Type) where
+module AllSyntax (fn, tuple, Type, Union(A,B,C), Union2(..)) where
 
 import String
 import Signal exposing (foldp, map)
