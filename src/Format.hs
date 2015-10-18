@@ -292,25 +292,40 @@ formatLiteral lit =
             text "False" -- TODO: not tested
 
 
+data TypeParensRequired
+    = ForLambda
+    | ForCtor
+    | NotRequired
+    deriving (Eq)
+
+
 formatType :: AST.Type.Type -> Box
-formatType atype =
+formatType =
+    formatType' NotRequired
+
+
+formatType' :: TypeParensRequired -> AST.Type.Type -> Box
+formatType' requireParens atype =
     case RA.drop atype of
         AST.Type.RLambda left right ->
             hbox
-                [ text "("
-                , formatType left
+                [ if requireParens /= NotRequired then text "(" else empty
+                , formatType' ForLambda left
                 , text " -> "
                 , formatType right
-                , text ")"
+                , if requireParens /= NotRequired then text ")" else empty
                 ]
         AST.Type.RVar var ->
             text var
         AST.Type.RType var ->
             formatVar var
         AST.Type.RApp ctor args ->
-            hboxlist "" " " "" formatType (ctor:args)
+            hboxlist
+                (if requireParens == ForCtor then "(" else "") " "
+                (if requireParens == ForCtor then ")" else "")
+                (formatType' ForCtor) (ctor:args)
         AST.Type.RTuple args ->
-            hboxlist "(" ", " ")" formatType args
+            hboxlist "(" ", " ")" (formatType) args
         AST.Type.RRecord ext fields multiline ->
             let
                 start =

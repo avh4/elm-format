@@ -21,7 +21,18 @@ type alias TypeWithArgs a b c =
 
 
 type alias MoreTypes x y z =
-    { x | field : y, rec : { z : z }, fn : (y -> (String -> x)) }
+    { x | field : y, rec : { z : z }, fn : y -> String -> x }
+
+
+type alias ParensInTypes a b c =
+    { f1 : a -> b
+    , f2 : (a -> b) -> c
+    , f3 : c -> List (a -> b)
+    , f4 : List (List (List b))
+    , f5 : List Type
+    , f6 : (a -> b, List (List c))
+    , f7 : List Type -> (a -> List b) -> List c
+    }
 
 
 type alias MultilineRecordType =
