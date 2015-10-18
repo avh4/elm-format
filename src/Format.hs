@@ -44,12 +44,17 @@ formatModuleDocs adocs =
         Nothing ->
             empty
         Just docs ->
-            hbox
-                [ text "{-| "
-                , text $ docs
-                , text "\n\n-}"
-                ]
+            formatDocComment docs
             |> margin 1
+
+
+formatDocComment :: String -> Box
+formatDocComment docs =
+    hbox
+        [ text "{-| "
+        , text $ docs
+        , text "-}"
+        ]
 
 
 formatName :: MN.Canonical -> Box
@@ -145,7 +150,8 @@ formatVarValue aval =
 formatDeclaration :: AST.Declaration.Decl -> Box
 formatDeclaration decl =
     case decl of
-        AST.Declaration.Comment _ -> text "<comment>"
+        AST.Declaration.Comment docs ->
+            formatDocComment docs
         AST.Declaration.Decl adecl ->
             case RA.drop adecl of
                 AST.Declaration.Definition def ->

@@ -4,7 +4,6 @@ module AllSyntax (fn, tuple, Type, Union(A,B,C), Union2(..)) where
 
 # Section
 @docs fn
-
 -}
 
 import String
@@ -13,6 +12,8 @@ import Json.Decode as Json
 import List exposing (..)
 
 
+{-| A function.
+-}
 fn =
     "XYZZY"
 

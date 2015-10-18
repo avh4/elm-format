@@ -398,7 +398,7 @@ docComment =
   do  try (string "{-|")
       many (string " ")
       contents <- closeComment
-      return (init (init contents))
+      return contents
 
 
 multiComment :: IParser ()
