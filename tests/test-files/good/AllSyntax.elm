@@ -124,3 +124,10 @@ multiArgLambda =
 
 parenthesizedExpressions =
     (1 + (2 * 3) / 4) |> ((+) 0)
+
+
+letExpression =
+    let
+        x = 1
+    in
+        x

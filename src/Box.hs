@@ -52,7 +52,7 @@ vboxlist start mid end format items =
             vbox $
                 [ hbox2 (text start) (format first) ]
                 ++ (List.map (hbox2 (text mid) . format) rest) ++
-                [ text end ]
+                [ if end == "" then empty else text end ]
 
 
 hbox2 :: Box -> Box -> Box

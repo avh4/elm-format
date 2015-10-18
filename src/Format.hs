@@ -155,7 +155,7 @@ formatDeclaration decl =
         AST.Declaration.Decl adecl ->
             case RA.drop adecl of
                 AST.Declaration.Definition def ->
-                    formatDefinition def
+                    formatDefinition False def
                 AST.Declaration.Datatype _ _ _ -> text "<datatype>"
                 AST.Declaration.TypeAlias name args typ ->
                     vbox
@@ -169,20 +169,29 @@ formatDeclaration decl =
                 AST.Declaration.Fixity _ _ _ -> text "<fixity>"
 
 
-formatDefinition :: AST.Expression.Def -> Box
-formatDefinition adef =
+formatDefinition :: Bool -> AST.Expression.Def -> Box
+formatDefinition compact adef =
     case RA.drop adef of
         AST.Expression.Definition name args expr ->
-            vbox
-                [ hbox
-                    [ formatPattern name
-                    , hbox $ List.map (\arg -> hbox [ text " ", formatPattern arg]) args
-                    , text " ="
-                    ]
-                , formatExpression expr
-                    |> indent 4
-                    |> margin 2
-                ]
+            case compact of
+                False ->
+                    vbox
+                        [ hbox
+                            [ formatPattern name
+                            , hbox $ List.map (\arg -> hbox [ text " ", formatPattern arg]) args
+                            , text " ="
+                            ]
+                        , formatExpression expr
+                            |> indent 4
+                            |> margin 2
+                        ]
+                True ->
+                    hbox
+                        [ formatPattern name
+                        , hbox $ List.map (\arg -> hbox [ text " ", formatPattern arg]) args
+                        , text " = "
+                        , formatExpression expr
+                        ]
         AST.Expression.TypeAnnotation var typ ->
             hbox
                 [ formatCommented formatVar var -- TODO: comments not tested
@@ -242,7 +251,15 @@ formatExpression aexpr =
                 , formatExpression r
                 ]
         AST.Expression.If _ _ -> text "<if>"
-        AST.Expression.Let _ _ -> text "<let>"
+        AST.Expression.Let defs expr ->
+            vbox
+                [ text "let"
+                , vboxlist "" "" "" (formatDefinition True) defs
+                    |> indent 4
+                , text "in"
+                , formatExpression expr
+                    |> indent 4
+                ]
         AST.Expression.Case _ _ -> text "<case>"
         AST.Expression.Data _ _ -> text "<expression data>"
         AST.Expression.Tuple exprs ->
