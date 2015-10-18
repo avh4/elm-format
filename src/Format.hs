@@ -23,6 +23,7 @@ formatModule modu =
         [ hbox
             [ text "module "
             , formatName $ AST.Module.name modu
+            , formatListing $ AST.Module.exports modu
             , text " where"
             ]
             |> margin 1
@@ -76,6 +77,23 @@ formatImport aimport =
                                 ]
                         AST.Variable.Listing _ True ->
                             text "<NOT POSSIBLE?>"
+
+
+formatListing :: AST.Variable.Listing (RA.Located AST.Variable.Value)-> Box
+formatListing listing =
+    case listing of
+        AST.Variable.Listing [] False ->
+            empty
+        AST.Variable.Listing [] True ->
+            text " (..)"
+        AST.Variable.Listing vars False ->
+            hbox
+                [ text " ("
+                , hjoin (text ", ") (map (formatVarValue . RA.drop) vars)
+                , text ")"
+                ]
+        AST.Variable.Listing _ True ->
+            text "<NOT POSSIBLE?>"
 
 
 formatVarValue :: AST.Variable.Value -> Box

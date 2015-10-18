@@ -17,7 +17,7 @@ data Module = Module
     { name    :: Name.Canonical
     , path    :: FilePath
     , docs    :: A.Located (Maybe String)
-    , exports :: (Var.Listing (A.Located Var.Value))
+    , exports :: Var.Listing (A.Located Var.Value)
     , imports :: [UserImport]
     , body    :: [Declaration.Decl]
     }
