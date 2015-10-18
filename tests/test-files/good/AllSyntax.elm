@@ -86,6 +86,10 @@ tuple =
     (1, 2)
 
 
+lists =
+    ([ 1, 2, 3, 4 ], [])
+
+
 commentedLiterals =
     ({- int -} 1, {- float -} 0.1, {- char -} 'c', {- string -} "str", {- boolean -} True)
 
