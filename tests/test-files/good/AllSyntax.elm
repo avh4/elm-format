@@ -12,6 +12,18 @@ import Json.Decode as Json
 import List exposing (..)
 
 
+type alias Type =
+    String
+
+
+type alias TypeWithArgs a b c =
+    List (a, b, { field : c })
+
+
+type alias MoreTypes x y z =
+    { x | field : y, rec : { z : z }, fn : (y -> (String -> x)) }
+
+
 {-| A function.
 -}
 fn =

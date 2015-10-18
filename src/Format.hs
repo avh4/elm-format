@@ -157,7 +157,13 @@ formatDeclaration decl =
                 AST.Declaration.Definition def ->
                     formatDefinition def
                 AST.Declaration.Datatype _ _ _ -> text "<datatype>"
-                AST.Declaration.TypeAlias _ _ _ -> text "<typealias>"
+                AST.Declaration.TypeAlias name args typ ->
+                    vbox
+                        [ hboxlist "type alias " " " " =" text (name:args)
+                        , formatType typ
+                            |> indent
+                        ]
+                    |> margin 2
                 AST.Declaration.PortAnnotation _ _ -> text "<port annotation>"
                 AST.Declaration.PortDefinition _ _ -> text "<port definition>"
                 AST.Declaration.Fixity _ _ _ -> text "<fixity>"
@@ -289,14 +295,42 @@ formatLiteral lit =
 formatType :: AST.Type.Type -> Box
 formatType atype =
     case RA.drop atype of
-        AST.Type.RLambda _ _ -> text "<lambda type>"
+        AST.Type.RLambda left right ->
+            hbox
+                [ text "("
+                , formatType left
+                , text " -> "
+                , formatType right
+                , text ")"
+                ]
         AST.Type.RVar var ->
-            text var -- TODO: not tested
+            text var
         AST.Type.RType var ->
             formatVar var
-        AST.Type.RApp _ _ -> text "<app>"
-        AST.Type.RTuple _ -> text "<tuple>"
-        AST.Type.RRecord _ _ -> text "<record>"
+        AST.Type.RApp ctor args ->
+            hboxlist "" " " "" formatType (ctor:args)
+        AST.Type.RTuple args ->
+            hboxlist "(" ", " ")" formatType args
+        AST.Type.RRecord fields ext ->
+            let
+                start =
+                    case ext of
+                        Nothing ->
+                            text "{ "
+                        Just base ->
+                            hbox
+                                [ text "{ "
+                                , formatType base
+                                , text " | "
+                                ]
+                pair (k,v) =
+                    hbox
+                        [ text k
+                        , text " : "
+                        , formatType v
+                        ]
+            in
+                hbox2 start $ hboxlist "" ", " " }" pair fields
 
 
 formatVar :: AST.Variable.Ref -> Box
