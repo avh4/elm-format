@@ -277,7 +277,18 @@ formatExpression aexpr =
                 , text field
                 ]
         AST.Expression.Update _ _ -> text "<update>"
-        AST.Expression.Record _ -> text "<record>"
+        AST.Expression.Record pairs -> -- TODO: single-line records
+            let
+                vStart = empty
+                vPrefix = "{ "
+                pair (k,v) =
+                    hbox
+                        [ text k
+                        , text " = "
+                        , formatExpression v
+                        ]
+            in
+                vbox2 vStart $ vboxlist vPrefix ", " "}" pair pairs
         AST.Expression.Parens expr ->
             hbox
                 [ text "("

@@ -134,6 +134,12 @@ recordAccess r =
     r.f1
 
 
+multilineRecordLiteral =
+    { f1 = ()
+    , f2 = 2
+    }
+
+
 letExpression =
     let
         x = 1
