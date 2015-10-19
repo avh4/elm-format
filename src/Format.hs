@@ -205,9 +205,9 @@ formatPattern apattern =
     case RA.drop apattern of
         AST.Pattern.Data _ _ -> text "<pattern data>"
         AST.Pattern.Tuple patterns ->
-            hboxlist "(" "," ")" formatPattern patterns
+            hboxlist "(" ", " ")" formatPattern patterns
         AST.Pattern.Record fields ->
-            hboxlist "{" "," "}" text fields
+            hboxlist "{" ", " "}" text fields
         AST.Pattern.Alias _ _ -> text "<alias>"
         AST.Pattern.Var var ->
             formatCommented formatVar var -- TODO: comments not tested
