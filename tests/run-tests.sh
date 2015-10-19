@@ -24,6 +24,7 @@ echo "# elm-format test suite"
 
 check Simple.elm
 check AllSyntax.elm
+check evancz/start-app/StartApp.elm
 
 echo
 echo "# GREAT SUCCESS!"

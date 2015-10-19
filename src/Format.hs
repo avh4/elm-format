@@ -192,6 +192,7 @@ formatDefinition compact adef =
                         , text " = "
                         , formatExpression expr
                         ]
+                    |> margin 1
         AST.Expression.TypeAnnotation var typ ->
             hbox
                 [ formatCommented formatVar var -- TODO: comments not tested
