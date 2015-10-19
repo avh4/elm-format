@@ -130,6 +130,10 @@ parenthesizedExpressions =
     (1 + (2 * 3) / 4) |> ((+) 0)
 
 
+recordAccess r =
+    r.f1
+
+
 letExpression =
     let
         x = 1
