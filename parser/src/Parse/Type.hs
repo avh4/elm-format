@@ -2,12 +2,11 @@
 module Parse.Type where
 
 import Data.List (intercalate)
-import Text.Parsec ((<|>), (<?>), char, many1, optionMaybe, string, try, getState, updateState)
+import Text.Parsec ((<|>), (<?>), char, many1, optionMaybe, string, try)
 
 import qualified AST.Type as Type
 import qualified AST.Variable as Var
 import Parse.Helpers
-import qualified Parse.State as State
 import qualified Reporting.Annotation as A
 import qualified Reporting.Region as R
 

@@ -294,10 +294,12 @@ definition :: IParser E.Def
 definition =
   addLocation $
   withPos $
-    do  (name:args) <- defStart
+    do  pushNewlineContext
+        (name:args) <- defStart
         padded equals
         body <- expr
-        return $ E.Definition name args body
+        sawNewline <- popNewlineContext
+        return $ E.Definition name args body sawNewline
 
 
 defStart :: IParser [P.Pattern]

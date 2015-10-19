@@ -135,3 +135,14 @@ letExpression =
         x = 1
     in
         x
+
+
+multilineDeclarationInLet =
+    let
+        string =
+            "String"
+
+        string' =
+            "String Prime"
+    in
+        string

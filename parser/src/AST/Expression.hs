@@ -22,7 +22,7 @@ type Def =
 
 
 data Def'
-    = Definition Pattern.Pattern [Pattern.Pattern] Expr
+    = Definition Pattern.Pattern [Pattern.Pattern] Expr Bool
     | TypeAnnotation (Commented Var.Ref) Type.Type
     deriving (Show)
 

@@ -27,7 +27,7 @@ formatModule modu =
             , text " where"
             ]
             |> margin 1
-            , formatModuleDocs $ AST.Module.docs modu
+        , formatModuleDocs (AST.Module.docs modu)
         , case AST.Module.imports modu of
             [] ->
                 empty
@@ -172,8 +172,8 @@ formatDeclaration decl =
 formatDefinition :: Bool -> AST.Expression.Def -> Box
 formatDefinition compact adef =
     case RA.drop adef of
-        AST.Expression.Definition name args expr ->
-            case compact of
+        AST.Expression.Definition name args expr multiline ->
+            case compact && (not multiline) of
                 False ->
                     vbox
                         [ hbox
@@ -183,8 +183,8 @@ formatDefinition compact adef =
                             ]
                         , formatExpression expr
                             |> indent 4
-                            |> margin 2
                         ]
+                    |> margin (if compact then 1 else 2)
                 True ->
                     hbox
                         [ formatPattern name
@@ -261,6 +261,7 @@ formatExpression aexpr =
                 [ text "let"
                 , vboxlist "" "" "" (formatDefinition True) defs
                     |> indent 4
+                    |> margin 0
                 , text "in"
                 , formatExpression expr
                     |> indent 4

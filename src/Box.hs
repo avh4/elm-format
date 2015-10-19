@@ -43,6 +43,7 @@ vbox :: [Box] -> Box
 vbox =
     foldl vbox2 empty
 
+
 vboxlist :: String -> String -> String -> (a -> Box) -> [a] -> Box
 vboxlist start mid end format items =
     case items of
@@ -50,13 +51,18 @@ vboxlist start mid end format items =
             hbox2 (text start) (text end)
         (first:rest) ->
             vbox $
-                [ hbox2 (text start) (format first) ]
-                ++ (List.map (hbox2 (text mid) . format) rest) ++
-                [ if end == "" then empty else text end ]
+                [ hbox2margin (text start) (format first) ]
+                ++ (List.map (hbox2margin (text mid) . format) rest) ++
+                if end == "" then [] else [ text end ]
 
 
 hbox2 :: Box -> Box -> Box
-hbox2 (Box a aMargin) (Box b bMargin) =
+hbox2 (Box a _) (Box b _) =
+    Box (a <> b) 0
+
+
+hbox2margin :: Box -> Box -> Box
+hbox2margin (Box a aMargin) (Box b bMargin) =
     Box (a <> b) (max aMargin bMargin)
 
 
@@ -80,7 +86,7 @@ hjoin sep list =
 
 indent :: Int -> Box -> Box
 indent i child =
-    hbox2 (hspace i) child
+    hbox2margin (hspace i) child
 
 
 margin :: Int -> Box -> Box
