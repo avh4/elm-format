@@ -6,10 +6,10 @@ module AllSyntax (fn, tuple, Type, Union(A,B,C), Union2(..)) where
 @docs fn
 -}
 
-import String
-import Signal exposing (foldp, map)
 import Json.Decode as Json
 import List exposing (..)
+import Signal exposing (foldp, map)
+import String
 
 
 type alias Type =

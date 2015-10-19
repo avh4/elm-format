@@ -32,7 +32,10 @@ formatModule modu =
             [] ->
                 empty
             imports ->
-                vbox (map formatImport imports)
+                imports
+                |> List.sortOn (fst . RA.drop)
+                |> map formatImport
+                |> vbox
                 |> margin 2
         , vbox (map formatDeclaration $ AST.Module.body modu)
         ]

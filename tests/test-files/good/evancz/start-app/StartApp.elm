@@ -15,9 +15,9 @@ works!**
 
 -}
 
+import Effects exposing (Effects, Never)
 import Html exposing (Html)
 import Task
-import Effects exposing (Effects, Never)
 
 
 {-| The configuration of an app follows the basic model / update / view pattern
