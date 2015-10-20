@@ -193,3 +193,13 @@ ifStatement b =
         "yes"
     else
         "No"
+
+
+caseStatement mb =
+    case mb of
+        Just True ->
+            "+"
+        Just _ ->
+            "_"
+        Nothing ->
+            "."

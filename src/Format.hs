@@ -207,7 +207,10 @@ formatDefinition compact adef =
 formatPattern :: AST.Pattern.Pattern -> Box
 formatPattern apattern =
     case RA.drop apattern of
-        AST.Pattern.Data _ _ -> text "<pattern data>"
+        AST.Pattern.Data ctor patterns ->
+            hbox2
+                (formatVar ctor)
+                (hboxlist (if List.null patterns then "" else " ") " " "" formatPattern patterns)
         AST.Pattern.Tuple patterns ->
             hboxlist "(" ", " ")" formatPattern patterns
         AST.Pattern.Record fields ->
@@ -217,7 +220,8 @@ formatPattern apattern =
             formatCommented formatVar var -- TODO: comments not tested
         AST.Pattern.Anything ->
             text "_"
-        AST.Pattern.Literal _ -> text "<literal>"
+        AST.Pattern.Literal lit ->
+            formatLiteral lit
 
 
 formatExpression :: AST.Expression.Expr -> Box
@@ -314,7 +318,27 @@ formatExpression aexpr =
                 , formatExpression expr
                     |> indent 4
                 ]
-        AST.Expression.Case _ _ -> text "<case>"
+        AST.Expression.Case subject clauses ->
+            vbox
+                [ hbox
+                    [ text "case "
+                    , formatExpression subject
+                    , text " of"
+                    ]
+                , let
+                      formatClause (pat,expr) =
+                          vbox
+                              [ hbox
+                                  [ formatPattern pat
+                                  , text " ->"
+                                  ]
+                              , formatExpression expr
+                                  |> indent 4
+                              ]
+                  in
+                      vbox (map formatClause clauses)
+                      |> indent 4
+                ]
         AST.Expression.Data _ _ -> text "<expression data>"
         AST.Expression.Tuple exprs ->
             hboxlist "(" ", " ")" formatExpression exprs
