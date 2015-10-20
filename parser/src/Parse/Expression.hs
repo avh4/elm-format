@@ -49,11 +49,7 @@ toVar v =
 
 accessor :: IParser E.Expr'
 accessor =
-  do  (start, lbl, end) <- located (try (string "." >> rLabel))
-
-      let ann value =
-            A.at start end value
-
+  do  lbl <- try (string "." >> rLabel)
       return $ E.AccessFunction lbl
 
 
