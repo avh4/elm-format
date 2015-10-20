@@ -282,7 +282,7 @@ formatExpression inList aexpr =
             vbox
                 [ hboxlist "\\" " " " -> " formatPattern patterns
                 , formatExpression False expr
-                    |> indent 4
+                    |> indent (if inList then 2 else 4)
                 ]
 
         AST.Expression.Unary AST.Expression.Negative e ->
@@ -307,7 +307,7 @@ formatExpression inList aexpr =
             vbox
                 [ text "<INVALID IF EXPRESSION>"
                 , formatExpression False els
-                    |> indent 4
+                    |> indent (if inList then 2 else 4)
                 ]
         AST.Expression.If ((if0,body0):elseifs) els ->
             vbox
@@ -340,11 +340,11 @@ formatExpression inList aexpr =
             vbox
                 [ text "let"
                 , vboxlist "" "" "" (formatDefinition True) defs
-                    |> indent 4
+                    |> indent (if inList then 2 else 4)
                     |> margin 0
                 , text "in"
                 , formatExpression False expr
-                    |> indent 4
+                    |> indent (if inList then 2 else 4)
                 ]
         AST.Expression.Case subject clauses ->
             vbox
@@ -365,7 +365,7 @@ formatExpression inList aexpr =
                               ]
                   in
                       vbox (map formatClause clauses)
-                      |> indent 4
+                      |> indent (if inList then 2 else 4)
                 ]
         AST.Expression.Data _ _ -> text "<expression data>"
 
