@@ -14,6 +14,7 @@ import qualified AST.Pattern
 import qualified AST.Type
 import qualified AST.Variable
 import qualified Data.List as List
+import qualified Data.Maybe as Maybe
 import qualified Reporting.Annotation as RA
 
 
@@ -501,7 +502,12 @@ formatType' requireParens atype =
                             _ ->
                                 hbox2 start $ hboxlist "" ", " " }" pair fields
                     True ->
-                        vbox2 vStart $ vboxlist vPrefix ", " "}" pair fields
+                        vbox
+                            [ vStart
+                            , vboxlist vPrefix ", " "" pair fields
+                                |> indent (if Maybe.isNothing ext then 0 else 4)
+                            , text "}"
+                            ]
 
 
 formatVar :: AST.Variable.Ref -> Box

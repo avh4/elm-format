@@ -44,8 +44,8 @@ type alias MultilineRecordType =
 
 type alias MultilineRecordExtension a =
     { a
-    | b : Bool
-    , c : Char
+        | b : Bool
+        , c : Char
     }
 
 
@@ -57,7 +57,7 @@ type alias NestedRecords a =
         , multiline2 : { inner : List Char }
         , multiline3 :
             { a
-            | multiline' : Bool
+                | multiline' : Bool
             }
         }
     , f4 :
