@@ -184,3 +184,12 @@ multilineDeclarationInLet =
             "String Prime"
     in
         string
+
+
+ifStatement b =
+    if b == "y" then
+        "YES"
+    else if b == "Y" then
+        "yes"
+    else
+        "No"

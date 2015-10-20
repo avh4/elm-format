@@ -270,7 +270,40 @@ formatExpression aexpr =
                     vbox2
                         (formatExpression l)
                         (vboxlist "" "" "" formatExpression rs |> indent 4)
-        AST.Expression.If _ _ -> text "<if>"
+
+        AST.Expression.If [] els ->
+            vbox
+                [ text "<INVALID IF EXPRESSION>"
+                , formatExpression els
+                    |> indent 4
+                ]
+        AST.Expression.If ((if0,body0):elseifs) els ->
+            vbox
+                [ hbox
+                    [ text "if "
+                    , formatExpression if0
+                    , text " then"
+                    ]
+                , formatExpression body0
+                    |> indent 4
+                , let
+                    formatElseIf (if',body') =
+                        vbox
+                            [ hbox
+                                [ text "else if "
+                                , formatExpression if'
+                                , text " then"
+                                ]
+                            , formatExpression body'
+                                |> indent 4
+                            ]
+                  in
+                      vbox (map formatElseIf elseifs)
+                , text "else"
+                , formatExpression els
+                    |> indent 4
+                ]
+
         AST.Expression.Let defs expr ->
             vbox
                 [ text "let"
