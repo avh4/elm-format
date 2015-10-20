@@ -180,15 +180,17 @@ term =
 appExpr :: IParser E.Expr
 appExpr =
   expecting "an expression" $
-  do  t <- term
+  do  pushNewlineContext
+      t <- term
       ts <- constrainedSpacePrefix term
+      sawNewline <- popNewlineContext
       return $
           case ts of
             [] -> t
             _  ->
                 A.sameAs
                     (List.foldl' (\f t -> A.merge f t ()) (A.sameAs t ()) ts)
-                    (E.App t ts)
+                    (E.App t ts sawNewline)
 
 
 --------  Normal Expressions  --------

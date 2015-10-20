@@ -253,11 +253,17 @@ formatExpression aexpr =
                 [ text "-"
                 , formatExpression e
                 ]
-        AST.Expression.App l rs ->
-            hbox
-                [ formatExpression l
-                , hboxlist " " " " "" formatExpression rs
-                ]
+        AST.Expression.App l rs multiline ->
+            case multiline of
+                False ->
+                    hbox
+                        [ formatExpression l
+                        , hboxlist " " " " "" formatExpression rs
+                        ]
+                True ->
+                    vbox2
+                        (formatExpression l)
+                        (vboxlist "" "" "" formatExpression rs |> indent 4)
         AST.Expression.If _ _ -> text "<if>"
         AST.Expression.Let defs expr ->
             vbox

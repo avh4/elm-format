@@ -39,7 +39,7 @@ data Expr'
     | Binops Expr [(Commented Var.Ref,Expr)]
     | Unary UnaryOperator Expr
     | Lambda [Pattern.Pattern] Expr
-    | App Expr [Expr]
+    | App Expr [Expr] Bool
     | If [(Expr, Expr)] Expr
     | Let [Def] Expr
     | Case Expr [(Pattern.Pattern, Expr)]

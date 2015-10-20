@@ -110,6 +110,12 @@ functionApplication =
     toString 10
 
 
+multilineFunctionApplication =
+    List.map
+        toString
+        [ 1, 2, 3 ]
+
+
 functionWithParam a =
     a
 
