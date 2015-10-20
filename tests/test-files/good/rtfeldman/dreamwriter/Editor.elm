@@ -1,17 +1,16 @@
-module Component.Editor where
+module Component.Editor (..) where
 
-import Dreamwriter exposing (..)
 import Component.WordGraph as WordGraph
-
-import String
+import Dreamwriter exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Lazy exposing (..)
 import Html.Events exposing (..)
-import Maybe
-import List exposing (..)
-import Signal exposing (Address, mailbox)
+import Html.Lazy exposing (..)
 import Json.Encode exposing (string)
+import List exposing (..)
+import Maybe
+import Signal exposing (Address, mailbox)
+import String
 
 
 type alias Addresses a =
