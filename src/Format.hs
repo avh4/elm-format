@@ -374,6 +374,9 @@ formatExpression inList aexpr =
         AST.Expression.Tuple exprs True ->
             vboxlist "( " ", " ")" (formatExpression True) exprs
 
+        AST.Expression.TupleFunction n ->
+            hboxlist "(" "" ")" (text . const ",") [0 .. n]
+
         AST.Expression.Access expr field ->
             hbox
                 [ formatExpression False expr -- TODO: needs to have parens in some cases

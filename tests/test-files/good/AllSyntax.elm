@@ -86,6 +86,10 @@ tuple =
     (1, 2)
 
 
+tupleFunction =
+    (,,,) 1 2 3 4
+
+
 multilineTuple a b =
     ( 1
     , if b then

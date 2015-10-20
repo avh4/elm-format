@@ -45,6 +45,7 @@ data Expr'
     | Case Expr [(Pattern.Pattern, Expr)]
     | Data String [Expr]
     | Tuple [Expr] Bool
+    | TupleFunction Int
     | Access Expr String
     | AccessFunction String
     | Update Expr [(String, Expr)]

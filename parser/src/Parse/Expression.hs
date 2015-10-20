@@ -95,12 +95,6 @@ parensTerm =
     , parens (tupleFn <|> parened)
     ]
   where
-    lambda multiline start end x body =
-        A.at start end (E.Lambda [A.at start end (P.Var $ Commented [] $ Var.VarRef x)] body multiline)
-
-    var start end x =
-        A.at start end (E.rawVar x)
-
     opFn =
       do  (start, op, end) <- located anyOp
           return $
@@ -108,18 +102,10 @@ parensTerm =
               E.Var op
 
     tupleFn =
-      do  pushNewlineContext
-          (start, commas, end) <-
+      do  (start, commas, end) <-
               located (comma >> many (whitespace >> comma))
-
-          let vars = map (('v':) . show) [ 0 .. length commas + 1 ]
-          multiline <- popNewlineContext
-
           return $
-            foldr
-              (lambda multiline start end)
-              (A.at start end (E.Tuple (map (var start end) vars) False))
-              vars
+              A.at start end $ E.TupleFunction $ length commas
 
     parened =
       do  pushNewlineContext
