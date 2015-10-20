@@ -392,12 +392,20 @@ formatExpression inList aexpr =
             let
                 vStart = empty
                 vPrefix = "{ "
-                pair (k,v) =
-                    hbox
-                        [ text k
-                        , text " = "
-                        , formatExpression False v
-                        ]
+                pair (k,v,multiline') =
+                    case multiline' of
+                        False ->
+                            hbox
+                                [ text k
+                                , text " = "
+                                , formatExpression False v
+                                ]
+                        True ->
+                            vbox
+                                [ hbox2 (text k) (text " =")
+                                , formatExpression False v
+                                    |> indent 2
+                                ]
             in
                 vbox2 vStart $ vboxlist vPrefix ", " "}" pair pairs
         AST.Expression.Parens expr ->

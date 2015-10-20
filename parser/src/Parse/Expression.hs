@@ -138,23 +138,27 @@ recordTerm =
           return (E.Update (A.A ann (E.rawVar starter)) fields)
 
     literal (A.A _ starter) =
-      do  try equals
+      do  pushNewlineContext
+          try equals -- TODO: can the try break newline tracking?
           whitespace
           value <- expr
+          multiline <- popNewlineContext
           whitespace
           choice
             [ do  try comma
                   whitespace
                   fields <- commaSep field
-                  return (E.Record ((starter, value) : fields))
-            , return (E.Record [(starter, value)])
+                  return (E.Record ((starter, value, multiline) : fields))
+            , return (E.Record [(starter, value, multiline)])
             ]
 
     field =
-      do  key <- rLabel
+      do  pushNewlineContext
+          key <- rLabel
           padded equals
           value <- expr
-          return (key, value)
+          multiline <- popNewlineContext
+          return (key, value, multiline)
 
 
 term :: IParser E.Expr
