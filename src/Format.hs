@@ -244,8 +244,10 @@ formatExpression aexpr =
                     text "[]"
                 _ ->
                     vboxlist "[ " ", " "]" formatExpression exprs
-        AST.Expression.Binops l ops ->
-            let opBoxes (op,e) =
+
+        AST.Expression.Binops l ops False ->
+            let
+                opBoxes (op,e) =
                   [ hspace 1, formatCommented formatInfixVar op
                   , hspace 1, formatExpression e
                   ]
@@ -253,6 +255,21 @@ formatExpression aexpr =
                 hbox $
                     formatExpression l
                     : concatMap opBoxes ops
+        AST.Expression.Binops l ops True ->
+            let
+                formatOp (op,e) =
+                    hbox
+                        [ formatCommented formatInfixVar op -- TODO: comments not tested
+                        , hspace 1
+                        , formatExpression e
+                        ]
+            in
+                vbox
+                    [ formatExpression l
+                    , vbox (map formatOp ops)
+                        |> indent 4
+                    ]
+
         AST.Expression.Lambda patterns expr ->
             hbox
                 [ hboxlist "\\" " " " -> " formatPattern patterns

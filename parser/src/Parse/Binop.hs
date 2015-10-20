@@ -6,7 +6,7 @@ import Text.Parsec ((<|>), choice, try)
 import AST.V0_15
 import qualified AST.Expression as E
 import qualified AST.Variable as Var
-import Parse.Helpers (IParser, commitIf, whitespace)
+import Parse.Helpers (IParser, commitIf, whitespace, popNewlineContext, pushNewlineContext)
 import qualified Reporting.Annotation as A
 
 
@@ -16,9 +16,11 @@ binops
     -> IParser (Commented Var.Ref)
     -> IParser E.Expr
 binops term last anyOp =
-  do  e <- term
+  do  pushNewlineContext
+      e <- term
       ops <- nextOps
-      return $ split e ops
+      sawNewline <- popNewlineContext
+      return $ split e ops sawNewline
   where
     nextOps =
       choice
@@ -37,9 +39,10 @@ binops term last anyOp =
 split
     :: E.Expr
     -> [(Commented Var.Ref, E.Expr)]
+    -> Bool
     -> E.Expr
-split e0 [] = e0
-split e0 ops =
+split e0 [] _ = e0
+split e0 ops multiline =
     let
         init :: A.Located (E.Expr,[(Commented Var.Ref,E.Expr)])
         init = A.sameAs e0 (e0,[])
@@ -60,6 +63,6 @@ split e0 ops =
           merge' (o,e) loc (A.drop loc)
 
         wrap :: (E.Expr,[(Commented Var.Ref,E.Expr)]) -> E.Expr'
-        wrap (e',ops) = E.Binops e' ops
+        wrap (e',ops) = E.Binops e' ops multiline
     in
       A.map wrap $ List.foldr merge init ops

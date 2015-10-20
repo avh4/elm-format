@@ -36,7 +36,7 @@ data Expr'
     | Var (Commented Var.Ref)
     | Range Expr Expr
     | ExplicitList [Expr] Bool
-    | Binops Expr [(Commented Var.Ref,Expr)]
+    | Binops Expr [(Commented Var.Ref,Expr)] Bool
     | Unary UnaryOperator Expr
     | Lambda [Pattern.Pattern] Expr
     | App Expr [Expr] Bool
