@@ -17,7 +17,8 @@ binops
     -> IParser E.Expr
 binops term last anyOp =
   do  e <- term
-      split e =<< nextOps
+      ops <- nextOps
+      return $ split e ops
   where
     nextOps =
       choice
@@ -36,8 +37,8 @@ binops term last anyOp =
 split
     :: E.Expr
     -> [(Commented Var.Ref, E.Expr)]
-    -> IParser E.Expr
-split e0 [] = return e0
+    -> E.Expr
+split e0 [] = e0
 split e0 ops =
     let
         init :: A.Located (E.Expr,[(Commented Var.Ref,E.Expr)])
@@ -61,4 +62,4 @@ split e0 ops =
         wrap :: (E.Expr,[(Commented Var.Ref,E.Expr)]) -> E.Expr'
         wrap (e',ops) = E.Binops e' ops
     in
-      return $ A.map wrap $ List.foldr merge init ops
+      A.map wrap $ List.foldr merge init ops
