@@ -408,12 +408,15 @@ formatExpression inList aexpr =
                                 ]
             in
                 vbox2 vStart $ vboxlist vPrefix ", " "}" pair pairs
-        AST.Expression.Parens expr ->
+        AST.Expression.Parens expr False ->
             hbox
                 [ text "("
                 , formatExpression False expr
                 , text ")"
                 ]
+        AST.Expression.Parens expr True->
+            vboxlist "( " "" ")" (formatExpression True) [expr]
+
         AST.Expression.Port _ -> text "<port>"
         AST.Expression.GLShader _ _ _ -> text "<glshader>"
 

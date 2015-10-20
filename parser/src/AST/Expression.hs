@@ -50,7 +50,7 @@ data Expr'
     | AccessFunction String
     | Update Expr [(String, Expr, Bool)]
     | Record [(String, Expr, Bool)]
-    | Parens Expr
+    | Parens Expr Bool
     -- for type checking and code gen only
     | Port PortImpl
     | GLShader String String Literal.GLShaderTipe

@@ -114,7 +114,7 @@ parensTerm =
           return $
             case expressions of
               [expression] ->
-                  A.at start end (E.Parens expression)
+                  A.at start end (E.Parens expression multiline)
               _ ->
                   A.at start end (E.Tuple expressions multiline)
 

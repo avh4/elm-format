@@ -198,6 +198,23 @@ parenthesizedExpressions =
     (1 + (2 * 3) / 4) |> ((+) 0)
 
 
+multilineParenthesizedExpressions =
+    graphHeight
+        / ( if range == 0 then
+              0.1
+            else
+              toFloat range
+          )
+
+
+multilineParenthesizedExpressions =
+    ( if range == 0 then
+        0.1
+      else
+        toFloat range
+    )
+
+
 recordAccess r =
     r.f1
 
