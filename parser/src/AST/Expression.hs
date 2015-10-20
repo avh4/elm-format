@@ -44,7 +44,7 @@ data Expr'
     | Let [Def] Expr
     | Case Expr [(Pattern.Pattern, Expr)]
     | Data String [Expr]
-    | Tuple [Expr]
+    | Tuple [Expr] Bool
     | Access Expr String
     | AccessFunction String
     | Update Expr [(String, Expr)]
@@ -78,8 +78,3 @@ portName impl =
 rawVar :: String -> Expr'
 rawVar x =
     Var $ Commented [] $ Var.VarRef x
-
-
-tuple :: [Expr] -> Expr'
-tuple expressions =
-    Tuple expressions

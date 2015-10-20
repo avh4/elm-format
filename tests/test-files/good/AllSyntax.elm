@@ -86,6 +86,18 @@ tuple =
     (1, 2)
 
 
+multilineTuple a b =
+    ( 1
+    , if b then
+        2
+      else
+        3
+    , (+) 3 4
+    , 7
+        + 9
+    )
+
+
 lists =
     ([ 1, 2, 3, 4 ], [])
 

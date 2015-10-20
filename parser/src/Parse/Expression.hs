@@ -118,17 +118,19 @@ parensTerm =
           return $
             foldr
               (lambda multiline start end)
-              (A.at start end (E.tuple (map (var start end) vars)))
+              (A.at start end (E.Tuple (map (var start end) vars) False))
               vars
 
     parened =
-      do  (start, expressions, end) <- located (commaSep expr)
+      do  pushNewlineContext
+          (start, expressions, end) <- located (commaSep expr)
+          multiline <- popNewlineContext
           return $
             case expressions of
               [expression] ->
                   A.at start end (E.Parens expression)
               _ ->
-                  A.at start end (E.tuple expressions)
+                  A.at start end (E.Tuple expressions multiline)
 
 
 recordTerm :: IParser E.Expr

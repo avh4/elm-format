@@ -270,7 +270,7 @@ formatExpression inList aexpr =
                 vbox
                     [ formatExpression False l
                     , vbox (map formatOp ops)
-                        |> indent 4
+                        |> indent (if inList then 2 else 4)
                     ]
 
         AST.Expression.Lambda patterns expr False ->
@@ -317,7 +317,7 @@ formatExpression inList aexpr =
                     , text " then"
                     ]
                 , formatExpression False body0
-                    |> indent 4
+                    |> indent (if inList then 2 else 4)
                 , let
                     formatElseIf (if',body') =
                         vbox
@@ -327,13 +327,13 @@ formatExpression inList aexpr =
                                 , text " then"
                                 ]
                             , formatExpression False body'
-                                |> indent 4
+                                |> indent (if inList then 2 else 4)
                             ]
                   in
                       vbox (map formatElseIf elseifs)
                 , text "else"
                 , formatExpression False els
-                    |> indent 4
+                    |> indent (if inList then 2 else 4)
                 ]
 
         AST.Expression.Let defs expr ->
@@ -368,8 +368,11 @@ formatExpression inList aexpr =
                       |> indent 4
                 ]
         AST.Expression.Data _ _ -> text "<expression data>"
-        AST.Expression.Tuple exprs ->
+
+        AST.Expression.Tuple exprs False ->
             hboxlist "(" ", " ")" (formatExpression False) exprs
+        AST.Expression.Tuple exprs True ->
+            vboxlist "( " ", " ")" (formatExpression True) exprs
 
         AST.Expression.Access expr field ->
             hbox
