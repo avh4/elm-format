@@ -99,12 +99,21 @@ multilineLists =
 
 nestedMultilineLists =
     [ []
-    , [ [], [ 1 ] ]
+    , [ [], [ "1" ] ]
     , [ [ "a"
         , "b"
         ]
       ]
     , [ [] ]
+    ]
+
+
+functionCallInMultilineList =
+    [ [ [ toString "a" ] ]
+    , [ [ toString
+            "a"
+        ]
+      ]
     ]
 
 
