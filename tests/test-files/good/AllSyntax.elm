@@ -271,3 +271,27 @@ multilineExpressionsInsideList =
     , \a ->
         9
     ]
+
+
+multilineExpressionsInsideTuple =
+    ( let
+        x = 1
+      in
+        x
+    , if True then
+        2
+      else if False then
+        3
+      else
+        4
+    , case True of
+        _ ->
+            5
+    , [ 6
+      , 7
+      ]
+        |> head
+        |> Maybe.withDefault 8
+    , \a ->
+        9
+    )
