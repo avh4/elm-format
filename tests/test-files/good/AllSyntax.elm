@@ -171,6 +171,10 @@ recordAccess r =
     r.f1
 
 
+recordAccessAsFunction r =
+    .f1 r
+
+
 multilineRecordLiteral =
     { f1 = ()
     , f2 = 2

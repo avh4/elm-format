@@ -46,6 +46,7 @@ data Expr'
     | Data String [Expr]
     | Tuple [Expr]
     | Access Expr String
+    | AccessFunction String
     | Update Expr [(String, Expr)]
     | Record [(String, Expr)]
     | Parens Expr

@@ -54,10 +54,7 @@ accessor =
       let ann value =
             A.at start end value
 
-      return $
-        E.Lambda
-            [(ann (P.Var $ Commented [] Var.WildcardRef))]
-            (ann (E.Access (ann (E.rawVar "_")) lbl))
+      return $ E.AccessFunction lbl
 
 
 negative :: IParser E.Expr'

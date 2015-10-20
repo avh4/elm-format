@@ -359,12 +359,17 @@ formatExpression aexpr =
         AST.Expression.Data _ _ -> text "<expression data>"
         AST.Expression.Tuple exprs ->
             hboxlist "(" ", " ")" formatExpression exprs
+
         AST.Expression.Access expr field ->
             hbox
                 [ formatExpression expr -- TODO: needs to have parens in some cases
                 , text "."
                 , text field
                 ]
+
+        AST.Expression.AccessFunction field ->
+            hbox2 (text ".") (text field)
+
         AST.Expression.Update _ _ -> text "<update>"
         AST.Expression.Record pairs -> -- TODO: single-line records
             let
