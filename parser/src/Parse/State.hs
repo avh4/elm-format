@@ -11,7 +11,7 @@ init :: State
 init =
   State
     { comments = []
-    , newline = []
+    , newline = [False]
     }
 
 
@@ -41,7 +41,8 @@ popNewlineContext :: State -> State
 popNewlineContext state =
     case newline state of
         [] -> state
-        (_:rest) -> state { newline = rest }
+        (_:[]) -> state
+        (last:next:rest) -> state { newline = (last || next):rest }
 
 
 sawNewline :: State -> Bool

@@ -75,7 +75,7 @@ negative =
 
 listTerm :: IParser E.Expr'
 listTerm =
-    shader' <|> braces (try range <|> E.ExplicitList <$> commaSep expr)
+    shader' <|> braces (try range <|> commaSeparated)
   where
     range =
       do  lo <- expr
@@ -87,6 +87,12 @@ listTerm =
           let uid = show (sourceLine pos) ++ ":" ++ show (sourceColumn pos)
           (rawSrc, tipe) <- Help.shader
           return $ E.GLShader uid (filter (/='\r') rawSrc) tipe
+
+    commaSeparated =
+      do  pushNewlineContext
+          term <- commaSep expr
+          sawNewline <- popNewlineContext
+          return $ E.ExplicitList term sawNewline
 
 
 parensTerm :: IParser E.Expr

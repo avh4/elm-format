@@ -228,12 +228,18 @@ formatExpression aexpr =
         AST.Expression.Var v ->
             formatCommented formatVar v -- TODO: comments not tested
         AST.Expression.Range _ _ -> text "<range>"
-        AST.Expression.ExplicitList exprs ->
+        AST.Expression.ExplicitList exprs False ->
             case exprs of
                 [] ->
                     text "[]"
                 _ ->
                     hboxlist "[ " ", " " ]" formatExpression exprs
+        AST.Expression.ExplicitList exprs True ->
+            case exprs of
+                [] ->
+                    text "[]"
+                _ ->
+                    vboxlist "[ " ", " "]" formatExpression exprs
         AST.Expression.Binops l ops ->
             let opBoxes (op,e) =
                   [ hspace 1, formatCommented formatInfixVar op

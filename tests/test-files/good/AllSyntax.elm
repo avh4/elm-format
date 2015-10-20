@@ -90,6 +90,24 @@ lists =
     ([ 1, 2, 3, 4 ], [])
 
 
+multilineLists =
+    [ "one"
+    , "two"
+    , "three"
+    ]
+
+
+nestedMultilineLists =
+    [ []
+    , [ [], [ 1 ] ]
+    , [ [ "a"
+        , "b"
+        ]
+      ]
+    , [ [] ]
+    ]
+
+
 commentedLiterals =
     ({- int -} 1, {- float -} 0.1, {- char -} 'c', {- string -} "str", {- boolean -} True)
 
