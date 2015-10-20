@@ -253,11 +253,10 @@ formatExpression aexpr =
                 [ text "-"
                 , formatExpression e
                 ]
-        AST.Expression.App l r ->
+        AST.Expression.App l rs ->
             hbox
                 [ formatExpression l
-                , hspace 1
-                , formatExpression r
+                , hboxlist " " " " "" formatExpression rs
                 ]
         AST.Expression.If _ _ -> text "<if>"
         AST.Expression.Let defs expr ->

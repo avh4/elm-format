@@ -106,6 +106,10 @@ unaryOperator a =
     -(1) + -2 + -a
 
 
+functionApplication =
+    toString 10
+
+
 functionWithParam a =
     a
 

@@ -185,7 +185,10 @@ appExpr =
       return $
           case ts of
             [] -> t
-            _  -> List.foldl' (\f x -> A.merge f x $ E.App f x) t ts
+            _  ->
+                A.sameAs
+                    (List.foldl' (\f t -> A.merge f t ()) (A.sameAs t ()) ts)
+                    (E.App t ts)
 
 
 --------  Normal Expressions  --------
