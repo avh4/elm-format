@@ -95,8 +95,8 @@ parensTerm =
     , parens (tupleFn <|> parened)
     ]
   where
-    lambda start end x body =
-        A.at start end (E.Lambda [A.at start end (P.Var $ Commented [] $ Var.VarRef x)] body)
+    lambda multiline start end x body =
+        A.at start end (E.Lambda [A.at start end (P.Var $ Commented [] $ Var.VarRef x)] body multiline)
 
     var start end x =
         A.at start end (E.rawVar x)
@@ -108,14 +108,16 @@ parensTerm =
               E.Var op
 
     tupleFn =
-      do  (start, commas, end) <-
+      do  pushNewlineContext
+          (start, commas, end) <-
               located (comma >> many (whitespace >> comma))
 
           let vars = map (('v':) . show) [ 0 .. length commas + 1 ]
+          multiline <- popNewlineContext
 
           return $
             foldr
-              (lambda start end)
+              (lambda multiline start end)
               (A.at start end (E.tuple (map (var start end) vars)))
               vars
 
@@ -237,12 +239,14 @@ ifHelp branches =
 lambdaExpr :: IParser E.Expr
 lambdaExpr =
   addLocation $
-  do  char '\\' <|> char '\x03BB' <?> "an anonymous function"
+  do  pushNewlineContext
+      char '\\' <|> char '\x03BB' <?> "an anonymous function"
       whitespace
       args <- spaceSep1 Pattern.term
       padded rightArrow
       body <- expr
-      return $ E.Lambda args body
+      multiline <- popNewlineContext
+      return $ E.Lambda args body multiline
 
 
 caseExpr :: IParser E.Expr'

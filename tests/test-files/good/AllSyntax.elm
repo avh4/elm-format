@@ -172,6 +172,12 @@ multiArgLambda =
     \a b (t, s, _, (t', s', _, (t'', s''), {x', y'})) {x, y} _ -> \c -> (\d -> ())
 
 
+multilineLambda =
+    \a ->
+        \b c ->
+            \d -> e
+
+
 parenthesizedExpressions =
     (1 + (2 * 3) / 4) |> ((+) 0)
 

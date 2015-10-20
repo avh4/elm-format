@@ -273,11 +273,18 @@ formatExpression inList aexpr =
                         |> indent 4
                     ]
 
-        AST.Expression.Lambda patterns expr ->
+        AST.Expression.Lambda patterns expr False ->
             hbox
                 [ hboxlist "\\" " " " -> " formatPattern patterns
                 , formatExpression False expr
                 ]
+        AST.Expression.Lambda patterns expr True ->
+            vbox
+                [ hboxlist "\\" " " " -> " formatPattern patterns
+                , formatExpression False expr
+                    |> indent 4
+                ]
+
         AST.Expression.Unary AST.Expression.Negative e ->
             hbox
                 [ text "-"
