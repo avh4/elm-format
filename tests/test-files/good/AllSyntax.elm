@@ -240,6 +240,13 @@ multilineRecordAccess f =
 
 
 multilineRecordAccess r f =
+    { r
+        | f1 = 1
+        , f2 = 2
+    }.f2
+
+
+multilineRecordAccess r f =
     { f1 = 1
     , f2 = 2
     }.f2
