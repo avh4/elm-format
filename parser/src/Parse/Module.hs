@@ -24,7 +24,7 @@ getModuleName source =
           return (ModuleName.toString names)
 
 
-header :: IParser (Module.Header [Module.UserImport])
+header :: IParser Module.Header
 header =
   do  optional freshLine
       (names, exports) <-
