@@ -35,9 +35,6 @@ flags =
     Config
       <$> file
       <*> output
-  where
-    file =
-      Opt.strArgument $ Opt.metavar "FILE"
 
 
 -- HELP
@@ -92,6 +89,11 @@ output =
     Opt.strOption $
         mconcat
         [ Opt.long "output"
-        , Opt.metavar "FILE"
-        , Opt.help "Write output to FILE instead of overwriting the given source file."
+        , Opt.metavar "OUTPUT"
+        , Opt.value ""
+        , Opt.help "Write output to OUTPUT instead of overwriting the given source file."
         ]
+
+file :: Opt.Parser FilePath
+file =
+    Opt.strArgument $ Opt.metavar "INPUT"

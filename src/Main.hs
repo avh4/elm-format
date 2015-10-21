@@ -3,6 +3,7 @@ module Main where
 
 import Elm.Utils ((|>))
 import System.Exit (exitFailure)
+import Control.Monad (when)
 
 import qualified AST.Module
 import qualified Box
@@ -28,17 +29,22 @@ formatResult config result =
                 |> Box.render
                 |> LazyText.pack
                 |> trimSpaces
-                |> LazyText.writeFile (Flags._output config)
+                |> LazyText.writeFile outputFile
         Result.Result _ (Result.Err errs) ->
             do
-                LazyText.writeFile (Flags._output config)
-                    $ LazyText.pack ""
+                when (not isOutputEmpty)
+                  (LazyText.writeFile (Flags._output config)
+                    $ LazyText.pack "")
 
                 putStrLn "ERRORS"
                 _ <- sequence $ map printError errs
                 exitFailure
     where
         trimSpaces = LazyText.unlines . (map LazyText.stripEnd) . LazyText.lines
+        isOutputEmpty = null (Flags._output config)
+        outputFile = if isOutputEmpty
+                         then Flags._file config
+                         else Flags._output config
 
 
 printError :: RA.Located Syntax.Error -> IO ()
