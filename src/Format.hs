@@ -185,7 +185,7 @@ formatDefinition compact adef =
                             , hbox $ List.map (\arg -> hbox [ text " ", formatPattern arg]) args
                             , text " ="
                             ]
-                        , formatExpression False expr
+                        , formatExpression False empty expr
                             |> indent 4
                         ]
                     |> margin (if compact then 1 else 2)
@@ -194,7 +194,7 @@ formatDefinition compact adef =
                         [ formatPattern name
                         , hbox $ List.map (\arg -> hbox [ text " ", formatPattern arg]) args
                         , text " = "
-                        , formatExpression False expr
+                        , formatExpression False empty expr
                         ]
                     |> margin 1
         AST.Expression.TypeAnnotation var typ ->
@@ -225,26 +225,31 @@ formatPattern apattern =
             formatLiteral lit
 
 
-formatExpression :: Bool -> AST.Expression.Expr -> Box
-formatExpression inList aexpr =
+formatExpression :: Bool -> Box -> AST.Expression.Expr -> Box
+formatExpression inList suffix aexpr =
     case RA.drop aexpr of
         AST.Expression.Literal lit ->
             formatCommented formatLiteral lit
         AST.Expression.Var v ->
-            formatCommented formatVar v -- TODO: comments not tested
+            hbox2
+                (formatCommented formatVar v) -- TODO: comments not tested
+                suffix
         AST.Expression.Range _ _ -> text "<range>"
         AST.Expression.ExplicitList exprs False ->
             case exprs of
                 [] ->
                     text "[]"
                 _ ->
-                    hboxlist "[ " ", " " ]" (formatExpression False) exprs
+                    hboxlist "[ " ", " " ]" (formatExpression False empty) exprs
         AST.Expression.ExplicitList exprs True ->
             case exprs of
                 [] ->
                     text "[]"
                 _ ->
-                    vboxlist "[ " ", " "]" (formatExpression True) exprs
+                    vboxlist
+                        (text "[ ") ", "
+                        (text "]")
+                        (formatExpression True empty) exprs
 
         AST.Expression.Binops l ops False ->
             let
@@ -252,11 +257,11 @@ formatExpression inList aexpr =
                   [ hspace 1
                   , formatCommented formatInfixVar op
                   , hspace 1
-                  , formatExpression False e
+                  , formatExpression False empty e
                   ]
             in
                 hbox $
-                    formatExpression False l
+                    formatExpression False empty l
                     : concatMap opBoxes ops
         AST.Expression.Binops l ops True ->
             let
@@ -264,11 +269,11 @@ formatExpression inList aexpr =
                     hbox
                         [ formatCommented formatInfixVar op -- TODO: comments not tested
                         , hspace 1
-                        , formatExpression False e
+                        , formatExpression False empty e
                         ]
             in
                 vbox
-                    [ formatExpression False l
+                    [ formatExpression False empty l
                     , vbox (map formatOp ops)
                         |> indent (if inList then 2 else 4)
                     ]
@@ -276,81 +281,81 @@ formatExpression inList aexpr =
         AST.Expression.Lambda patterns expr False ->
             hbox
                 [ hboxlist "\\" " " " -> " formatPattern patterns
-                , formatExpression False expr
+                , formatExpression False empty expr
                 ]
         AST.Expression.Lambda patterns expr True ->
             vbox
                 [ hboxlist "\\" " " " -> " formatPattern patterns
-                , formatExpression False expr
+                , formatExpression False empty expr
                     |> indent (if inList then 2 else 4)
                 ]
 
         AST.Expression.Unary AST.Expression.Negative e ->
             hbox
                 [ text "-"
-                , formatExpression False e
+                , formatExpression False empty e
                 ]
         AST.Expression.App l rs multiline ->
             case multiline of
                 False ->
                     hbox
-                        [ formatExpression False l
-                        , hboxlist " " " " "" (formatExpression False) rs
+                        [ formatExpression False empty l
+                        , hboxlist " " " " "" (formatExpression False empty) rs
                         ]
                 True ->
                     vbox2
-                        (formatExpression False l)
-                        (vboxlist "" "" "" (formatExpression False) rs
+                        (formatExpression False empty l)
+                        (vboxlist empty "" empty (formatExpression False empty) rs
                             |> indent (if inList then 2 else 4))
 
         AST.Expression.If [] els ->
             vbox
                 [ text "<INVALID IF EXPRESSION>"
-                , formatExpression False els
+                , formatExpression False empty els
                     |> indent (if inList then 2 else 4)
                 ]
         AST.Expression.If ((if0,body0):elseifs) els ->
             vbox
                 [ hbox
                     [ text "if "
-                    , formatExpression False if0
+                    , formatExpression False empty if0
                     , text " then"
                     ]
-                , formatExpression False body0
+                , formatExpression False empty body0
                     |> indent (if inList then 2 else 4)
                 , let
                     formatElseIf (if',body') =
                         vbox
                             [ hbox
                                 [ text "else if "
-                                , formatExpression False if'
+                                , formatExpression False empty if'
                                 , text " then"
                                 ]
-                            , formatExpression False body'
+                            , formatExpression False empty body'
                                 |> indent (if inList then 2 else 4)
                             ]
                   in
                       vbox (map formatElseIf elseifs)
                 , text "else"
-                , formatExpression False els
+                , formatExpression False empty els
                     |> indent (if inList then 2 else 4)
                 ]
 
         AST.Expression.Let defs expr ->
             vbox
                 [ text "let"
-                , vboxlist "" "" "" (formatDefinition True) defs
+                , vboxlist empty "" empty (formatDefinition True) defs
                     |> indent (if inList then 2 else 4)
                     |> margin 0
                 , text "in"
-                , formatExpression False expr
+                , formatExpression False empty expr
                     |> indent (if inList then 2 else 4)
                 ]
         AST.Expression.Case subject clauses ->
             vbox
                 [ hbox
                     [ text "case "
-                    , formatExpression False subject
+                    , formatExpression False empty subject
                     , text " of"
                     ]
                 , let
@@ -360,7 +365,7 @@ formatExpression inList aexpr =
                                   [ formatPattern pat
                                   , text " ->"
                                   ]
-                              , formatExpression False expr
+                              , formatExpression False empty expr
                                   |> indent 4
                               ]
                   in
@@ -370,19 +375,21 @@ formatExpression inList aexpr =
         AST.Expression.Data _ _ -> text "<expression data>"
 
         AST.Expression.Tuple exprs False ->
-            hboxlist "(" ", " ")" (formatExpression False) exprs
+            hboxlist "(" ", " ")" (formatExpression False empty) exprs
         AST.Expression.Tuple exprs True ->
-            vboxlist "( " ", " ")" (formatExpression True) exprs
+            vboxlist
+                (text "( ") ", "
+                (text ")")
+                (formatExpression True empty) exprs
 
         AST.Expression.TupleFunction n ->
             hboxlist "(" "" ")" (text . const ",") [0 .. n]
 
         AST.Expression.Access expr field ->
-            hbox
-                [ formatExpression False expr -- TODO: needs to have parens in some cases
-                , text "."
-                , text field
-                ]
+            formatExpression
+                False
+                (hbox [ text ".", text field, suffix ])
+                expr -- TODO: needs to have parens in some cases
 
         AST.Expression.AccessFunction field ->
             hbox2 (text ".") (text field)
@@ -390,32 +397,36 @@ formatExpression inList aexpr =
         AST.Expression.Update _ _ -> text "<update>"
         AST.Expression.Record pairs -> -- TODO: single-line records
             let
-                vStart = empty
-                vPrefix = "{ "
                 pair (k,v,multiline') =
                     case multiline' of
                         False ->
                             hbox
                                 [ text k
                                 , text " = "
-                                , formatExpression False v
+                                , formatExpression False empty v
                                 ]
                         True ->
                             vbox
                                 [ hbox2 (text k) (text " =")
-                                , formatExpression False v
+                                , formatExpression False empty v
                                     |> indent 2
                                 ]
             in
-                vbox2 vStart $ vboxlist vPrefix ", " "}" pair pairs
+                vboxlist
+                    (text "{ ") ", "
+                    (hbox2 (text "}") suffix)
+                    pair pairs
         AST.Expression.Parens expr False ->
             hbox
                 [ text "("
-                , formatExpression False expr
-                , text ")"
+                , formatExpression False empty expr
+                , hbox2 (text ")") suffix
                 ]
         AST.Expression.Parens expr True->
-            vboxlist "( " "" ")" (formatExpression True) [expr]
+            vboxlist
+                (text "( ") ""
+                (hbox2 (text ")") suffix)
+                (formatExpression True empty) [expr]
 
         AST.Expression.Port _ -> text "<port>"
         AST.Expression.GLShader _ _ _ -> text "<glshader>"
@@ -504,9 +515,9 @@ formatType' requireParens atype =
                 (vStart,vPrefix) =
                     case ext of
                         Nothing ->
-                            (empty, "{ ")
+                            (empty, text "{ ")
                         Just base ->
-                            (hbox2 (text "{ ") (formatType base), "| ")
+                            (hbox2 (text "{ ") (formatType base), text "| ")
                 pair (k,v,multiline') =
                     case multiline' of
                         False ->
@@ -530,7 +541,7 @@ formatType' requireParens atype =
                     True ->
                         vbox
                             [ vStart
-                            , vboxlist vPrefix ", " "" pair fields
+                            , vboxlist vPrefix ", " empty pair fields
                                 |> indent (if Maybe.isNothing ext then 0 else 4)
                             , text "}"
                             ]

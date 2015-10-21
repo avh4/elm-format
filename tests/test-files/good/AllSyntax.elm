@@ -233,6 +233,22 @@ recordAccessAsFunction r =
     .f1 r
 
 
+multilineRecordAccess f =
+    ( True
+        |> f
+    ).f1
+
+
+multilineRecordAccess r f =
+    { f1 = 1
+    , f2 = 2
+    }.f2
+
+
+chainedRecordAccess r =
+    (r.f1.f2).f3.f4
+
+
 multilineRecordLiteral =
     { f1 = ()
     , f2 = 2

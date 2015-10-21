@@ -11,32 +11,33 @@ import qualified Text.PrettyPrint.Boxes as B
 data Box = Box
     { box :: B.Box
     , bottomMargin :: Int
+    , hasSize :: Bool
     }
 
 
 empty :: Box
 empty =
-    Box B.nullBox 0
+    Box B.nullBox 0 False
 
 
 hspace :: Int -> Box
 hspace c =
-    Box (B.emptyBox 0 c) 0
+    Box (B.emptyBox 0 c) 0 (c > 0)
 
 
 vspace :: Int -> Box
 vspace r =
-    Box (B.emptyBox r 0) 0
+    Box (B.emptyBox r 0) 0 (r > 0)
 
 
 text :: String -> Box
 text s =
-    Box (B.text s) 0
+    Box (B.text s) 0 (s /= "")
 
 
 vbox2 :: Box -> Box -> Box
-vbox2 (Box a aMargin) (Box b bMargin) =
-    Box (a // B.emptyBox aMargin 0 // b) bMargin
+vbox2 (Box a aMargin ae) (Box b bMargin be) =
+    Box (a // B.emptyBox aMargin 0 // b) bMargin (ae || be)
 
 
 vbox :: [Box] -> Box
@@ -44,26 +45,26 @@ vbox =
     foldl vbox2 empty
 
 
-vboxlist :: String -> String -> String -> (a -> Box) -> [a] -> Box
+vboxlist :: Box -> String -> Box -> (a -> Box) -> [a] -> Box
 vboxlist start mid end format items =
     case items of
         [] ->
-            hbox2 (text start) (text end)
+            hbox2 start end
         (first:rest) ->
             vbox $
-                [ hbox2margin (text start) (format first) ]
+                [ hbox2margin start (format first) ]
                 ++ (List.map (hbox2margin (text mid) . format) rest) ++
-                if end == "" then [] else [ text end ]
+                if hasSize end then [ end ] else []
 
 
 hbox2 :: Box -> Box -> Box
-hbox2 (Box a _) (Box b _) =
-    Box (a <> b) 0
+hbox2 (Box a _ ae) (Box b _ be) =
+    Box (a <> b) 0 (ae || be)
 
 
 hbox2margin :: Box -> Box -> Box
-hbox2margin (Box a aMargin) (Box b bMargin) =
-    Box (a <> b) (max aMargin bMargin)
+hbox2margin (Box a aMargin ae) (Box b bMargin be) =
+    Box (a <> b) (max aMargin bMargin) (ae || be)
 
 
 hbox :: [Box] -> Box
@@ -90,10 +91,10 @@ indent i child =
 
 
 margin :: Int -> Box -> Box
-margin m (Box child _) =
-    Box child m
+margin m (Box child _ ae) =
+    Box child m ae
 
 
 render :: Box -> String
-render (Box child _) =
+render (Box child _ _) =
     B.render child
