@@ -420,7 +420,7 @@ multiComment =
   do  try (string "{-" <* notFollowedBy (string "|") )
       many (string " ")
       b <- closeComment
-      updateState $ State.addComment b
+      updateState $ State.addComment $ BlockComment b
       return ()
 
 

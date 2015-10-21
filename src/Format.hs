@@ -431,9 +431,11 @@ formatCommented format commented =
                 ]
 
 
-formatComment :: String -> Box
+formatComment :: Comment -> Box
 formatComment comment =
-    text $ "{- " ++ comment ++ " -} "
+    case comment of
+        BlockComment c ->
+            text $ "{- " ++ c ++ " -} "
 
 
 formatLiteral :: L.Literal -> Box
