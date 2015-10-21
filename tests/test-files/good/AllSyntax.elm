@@ -205,6 +205,16 @@ multilineParenthesizedExpressions =
             else
               toFloat range
           )
+        ==/== ( if range == 0 then
+                  0.2
+                else
+                  toFloat (range - 1)
+              )
+        <<>> ( if range == 0 then
+                 -1.0
+               else
+                 0.0
+             )
 
 
 multilineParenthesizedExpressions =
