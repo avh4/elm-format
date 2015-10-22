@@ -4,6 +4,7 @@ module Main where
 import Elm.Utils ((|>))
 import System.Exit (exitFailure)
 import Control.Monad (when)
+import Data.Maybe (isJust, fromMaybe)
 
 import qualified AST.Module
 import qualified Box
@@ -32,19 +33,18 @@ formatResult config result =
                 |> LazyText.writeFile outputFile
         Result.Result _ (Result.Err errs) ->
             do
-                when (not isOutputEmpty)
-                  (LazyText.writeFile (Flags._output config)
-                    $ LazyText.pack "")
+                case givenOutput of
+                  Just givenOutputFile ->
+                    LazyText.writeFile givenOutputFile $ LazyText.pack ""
 
                 putStrLn "ERRORS"
                 _ <- sequence $ map printError errs
                 exitFailure
     where
         trimSpaces = LazyText.unlines . (map LazyText.stripEnd) . LazyText.lines
-        isOutputEmpty = null (Flags._output config)
-        outputFile = if isOutputEmpty
-                         then Flags._input config
-                         else Flags._output config
+        givenInput = Flags._input config
+        givenOutput = Flags._output config
+        outputFile = fromMaybe givenInput givenOutput
 
 
 printError :: RA.Located Syntax.Error -> IO ()

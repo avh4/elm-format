@@ -10,7 +10,7 @@ import qualified Text.PrettyPrint.ANSI.Leijen as PP
 
 data Config = Config
     { _input :: FilePath
-    , _output :: FilePath
+    , _output :: Maybe FilePath
     }
 
 -- PARSE ARGUMENTS
@@ -84,13 +84,12 @@ dependencies =
         ]
 
 
-output :: Opt.Parser FilePath
+output :: Opt.Parser (Maybe FilePath)
 output =
-    Opt.strOption $
+    Opt.optional $ Opt.strOption $
         mconcat
         [ Opt.long "output"
         , Opt.metavar "OUTPUT"
-        , Opt.value ""
         , Opt.help "Write output to OUTPUT instead of overwriting the given source file."
         ]
 
