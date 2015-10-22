@@ -158,6 +158,14 @@ unaryOperator a =
     -(1) + -2 + -a
 
 
+multilineUnaryOperator a =
+    -( if a then
+         1
+       else
+         2
+     )
+
+
 functionApplication =
     toString 10
 
@@ -239,7 +247,7 @@ multilineRecordAccess f =
     ).f1
 
 
-multilineRecordAccess r f =
+multilineRecordUpdate r f =
     { r
         | f1 = 1
         , f2 = 2
