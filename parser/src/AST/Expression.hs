@@ -42,7 +42,7 @@ data Expr'
     | App Expr [Expr] Bool
     | If [(Expr, Bool, Expr)] Expr
     | Let [Def] Expr
-    | Case Expr [(Pattern.Pattern, Expr)]
+    | Case (Expr,Bool) [(Pattern.Pattern, Expr)]
     | Data String [Expr]
     | Tuple [Expr] Bool
     | TupleFunction Int

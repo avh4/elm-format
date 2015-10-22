@@ -369,13 +369,22 @@ formatExpression inList suffix aexpr =
                 , formatExpression False empty expr
                     |> indent (if inList then 2 else 4)
                 ]
-        AST.Expression.Case subject clauses ->
+        AST.Expression.Case (subject,multilineSubject) clauses ->
             vbox
-                [ hbox
-                    [ text "case "
-                    , formatExpression False empty subject
-                    , text " of"
-                    ]
+                [ case multilineSubject of
+                    False ->
+                        hbox
+                            [ text "case "
+                            , formatExpression False empty subject
+                            , text " of"
+                            ]
+                    True ->
+                        vbox
+                            [ text "case"
+                            , formatExpression False empty subject
+                                |> indent (if inList then 2 else 4)
+                            , text "of"
+                            ]
                 , let
                       formatClause (pat,expr) =
                           vbox

@@ -410,3 +410,14 @@ multilineIfCondition a =
         "Perhaps"
     else
         "No"
+
+
+multilineCaseSubject a =
+    case
+        if a == Nothing then
+            "X"
+        else
+            "Y"
+    of
+        _ ->
+            ()

@@ -246,11 +246,13 @@ lambdaExpr =
 caseExpr :: IParser E.Expr'
 caseExpr =
   do  try (reserved "case")
+      pushNewlineContext
       e <- padded expr
       reserved "of"
+      multilineSubject <- popNewlineContext
       whitespace
       updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
-      E.Case e <$> (with <|> without)
+      E.Case (e, multilineSubject) <$> (with <|> without)
   where
     case_ =
       do  p <- Pattern.expr
