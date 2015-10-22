@@ -421,7 +421,7 @@ formatExpression inList suffix aexpr =
                     , (hbox2 (text "}") suffix)
                     ]
 
-        AST.Expression.Record pairs -> -- TODO: single-line records
+        AST.Expression.Record pairs True ->
             let
                 pair (k,v,multiline') =
                     case multiline' of
@@ -442,6 +442,22 @@ formatExpression inList suffix aexpr =
                     (text "{ ") ", "
                     (hbox2 (text "}") suffix)
                     pair pairs
+        AST.Expression.Record pairs False ->
+            let
+                pair (k,v,_) = -- multiline' will always be false
+                    hbox
+                        [ text k
+                        , text " = "
+                        , formatExpression False empty v
+                        ]
+            in
+                hbox2
+                  (hboxlist
+                      "{ " ", "
+                      " }"
+                      pair pairs)
+                  suffix
+
         AST.Expression.Parens expr False ->
             hbox
                 [ text "("

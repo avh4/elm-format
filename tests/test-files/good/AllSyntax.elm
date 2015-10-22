@@ -263,6 +263,10 @@ multilineRecordLiteral =
     }
 
 
+singleLineRecord =
+    (addStatus { id = 50 }.f1)
+
+
 letExpression =
     let
         x = 1

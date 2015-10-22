@@ -119,35 +119,35 @@ parensTerm =
 
 recordTerm :: IParser E.Expr
 recordTerm =
-  addLocation $ brackets $ fmap const $ choice
+  addLocation $ brackets $ choice
     [ do  starter <- try (addLocation rLabel)
           whitespace
           choice
             [ update starter
             , literal starter
             ]
-    , return (E.Record [])
+    , return $ \multiline -> E.Record [] multiline
     ]
   where
     update (A.A ann starter) =
       do  try (string "|")
           whitespace
           fields <- commaSep1 field
-          return (E.Update (A.A ann (E.rawVar starter)) fields)
+          return $ \multiline -> (E.Update (A.A ann (E.rawVar starter)) fields)
 
     literal (A.A _ starter) =
       do  pushNewlineContext
           try equals -- TODO: can the try break newline tracking?
           whitespace
           value <- expr
-          multiline <- popNewlineContext
+          multiline' <- popNewlineContext
           whitespace
           choice
             [ do  try comma
                   whitespace
                   fields <- commaSep field
-                  return (E.Record ((starter, value, multiline) : fields))
-            , return (E.Record [(starter, value, multiline)])
+                  return $ \multiline -> (E.Record ((starter, value, multiline') : fields) multiline)
+            , return $ \multiline -> (E.Record [(starter, value, multiline')] multiline)
             ]
 
     field =
