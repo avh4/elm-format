@@ -11,6 +11,7 @@ import qualified Text.PrettyPrint.ANSI.Leijen as PP
 data Config = Config
     { _input :: FilePath
     , _output :: Maybe FilePath
+    , _yes :: Bool
     }
 
 -- PARSE ARGUMENTS
@@ -35,6 +36,7 @@ flags =
     Config
       <$> input
       <*> output
+      <*> yes
 
 
 -- HELP
