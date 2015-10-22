@@ -12,6 +12,14 @@ import Signal exposing (foldp, map)
 import String
 
 
+type Data x y z
+    = A
+    | B Int
+    | C (List Int)
+    | D { f1 : Bool, f2 : x }
+    | E (y -> z)
+
+
 type alias Type =
     String
 

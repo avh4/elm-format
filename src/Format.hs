@@ -160,7 +160,20 @@ formatDeclaration decl =
             case RA.drop adecl of
                 AST.Declaration.Definition def ->
                     formatDefinition False def
-                AST.Declaration.Datatype _ _ _ -> text "<datatype>"
+                AST.Declaration.Datatype name args ctors ->
+                    vbox
+                        [ hbox
+                            [ text "type "
+                            , text name
+                            , hboxlist " " " " "" text args
+                            ]
+                        , vboxlist
+                            (text "= ") "| "
+                            empty
+                            (\(c, args') -> hbox2 (text c) (hboxlist " " " " "" (formatType' ForCtor) args')) ctors
+                            |> indent 4
+                        ]
+                    |> margin 2
                 AST.Declaration.TypeAlias name args typ ->
                     vbox
                         [ hboxlist "type alias " " " " =" text (name:args)
