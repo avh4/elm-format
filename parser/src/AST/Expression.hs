@@ -40,16 +40,16 @@ data Expr'
     | Unary UnaryOperator Expr
     | Lambda [Pattern.Pattern] Expr Bool
     | App Expr [Expr] Bool
-    | If [(Expr, Expr)] Expr
+    | If [(Expr, Bool, Expr)] Expr
     | Let [Def] Expr
-    | Case Expr [(Pattern.Pattern, Expr)]
+    | Case (Expr,Bool) [(Pattern.Pattern, Expr)]
     | Data String [Expr]
     | Tuple [Expr] Bool
     | TupleFunction Int
     | Access Expr String
     | AccessFunction String
-    | Update Expr [(String, Expr, Bool)]
-    | Record [(String, Expr, Bool)]
+    | Update Expr [(String, Expr, Bool)] Bool
+    | Record [(String, Expr, Bool)] Bool
     | Parens Expr Bool
     -- for type checking and code gen only
     | Port PortImpl

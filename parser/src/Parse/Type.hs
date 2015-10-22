@@ -19,7 +19,7 @@ tvar =
 
 tuple :: IParser Type.Type
 tuple =
-  do  (start, types, end) <- located (parens (commaSep expr))
+  do  (start, types, end) <- located (parens (fmap const $ commaSep expr))
       case types of
         [t] -> return t
         _   -> return (Type.tuple (R.Region start end) types)
@@ -85,7 +85,7 @@ app =
   where
     tupleCtor =
       addLocation $
-      do  ctor <- parens (many1 (char ','))
+      do  ctor <- parens (fmap const $ many1 (char ','))
           return (Type.RType (Var.VarRef ctor))
 
 

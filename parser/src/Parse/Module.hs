@@ -24,7 +24,7 @@ getModuleName source =
           return (ModuleName.toString names)
 
 
-header :: IParser (Module.Header [Module.UserImport])
+header :: IParser Module.Header
 header =
   do  optional freshLine
       (names, exports) <-
@@ -104,7 +104,7 @@ value =
     val <|> tipe <?> "a value or type to expose"
   where
     val =
-      Var.Value <$> (addComments (Var.VarRef <$> lowVar) <|> parens symOp)
+      Var.Value <$> (addComments (Var.VarRef <$> lowVar) <|> parens (fmap const symOp))
 
     tipe =
       do  name <- capVar

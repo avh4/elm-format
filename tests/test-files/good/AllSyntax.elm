@@ -12,6 +12,14 @@ import Signal exposing (foldp, map)
 import String
 
 
+type Data x y z
+    = A
+    | B Int
+    | C (List Int)
+    | D { f1 : Bool, f2 : x }
+    | E (y -> z)
+
+
 type alias Type =
     String
 
@@ -158,6 +166,14 @@ unaryOperator a =
     -(1) + -2 + -a
 
 
+multilineUnaryOperator a =
+    -( if a then
+         1
+       else
+         2
+     )
+
+
 functionApplication =
     toString 10
 
@@ -205,6 +221,16 @@ multilineParenthesizedExpressions =
             else
               toFloat range
           )
+        ==/== ( if range == 0 then
+                  0.2
+                else
+                  toFloat (range - 1)
+              )
+        <<>> ( if range == 0 then
+                 -1.0
+               else
+                 0.0
+             )
 
 
 multilineParenthesizedExpressions =
@@ -223,10 +249,42 @@ recordAccessAsFunction r =
     .f1 r
 
 
+multilineRecordAccess f =
+    ( True
+        |> f
+    ).f1
+
+
+multilineRecordUpdate r f =
+    { r
+        | f1 = 1
+        , f2 = 2
+    }.f2
+
+
+multilineRecordAccess r f =
+    { f1 = 1
+    , f2 = 2
+    }.f2
+
+
+chainedRecordAccess r =
+    ( (r.f1.f2).f3.f4
+    ).f5.f6
+
+
 multilineRecordLiteral =
     { f1 = ()
     , f2 = 2
     }
+
+
+singleLineRecord =
+    (addStatus { id = 50 }.f1)
+
+
+singleLineRecordUpdate x =
+    (always { x | f1 = 20 }.f1)
 
 
 letExpression =
@@ -341,3 +399,33 @@ multilineExpressionsInsideRecord =
         \a ->
             9
     }
+
+
+multilineIfCondition a =
+    if
+        if a == Nothing then
+            True
+        else
+            False
+    then
+        "Yes"
+    else if
+        if b == Nothing then
+            True
+        else
+            False
+    then
+        "Perhaps"
+    else
+        "No"
+
+
+multilineCaseSubject a =
+    case
+        if a == Nothing then
+            "X"
+        else
+            "Y"
+    of
+        _ ->
+            ()

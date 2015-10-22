@@ -9,6 +9,7 @@ import Parse.Helpers
 import qualified Parse.Helpers as Help
 import qualified Parse.Literal as Literal
 import qualified Parse.Pattern as Pattern
+import qualified Parse.State as State
 import qualified Parse.Type as Type
 
 import AST.V0_15
@@ -68,7 +69,7 @@ negative =
 
 listTerm :: IParser E.Expr'
 listTerm =
-    shader' <|> braces (try range <|> commaSeparated)
+    shader' <|> braces (fmap const (try range <|> commaSeparated))
   where
     range =
       do  lo <- expr
@@ -91,7 +92,7 @@ listTerm =
 parensTerm :: IParser E.Expr
 parensTerm =
   choice
-    [ try (parens opFn)
+    [ try (parens $ fmap const opFn)
     , parens (tupleFn <|> parened)
     ]
   where
@@ -105,18 +106,16 @@ parensTerm =
       do  (start, commas, end) <-
               located (comma >> many (whitespace >> comma))
           return $
-              A.at start end $ E.TupleFunction $ length commas
+              \_ -> A.at start end $ E.TupleFunction $ length commas
 
     parened =
-      do  pushNewlineContext
-          (start, expressions, end) <- located (commaSep expr)
-          multiline <- popNewlineContext
+      do  (start, expressions, end) <- located (commaSep expr)
           return $
             case expressions of
               [expression] ->
-                  A.at start end (E.Parens expression multiline)
+                  \multiline -> A.at start end (E.Parens expression multiline)
               _ ->
-                  A.at start end (E.Tuple expressions multiline)
+                  \multiline -> A.at start end (E.Tuple expressions multiline)
 
 
 recordTerm :: IParser E.Expr
@@ -128,28 +127,28 @@ recordTerm =
             [ update starter
             , literal starter
             ]
-    , return (E.Record [])
+    , return $ \multiline -> E.Record [] multiline
     ]
   where
     update (A.A ann starter) =
       do  try (string "|")
           whitespace
           fields <- commaSep1 field
-          return (E.Update (A.A ann (E.rawVar starter)) fields)
+          return $ \multiline -> (E.Update (A.A ann (E.rawVar starter)) fields multiline)
 
     literal (A.A _ starter) =
       do  pushNewlineContext
           try equals -- TODO: can the try break newline tracking?
           whitespace
           value <- expr
-          multiline <- popNewlineContext
+          multiline' <- popNewlineContext
           whitespace
           choice
             [ do  try comma
                   whitespace
                   fields <- commaSep field
-                  return (E.Record ((starter, value, multiline) : fields))
-            , return (E.Record [(starter, value, multiline)])
+                  return $ \multiline -> (E.Record ((starter, value, multiline') : fields) multiline)
+            , return $ \multiline -> (E.Record [(starter, value, multiline')] multiline)
             ]
 
     field =
@@ -211,17 +210,20 @@ ifExpr =
   ifHelp []
 
 
-ifHelp :: [(E.Expr, E.Expr)] -> IParser E.Expr'
+ifHelp :: [(E.Expr, Bool, E.Expr)] -> IParser E.Expr'
 ifHelp branches =
   do  try (reserved "if")
+      pushNewlineContext
       whitespace
       condition <- expr
+      multilineCondition <- popNewlineContext
       padded (reserved "then")
+      updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
       thenBranch <- expr
       whitespace <?> "an 'else' branch"
       reserved "else" <?> "an 'else' branch"
       whitespace
-      let newBranches = (condition, thenBranch) : branches
+      let newBranches = (condition, multilineCondition, thenBranch) : branches
       choice
         [ ifHelp newBranches
         , E.If (reverse newBranches) <$> expr
@@ -244,10 +246,13 @@ lambdaExpr =
 caseExpr :: IParser E.Expr'
 caseExpr =
   do  try (reserved "case")
+      pushNewlineContext
       e <- padded expr
       reserved "of"
+      multilineSubject <- popNewlineContext
       whitespace
-      E.Case e <$> (with <|> without)
+      updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
+      E.Case (e, multilineSubject) <$> (with <|> without)
   where
     case_ =
       do  p <- Pattern.expr
@@ -255,7 +260,7 @@ caseExpr =
           (,) p <$> expr
 
     with =
-      brackets (semiSep1 (case_ <?> "cases { x -> ... }"))
+      brackets (fmap const $ semiSep1 (case_ <?> "cases { x -> ... }"))
 
     without =
       block (do c <- case_ ; whitespace ; return c)
@@ -283,7 +288,7 @@ typeAnnotation =
     addLocation (E.TypeAnnotation <$> try start <*> Type.expr)
   where
     start =
-      do  v <- addComments (Var.VarRef <$> lowVar) <|> parens symOp
+      do  v <- addComments (Var.VarRef <$> lowVar) <|> parens (fmap const symOp)
           padded hasType
           return v
 
@@ -307,7 +312,7 @@ defStart =
     choice
       [ do  pattern <- try Pattern.term
             infics pattern <|> func pattern
-      , do  opPattern <- addLocation (P.Var <$> parens symOp)
+      , do  opPattern <- addLocation (P.Var <$> parens (fmap const symOp))
             func opPattern
       ]
       <?> "the definition of a variable (x = ...)"

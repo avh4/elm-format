@@ -1,8 +1,10 @@
 module Parse.State where
 
+import qualified AST.V0_15 as AST
+
 
 data State = State
-  { comments :: [String]
+  { comments :: [AST.Comment]
   , newline :: [Bool]
   }
 
@@ -15,7 +17,7 @@ init =
     }
 
 
-addComment :: String -> State -> State
+addComment :: AST.Comment -> State -> State
 addComment comment state =
     state { comments = comment : (comments state) }
 

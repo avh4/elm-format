@@ -63,13 +63,13 @@ asPattern patternParser =
 record :: IParser P.Pattern
 record =
   addLocation
-    (P.Record <$> brackets (commaSep1 lowVar))
+    (P.Record <$> brackets (fmap const $ commaSep1 lowVar))
 
 
 tuple :: IParser P.Pattern
 tuple =
   do  (start, patterns, end) <-
-          located (parens (commaSep expr))
+          located (parens (fmap const $ commaSep expr))
 
       case patterns of
         [pattern] ->
@@ -83,7 +83,7 @@ list :: IParser P.Pattern
 list =
   braces $
     do  (_, patterns, end) <- located (commaSep expr)
-        return (P.list end patterns)
+        return (const $ P.list end patterns)
 
 
 term :: IParser P.Pattern

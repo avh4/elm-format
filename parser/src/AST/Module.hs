@@ -33,11 +33,11 @@ data Body expr = Body
 -- HEADERS
 
 {-| Basic info needed to identify modules and determine dependencies. -}
-data Header imports = Header
+data Header = Header
     { _name :: Name.Raw
     , _docs :: A.Located (Maybe String)
     , _exports :: Var.Listing (A.Located Var.Value)
-    , _imports :: imports
+    , _imports :: [UserImport]
     }
 
 
