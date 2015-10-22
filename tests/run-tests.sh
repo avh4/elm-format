@@ -8,11 +8,11 @@ else
 fi
 
 function returnCodeShouldEqual() {
-  [ "$?" -eq "$1" ] || exit 1
+	[ "$?" -eq "$1" ] || exit 1
 }
 
 function shouldOutputTheSame() {
-  diff <(echo "$1") <(echo "$2") || exit 1
+	diff <(echo "$1") <(echo "$2") || exit 1
 }
 
 function checkWaysToRun() {
@@ -21,35 +21,35 @@ function checkWaysToRun() {
 
 	echo
 	echo "## elm-format --help"
-  HELP=`"$ELM_FORMAT" --help 2>&1`
-  returnCodeShouldEqual 0
-  echo "OK"
+	HELP=`"$ELM_FORMAT" --help 2>&1`
+	returnCodeShouldEqual 0
+	echo "OK"
 
 	echo
 	echo "## elm-format -h"
-  SHORTHELP=`"$ELM_FORMAT" -h 2>&1`
-  returnCodeShouldEqual 0
-  shouldOutputTheSame "$HELP" "$SHORTHELP"
-  echo "OK"
+	SHORTHELP=`"$ELM_FORMAT" -h 2>&1`
+	returnCodeShouldEqual 0
+	shouldOutputTheSame "$HELP" "$SHORTHELP"
+	echo "OK"
 
 	echo
 	echo "## elm-format"
-  NOARGS=`"$ELM_FORMAT" 2>&1`
-  returnCodeShouldEqual 1
-  shouldOutputTheSame "$HELP" "$NOARGS"
-  echo "OK"
+	NOARGS=`"$ELM_FORMAT" 2>&1`
+	returnCodeShouldEqual 1
+	shouldOutputTheSame "$HELP" "$NOARGS"
+	echo "OK"
 
 	echo
 	echo "## elm-format INPUT"
 	"$ELM_FORMAT" "$INPUT"
-  returnCodeShouldEqual 0
-  echo "OK"
+	returnCodeShouldEqual 0
+	echo "OK"
 
 	echo
 	echo "## elm-format INPUT --output OUTPUT"
 	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT"
-  returnCodeShouldEqual 0
-  echo "OK"
+	returnCodeShouldEqual 0
+	echo "OK"
 }
 
 function checkGood() {
