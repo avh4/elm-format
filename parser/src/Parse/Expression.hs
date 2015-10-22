@@ -92,7 +92,7 @@ listTerm =
 parensTerm :: IParser E.Expr
 parensTerm =
   choice
-    [ try (parens $ fmap const $ opFn)
+    [ try (parens $ fmap const opFn)
     , parens (tupleFn <|> parened)
     ]
   where
