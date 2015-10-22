@@ -19,6 +19,11 @@ import qualified Reporting.Report as Report
 import qualified Reporting.Result as Result
 
 
+
+createEmptyFile :: Maybe FilePath -> IO ()
+createEmptyFile (Just outputFile) = LazyText.writeFile outputFile $ LazyText.pack ""
+createEmptyFile _                 = return ()
+
 formatResult
     :: Flags.Config
     -> Result.Result () Syntax.Error AST.Module.Module
@@ -33,9 +38,7 @@ formatResult config result =
                 |> LazyText.writeFile outputFile
         Result.Result _ (Result.Err errs) ->
             do
-                case givenOutput of
-                  Just givenOutputFile ->
-                    LazyText.writeFile givenOutputFile $ LazyText.pack ""
+                createEmptyFile givenOutput
 
                 putStrLn "ERRORS"
                 _ <- sequence $ map printError errs
