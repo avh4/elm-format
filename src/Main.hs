@@ -2,9 +2,10 @@
 module Main where
 
 import Elm.Utils ((|>))
-import System.Exit (exitFailure)
+import System.Exit (exitFailure, exitSuccess)
 import Control.Monad (when)
 import Data.Maybe (isJust, fromMaybe)
+import Data.Char (toLower)
 
 import qualified AST.Module
 import qualified Box
@@ -54,10 +55,29 @@ printError :: RA.Located Syntax.Error -> IO ()
 printError (RA.A range err) =
     Report.printError "<location>" range (Syntax.toReport err) ""
 
+promptRewriting :: FilePath -> String
+promptRewriting filePath =
+    unlines
+        [ "This will overwrite the following files to use Elm’s preferred style:"
+        , ""
+        , "  " ++ filePath
+        , ""
+        , "This cannot be undone! Make sure to back up these files before proceeding."
+        , ""
+        , "Are you sure you want to overwrite these files with formatted versions? (y/N)"
+        ]
 
 main :: IO ()
 main =
     do  config <- Flags.parse
+
+        case (Flags._output config) of
+            Nothing -> do -- we are overwriting the input file
+                putStrLn $ promptRewriting (Flags._input config)
+                answer <- getLine
+                when ((map toLower answer) == "n") $
+                    exitSuccess
+            Just _ -> return ()
 
         input <- LazyText.readFile (Flags._input config)
 
