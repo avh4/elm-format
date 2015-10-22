@@ -243,25 +243,27 @@ betwixt a b c =
       return out
 
 
-surround :: Char -> Char -> String -> IParser a -> IParser a
+surround :: Char -> Char -> String -> IParser (Bool -> a) -> IParser a
 surround a z name p = do
+  pushNewlineContext
   char a
   v <- padded p
   char z <?> unwords ["a closing", name, show z]
-  return v
+  multiline <- popNewlineContext
+  return $ v multiline
 
 
-braces :: IParser a -> IParser a
+braces :: IParser (Bool -> a) -> IParser a
 braces =
   surround '[' ']' "brace"
 
 
-parens :: IParser a -> IParser a
+parens :: IParser (Bool -> a) -> IParser a
 parens =
   surround '(' ')' "paren"
 
 
-brackets :: IParser a -> IParser a
+brackets :: IParser (Bool -> a) -> IParser a
 brackets =
   surround '{' '}' "bracket"
 

@@ -68,7 +68,7 @@ negative =
 
 listTerm :: IParser E.Expr'
 listTerm =
-    shader' <|> braces (try range <|> commaSeparated)
+    shader' <|> braces (fmap const (try range <|> commaSeparated))
   where
     range =
       do  lo <- expr
@@ -91,7 +91,7 @@ listTerm =
 parensTerm :: IParser E.Expr
 parensTerm =
   choice
-    [ try (parens opFn)
+    [ try (parens $ fmap const $ opFn)
     , parens (tupleFn <|> parened)
     ]
   where
@@ -105,23 +105,21 @@ parensTerm =
       do  (start, commas, end) <-
               located (comma >> many (whitespace >> comma))
           return $
-              A.at start end $ E.TupleFunction $ length commas
+              \_ -> A.at start end $ E.TupleFunction $ length commas
 
     parened =
-      do  pushNewlineContext
-          (start, expressions, end) <- located (commaSep expr)
-          multiline <- popNewlineContext
+      do  (start, expressions, end) <- located (commaSep expr)
           return $
             case expressions of
               [expression] ->
-                  A.at start end (E.Parens expression multiline)
+                  \multiline -> A.at start end (E.Parens expression multiline)
               _ ->
-                  A.at start end (E.Tuple expressions multiline)
+                  \multiline -> A.at start end (E.Tuple expressions multiline)
 
 
 recordTerm :: IParser E.Expr
 recordTerm =
-  addLocation $ brackets $ choice
+  addLocation $ brackets $ fmap const $ choice
     [ do  starter <- try (addLocation rLabel)
           whitespace
           choice
@@ -255,7 +253,7 @@ caseExpr =
           (,) p <$> expr
 
     with =
-      brackets (semiSep1 (case_ <?> "cases { x -> ... }"))
+      brackets (fmap const $ semiSep1 (case_ <?> "cases { x -> ... }"))
 
     without =
       block (do c <- case_ ; whitespace ; return c)
@@ -283,7 +281,7 @@ typeAnnotation =
     addLocation (E.TypeAnnotation <$> try start <*> Type.expr)
   where
     start =
-      do  v <- addComments (Var.VarRef <$> lowVar) <|> parens symOp
+      do  v <- addComments (Var.VarRef <$> lowVar) <|> parens (fmap const symOp)
           padded hasType
           return v
 
@@ -307,7 +305,7 @@ defStart =
     choice
       [ do  pattern <- try Pattern.term
             infics pattern <|> func pattern
-      , do  opPattern <- addLocation (P.Var <$> parens symOp)
+      , do  opPattern <- addLocation (P.Var <$> parens (fmap const symOp))
             func opPattern
       ]
       <?> "the definition of a variable (x = ...)"
