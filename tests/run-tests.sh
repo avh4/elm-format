@@ -40,8 +40,14 @@ function checkWaysToRun() {
 	echo "OK"
 
 	echo
-	echo "## elm-format INPUT"
-	"$ELM_FORMAT" "$INPUT"
+  echo "## elm-format INPUT (answer = y)"
+	echo "y" | "$ELM_FORMAT" "$INPUT" 1>/dev/null
+	returnCodeShouldEqual 0
+	echo "OK"
+
+	echo
+  echo "## elm-format INPUT (answer = n)"
+	echo "n" | "$ELM_FORMAT" "$INPUT" 1>/dev/null
 	returnCodeShouldEqual 0
 	echo "OK"
 
