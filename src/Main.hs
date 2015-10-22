@@ -43,7 +43,7 @@ formatResult config result =
         trimSpaces = LazyText.unlines . (map LazyText.stripEnd) . LazyText.lines
         isOutputEmpty = null (Flags._output config)
         outputFile = if isOutputEmpty
-                         then Flags._file config
+                         then Flags._input config
                          else Flags._output config
 
 
@@ -56,6 +56,6 @@ main :: IO ()
 main =
     do  config <- Flags.parse
 
-        input <- LazyText.readFile (Flags._file config)
+        input <- LazyText.readFile (Flags._input config)
 
         formatResult config $ Parse.parseSource $ LazyText.unpack input

@@ -9,7 +9,7 @@ import qualified Text.PrettyPrint.ANSI.Leijen as PP
 
 
 data Config = Config
-    { _file :: FilePath
+    { _input :: FilePath
     , _output :: FilePath
     }
 
@@ -33,7 +33,7 @@ parse =
 flags :: Opt.Parser Config
 flags =
     Config
-      <$> file
+      <$> input
       <*> output
 
 
@@ -94,6 +94,6 @@ output =
         , Opt.help "Write output to OUTPUT instead of overwriting the given source file."
         ]
 
-file :: Opt.Parser FilePath
-file =
+input :: Opt.Parser FilePath
+input =
     Opt.strArgument $ Opt.metavar "INPUT"
