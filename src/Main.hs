@@ -73,10 +73,11 @@ main =
 
         case (Flags._output config) of
             Nothing -> do -- we are overwriting the input file
-                putStrLn $ promptRewriting (Flags._input config)
-                answer <- getLine
-                when ((map toLower answer) == "n") $
-                    exitSuccess
+                when (not $ Flags._yes config) $ do
+                    putStrLn $ promptRewriting (Flags._input config)
+                    answer <- getLine
+                    when ((map toLower answer) == "n") $
+                        exitSuccess
             Just _ -> return ()
 
         input <- LazyText.readFile (Flags._input config)
