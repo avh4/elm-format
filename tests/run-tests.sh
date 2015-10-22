@@ -7,13 +7,25 @@ else
 	MD5="md5sum"
 fi
 
-function check() {
+function checkGood() {
 	INPUT="tests/test-files/good/$1"
 	OUTPUT="formatted.elm"
 	echo
-	echo "## $1"
+	echo "## good/$1"
 	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT" || exit 1
 	diff -u "$OUTPUT" "$INPUT" || exit 1
+	echo -n "Checksum: "
+	"$MD5" "$OUTPUT"
+}
+
+function checkTransformation() {
+	INPUT="tests/test-files/transform/$1"
+	OUTPUT="formatted.elm"
+	EXPECTED="tests/test-files/transform/${1%.*}.formatted.elm"
+	echo
+	echo "## transform/$1"
+	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT" || exit 1
+	diff -u "$OUTPUT" "$EXPECTED" || exit 1
 	echo -n "Checksum: "
 	"$MD5" "$OUTPUT"
 }
@@ -22,9 +34,11 @@ echo
 echo
 echo "# elm-format test suite"
 
-check Simple.elm
-check AllSyntax.elm
-check evancz/start-app/StartApp.elm
+checkGood Simple.elm
+checkGood AllSyntax.elm
+checkGood evancz/start-app/StartApp.elm
+
+checkTransformation Examples.elm
 
 echo
 echo "# GREAT SUCCESS!"

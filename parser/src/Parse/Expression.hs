@@ -9,6 +9,7 @@ import Parse.Helpers
 import qualified Parse.Helpers as Help
 import qualified Parse.Literal as Literal
 import qualified Parse.Pattern as Pattern
+import qualified Parse.State as State
 import qualified Parse.Type as Type
 
 import AST.V0_15
@@ -215,6 +216,7 @@ ifHelp branches =
       whitespace
       condition <- expr
       padded (reserved "then")
+      updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
       thenBranch <- expr
       whitespace <?> "an 'else' branch"
       reserved "else" <?> "an 'else' branch"
