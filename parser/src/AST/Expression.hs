@@ -48,7 +48,7 @@ data Expr'
     | TupleFunction Int
     | Access Expr String
     | AccessFunction String
-    | Update Expr [(String, Expr, Bool)]
+    | Update Expr [(String, Expr, Bool)] Bool
     | Record [(String, Expr, Bool)] Bool
     | Parens Expr Bool
     -- for type checking and code gen only

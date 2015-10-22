@@ -133,7 +133,7 @@ recordTerm =
       do  try (string "|")
           whitespace
           fields <- commaSep1 field
-          return $ \multiline -> (E.Update (A.A ann (E.rawVar starter)) fields)
+          return $ \multiline -> (E.Update (A.A ann (E.rawVar starter)) fields multiline)
 
     literal (A.A _ starter) =
       do  pushNewlineContext

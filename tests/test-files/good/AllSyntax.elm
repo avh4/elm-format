@@ -267,6 +267,10 @@ singleLineRecord =
     (addStatus { id = 50 }.f1)
 
 
+singleLineRecordUpdate x =
+    (always { x | f1 = 20 }.f1)
+
+
 letExpression =
     let
         x = 1

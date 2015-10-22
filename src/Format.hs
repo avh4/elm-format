@@ -394,7 +394,23 @@ formatExpression inList suffix aexpr =
         AST.Expression.AccessFunction field ->
             hbox2 (text ".") (text field)
 
-        AST.Expression.Update base pairs ->
+        AST.Expression.Update base pairs False ->
+            let
+                pair (k,v,_) = -- multiline' will always be False
+                    hbox
+                        [ text k
+                        , text " = "
+                        , formatExpression False empty v
+                        ]
+            in
+                hbox
+                    [ text "{ "
+                    , formatExpression False empty base
+                    , hboxlist " | " ", " "" pair pairs
+                    , text " }"
+                    , suffix
+                    ]
+        AST.Expression.Update base pairs True ->
             let
                 pair (k,v,multiline') =
                     case multiline' of
