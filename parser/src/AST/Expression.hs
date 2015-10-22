@@ -40,7 +40,7 @@ data Expr'
     | Unary UnaryOperator Expr
     | Lambda [Pattern.Pattern] Expr Bool
     | App Expr [Expr] Bool
-    | If [(Expr, Expr)] Expr
+    | If [(Expr, Bool, Expr)] Expr
     | Let [Def] Expr
     | Case Expr [(Pattern.Pattern, Expr)]
     | Data String [Expr]

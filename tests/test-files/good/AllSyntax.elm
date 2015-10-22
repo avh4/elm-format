@@ -391,3 +391,22 @@ multilineExpressionsInsideRecord =
         \a ->
             9
     }
+
+
+multilineIfCondition a =
+    if
+        if a == Nothing then
+            True
+        else
+            False
+    then
+        "Yes"
+    else if
+        if b == Nothing then
+            True
+        else
+            False
+    then
+        "Perhaps"
+    else
+        "No"

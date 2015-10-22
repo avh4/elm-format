@@ -24,3 +24,16 @@ foo =
         False ->
             3
     )
+
+
+bar =
+    ( if
+        if a then
+            True
+        else
+            False
+      then
+        "a"
+      else
+        "b"
+    )

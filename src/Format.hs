@@ -314,23 +314,41 @@ formatExpression inList suffix aexpr =
                 , formatExpression False empty els
                     |> indent (if inList then 2 else 4)
                 ]
-        AST.Expression.If ((if0,body0):elseifs) els ->
+        AST.Expression.If ((if0,multiline0,body0):elseifs) els ->
             vbox
-                [ hbox
-                    [ text "if "
-                    , formatExpression False empty if0
-                    , text " then"
-                    ]
+                [ case multiline0 of
+                      False ->
+                          hbox
+                              [ text "if "
+                              , formatExpression False empty if0
+                              , text " then"
+                              ]
+                      True ->
+                          vbox
+                              [ text "if"
+                              , formatExpression False empty if0
+                                  |> indent (if inList then 2 else 4)
+                              , text "then"
+                              ]
                 , formatExpression False empty body0
                     |> indent (if inList then 2 else 4)
                 , let
-                    formatElseIf (if',body') =
+                    formatElseIf (if',multiline',body') =
                         vbox
-                            [ hbox
-                                [ text "else if "
-                                , formatExpression False empty if'
-                                , text " then"
-                                ]
+                            [ case multiline' of
+                                False ->
+                                    hbox
+                                        [ text "else if "
+                                        , formatExpression False empty if'
+                                        , text " then"
+                                        ]
+                                True ->
+                                    vbox
+                                        [ text "else if"
+                                        , formatExpression False empty if'
+                                            |> indent (if inList then 2 else 4)
+                                        , text "then"
+                                        ]
                             , formatExpression False empty body'
                                 |> indent (if inList then 2 else 4)
                             ]
