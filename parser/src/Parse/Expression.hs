@@ -247,6 +247,7 @@ caseExpr =
       e <- padded expr
       reserved "of"
       whitespace
+      updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
       E.Case e <$> (with <|> without)
   where
     case_ =
