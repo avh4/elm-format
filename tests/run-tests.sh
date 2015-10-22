@@ -18,44 +18,44 @@ function shouldOutputTheSame() {
 function checkWaysToRun() {
 	INPUT="tests/test-files/good/$1"
 	OUTPUT="formatted.elm"
-
 	echo
+
 	echo "## elm-format --help"
 	HELP=`"$ELM_FORMAT" --help 2>&1`
 	returnCodeShouldEqual 0
-	echo "OK"
 
-	echo
 	echo "## elm-format -h"
 	SHORTHELP=`"$ELM_FORMAT" -h 2>&1`
 	returnCodeShouldEqual 0
 	shouldOutputTheSame "$HELP" "$SHORTHELP"
-	echo "OK"
 
-	echo
 	echo "## elm-format"
 	NOARGS=`"$ELM_FORMAT" 2>&1`
 	returnCodeShouldEqual 1
 	shouldOutputTheSame "$HELP" "$NOARGS"
-	echo "OK"
 
-	echo
   echo "## elm-format INPUT (answer = y)"
 	echo "y" | "$ELM_FORMAT" "$INPUT" 1>/dev/null
 	returnCodeShouldEqual 0
-	echo "OK"
 
-	echo
   echo "## elm-format INPUT (answer = n)"
 	echo "n" | "$ELM_FORMAT" "$INPUT" 1>/dev/null
 	returnCodeShouldEqual 0
-	echo "OK"
 
-	echo
+  echo "## elm-format INPUT --yes"
+	"$ELM_FORMAT" "$INPUT" --yes
+	returnCodeShouldEqual 0
+
+  echo "## elm-format --yes INPUT"
+	"$ELM_FORMAT" --yes "$INPUT"
+	returnCodeShouldEqual 0
+
 	echo "## elm-format INPUT --output OUTPUT"
 	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT"
 	returnCodeShouldEqual 0
-	echo "OK"
+
+  echo
+  echo "# CLI tests OK!"
 }
 
 function checkGood() {
