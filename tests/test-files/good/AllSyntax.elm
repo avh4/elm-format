@@ -429,3 +429,7 @@ multilineCaseSubject a =
     of
         _ ->
             ()
+
+
+singleLineRange =
+    [{ f1 = 6 }.f1..(9 + 6 |> (-) 2) + 2]

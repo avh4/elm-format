@@ -247,7 +247,16 @@ formatExpression inList suffix aexpr =
             hbox2
                 (formatCommented formatVar v) -- TODO: comments not tested
                 suffix
-        AST.Expression.Range _ _ -> text "<range>"
+
+        AST.Expression.Range left right ->
+            hbox
+                [ text "["
+                , formatExpression False empty left
+                , text ".."
+                , formatExpression False empty right
+                , text "]"
+                ]
+
         AST.Expression.ExplicitList exprs False ->
             case exprs of
                 [] ->
