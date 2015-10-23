@@ -5,7 +5,6 @@ import Elm.Utils ((|>))
 import System.Exit (exitFailure, exitSuccess)
 import Control.Monad (when)
 import Data.Maybe (isJust, fromMaybe)
-import Data.Char (toLower)
 
 import qualified AST.Module
 import qualified Box
