@@ -192,7 +192,7 @@ functionParameters a b (t, s, _, (t', s', _, (t'', s''), {x', y'})) {x, y} _ =
     ()
 
 
-patternAlias ({x, y} as r) =
+patternAlias ({x, y} as r) (a, {b} as r') =
     r.x == y
 
 
