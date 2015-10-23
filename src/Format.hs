@@ -229,7 +229,14 @@ formatPattern apattern =
             hboxlist "(" ", " ")" formatPattern patterns
         AST.Pattern.Record fields ->
             hboxlist "{" ", " "}" text fields
-        AST.Pattern.Alias _ _ -> text "<alias>"
+        AST.Pattern.Alias name pattern ->
+            hbox
+                [ text "("
+                , formatPattern pattern
+                , text " as "
+                , text name
+                , text ")"
+                ]
         AST.Pattern.Var var ->
             formatCommented formatVar var -- TODO: comments not tested
         AST.Pattern.Anything ->

@@ -192,6 +192,10 @@ functionParameters a b (t, s, _, (t', s', _, (t'', s''), {x', y'})) {x, y} _ =
     ()
 
 
+patternAlias ({x, y} as r) =
+    r.x == y
+
+
 fnAsLambda =
     (\a -> a)
 
