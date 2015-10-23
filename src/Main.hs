@@ -9,6 +9,7 @@ import Data.Char (toLower)
 
 import qualified AST.Module
 import qualified Box
+import qualified CommandLine.Helpers as Cmd
 import qualified Flags
 import qualified Format
 import qualified Data.Text.Lazy as LazyText
@@ -58,17 +59,17 @@ printError :: RA.Located Syntax.Error -> IO ()
 printError (RA.A range err) =
     Report.printError "<location>" range (Syntax.toReport err) ""
 
-promptRewriting :: FilePath -> String
-promptRewriting filePath =
-    unlines
-        [ "This will overwrite the following files to use Elm’s preferred style:"
-        , ""
-        , "  " ++ filePath
-        , ""
-        , "This cannot be undone! Make sure to back up these files before proceeding."
-        , ""
-        , "Are you sure you want to overwrite these files with formatted versions? (y/N)"
-        ]
+getApproval :: Bool -> FilePath -> IO Bool
+getApproval autoYes filePath =
+    case autoYes of
+        True ->
+            return True
+        False -> do
+            putStrLn "This will overwrite the following files to use Elm’s preferred style:\n"
+            putStrLn $ "  " ++ filePath ++ "\n"
+            putStrLn "This cannot be undone! Make sure to back up these files before proceeding.\n"
+            putStr "Are you sure you want to overwrite these files with formatted versions? (y/N) "
+            Cmd.yesOrNo
 
 main :: IO ()
 main =
@@ -76,11 +77,10 @@ main =
 
         case (Flags._output config) of
             Nothing -> do -- we are overwriting the input file
-                when (not $ Flags._yes config) $ do
-                    putStrLn $ promptRewriting (Flags._input config)
-                    answer <- getLine
-                    when ((map toLower answer) == "n") $
-                        exitSuccess
+                canOverwrite <- getApproval (Flags._yes config) (Flags._input config)
+                case canOverwrite of
+                    True -> return ()
+                    False -> exitSuccess
             Just _ -> return ()
 
         input <- LazyText.readFile (Flags._input config)
