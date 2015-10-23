@@ -44,19 +44,19 @@ function checkWaysToRun() {
 	returnCodeShouldEqual 1
 	shouldOutputTheSame "$HELP" "$NOARGS"
 
-  echo "## elm-format INPUT (answer = y)"
+	echo "## elm-format INPUT (answer = y)"
 	echo "y" | "$ELM_FORMAT" "$INPUT" 1>/dev/null
 	returnCodeShouldEqual 0
 
-  echo "## elm-format INPUT (answer = n)"
+	echo "## elm-format INPUT (answer = n)"
 	echo "n" | "$ELM_FORMAT" "$INPUT" 1>/dev/null
 	returnCodeShouldEqual 0
 
-  echo "## elm-format INPUT --yes"
+	echo "## elm-format INPUT --yes"
 	"$ELM_FORMAT" "$INPUT" --yes
 	returnCodeShouldEqual 0
 
-  echo "## elm-format --yes INPUT"
+	echo "## elm-format --yes INPUT"
 	"$ELM_FORMAT" --yes "$INPUT"
 	returnCodeShouldEqual 0
 
@@ -65,8 +65,8 @@ function checkWaysToRun() {
 	returnCodeShouldEqual 0
 	compareFiles "$INPUT" "$OUTPUT"
 
-  echo
-  echo "# CLI tests OK!"
+	echo
+	echo "# CLI tests OK!"
 }
 
 function checkGood() {
