@@ -447,3 +447,19 @@ multilineRange =
         else
             5
     ]
+
+
+nestedMultilineRange =
+    [ [
+        if True then
+            1
+        else
+            2
+      ..
+        if False then
+            3
+        else
+            5
+      ]
+    , [4..2]
+    ]

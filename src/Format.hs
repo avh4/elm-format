@@ -260,10 +260,10 @@ formatExpression inList suffix aexpr =
             vbox
                 [ text "["
                 , formatExpression False empty left
-                    |> indent 4
+                    |> indent (if inList then 2 else 4)
                 , text ".."
                 , formatExpression False empty right
-                    |> indent 4
+                    |> indent (if inList then 2 else 4)
                 , text "]"
                 ]
 
