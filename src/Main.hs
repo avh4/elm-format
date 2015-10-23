@@ -25,6 +25,11 @@ maybeCreateEmptyFile :: Maybe FilePath -> IO ()
 maybeCreateEmptyFile (Just outputFile) = LazyText.writeFile outputFile $ LazyText.pack ""
 maybeCreateEmptyFile _                 = return ()
 
+showErrors errs = do
+    putStrLn "ERRORS"
+    mapM_ printError errs
+
+
 formatResult
     :: Flags.Config
     -> Result.Result () Syntax.Error AST.Module.Module
@@ -40,9 +45,7 @@ formatResult config result =
         Result.Result _ (Result.Err errs) ->
             do
                 maybeCreateEmptyFile givenOutput
-
-                putStrLn "ERRORS"
-                _ <- sequence $ map printError errs
+                showErrors errs
                 exitFailure
     where
         trimSpaces = LazyText.unlines . (map LazyText.stripEnd) . LazyText.lines
