@@ -49,7 +49,7 @@ helpInfo =
         ]
   where
     top =
-        "elm-format " ++ showVersion This.version ++ "\n"
+        "elm-format " ++ showVersion This.version ++ "-alpha \n"
 
     examples =
         linesToDoc
