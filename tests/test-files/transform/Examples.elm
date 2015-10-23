@@ -9,3 +9,6 @@ myTuple = (,
 foo=(case x of {True->1;False->3})
 
 bar = (if if a then True else False then "a" else "b")
+
+multilineList = [1,2,3
+  ]

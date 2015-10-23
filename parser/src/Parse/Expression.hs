@@ -84,10 +84,8 @@ listTerm =
           return $ E.GLShader uid (filter (/='\r') rawSrc) tipe
 
     commaSeparated =
-      do  pushNewlineContext
-          term <- commaSep expr
-          sawNewline <- popNewlineContext
-          return $ \_ -> E.ExplicitList term sawNewline
+      do  term <- commaSep expr
+          return $ \multiline -> E.ExplicitList term multiline
 
 
 parensTerm :: IParser E.Expr
