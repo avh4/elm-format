@@ -21,9 +21,9 @@ import qualified Reporting.Result as Result
 
 
 
-createEmptyFile :: Maybe FilePath -> IO ()
-createEmptyFile (Just outputFile) = LazyText.writeFile outputFile $ LazyText.pack ""
-createEmptyFile _                 = return ()
+maybeCreateEmptyFile :: Maybe FilePath -> IO ()
+maybeCreateEmptyFile (Just outputFile) = LazyText.writeFile outputFile $ LazyText.pack ""
+maybeCreateEmptyFile _                 = return ()
 
 formatResult
     :: Flags.Config
@@ -39,7 +39,7 @@ formatResult config result =
                 |> LazyText.writeFile outputFile
         Result.Result _ (Result.Err errs) ->
             do
-                createEmptyFile givenOutput
+                maybeCreateEmptyFile givenOutput
 
                 putStrLn "ERRORS"
                 _ <- sequence $ map printError errs
