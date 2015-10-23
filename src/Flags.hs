@@ -89,8 +89,8 @@ output =
     Opt.optional $ Opt.strOption $
         mconcat
         [ Opt.long "output"
-        , Opt.metavar "OUTPUT"
-        , Opt.help "Write output to OUTPUT instead of overwriting the given source file."
+        , Opt.metavar "FILE"
+        , Opt.help "Write output to FILE instead of overwriting the given source file."
         ]
 
 input :: Opt.Parser FilePath
