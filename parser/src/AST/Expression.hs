@@ -43,7 +43,6 @@ data Expr'
     | If [(Expr, Bool, Expr)] Expr
     | Let [Def] Expr
     | Case (Expr,Bool) [(Pattern.Pattern, Expr)]
-    | Data String [Expr]
     | Tuple [Expr] Bool
     | TupleFunction Int
     | Access Expr String

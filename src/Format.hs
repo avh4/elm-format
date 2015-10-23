@@ -432,7 +432,6 @@ formatExpression inList suffix aexpr =
                       vbox (map formatClause clauses)
                       |> indent (if inList then 2 else 4)
                 ]
-        AST.Expression.Data _ _ -> text "<expression data>"
 
         AST.Expression.Tuple exprs False ->
             hboxlist "(" ", " ")" (formatExpression False empty) exprs
