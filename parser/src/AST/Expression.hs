@@ -34,7 +34,7 @@ type Expr =
 data Expr'
     = Literal (Commented Literal.Literal)
     | Var (Commented Var.Ref)
-    | Range Expr Expr
+    | Range Expr Expr Bool
     | ExplicitList [Expr] Bool
     | Binops Expr [(Commented Var.Ref,Expr)] Bool
     | Unary UnaryOperator Expr

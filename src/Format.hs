@@ -248,7 +248,7 @@ formatExpression inList suffix aexpr =
                 (formatCommented formatVar v) -- TODO: comments not tested
                 suffix
 
-        AST.Expression.Range left right ->
+        AST.Expression.Range left right False ->
             hbox
                 [ text "["
                 , formatExpression False empty left
@@ -256,6 +256,17 @@ formatExpression inList suffix aexpr =
                 , formatExpression False empty right
                 , text "]"
                 ]
+        AST.Expression.Range left right True ->
+            vbox
+                [ text "["
+                , formatExpression False empty left
+                    |> indent 4
+                , text ".."
+                , formatExpression False empty right
+                    |> indent 4
+                , text "]"
+                ]
+
 
         AST.Expression.ExplicitList exprs False ->
             case exprs of

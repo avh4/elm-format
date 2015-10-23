@@ -69,12 +69,13 @@ negative =
 
 listTerm :: IParser E.Expr'
 listTerm =
-    shader' <|> braces (fmap const (try range <|> commaSeparated))
+    shader' <|> braces (try range <|> commaSeparated)
   where
     range =
       do  lo <- expr
           padded (string "..")
-          E.Range lo <$> expr
+          hi <- expr
+          return $ \multiline -> E.Range lo hi multiline
 
     shader' =
       do  pos <- getPosition
@@ -86,7 +87,7 @@ listTerm =
       do  pushNewlineContext
           term <- commaSep expr
           sawNewline <- popNewlineContext
-          return $ E.ExplicitList term sawNewline
+          return $ \_ -> E.ExplicitList term sawNewline
 
 
 parensTerm :: IParser E.Expr

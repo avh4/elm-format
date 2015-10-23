@@ -433,3 +433,17 @@ multilineCaseSubject a =
 
 singleLineRange =
     [{ f1 = 6 }.f1..(9 + 6 |> (-) 2) + 2]
+
+
+multilineRange =
+    [
+        if True then
+            1
+        else
+            2
+    ..
+        if False then
+            3
+        else
+            5
+    ]
