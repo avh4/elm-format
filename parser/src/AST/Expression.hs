@@ -34,7 +34,7 @@ type Expr =
 data Expr'
     = Literal (Commented Literal.Literal)
     | Var (Commented Var.Ref)
-    | Range Expr Expr
+    | Range Expr Expr Bool
     | ExplicitList [Expr] Bool
     | Binops Expr [(Commented Var.Ref,Expr)] Bool
     | Unary UnaryOperator Expr
@@ -43,7 +43,6 @@ data Expr'
     | If [(Expr, Bool, Expr)] Expr
     | Let [Def] Expr
     | Case (Expr,Bool) [(Pattern.Pattern, Expr)]
-    | Data String [Expr]
     | Tuple [Expr] Bool
     | TupleFunction Int
     | Access Expr String

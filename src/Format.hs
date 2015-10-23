@@ -194,8 +194,8 @@ formatDefinition compact adef =
                 False ->
                     vbox
                         [ hbox
-                            [ formatPattern name
-                            , hbox $ List.map (\arg -> hbox [ text " ", formatPattern arg]) args
+                            [ formatPattern True name
+                            , hbox $ List.map (\arg -> hbox [ text " ", formatPattern True arg]) args
                             , text " ="
                             ]
                         , formatExpression False empty expr
@@ -204,8 +204,8 @@ formatDefinition compact adef =
                     |> margin (if compact then 1 else 2)
                 True ->
                     hbox
-                        [ formatPattern name
-                        , hbox $ List.map (\arg -> hbox [ text " ", formatPattern arg]) args
+                        [ formatPattern True name
+                        , hbox $ List.map (\arg -> hbox [ text " ", (formatPattern True) arg]) args
                         , text " = "
                         , formatExpression False empty expr
                         ]
@@ -218,18 +218,25 @@ formatDefinition compact adef =
                 ]
 
 
-formatPattern :: AST.Pattern.Pattern -> Box
-formatPattern apattern =
+formatPattern :: Bool -> AST.Pattern.Pattern -> Box
+formatPattern parensRequired apattern =
     case RA.drop apattern of
         AST.Pattern.Data ctor patterns ->
             hbox2
                 (formatVar ctor)
-                (hboxlist (if List.null patterns then "" else " ") " " "" formatPattern patterns)
+                (hboxlist (if List.null patterns then "" else " ") " " "" (formatPattern True) patterns)
         AST.Pattern.Tuple patterns ->
-            hboxlist "(" ", " ")" formatPattern patterns
+            hboxlist "(" ", " ")" (formatPattern False) patterns
         AST.Pattern.Record fields ->
             hboxlist "{" ", " "}" text fields
-        AST.Pattern.Alias _ _ -> text "<alias>"
+        AST.Pattern.Alias name pattern ->
+            hbox
+                [ if parensRequired then text "(" else empty
+                , formatPattern True pattern
+                , text " as "
+                , text name
+                , if parensRequired then text ")" else empty
+                ]
         AST.Pattern.Var var ->
             formatCommented formatVar var -- TODO: comments not tested
         AST.Pattern.Anything ->
@@ -247,7 +254,27 @@ formatExpression inList suffix aexpr =
             hbox2
                 (formatCommented formatVar v) -- TODO: comments not tested
                 suffix
-        AST.Expression.Range _ _ -> text "<range>"
+
+        AST.Expression.Range left right False ->
+            hbox
+                [ text "["
+                , formatExpression False empty left
+                , text ".."
+                , formatExpression False empty right
+                , text "]"
+                ]
+        AST.Expression.Range left right True ->
+            vbox
+                [ text "["
+                , formatExpression False empty left
+                    |> indent (if inList then 2 else 4)
+                , text ".."
+                , formatExpression False empty right
+                    |> indent (if inList then 2 else 4)
+                , text "]"
+                ]
+
+
         AST.Expression.ExplicitList exprs False ->
             case exprs of
                 [] ->
@@ -293,12 +320,12 @@ formatExpression inList suffix aexpr =
 
         AST.Expression.Lambda patterns expr False ->
             hbox
-                [ hboxlist "\\" " " " -> " formatPattern patterns
+                [ hboxlist "\\" " " " -> " (formatPattern True) patterns
                 , formatExpression False empty expr
                 ]
         AST.Expression.Lambda patterns expr True ->
             vbox
-                [ hboxlist "\\" " " " -> " formatPattern patterns
+                [ hboxlist "\\" " " " -> " (formatPattern True) patterns
                 , formatExpression False empty expr
                     |> indent (if inList then 2 else 4)
                 ]
@@ -402,7 +429,7 @@ formatExpression inList suffix aexpr =
                       formatClause (pat,expr) =
                           vbox
                               [ hbox
-                                  [ formatPattern pat
+                                  [ formatPattern True pat
                                   , text " ->"
                                   ]
                               , formatExpression False empty expr
@@ -412,7 +439,6 @@ formatExpression inList suffix aexpr =
                       vbox (map formatClause clauses)
                       |> indent (if inList then 2 else 4)
                 ]
-        AST.Expression.Data _ _ -> text "<expression data>"
 
         AST.Expression.Tuple exprs False ->
             hboxlist "(" ", " ")" (formatExpression False empty) exprs

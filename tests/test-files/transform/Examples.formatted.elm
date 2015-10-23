@@ -37,3 +37,10 @@ bar =
       else
         "b"
     )
+
+
+multilineList =
+    [ 1
+    , 2
+    , 3
+    ]

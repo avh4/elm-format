@@ -192,6 +192,10 @@ functionParameters a b (t, s, _, (t', s', _, (t'', s''), {x', y'})) {x, y} _ =
     ()
 
 
+patternAlias ({x, y} as r) (a, {b} as r') =
+    r.x == y
+
+
 fnAsLambda =
     (\a -> a)
 
@@ -429,3 +433,37 @@ multilineCaseSubject a =
     of
         _ ->
             ()
+
+
+singleLineRange =
+    [{ f1 = 6 }.f1..(9 + 6 |> (-) 2) + 2]
+
+
+multilineRange =
+    [
+        if True then
+            1
+        else
+            2
+    ..
+        if False then
+            3
+        else
+            5
+    ]
+
+
+nestedMultilineRange =
+    [ [
+        if True then
+            1
+        else
+            2
+      ..
+        if False then
+            3
+        else
+            5
+      ]
+    , [4..2]
+    ]
