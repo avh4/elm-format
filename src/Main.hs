@@ -25,6 +25,8 @@ maybeCreateEmptyFile :: Maybe FilePath -> IO ()
 maybeCreateEmptyFile (Just outputFile) = LazyText.writeFile outputFile $ LazyText.pack ""
 maybeCreateEmptyFile _                 = return ()
 
+
+showErrors :: [RA.Located Syntax.Error] -> IO ()
 showErrors errs = do
     putStrLn "ERRORS"
     mapM_ printError errs
