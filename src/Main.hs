@@ -18,6 +18,7 @@ import qualified Reporting.Annotation as RA
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Report as Report
 import qualified Reporting.Result as Result
+import qualified System.Directory as Dir
 
 
 showErrors :: [RA.Located Syntax.Error] -> IO ()
@@ -71,6 +72,12 @@ getApproval autoYes filePath =
             putStr "Are you sure you want to overwrite these files with formatted versions? (y/n) "
             Cmd.yesOrNo
 
+printFileNotFound :: FilePath -> IO ()
+printFileNotFound filePath = do
+    putStrLn "Could not find the file:\n"
+    putStrLn $ "  " ++ filePath ++ "\n"
+    putStrLn "Please check the given path."
+
 processFile :: FilePath -> FilePath -> IO ()
 processFile inputFile outputFile =
     do
@@ -88,6 +95,12 @@ main =
         let inputFile = (Flags._input config)
         let outputFile = (Flags._output config)
         let autoYes = (Flags._yes config)
+
+        fileExists <- Dir.doesFileExist inputFile
+
+        when (not fileExists) $ do
+            printFileNotFound inputFile
+            exitFailure
 
         case outputFile of
 
