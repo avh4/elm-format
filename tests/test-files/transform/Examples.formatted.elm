@@ -21,6 +21,7 @@ foo =
     ( case x of
         True ->
             1
+
         False ->
             3
     )
