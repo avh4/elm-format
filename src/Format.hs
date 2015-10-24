@@ -181,8 +181,23 @@ formatDeclaration decl =
                             |> indent 4
                         ]
                     |> margin 2
-                AST.Declaration.PortAnnotation _ _ -> text "<port annotation>"
-                AST.Declaration.PortDefinition _ _ -> text "<port definition>"
+                AST.Declaration.PortAnnotation name typ ->
+                    hbox
+                        [ text "port "
+                        , text name
+                        , text " : "
+                        , formatType typ
+                        ]
+                AST.Declaration.PortDefinition name expr ->
+                    vbox
+                        [ hbox
+                            [ text "port "
+                            , text name
+                            , text " ="
+                            ]
+                        , formatExpression False empty expr
+                            |> indent 4
+                        ]
                 AST.Declaration.Fixity _ _ _ -> text "<fixity>"
 
 
@@ -210,9 +225,9 @@ formatDefinition compact adef =
                         , formatExpression False empty expr
                         ]
                     |> margin 1
-        AST.Expression.TypeAnnotation var typ ->
+        AST.Expression.TypeAnnotation name typ ->
             hbox
-                [ formatCommented formatVar var -- TODO: comments not tested
+                [ formatCommented formatVar name -- TODO: comments not tested
                 , text " : "
                 , formatType typ
                 ]
