@@ -88,6 +88,16 @@ processFile inputFile outputFile =
     where
         canWriteEmptyFileOnError = outputFile /= inputFile
 
+decideOutputFile :: Bool -> FilePath -> Maybe FilePath -> IO FilePath
+decideOutputFile autoYes inputFile outputFile =
+    case outputFile of
+        Nothing -> do -- we are overwriting the input file
+            canOverwrite <- getApproval autoYes inputFile
+            case canOverwrite of
+                True -> return inputFile
+                False -> exitSuccess
+        Just outputFile' -> return outputFile'
+
 main :: IO ()
 main =
     do
@@ -97,18 +107,12 @@ main =
         let autoYes = (Flags._yes config)
 
         fileExists <- Dir.doesFileExist inputFile
+        dirExists <- Dir.doesDirectoryExist inputFile
 
-        when (not fileExists) $ do
+        when (not (fileExists || dirExists)) $ do
             printFileNotFound inputFile
             exitFailure
 
-        case outputFile of
-
-            Nothing -> do -- we are overwriting the input file
-                canOverwrite <- getApproval autoYes inputFile
-                case canOverwrite of
-                    True -> processFile inputFile inputFile
-                    False -> exitSuccess
-
-            Just outputFile' ->
-                processFile inputFile outputFile'
+        when fileExists $ do
+            realOutputFile <- decideOutputFile autoYes inputFile outputFile
+            processFile inputFile realOutputFile
