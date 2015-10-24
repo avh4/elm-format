@@ -472,3 +472,13 @@ nestedMultilineRange =
 port runner : Signal (Task.Task x ())
 port runner =
     Console.run console
+
+
+infixl 4 |.
+(|.) : D3 a b -> D3 b c -> D3 a c
+(|.) =
+    chain
+
+
+infix 1 <>
+infixr 9 ==/==

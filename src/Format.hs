@@ -199,7 +199,17 @@ formatDeclaration decl =
                             |> indent 4
                         ]
                         |> margin 2
-                AST.Declaration.Fixity _ _ _ -> text "<fixity>"
+                AST.Declaration.Fixity assoc precedence name ->
+                    hbox
+                        [ case assoc of
+                              AST.Declaration.L -> text "infixl"
+                              AST.Declaration.R -> text "infixr"
+                              AST.Declaration.N -> text "infix"
+                        , text " "
+                        , text $ show precedence
+                        , text " "
+                        , formatCommented formatInfixVar name
+                        ]
 
 
 formatDefinition :: Bool -> AST.Expression.Def -> Box
