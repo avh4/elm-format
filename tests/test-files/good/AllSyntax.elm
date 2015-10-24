@@ -322,8 +322,10 @@ caseStatement mb =
     case mb of
         Just True ->
             "+"
+
         Just _ ->
             "_"
+
         Nothing ->
             "."
 

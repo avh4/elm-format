@@ -461,8 +461,10 @@ formatExpression inList suffix aexpr =
                               , formatExpression False empty expr
                                   |> indent 4
                               ]
+                              |> margin 1
                   in
                       vbox (map formatClause clauses)
+                      |> margin 0
                       |> indent (if inList then 2 else 4)
                 ]
 
