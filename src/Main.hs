@@ -76,14 +76,18 @@ main :: IO ()
 main =
     do  config <- Flags.parse
 
-        case (Flags._output config) of
+        case outputFile of
             Nothing -> do -- we are overwriting the input file
-                canOverwrite <- getApproval (Flags._yes config) (Flags._input config)
+                canOverwrite <- getApproval autoYes inputFile
                 case canOverwrite of
                     True -> return ()
                     False -> exitSuccess
             Just _ -> return ()
 
-        input <- LazyText.readFile (Flags._input config)
+        input <- LazyText.readFile inputFile
 
         formatResult config $ Parse.parseSource $ LazyText.unpack input
+    where
+        inputFile = (Flags._input config)
+        outputFile = (Flags._output config)
+        autoYes = (Flags._yes config)
