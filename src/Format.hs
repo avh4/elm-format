@@ -567,7 +567,6 @@ formatExpression inList suffix aexpr =
                 (hbox2 (text ")") suffix)
                 (formatExpression True empty) [expr]
 
-        AST.Expression.Port _ -> text "<port>"
         AST.Expression.GLShader _ _ _ -> text "<glshader>"
 
 

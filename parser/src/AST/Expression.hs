@@ -51,26 +51,8 @@ data Expr'
     | Record [(String, Expr, Bool)] Bool
     | Parens Expr Bool
     -- for type checking and code gen only
-    | Port PortImpl
     | GLShader String String Literal.GLShaderTipe
     deriving (Show)
-
-
--- PORTS
-
-data PortImpl
-    = In String Type.Port
-    | Out String Expr Type.Port
-    | Task String Expr Type.Port
-    deriving (Show)
-
-
-portName :: PortImpl -> String
-portName impl =
-  case impl of
-    In name _ -> name
-    Out name _ _ -> name
-    Task name _ _ -> name
 
 
 ---- UTILITIES ----
