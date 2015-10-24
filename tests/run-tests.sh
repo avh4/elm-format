@@ -28,6 +28,10 @@ function compareFiles() {
 function checkWaysToRun() {
 	INPUT="tests/test-files/good/$1"
 	OUTPUT="formatted.elm"
+
+  NONEXISTENT_AT_TMP=`tempfile`
+  NONEXISTENT=`basename "$NONEXISTENT_AT_TMP"`
+
 	echo
 
 	echo "## elm-format --help"
@@ -59,6 +63,10 @@ function checkWaysToRun() {
 	echo "## elm-format --yes INPUT"
 	"$ELM_FORMAT" --yes "$INPUT"
 	returnCodeShouldEqual 0
+
+	echo "## elm-format NONEXISTENT --yes"
+	"$ELM_FORMAT" "$NONEXISTENT" --yes 1>/dev/null
+	returnCodeShouldEqual 1
 
 	echo "## elm-format INPUT --output OUTPUT"
 	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT"
