@@ -15,9 +15,9 @@ import String
 
 type alias Addresses a =
     { a
-    | fullscreen : Address FullscreenState
-    , remoteSync : Address ()
-    , execCommand : Address String
+        | fullscreen : Address FullscreenState
+        , remoteSync : Address ()
+        , execCommand : Address String
     }
 
 
@@ -95,9 +95,9 @@ viewEditorFooter channels currentDoc fullscreen =
                 |> List.sum
 
         wordCount =
-            currentDoc.titleWords +
-            currentDoc.descriptionWords +
-            chapterWords
+            currentDoc.titleWords
+                + currentDoc.descriptionWords
+                + chapterWords
 
         wordCountLabel =
             (pluralize "word" wordCount) ++ " saved "
