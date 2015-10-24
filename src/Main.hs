@@ -20,23 +20,23 @@ import qualified Reporting.Report as Report
 import qualified Reporting.Result as Result
 
 
-
-maybeCreateEmptyFile :: Maybe FilePath -> IO ()
-maybeCreateEmptyFile (Just outputFile) = LazyText.writeFile outputFile $ LazyText.pack ""
-maybeCreateEmptyFile _                 = return ()
-
-
 showErrors :: [RA.Located Syntax.Error] -> IO ()
 showErrors errs = do
     putStrLn "ERRORS"
     mapM_ printError errs
 
 
+writeEmptyFile :: FilePath -> IO ()
+writeEmptyFile filePath =
+    LazyText.writeFile filePath $ LazyText.pack ""
+
+
 formatResult
-    :: Flags.Config
+    :: Bool
+    -> FilePath
     -> Result.Result () Syntax.Error AST.Module.Module
     -> IO ()
-formatResult config result =
+formatResult canWriteEmptyFileOnError outputFile result =
     case result of
         Result.Result _ (Result.Ok modu) ->
             Format.formatModule modu
@@ -46,14 +46,13 @@ formatResult config result =
                 |> LazyText.writeFile outputFile
         Result.Result _ (Result.Err errs) ->
             do
-                maybeCreateEmptyFile givenOutput
+                when canWriteEmptyFileOnError $
+                    writeEmptyFile outputFile
+
                 showErrors errs
                 exitFailure
     where
         trimSpaces = LazyText.unlines . (map LazyText.stripEnd) . LazyText.lines
-        givenInput = Flags._input config
-        givenOutput = Flags._output config
-        outputFile = fromMaybe givenInput givenOutput
 
 
 printError :: RA.Located Syntax.Error -> IO ()
@@ -72,22 +71,31 @@ getApproval autoYes filePath =
             putStr "Are you sure you want to overwrite these files with formatted versions? (y/n) "
             Cmd.yesOrNo
 
+processFile :: FilePath -> FilePath -> IO ()
+processFile inputFile outputFile =
+    do
+        input <- LazyText.readFile inputFile
+        LazyText.unpack input
+            |> Parse.parseSource
+            |> formatResult canWriteEmptyFileOnError outputFile
+    where
+        canWriteEmptyFileOnError = outputFile /= inputFile
+
 main :: IO ()
 main =
-    do  config <- Flags.parse
+    do
+        config <- Flags.parse
+        let inputFile = (Flags._input config)
+        let outputFile = (Flags._output config)
+        let autoYes = (Flags._yes config)
 
         case outputFile of
+
             Nothing -> do -- we are overwriting the input file
                 canOverwrite <- getApproval autoYes inputFile
                 case canOverwrite of
-                    True -> return ()
+                    True -> processFile inputFile inputFile
                     False -> exitSuccess
-            Just _ -> return ()
 
-        input <- LazyText.readFile inputFile
-
-        formatResult config $ Parse.parseSource $ LazyText.unpack input
-    where
-        inputFile = (Flags._input config)
-        outputFile = (Flags._output config)
-        autoYes = (Flags._yes config)
+            Just outputFile' ->
+                processFile inputFile outputFile'
