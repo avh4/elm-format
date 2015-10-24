@@ -173,14 +173,14 @@ formatDeclaration decl =
                             (\(c, args') -> hbox2 (text c) (hboxlist " " " " "" (formatType' ForCtor) args')) ctors
                             |> indent 4
                         ]
-                    |> margin 2
+                        |> margin 2
                 AST.Declaration.TypeAlias name args typ ->
                     vbox
                         [ hboxlist "type alias " " " " =" text (name:args)
                         , formatType typ
                             |> indent 4
                         ]
-                    |> margin 2
+                        |> margin 2
                 AST.Declaration.PortAnnotation name typ ->
                     hbox
                         [ text "port "
@@ -198,6 +198,7 @@ formatDeclaration decl =
                         , formatExpression False empty expr
                             |> indent 4
                         ]
+                        |> margin 2
                 AST.Declaration.Fixity _ _ _ -> text "<fixity>"
 
 
