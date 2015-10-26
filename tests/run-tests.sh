@@ -31,14 +31,14 @@ function checkWaysToRun() {
 	DIRECTORY="tests/test-files/directory"
 	RECURSIVE_DIRECTORY="tests/test-files/recursive-directory"
 
-  NONEXISTENT_AT_TMP=`tempfile`
-  NONEXISTENT=`basename "$NONEXISTENT_AT_TMP"`
-  NONEXISTENT_DIR=`mktemp -d`
+	NONEXISTENT_AT_TMP=`tempfile`
+	NONEXISTENT=`basename "$NONEXISTENT_AT_TMP"`
+	NONEXISTENT_DIR=`mktemp -d`
 
 	echo
-  echo "------------------------------"
-  echo "# WAYS TO RUN"
-  echo
+	echo "------------------------------"
+	echo "# WAYS TO RUN"
+	echo
 
 	echo "## elm-format --help"
 	HELP=`"$ELM_FORMAT" --help 2>&1`
@@ -79,31 +79,31 @@ function checkWaysToRun() {
 	returnCodeShouldEqual 0
 	compareFiles "$INPUT" "$OUTPUT" 1>/dev/null
 
-  echo "## elm-format DIRECTORY --output OUTPUT"
+	echo "## elm-format DIRECTORY --output OUTPUT"
 	"$ELM_FORMAT" "$DIRECTORY" --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 1
 
-  echo "## elm-format DIRECTORY (answer = n)"
+	echo "## elm-format DIRECTORY (answer = n)"
 	echo "n" | "$ELM_FORMAT" "$DIRECTORY" 1>/dev/null
 	returnCodeShouldEqual 0
 
-  echo "## elm-format DIRECTORY (answer = y)"
+	echo "## elm-format DIRECTORY (answer = y)"
 	echo "y" | "$ELM_FORMAT" "$RECURSIVE_DIRECTORY" 1>/dev/null 2>/dev/null
 	returnCodeShouldEqual 1
-  # invalid file in the nested directory
-  # if recursion didn't work, return code would be 0
-  # because it never got to the nested invalid file
+	# invalid file in the nested directory
+	# if recursion didn't work, return code would be 0
+	# because it never got to the nested invalid file
 
-  echo "## elm-format DIRECTORY --yes"
+	echo "## elm-format DIRECTORY --yes"
 	"$ELM_FORMAT" "$DIRECTORY" --yes 1>/dev/null 2>/dev/null
 	returnCodeShouldEqual 1
 
-  echo "## elm-format NONEXISTENT_DIRECTORY --yes"
+	echo "## elm-format NONEXISTENT_DIRECTORY --yes"
 	"$ELM_FORMAT" "$NONEXISTENT_DIR" --yes 1>/dev/null
 	returnCodeShouldEqual 1
 
 	echo "# OK!"
-  echo "------------------------------"
+	echo "------------------------------"
 }
 
 function checkGood() {
