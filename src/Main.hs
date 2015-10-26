@@ -61,6 +61,7 @@ printError :: RA.Located Syntax.Error -> IO ()
 printError (RA.A range err) =
     Report.printError "<location>" range (Syntax.toReport err) ""
 
+
 getApproval :: Bool -> [FilePath] -> IO Bool
 getApproval autoYes filePaths =
     case autoYes of
@@ -73,6 +74,7 @@ getApproval autoYes filePaths =
             putStr "Are you sure you want to overwrite these files with formatted versions? (y/n) "
             Cmd.yesOrNo
 
+
 exitFileNotFound :: FilePath -> IO ()
 exitFileNotFound filePath = do
     putStrLn "Could not find any .elm files on the specified path:\n"
@@ -80,11 +82,13 @@ exitFileNotFound filePath = do
     putStrLn "Please check the given path."
     exitFailure
 
+
 exitOnInputDirAndOutput :: IO ()
 exitOnInputDirAndOutput = do
     putStrLn "Can't write to the OUTPUT path, because INPUT path is a directory.\n"
     putStrLn "Please remove the OUTPUT argument. The .elm files in INPUT will be formatted in place."
     exitFailure
+
 
 processFile :: FilePath -> FilePath -> IO ()
 processFile inputFile outputFile =
@@ -97,6 +101,7 @@ processFile inputFile outputFile =
     where
         canWriteEmptyFileOnError = outputFile /= inputFile
 
+
 decideOutputFile :: Bool -> FilePath -> Maybe FilePath -> IO FilePath
 decideOutputFile autoYes inputFile outputFile =
     case outputFile of
@@ -106,6 +111,7 @@ decideOutputFile autoYes inputFile outputFile =
                 True -> return inputFile
                 False -> exitSuccess
         Just outputFile' -> return outputFile'
+
 
 findAllElmFiles :: FilePath -> IO [FilePath]
 findAllElmFiles inputFile =
