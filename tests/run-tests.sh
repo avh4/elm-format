@@ -28,7 +28,17 @@ function compareFiles() {
 function checkWaysToRun() {
 	INPUT="tests/test-files/good/$1"
 	OUTPUT="formatted.elm"
+	DIRECTORY="tests/test-files/directory"
+	RECURSIVE_DIRECTORY="tests/test-files/recursive-directory"
+
+  NONEXISTENT_AT_TMP=`tempfile`
+  NONEXISTENT=`basename "$NONEXISTENT_AT_TMP"`
+  NONEXISTENT_DIR=`mktemp -d`
+
 	echo
+  echo "------------------------------"
+  echo "# WAYS TO RUN"
+  echo
 
 	echo "## elm-format --help"
 	HELP=`"$ELM_FORMAT" --help 2>&1`
@@ -53,20 +63,47 @@ function checkWaysToRun() {
 	returnCodeShouldEqual 0
 
 	echo "## elm-format INPUT --yes"
-	"$ELM_FORMAT" "$INPUT" --yes
+	"$ELM_FORMAT" "$INPUT" --yes 1>/dev/null
 	returnCodeShouldEqual 0
 
 	echo "## elm-format --yes INPUT"
-	"$ELM_FORMAT" --yes "$INPUT"
+	"$ELM_FORMAT" --yes "$INPUT" 1>/dev/null
 	returnCodeShouldEqual 0
+
+	echo "## elm-format NONEXISTENT --yes"
+	"$ELM_FORMAT" "$NONEXISTENT" --yes 1>/dev/null
+	returnCodeShouldEqual 1
 
 	echo "## elm-format INPUT --output OUTPUT"
-	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT"
+	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 0
-	compareFiles "$INPUT" "$OUTPUT"
+	compareFiles "$INPUT" "$OUTPUT" 1>/dev/null
 
-	echo
-	echo "# CLI tests OK!"
+  echo "## elm-format DIRECTORY --output OUTPUT"
+	"$ELM_FORMAT" "$DIRECTORY" --output "$OUTPUT" 1>/dev/null
+	returnCodeShouldEqual 1
+
+  echo "## elm-format DIRECTORY (answer = n)"
+	echo "n" | "$ELM_FORMAT" "$DIRECTORY" 1>/dev/null
+	returnCodeShouldEqual 0
+
+  echo "## elm-format DIRECTORY (answer = y)"
+	echo "y" | "$ELM_FORMAT" "$RECURSIVE_DIRECTORY" 1>/dev/null 2>/dev/null
+	returnCodeShouldEqual 1
+  # invalid file in the nested directory
+  # if recursion didn't work, return code would be 0
+  # because it never got to the nested invalid file
+
+  echo "## elm-format DIRECTORY --yes"
+	"$ELM_FORMAT" "$DIRECTORY" --yes 1>/dev/null 2>/dev/null
+	returnCodeShouldEqual 1
+
+  echo "## elm-format NONEXISTENT_DIRECTORY --yes"
+	"$ELM_FORMAT" "$NONEXISTENT_DIR" --yes 1>/dev/null
+	returnCodeShouldEqual 1
+
+	echo "# OK!"
+  echo "------------------------------"
 }
 
 function checkGood() {
@@ -75,7 +112,7 @@ function checkGood() {
 
 	echo
 	echo "## good/$1"
-	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT"
+	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 0
 	compareFiles "$INPUT" "$OUTPUT"
 }
@@ -87,7 +124,7 @@ function checkTransformation() {
 
 	echo
 	echo "## transform/$1"
-	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT"
+	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 0
 	compareFiles "$EXPECTED" "$OUTPUT"
 }

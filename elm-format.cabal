@@ -52,6 +52,7 @@ Executable elm-format
         directory >= 1.0 && < 2.0,
         edit-distance >= 0.2 && < 0.3,
         filepath >= 1 && < 2.0,
+        filemanip >= 0.1 && < 1.0,
         indents >= 0.3 && < 0.4,
         language-glsl >= 0.0.2 && < 0.3,
         mtl >= 2.2 && < 3,
