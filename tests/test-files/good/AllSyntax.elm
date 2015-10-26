@@ -105,6 +105,21 @@ escapedString =
         ()
 
 
+escapedChar =
+    let
+        normals = [ 'a', ' ', '/', '"', 'ڥ', '😀', 'ぁ', '⾃', '𝟟' ]
+
+        specials = [ '\t', '\n', '\\', '\'' ]
+
+        controls = [ '\x00', '\x1F', '\x7F' ]
+
+        otherNonPrint = [ '\x06DD', '\xFFFB', '\x110BD', '\xE007F' ]
+
+        whitespace = [ '\xA0', '\x2000', '\x205F' ]
+    in
+        ()
+
+
 inlinePipeline =
     1 |> (+) 2
 

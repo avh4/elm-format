@@ -610,17 +610,17 @@ formatLiteral lit =
         L.FloatNum f ->
             text $ show f
         L.Chr c ->
-            text ['\'', c, '\''] -- TODO: escape specials
+            formatString True [c]
         L.Str s ->
-            formatString s
+            formatString False s
         L.Boolean True ->
             text "True"
         L.Boolean False ->
             text "False" -- TODO: not tested
 
 
-formatString :: String -> Box
-formatString s =
+formatString :: Bool -> String -> Box
+formatString isChar s =
     let
         hex c =
             if Char.ord c <= 0xFF then
@@ -635,8 +635,10 @@ formatString s =
                 "\\t"
             else if c == '\\' then
                 "\\\\"
-            else if c == '\"' then
+            else if (not isChar) && c == '\"' then
                 "\\\""
+            else if isChar && c == '\'' then
+                "\\\'"
             else if not $ Char.isPrint c then
                 hex c
             else if c == ' ' then
@@ -645,8 +647,11 @@ formatString s =
                 hex c
             else
                 [c]
+
+        delim =
+            if isChar then "\'" else "\""
     in
-        text $ "\"" ++ (concatMap fix s) ++ "\""
+        text $ delim ++ (concatMap fix s) ++ delim
 
 
 data TypeParensRequired
