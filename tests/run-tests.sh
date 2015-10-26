@@ -31,9 +31,8 @@ function checkWaysToRun() {
 	DIRECTORY="tests/test-files/directory"
 	RECURSIVE_DIRECTORY="tests/test-files/recursive-directory"
 
-	NONEXISTENT_AT_TMP=$(tempfile)
-	NONEXISTENT=$(basename "$NONEXISTENT_AT_TMP")
-	NONEXISTENT_DIR=$(mktemp -d)
+	NONEXISTENT="DoesNotExist.elm"
+	EMPTY_DIR=$(mktemp -d -t elm-format-tests)
 
 	echo
 	echo "------------------------------"
@@ -70,8 +69,8 @@ function checkWaysToRun() {
 	"$ELM_FORMAT" --yes "$INPUT" 1>/dev/null
 	returnCodeShouldEqual 0
 
-	echo "## elm-format NONEXISTENT --yes"
-	"$ELM_FORMAT" "$NONEXISTENT" --yes 1>/dev/null
+	echo "## elm-format NONEXISTENT"
+	"$ELM_FORMAT" "$NONEXISTENT" 1>/def/null
 	returnCodeShouldEqual 1
 
 	echo "## elm-format INPUT --output OUTPUT"
@@ -98,8 +97,8 @@ function checkWaysToRun() {
 	"$ELM_FORMAT" "$DIRECTORY" --yes 1>/dev/null 2>/dev/null
 	returnCodeShouldEqual 1
 
-	echo "## elm-format NONEXISTENT_DIRECTORY --yes"
-	"$ELM_FORMAT" "$NONEXISTENT_DIR" --yes 1>/dev/null
+	echo "## elm-format EMPTY_DIRECTORY"
+	"$ELM_FORMAT" "$EMPTY_DIR" 1>/dev/null
 	returnCodeShouldEqual 1
 
 	echo "# OK!"
