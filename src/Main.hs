@@ -3,8 +3,9 @@ module Main where
 
 import Elm.Utils ((|>))
 import System.Exit (exitFailure, exitSuccess)
+import System.FilePath.Find (find, (==?), extension, always)
 import Control.Monad (when)
-import Data.Maybe (isJust, fromMaybe)
+import Data.Maybe (isJust)
 
 import qualified AST.Module
 import qualified Box
@@ -60,15 +61,15 @@ printError :: RA.Located Syntax.Error -> IO ()
 printError (RA.A range err) =
     Report.printError "<location>" range (Syntax.toReport err) ""
 
-getApproval :: Bool -> FilePath -> IO Bool
-getApproval autoYes filePath =
+getApproval :: Bool -> [FilePath] -> IO Bool
+getApproval autoYes filePaths =
     case autoYes of
         True ->
             return True
         False -> do
             putStrLn "This will overwrite the following files to use Elm’s preferred style:\n"
-            putStrLn $ "  " ++ filePath ++ "\n"
-            putStrLn "This cannot be undone! Make sure to back up these files before proceeding.\n"
+            mapM_ (\filePath -> putStrLn $ "  " ++ filePath) filePaths
+            putStrLn "\nThis cannot be undone! Make sure to back up these files before proceeding.\n"
             putStr "Are you sure you want to overwrite these files with formatted versions? (y/n) "
             Cmd.yesOrNo
 
@@ -78,9 +79,16 @@ printFileNotFound filePath = do
     putStrLn $ "  " ++ filePath ++ "\n"
     putStrLn "Please check the given path."
 
+exitOnInputDirAndOutput :: IO ()
+exitOnInputDirAndOutput = do
+    putStrLn "Can't write to the OUTPUT path, because INPUT path is a directory.\n"
+    putStrLn "Please remove the OUTPUT argument. The .elm files in INPUT will be formatted in place."
+    exitFailure
+
 processFile :: FilePath -> FilePath -> IO ()
 processFile inputFile outputFile =
     do
+        putStrLn $ "Processing file " ++ inputFile
         input <- LazyText.readFile inputFile
         LazyText.unpack input
             |> Parse.parseSource
@@ -92,11 +100,16 @@ decideOutputFile :: Bool -> FilePath -> Maybe FilePath -> IO FilePath
 decideOutputFile autoYes inputFile outputFile =
     case outputFile of
         Nothing -> do -- we are overwriting the input file
-            canOverwrite <- getApproval autoYes inputFile
+            canOverwrite <- getApproval autoYes [inputFile]
             case canOverwrite of
                 True -> return inputFile
                 False -> exitSuccess
         Just outputFile' -> return outputFile'
+
+findAllElmFiles :: FilePath -> IO [FilePath]
+findAllElmFiles inputFile =
+    find always (extension ==? ".elm") inputFile
+
 
 main :: IO ()
 main =
@@ -113,6 +126,13 @@ main =
             printFileNotFound inputFile
             exitFailure
 
-        when fileExists $ do
-            realOutputFile <- decideOutputFile autoYes inputFile outputFile
-            processFile inputFile realOutputFile
+        if fileExists
+            then do
+                realOutputFile <- decideOutputFile autoYes inputFile outputFile
+                processFile inputFile realOutputFile
+            else do -- dirExists
+                when (isJust outputFile) exitOnInputDirAndOutput
+                elmFiles <- findAllElmFiles inputFile
+                canOverwriteFiles <- getApproval autoYes elmFiles
+                when canOverwriteFiles $ do
+                    mapM_ (\file -> processFile file file) elmFiles
