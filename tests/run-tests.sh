@@ -33,6 +33,7 @@ function checkWaysToRun() {
 
   NONEXISTENT_AT_TMP=`tempfile`
   NONEXISTENT=`basename "$NONEXISTENT_AT_TMP"`
+  NONEXISTENT_DIR=`mktemp -d`
 
 	echo
   echo "------------------------------"
@@ -95,6 +96,10 @@ function checkWaysToRun() {
 
   echo "## elm-format DIRECTORY --yes"
 	"$ELM_FORMAT" "$DIRECTORY" --yes 1>/dev/null 2>/dev/null
+	returnCodeShouldEqual 1
+
+  echo "## elm-format NONEXISTENT_DIRECTORY --yes"
+	"$ELM_FORMAT" "$NONEXISTENT_DIR" --yes 1>/dev/null
 	returnCodeShouldEqual 1
 
 	echo "# OK!"
