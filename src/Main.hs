@@ -75,7 +75,7 @@ getApproval autoYes filePaths =
 
 exitFileNotFound :: FilePath -> IO ()
 exitFileNotFound filePath = do
-    putStrLn "Could not find any .elm file on the specified path:\n"
+    putStrLn "Could not find any .elm files on the specified path:\n"
     putStrLn $ "  " ++ filePath ++ "\n"
     putStrLn "Please check the given path."
     exitFailure
