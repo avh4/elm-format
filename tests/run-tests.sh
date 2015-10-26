@@ -31,9 +31,9 @@ function checkWaysToRun() {
 	DIRECTORY="tests/test-files/directory"
 	RECURSIVE_DIRECTORY="tests/test-files/recursive-directory"
 
-	NONEXISTENT_AT_TMP=`tempfile`
-	NONEXISTENT=`basename "$NONEXISTENT_AT_TMP"`
-	NONEXISTENT_DIR=`mktemp -d`
+	NONEXISTENT_AT_TMP=$(tempfile)
+	NONEXISTENT=$(basename "$NONEXISTENT_AT_TMP")
+	NONEXISTENT_DIR=$(mktemp -d)
 
 	echo
 	echo "------------------------------"
@@ -41,16 +41,16 @@ function checkWaysToRun() {
 	echo
 
 	echo "## elm-format --help"
-	HELP=`"$ELM_FORMAT" --help 2>&1`
+	HELP=$("$ELM_FORMAT" --help 2>&1)
 	returnCodeShouldEqual 0
 
 	echo "## elm-format -h"
-	SHORTHELP=`"$ELM_FORMAT" -h 2>&1`
+	SHORTHELP=$("$ELM_FORMAT" -h 2>&1)
 	returnCodeShouldEqual 0
 	shouldOutputTheSame "$HELP" "$SHORTHELP"
 
 	echo "## elm-format"
-	NOARGS=`"$ELM_FORMAT" 2>&1`
+	NOARGS=$("$ELM_FORMAT" 2>&1)
 	returnCodeShouldEqual 1
 	shouldOutputTheSame "$HELP" "$NOARGS"
 
