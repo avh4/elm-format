@@ -610,17 +610,24 @@ formatLiteral lit =
         L.FloatNum f ->
             text $ show f
         L.Chr c ->
-            formatString True [c]
-        L.Str s ->
-            formatString False s
+            formatString SChar [c]
+        L.Str s multi ->
+            formatString (if multi then SMulti else SString) s
         L.Boolean True ->
             text "True"
         L.Boolean False ->
             text "False" -- TODO: not tested
 
 
-formatString :: Bool -> String -> Box
-formatString isChar s =
+data StringStyle
+    = SChar
+    | SString
+    | SMulti
+    deriving (Eq)
+
+
+formatString :: StringStyle -> String -> Box
+formatString style s =
     let
         hex c =
             if Char.ord c <= 0xFF then
@@ -629,15 +636,17 @@ formatString isChar s =
                 "\\x" ++ (printf "%04X" $ Char.ord c)
 
         fix c =
-            if c == '\n' then
+            if (style == SMulti) && c == '\n' then
+                [c]
+            else if c == '\n' then
                 "\\n"
             else if c == '\t' then
                 "\\t"
             else if c == '\\' then
                 "\\\\"
-            else if (not isChar) && c == '\"' then
+            else if (style == SString) && c == '\"' then
                 "\\\""
-            else if isChar && c == '\'' then
+            else if (style == SChar) && c == '\'' then
                 "\\\'"
             else if not $ Char.isPrint c then
                 hex c
@@ -649,7 +658,10 @@ formatString isChar s =
                 [c]
 
         delim =
-            if isChar then "\'" else "\""
+            case style of
+                SChar -> "\'"
+                SString -> "\""
+                SMulti -> "\"\"\""
     in
         text $ delim ++ (concatMap fix s) ++ delim
 

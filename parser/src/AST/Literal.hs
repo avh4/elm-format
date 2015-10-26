@@ -11,7 +11,7 @@ data Literal
     = IntNum Int
     | FloatNum Double
     | Chr Char
-    | Str String
+    | Str String Bool
     | Boolean Bool
     deriving (Eq, Ord, Show)
 
@@ -27,7 +27,7 @@ toString literal =
       IntNum n -> show n
       FloatNum n -> show n
       Chr c -> show c
-      Str s -> show s
+      Str s _ -> show s
       Boolean bool -> show bool
 
 

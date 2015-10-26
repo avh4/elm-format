@@ -8,7 +8,7 @@ import qualified AST.Literal as L
 
 literal :: IParser L.Literal
 literal =
-  num <|> (L.Str <$> str) <|> (L.Chr <$> chr)
+  num <|> ((\(s,b) -> L.Str s b) <$> str) <|> (L.Chr <$> chr)
 
 
 num :: IParser L.Literal

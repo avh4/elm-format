@@ -583,17 +583,22 @@ glSource src =
         _ -> []
 
 
-str :: IParser String
+str :: IParser (String, Bool)
 str =
   expecting "a string" $
-  do  s <- choice [ multiStr, singleStr ]
-      processAs T.stringLiteral . sandwich '\"' $ concat s
+  do  (s, multi) <- choice [ multiStr, singleStr ]
+      result <- processAs T.stringLiteral . sandwich '\"' $ concat s
+      return (result, multi)
   where
     rawString quote insides =
         quote >> manyTill insides quote
 
-    multiStr  = rawString (try (string "\"\"\"")) multilineStringChar
-    singleStr = rawString (char '"') stringChar
+    multiStr  =
+        do  result <- rawString (try (string "\"\"\"")) multilineStringChar
+            return (result, True)
+    singleStr =
+        do  result <- rawString (char '"') stringChar
+            return (result, False)
 
     stringChar :: IParser String
     stringChar = choice [ newlineChar, escaped '\"', (:[]) <$> satisfy (/= '\"') ]
