@@ -73,11 +73,12 @@ getApproval autoYes filePaths =
             putStr "Are you sure you want to overwrite these files with formatted versions? (y/n) "
             Cmd.yesOrNo
 
-printFileNotFound :: FilePath -> IO ()
-printFileNotFound filePath = do
-    putStrLn "Could not find the file:\n"
+exitFileNotFound :: FilePath -> IO ()
+exitFileNotFound filePath = do
+    putStrLn "Could not find any .elm file on the specified path:\n"
     putStrLn $ "  " ++ filePath ++ "\n"
     putStrLn "Please check the given path."
+    exitFailure
 
 exitOnInputDirAndOutput :: IO ()
 exitOnInputDirAndOutput = do
@@ -122,17 +123,21 @@ main =
         fileExists <- Dir.doesFileExist inputFile
         dirExists <- Dir.doesDirectoryExist inputFile
 
-        when (not (fileExists || dirExists)) $ do
-            printFileNotFound inputFile
-            exitFailure
+        when (not (fileExists || dirExists)) $
+            exitFileNotFound inputFile
 
         if fileExists
             then do
                 realOutputFile <- decideOutputFile autoYes inputFile outputFile
                 processFile inputFile realOutputFile
             else do -- dirExists
-                when (isJust outputFile) exitOnInputDirAndOutput
+                when (isJust outputFile)
+                    exitOnInputDirAndOutput
+
                 elmFiles <- findAllElmFiles inputFile
+                when (null elmFiles) $
+                    exitFileNotFound inputFile
+
                 canOverwriteFiles <- getApproval autoYes elmFiles
-                when canOverwriteFiles $ do
+                when canOverwriteFiles $
                     mapM_ (\file -> processFile file file) elmFiles
