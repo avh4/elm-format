@@ -13,9 +13,11 @@ import qualified AST.Module.Name as MN
 import qualified AST.Pattern
 import qualified AST.Type
 import qualified AST.Variable
+import qualified Data.Char as Char
 import qualified Data.List as List
 import qualified Data.Maybe as Maybe
 import qualified Reporting.Annotation as RA
+import Text.Printf (printf)
 
 
 formatModule :: AST.Module.Module -> Box
@@ -610,11 +612,41 @@ formatLiteral lit =
         L.Chr c ->
             text ['\'', c, '\''] -- TODO: escape specials
         L.Str s ->
-            text $ "\"" ++ s ++ "\"" -- TODO: escaping
+            formatString s
         L.Boolean True ->
             text "True"
         L.Boolean False ->
             text "False" -- TODO: not tested
+
+
+formatString :: String -> Box
+formatString s =
+    let
+        hex c =
+            if Char.ord c <= 0xFF then
+                "\\x" ++ (printf "%02X" $ Char.ord c)
+            else
+                "\\x" ++ (printf "%04X" $ Char.ord c)
+
+        fix c =
+            if c == '\n' then
+                "\\n"
+            else if c == '\t' then
+                "\\t"
+            else if c == '\\' then
+                "\\\\"
+            else if c == '\"' then
+                "\\\""
+            else if not $ Char.isPrint c then
+                hex c
+            else if c == ' ' then
+                [c]
+            else if Char.isSpace c then
+                hex c
+            else
+                [c]
+    in
+        text $ "\"" ++ (concatMap fix s) ++ "\""
 
 
 data TypeParensRequired
