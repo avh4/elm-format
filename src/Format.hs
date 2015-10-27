@@ -334,11 +334,22 @@ formatExpression inList suffix aexpr =
         AST.Expression.Binops l ops True ->
             let
                 formatOp (op,e) =
-                    hbox
-                        [ formatCommented formatInfixVar op -- TODO: comments not tested
-                        , hspace 1
-                        , formatExpression False empty e
-                        ]
+                    let
+                        fop = formatCommented formatInfixVar op -- TODO: comments not tested
+                        fexp = formatExpression True empty e
+                        space =
+                            if height fexp <= 1 then
+                                1
+                            else if width fop `mod` 2 == 1 then
+                                1
+                            else
+                                2
+                    in
+                        hbox
+                            [ fop
+                            , hspace space
+                            , fexp
+                            ]
             in
                 vbox
                     [ formatExpression False empty l

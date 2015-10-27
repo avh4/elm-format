@@ -95,6 +95,16 @@ margin m (Box child _ ae) =
     Box child m ae
 
 
+width :: Box -> Int
+width (Box b _ _) =
+    B.cols b
+
+
+height :: Box -> Int
+height (Box b _ _) =
+    B.rows b
+
+
 render :: Box -> String
 render (Box child _ _) =
     B.render child

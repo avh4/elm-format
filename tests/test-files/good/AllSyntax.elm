@@ -278,11 +278,11 @@ multilineParenthesizedExpressions =
                 else
                   toFloat (range - 1)
               )
-        <<>> ( if range == 0 then
-                 -1.0
-               else
-                 0.0
-             )
+        <<>>  ( if range == 0 then
+                  -1.0
+                else
+                  0.0
+              )
 
 
 multilineParenthesizedExpressions =
@@ -517,6 +517,25 @@ nestedMultilineRange =
       ]
     , [4..2]
     ]
+
+
+indentedMultilineInsideMultilineInfixApplication =
+    div [ id "page" ]
+        + { x = 1
+          , y = 2
+          }
+        <|  { x = 1
+            , y = 2
+            }
+        *** { x = 1
+            , y = 2
+            }
+        <<>>  { x = 1
+              , y = 2
+              }
+        ==/== { x = 1
+              , y = 2
+              }
 
 
 port runner : Signal (Task.Task x ())
