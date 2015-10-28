@@ -32,7 +32,7 @@ function checkWaysToRun() {
 	RECURSIVE_DIRECTORY="tests/test-files/recursive-directory"
 
 	NONEXISTENT="DoesNotExist.elm"
-	EMPTY_DIR=$(mktemp -d -t elm-format-tests)
+	EMPTY_DIR=$(mktemp -d -t elm-format-tests.XXXXXXXXXX)
 
 	echo
 	echo "------------------------------"
@@ -70,7 +70,7 @@ function checkWaysToRun() {
 	returnCodeShouldEqual 0
 
 	echo "## elm-format NONEXISTENT"
-	"$ELM_FORMAT" "$NONEXISTENT" 1>/def/null
+	"$ELM_FORMAT" "$NONEXISTENT" 1>/dev/null
 	returnCodeShouldEqual 1
 
 	echo "## elm-format INPUT --output OUTPUT"
