@@ -210,7 +210,7 @@ formatDeclaration decl =
                         , text " "
                         , text $ show precedence
                         , text " "
-                        , formatCommented formatInfixVar name
+                        , formatCommented (line . formatInfixVar) name
                         ]
 
 
@@ -323,7 +323,7 @@ formatExpression inList suffix aexpr =
             let
                 opBoxes (op,e) =
                   [ hspace 1
-                  , formatCommented formatInfixVar op
+                  , formatCommented (line. formatInfixVar) op
                   , hspace 1
                   , formatExpression False empty e
                   ]
@@ -335,7 +335,7 @@ formatExpression inList suffix aexpr =
             let
                 formatOp (op,e) =
                     let
-                        fop = formatCommented formatInfixVar op -- TODO: comments not tested
+                        fop = formatCommented (line . formatInfixVar) op -- TODO: comments not tested
                         fexp = formatExpression True empty e
                         space =
                             if height fexp <= 1 then
@@ -769,12 +769,12 @@ formatVar var =
             keyword "_" -- TODO: not tested
 
 
-formatInfixVar :: AST.Variable.Ref -> Box
+formatInfixVar :: AST.Variable.Ref -> Line
 formatInfixVar var =
     case var of
         AST.Variable.VarRef name ->
-            text $ "`" ++ name ++ "`" -- TODO: not tested
+            identifier $ "`" ++ name ++ "`" -- TODO: not tested
         AST.Variable.OpRef name ->
-            text name
+            identifier name
         AST.Variable.WildcardRef ->
-            text "_" -- TODO: should never happen
+            keyword "_" -- TODO: should never happen
