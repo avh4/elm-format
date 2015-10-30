@@ -8,11 +8,31 @@ import qualified Data.List as List
 import qualified Text.PrettyPrint.Boxes as B
 
 
+data Line
+    = Text String
+
+
+identifier :: String -> Line
+identifier =
+    Text
+
+
+keyword :: String -> Line
+keyword =
+    Text
+
 data Box = Box
     { box :: B.Box
     , bottomMargin :: Int
     , hasSize :: Bool
     }
+
+
+line :: Line -> Box
+line l =
+    case l of
+        Text s ->
+            text s
 
 
 empty :: Box

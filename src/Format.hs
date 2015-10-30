@@ -143,7 +143,7 @@ formatVarValue :: AST.Variable.Value -> Box
 formatVarValue aval =
     case aval of
         AST.Variable.Value val ->
-            formatCommented formatVar val -- TODO: comments not tested
+            formatCommented (line . formatVar) val -- TODO: comments not tested
         AST.Variable.Alias name ->
             text name
         AST.Variable.Union name listing ->
@@ -240,7 +240,7 @@ formatDefinition compact adef =
                     |> margin 1
         AST.Expression.TypeAnnotation name typ ->
             hbox
-                [ formatCommented formatVar name -- TODO: comments not tested
+                [ formatCommented (line . formatVar) name -- TODO: comments not tested
                 , text " : "
                 , formatType typ
                 ]
@@ -251,7 +251,7 @@ formatPattern parensRequired apattern =
     case RA.drop apattern of
         AST.Pattern.Data ctor patterns ->
             hbox2
-                (formatVar ctor)
+                (line $ formatVar ctor)
                 (hboxlist (if List.null patterns then "" else " ") " " "" (formatPattern True) patterns)
         AST.Pattern.Tuple patterns ->
             hboxlist "(" ", " ")" (formatPattern False) patterns
@@ -266,7 +266,7 @@ formatPattern parensRequired apattern =
                 , if parensRequired then text ")" else empty
                 ]
         AST.Pattern.Var var ->
-            formatCommented formatVar var -- TODO: comments not tested
+            formatCommented (line . formatVar) var -- TODO: comments not tested
         AST.Pattern.Anything ->
             text "_"
         AST.Pattern.Literal lit ->
@@ -280,7 +280,7 @@ formatExpression inList suffix aexpr =
             formatCommented formatLiteral lit
         AST.Expression.Var v ->
             hbox2
-                (formatCommented formatVar v) -- TODO: comments not tested
+                (formatCommented (line . formatVar) v) -- TODO: comments not tested
                 suffix
 
         AST.Expression.Range left right False ->
@@ -703,7 +703,7 @@ formatType' requireParens atype =
         AST.Type.RVar var ->
             text var
         AST.Type.RType var ->
-            formatVar var
+            line $ formatVar var
         AST.Type.RApp ctor args ->
             hboxlist
                 (if requireParens == ForCtor then "(" else "") " "
@@ -758,15 +758,15 @@ formatType' requireParens atype =
                             ]
 
 
-formatVar :: AST.Variable.Ref -> Box
+formatVar :: AST.Variable.Ref -> Line
 formatVar var =
     case var of
         AST.Variable.VarRef name ->
-            text name
+            identifier name
         AST.Variable.OpRef name ->
-            text $ "(" ++ name ++ ")"
+            identifier $ "(" ++ name ++ ")"
         AST.Variable.WildcardRef ->
-            text "_" -- TODO: not tested
+            keyword "_" -- TODO: not tested
 
 
 formatInfixVar :: AST.Variable.Ref -> Box
