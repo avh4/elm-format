@@ -20,7 +20,7 @@ import qualified Reporting.Annotation as RA
 import Text.Printf (printf)
 
 
-formatModule :: AST.Module.Module -> Box
+formatModule :: AST.Module.Module -> Box'
 formatModule modu =
     vbox
         [ hbox
@@ -44,7 +44,7 @@ formatModule modu =
         ]
 
 
-formatModuleDocs :: RA.Located (Maybe String) -> Box
+formatModuleDocs :: RA.Located (Maybe String) -> Box'
 formatModuleDocs adocs =
     case RA.drop adocs of
         Nothing ->
@@ -54,7 +54,7 @@ formatModuleDocs adocs =
             |> margin 1
 
 
-formatDocComment :: String -> Box
+formatDocComment :: String -> Box'
 formatDocComment docs =
     hbox
         [ text "{-| "
@@ -63,16 +63,16 @@ formatDocComment docs =
         ]
 
 
-formatName :: MN.Canonical -> Box
+formatName :: MN.Canonical -> Box'
 formatName name = formatRawName $ MN._module name
 
 
-formatRawName :: MN.Raw -> Box
+formatRawName :: MN.Raw -> Box'
 formatRawName name =
     text (List.intercalate "." name)
 
 
-formatImport :: AST.Module.UserImport -> Box
+formatImport :: AST.Module.UserImport -> Box'
 formatImport aimport =
     case RA.drop aimport of
         (name,method) ->
@@ -105,7 +105,7 @@ formatImport aimport =
                             text "<NOT POSSIBLE?>"
 
 
-formatListing :: AST.Variable.Listing (RA.Located AST.Variable.Value)-> Box
+formatListing :: AST.Variable.Listing (RA.Located AST.Variable.Value)-> Box'
 formatListing listing =
     case listing of
         AST.Variable.Listing [] False ->
@@ -122,7 +122,7 @@ formatListing listing =
             text "<NOT POSSIBLE?>"
 
 
-formatStringListing :: AST.Variable.Listing String -> Box
+formatStringListing :: AST.Variable.Listing String -> Box'
 formatStringListing listing =
     case listing of
         AST.Variable.Listing [] False ->
@@ -139,7 +139,7 @@ formatStringListing listing =
             text "<NOT POSSIBLE?>"
 
 
-formatVarValue :: AST.Variable.Value -> Box
+formatVarValue :: AST.Variable.Value -> Box'
 formatVarValue aval =
     case aval of
         AST.Variable.Value val ->
@@ -153,7 +153,7 @@ formatVarValue aval =
                 ]
 
 
-formatDeclaration :: AST.Declaration.Decl -> Box
+formatDeclaration :: AST.Declaration.Decl -> Box'
 formatDeclaration decl =
     case decl of
         AST.Declaration.Comment docs ->
@@ -214,7 +214,7 @@ formatDeclaration decl =
                         ]
 
 
-formatDefinition :: Bool -> AST.Expression.Def -> Box
+formatDefinition :: Bool -> AST.Expression.Def -> Box'
 formatDefinition compact adef =
     case RA.drop adef of
         AST.Expression.Definition name args expr multiline ->
@@ -246,7 +246,7 @@ formatDefinition compact adef =
                 ]
 
 
-formatPattern :: Bool -> AST.Pattern.Pattern -> Box
+formatPattern :: Bool -> AST.Pattern.Pattern -> Box'
 formatPattern parensRequired apattern =
     case RA.drop apattern of
         AST.Pattern.Data ctor patterns ->
@@ -273,7 +273,7 @@ formatPattern parensRequired apattern =
             formatLiteral lit
 
 
-formatExpression :: Bool -> Box -> AST.Expression.Expr -> Box
+formatExpression :: Bool -> Box' -> AST.Expression.Expr -> Box'
 formatExpression inList suffix aexpr =
     case RA.drop aexpr of
         AST.Expression.Literal lit ->
@@ -596,7 +596,7 @@ formatExpression inList suffix aexpr =
         AST.Expression.GLShader _ _ _ -> text "<glshader>"
 
 
-formatCommented :: (a -> Box) -> Commented a -> Box
+formatCommented :: (a -> Box') -> Commented a -> Box'
 formatCommented format commented =
     case commented of
         Commented comments inner ->
@@ -606,14 +606,14 @@ formatCommented format commented =
                 ]
 
 
-formatComment :: Comment -> Box
+formatComment :: Comment -> Box'
 formatComment comment =
     case comment of
         BlockComment c ->
             text $ "{- " ++ c ++ " -} "
 
 
-formatLiteral :: L.Literal -> Box
+formatLiteral :: L.Literal -> Box'
 formatLiteral lit =
     case lit of
         L.IntNum i ->
@@ -637,7 +637,7 @@ data StringStyle
     deriving (Eq)
 
 
-formatString :: StringStyle -> String -> Box
+formatString :: StringStyle -> String -> Box'
 formatString style s =
     let
         hex c =
@@ -684,12 +684,12 @@ data TypeParensRequired
     deriving (Eq)
 
 
-formatType :: AST.Type.Type -> Box
+formatType :: AST.Type.Type -> Box'
 formatType =
     formatType' NotRequired
 
 
-formatType' :: TypeParensRequired -> AST.Type.Type -> Box
+formatType' :: TypeParensRequired -> AST.Type.Type -> Box'
 formatType' requireParens atype =
     case RA.drop atype of
         AST.Type.RLambda left right ->

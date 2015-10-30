@@ -21,51 +21,54 @@ keyword :: String -> Line
 keyword =
     Text
 
-data Box = Box
+
+-- DEPRECATED BELOW THIS LINE
+
+data Box' = Box'
     { box :: B.Box
     , bottomMargin :: Int
     , hasSize :: Bool
     }
 
 
-line :: Line -> Box
+line :: Line -> Box'
 line l =
     case l of
         Text s ->
             text s
 
 
-empty :: Box
+empty :: Box'
 empty =
-    Box B.nullBox 0 False
+    Box' B.nullBox 0 False
 
 
-hspace :: Int -> Box
+hspace :: Int -> Box'
 hspace c =
-    Box (B.emptyBox 0 c) 0 (c > 0)
+    Box' (B.emptyBox 0 c) 0 (c > 0)
 
 
-vspace :: Int -> Box
+vspace :: Int -> Box'
 vspace r =
-    Box (B.emptyBox r 0) 0 (r > 0)
+    Box' (B.emptyBox r 0) 0 (r > 0)
 
 
-text :: String -> Box
+text :: String -> Box'
 text s =
-    Box (B.text s) 0 (s /= "")
+    Box' (B.text s) 0 (s /= "")
 
 
-vbox2 :: Box -> Box -> Box
-vbox2 (Box a aMargin ae) (Box b bMargin be) =
-    Box (a // B.emptyBox aMargin 0 // b) bMargin (ae || be)
+vbox2 :: Box' -> Box' -> Box'
+vbox2 (Box' a aMargin ae) (Box' b bMargin be) =
+    Box' (a // B.emptyBox aMargin 0 // b) bMargin (ae || be)
 
 
-vbox :: [Box] -> Box
+vbox :: [Box'] -> Box'
 vbox =
     foldl vbox2 empty
 
 
-vboxlist :: Box -> String -> Box -> (a -> Box) -> [a] -> Box
+vboxlist :: Box' -> String -> Box' -> (a -> Box') -> [a] -> Box'
 vboxlist start mid end format items =
     case items of
         [] ->
@@ -77,22 +80,22 @@ vboxlist start mid end format items =
                 if hasSize end then [ end ] else []
 
 
-hbox2 :: Box -> Box -> Box
-hbox2 (Box a _ ae) (Box b _ be) =
-    Box (a <> b) 0 (ae || be)
+hbox2 :: Box' -> Box' -> Box'
+hbox2 (Box' a _ ae) (Box' b _ be) =
+    Box' (a <> b) 0 (ae || be)
 
 
-hbox2margin :: Box -> Box -> Box
-hbox2margin (Box a aMargin ae) (Box b bMargin be) =
-    Box (a <> b) (max aMargin bMargin) (ae || be)
+hbox2margin :: Box' -> Box' -> Box'
+hbox2margin (Box' a aMargin ae) (Box' b bMargin be) =
+    Box' (a <> b) (max aMargin bMargin) (ae || be)
 
 
-hbox :: [Box] -> Box
+hbox :: [Box'] -> Box'
 hbox =
     foldl hbox2 empty
 
 
-hboxlist :: String -> String -> String -> (a -> Box) -> [a] -> Box
+hboxlist :: String -> String -> String -> (a -> Box') -> [a] -> Box'
 hboxlist start mid end format items =
     hbox $
         [ text start ]
@@ -100,31 +103,31 @@ hboxlist start mid end format items =
         [ text end ]
 
 
-hjoin :: Box -> [Box] -> Box
+hjoin :: Box' -> [Box'] -> Box'
 hjoin sep list =
     hbox (List.intersperse sep list)
 
 
-indent :: Int -> Box -> Box
+indent :: Int -> Box' -> Box'
 indent i child =
     hbox2margin (hspace i) child
 
 
-margin :: Int -> Box -> Box
-margin m (Box child _ ae) =
-    Box child m ae
+margin :: Int -> Box' -> Box'
+margin m (Box' child _ ae) =
+    Box' child m ae
 
 
-width :: Box -> Int
-width (Box b _ _) =
+width :: Box' -> Int
+width (Box' b _ _) =
     B.cols b
 
 
-height :: Box -> Int
-height (Box b _ _) =
+height :: Box' -> Int
+height (Box' b _ _) =
     B.rows b
 
 
-render :: Box -> String
-render (Box child _ _) =
+render :: Box' -> String
+render (Box' child _ _) =
     B.render child
