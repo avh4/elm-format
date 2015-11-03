@@ -128,6 +128,10 @@ function checkTransformation() {
 	compareFiles "$EXPECTED" "$OUTPUT"
 }
 
+cabal test
+returnCodeShouldEqual 0
+
+
 echo
 echo
 echo "# elm-format test suite"

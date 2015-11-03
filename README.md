@@ -21,7 +21,7 @@ elm-format Main.elm
 git clone https://github.com/avh4/elm-format.git
 cd elm-format
 cabal sandbox init --sandbox=.cabal-sandbox
-cabal install -j
+cabal install -j --enable-tests
 .cabal-sandbox/bin/elm-format --help
 ```
 
