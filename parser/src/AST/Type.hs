@@ -25,7 +25,7 @@ data Type'
     | RApp Type [Type]
     | RTuple [Type]
     | RRecord (Maybe Type) [(String, Type, Bool)] Bool
-    deriving (Show)
+    deriving (Eq, Show)
 
 
 data Port

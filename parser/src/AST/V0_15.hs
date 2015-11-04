@@ -5,9 +5,9 @@ module AST.V0_15 where
 
 data Comment
     = BlockComment String
-    deriving (Show)
+    deriving (Eq, Show)
 
 
 data Commented a =
     Commented [Comment] a
-    deriving (Show)
+    deriving (Eq, Show)

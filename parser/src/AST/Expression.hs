@@ -15,7 +15,7 @@ import qualified Reporting.Region as R
 
 data UnaryOperator =
     Negative
-    deriving (Show)
+    deriving (Eq, Show)
 
 type Def =
     A.Located Def'
@@ -24,7 +24,7 @@ type Def =
 data Def'
     = Definition Pattern.Pattern [Pattern.Pattern] Expr Bool
     | TypeAnnotation (Commented Var.Ref) Type.Type
-    deriving (Show)
+    deriving (Eq, Show)
 
 
 type Expr =
@@ -52,7 +52,7 @@ data Expr'
     | Parens Expr Bool
     -- for type checking and code gen only
     | GLShader String String Literal.GLShaderTipe
-    deriving (Show)
+    deriving (Eq, Show)
 
 
 ---- UTILITIES ----

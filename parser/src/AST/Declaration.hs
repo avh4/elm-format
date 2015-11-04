@@ -17,12 +17,13 @@ data Declaration
     | PortAnnotation String Type.Type
     | PortDefinition String Expression.Expr
     | Fixity Assoc Int (Commented Var.Ref)
+    deriving (Eq, Show)
 
 
 -- INFIX STUFF
 
 data Assoc = L | N | R
-    deriving (Eq)
+    deriving (Eq, Show)
 
 
 assocToString :: Assoc -> String
@@ -39,3 +40,4 @@ assocToString assoc =
 data Decl
     = Comment String
     | Decl (A.Located Declaration)
+    deriving (Eq, Show)

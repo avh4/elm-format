@@ -21,6 +21,7 @@ data Module = Module
     , imports :: [UserImport]
     , body    :: [Declaration.Decl]
     }
+    deriving (Eq, Show)
 
 
 data Body expr = Body
@@ -53,3 +54,4 @@ data ImportMethod = ImportMethod
     { alias :: Maybe String
     , exposedVars :: !(Var.Listing Var.Value)
     }
+    deriving (Eq, Show)

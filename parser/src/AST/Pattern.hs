@@ -20,7 +20,7 @@ data Pattern'
     | Var (Commented Var.Ref)
     | Anything
     | Literal L.Literal
-    deriving (Show)
+    deriving (Eq, Show)
 
 
 list :: R.Position -> [Pattern] -> Pattern

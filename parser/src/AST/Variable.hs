@@ -40,4 +40,4 @@ data Value
     = Value !(Commented Ref)
     | Alias !String
     | Union !String !(Listing String)
-    deriving (Show)
+    deriving (Eq, Show)
