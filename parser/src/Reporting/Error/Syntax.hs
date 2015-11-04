@@ -18,6 +18,11 @@ data Error
     | DuplicateValueDeclaration String
     | DuplicateTypeDeclaration String
     | DuplicateDefinition String
+    deriving (Eq, Show)
+
+
+instance Show (Parsec.Message) where
+    show _ = "<Parsec.Message>"
 
 
 -- TO REPORT

@@ -8,39 +8,17 @@ import Control.Monad (when)
 import Data.Maybe (isJust)
 
 import qualified AST.Module
-import qualified Box
 import qualified CommandLine.Helpers as Cmd
 import qualified Flags
-import qualified Format
 import qualified Data.Text.Lazy as LazyText
 import qualified Data.Text.Lazy.IO as LazyText
-import qualified Parse.Parse as Parse
+import qualified ElmFormat.Parse as Parse
+import qualified ElmFormat.Render.Text as Render
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Report as Report
 import qualified Reporting.Result as Result
 import qualified System.Directory as Dir
-
-
-parse :: LazyText.Text -> Result.Result () Syntax.Error AST.Module.Module
-parse input =
-    LazyText.unpack input
-        |> Parse.parseSource
-
-
-render :: AST.Module.Module -> LazyText.Text
-render modu =
-    let
-        trimSpaces text =
-            text
-                |> LazyText.lines
-                |> map LazyText.stripEnd
-                |> LazyText.unlines
-    in
-        Format.formatModule modu
-            |> Box.render
-            |> LazyText.pack
-            |> trimSpaces
 
 
 showErrors :: [RA.Located Syntax.Error] -> IO ()
@@ -62,7 +40,7 @@ formatResult
 formatResult canWriteEmptyFileOnError outputFile result =
     case result of
         Result.Result _ (Result.Ok modu) ->
-            render modu
+            Render.render modu
                 |> LazyText.writeFile outputFile
 
         Result.Result _ (Result.Err errs) ->
@@ -112,7 +90,7 @@ processFile inputFile outputFile =
     do
         putStrLn $ "Processing file " ++ inputFile
         input <- LazyText.readFile inputFile
-        parse input
+        Parse.parse input
             |> formatResult canWriteEmptyFileOnError outputFile
     where
         canWriteEmptyFileOnError = outputFile /= inputFile

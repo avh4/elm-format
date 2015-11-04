@@ -17,6 +17,7 @@ import qualified Reporting.Report as Report
 data Error
     = Syntax Syntax.Error
     | Docs Docs.Error
+    deriving (Eq, Show)
 
 
 -- TO REPORT

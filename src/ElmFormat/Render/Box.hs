@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wall #-}
-module Format where
+module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
 import Box
