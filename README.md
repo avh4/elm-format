@@ -21,7 +21,7 @@ elm-format Main.elm
 git clone https://github.com/avh4/elm-format.git
 cd elm-format
 cabal sandbox init --sandbox=.cabal-sandbox
-cabal install -j --enable-tests
+cabal install -j
 .cabal-sandbox/bin/elm-format --help
 ```
 
@@ -30,5 +30,6 @@ cabal install -j --enable-tests
 After installing with the instructions above:
 
 ```bash
+cabal install -j --enable-tests
 ./tests/run-tests.sh
 ```
