@@ -22,6 +22,27 @@ import qualified Reporting.Result as Result
 import qualified System.Directory as Dir
 
 
+parse :: LazyText.Text -> Result.Result () Syntax.Error AST.Module.Module
+parse input =
+    LazyText.unpack input
+        |> Parse.parseSource
+
+
+render :: AST.Module.Module -> LazyText.Text
+render modu =
+    let
+        trimSpaces text =
+            text
+                |> LazyText.lines
+                |> map LazyText.stripEnd
+                |> LazyText.unlines
+    in
+        Format.formatModule modu
+            |> Box.render
+            |> LazyText.pack
+            |> trimSpaces
+
+
 showErrors :: [RA.Located Syntax.Error] -> IO ()
 showErrors errs = do
     putStrLn "ERRORS"
@@ -41,11 +62,9 @@ formatResult
 formatResult canWriteEmptyFileOnError outputFile result =
     case result of
         Result.Result _ (Result.Ok modu) ->
-            Format.formatModule modu
-                |> Box.render
-                |> LazyText.pack
-                |> trimSpaces
+            render modu
                 |> LazyText.writeFile outputFile
+
         Result.Result _ (Result.Err errs) ->
             do
                 when canWriteEmptyFileOnError $
@@ -53,8 +72,6 @@ formatResult canWriteEmptyFileOnError outputFile result =
 
                 showErrors errs
                 exitFailure
-    where
-        trimSpaces = LazyText.unlines . (map LazyText.stripEnd) . LazyText.lines
 
 
 printError :: RA.Located Syntax.Error -> IO ()
@@ -95,8 +112,7 @@ processFile inputFile outputFile =
     do
         putStrLn $ "Processing file " ++ inputFile
         input <- LazyText.readFile inputFile
-        LazyText.unpack input
-            |> Parse.parseSource
+        parse input
             |> formatResult canWriteEmptyFileOnError outputFile
     where
         canWriteEmptyFileOnError = outputFile /= inputFile
