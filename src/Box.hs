@@ -30,6 +30,11 @@ punc =
     Text
 
 
+literal :: String -> Line
+literal =
+    Text
+
+
 row :: [Line] -> Line
 row =
     Row

@@ -621,9 +621,9 @@ formatLiteral lit =
         L.FloatNum f ->
             text $ show f
         L.Chr c ->
-            formatString SChar [c]
+            depr $ formatString SChar [c]
         L.Str s multi ->
-            formatString (if multi then SMulti else SString) s
+            depr $ formatString (if multi then SMulti else SString) s
         L.Boolean True ->
             text "True"
         L.Boolean False ->
@@ -637,7 +637,7 @@ data StringStyle
     deriving (Eq)
 
 
-formatString :: StringStyle -> String -> Box'
+formatString :: StringStyle -> String -> Box
 formatString style s =
     let
         hex c =
@@ -667,14 +667,22 @@ formatString style s =
                 hex c
             else
                 [c]
-
-        delim =
-            case style of
-                SChar -> "\'"
-                SString -> "\""
-                SMulti -> "\"\"\""
     in
-        text $ delim ++ (concatMap fix s) ++ delim
+        case style of
+            SChar ->
+                line $ row
+                    [ punc "\'"
+                    , literal $ concatMap fix s
+                    , punc "\'"
+                    ]
+            SString ->
+                line $ row
+                    [ punc "\""
+                    , literal $ concatMap fix s
+                    , punc "\""
+                    ]
+            SMulti ->
+                line $ literal $ "\"\"\"" ++ concatMap fix s ++ "\"\"\""
 
 
 data TypeParensRequired
