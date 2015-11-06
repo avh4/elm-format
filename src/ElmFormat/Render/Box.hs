@@ -270,14 +270,14 @@ formatPattern parensRequired apattern =
         AST.Pattern.Anything ->
             text "_"
         AST.Pattern.Literal lit ->
-            formatLiteral lit
+            depr $ formatLiteral lit
 
 
 formatExpression :: Bool -> Box' -> AST.Expression.Expr -> Box'
 formatExpression inList suffix aexpr =
     case RA.drop aexpr of
         AST.Expression.Literal lit ->
-            formatCommented formatLiteral lit
+            formatCommented (depr . formatLiteral) lit
         AST.Expression.Var v ->
             hbox2
                 (formatCommented (depr . line . formatVar) v) -- TODO: comments not tested
@@ -613,21 +613,21 @@ formatComment comment =
             text $ "{- " ++ c ++ " -} "
 
 
-formatLiteral :: L.Literal -> Box'
+formatLiteral :: L.Literal -> Box
 formatLiteral lit =
     case lit of
         L.IntNum i ->
-            text $ show i
+            line $ literal $ show i
         L.FloatNum f ->
-            text $ show f
+            line $ literal $ show f
         L.Chr c ->
-            depr $ formatString SChar [c]
+            formatString SChar [c]
         L.Str s multi ->
-            depr $ formatString (if multi then SMulti else SString) s
+            formatString (if multi then SMulti else SString) s
         L.Boolean True ->
-            text "True"
+            line $ literal "True"
         L.Boolean False ->
-            text "False" -- TODO: not tested
+            line $ literal "False" -- TODO: not tested
 
 
 data StringStyle
