@@ -9,7 +9,12 @@ import qualified Reporting.Region as R
 
 data Annotated annotation a
     = A annotation a
-    deriving (Eq, Show)
+    deriving (Show)
+
+
+instance (Eq a) => Eq (Annotated ann a) where
+    (==) (A _ a) (A _ b) =
+        a == b
 
 
 type Located a =

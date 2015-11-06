@@ -9,7 +9,7 @@ import qualified Reporting.Region as R
 
 
 type Pattern =
-    A.Annotated R.Region Pattern'
+    A.Located Pattern'
 
 
 data Pattern'

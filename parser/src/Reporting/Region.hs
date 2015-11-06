@@ -1,8 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Reporting.Region where
 
-import Data.Aeson ((.=))
-import qualified Data.Aeson as Json
 import qualified Text.Parsec.Pos as Parsec
 
 
@@ -44,21 +42,3 @@ toString (Region start end) =
     True ->
         "on line " ++ show (line end) ++ ", column "
         ++ show (column start) ++ " to " ++ show (column end)
-
-
--- JSON
-
-instance Json.ToJSON Region where
-  toJSON (Region start end) =
-      Json.object
-        [ "start" .= start
-        , "end" .= end
-        ]
-
-
-instance Json.ToJSON Position where
-  toJSON (Position line column) =
-      Json.object
-        [ "line" .= line
-        , "column" .= column
-        ]

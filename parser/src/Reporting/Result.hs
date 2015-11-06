@@ -15,11 +15,13 @@ data Result warning error result =
     Result
       (Maybe P.Dealiaser, [A.Located warning])
       (RawResult [A.Located error] result)
+    deriving (Show)
 
 
 data RawResult e a
     = Ok a
     | Err e
+    deriving (Show)
 
 
 -- HELPERS

@@ -3,7 +3,7 @@ module Test.Property where
 import Elm.Utils ((|>))
 
 import Data.Char
-import Test.HUnit (Assertion, assertEqual)
+import Test.HUnit (Assertion, assertEqual, assertBool)
 import Test.Framework
 import Test.Framework.Providers.HUnit
 import Test.Framework.Providers.QuickCheck2
@@ -13,6 +13,7 @@ import qualified AST.Module
 import qualified Data.Text.Lazy as LazyText
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
+import qualified Test.Generators
 
 
 assertStringToString :: String -> Assertion
@@ -28,8 +29,8 @@ assertStringToString source =
         assertEqual "" (Right source') result
 
 
-assertAstToAst :: AST.Module.Module -> Assertion
-assertAstToAst ast =
+astToAst :: AST.Module.Module -> Bool
+astToAst ast =
     let
         result =
             ast
@@ -37,7 +38,7 @@ assertAstToAst ast =
                 |> Parse.parse
                 |> Parse.toEither
     in
-        assertEqual "" result (Right ast)
+        result == (Right ast)
 
 
 simpleAst =
@@ -45,13 +46,29 @@ simpleAst =
         Right ast -> ast
 
 
+reportFailedAst ast =
+    let
+        rendering = Render.render ast |> LazyText.unpack
+        result = Render.render ast |> Parse.parse |> show
+    in
+        concat
+            [ "=== Parsed as:\n"
+            , result
+            , "=== END OF parse\n"
+            , "=== Rendering of failed AST:\n"
+            , rendering
+            , "=== END OF failed AST rendering\n"
+            ]
+
+
 propertyTests :: Test
 propertyTests =
     testGroup "example test group"
-    [ testProperty "example QuickCheck test" ((\s -> s == s) :: [Char] -> Bool)
+    [ testCase "simple AST round trip" $
+        assertBool "" (astToAst simpleAst)
+    , testProperty "rendered AST should parse as equivalent AST"
+        (\s -> counterexample (reportFailedAst s) (astToAst s))
 
     , testCase "simple round trip" $
         assertStringToString "module Main (..) where\n\nfoo =\n    8\n"
-    , testCase "simple AST round trip" $
-        assertAstToAst simpleAst
     ]

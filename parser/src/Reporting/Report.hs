@@ -24,6 +24,7 @@ data Report = Report
     , _preHint :: String
     , _postHint :: String
     }
+    deriving (Show)
 
 
 simple :: String -> String -> String -> Report

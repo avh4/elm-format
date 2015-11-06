@@ -8,7 +8,6 @@ import qualified AST.Pattern as Pattern
 import qualified AST.Type as Type
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
-import qualified Reporting.Region as R
 
 
 ---- GENERAL AST ----
@@ -28,7 +27,7 @@ data Def'
 
 
 type Expr =
-    A.Annotated R.Region Expr'
+    A.Located Expr'
 
 
 data Expr'

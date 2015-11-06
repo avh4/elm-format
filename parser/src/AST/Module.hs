@@ -14,8 +14,7 @@ import qualified Reporting.Annotation as A
 
 
 data Module = Module
-    { name    :: Name.Canonical
-    , path    :: FilePath
+    { name    :: Name.Raw
     , docs    :: A.Located (Maybe String)
     , exports :: Var.Listing (A.Located Var.Value)
     , imports :: [UserImport]

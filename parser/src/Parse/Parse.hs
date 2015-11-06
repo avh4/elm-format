@@ -6,8 +6,6 @@ import qualified Text.Parsec.Error as Parsec
 
 import qualified AST.Declaration
 import qualified AST.Module
-import qualified AST.Module.Name as ModuleName
-import qualified Elm.Package as Package
 import qualified Parse.Declaration as Decl
 import Parse.Helpers
 import qualified Parse.Module as Module
@@ -18,24 +16,20 @@ import qualified Reporting.Result as Result
 
 parseSource :: String -> Result.Result () Error.Error AST.Module.Module
 parseSource src =
-  parse src
-      $ programParser $ Package.Name "example" "example"
+  parse src programParser
 
 
 -- HEADERS AND DECLARATIONS
 
-programParser :: Package.Name -> IParser AST.Module.Module
-programParser pkgName =
+programParser :: IParser AST.Module.Module
+programParser =
   do  (AST.Module.Header name docs exports imports) <- Module.header
       decls <- declarations
       optional freshLine
       optional spaces
       eof
 
-      let canonicalName =
-            ModuleName.Canonical pkgName name
-
-      return $ AST.Module.Module canonicalName "" docs exports imports decls
+      return $ AST.Module.Module name docs exports imports decls
 
 
 declarations :: IParser [AST.Declaration.Decl]

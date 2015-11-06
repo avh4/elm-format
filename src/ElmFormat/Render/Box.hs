@@ -15,7 +15,6 @@ import qualified AST.Type
 import qualified AST.Variable
 import qualified Data.Char as Char
 import qualified Data.List as List
-import qualified Data.Maybe as Maybe
 import qualified Reporting.Annotation as RA
 import Text.Printf (printf)
 
@@ -63,12 +62,8 @@ formatDocComment docs =
         ]
 
 
-formatName :: MN.Canonical -> Box'
-formatName name = formatRawName $ MN._module name
-
-
-formatRawName :: MN.Raw -> Box'
-formatRawName name =
+formatName :: MN.Raw -> Box'
+formatName name =
     text (List.intercalate "." name)
 
 
@@ -78,7 +73,7 @@ formatImport aimport =
         (name,method) ->
             hbox
                 [ text "import "
-                , formatRawName name
+                , formatName name
                 , as
                 , exposing
                 ]
