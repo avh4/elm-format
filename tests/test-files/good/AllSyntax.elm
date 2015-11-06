@@ -25,7 +25,7 @@ type alias Type =
 
 
 type alias TypeWithArgs a b c =
-    List (a, b, { field : c })
+    List ( a, b, { field : c } )
 
 
 type alias MoreTypes x y z =
@@ -38,7 +38,7 @@ type alias ParensInTypes a b c =
     , f3 : c -> List (a -> b)
     , f4 : List (List (List b))
     , f5 : List Type
-    , f6 : (a -> b, List (List c))
+    , f6 : ( a -> b, List (List c) )
     , f7 : List Type -> (a -> List b) -> List c
     }
 
@@ -61,7 +61,7 @@ type alias NestedRecords a =
     { f1 : Int
     , f2 : { singleLine : () }
     , f3 :
-        { multiline1 : ((), ())
+        { multiline1 : ( (), () )
         , multiline2 : { inner : List Char }
         , multiline3 :
             { a

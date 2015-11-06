@@ -143,7 +143,7 @@ formatVarValue :: AST.Variable.Value -> Box'
 formatVarValue aval =
     case aval of
         AST.Variable.Value val ->
-            formatCommented (line . formatVar) val -- TODO: comments not tested
+            formatCommented (depr . line . formatVar) val -- TODO: comments not tested
         AST.Variable.Alias name ->
             text name
         AST.Variable.Union name listing ->
@@ -172,15 +172,15 @@ formatDeclaration decl =
                         , vboxlist
                             (text "= ") "| "
                             empty
-                            (\(c, args') -> hbox2 (text c) (hboxlist " " " " "" (formatType' ForCtor) args')) ctors
-                            |> indent 4
+                            (\(c, args') -> hbox2 (text c) (hboxlist " " " " "" (depr . formatType' ForCtor) args')) ctors
+                            |> indent' 4
                         ]
                         |> margin 2
                 AST.Declaration.TypeAlias name args typ ->
                     vbox
                         [ hboxlist "type alias " " " " =" text (name:args)
-                        , formatType typ
-                            |> indent 4
+                        , (depr . formatType) typ
+                            |> indent' 4
                         ]
                         |> margin 2
                 AST.Declaration.PortAnnotation name typ ->
@@ -188,7 +188,7 @@ formatDeclaration decl =
                         [ text "port "
                         , text name
                         , text " : "
-                        , formatType typ
+                        , (depr . formatType) typ
                         ]
                 AST.Declaration.PortDefinition name expr ->
                     vbox
@@ -198,7 +198,7 @@ formatDeclaration decl =
                             , text " ="
                             ]
                         , formatExpression False empty expr
-                            |> indent 4
+                            |> indent' 4
                         ]
                         |> margin 2
                 AST.Declaration.Fixity assoc precedence name ->
@@ -210,7 +210,7 @@ formatDeclaration decl =
                         , text " "
                         , text $ show precedence
                         , text " "
-                        , formatCommented (line . formatInfixVar) name
+                        , formatCommented (depr . line . formatInfixVar) name
                         ]
 
 
@@ -227,7 +227,7 @@ formatDefinition compact adef =
                             , text " ="
                             ]
                         , formatExpression False empty expr
-                            |> indent 4
+                            |> indent' 4
                         ]
                     |> margin (if compact then 1 else 2)
                 True ->
@@ -240,9 +240,9 @@ formatDefinition compact adef =
                     |> margin 1
         AST.Expression.TypeAnnotation name typ ->
             hbox
-                [ formatCommented (line . formatVar) name -- TODO: comments not tested
+                [ formatCommented (depr . line . formatVar) name -- TODO: comments not tested
                 , text " : "
-                , formatType typ
+                , (depr . formatType) typ
                 ]
 
 
@@ -251,7 +251,7 @@ formatPattern parensRequired apattern =
     case RA.drop apattern of
         AST.Pattern.Data ctor patterns ->
             hbox2
-                (line $ formatVar ctor)
+                (depr . line $ formatVar ctor)
                 (hboxlist (if List.null patterns then "" else " ") " " "" (formatPattern True) patterns)
         AST.Pattern.Tuple patterns ->
             hboxlist "(" ", " ")" (formatPattern False) patterns
@@ -266,7 +266,7 @@ formatPattern parensRequired apattern =
                 , if parensRequired then text ")" else empty
                 ]
         AST.Pattern.Var var ->
-            formatCommented (line . formatVar) var -- TODO: comments not tested
+            formatCommented (depr . line . formatVar) var -- TODO: comments not tested
         AST.Pattern.Anything ->
             text "_"
         AST.Pattern.Literal lit ->
@@ -280,7 +280,7 @@ formatExpression inList suffix aexpr =
             formatCommented formatLiteral lit
         AST.Expression.Var v ->
             hbox2
-                (formatCommented (line . formatVar) v) -- TODO: comments not tested
+                (formatCommented (depr . line . formatVar) v) -- TODO: comments not tested
                 suffix
 
         AST.Expression.Range left right False ->
@@ -295,10 +295,10 @@ formatExpression inList suffix aexpr =
             vbox
                 [ text "["
                 , formatExpression False empty left
-                    |> indent (if inList then 2 else 4)
+                    |> indent' (if inList then 2 else 4)
                 , text ".."
                 , formatExpression False empty right
-                    |> indent (if inList then 2 else 4)
+                    |> indent' (if inList then 2 else 4)
                 , text "]"
                 ]
 
@@ -323,7 +323,7 @@ formatExpression inList suffix aexpr =
             let
                 opBoxes (op,e) =
                   [ hspace 1
-                  , formatCommented (line. formatInfixVar) op
+                  , formatCommented (depr . line. formatInfixVar) op
                   , hspace 1
                   , formatExpression False empty e
                   ]
@@ -335,7 +335,7 @@ formatExpression inList suffix aexpr =
             let
                 formatOp (op,e) =
                     let
-                        fop = formatCommented (line . formatInfixVar) op -- TODO: comments not tested
+                        fop = formatCommented (depr . line . formatInfixVar) op -- TODO: comments not tested
                         fexp = formatExpression True empty e
                         space =
                             if height fexp <= 1 then
@@ -354,7 +354,7 @@ formatExpression inList suffix aexpr =
                 vbox
                     [ formatExpression False empty l
                     , vbox (map formatOp ops)
-                        |> indent (if inList then 2 else 4)
+                        |> indent' (if inList then 2 else 4)
                     ]
 
         AST.Expression.Lambda patterns expr False ->
@@ -366,7 +366,7 @@ formatExpression inList suffix aexpr =
             vbox
                 [ hboxlist "\\" " " " -> " (formatPattern True) patterns
                 , formatExpression False empty expr
-                    |> indent (if inList then 2 else 4)
+                    |> indent' (if inList then 2 else 4)
                 ]
 
         AST.Expression.Unary AST.Expression.Negative e ->
@@ -385,13 +385,13 @@ formatExpression inList suffix aexpr =
                     vbox2
                         (formatExpression False empty l)
                         (vboxlist empty "" empty (formatExpression False empty) rs
-                            |> indent (if inList then 2 else 4))
+                            |> indent' (if inList then 2 else 4))
 
         AST.Expression.If [] els ->
             vbox
                 [ text "<INVALID IF EXPRESSION>"
                 , formatExpression False empty els
-                    |> indent (if inList then 2 else 4)
+                    |> indent' (if inList then 2 else 4)
                 ]
         AST.Expression.If ((if0,multiline0,body0):elseifs) els ->
             vbox
@@ -406,11 +406,11 @@ formatExpression inList suffix aexpr =
                           vbox
                               [ text "if"
                               , formatExpression False empty if0
-                                  |> indent (if inList then 2 else 4)
+                                  |> indent' (if inList then 2 else 4)
                               , text "then"
                               ]
                 , formatExpression False empty body0
-                    |> indent (if inList then 2 else 4)
+                    |> indent' (if inList then 2 else 4)
                 , let
                     formatElseIf (if',multiline',body') =
                         vbox
@@ -425,28 +425,28 @@ formatExpression inList suffix aexpr =
                                     vbox
                                         [ text "else if"
                                         , formatExpression False empty if'
-                                            |> indent (if inList then 2 else 4)
+                                            |> indent' (if inList then 2 else 4)
                                         , text "then"
                                         ]
                             , formatExpression False empty body'
-                                |> indent (if inList then 2 else 4)
+                                |> indent' (if inList then 2 else 4)
                             ]
                   in
                       vbox (map formatElseIf elseifs)
                 , text "else"
                 , formatExpression False empty els
-                    |> indent (if inList then 2 else 4)
+                    |> indent' (if inList then 2 else 4)
                 ]
 
         AST.Expression.Let defs expr ->
             vbox
                 [ text "let"
                 , vboxlist empty "" empty (formatDefinition True) defs
-                    |> indent (if inList then 2 else 4)
+                    |> indent' (if inList then 2 else 4)
                     |> margin 0
                 , text "in"
                 , formatExpression False empty expr
-                    |> indent (if inList then 2 else 4)
+                    |> indent' (if inList then 2 else 4)
                 ]
         AST.Expression.Case (subject,multilineSubject) clauses ->
             vbox
@@ -461,7 +461,7 @@ formatExpression inList suffix aexpr =
                         vbox
                             [ text "case"
                             , formatExpression False empty subject
-                                |> indent (if inList then 2 else 4)
+                                |> indent' (if inList then 2 else 4)
                             , text "of"
                             ]
                 , let
@@ -472,13 +472,13 @@ formatExpression inList suffix aexpr =
                                   , text " ->"
                                   ]
                               , formatExpression False empty expr
-                                  |> indent 4
+                                  |> indent' 4
                               ]
                               |> margin 1
                   in
                       vbox (map formatClause clauses)
                       |> margin 0
-                      |> indent (if inList then 2 else 4)
+                      |> indent' (if inList then 2 else 4)
                 ]
 
         AST.Expression.Tuple exprs False ->
@@ -531,7 +531,7 @@ formatExpression inList suffix aexpr =
                             vbox
                                 [ hbox2 (text k) (text " =")
                                 , formatExpression False empty v
-                                    |> indent 2
+                                    |> indent' 2
                                 ]
             in
                 vbox
@@ -540,7 +540,7 @@ formatExpression inList suffix aexpr =
                         (text "| ") ", "
                         empty
                         pair pairs
-                        |> indent 4
+                        |> indent' 4
                     , (hbox2 (text "}") suffix)
                     ]
 
@@ -558,7 +558,7 @@ formatExpression inList suffix aexpr =
                             vbox
                                 [ hbox2 (text k) (text " =")
                                 , formatExpression False empty v
-                                    |> indent 2
+                                    |> indent' 2
                                 ]
             in
                 vboxlist
@@ -684,78 +684,134 @@ data TypeParensRequired
     deriving (Eq)
 
 
-formatType :: AST.Type.Type -> Box'
+formatType :: AST.Type.Type -> Box
 formatType =
     formatType' NotRequired
 
 
-formatType' :: TypeParensRequired -> AST.Type.Type -> Box'
+wrap :: Line -> Line -> [Line] -> Line -> Box
+wrap left first rest right =
+    stack
+        [ line $ row [left, first]
+        , stack (map (\l -> line $ row [space, space, l]) rest)
+        , line $ right
+        ]
+
+
+addParens :: Box -> Box
+addParens b =
+    case destructure b of
+        (l, []) ->
+            line $ row
+                [ punc "("
+                , l
+                , punc ")"
+                ]
+        (first, rest) ->
+            wrap (punc "(") first rest (punc ")")
+
+
+commaSpace :: Line
+commaSpace =
+    row
+        [ punc ","
+        , space
+        ]
+
+
+formatType' :: TypeParensRequired -> AST.Type.Type -> Box
 formatType' requireParens atype =
     case RA.drop atype of
         AST.Type.RLambda left right ->
-            hbox
-                [ if requireParens /= NotRequired then text "(" else empty
-                , formatType' ForLambda left
-                , text " -> "
-                , formatType right
-                , if requireParens /= NotRequired then text ")" else empty
-                ]
+            case
+                ( isLine (formatType' ForLambda left)
+                , isLine (formatType' NotRequired right)
+                )
+            of
+                (Just left', Just right') ->
+                    line $ row
+                        [ left'
+                        , space
+                        , keyword "->"
+                        , space
+                        , right'
+                        ]
+                _ ->
+                    line $ keyword "<TODO1>"
+                    -- stack
+                    --     [ left
+                    --     , shift (row [punc "->", space]) right
+                    --     ]
+            |> (if requireParens /= NotRequired then addParens else id)
         AST.Type.RVar var ->
-            text var
+            line $ identifier var
         AST.Type.RType var ->
             line $ formatVar var
         AST.Type.RApp ctor args ->
-            hboxlist
-                (if requireParens == ForCtor then "(" else "") " "
-                (if requireParens == ForCtor then ")" else "")
-                (formatType' ForCtor) (ctor:args)
-        AST.Type.RTuple args ->
-            hboxlist "(" ", " ")" (formatType) args
+            elmApplication
+                (formatType' ForCtor ctor)
+                (map (formatType' ForCtor) args)
+                |> (if requireParens == ForCtor then addParens else id)
+        AST.Type.RTuple (first:rest) ->
+            elmGroup "(" "," ")" False (map formatType (first:rest))
+        AST.Type.RTuple [] ->
+            line $ keyword "()"
         AST.Type.RRecord ext fields multiline ->
             let
-                start =
-                    case ext of
-                        Nothing ->
-                            text "{ "
-                        Just base ->
-                            hbox
-                                [ text "{ "
-                                , formatType base
-                                , text " | "
+                formatField (name, typ, multiline') =
+                    case (multiline', destructure (formatType typ)) of
+                        (False, (first, [])) ->
+                            line $ row
+                                [ identifier name
+                                , space
+                                , punc ":"
+                                , space
+                                , first
                                 ]
-                (vStart,vPrefix) =
-                    case ext of
-                        Nothing ->
-                            (empty, text "{ ")
-                        Just base ->
-                            (hbox2 (text "{ ") (formatType base), text "| ")
-                pair (k,v,multiline') =
-                    case multiline' of
-                        False ->
-                            hbox
-                                [ text k
-                                , text " : "
-                                , formatType v
+                        _ ->
+                            stack
+                                [ line $ row
+                                    [ identifier name
+                                    , space
+                                    , punc ":"
+                                    ]
+                                , formatType typ
+                                    |> indent
                                 ]
-                        True ->
-                            vbox2
-                                (hbox2 (text k) (text " :"))
-                                (formatType v |> indent 2)
             in
-                case multiline of
-                    False ->
-                        case fields of
-                            [] ->
-                                text "{}"
+                case (ext, fields) of
+                    (Just _, []) ->
+                        line $ keyword "<INVALID RECORD EXTENSION>"
+                    (Just typ, first:rest) ->
+                        case
+                            ( multiline
+                            , isLine $ formatType typ
+                            , allSingles $ map formatField fields
+                            )
+                        of
+                            (False, Just typ', Just fields') ->
+                                line $ row
+                                    [ punc "{"
+                                    , space
+                                    , typ'
+                                    , space
+                                    , punc "|"
+                                    , space
+                                    , row (List.intersperse commaSpace fields')
+                                    , space
+                                    , punc "}"
+                                    ]
                             _ ->
-                                hbox2 start $ hboxlist "" ", " " }" pair fields
-                    True ->
-                        vbox
-                            [ vStart
-                            , vboxlist vPrefix ", " empty pair fields
-                                |> indent (if Maybe.isNothing ext then 0 else 4)
-                            , text "}"
-                            ]
+                                stack
+                                    [ prefix (punc "{") (formatType typ)
+                                    , stack
+                                        ([ prefix (punc "|") $ formatField first ]
+                                        ++ (map (prefix (punc ",") . formatField) rest))
+                                        |> indent
+                                    , line $ punc "}"
+                                    ]
+                    (Nothing, _) ->
+                        elmGroup "{" "," "}" multiline (map formatField fields)
 
 
 formatVar :: AST.Variable.Ref -> Line

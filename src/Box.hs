@@ -10,6 +10,9 @@ import qualified Text.PrettyPrint.Boxes as B
 
 data Line
     = Text String
+    | Row [Line]
+    | Space
+    | Tab
 
 
 identifier :: String -> Line
@@ -22,6 +25,138 @@ keyword =
     Text
 
 
+punc :: String -> Line
+punc =
+    Text
+
+
+row :: [Line] -> Line
+row =
+    Row
+
+
+space :: Line
+space =
+    Space
+
+
+data Box
+    = Stack Line [Line]
+    -- | Margin Int
+    -- | Empty
+
+
+line :: Line -> Box
+line l =
+    Stack l []
+
+
+stack' :: Box -> Box -> Box
+stack' b1 b2 =
+     case (b1, b2) of
+        (Stack l11 l1n, Stack l21 l2n) ->
+            Stack l11 (l1n ++ (l21:l2n))
+
+
+stack :: [Box] -> Box
+stack children =
+    case children of
+        -- [] -> -- crash? -- TODO?
+        (first:[]) ->
+            first
+        (first:rest) ->
+            foldl1 stack' (first:rest)
+
+
+mapLines :: (Line -> Line) -> Box -> Box
+mapLines fn =
+    mapFirstLine fn fn
+
+
+mapFirstLine :: (Line -> Line) -> (Line -> Line) -> Box -> Box
+mapFirstLine firstFn restFn b =
+    case b of
+        Stack l1 ls ->
+            Stack (firstFn l1) (map restFn ls)
+
+
+indent :: Box -> Box
+indent =
+    mapLines (\l -> row [Tab, l])
+
+-- boxMap :: (Line -> a) -> (Box -> a) -> Box -> a
+-- boxMap singleFn boxFn b =
+--     case b of
+--         Single l ->
+--             singleFn l
+--         Stack _ ->
+--             boxFn b
+
+
+-- TODO: use destructure instead?
+isLine :: Box -> Maybe Line
+isLine b =
+    case b of
+        Stack l [] ->
+            Just l
+        _ ->
+            Nothing
+
+
+destructure :: Box -> (Line, [Line])
+destructure b =
+    case b of
+        Stack first rest ->
+            (first, rest)
+
+
+allSingles :: [Box] -> Maybe [Line]
+allSingles =
+    sequence . (map isLine)
+
+
+elmApplication :: Box -> [Box] -> Box
+elmApplication first rest =
+    case allSingles (first:rest) of
+        Just ls ->
+            ls
+                |> List.intersperse space
+                |> row
+                |> line
+        _ ->
+            stack
+                $ first : (map indent rest)
+
+
+prefix :: Line -> Box -> Box
+prefix pref =
+    mapFirstLine
+        (\l -> row [ pref, space, l ])
+        (\l -> row [ space, space, l ])
+
+
+elmGroup :: String -> String -> String -> Bool -> [Box] -> Box
+elmGroup left sep right forceMultiline children =
+    case (forceMultiline, allSingles children) of
+        (_, Just []) ->
+            line $ row [punc left, punc right]
+        (False, Just ls) ->
+            line $ row $ concat
+                [ [punc left, space]
+                , List.intersperse (row [punc sep, space]) ls
+                , [space, punc right]
+                ]
+        _ ->
+            case children of
+                [] ->
+                    line $ row [ punc left, punc right]
+                (first:rest) ->
+                    stack $
+                        (prefix (punc left) first)
+                        : (map (prefix (punc sep)) rest)
+                        ++ [ line $ punc right ]
+
+
 -- DEPRECATED BELOW THIS LINE
 
 data Box' = Box'
@@ -31,11 +166,27 @@ data Box' = Box'
     }
 
 
-line :: Line -> Box'
-line l =
+depr' :: Int -> Line -> (Int, Box')
+depr' margin l =
     case l of
         Text s ->
-            text s
+            (0, text s)
+        Row items ->
+            foldl
+                (\(m,b) l -> let (mm,bb) = depr' m l in (mm, hbox2 b bb))
+                (margin,empty)
+                items
+        Space ->
+            (margin + 1, text " ")
+        Tab ->
+            (0, text $ replicate (4 - (margin `mod` 4)) ' ')
+
+
+depr :: Box -> Box'
+depr b =
+    case b of
+        Stack first rest ->
+            vbox (map (snd . depr' 0) (first:rest))
 
 
 empty :: Box'
@@ -108,8 +259,8 @@ hjoin sep list =
     hbox (List.intersperse sep list)
 
 
-indent :: Int -> Box' -> Box'
-indent i child =
+indent' :: Int -> Box' -> Box'
+indent' i child =
     hbox2margin (hspace i) child
 
 
