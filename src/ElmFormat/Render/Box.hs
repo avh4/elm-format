@@ -722,26 +722,20 @@ commaSpace =
 formatType' :: TypeParensRequired -> AST.Type.Type -> Box
 formatType' requireParens atype =
     case RA.drop atype of
-        AST.Type.RLambda left right ->
+        AST.Type.RLambda first rest ->
             case
-                ( isLine (formatType' ForLambda left)
-                , isLine (formatType' NotRequired right)
-                )
+                allSingles $ map (formatType' ForLambda) (first:rest)
             of
-                (Just left', Just right') ->
-                    line $ row
-                        [ left'
-                        , space
-                        , keyword "->"
-                        , space
-                        , right'
-                        ]
+                Just typs ->
+                    line $ row $ List.intersperse (row [ space, keyword "->", space]) typs
                 _ ->
-                    line $ keyword "<TODO1>"
-                    -- stack
-                    --     [ left
-                    --     , shift (row [punc "->", space]) right
-                    --     ]
+                    stack
+                        [ formatType' ForLambda first
+                        , rest
+                            |> map (formatType' ForLambda)
+                            |> map (prefix (keyword "->"))
+                            |> stack
+                        ]
             |> (if requireParens /= NotRequired then addParens else id)
         AST.Type.RVar var ->
             line $ identifier var

@@ -101,7 +101,11 @@ expr =
             do  whitespace
                 t2 <- expr
                 end <- getMyPosition
-                return (A.A (R.Region start end) (Type.RLambda t1 t2))
+                case A.drop t2 of
+                    Type.RLambda t2' ts ->
+                        return (A.A (R.Region start end) (Type.RLambda t1 (t2':ts)))
+                    _ ->
+                        return (A.A (R.Region start end) (Type.RLambda t1 [t2]))
 
 
 constructor :: IParser (String, [Type.Type])

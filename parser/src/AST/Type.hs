@@ -19,7 +19,7 @@ type Type =
 
 
 data Type'
-    = RLambda Type Type
+    = RLambda Type [Type]
     | RVar String
     | RType Var.Ref
     | RApp Type [Type]
