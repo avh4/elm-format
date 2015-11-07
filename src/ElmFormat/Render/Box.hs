@@ -48,7 +48,7 @@ formatModule modu =
             imports ->
                 imports
                 |> List.sortOn (fst . RA.drop)
-                |> map formatImport
+                |> map (depr . formatImport)
                 |> vbox
                 |> margin 2
         , vbox (map formatDeclaration $ AST.Module.body modu)
@@ -87,31 +87,45 @@ formatName name =
     identifier (List.intercalate "." name)
 
 
-formatImport :: AST.Module.UserImport -> Box'
+formatImport :: AST.Module.UserImport -> Box
 formatImport aimport =
     case RA.drop aimport of
         (name,method) ->
-            hbox
-                [ text "import "
-                , depr $ line $ formatName name
-                , as
-                , case formatListing $ AST.Module.exposedVars method of
-                    Just listing ->
-                        case isLine listing of
-                            Just listing' ->
-                                depr $ line $ row [ space, keyword "exposing", space, listing' ]
-                            _ ->
-                                text "<TODO: multiline exposing>"
-                    Nothing ->
-                        empty
-                ]
-            where
+            let
                 as =
                     case AST.Module.alias method of
                         Nothing ->
-                            empty
+                            formatName name
                         Just alias ->
-                            text $ " as " ++ alias
+                            row
+                                [ formatName name
+                                , space
+                                , keyword "as"
+                                , space
+                                , identifier alias
+                                ]
+            in
+                case formatListing $ AST.Module.exposedVars method of
+                    Just listing ->
+                        case isLine listing of
+                            Just listing' ->
+                                line $ row
+                                    [ keyword "import"
+                                    , space
+                                    , as
+                                    , space
+                                    , keyword "exposing"
+                                    , space
+                                    , listing'
+                                    ]
+                            _ ->
+                                line $ keyword "<TODO: multiline exposing>"
+                    Nothing ->
+                        line $ row
+                            [ keyword "import"
+                            , space
+                            , as
+                            ]
 
 
 formatListing :: AST.Variable.Listing AST.Variable.Value-> Maybe Box
