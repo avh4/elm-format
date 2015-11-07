@@ -25,7 +25,15 @@ formatModule modu =
         [ hbox
             [ text "module "
             , formatName $ AST.Module.name modu
-            , formatListing $ AST.Module.exports modu
+            , case formatListing $ AST.Module.exports modu of
+                Just listing ->
+                    case isLine listing of
+                        Just listing' ->
+                            depr $ line $ row [ space, listing' ]
+                        _ ->
+                            text "<TODO: multiline module listing>"
+                _ ->
+                    empty
             , text " where"
             ]
             |> margin 1
@@ -100,21 +108,15 @@ formatImport aimport =
                             text "<NOT POSSIBLE?>"
 
 
-formatListing :: AST.Variable.Listing (RA.Located AST.Variable.Value)-> Box'
+formatListing :: AST.Variable.Listing (RA.Located AST.Variable.Value)-> Maybe Box
 formatListing listing =
     case listing of
         AST.Variable.Listing [] False ->
-            empty
-        AST.Variable.Listing [] True ->
-            text " (..)"
+            Nothing
+        AST.Variable.Listing _ True -> -- Not possible for first arg to be non-empty
+            Just $ line $ keyword "(..)"
         AST.Variable.Listing vars False ->
-            hbox
-                [ text " ("
-                , hjoin (text ", ") (map (depr . formatVarValue . RA.drop) vars)
-                , text ")"
-                ]
-        AST.Variable.Listing _ True ->
-            text "<NOT POSSIBLE?>"
+            Just $ elmGroup False "(" "," ")" False $ map (formatVarValue . RA.drop) vars
 
 
 formatStringListing :: AST.Variable.Listing String -> Maybe Line
@@ -251,9 +253,9 @@ formatPattern parensRequired apattern =
                 (line $ formatVar ctor)
                 (map (formatPattern True) patterns)
         AST.Pattern.Tuple patterns ->
-            elmGroup "(" "," ")" False $ map (formatPattern False) patterns
+            elmGroup True "(" "," ")" False $ map (formatPattern False) patterns
         AST.Pattern.Record fields ->
-            elmGroup "{" "," "}" False $ map (line . identifier) fields
+            elmGroup True "{" "," "}" False $ map (line . identifier) fields
         AST.Pattern.Alias name pattern ->
             case isLine $ formatPattern True pattern of
                 Just pattern' ->
@@ -789,7 +791,7 @@ formatType' requireParens atype =
                 (map (formatType' ForCtor) args)
                 |> (if requireParens == ForCtor then addParens else id)
         AST.Type.RTuple (first:rest) ->
-            elmGroup "(" "," ")" False (map formatType (first:rest))
+            elmGroup True "(" "," ")" False (map formatType (first:rest))
         AST.Type.RTuple [] ->
             line $ keyword "()"
         AST.Type.RRecord ext fields multiline ->
@@ -847,7 +849,7 @@ formatType' requireParens atype =
                                     , line $ punc "}"
                                     ]
                     (Nothing, _) ->
-                        elmGroup "{" "," "}" multiline (map formatField fields)
+                        elmGroup True "{" "," "}" multiline (map formatField fields)
 
 
 formatVar :: AST.Variable.Ref -> Line

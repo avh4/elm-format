@@ -142,16 +142,16 @@ prefix pref =
         (\l -> row [ space, space, l ])
 
 
-elmGroup :: String -> String -> String -> Bool -> [Box] -> Box
-elmGroup left sep right forceMultiline children =
+elmGroup :: Bool -> String -> String -> String -> Bool -> [Box] -> Box
+elmGroup innerSpaces left sep right forceMultiline children =
     case (forceMultiline, allSingles children) of
         (_, Just []) ->
             line $ row [punc left, punc right]
         (False, Just ls) ->
             line $ row $ concat
-                [ [punc left, space]
+                [ if innerSpaces then [punc left, space] else [punc left]
                 , List.intersperse (row [punc sep, space]) ls
-                , [space, punc right]
+                , if innerSpaces then [space, punc right] else [punc right]
                 ]
         _ ->
             case children of
