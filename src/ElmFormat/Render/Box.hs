@@ -57,17 +57,26 @@ formatModuleDocs adocs =
         Nothing ->
             empty
         Just docs ->
-            formatDocComment docs
+            (depr . formatDocComment) docs
             |> margin 1
 
 
-formatDocComment :: String -> Box'
+formatDocComment :: String -> Box
 formatDocComment docs =
-    hbox
-        [ text "{-| "
-        , text $ docs
-        , text "-}"
-        ]
+    case lines docs of
+        [] ->
+            line $ row [ punc "{-|", space, punc "-}" ]
+        (first:[]) ->
+            stack
+                [ line $ row [ punc "{-|", space, literal first ]
+                , line $ punc "-}"
+                ]
+        (first:rest) ->
+            stack
+                [ line $ row [ punc "{-|", space, literal first ]
+                , stack $ map (line . literal) rest
+                , line $ punc "-}"
+                ]
 
 
 formatName :: MN.Raw -> Line
@@ -156,7 +165,7 @@ formatDeclaration :: AST.Declaration.Decl -> Box'
 formatDeclaration decl =
     case decl of
         AST.Declaration.Comment docs ->
-            formatDocComment docs
+            depr $ formatDocComment docs
         AST.Declaration.Decl adecl ->
             case RA.drop adecl of
                 AST.Declaration.Definition def ->
