@@ -505,8 +505,10 @@ formatExpression inList suffix aexpr =
                       |> indent' (if inList then 2 else 4)
                 ]
 
+        AST.Expression.Tuple [] _ ->
+            text "()"
         AST.Expression.Tuple exprs False ->
-            hboxlist "(" ", " ")" (formatExpression False empty) exprs
+            hboxlist "( " ", " " )" (formatExpression False empty) exprs
         AST.Expression.Tuple exprs True ->
             vboxlist
                 (text "( ") ", "

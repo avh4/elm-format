@@ -139,7 +139,7 @@ inlinePipeline =
 
 
 tuple =
-    (1, 2)
+    ( 1, 2 )
 
 
 tupleFunction =
@@ -159,7 +159,7 @@ multilineTuple a b =
 
 
 lists =
-    ([ 1, 2, 3, 4 ], [])
+    ( [ 1, 2, 3, 4 ], [] )
 
 
 multilineLists =
@@ -190,7 +190,7 @@ functionCallInMultilineList =
 
 
 commentedLiterals =
-    ({- int -} 1, {- float -} 0.1, {- char -} 'c', {- string -} "str", {- boolean -} True)
+    ( {- int -} 1, {- float -} 0.1, {- char -} 'c', {- string -} "str", {- boolean -} True )
 
 
 infixOperator =

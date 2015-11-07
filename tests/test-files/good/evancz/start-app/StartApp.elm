@@ -95,11 +95,11 @@ start config =
             let
                 ( newModel, additionalEffects ) = config.update action oldModel
             in
-                (newModel, Effects.batch [ accumulatedEffects, additionalEffects ])
+                ( newModel, Effects.batch [ accumulatedEffects, additionalEffects ] )
 
         update : List action -> ( model, Effects action ) -> ( model, Effects action )
         update actions ( model, _ ) =
-            List.foldl updateStep (model, Effects.none) actions
+            List.foldl updateStep ( model, Effects.none ) actions
 
         inputs : Signal (List action)
         inputs =
