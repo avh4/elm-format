@@ -117,21 +117,19 @@ formatListing listing =
             text "<NOT POSSIBLE?>"
 
 
-formatStringListing :: AST.Variable.Listing String -> Box'
+formatStringListing :: AST.Variable.Listing String -> Maybe Line
 formatStringListing listing =
     case listing of
         AST.Variable.Listing [] False ->
-            empty
-        AST.Variable.Listing [] True ->
-            text "(..)"
+            Nothing
+        AST.Variable.Listing _ True -> -- Not possible for first arg to be non-empty
+            Just $ keyword "(..)"
         AST.Variable.Listing vars False ->
-            hbox
-                [ text "("
-                , hjoin (text ",") (map text vars)
-                , text ")"
+            Just $ row
+                [ punc "("
+                , row $ List.intersperse (punc ",") $ map identifier vars
+                , punc ")"
                 ]
-        AST.Variable.Listing _ True ->
-            text "<NOT POSSIBLE?>"
 
 
 formatVarValue :: AST.Variable.Value -> Box'
@@ -142,10 +140,14 @@ formatVarValue aval =
         AST.Variable.Alias name ->
             text name
         AST.Variable.Union name listing ->
-            hbox
-                [ text name
-                , formatStringListing listing
-                ]
+            case formatStringListing listing of
+                Just listing' ->
+                    hbox
+                        [ text name
+                        , depr $ line $ listing'
+                        ]
+                Nothing ->
+                    text name
 
 
 formatDeclaration :: AST.Declaration.Decl -> Box'
