@@ -20,6 +20,11 @@ data Listing a = Listing
     deriving (Eq, Ord, Show)
 
 
+instance Functor Listing where
+    fmap fn (Listing explicits open) =
+        Listing (map fn explicits) open
+
+
 openListing :: Listing a
 openListing =
     Listing [] True

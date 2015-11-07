@@ -26,7 +26,7 @@ formatModule modu =
         [ hbox
             [ text "module "
             , depr $ line $ formatName $ AST.Module.name modu
-            , case formatListing $ AST.Module.exports modu of
+            , case formatListing $ fmap RA.drop $ AST.Module.exports modu of
                 Just listing ->
                     case isLine listing of
                         Just listing' ->
@@ -95,7 +95,15 @@ formatImport aimport =
                 [ text "import "
                 , depr $ line $ formatName name
                 , as
-                , exposing
+                , case formatListing $ AST.Module.exposedVars method of
+                    Just listing ->
+                        case isLine listing of
+                            Just listing' ->
+                                depr $ line $ row [ space, keyword "exposing", space, listing' ]
+                            _ ->
+                                text "<TODO: multiline exposing>"
+                    Nothing ->
+                        empty
                 ]
             where
                 as =
@@ -104,23 +112,9 @@ formatImport aimport =
                             empty
                         Just alias ->
                             text $ " as " ++ alias
-                exposing =
-                    case AST.Module.exposedVars method of
-                        AST.Variable.Listing [] False ->
-                            empty
-                        AST.Variable.Listing [] True ->
-                            text " exposing (..)"
-                        AST.Variable.Listing vars False ->
-                            hbox
-                                [ text " exposing ("
-                                , hjoin (text ", ") (map (depr . formatVarValue) vars)
-                                , text ")"
-                                ]
-                        AST.Variable.Listing _ True ->
-                            text "<NOT POSSIBLE?>"
 
 
-formatListing :: AST.Variable.Listing (RA.Located AST.Variable.Value)-> Maybe Box
+formatListing :: AST.Variable.Listing AST.Variable.Value-> Maybe Box
 formatListing listing =
     case listing of
         AST.Variable.Listing [] False ->
@@ -128,7 +122,7 @@ formatListing listing =
         AST.Variable.Listing _ True -> -- Not possible for first arg to be non-empty
             Just $ line $ keyword "(..)"
         AST.Variable.Listing vars False ->
-            Just $ elmGroup False "(" "," ")" False $ map (formatVarValue . RA.drop) vars
+            Just $ elmGroup False "(" "," ")" False $ map formatVarValue vars
 
 
 formatStringListing :: AST.Variable.Listing String -> Maybe Line
