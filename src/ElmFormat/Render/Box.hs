@@ -93,7 +93,7 @@ formatImport aimport =
                         AST.Variable.Listing vars False ->
                             hbox
                                 [ text " exposing ("
-                                , hjoin (text ", ") (map formatVarValue vars)
+                                , hjoin (text ", ") (map (depr . formatVarValue) vars)
                                 , text ")"
                                 ]
                         AST.Variable.Listing _ True ->
@@ -110,7 +110,7 @@ formatListing listing =
         AST.Variable.Listing vars False ->
             hbox
                 [ text " ("
-                , hjoin (text ", ") (map (formatVarValue . RA.drop) vars)
+                , hjoin (text ", ") (map (depr . formatVarValue . RA.drop) vars)
                 , text ")"
                 ]
         AST.Variable.Listing _ True ->
@@ -132,22 +132,22 @@ formatStringListing listing =
                 ]
 
 
-formatVarValue :: AST.Variable.Value -> Box'
+formatVarValue :: AST.Variable.Value -> Box
 formatVarValue aval =
     case aval of
         AST.Variable.Value val ->
-            depr $ formatCommented (line . formatVar) val -- TODO: comments not tested
+            formatCommented (line . formatVar) val -- TODO: comments not tested
         AST.Variable.Alias name ->
-            text name
+            line $ identifier name
         AST.Variable.Union name listing ->
             case formatStringListing listing of
                 Just listing' ->
-                    hbox
-                        [ text name
-                        , depr $ line $ listing'
+                    line $ row
+                        [ identifier name
+                        , listing'
                         ]
                 Nothing ->
-                    text name
+                    line $ identifier name
 
 
 formatDeclaration :: AST.Declaration.Decl -> Box'
