@@ -149,7 +149,7 @@ formatStringListing listing =
         AST.Variable.Listing vars False ->
             Just $ row
                 [ punc "("
-                , row $ List.intersperse (punc ",") $ map identifier vars
+                , row $ List.intersperse (row [punc ",", space]) $ map identifier vars
                 , punc ")"
                 ]
 
