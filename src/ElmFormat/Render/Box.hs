@@ -24,7 +24,7 @@ formatModule modu =
     vbox
         [ hbox
             [ text "module "
-            , formatName $ AST.Module.name modu
+            , depr $ line $ formatName $ AST.Module.name modu
             , case formatListing $ AST.Module.exports modu of
                 Just listing ->
                     case isLine listing of
@@ -70,9 +70,9 @@ formatDocComment docs =
         ]
 
 
-formatName :: MN.Raw -> Box'
+formatName :: MN.Raw -> Line
 formatName name =
-    text (List.intercalate "." name)
+    identifier (List.intercalate "." name)
 
 
 formatImport :: AST.Module.UserImport -> Box'
@@ -81,7 +81,7 @@ formatImport aimport =
         (name,method) ->
             hbox
                 [ text "import "
-                , formatName name
+                , depr $ line $ formatName name
                 , as
                 , exposing
                 ]
