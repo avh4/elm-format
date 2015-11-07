@@ -91,14 +91,14 @@ start config =
             Signal.forwardTo messages.address singleton
 
         updateStep : action -> ( model, Effects action ) -> ( model, Effects action )
-        updateStep action (oldModel, accumulatedEffects) =
+        updateStep action ( oldModel, accumulatedEffects ) =
             let
-                (newModel, additionalEffects) = config.update action oldModel
+                ( newModel, additionalEffects ) = config.update action oldModel
             in
                 (newModel, Effects.batch [ accumulatedEffects, additionalEffects ])
 
         update : List action -> ( model, Effects action ) -> ( model, Effects action )
-        update actions (model, _) =
+        update actions ( model, _ ) =
             List.foldl updateStep (model, Effects.none) actions
 
         inputs : Signal (List action)

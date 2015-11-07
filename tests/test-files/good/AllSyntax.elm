@@ -236,11 +236,11 @@ functionWithParam a =
     a
 
 
-functionParameters a b (t, s, _, (t', s', _, (t'', s''), {x', y'})) {x, y} _ =
+functionParameters a b ( t, s, _, ( t', s', _, ( t'', s'' ), { x', y' } ) ) { x, y } _ =
     ()
 
 
-patternAlias ({x, y} as r) (a, {b} as r') =
+patternAlias ({ x, y } as r) ( a, { b } as r' ) =
     r.x == y
 
 
@@ -253,7 +253,7 @@ fnAsUnparenthesizedLambda =
 
 
 multiArgLambda =
-    \a b (t, s, _, (t', s', _, (t'', s''), {x', y'})) {x, y} _ -> \c -> (\d -> ())
+    \a b ( t, s, _, ( t', s', _, ( t'', s'' ), { x', y' } ) ) { x, y } _ -> \c -> (\d -> ())
 
 
 multilineLambda =

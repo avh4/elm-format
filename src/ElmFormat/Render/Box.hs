@@ -217,8 +217,8 @@ formatDefinition compact adef =
                 False ->
                     vbox
                         [ hbox
-                            [ formatPattern True name
-                            , hbox $ List.map (\arg -> hbox [ text " ", formatPattern True arg]) args
+                            [ depr $ formatPattern True name
+                            , hbox $ List.map (\arg -> hbox [ text " ", depr $ formatPattern True arg]) args
                             , text " ="
                             ]
                         , formatExpression False empty expr
@@ -227,8 +227,8 @@ formatDefinition compact adef =
                     |> margin (if compact then 1 else 2)
                 True ->
                     hbox
-                        [ formatPattern True name
-                        , hbox $ List.map (\arg -> hbox [ text " ", (formatPattern True) arg]) args
+                        [ depr $ formatPattern True name
+                        , hbox $ List.map (\arg -> hbox [ text " ", depr $ formatPattern True arg]) args
                         , text " = "
                         , formatExpression False empty expr
                         ]
@@ -241,31 +241,36 @@ formatDefinition compact adef =
                 ]
 
 
-formatPattern :: Bool -> AST.Pattern.Pattern -> Box'
+formatPattern :: Bool -> AST.Pattern.Pattern -> Box
 formatPattern parensRequired apattern =
     case RA.drop apattern of
         AST.Pattern.Data ctor patterns ->
-            hbox2
-                (depr . line $ formatVar ctor)
-                (hboxlist (if List.null patterns then "" else " ") " " "" (formatPattern True) patterns)
+            elmApplication
+                (line $ formatVar ctor)
+                (map (formatPattern True) patterns)
         AST.Pattern.Tuple patterns ->
-            hboxlist "(" ", " ")" (formatPattern False) patterns
+            elmGroup "(" "," ")" False $ map (formatPattern False) patterns
         AST.Pattern.Record fields ->
-            hboxlist "{" ", " "}" text fields
+            elmGroup "{" "," "}" False $ map (line . identifier) fields
         AST.Pattern.Alias name pattern ->
-            hbox
-                [ if parensRequired then text "(" else empty
-                , formatPattern True pattern
-                , text " as "
-                , text name
-                , if parensRequired then text ")" else empty
-                ]
+            case isLine $ formatPattern True pattern of
+                Just pattern' ->
+                    line $ row
+                        [ pattern'
+                        , space
+                        , keyword "as"
+                        , space
+                        , identifier name
+                        ]
+                _ -> -- TODO
+                    line $ keyword "<TODO-multiline PAttern alias>"
+            |> (if parensRequired then addParens else id)
         AST.Pattern.Var var ->
-            depr $ formatCommented (line . formatVar) var -- TODO: comments not tested
+            formatCommented (line . formatVar) var -- TODO: comments not tested
         AST.Pattern.Anything ->
-            text "_"
+            line $ keyword "_"
         AST.Pattern.Literal lit ->
-            depr $ formatLiteral lit
+            formatLiteral lit
 
 
 formatExpression :: Bool -> Box' -> AST.Expression.Expr -> Box'
@@ -354,12 +359,12 @@ formatExpression inList suffix aexpr =
 
         AST.Expression.Lambda patterns expr False ->
             hbox
-                [ hboxlist "\\" " " " -> " (formatPattern True) patterns
+                [ hboxlist "\\" " " " -> " (depr . formatPattern True) patterns
                 , formatExpression False empty expr
                 ]
         AST.Expression.Lambda patterns expr True ->
             vbox
-                [ hboxlist "\\" " " " -> " (formatPattern True) patterns
+                [ hboxlist "\\" " " " -> " (depr . formatPattern True) patterns
                 , formatExpression False empty expr
                     |> indent' (if inList then 2 else 4)
                 ]
@@ -463,7 +468,7 @@ formatExpression inList suffix aexpr =
                       formatClause (pat,expr) =
                           vbox
                               [ hbox
-                                  [ formatPattern True pat
+                                  [ depr $ formatPattern True pat
                                   , text " ->"
                                   ]
                               , formatExpression False empty expr
