@@ -15,6 +15,7 @@ import qualified AST.Type
 import qualified AST.Variable
 import qualified Data.Char as Char
 import qualified Data.List as List
+import qualified Data.Maybe as Maybe
 import qualified Reporting.Annotation as RA
 import Text.Printf (printf)
 
@@ -38,6 +39,9 @@ formatModule modu =
             ]
             |> margin 1
         , formatModuleDocs (AST.Module.docs modu)
+            |> fmap depr
+            |> fmap (margin 1)
+            |> Maybe.fromMaybe empty
         , case AST.Module.imports modu of
             [] ->
                 empty
@@ -51,14 +55,13 @@ formatModule modu =
         ]
 
 
-formatModuleDocs :: RA.Located (Maybe String) -> Box'
+formatModuleDocs :: RA.Located (Maybe String) -> Maybe Box
 formatModuleDocs adocs =
     case RA.drop adocs of
         Nothing ->
-            empty
+            Nothing
         Just docs ->
-            (depr . formatDocComment) docs
-            |> margin 1
+            Just $ formatDocComment docs
 
 
 formatDocComment :: String -> Box
