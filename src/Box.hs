@@ -98,6 +98,7 @@ indent =
 --             boxFn b
 
 
+-- TODO: should return Either [Box] [Line] -- replace isLine and destructure
 -- TODO: use destructure instead?
 isLine :: Box -> Maybe Line
 isLine b =
@@ -115,6 +116,7 @@ destructure b =
             (first, rest)
 
 
+-- TODO: should return Either [Box] [Line]
 allSingles :: [Box] -> Maybe [Line]
 allSingles =
     sequence . (map isLine)

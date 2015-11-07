@@ -138,7 +138,7 @@ formatVarValue :: AST.Variable.Value -> Box'
 formatVarValue aval =
     case aval of
         AST.Variable.Value val ->
-            formatCommented (line . formatVar) val -- TODO: comments not tested
+            depr $ formatCommented (line . formatVar) val -- TODO: comments not tested
         AST.Variable.Alias name ->
             text name
         AST.Variable.Union name listing ->
@@ -205,7 +205,7 @@ formatDeclaration decl =
                         , text " "
                         , text $ show precedence
                         , text " "
-                        , formatCommented (line . formatInfixVar) name
+                        , depr $ formatCommented (line . formatInfixVar) name
                         ]
 
 
@@ -235,7 +235,7 @@ formatDefinition compact adef =
                     |> margin 1
         AST.Expression.TypeAnnotation name typ ->
             hbox
-                [ formatCommented (line . formatVar) name -- TODO: comments not tested
+                [ depr $ formatCommented (line . formatVar) name -- TODO: comments not tested
                 , text " : "
                 , (depr . formatType) typ
                 ]
@@ -261,7 +261,7 @@ formatPattern parensRequired apattern =
                 , if parensRequired then text ")" else empty
                 ]
         AST.Pattern.Var var ->
-            formatCommented (line . formatVar) var -- TODO: comments not tested
+            depr $ formatCommented (line . formatVar) var -- TODO: comments not tested
         AST.Pattern.Anything ->
             text "_"
         AST.Pattern.Literal lit ->
@@ -272,10 +272,10 @@ formatExpression :: Bool -> Box' -> AST.Expression.Expr -> Box'
 formatExpression inList suffix aexpr =
     case RA.drop aexpr of
         AST.Expression.Literal lit ->
-            formatCommented (formatLiteral) lit
+            depr $ formatCommented (formatLiteral) lit
         AST.Expression.Var v ->
             hbox2
-                (formatCommented (line . formatVar) v) -- TODO: comments not tested
+                (depr $ formatCommented (line . formatVar) v) -- TODO: comments not tested
                 suffix
 
         AST.Expression.Range left right False ->
@@ -318,7 +318,7 @@ formatExpression inList suffix aexpr =
             let
                 opBoxes (op,e) =
                   [ hspace 1
-                  , formatCommented (line. formatInfixVar) op
+                  , depr $ formatCommented (line. formatInfixVar) op
                   , hspace 1
                   , formatExpression False empty e
                   ]
@@ -330,7 +330,7 @@ formatExpression inList suffix aexpr =
             let
                 formatOp (op,e) =
                     let
-                        fop = formatCommented (line . formatInfixVar) op -- TODO: comments not tested
+                        fop = depr $ formatCommented (line . formatInfixVar) op -- TODO: comments not tested
                         fexp = formatExpression True empty e
                         space =
                             if height fexp <= 1 then
@@ -591,21 +591,53 @@ formatExpression inList suffix aexpr =
         AST.Expression.GLShader _ _ _ -> text "<glshader>"
 
 
-formatCommented :: (a -> Box) -> Commented a -> Box'
+formatCommented :: (a -> Box) -> Commented a -> Box
 formatCommented format commented =
     case commented of
         Commented comments inner ->
-            hbox
-                [ hbox (map formatComment comments)
-                , depr $ format inner
-                ]
+            case
+                ( allSingles $ map formatComment comments
+                , isLine $ format inner
+                )
+            of
+                (Just [], Just inner') ->
+                    line inner'
+                (Just cs, Just inner') ->
+                    line $ row
+                        [ row cs
+                        , space
+                        , inner'
+                        ]
+                _ ->
+                    stack
+                        [ stack $ map formatComment comments
+                        , format inner
+                        ]
 
 
-formatComment :: Comment -> Box'
+formatComment :: Comment -> Box
 formatComment comment =
     case comment of
         BlockComment c ->
-            text $ "{- " ++ c ++ " -} "
+            case lines c of
+                (l:[]) ->
+                    line $ row
+                        [ punc "{-"
+                        , space
+                        , literal l
+                        , space
+                        , punc "-}"
+                        ]
+                (l1:ls) -> -- TODO: not tested
+                    stack
+                        [ line $ row
+                            [ punc "{-"
+                            , space
+                            , literal l1
+                            ]
+                        , stack $ map (line . literal) ls
+                        , line $ punc "-}"
+                        ]
 
 
 formatLiteral :: L.Literal -> Box
