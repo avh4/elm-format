@@ -247,8 +247,9 @@ formatDeclaration decl =
                             , text name
                             , text " ="
                             ]
-                        , formatExpression' False Nothing expr
-                            |> indent' 4
+                        , formatExpression False Nothing expr
+                            |> indent
+                            |> depr
                         ]
                         |> margin 2
                 AST.Declaration.Fixity assoc precedence name ->
@@ -617,9 +618,9 @@ formatExpression inList suffix aexpr =
         AST.Expression.TupleFunction n ->
             line $ keyword $ "(" ++ (List.replicate (n+1) ',') ++ ")"
 
-        -- AST.Expression.Access expr field ->
-        --     formatExpression False Nothing expr -- TODO: needs to have parens in some cases
-        --         |> addSuffix (Just $ row $ [punc ".", identifier field])
+        AST.Expression.Access expr field ->
+            formatExpression False Nothing expr -- TODO: needs to have parens in some cases
+                |> addSuffix (Just $ row $ [punc ".", identifier field])
 
         AST.Expression.AccessFunction field ->
             line $ identifier $ "." ++ field
@@ -692,26 +693,6 @@ formatExpression inList suffix aexpr =
 
         AST.Expression.GLShader _ _ _ ->
             line $ keyword "<TODO: glshader>"
-
-        _ ->
-            case lines $ render $ formatExpression' inList suffix aexpr of
-                (l:[]) ->
-                    line $ literal l
-                (ls) ->
-                    stack (map (line . literal) ls)
-
-
-formatExpression' :: Bool -> Maybe Line -> AST.Expression.Expr -> Box'
-formatExpression' inList suffix aexpr =
-    case RA.drop aexpr of
-        AST.Expression.Access expr field ->
-            formatExpression'
-                False
-                (Just $ row $ [punc ".", identifier field] ++ (suffix |> fmap ((flip (:)) []) |> Maybe.fromMaybe []))
-                expr -- TODO: needs to have parens in some cases
-
-        _ ->
-            depr $ formatExpression inList suffix aexpr
 
 
 formatCommented :: (a -> Box) -> Commented a -> Box
