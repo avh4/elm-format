@@ -14,7 +14,8 @@ import qualified Reporting.Region
 
 capitalLetter :: Gen Char
 capitalLetter =
-    elements "ABCDEFGHIJKLMNOPQRSTUVWXYZÀΩЉԱႠᎣḀℇ𐐅𝐴𝞨"
+    elements "ABCDEFGHIJKLMNOPQRSTUVWXYZÀΩЉԱႠḀℇ𐐅𝐴𝞨"
+    -- Should also be capital, but Data.Char.isUpper does not agree: Ꭳ
 
 
 capitalAscii :: Gen Char
@@ -35,7 +36,7 @@ number =
 capIdentifier :: Gen String
 capIdentifier =
     do
-        first <- capitalAscii
+        first <- capitalLetter
         rest <- listOf $ oneof [ capitalLetter, lowerLetter, number ]
         return $ first:rest
 
