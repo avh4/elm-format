@@ -103,17 +103,16 @@ indent =
     mapLines (\l -> row [Tab, l])
 
 
--- TODO: should return Either [Box] [Line] -- replace isLine and destructure
--- TODO: use destructure instead?
-isLine :: Box -> Maybe Line
+isLine :: Box -> Either Box Line
 isLine b =
     case b of
         Stack l [] ->
-            Just l
+            Right l
         _ ->
-            Nothing
+            Left b
 
 
+-- TODO: replace with isLine?
 destructure :: Box -> (Line, [Line])
 destructure b =
     case b of
@@ -121,16 +120,19 @@ destructure b =
             (first, rest)
 
 
--- TODO: should return Either [Box] [Line]
-allSingles :: [Box] -> Maybe [Line]
-allSingles =
-    sequence . (map isLine)
+allSingles :: [Box] -> Either [Box] [Line]
+allSingles boxes =
+    case sequence $ map isLine boxes of
+        Right lines' ->
+            Right lines'
+        _ ->
+            Left boxes
 
 
 elmApplication :: Box -> [Box] -> Box
 elmApplication first rest =
     case allSingles (first:rest) of
-        Just ls ->
+        Right ls ->
             ls
                 |> List.intersperse space
                 |> row
@@ -150,9 +152,9 @@ prefix pref =
 elmGroup :: Bool -> String -> String -> String -> Bool -> [Box] -> Box
 elmGroup innerSpaces left sep right forceMultiline children =
     case (forceMultiline, allSingles children) of
-        (_, Just []) ->
+        (_, Right []) ->
             line $ row [punc left, punc right]
-        (False, Just ls) ->
+        (False, Right ls) ->
             line $ row $ concat
                 [ if innerSpaces then [punc left, space] else [punc left]
                 , List.intersperse (row [punc sep, space]) ls

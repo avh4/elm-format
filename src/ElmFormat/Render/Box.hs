@@ -87,7 +87,7 @@ formatModule modu =
                 , case formatListing $ fmap RA.drop $ AST.Module.exports modu of
                     Just listing ->
                         case isLine listing of
-                            Just listing' ->
+                            Right listing' ->
                                 row [ space, listing' ]
                             _ ->
                                 keyword "<TODO: multiline module listing>"
@@ -202,7 +202,7 @@ formatImport aimport =
                 case formatListing $ AST.Module.exposedVars method of
                     Just listing ->
                         case isLine listing of
-                            Just listing' ->
+                            Right listing' ->
                                 line $ row
                                     [ keyword "import"
                                     , space
@@ -289,7 +289,7 @@ formatDeclaration decl =
                     let
                         ctor (tag,args') =
                             case allSingles $ map (formatType' ForCtor) args' of
-                                Just args'' ->
+                                Right args'' ->
                                     line $ row $ List.intersperse space $ (identifier tag):args''
                                 _ ->
                                     line $ keyword "<TODO: multiline type in constructor argument>"
@@ -329,7 +329,7 @@ formatDeclaration decl =
 
                 AST.Declaration.PortAnnotation name typ ->
                     case isLine $ formatType typ of
-                        Just typ' ->
+                        Right typ' ->
                             line $ row
                                 [ keyword "port"
                                 , space
@@ -357,7 +357,7 @@ formatDeclaration decl =
 
                 AST.Declaration.Fixity assoc precedence name ->
                     case isLine $ formatCommented (line . formatInfixVar) name of
-                        Just name' ->
+                        Right name' ->
                             line $ row
                                 [ case assoc of
                                       AST.Declaration.L -> keyword "infixl"
@@ -384,7 +384,7 @@ formatDefinition compact adef =
                 , isLine $ formatExpression expr
                 )
             of
-                (True, False, Just name', Just args', Just expr') ->
+                (True, False, Right name', Right args', Right expr') ->
                     line $ row
                         [ row $ List.intersperse space $ (name':args')
                         , space
@@ -392,7 +392,7 @@ formatDefinition compact adef =
                         , space
                         , expr'
                         ]
-                (_, _, Just name', Just args', _) ->
+                (_, _, Right name', Right args', _) ->
                     stack
                         [ line $ row
                             [ row $ List.intersperse space $ (name':args')
@@ -410,7 +410,7 @@ formatDefinition compact adef =
                 , isLine $ formatType typ
                 )
             of
-                (Just name', Just typ') ->
+                (Right name', Right typ') ->
                     line $ row
                         [ name'
                         , space
@@ -435,7 +435,7 @@ formatPattern parensRequired apattern =
             elmGroup True "{" "," "}" False $ map (line . identifier) fields
         AST.Pattern.Alias name pattern ->
             case isLine $ formatPattern True pattern of
-                Just pattern' ->
+                Right pattern' ->
                     line $ row
                         [ pattern'
                         , space
@@ -473,7 +473,7 @@ formatRecordPair (k,v,multiline') =
         , isLine $ formatExpression v
         )
     of
-        (False, Just v') ->
+        (False, Right v') ->
             line $ row
                 [ identifier k
                 , space
@@ -505,7 +505,7 @@ formatExpression aexpr =
                 , isLine $ formatExpression right
                 )
             of
-                (False, Just left', Just right') ->
+                (False, Right left', Right right') ->
                     line $ row
                         [ punc "["
                         , left'
@@ -545,7 +545,7 @@ formatExpression aexpr =
                     , allSingles $ es
                     )
                 of
-                    (False, Just left'', Just ops'', Just es') ->
+                    (False, Right left'', Right ops'', Right es') ->
                         zip ops'' es'
                             |> map (\(op,e) -> row [op, space, e])
                             |> List.intersperse space
@@ -553,7 +553,7 @@ formatExpression aexpr =
                             |> (:) left''
                             |> row
                             |> line
-                    (_, _, Just ops'', _) ->
+                    (_, _, Right ops'', _) ->
                         zip ops'' es
                             |> map (\(op,e) -> prefix (row [op, space]) e)
                             |> stack
@@ -568,7 +568,7 @@ formatExpression aexpr =
                 , isLine $ formatExpression expr
                 )
             of
-                (False, Just patterns', Just expr') ->
+                (False, Right patterns', Right expr') ->
                     line $ row
                         [ punc "\\"
                         , row $ List.intersperse space $ patterns'
@@ -577,7 +577,7 @@ formatExpression aexpr =
                         , space
                         , expr'
                         ]
-                (_, Just patterns', _) ->
+                (_, Right patterns', _) ->
                     stack
                         [ line $ row
                             [ punc "\\"
@@ -601,7 +601,7 @@ formatExpression aexpr =
                 , allSingles $ map formatExpression args
                 )
             of
-                (False, Just left', Just args') ->
+                (False, Right left', Right args') ->
                   line $ row
                       $ List.intersperse space $ (left':args')
                 _ ->
@@ -623,7 +623,7 @@ formatExpression aexpr =
             let
                 opening key multiline cond =
                     case (multiline, isLine cond) of
-                        (False, Just cond') ->
+                        (False, Right cond') ->
                             line $ row
                                 [ keyword key
                                 , space
@@ -674,7 +674,7 @@ formatExpression aexpr =
                       , isLine $ formatExpression subject
                       )
                   of
-                      (False, Just subject') ->
+                      (False, Right subject') ->
                           line $ row
                               [ keyword "case"
                               , space
@@ -692,7 +692,7 @@ formatExpression aexpr =
 
                 clause (pat,expr) =
                     case isLine $ formatPattern True pat of
-                        Just pat' ->
+                        Right pat' ->
                             stack
                                 [ line $ row [ pat', space, keyword "->"]
                                 , formatExpression expr
@@ -730,7 +730,7 @@ formatExpression aexpr =
                 , allSingles $ map formatRecordPair pairs
                 )
             of
-                (False, Just base', Just pairs') ->
+                (False, Right base', Right pairs') ->
                     line $ row
                         [ punc "{"
                         , space
@@ -764,7 +764,7 @@ formatExpression aexpr =
                 , allSingles $ map formatRecordPair pairs
                 )
             of
-                (False, Just pairs') ->
+                (False, Right pairs') ->
                     line $ row
                         [ punc "{"
                         , space
@@ -777,7 +777,7 @@ formatExpression aexpr =
 
         AST.Expression.Parens expr multiline ->
             case (multiline, isLine $ formatExpression expr) of
-                (False, Just expr') ->
+                (False, Right expr') ->
                     line $ row [ punc "(", expr', punc ")" ]
                 _ ->
                     stack
@@ -799,9 +799,9 @@ formatCommented format commented =
                 , isLine $ format inner
                 )
             of
-                (Just [], Just inner') ->
+                (Right [], Right inner') ->
                     line inner'
-                (Just cs, Just inner') ->
+                (Right cs, Right inner') ->
                     line $ row
                         [ row cs
                         , space
@@ -960,7 +960,7 @@ formatType' requireParens atype =
             case
                 allSingles $ map (formatType' ForLambda) (first:rest)
             of
-                Just typs ->
+                Right typs ->
                     line $ row $ List.intersperse (row [ space, keyword "->", space]) typs
                 _ -> -- TODO: not tested
                     stack
@@ -1017,7 +1017,7 @@ formatType' requireParens atype =
                             , allSingles $ map formatField fields
                             )
                         of
-                            (False, Just typ', Just fields') ->
+                            (False, Right typ', Right fields') ->
                                 line $ row
                                     [ punc "{"
                                     , space
