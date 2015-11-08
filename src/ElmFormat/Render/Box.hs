@@ -594,6 +594,13 @@ formatExpression inList suffix aexpr =
         AST.Expression.TupleFunction n ->
             line $ keyword $ "(" ++ (List.replicate (n+1) ',') ++ ")"
 
+        -- AST.Expression.Access expr field ->
+        --     formatExpression False Nothing expr -- TODO: needs to have parens in some cases
+        --         |> addSuffix (Just $ row $ [punc ".", identifier field])
+
+        AST.Expression.AccessFunction field ->
+            line $ identifier $ "." ++ field
+
         _ ->
             case lines $ render $ formatExpression' inList suffix aexpr of
                 (l:[]) ->
@@ -610,9 +617,6 @@ formatExpression' inList suffix aexpr =
                 False
                 (Just $ row $ [punc ".", identifier field] ++ (suffix |> fmap ((flip (:)) []) |> Maybe.fromMaybe []))
                 expr -- TODO: needs to have parens in some cases
-
-        AST.Expression.AccessFunction field ->
-            hbox2 (text ".") (text field)
 
         AST.Expression.Update base pairs False ->
             let
