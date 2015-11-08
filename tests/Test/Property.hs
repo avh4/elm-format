@@ -67,7 +67,7 @@ propertyTests =
     [ testCase "simple AST round trip" $
         assertBool "" (astToAst simpleAst)
     , testProperty "rendered AST should parse as equivalent AST"
-        (\s -> counterexample (reportFailedAst s) (astToAst s))
+        $ verbose (\s -> counterexample (reportFailedAst s) $ astToAst s)
 
     , testCase "simple round trip" $
         assertStringToString "module Main (..) where\n\nfoo =\n    8\n"
