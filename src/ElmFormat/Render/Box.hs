@@ -346,6 +346,9 @@ formatExpression inList suffix aexpr =
                         , line $ punc "]"
                         ]
 
+        AST.Expression.ExplicitList exprs multiline ->
+            elmGroup True "[" "," "]" multiline $ map (formatExpression multiline Nothing) exprs
+
         _ ->
             case lines $ render $ formatExpression' inList suffix aexpr of
                 (l:[]) ->
@@ -357,22 +360,6 @@ formatExpression inList suffix aexpr =
 formatExpression' :: Bool -> Maybe Line -> AST.Expression.Expr -> Box'
 formatExpression' inList suffix aexpr =
     case RA.drop aexpr of
-        AST.Expression.ExplicitList exprs False ->
-            case exprs of
-                [] ->
-                    text "[]"
-                _ ->
-                    hboxlist "[ " ", " " ]" (formatExpression' False Nothing) exprs
-        AST.Expression.ExplicitList exprs True ->
-            case exprs of
-                [] ->
-                    text "[]"
-                _ ->
-                    vboxlist
-                        (text "[ ") ", "
-                        (text "]")
-                        (formatExpression' True Nothing) exprs
-
         AST.Expression.Binops l ops False ->
             let
                 opBoxes (op,e) =

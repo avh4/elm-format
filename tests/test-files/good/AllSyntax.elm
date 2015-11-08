@@ -505,15 +505,15 @@ multilineRange =
 
 nestedMultilineRange =
     [ [
-          if True then
-              1
-          else
-              2
+        if True then
+            1
+        else
+            2
       ..
-          if False then
-              3
-          else
-              5
+        if False then
+            3
+        else
+            5
       ]
     , [4..2]
     ]
