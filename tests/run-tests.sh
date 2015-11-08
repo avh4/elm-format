@@ -26,7 +26,8 @@ function compareFiles() {
 }
 
 function checkWaysToRun() {
-	INPUT="tests/test-files/good/$1"
+	cp "tests/test-files/good/$1" "_input.elm"
+	INPUT="_input.elm"
 	OUTPUT="formatted.elm"
 	DIRECTORY="tests/test-files/directory"
 	RECURSIVE_DIRECTORY="tests/test-files/recursive-directory"

@@ -45,10 +45,23 @@ space =
     Space
 
 
+len :: Line -> Int
+len l =
+    case l of
+        Text s -> length s
+        Row ls -> sum $ map len ls
+        Space -> 1
+
+
 data Box
     = Stack Line [Line]
     -- | Margin Int
     -- | Empty
+
+
+blankLine :: Box
+blankLine =
+    line $ literal ""
 
 
 line :: Line -> Box
@@ -138,8 +151,8 @@ elmApplication first rest =
 prefix :: Line -> Box -> Box
 prefix pref =
     mapFirstLine
-        (\l -> row [ pref, space, l ])
-        (\l -> row [ space, space, l ])
+        (\l -> row [ pref, l ])
+        (\l -> row [ row $ replicate (len pref) space, l ])
 
 
 elmGroup :: Bool -> String -> String -> String -> Bool -> [Box] -> Box
@@ -159,8 +172,8 @@ elmGroup innerSpaces left sep right forceMultiline children =
                     line $ row [ punc left, punc right]
                 (first:rest) ->
                     stack $
-                        (prefix (punc left) first)
-                        : (map (prefix (punc sep)) rest)
+                        (prefix (row [punc left, space]) first)
+                        : (map (prefix $ row [punc sep, space]) rest)
                         ++ [ line $ punc right ]
 
 

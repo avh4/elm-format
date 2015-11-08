@@ -278,11 +278,11 @@ multilineParenthesizedExpressions =
                 else
                   toFloat (range - 1)
               )
-        <<>>  ( if range == 0 then
-                  -1.0
-                else
-                  0.0
-              )
+        <<>> ( if range == 0 then
+                 -1.0
+               else
+                 0.0
+             )
 
 
 multilineParenthesizedExpressions =
@@ -423,6 +423,18 @@ multilineExpressionsInsideTuple =
         |> Maybe.withDefault 8
     , \a ->
         9
+    , foo
+        10
+    , ( 11
+      , 12
+      )
+    , { x = 13
+      , y = 14
+      }
+    , { a
+          | x = 15
+          , y = 16
+      }
     )
 
 
@@ -524,15 +536,15 @@ indentedMultilineInsideMultilineInfixApplication =
         + { x = 1
           , y = 2
           }
-        <|  { x = 1
-            , y = 2
-            }
+        <| { x = 1
+           , y = 2
+           }
         *** { x = 1
             , y = 2
             }
-        <<>>  { x = 1
-              , y = 2
-              }
+        <<>> { x = 1
+             , y = 2
+             }
         ==/== { x = 1
               , y = 2
               }

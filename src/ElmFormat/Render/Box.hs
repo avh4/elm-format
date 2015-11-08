@@ -20,6 +20,25 @@ import qualified Reporting.Annotation as RA
 import Text.Printf (printf)
 
 
+splitWhere :: (a -> Bool) -> [a] -> [[a]]
+splitWhere predicate list =
+    let
+        merge acc result =
+            (reverse acc):result
+
+        step (acc,result) next =
+            if predicate next then
+                ([], merge (next:acc) result)
+            else
+                (next:acc, result)
+    in
+      list
+          |> foldl step ([],[])
+          |> uncurry merge
+          |> dropWhile null
+          |> reverse
+
+
 formatModule :: AST.Module.Module -> Box'
 formatModule modu =
     vbox
@@ -172,6 +191,15 @@ formatVarValue aval =
                     line $ identifier name
 
 
+isDefinition :: AST.Expression.Def' -> Bool
+isDefinition def =
+    case def of
+        AST.Expression.Definition _ _ _ _ ->
+            True
+        _ ->
+            False
+
+
 formatDeclaration :: AST.Declaration.Decl -> Box'
 formatDeclaration decl =
     case decl of
@@ -181,6 +209,9 @@ formatDeclaration decl =
             case RA.drop adecl of
                 AST.Declaration.Definition def ->
                     formatDefinition False def
+                        |> depr
+                        |> if isDefinition (RA.drop def) then margin 2 else id
+
                 AST.Declaration.Datatype name args ctors ->
                     vbox
                         [ hbox
@@ -233,36 +264,54 @@ formatDeclaration decl =
                         ]
 
 
-formatDefinition :: Bool -> AST.Expression.Def -> Box'
+formatDefinition :: Bool -> AST.Expression.Def -> Box
 formatDefinition compact adef =
     case RA.drop adef of
         AST.Expression.Definition name args expr multiline ->
-            case compact && (not multiline) of
-                False ->
-                    vbox
-                        [ hbox
-                            [ depr $ formatPattern True name
-                            , hbox $ List.map (\arg -> hbox [ text " ", depr $ formatPattern True arg]) args
-                            , text " ="
+            case
+                ( compact
+                , multiline
+                , isLine $ formatPattern True name
+                , allSingles $ map (formatPattern True) args
+                , isLine $ formatExpression False Nothing expr
+                )
+            of
+                (True, False, Just name', Just args', Just expr') ->
+                    line $ row
+                        [ row $ List.intersperse space $ (name':args')
+                        , space
+                        , punc "="
+                        , space
+                        , expr'
+                        ]
+                (_, _, Just name', Just args', _) ->
+                    stack
+                        [ line $ row
+                            [ row $ List.intersperse space $ (name':args')
+                            , space
+                            , punc "="
                             ]
-                        , formatExpression' False Nothing expr
-                            |> indent' 4
+                        , formatExpression False Nothing expr
+                            |> indent
                         ]
-                    |> margin (if compact then 1 else 2)
-                True ->
-                    hbox
-                        [ depr $ formatPattern True name
-                        , hbox $ List.map (\arg -> hbox [ text " ", depr $ formatPattern True arg]) args
-                        , text " = "
-                        , formatExpression' False Nothing expr
-                        ]
-                    |> margin 1
+                _ ->
+                    line $ keyword "<TODO: let binding with multiline name/pattern>"
         AST.Expression.TypeAnnotation name typ ->
-            hbox
-                [ depr $ formatCommented (line . formatVar) name -- TODO: comments not tested
-                , text " : "
-                , (depr . formatType) typ
-                ]
+            case
+                ( isLine $ formatCommented (line . formatVar) name -- TODO: comments not tested
+                , isLine $ formatType typ
+                )
+            of
+                (Just name', Just typ') ->
+                    line $ row
+                        [ name'
+                        , space
+                        , punc ":"
+                        , space
+                        , typ'
+                        ]
+                _ ->
+                    line $ keyword "<TODO: multiline type annotation>"
 
 
 formatPattern :: Bool -> AST.Pattern.Pattern -> Box
@@ -307,7 +356,10 @@ addSuffix suffix b =
                 (l,[]) ->
                     line $ row [ l, suffix' ]
                 (l1,ls) ->
-                    line $ keyword "<TODO: suffix>"
+                    stack $
+                        [ line l1 ]
+                        ++ (map line $ init ls)
+                        ++ [ line $ row [ last ls, suffix' ] ]
 
 
 formatExpression :: Bool -> Maybe Line -> AST.Expression.Expr -> Box
@@ -349,6 +401,196 @@ formatExpression inList suffix aexpr =
         AST.Expression.ExplicitList exprs multiline ->
             elmGroup True "[" "," "]" multiline $ map (formatExpression multiline Nothing) exprs
 
+        AST.Expression.Binops left ops multiline ->
+            let
+                left' =
+                    formatExpression False Nothing left
+
+                ops' =
+                    ops |> map fst |> map (formatCommented (line. formatInfixVar)) -- TODO: comments not
+
+                es =
+                    ops |> map snd |> map (formatExpression inList Nothing)
+            in
+                case
+                    ( multiline
+                    , isLine $ left'
+                    , allSingles $ ops'
+                    , allSingles $ es
+                    )
+                of
+                    (False, Just left'', Just ops'', Just es') ->
+                        zip ops'' es'
+                            |> map (\(op,e) -> row [op, space, e])
+                            |> List.intersperse space
+                            |> (:) space
+                            |> (:) left''
+                            |> row
+                            |> line
+                    (_, _, Just ops'', _) ->
+                        zip ops'' es
+                            |> map (\(op,e) -> prefix (row [op, space]) e)
+                            |> stack
+                            |> (\body -> stack [left', indent body])
+                    _ ->
+                        line $ keyword "<TODO: multiline binary operator>"
+
+        AST.Expression.Lambda patterns expr multiline ->
+            case
+                ( multiline
+                , allSingles $ map (formatPattern True) patterns
+                , isLine $ formatExpression False Nothing expr
+                )
+            of
+                (False, Just patterns', Just expr') ->
+                    line $ row
+                        [ punc "\\"
+                        , row $ List.intersperse space $ patterns'
+                        , space
+                        , punc "->"
+                        , space
+                        , expr'
+                        ]
+                (_, Just patterns', _) ->
+                    stack
+                        [ line $ row
+                            [ punc "\\"
+                            , row $ List.intersperse space $ patterns'
+                            , space
+                            , punc "->"
+                            ]
+                        , formatExpression False Nothing expr
+                            |> indent
+                        ]
+                _ ->
+                    line $ keyword "<TODO: multiline pattern in lambda>"
+
+        AST.Expression.Unary AST.Expression.Negative e ->
+            prefix (punc "-") $ formatExpression False Nothing e
+
+        AST.Expression.App left args multiline ->
+            case
+                ( multiline
+                , isLine $ formatExpression False Nothing left
+                , allSingles $ map (formatExpression False Nothing) args
+                )
+            of
+                (False, Just left', Just args') ->
+                  line $ row
+                      $ List.intersperse space $ (left':args')
+                _ ->
+                    stack
+                        [ formatExpression False Nothing left
+                        , args
+                            |> map (formatExpression False Nothing)
+                            |> stack
+                            |> indent
+                        ]
+
+        AST.Expression.If [] els ->
+            stack
+                [ line $ keyword "<INVALID IF EXPRESSION>"
+                , formatExpression False Nothing els
+                    |> indent
+                ]
+        AST.Expression.If (if':elseifs) els ->
+            let
+                opening key multiline cond =
+                    case (multiline, isLine cond) of
+                        (False, Just cond') ->
+                            line $ row
+                                [ keyword key
+                                , space
+                                , cond'
+                                , space
+                                , keyword "then"
+                                ]
+                        _ ->
+                            stack
+                                [ line $ keyword key
+                                , cond |> indent
+                                , line $ keyword "then"
+                                ]
+
+                clause key (cond,multiline,body) =
+                    stack
+                        [ opening key multiline $ formatExpression False Nothing cond
+                        , formatExpression False Nothing body
+                            |> indent
+                        ]
+            in
+                stack $
+                    [ clause "if" if']
+                    ++ ( elseifs |> map (clause "else if") )
+                    ++
+                    [ line $ keyword "else"
+                    , formatExpression False Nothing els
+                        |> indent
+                    ]
+
+        AST.Expression.Let defs expr ->
+            stack
+                [ line $ keyword "let"
+                , defs
+                    |> map (\x -> (isDefinition $ RA.drop x, formatDefinition True x))
+                    |> splitWhere fst
+                    |> List.intersperse [(False, blankLine)]
+                    |> concat
+                    |> map snd
+                    |> stack
+                    |> indent
+                , line $ keyword "in"
+                , formatExpression False Nothing expr
+                    |> indent
+                ]
+
+        AST.Expression.Case (subject,multiline) clauses ->
+            let
+                opening =
+                  case
+                      ( multiline
+                      , isLine $ formatExpression False Nothing subject
+                      )
+                  of
+                      (False, Just subject') ->
+                          line $ row
+                              [ keyword "case"
+                              , space
+                              , subject'
+                              , space
+                              , keyword "of"
+                              ]
+                      _ ->
+                          stack
+                              [ line $ keyword "case"
+                              , formatExpression False Nothing subject
+                                  |> indent
+                              , line $ keyword "of"
+                              ]
+
+                clause (pat,expr) =
+                    case isLine $ formatPattern True pat of
+                        Just pat' ->
+                            stack
+                                [ line $ row [ pat', space, keyword "->"]
+                                , formatExpression False Nothing expr
+                                    |> indent
+                                ]
+                        _ ->
+                            line $ keyword "<TODO: multiline case pattern>"
+            in
+                stack
+                    [ opening
+                    , clauses
+                        |> map clause
+                        |> List.intersperse blankLine
+                        |> stack
+                        |> indent
+                    ]
+
+        AST.Expression.Tuple exprs multiline ->
+            elmGroup True "(" "," ")" multiline $ map (formatExpression False Nothing) exprs
+
         _ ->
             case lines $ render $ formatExpression' inList suffix aexpr of
                 (l:[]) ->
@@ -360,178 +602,6 @@ formatExpression inList suffix aexpr =
 formatExpression' :: Bool -> Maybe Line -> AST.Expression.Expr -> Box'
 formatExpression' inList suffix aexpr =
     case RA.drop aexpr of
-        AST.Expression.Binops l ops False ->
-            let
-                opBoxes (op,e) =
-                  [ hspace 1
-                  , depr $ formatCommented (line. formatInfixVar) op
-                  , hspace 1
-                  , formatExpression' False Nothing e
-                  ]
-            in
-                hbox $
-                    formatExpression' False Nothing l
-                    : concatMap opBoxes ops
-        AST.Expression.Binops l ops True ->
-            let
-                formatOp (op,e) =
-                    let
-                        fop = depr $ formatCommented (line . formatInfixVar) op -- TODO: comments not tested
-                        fexp = formatExpression' True Nothing e
-                        space =
-                            if height fexp <= 1 then
-                                1
-                            else if width fop `mod` 2 == 1 then
-                                1
-                            else
-                                2
-                    in
-                        hbox
-                            [ fop
-                            , hspace space
-                            , fexp
-                            ]
-            in
-                vbox
-                    [ formatExpression' False Nothing l
-                    , vbox (map formatOp ops)
-                        |> indent' (if inList then 2 else 4)
-                    ]
-
-        AST.Expression.Lambda patterns expr False ->
-            hbox
-                [ hboxlist "\\" " " " -> " (depr . formatPattern True) patterns
-                , formatExpression' False Nothing expr
-                ]
-        AST.Expression.Lambda patterns expr True ->
-            vbox
-                [ hboxlist "\\" " " " -> " (depr . formatPattern True) patterns
-                , formatExpression' False Nothing expr
-                    |> indent' (if inList then 2 else 4)
-                ]
-
-        AST.Expression.Unary AST.Expression.Negative e ->
-            hbox
-                [ text "-"
-                , formatExpression' False Nothing e
-                ]
-        AST.Expression.App l rs multiline ->
-            case multiline of
-                False ->
-                    hbox
-                        [ formatExpression' False Nothing l
-                        , hboxlist " " " " "" (formatExpression' False Nothing) rs
-                        ]
-                True ->
-                    vbox2
-                        (formatExpression' False Nothing l)
-                        (vboxlist empty "" empty (formatExpression' False Nothing) rs
-                            |> indent' (if inList then 2 else 4))
-
-        AST.Expression.If [] els ->
-            vbox
-                [ text "<INVALID IF EXPRESSION>"
-                , formatExpression' False Nothing els
-                    |> indent' (if inList then 2 else 4)
-                ]
-        AST.Expression.If ((if0,multiline0,body0):elseifs) els ->
-            vbox
-                [ case multiline0 of
-                      False ->
-                          hbox
-                              [ text "if "
-                              , formatExpression' False Nothing if0
-                              , text " then"
-                              ]
-                      True ->
-                          vbox
-                              [ text "if"
-                              , formatExpression' False Nothing if0
-                                  |> indent' (if inList then 2 else 4)
-                              , text "then"
-                              ]
-                , formatExpression' False Nothing body0
-                    |> indent' (if inList then 2 else 4)
-                , let
-                    formatElseIf (if',multiline',body') =
-                        vbox
-                            [ case multiline' of
-                                False ->
-                                    hbox
-                                        [ text "else if "
-                                        , formatExpression' False Nothing if'
-                                        , text " then"
-                                        ]
-                                True ->
-                                    vbox
-                                        [ text "else if"
-                                        , formatExpression' False Nothing if'
-                                            |> indent' (if inList then 2 else 4)
-                                        , text "then"
-                                        ]
-                            , formatExpression' False Nothing body'
-                                |> indent' (if inList then 2 else 4)
-                            ]
-                  in
-                      vbox (map formatElseIf elseifs)
-                , text "else"
-                , formatExpression' False Nothing els
-                    |> indent' (if inList then 2 else 4)
-                ]
-
-        AST.Expression.Let defs expr ->
-            vbox
-                [ text "let"
-                , vboxlist empty "" empty (formatDefinition True) defs
-                    |> indent' (if inList then 2 else 4)
-                    |> margin 0
-                , text "in"
-                , formatExpression' False Nothing expr
-                    |> indent' (if inList then 2 else 4)
-                ]
-        AST.Expression.Case (subject,multilineSubject) clauses ->
-            vbox
-                [ case multilineSubject of
-                    False ->
-                        hbox
-                            [ text "case "
-                            , formatExpression' False Nothing subject
-                            , text " of"
-                            ]
-                    True ->
-                        vbox
-                            [ text "case"
-                            , formatExpression' False Nothing subject
-                                |> indent' (if inList then 2 else 4)
-                            , text "of"
-                            ]
-                , let
-                      formatClause (pat,expr) =
-                          vbox
-                              [ hbox
-                                  [ depr $ formatPattern True pat
-                                  , text " ->"
-                                  ]
-                              , formatExpression' False Nothing expr
-                                  |> indent' 4
-                              ]
-                              |> margin 1
-                  in
-                      vbox (map formatClause clauses)
-                      |> margin 0
-                      |> indent' (if inList then 2 else 4)
-                ]
-
-        AST.Expression.Tuple [] _ ->
-            text "()"
-        AST.Expression.Tuple exprs False ->
-            hboxlist "( " ", " " )" (formatExpression' False Nothing) exprs
-        AST.Expression.Tuple exprs True ->
-            vboxlist
-                (text "( ") ", "
-                (text ")")
-                (formatExpression' True Nothing) exprs
-
         AST.Expression.TupleFunction n ->
             hboxlist "(" "" ")" (text . const ",") [0 .. n]
 
@@ -624,17 +694,10 @@ formatExpression' inList suffix aexpr =
                       pair pairs)
                   (suffix |> fmap (depr . line) |> Maybe.fromMaybe empty)
 
-        AST.Expression.Parens expr False ->
-            hbox
-                [ text "("
-                , formatExpression' False Nothing expr
-                , hbox2 (text ")") (suffix |> fmap (depr . line) |> Maybe.fromMaybe empty)
-                ]
-        AST.Expression.Parens expr True->
-            vboxlist
-                (text "( ") ""
-                (hbox2 (text ")") (suffix |> fmap (depr . line) |> Maybe.fromMaybe empty))
-                (formatExpression' True Nothing) [expr]
+        AST.Expression.Parens expr multiline ->
+            depr $
+            addSuffix suffix $
+            elmGroup multiline "(" "," ")" multiline [formatExpression False Nothing expr]
 
         AST.Expression.GLShader _ _ _ -> text "<glshader>"
 
@@ -814,7 +877,7 @@ formatType' requireParens atype =
             of
                 Just typs ->
                     line $ row $ List.intersperse (row [ space, keyword "->", space]) typs
-                _ ->
+                _ -> -- TODO: not tested
                     stack
                         [ formatType' ForLambda first
                         , rest
@@ -883,10 +946,10 @@ formatType' requireParens atype =
                                     ]
                             _ ->
                                 stack
-                                    [ prefix (punc "{") (formatType typ)
+                                    [ prefix (row [punc "{", space]) (formatType typ)
                                     , stack
-                                        ([ prefix (punc "|") $ formatField first ]
-                                        ++ (map (prefix (punc ",") . formatField) rest))
+                                        ([ prefix (row [punc "|", space]) $ formatField first ]
+                                        ++ (map (prefix (row [punc ",", space]) . formatField) rest))
                                         |> indent
                                     , line $ punc "}"
                                     ]
