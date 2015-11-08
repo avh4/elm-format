@@ -297,18 +297,30 @@ formatPattern parensRequired apattern =
             formatLiteral lit
 
 
+addSuffix :: Maybe Line -> Box -> Box
+addSuffix suffix b =
+    case suffix of
+        Nothing ->
+            b
+        Just suffix' ->
+            case destructure b of
+                (l,[]) ->
+                    line $ row [ l, suffix' ]
+                (l1,ls) ->
+                    line $ keyword "<TODO: suffix>"
+
+
 formatExpression :: Bool -> Maybe Line -> AST.Expression.Expr -> Box'
 formatExpression inList suffix aexpr =
     case RA.drop aexpr of
         AST.Expression.Literal lit ->
-            depr $ formatCommented (formatLiteral) lit
+            formatCommented (formatLiteral) lit
+                |> depr
+
         AST.Expression.Var v ->
-            hbox2
-                (depr $ formatCommented (line . formatVar) v) -- TODO: comments not tested
-                ( case suffix of
-                    Just l -> depr $ line $ l
-                    _ -> empty
-                )
+            formatCommented (line . formatVar) v -- TODO: comments not tested
+                |> addSuffix suffix
+                |> depr
 
         AST.Expression.Range left right False ->
             hbox
