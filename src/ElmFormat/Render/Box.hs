@@ -591,6 +591,9 @@ formatExpression inList suffix aexpr =
         AST.Expression.Tuple exprs multiline ->
             elmGroup True "(" "," ")" multiline $ map (formatExpression False Nothing) exprs
 
+        AST.Expression.TupleFunction n ->
+            line $ keyword $ "(" ++ (List.replicate (n+1) ',') ++ ")"
+
         _ ->
             case lines $ render $ formatExpression' inList suffix aexpr of
                 (l:[]) ->
@@ -602,9 +605,6 @@ formatExpression inList suffix aexpr =
 formatExpression' :: Bool -> Maybe Line -> AST.Expression.Expr -> Box'
 formatExpression' inList suffix aexpr =
     case RA.drop aexpr of
-        AST.Expression.TupleFunction n ->
-            hboxlist "(" "" ")" (text . const ",") [0 .. n]
-
         AST.Expression.Access expr field ->
             formatExpression'
                 False
