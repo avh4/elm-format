@@ -2,10 +2,10 @@ module Main (..) where
 
 ratio =
     graphHeight
-        / ( if range == 0 then
-              0.1
-            else
-              toFloat range
+        / (if range == 0 then
+            0.1
+           else
+            toFloat range
           )
 
 
@@ -18,7 +18,7 @@ myTuple =
 
 
 foo =
-    ( case x of
+    (case x of
         True ->
             1
 
@@ -28,14 +28,14 @@ foo =
 
 
 bar =
-    ( if
+    (if
         if a then
             True
         else
             False
-      then
+     then
         "a"
-      else
+     else
         "b"
     )
 

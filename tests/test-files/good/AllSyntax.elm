@@ -215,10 +215,10 @@ unaryOperator a =
 
 
 multilineUnaryOperator a =
-    -( if a then
-         1
-       else
-         2
+    -(if a then
+        1
+      else
+        2
      )
 
 
@@ -268,27 +268,27 @@ parenthesizedExpressions =
 
 multilineParenthesizedExpressions =
     graphHeight
-        / ( if range == 0 then
-              0.1
-            else
-              toFloat range
+        / (if range == 0 then
+            0.1
+           else
+            toFloat range
           )
-        ==/== ( if range == 0 then
-                  0.2
-                else
-                  toFloat (range - 1)
-              )
-        <<>> ( if range == 0 then
-                 -1.0
+        ==/== (if range == 0 then
+                0.2
                else
-                 0.0
+                toFloat (range - 1)
+              )
+        <<>> (if range == 0 then
+                -1.0
+              else
+                0.0
              )
 
 
 multilineParenthesizedExpressions =
-    ( if range == 0 then
+    (if range == 0 then
         0.1
-      else
+     else
         toFloat range
     )
 
@@ -302,7 +302,7 @@ recordAccessAsFunction r =
 
 
 multilineRecordAccess f =
-    ( True
+    (True
         |> f
     ).f1
 
@@ -321,7 +321,7 @@ multilineRecordAccess r f =
 
 
 chainedRecordAccess r =
-    ( (r.f1.f2).f3.f4
+    ((r.f1.f2).f3.f4
     ).f5.f6
 
 

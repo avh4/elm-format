@@ -678,6 +678,21 @@ formatExpression inList suffix aexpr =
                     elmGroup True "{" "," "}" multiline $ map formatRecordPair pairs
             |> addSuffix suffix
 
+        AST.Expression.Parens expr multiline ->
+            case (multiline, isLine $ formatExpression False Nothing expr) of
+                (False, Just expr') ->
+                    line $ row [ punc "(", expr', punc ")" ]
+                _ ->
+                    stack
+                        [ formatExpression False Nothing expr
+                            |> prefix (punc "(")
+                        , line $ punc ")"
+                        ]
+            |> addSuffix suffix
+
+        AST.Expression.GLShader _ _ _ ->
+            line $ keyword "<TODO: glshader>"
+
         _ ->
             case lines $ render $ formatExpression' inList suffix aexpr of
                 (l:[]) ->
@@ -694,13 +709,6 @@ formatExpression' inList suffix aexpr =
                 False
                 (Just $ row $ [punc ".", identifier field] ++ (suffix |> fmap ((flip (:)) []) |> Maybe.fromMaybe []))
                 expr -- TODO: needs to have parens in some cases
-
-        AST.Expression.Parens expr multiline ->
-            depr $
-            addSuffix suffix $
-            elmGroup multiline "(" "," ")" multiline [formatExpression False Nothing expr]
-
-        AST.Expression.GLShader _ _ _ -> text "<glshader>"
 
         _ ->
             depr $ formatExpression inList suffix aexpr
