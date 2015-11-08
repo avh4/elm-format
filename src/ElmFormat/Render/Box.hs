@@ -39,6 +39,44 @@ splitWhere predicate list =
           |> reverse
 
 
+intersperseMap :: (a -> Bool) -> b -> (a -> b) -> [a] -> [b]
+intersperseMap predicate sep fn list =
+    list
+        |> map (\x -> (predicate x, fn x))
+        |> splitWhere fst
+        |> List.intersperse [(False, sep)]
+        |> concat
+        |> map snd
+
+
+isDeclaration :: AST.Declaration.Decl -> Bool
+isDeclaration decl =
+    case decl of
+        AST.Declaration.Decl adecl ->
+            case RA.drop adecl of
+                AST.Declaration.Definition def ->
+                    case RA.drop def of
+                        AST.Expression.Definition _ _ _ _ ->
+                            True
+
+                        _ ->
+                            False
+
+                AST.Declaration.Datatype _ _ _ ->
+                    True
+
+                AST.Declaration.TypeAlias _ _ _ ->
+                    True
+
+                AST.Declaration.PortDefinition _ _ ->
+                    True
+
+                _ ->
+                    False
+
+        _ ->
+            False
+
 formatModule :: AST.Module.Module -> Box'
 formatModule modu =
     vbox
@@ -70,7 +108,9 @@ formatModule modu =
                 |> map (depr . formatImport)
                 |> vbox
                 |> margin 2
-        , vbox (map formatDeclaration $ AST.Module.body modu)
+        , depr $ stack $
+            intersperseMap isDeclaration (stack [blankLine, blankLine]) formatDeclaration $
+                AST.Module.body modu
         ]
 
 
@@ -200,69 +240,101 @@ isDefinition def =
             False
 
 
-formatDeclaration :: AST.Declaration.Decl -> Box'
+formatDeclaration :: AST.Declaration.Decl -> Box
 formatDeclaration decl =
     case decl of
         AST.Declaration.Comment docs ->
-            depr $ formatDocComment docs
+            formatDocComment docs
         AST.Declaration.Decl adecl ->
             case RA.drop adecl of
                 AST.Declaration.Definition def ->
                     formatDefinition False def
-                        |> depr
-                        |> if isDefinition (RA.drop def) then margin 2 else id
 
                 AST.Declaration.Datatype name args ctors ->
-                    vbox
-                        [ hbox
-                            [ text "type "
-                            , text name
-                            , hboxlist " " " " "" text args
-                            ]
-                        , vboxlist
-                            (text "= ") "| "
-                            empty
-                            (\(c, args') -> hbox2 (text c) (hboxlist " " " " "" (depr . formatType' ForCtor) args')) ctors
-                            |> indent' 4
-                        ]
-                        |> margin 2
+                    let
+                        ctor (tag,args') =
+                            case allSingles $ map (formatType' ForCtor) args' of
+                                Just args'' ->
+                                    line $ row $ List.intersperse space $ (identifier tag):args''
+                                _ ->
+                                    line $ keyword "<TODO: multiline type in constructor argument>"
+                    in
+                        case ctors of
+                            [] ->
+                                line $ keyword "<INVALID DATA TYPE: no constructors>"
+                            (first:rest) ->
+                                stack
+                                    [ line $ row
+                                        [ keyword "type"
+                                        , space
+                                        , row $ List.intersperse space $ map identifier (name:args)
+                                        ]
+                                    , stack
+                                        [ ctor first
+                                            |> prefix (row [punc "=", space])
+                                        , stack $ map (prefix (row [punc "|", space]) . ctor) rest
+                                        ]
+                                        |> indent
+                                    ]
+
                 AST.Declaration.TypeAlias name args typ ->
-                    vbox
-                        [ hboxlist "type alias " " " " =" text (name:args)
-                        , (depr . formatType) typ
-                            |> indent' 4
+                    stack
+                        [ line $ row
+                            [ keyword "type"
+                            , space
+                            , keyword "alias"
+                            , space
+                            , row $ List.intersperse space $ map identifier $ name:args
+                            , space
+                            , punc "="
+                            ]
+                        , formatType typ
+                            |> indent
                         ]
-                        |> margin 2
+
                 AST.Declaration.PortAnnotation name typ ->
-                    hbox
-                        [ text "port "
-                        , text name
-                        , text " : "
-                        , (depr . formatType) typ
-                        ]
+                    case isLine $ formatType typ of
+                        Just typ' ->
+                            line $ row
+                                [ keyword "port"
+                                , space
+                                , identifier name
+                                , space
+                                , punc ":"
+                                , space
+                                , typ'
+                                ]
+                        _ ->
+                            line $ keyword "<TODO: multiline type in port annotation>"
+
                 AST.Declaration.PortDefinition name expr ->
-                    vbox
-                        [ hbox
-                            [ text "port "
-                            , text name
-                            , text " ="
+                    stack
+                        [ line $ row
+                            [ keyword "port"
+                            , space
+                            , identifier name
+                            , space
+                            , punc "="
                             ]
                         , formatExpression expr
                             |> indent
-                            |> depr
                         ]
-                        |> margin 2
+
                 AST.Declaration.Fixity assoc precedence name ->
-                    hbox
-                        [ case assoc of
-                              AST.Declaration.L -> text "infixl"
-                              AST.Declaration.R -> text "infixr"
-                              AST.Declaration.N -> text "infix"
-                        , text " "
-                        , text $ show precedence
-                        , text " "
-                        , depr $ formatCommented (line . formatInfixVar) name
-                        ]
+                    case isLine $ formatCommented (line . formatInfixVar) name of
+                        Just name' ->
+                            line $ row
+                                [ case assoc of
+                                      AST.Declaration.L -> keyword "infixl"
+                                      AST.Declaration.R -> keyword "infixr"
+                                      AST.Declaration.N -> keyword "infix"
+                                , space
+                                , literal $ show precedence
+                                , space
+                                , name'
+                                ]
+                        _ ->
+                            line $ keyword "<TODO: multiline name in fixity declaration>"
 
 
 formatDefinition :: Bool -> AST.Expression.Def -> Box
@@ -551,11 +623,7 @@ formatExpression aexpr =
             stack
                 [ line $ keyword "let"
                 , defs
-                    |> map (\x -> (isDefinition $ RA.drop x, formatDefinition True x))
-                    |> splitWhere fst
-                    |> List.intersperse [(False, blankLine)]
-                    |> concat
-                    |> map snd
+                    |> intersperseMap (isDefinition . RA.drop) blankLine (formatDefinition True)
                     |> stack
                     |> indent
                 , line $ keyword "in"
