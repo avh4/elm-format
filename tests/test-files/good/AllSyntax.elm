@@ -86,6 +86,19 @@ annotatedFn =
     "XYZZY"
 
 
+fn2 :
+    { x : Int
+    , y : String
+    }
+    -> String
+    -> { a
+        | x : Float
+       }
+    -> Int
+fn2 _ _ _ =
+    999
+
+
 escapedString =
     let
         normals = "a b'`<>{}/ڥ😀ぁ⾃𝟟"

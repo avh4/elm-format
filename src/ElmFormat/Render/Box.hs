@@ -418,8 +418,16 @@ formatDefinition compact adef =
                         , space
                         , typ'
                         ]
+
+                (Right name', Left typ') ->
+                    stack
+                        [ line $ row [ name', space, punc ":" ]
+                        , typ'
+                            |> indent
+                        ]
+
                 _ ->
-                    line $ keyword "<TODO: multiline type annotation>"
+                    line $ keyword "<TODO: multiline name in type annotation>"
 
 
 formatPattern :: Bool -> AST.Pattern.Pattern -> Box
@@ -967,7 +975,7 @@ formatType' requireParens atype =
                         [ formatType' ForLambda first
                         , rest
                             |> map (formatType' ForLambda)
-                            |> map (prefix (keyword "->"))
+                            |> map (prefix (row [keyword "->", space]))
                             |> stack
                         ]
             |> (if requireParens /= NotRequired then addParens else id)
