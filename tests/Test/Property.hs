@@ -42,7 +42,7 @@ astToAst ast =
 
 
 simpleAst =
-    case Parse.toEither $ Parse.parse $ LazyText.pack "module Main (..) where\n\nfoo =\n    8\n" of
+    case Parse.toEither $ Parse.parse $ LazyText.pack "module Main (..) where\n\n\nfoo =\n    8\n" of
         Right ast -> ast
 
 
@@ -70,5 +70,5 @@ propertyTests =
         $ verbose (\s -> counterexample (reportFailedAst s) $ astToAst s)
 
     , testCase "simple round trip" $
-        assertStringToString "module Main (..) where\n\nfoo =\n    8\n"
+        assertStringToString "module Main (..) where\n\n\nfoo =\n    8\n"
     ]

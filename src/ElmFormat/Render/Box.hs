@@ -15,7 +15,6 @@ import qualified AST.Type
 import qualified AST.Variable
 import qualified Data.Char as Char
 import qualified Data.List as List
-import qualified Data.Maybe as Maybe
 import qualified Reporting.Annotation as RA
 import Text.Printf (printf)
 
@@ -77,41 +76,77 @@ isDeclaration decl =
         _ ->
             False
 
-formatModule :: AST.Module.Module -> Box'
+formatModule :: AST.Module.Module -> Box
 formatModule modu =
-    vbox
-        [ hbox
-            [ text "module "
-            , depr $ line $ formatName $ AST.Module.name modu
-            , case formatListing $ fmap RA.drop $ AST.Module.exports modu of
-                Just listing ->
-                    case isLine listing of
-                        Just listing' ->
-                            depr $ line $ row [ space, listing' ]
-                        _ ->
-                            text "<TODO: multiline module listing>"
-                _ ->
-                    empty
-            , text " where"
-            ]
-            |> margin 1
-        , formatModuleDocs (AST.Module.docs modu)
-            |> fmap depr
-            |> fmap (margin 1)
-            |> Maybe.fromMaybe empty
-        , case AST.Module.imports modu of
-            [] ->
-                empty
-            imports ->
-                imports
-                |> List.sortOn (fst . RA.drop)
-                |> map (depr . formatImport)
-                |> vbox
-                |> margin 2
-        , depr $ stack $
-            intersperseMap isDeclaration (stack [blankLine, blankLine]) formatDeclaration $
-                AST.Module.body modu
-        ]
+    let
+        moduleLine =
+            line $ row
+                [ keyword "module"
+                , space
+                , formatName $ AST.Module.name modu
+                , case formatListing $ fmap RA.drop $ AST.Module.exports modu of
+                    Just listing ->
+                        case isLine listing of
+                            Just listing' ->
+                                row [ space, listing' ]
+                            _ ->
+                                keyword "<TODO: multiline module listing>"
+                    _ ->
+                        keyword "<TODO: no listing>"
+                , space
+                , keyword "where"
+                ]
+
+        docs =
+            formatModuleDocs (AST.Module.docs modu)
+
+        imports =
+              AST.Module.imports modu
+                  |> List.sortOn (fst . RA.drop)
+                  |> map formatImport
+
+        body =
+            stack $
+                intersperseMap isDeclaration (stack [blankLine, blankLine]) formatDeclaration $
+                    AST.Module.body modu
+    in
+        case (docs, imports) of -- TODO: not all cases are tested
+            (Just docs', []) ->
+                stack
+                    [ moduleLine
+                    , blankLine
+                    , docs'
+                    , blankLine
+                    , blankLine
+                    , body
+                    ]
+            (Just docs', _) ->
+                stack
+                    [ moduleLine
+                    , blankLine
+                    , docs'
+                    , blankLine
+                    , stack imports
+                    , blankLine
+                    , blankLine
+                    , body
+                    ]
+            (Nothing, []) ->
+                stack
+                    [ moduleLine
+                    , blankLine
+                    , blankLine
+                    , body
+                    ]
+            (Nothing, _) ->
+                stack
+                    [ moduleLine
+                    , blankLine
+                    , stack imports
+                    , blankLine
+                    , blankLine
+                    , body
+                    ]
 
 
 formatModuleDocs :: RA.Located (Maybe String) -> Maybe Box
