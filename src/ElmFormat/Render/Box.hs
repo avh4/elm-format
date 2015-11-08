@@ -247,7 +247,7 @@ formatDeclaration decl =
                             , text name
                             , text " ="
                             ]
-                        , formatExpression False Nothing expr
+                        , formatExpression expr
                             |> indent
                             |> depr
                         ]
@@ -274,7 +274,7 @@ formatDefinition compact adef =
                 , multiline
                 , isLine $ formatPattern True name
                 , allSingles $ map (formatPattern True) args
-                , isLine $ formatExpression False Nothing expr
+                , isLine $ formatExpression expr
                 )
             of
                 (True, False, Just name', Just args', Just expr') ->
@@ -292,7 +292,7 @@ formatDefinition compact adef =
                             , space
                             , punc "="
                             ]
-                        , formatExpression False Nothing expr
+                        , formatExpression expr
                             |> indent
                         ]
                 _ ->
@@ -347,27 +347,23 @@ formatPattern parensRequired apattern =
             formatLiteral lit
 
 
-addSuffix :: Maybe Line -> Box -> Box
+addSuffix :: Line -> Box -> Box
 addSuffix suffix b =
-    case suffix of
-        Nothing ->
-            b
-        Just suffix' ->
-            case destructure b of
-                (l,[]) ->
-                    line $ row [ l, suffix' ]
-                (l1,ls) ->
-                    stack $
-                        [ line l1 ]
-                        ++ (map line $ init ls)
-                        ++ [ line $ row [ last ls, suffix' ] ]
+    case destructure b of
+        (l,[]) ->
+            line $ row [ l, suffix ]
+        (l1,ls) ->
+            stack $
+                [ line l1 ]
+                ++ (map line $ init ls)
+                ++ [ line $ row [ last ls, suffix ] ]
 
 
 formatRecordPair :: (String, AST.Expression.Expr, Bool) -> Box
 formatRecordPair (k,v,multiline') =
     case
         ( multiline'
-        , isLine $ formatExpression False Nothing v
+        , isLine $ formatExpression v
         )
     of
         (False, Just v') ->
@@ -381,26 +377,25 @@ formatRecordPair (k,v,multiline') =
         _ ->
             stack
                 [ line $ row [ identifier k, space, punc "=" ]
-                , formatExpression False Nothing v
+                , formatExpression v
                     |> indent
                 ]
 
 
-formatExpression :: Bool -> Maybe Line -> AST.Expression.Expr -> Box
-formatExpression inList suffix aexpr =
+formatExpression :: AST.Expression.Expr -> Box
+formatExpression aexpr =
     case RA.drop aexpr of
         AST.Expression.Literal lit ->
             formatCommented (formatLiteral) lit
 
         AST.Expression.Var v ->
             formatCommented (line . formatVar) v -- TODO: comments not tested
-                |> addSuffix suffix
 
         AST.Expression.Range left right multiline ->
             case
                 ( multiline
-                , isLine $ formatExpression False Nothing left
-                , isLine $ formatExpression False Nothing right
+                , isLine $ formatExpression left
+                , isLine $ formatExpression right
                 )
             of
                 (False, Just left', Just right') ->
@@ -414,27 +409,27 @@ formatExpression inList suffix aexpr =
                 _ ->
                     stack
                         [ line $ punc "["
-                        , formatExpression False Nothing left
+                        , formatExpression left
                             |> indent
                         , line $ punc ".."
-                        , formatExpression False Nothing right
+                        , formatExpression right
                             |> indent
                         , line $ punc "]"
                         ]
 
         AST.Expression.ExplicitList exprs multiline ->
-            elmGroup True "[" "," "]" multiline $ map (formatExpression multiline Nothing) exprs
+            elmGroup True "[" "," "]" multiline $ map formatExpression exprs
 
         AST.Expression.Binops left ops multiline ->
             let
                 left' =
-                    formatExpression False Nothing left
+                    formatExpression left
 
                 ops' =
                     ops |> map fst |> map (formatCommented (line. formatInfixVar)) -- TODO: comments not
 
                 es =
-                    ops |> map snd |> map (formatExpression inList Nothing)
+                    ops |> map snd |> map formatExpression
             in
                 case
                     ( multiline
@@ -463,7 +458,7 @@ formatExpression inList suffix aexpr =
             case
                 ( multiline
                 , allSingles $ map (formatPattern True) patterns
-                , isLine $ formatExpression False Nothing expr
+                , isLine $ formatExpression expr
                 )
             of
                 (False, Just patterns', Just expr') ->
@@ -483,20 +478,20 @@ formatExpression inList suffix aexpr =
                             , space
                             , punc "->"
                             ]
-                        , formatExpression False Nothing expr
+                        , formatExpression expr
                             |> indent
                         ]
                 _ ->
                     line $ keyword "<TODO: multiline pattern in lambda>"
 
         AST.Expression.Unary AST.Expression.Negative e ->
-            prefix (punc "-") $ formatExpression False Nothing e
+            prefix (punc "-") $ formatExpression e
 
         AST.Expression.App left args multiline ->
             case
                 ( multiline
-                , isLine $ formatExpression False Nothing left
-                , allSingles $ map (formatExpression False Nothing) args
+                , isLine $ formatExpression left
+                , allSingles $ map formatExpression args
                 )
             of
                 (False, Just left', Just args') ->
@@ -504,9 +499,9 @@ formatExpression inList suffix aexpr =
                       $ List.intersperse space $ (left':args')
                 _ ->
                     stack
-                        [ formatExpression False Nothing left
+                        [ formatExpression left
                         , args
-                            |> map (formatExpression False Nothing)
+                            |> map formatExpression
                             |> stack
                             |> indent
                         ]
@@ -514,7 +509,7 @@ formatExpression inList suffix aexpr =
         AST.Expression.If [] els ->
             stack
                 [ line $ keyword "<INVALID IF EXPRESSION>"
-                , formatExpression False Nothing els
+                , formatExpression els
                     |> indent
                 ]
         AST.Expression.If (if':elseifs) els ->
@@ -538,8 +533,8 @@ formatExpression inList suffix aexpr =
 
                 clause key (cond,multiline,body) =
                     stack
-                        [ opening key multiline $ formatExpression False Nothing cond
-                        , formatExpression False Nothing body
+                        [ opening key multiline $ formatExpression cond
+                        , formatExpression body
                             |> indent
                         ]
             in
@@ -548,7 +543,7 @@ formatExpression inList suffix aexpr =
                     ++ ( elseifs |> map (clause "else if") )
                     ++
                     [ line $ keyword "else"
-                    , formatExpression False Nothing els
+                    , formatExpression els
                         |> indent
                     ]
 
@@ -564,7 +559,7 @@ formatExpression inList suffix aexpr =
                     |> stack
                     |> indent
                 , line $ keyword "in"
-                , formatExpression False Nothing expr
+                , formatExpression expr
                     |> indent
                 ]
 
@@ -573,7 +568,7 @@ formatExpression inList suffix aexpr =
                 opening =
                   case
                       ( multiline
-                      , isLine $ formatExpression False Nothing subject
+                      , isLine $ formatExpression subject
                       )
                   of
                       (False, Just subject') ->
@@ -587,7 +582,7 @@ formatExpression inList suffix aexpr =
                       _ ->
                           stack
                               [ line $ keyword "case"
-                              , formatExpression False Nothing subject
+                              , formatExpression subject
                                   |> indent
                               , line $ keyword "of"
                               ]
@@ -597,7 +592,7 @@ formatExpression inList suffix aexpr =
                         Just pat' ->
                             stack
                                 [ line $ row [ pat', space, keyword "->"]
-                                , formatExpression False Nothing expr
+                                , formatExpression expr
                                     |> indent
                                 ]
                         _ ->
@@ -613,14 +608,14 @@ formatExpression inList suffix aexpr =
                     ]
 
         AST.Expression.Tuple exprs multiline ->
-            elmGroup True "(" "," ")" multiline $ map (formatExpression False Nothing) exprs
+            elmGroup True "(" "," ")" multiline $ map formatExpression exprs
 
         AST.Expression.TupleFunction n ->
             line $ keyword $ "(" ++ (List.replicate (n+1) ',') ++ ")"
 
         AST.Expression.Access expr field ->
-            formatExpression False Nothing expr -- TODO: needs to have parens in some cases
-                |> addSuffix (Just $ row $ [punc ".", identifier field])
+            formatExpression expr -- TODO: needs to have parens in some cases
+                |> addSuffix (row $ [punc ".", identifier field])
 
         AST.Expression.AccessFunction field ->
             line $ identifier $ "." ++ field
@@ -628,7 +623,7 @@ formatExpression inList suffix aexpr =
         AST.Expression.RecordUpdate base pairs multiline ->
             case
                 ( multiline
-                , isLine $ formatExpression False Nothing base
+                , isLine $ formatExpression base
                 , allSingles $ map formatRecordPair pairs
                 )
             of
@@ -650,7 +645,7 @@ formatExpression inList suffix aexpr =
                             line $ keyword "<INVALID RECORD EXTENSION>"
                         (first:rest) ->
                             stack
-                                [ formatExpression False Nothing base
+                                [ formatExpression base
                                     |> prefix (row [punc "{", space])
                                 , stack
                                     [ prefix (row [punc "|", space]) first
@@ -659,7 +654,6 @@ formatExpression inList suffix aexpr =
                                     |> indent
                                 , line $ punc "}"
                                 ]
-            |> addSuffix suffix
 
         AST.Expression.Record pairs multiline ->
             case
@@ -677,19 +671,17 @@ formatExpression inList suffix aexpr =
                         ]
                 _ ->
                     elmGroup True "{" "," "}" multiline $ map formatRecordPair pairs
-            |> addSuffix suffix
 
         AST.Expression.Parens expr multiline ->
-            case (multiline, isLine $ formatExpression False Nothing expr) of
+            case (multiline, isLine $ formatExpression expr) of
                 (False, Just expr') ->
                     line $ row [ punc "(", expr', punc ")" ]
                 _ ->
                     stack
-                        [ formatExpression False Nothing expr
+                        [ formatExpression expr
                             |> prefix (punc "(")
                         , line $ punc ")"
                         ]
-            |> addSuffix suffix
 
         AST.Expression.GLShader _ _ _ ->
             line $ keyword "<TODO: glshader>"
