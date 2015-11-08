@@ -432,8 +432,8 @@ multilineExpressionsInsideTuple =
       , y = 14
       }
     , { a
-          | x = 15
-          , y = 16
+        | x = 15
+        , y = 16
       }
     )
 

@@ -601,6 +601,64 @@ formatExpression inList suffix aexpr =
         AST.Expression.AccessFunction field ->
             line $ identifier $ "." ++ field
 
+        AST.Expression.Update base pairs multiline ->
+            let
+                pair (k,v,multiline') =
+                    case
+                        ( multiline'
+                        , isLine $ formatExpression False Nothing v
+                        )
+                    of
+                        (False, Just v') ->
+                            line $ row
+                                [ identifier k
+                                , space
+                                , punc "="
+                                , space
+                                , v'
+                                ]
+                        _ ->
+                            stack
+                                [ line $ row [ identifier k, space, punc "=" ]
+                                , formatExpression False Nothing v
+                                    |> indent
+                                ]
+            in
+                case
+                    ( multiline
+                    , isLine $ formatExpression False Nothing base
+                    , allSingles $ map pair pairs
+                    )
+                of
+                    (False, Just base', Just pairs') ->
+                        line $ row
+                            [ punc "{"
+                            , space
+                            , base'
+                            , space
+                            , punc "|"
+                            , space
+                            , row $ List.intersperse commaSpace pairs'
+                            , space
+                            , punc "}"
+                            ]
+                    _ ->
+                        case map pair pairs of
+                            [] ->
+                                line $ keyword "<INVALID RECORD EXTENSION>"
+                            (first:rest) ->
+                                stack
+                                    [ formatExpression False Nothing base
+                                        |> prefix (row [punc "{", space])
+                                    , stack
+                                        [ prefix (row [punc "|", space]) first
+                                        , stack $ map (prefix (row [punc ",", space])) rest
+                                        ]
+                                        |> indent
+                                    , line $ punc "}"
+                                    ]
+            |> addSuffix suffix
+
         _ ->
             case lines $ render $ formatExpression' inList suffix aexpr of
                 (l:[]) ->
@@ -617,49 +675,6 @@ formatExpression' inList suffix aexpr =
                 False
                 (Just $ row $ [punc ".", identifier field] ++ (suffix |> fmap ((flip (:)) []) |> Maybe.fromMaybe []))
                 expr -- TODO: needs to have parens in some cases
-
-        AST.Expression.Update base pairs False ->
-            let
-                pair (k,v,_) = -- multiline' will always be False
-                    hbox
-                        [ text k
-                        , text " = "
-                        , formatExpression' False Nothing v
-                        ]
-            in
-                hbox
-                    [ text "{ "
-                    , formatExpression' False Nothing base
-                    , hboxlist " | " ", " "" pair pairs
-                    , text " }"
-                    , suffix |> fmap (depr . line) |> Maybe.fromMaybe empty
-                    ]
-        AST.Expression.Update base pairs True ->
-            let
-                pair (k,v,multiline') =
-                    case multiline' of
-                        False ->
-                            hbox
-                                [ text k
-                                , text " = "
-                                , formatExpression' False Nothing v
-                                ]
-                        True ->
-                            vbox
-                                [ hbox2 (text k) (text " =")
-                                , formatExpression' False Nothing v
-                                    |> indent' 2
-                                ]
-            in
-                vbox
-                    [ hbox2 (text "{ ") (formatExpression' False Nothing base)
-                    , vboxlist
-                        (text "| ") ", "
-                        empty
-                        pair pairs
-                        |> indent' 4
-                    , (hbox2 (text "}") (suffix |> fmap (depr . line) |> Maybe.fromMaybe empty))
-                    ]
 
         AST.Expression.Record pairs True ->
             let
