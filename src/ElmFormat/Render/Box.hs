@@ -601,7 +601,7 @@ formatExpression inList suffix aexpr =
         AST.Expression.AccessFunction field ->
             line $ identifier $ "." ++ field
 
-        AST.Expression.Update base pairs multiline ->
+        AST.Expression.RecordUpdate base pairs multiline ->
             let
                 pair (k,v,multiline') =
                     case
