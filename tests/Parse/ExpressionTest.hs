@@ -153,4 +153,50 @@ tests =
         , testCase "(3)" $ assertFailure expr "(\n 1\n ,\n2\n )"
         , testCase "(4)" $ assertFailure expr "(\n 1\n ,\n 2\n)"
         ]
+
+    , testCase "record (empty)" $
+        assertParse expr "{}" $ at 1 1 1 3 $ Record [] False
+    , testCase "record (empty, whitespace)" $
+        assertParse expr "{ } " $ at 1 1 1 4 $ Record [] False
+    , testCase "record" $
+        assertParse expr "{x=7,y=8}" $ at 1 1 1 10 $ Record [("x", intExpr (1,4,1,5) 7, False), ("y", intExpr (1,8,1,9) 8, False)] False
+    , testCase "record (single field)" $
+        assertParse expr "{x=7}" $ at 1 1 1 6 $ Record [("x", intExpr (1,4,1,5) 7, False)] False
+    , testCase "record (whitespace)" $
+        assertParse expr "{ x = 7 , y = 8 } " $ at 1 1 1 18 $ Record [("x", intExpr (1,7,1,8) 7, False), ("y", intExpr (1,15,1,16) 8, False)] False
+    , testCase "record (newlines)" $
+        assertParse expr "{\n x\n =\n 7\n ,\n y\n =\n 8\n }\n" $ at 1 1 9 3 $ Record [("x", intExpr (4,2,4,3) 7, True), ("y", intExpr (8,2,8,3) 8, True)] True
+    , testGroup "record (must be indented)"
+        [ testCase "(1)" $ assertFailure expr "{\nx\n =\n 7\n ,\n y\n =\n 8\n }"
+        , testCase "(2)" $ assertFailure expr "{\n x\n=\n 7\n ,\n y\n =\n 8\n }"
+        , testCase "(3)" $ assertFailure expr "{\n x\n =\n7\n ,\n y\n =\n 8\n }"
+        , testCase "(4)" $ assertFailure expr "{\n x\n =\n 7\n,\n y\n =\n 8\n }"
+        , testCase "(5)" $ assertFailure expr "{\n x\n =\n 7\n ,\ny\n =\n 8\n }"
+        , testCase "(6)" $ assertFailure expr "{\n x\n =\n 7\n ,\n y\n=\n 8\n }"
+        , testCase "(7)" $ assertFailure expr "{\n x\n =\n 7\n ,\n y\n =\n8\n }"
+        , testCase "(8)" $ assertFailure expr "{\n x\n =\n 7\n ,\n y\n =\n 8\n}"
+        ]
+
+    , testCase "record update" $
+        assertParse expr "{a|x=7,y=8}" $ at 1 1 1 12 $ RecordUpdate (at 1 2 1 3 $ Var $ Commented [] $ VarRef "a") [("x", intExpr (1,6,1,7) 7, False), ("y", intExpr (1,10,1,11) 8, False)] False
+    , testCase "record update (whitespace)" $
+        assertParse expr "{ a | x = 7 , y = 8 } " $ at 1 1 1 22 $ RecordUpdate (at 1 3 1 4 $ Var $ Commented [] $ VarRef "a") [("x", intExpr (1,11,1,12) 7, False), ("y", intExpr (1,19,1,20) 8, False)] False
+    , testCase "record update (newlines)" $
+        assertParse expr "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }\n" $ at 1 1 11 3 $ RecordUpdate (at 2 2 2 3 $ Var $ Commented [] $ VarRef "a") [("x", intExpr (6,2,6,3) 7, True), ("y", intExpr (10,2,10,3) 8, True)] True
+    , testCase "record update (only allows simple base)" $
+        assertFailure expr "{9|x=7}"
+    , testCase "record update (only allows simple base)" $
+        assertFailure expr "{{}|x=7}"
+    , testGroup "record update (must be indented)" $
+        [ testCase "(1)" $ assertFailure expr "{\na\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }"
+        , testCase "(2)" $ assertFailure expr "{\n a\n|\n x\n =\n 7\n ,\n y\n =\n 8\n }"
+        , testCase "(3)" $ assertFailure expr "{\n a\n |\nx\n =\n 7\n ,\n y\n =\n 8\n }"
+        , testCase "(4)" $ assertFailure expr "{\n a\n |\n x\n=\n 7\n ,\n y\n =\n 8\n }"
+        , testCase "(5)" $ assertFailure expr "{\n a\n |\n x\n =\n7\n ,\n y\n =\n 8\n }"
+        , testCase "(6)" $ assertFailure expr "{\n a\n |\n x\n =\n 7\n,\n y\n =\n 8\n }"
+        , testCase "(7)" $ assertFailure expr "{\n a\n |\n x\n =\n 7\n ,\ny\n =\n 8\n }"
+        , testCase "(8)" $ assertFailure expr "{\n a\n |\n x\n =\n 7\n ,\n y\n=\n 8\n }"
+        , testCase "(9)" $ assertFailure expr "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n8\n }"
+        , testCase "(10)" $ assertFailure expr "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n}"
+        ]
     ]
