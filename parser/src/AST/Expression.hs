@@ -52,10 +52,3 @@ data Expr'
     -- for type checking and code gen only
     | GLShader String String Literal.GLShaderTipe
     deriving (Eq, Show)
-
-
----- UTILITIES ----
-
-rawVar :: String -> Expr'
-rawVar x =
-    Var $ Commented [] $ Var.VarRef x

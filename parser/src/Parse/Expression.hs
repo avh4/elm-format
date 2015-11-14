@@ -24,7 +24,7 @@ import qualified Reporting.Annotation as A
 
 varTerm :: IParser E.Expr'
 varTerm =
-  boolean <|> (toVar <$> var)
+  boolean <|> ((\x -> E.Var $ Commented [] $ Var.VarRef x) <$> var)
 
 
 boolean :: IParser E.Expr'
@@ -33,19 +33,6 @@ boolean =
       f = const (L.Boolean False) <$> string "False"
   in
     E.Literal <$> addComments (t <|> f)
-
-
-toVar :: String -> E.Expr'
-toVar v =
-  case v of
-    "True" ->
-        E.Literal $ Commented [] $ L.Boolean True
-
-    "False" ->
-        E.Literal $ Commented [] $ L.Boolean False
-
-    _ ->
-        E.rawVar v
 
 
 accessor :: IParser E.Expr'
@@ -133,7 +120,7 @@ recordTerm =
       do  try (string "|")
           whitespace
           fields <- commaSep1 field
-          return $ \multiline -> (E.RecordUpdate (A.A ann (E.rawVar starter)) fields multiline)
+          return $ \multiline -> (E.RecordUpdate (A.A ann (E.Var $ Commented [] $ Var.VarRef starter)) fields multiline)
 
     literal (A.A _ starter) =
       do  pushNewlineContext
