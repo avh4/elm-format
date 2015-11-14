@@ -80,9 +80,9 @@ tests =
     , testCase "range" $
         assertParse expr "[7..9]" $ simple $ Range (intExpr 7) (intExpr 9) False
     , testCase "range (whitespace)" $
-        assertParse expr "[ 7 .. 9 ]" $ simple $ Range (intExpr 7) (intExpr 9) False
+        assertParse expr "[ 7 .. 9 ] " $ simple $ Range (intExpr 7) (intExpr 9) False
     , testCase "range (newlines)" $
-        assertParse expr "[\n 7\n ..\n 9\n ]" $ simple $ Range (intExpr 7) (intExpr 9) True
+        assertParse expr "[\n 7\n ..\n 9\n ]\n" $ simple $ Range (intExpr 7) (intExpr 9) True
     , testGroup "range (must be indented)"
         [ testCase "(1) " $ assertFailure expr "[\n7\n ..\n 9\n ]"
         , testCase "(2) " $ assertFailure expr "[\n 7\n..\n 9\n ]"
@@ -95,9 +95,9 @@ tests =
     , testCase "list (empty)" $
         assertParse expr "[]" $ simple $ ExplicitList [] False
     , testCase "list (whitespace)" $
-        assertParse expr "[ 1 , 2 , 3 ]" $ simple $ ExplicitList (map intExpr [1,2,3]) False
+        assertParse expr "[ 1 , 2 , 3 ] " $ simple $ ExplicitList (map intExpr [1,2,3]) False
     , testCase "list (newlines)" $
-        assertParse expr "[\n 1\n ,\n 2\n ,\n 3\n ]" $ simple $ ExplicitList (map intExpr [1,2,3]) True
+        assertParse expr "[\n 1\n ,\n 2\n ,\n 3\n ]\n" $ simple $ ExplicitList (map intExpr [1,2,3]) True
     , testGroup "list (must be indented)"
         [ testCase "(1)" $ assertFailure expr "[\n1\n ,\n 2\n ]"
         , testCase "(2)" $ assertFailure expr "[\n 1\n,\n 2\n ]"
@@ -105,6 +105,47 @@ tests =
         , testCase "(4)" $ assertFailure expr "[\n 1\n ,\n 2\n]"
         ]
 
+    , testCase "symbolic operator as function" $
+        assertParse expr "(+)" $ simple $ Var $ Commented [] $ OpRef "+"
+    , testCase "symbolic operator as function (whitespace)" $
+        assertParse expr "( + ) " $ simple $ Var $ Commented [] $ OpRef "+"
+    , testCase "symbolic operator as function (does not allow newlines)" $
+        assertFailure expr "(\n + \n)"
+
+    , testCase "tuple function" $
+        assertParse expr "(,,)" $ simple $ TupleFunction 3
+    , testCase "tuple function (whitespace)" $
+        assertParse expr "( , ,) " $ simple $ TupleFunction 3
+    , testCase "tuple function (newlines)" $
+        assertParse expr "(\n ,\n ,)\n" $ simple $ TupleFunction 3
+    , testGroup "tuple function (must be indented)"
+        [ testCase "(1)" $ assertFailure expr "(\n,\n ,)"
+        , testCase "(2)" $ assertFailure expr "(\n ,\n,)"
+        ]
+    , testCase "tuple function (does not allow trailing inner whitespace)" $
+        assertFailure expr "(,, )"
+
+    , testCase "parenthesized expression" $
+        assertParse expr "(7)" $ simple $ Parens (intExpr 7) False
+    , testCase "parenthesized expression (whitespace)" $
+        assertParse expr "( 7 ) " $ simple $ Parens (intExpr 7) False
+    , testCase "parenthesized expression (newlines)" $
+        assertParse expr "(\n 7\n )\n" $ simple $ Parens (intExpr 7) True
+    , testGroup "parenthesized expression (must be indented)"
+        [ testCase "(1)" $ assertFailure expr "(\n7\n )"
+        , testCase "(2)" $ assertFailure expr "(\n 7\n)"
+        ]
+
     , testCase "tuple" $
-        assertParse expr "(1,2)" $ simple $ Tuple [simple $ Literal $ Commented [] $ IntNum 1, simple $ Literal $ Commented [] $ IntNum 2] False
+        assertParse expr "(1,2)" $ simple $ Tuple (map intExpr [1,2]) False
+    , testCase "tuple (whitespace)" $
+        assertParse expr "( 1 , 2 ) " $ simple $ Tuple (map intExpr [1,2]) False
+    , testCase "tuple (newlines)" $
+        assertParse expr "(\n 1\n ,\n 2\n )\n" $ simple $ Tuple (map intExpr [1,2]) True
+    , testGroup "tuple (must be indented)"
+        [ testCase "(1)" $ assertFailure expr "(\n1\n ,\n 2\n )"
+        , testCase "(2)" $ assertFailure expr "(\n 1\n,\n 2\n )"
+        , testCase "(3)" $ assertFailure expr "(\n 1\n ,\n2\n )"
+        , testCase "(4)" $ assertFailure expr "(\n 1\n ,\n 2\n)"
+        ]
     ]

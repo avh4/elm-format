@@ -43,7 +43,7 @@ data Expr'
     | Let [Def] Expr
     | Case (Expr,Bool) [(Pattern.Pattern, Expr)]
     | Tuple [Expr] Bool
-    | TupleFunction Int
+    | TupleFunction Int -- will be 2 (,) or greater, indicating the size of the tuple
     | Access Expr String
     | AccessFunction String
     | RecordUpdate Expr [(String, Expr, Bool)] Bool

@@ -92,7 +92,7 @@ parensTerm =
       do  (start, commas, end) <-
               located (comma >> many (whitespace >> comma))
           return $
-              \_ -> A.at start end $ E.TupleFunction $ length commas
+              \_ -> A.at start end $ E.TupleFunction (length commas + 2)
 
     parened =
       do  (start, expressions, end) <- located (commaSep expr)

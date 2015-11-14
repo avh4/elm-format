@@ -722,7 +722,7 @@ formatExpression aexpr =
             elmGroup True "(" "," ")" multiline $ map formatExpression exprs
 
         AST.Expression.TupleFunction n ->
-            line $ keyword $ "(" ++ (List.replicate (n+1) ',') ++ ")"
+            line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
 
         AST.Expression.Access expr field ->
             formatExpression expr -- TODO: needs to have parens in some cases
