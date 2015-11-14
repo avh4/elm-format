@@ -13,7 +13,7 @@ import AST.V0_15
 import AST.Expression
 import AST.Literal
 import AST.Variable
-import Reporting.Annotation
+import Reporting.Annotation hiding (map)
 import Reporting.Region
 
 
@@ -88,6 +88,21 @@ tests =
         , testCase "(2) " $ assertFailure expr "[\n 7\n..\n 9\n ]"
         , testCase "(3) " $ assertFailure expr "[\n 7\n ..\n9\n ]"
         , testCase "(4) " $ assertFailure expr "[\n 7\n ..\n 9\n]"
+        ]
+
+    , testCase "list" $
+        assertParse expr "[1,2,3]" $ simple $ ExplicitList (map intExpr [1,2,3]) False
+    , testCase "list (empty)" $
+        assertParse expr "[]" $ simple $ ExplicitList [] False
+    , testCase "list (whitespace)" $
+        assertParse expr "[ 1 , 2 , 3 ]" $ simple $ ExplicitList (map intExpr [1,2,3]) False
+    , testCase "list (newlines)" $
+        assertParse expr "[\n 1\n ,\n 2\n ,\n 3\n ]" $ simple $ ExplicitList (map intExpr [1,2,3]) True
+    , testGroup "list (must be indented)"
+        [ testCase "(1)" $ assertFailure expr "[\n1\n ,\n 2\n ]"
+        , testCase "(2)" $ assertFailure expr "[\n 1\n,\n 2\n ]"
+        , testCase "(3)" $ assertFailure expr "[\n 1\n ,\n2\n ]"
+        , testCase "(4)" $ assertFailure expr "[\n 1\n ,\n 2\n]"
         ]
 
     , testCase "tuple" $
