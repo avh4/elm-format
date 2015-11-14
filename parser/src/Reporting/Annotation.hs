@@ -9,12 +9,7 @@ import qualified Reporting.Region as R
 
 data Annotated annotation a
     = A annotation a
-    deriving (Show)
-
-
-instance (Eq a) => Eq (Annotated ann a) where
-    (==) (A _ a) (A _ b) =
-        a == b
+    deriving (Show, Eq)
 
 
 type Located a =
@@ -52,6 +47,11 @@ map f (A annotation value) =
 drop :: Annotated info a -> a
 drop (A _ value) =
     value
+
+
+stripRegion :: Annotated R.Region a -> Annotated R.Region a
+stripRegion (A _ value) =
+    A (R.Region (R.Position 0 0) (R.Position 0 0)) value
 
 
 -- PRETTY PRINT

@@ -79,7 +79,9 @@ parensTerm :: IParser E.Expr
 parensTerm =
   choice
     [ try (parens $ fmap const opFn)
-    , parens (tupleFn <|> parened)
+    , do
+          (start, e, end) <- located $ parens (tupleFn <|> parened)
+          return $ A.at start end e
     ]
   where
     opFn =
@@ -89,19 +91,18 @@ parensTerm =
               E.Var op
 
     tupleFn =
-      do  (start, commas, end) <-
-              located (comma >> many (whitespace >> comma))
+      do  commas <- comma >> many (whitespace >> comma)
           return $
-              \_ -> A.at start end $ E.TupleFunction (length commas + 2)
+              \_ -> E.TupleFunction (length commas + 2)
 
     parened =
-      do  (start, expressions, end) <- located (commaSep expr)
+      do  expressions <- commaSep expr
           return $
             case expressions of
               [expression] ->
-                  \multiline -> A.at start end (E.Parens expression multiline)
+                  \multiline -> E.Parens expression multiline
               _ ->
-                  \multiline -> A.at start end (E.Tuple expressions multiline)
+                  \multiline -> E.Tuple expressions multiline
 
 
 recordTerm :: IParser E.Expr

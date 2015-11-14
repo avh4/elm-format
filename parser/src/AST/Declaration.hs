@@ -20,6 +20,13 @@ data Declaration
     deriving (Eq, Show)
 
 
+stripRegion :: Declaration -> Declaration
+stripRegion d =
+    case d of
+        Definition e ->
+            Definition $ Expression.stripRegion e
+        _ -> d
+
 -- INFIX STUFF
 
 data Assoc = L | N | R
@@ -41,3 +48,11 @@ data Decl
     = Comment String
     | Decl (A.Located Declaration)
     deriving (Eq, Show)
+
+
+stripRegion' :: Decl -> Decl
+stripRegion' d =
+    case d of
+        Decl d' ->
+            Decl $ A.stripRegion $ A.map stripRegion d'
+        _ -> d

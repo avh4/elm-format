@@ -9,6 +9,8 @@ import Test.Framework.Providers.HUnit
 import Test.Framework.Providers.QuickCheck2
 import Test.QuickCheck
 
+import AST.Module (stripRegion)
+
 import qualified AST.Module
 import qualified Data.Text.Lazy as LazyText
 import qualified ElmFormat.Parse as Parse
@@ -38,7 +40,7 @@ astToAst ast =
                 |> Parse.parse
                 |> Parse.toEither
     in
-        result == (Right ast)
+        (fmap stripRegion result) == (Right $ stripRegion ast)
 
 
 simpleAst =
@@ -49,7 +51,7 @@ simpleAst =
 reportFailedAst ast =
     let
         rendering = Render.render ast |> LazyText.unpack
-        result = Render.render ast |> Parse.parse |> show
+        result = Render.render ast |> Parse.parse |> fmap stripRegion |> show
     in
         concat
             [ "=== Parsed as:\n"

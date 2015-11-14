@@ -2,6 +2,7 @@ module AST.Module
     ( Module(..), Body(..)
     , Header(..)
     , UserImport, DefaultImport, ImportMethod(..)
+    , stripRegion
     ) where
 
 import qualified AST.Declaration as Declaration
@@ -22,6 +23,15 @@ data Module = Module
     }
     deriving (Eq, Show)
 
+
+stripRegion m =
+    Module
+    { name = name m
+    , docs = A.stripRegion $ docs m
+    , exports = fmap A.stripRegion $ exports m
+    , imports = imports m
+    , body = map Declaration.stripRegion' $ body m
+    }
 
 data Body expr = Body
     { program   :: expr

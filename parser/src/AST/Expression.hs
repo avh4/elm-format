@@ -26,6 +26,20 @@ data Def'
     deriving (Eq, Show)
 
 
+stripRegion :: Def -> Def
+stripRegion d =
+    A.stripRegion $ A.map stripRegion' d
+
+
+stripRegion' :: Def' -> Def'
+stripRegion' d =
+    case d of
+        Definition p ps e b ->
+            Definition (A.stripRegion p) (map A.stripRegion ps) (A.stripRegion e) b
+        _ ->
+            d
+
+
 type Expr =
     A.Located Expr'
 
