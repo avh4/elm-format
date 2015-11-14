@@ -9,6 +9,7 @@ import qualified Data.Text.Lazy as LazyText
 
 import Parse.Expression
 import Parse.Helpers (IParser, iParse)
+import Text.ParserCombinators.Parsec.Combinator (eof)
 import AST.V0_15
 import AST.Expression
 import AST.Literal
@@ -198,5 +199,14 @@ tests =
         , testCase "(8)" $ assertFailure expr "{\n a\n |\n x\n =\n 7\n ,\n y\n=\n 8\n }"
         , testCase "(9)" $ assertFailure expr "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n8\n }"
         , testCase "(10)" $ assertFailure expr "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n}"
+        ]
+
+    , testCase "function application" $
+        assertParse expr "f 7 8" $ at 1 1 1 6 $ App (at 1 1 1 2 $ Var $ Commented [] $ VarRef "f") [intExpr (1,3,1,4) 7, intExpr (1,5,1,6) 8] False
+    , testCase "function application (newlines)" $
+        assertParse expr "f\n 7\n 8\n" $ at 1 1 3 3 $ App (at 1 1 1 2 $ Var $ Commented [] $ VarRef "f") [intExpr (2,2,2,3) 7, intExpr (3,2,3,3) 8] True
+    , testGroup "function application (must be indented)"
+        [ testCase "(1)" $ assertFailure (expr >> eof) "f\n7\n 8"
+        , testCase "(2)" $ assertFailure (expr >> eof) "f\n 7\n8"
         ]
     ]
