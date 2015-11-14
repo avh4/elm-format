@@ -45,6 +45,8 @@ nowhere = Region (Position 0 0) (Position 0 0)
 
 simple e = A nowhere $ e
 
+intExpr i = simple $ Literal $ Commented [] $ IntNum i
+
 
 tests :: Test
 tests =
@@ -66,10 +68,27 @@ tests =
 
     , testCase "negative" $
         assertParse expr "-True" $ simple $ Unary Negative $ simple $ Literal $ Commented [] $ Boolean True
+    , testCase "negative (must not have whitespace)" $
+        assertFailure expr "- True"
+    , testCase "negative (must not have comment)" $
+        assertFailure expr "-{- -}True"
     , testCase "negative (does not apply to '-')" $
         assertFailure expr "--True"
     , testCase "negative (does not apply to '.')" $
         assertFailure expr "-.foo"
+
+    , testCase "range" $
+        assertParse expr "[7..9]" $ simple $ Range (intExpr 7) (intExpr 9) False
+    , testCase "range (whitespace)" $
+        assertParse expr "[ 7 .. 9 ]" $ simple $ Range (intExpr 7) (intExpr 9) False
+    , testCase "range (newlines)" $
+        assertParse expr "[\n 7\n ..\n 9\n ]" $ simple $ Range (intExpr 7) (intExpr 9) True
+    , testGroup "range (must be indented)"
+        [ testCase "(1) " $ assertFailure expr "[\n7\n ..\n 9\n ]"
+        , testCase "(2) " $ assertFailure expr "[\n 7\n..\n 9\n ]"
+        , testCase "(3) " $ assertFailure expr "[\n 7\n ..\n9\n ]"
+        , testCase "(4) " $ assertFailure expr "[\n 7\n ..\n 9\n]"
+        ]
 
     , testCase "tuple" $
         assertParse expr "(1,2)" $ simple $ Tuple [simple $ Literal $ Commented [] $ IntNum 1, simple $ Literal $ Commented [] $ IntNum 2] False
