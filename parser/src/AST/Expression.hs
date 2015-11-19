@@ -45,7 +45,7 @@ type Expr =
 
 
 data Expr'
-    = Literal (Commented Literal.Literal)
+    = Literal Literal.Literal
     | Var (Commented Var.Ref)
     | Range (Commented' Expr) (Commented' Expr) Bool
     | ExplicitList [Expr] Bool

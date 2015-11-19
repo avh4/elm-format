@@ -32,7 +32,7 @@ boolean =
   let t = const (L.Boolean True) <$> string "True"
       f = const (L.Boolean False) <$> string "False"
   in
-    E.Literal <$> addComments (t <|> f)
+    E.Literal <$> (t <|> f)
 
 
 accessor :: IParser E.Expr'
@@ -158,7 +158,7 @@ recordTerm =
 
 term :: IParser E.Expr
 term =
-  addLocation (choice [ E.Literal <$> addComments Literal.literal, listTerm, accessor, negative ])
+  addLocation (choice [ E.Literal <$> Literal.literal, listTerm, accessor, negative ])
     <|> accessible (addLocation varTerm <|> parensTerm <|> recordTerm)
     <?> "an expression"
 

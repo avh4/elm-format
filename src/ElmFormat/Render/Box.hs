@@ -501,7 +501,7 @@ formatExpression :: AST.Expression.Expr -> Box
 formatExpression aexpr =
     case RA.drop aexpr of
         AST.Expression.Literal lit ->
-            formatCommented (formatLiteral) lit
+            formatLiteral lit
 
         AST.Expression.Var v ->
             formatCommented (line . formatVar) v -- TODO: comments not tested

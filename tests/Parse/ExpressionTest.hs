@@ -20,25 +20,25 @@ import Parse.TestHelpers
 
 
 commentedIntExpr (a,b,c,d) preComment postComment i =
-    Commented' [BlockComment preComment] [BlockComment postComment] $ at a b c d  $ Literal $ Commented [] $ IntNum i
+    Commented' [BlockComment preComment] [BlockComment postComment] $ at a b c d  $ Literal $ IntNum i
 
 commentedIntExpr' (a,b,c,d) preComment i =
-    Commented' [BlockComment preComment] [] $ at a b c d  $ Literal $ Commented [] $ IntNum i
+    Commented' [BlockComment preComment] [] $ at a b c d  $ Literal $ IntNum i
 
 
-intExpr (a,b,c,d) i = at a b c d $ Literal $ Commented [] $ IntNum i
+intExpr (a,b,c,d) i = at a b c d $ Literal $ IntNum i
 
 intExpr' (a,b,c,d) i =
-    Commented' [] [] $ at a b c d  $ Literal $ Commented [] $ IntNum i
+    Commented' [] [] $ at a b c d  $ Literal $ IntNum i
 
 
 tests :: Test
 tests =
     testGroup "Parse.Expression"
     [ testCase "boolean (True)" $
-        assertParse expr "True" $ at 1 1 1 5 $ Literal $ Commented [] $ Boolean True
+        assertParse expr "True" $ at 1 1 1 5 $ Literal $ Boolean True
     , testCase "boolean (False)" $
-        assertParse expr "False" $ at 1 1 1 6 $ Literal $ Commented [] $ Boolean False
+        assertParse expr "False" $ at 1 1 1 6 $ Literal $ Boolean False
 
     , testCase "var (lowercase)" $
         assertParse expr "foo" $ at 1 1 1 4 $ Var $ Commented [] $ VarRef "foo"
@@ -52,7 +52,7 @@ tests =
         assertParse expr ".f1" $ at 1 1 1 4 $ AccessFunction "f1"
 
     , testCase "negative" $
-        assertParse expr "-True" $ at 1 1 1 6 $ Unary Negative $ at 1 2 1 6 $ Literal $ Commented [] $ Boolean True
+        assertParse expr "-True" $ at 1 1 1 6 $ Unary Negative $ at 1 2 1 6 $ Literal $ Boolean True
     , testCase "negative (must not have whitespace)" $
         assertFailure expr "- True"
     , testCase "negative (must not have comment)" $
