@@ -541,10 +541,10 @@ formatExpression aexpr =
                     formatExpression left
 
                 ops' =
-                    ops |> map fst |> map (formatCommented (line. formatInfixVar)) -- TODO: comments not
+                    ops |> map fst |> map (formatCommented' (line. formatInfixVar)) -- TODO: comments not
 
                 es =
-                    ops |> map snd |> map formatExpression
+                    ops |> map snd |> map (formatCommented' formatExpression)
             in
                 case
                     ( multiline

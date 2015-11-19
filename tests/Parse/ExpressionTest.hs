@@ -45,8 +45,7 @@ tests =
     , testCase "var (uppercase)" $
         assertParse expr "Bar" $ at 1 1 1 4 $ Var $ VarRef "Bar"
     , testCase "var (qualified)" $
-        -- assertParse expr "Bar.Baz.foo" $ at 1 1 1 12 $ Var $ VarRef "Bar.Baz.foo"
-        assertParse expr "Bar.Baz.foo" $ at 1 5 1 12 $ Var $ VarRef "Bar.Baz.foo"
+        assertParse expr "Bar.Baz.foo" $ at 1 1 1 12 $ Var $ VarRef "Bar.Baz.foo"
 
     , testCase "record access fuction" $
         assertParse expr ".f1" $ at 1 1 1 4 $ AccessFunction "f1"
@@ -94,12 +93,27 @@ tests =
         , testCase "(4)" $ assertFailure expr "[\n 1\n ,\n 2\n]"
         ]
 
+    , testCase "binary operator" $
+        assertParse expr "7+8<<>>9" $ at 1 1 1 9 $ Binops (intExpr (1,1,1,2) 7) [(Commented' [] [] $ OpRef "+", intExpr' (1,3,1,4) 8), (Commented' [] [] $ OpRef "<<>>", intExpr' (1,8,1,9) 9)] False
+    , testCase "binary operator (named function)" $
+        assertParse expr "7`plus`8`shift`9" $ at 1 1 1 17 $ Binops (intExpr (1,1,1,2) 7) [(Commented' [] [] $ VarRef "plus", intExpr' (1,8,1,9) 8), (Commented' [] [] $ VarRef "shift", intExpr' (1,16,1,17) 9)] False
+    , testCase "binary operator (whitespace)" $
+        assertParse expr "7 + 8 <<>> 9" $ at 1 1 1 13 $ Binops (intExpr (1,1,1,2) 7) [(Commented' [] [] $ OpRef "+", intExpr' (1,5,1,6) 8), (Commented' [] [] $ OpRef "<<>>", intExpr' (1,12,1,13) 9)] False
+    , testCase "binary operator (comments)" $
+        assertParse expr "7{-A-}+{-B-}8{-C-}<<>>{-D-}9" $ at 1 1 1 29 $ Binops (intExpr (1,1,1,2) 7) [(Commented' [BlockComment "A"] [] $ OpRef "+", commentedIntExpr' (1,13,1,14) "B" 8), (Commented' [BlockComment "C"] [] $ OpRef "<<>>", commentedIntExpr' (1,28,1,29) "D" 9)] False
+    , testCase "binary operator (newlines)" $
+        assertParse expr "7\n +\n 8\n <<>>\n 9" $ at 1 1 5 3 $ Binops (intExpr (1,1,1,2) 7) [(Commented' [] [] $ OpRef "+", intExpr' (3,2,3,3) 8), (Commented' [] [] $ OpRef "<<>>", intExpr' (5,2,5,3) 9)] True
+    , testGroup "binary operator (must be indented)" $
+        [ testCase "(1)" $ assertFailure expr "7\n+\n 8\n <<>>\n 9"
+        , testCase "(2)" $ assertFailure expr "7\n +\n8\n <<>>\n 9"
+        , testCase "(3)" $ assertFailure expr "7\n +\n 8\n<<>>\n 9"
+        , testCase "(4)" $ assertFailure expr "7\n +\n 8\n <<>>\n9"
+        ]
+
     , testCase "symbolic operator as function" $
-        -- assertParse expr "(+)" $ at 1 1 1 4 $ Var $ OpRef "+"
-        assertParse expr "(+)" $ at 1 2 1 3 $ Var $ OpRef "+"
+        assertParse expr "(+)" $ at 1 1 1 4 $ Var $ OpRef "+"
     , testCase "symbolic operator as function (whitespace)" $
-        -- assertParse expr "( + )" $ at 1 1 1 6 $ Var $ OpRef "+"
-        assertParse expr "( + )" $ at 1 3 1 4 $ Var $ OpRef "+"
+        assertParse expr "( + )" $ at 1 1 1 6 $ Var $ OpRef "+"
     , testCase "symbolic operator as function (does not allow newlines)" $
         assertFailure expr "(\n + \n)"
 

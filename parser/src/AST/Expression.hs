@@ -49,7 +49,7 @@ data Expr'
     | Var Var.Ref
     | Range (Commented' Expr) (Commented' Expr) Bool
     | ExplicitList [Expr] Bool
-    | Binops Expr [(Commented Var.Ref,Expr)] Bool
+    | Binops Expr [(Commented' Var.Ref, Commented' Expr)] Bool -- will only have pre comments
     | Unary UnaryOperator Expr
     | Lambda [Pattern.Pattern] Expr Bool
     | App Expr [Commented' Expr] Bool -- will only have pre comments

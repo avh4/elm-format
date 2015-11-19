@@ -193,7 +193,7 @@ expr =
 
 binaryExpr :: IParser E.Expr
 binaryExpr =
-    Binop.binops appExpr lastExpr anyOp
+    Binop.binops appExpr lastExpr ((\(Commented _ v) -> v) <$> anyOp)
   where
     lastExpr =
         addLocation (choice [ letExpr, caseExpr, ifExpr ])
