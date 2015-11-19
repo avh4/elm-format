@@ -11,3 +11,8 @@ data Comment
 data Commented a =
     Commented [Comment] a
     deriving (Eq, Show)
+
+
+data Commented' a =
+    Commented' [Comment] [Comment] a
+    deriving (Eq, Show)

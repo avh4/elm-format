@@ -73,4 +73,8 @@ propertyTests =
 
     , testCase "simple round trip" $
         assertStringToString "module Main (..) where\n\n\nfoo =\n    8\n"
+    , testCase "simple round trip with comments" $
+        assertStringToString "module Main (..) where\n\n\nfoo =\n    ( {- A -} 3 {- B -}, {- C -} 4 {- D -} )\n"
+    , testCase "simple round trip with comments" $
+        assertStringToString "module Main (..) where\n\n\ncommentedLiterals =\n    ( {- int -} 1, {- float -} 0.1, {- char -} \'c\', {- string -} \"str\", {- boolean -} True )\n"
     ]

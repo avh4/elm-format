@@ -19,7 +19,13 @@ import Reporting.Region
 import Parse.TestHelpers
 
 
+commentedIntExpr (a,b,c,d) preComment postComment i =
+    Commented' [BlockComment preComment] [BlockComment postComment] $ at a b c d  $ Literal $ Commented [] $ IntNum i
+
 intExpr (a,b,c,d) i = at a b c d $ Literal $ Commented [] $ IntNum i
+
+intExpr' (a,b,c,d) i =
+    Commented' [] [] $ at a b c d  $ Literal $ Commented [] $ IntNum i
 
 
 tests :: Test
@@ -53,11 +59,13 @@ tests =
         assertFailure expr "-.foo"
 
     , testCase "range" $
-        assertParse expr "[7..9]" $ at 1 1 1 7 $ Range (intExpr (1,2,1,3) 7) (intExpr (1,5,1,6) 9) False
+        assertParse expr "[7..9]" $ at 1 1 1 7 $ Range (intExpr' (1,2,1,3) 7) (intExpr' (1,5,1,6) 9) False
     , testCase "range (whitespace)" $
-        assertParse expr "[ 7 .. 9 ]" $ at 1 1 1 11 $ Range (intExpr (1,3,1,4) 7) (intExpr (1,8,1,9) 9) False
+        assertParse expr "[ 7 .. 9 ]" $ at 1 1 1 11 $ Range (intExpr' (1,3,1,4) 7) (intExpr' (1,8,1,9) 9) False
+    , testCase "range (comments)" $
+        assertParse expr "[{-A-}7{-B-}..{-C-}9{-D-}]" $ at 1 1 1 27 $ Range (commentedIntExpr (1,7,1,8) "A" "B" 7) (commentedIntExpr (1,20,1,21) "C" "D" 9) False
     , testCase "range (newlines)" $
-        assertParse expr "[\n 7\n ..\n 9\n ]" $ at 1 1 5 3 $ Range (intExpr (2,2,2,3) 7) (intExpr (4,2,4,3) 9) True
+        assertParse expr "[\n 7\n ..\n 9\n ]" $ at 1 1 5 3 $ Range (intExpr' (2,2,2,3) 7) (intExpr' (4,2,4,3) 9) True
     , testGroup "range (must be indented)"
         [ testCase "(1)" $ assertFailure expr "[\n7\n ..\n 9\n ]"
         , testCase "(2)" $ assertFailure expr "[\n 7\n..\n 9\n ]"
@@ -67,6 +75,8 @@ tests =
 
     , testCase "list" $
         assertParse expr "[1,2,3]" $ at 1 1 1 8 $ ExplicitList [intExpr (1,2,1,3) 1, intExpr (1,4,1,5) 2, intExpr (1,6,1,7) 3] False
+    , testCase "list (single element)" $
+        assertParse expr "[1]" $ at 1 1 1 4 $ ExplicitList [intExpr (1,2,1,3) 1] False
     , testCase "list (empty)" $
         assertParse expr "[]" $ at 1 1 1 3 $ ExplicitList [] False
     , testCase "list (whitespace)" $
@@ -114,11 +124,13 @@ tests =
         ]
 
     , testCase "tuple" $
-        assertParse expr "(1,2)" $ at 1 1 1 6 $ Tuple [intExpr (1,2,1,3) 1, intExpr (1,4,1,5) 2] False
+        assertParse expr "(1,2)" $ at 1 1 1 6 $ Tuple [intExpr' (1,2,1,3) 1, intExpr' (1,4,1,5) 2] False
     , testCase "tuple (whitespace)" $
-        assertParse expr "( 1 , 2 )" $ at 1 1 1 10 $ Tuple [intExpr (1,3,1,4) 1, intExpr (1,7,1,8) 2] False
+        assertParse expr "( 1 , 2 )" $ at 1 1 1 10 $ Tuple [intExpr' (1,3,1,4) 1, intExpr' (1,7,1,8) 2] False
+    , testCase "tuple (comments)" $
+        assertParse expr "({-A-}1{-B-},{-C-}2{-D-})" $ at 1 1 1 26 $ Tuple [commentedIntExpr (1,7,1,8) "A" "B" 1, commentedIntExpr (1,19,1,20) "C" "D" 2] False
     , testCase "tuple (newlines)" $
-        assertParse expr "(\n 1\n ,\n 2\n )" $ at 1 1 5 3 $ Tuple [intExpr (2,2,2,3) 1, intExpr (4,2,4,3) 2] True
+        assertParse expr "(\n 1\n ,\n 2\n )" $ at 1 1 5 3 $ Tuple [intExpr' (2,2,2,3) 1, intExpr' (4,2,4,3) 2] True
     , testGroup "tuple (must be indented)"
         [ testCase "(1)" $ assertFailure expr "(\n1\n ,\n 2\n )"
         , testCase "(2)" $ assertFailure expr "(\n 1\n,\n 2\n )"
@@ -151,6 +163,8 @@ tests =
 
     , testCase "record update" $
         assertParse expr "{a|x=7,y=8}" $ at 1 1 1 12 $ RecordUpdate (at 1 2 1 3 $ Var $ Commented [] $ VarRef "a") [("x", intExpr (1,6,1,7) 7, False), ("y", intExpr (1,10,1,11) 8, False)] False
+    , testCase "record update (single field)" $
+        assertParse expr "{a|x=7}" $ at 1 1 1 8 $ RecordUpdate (at 1 2 1 3 $ Var $ Commented [] $ VarRef "a") [("x", intExpr (1,6,1,7) 7, False)] False
     , testCase "record update (whitespace)" $
         assertParse expr "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 $ RecordUpdate (at 1 3 1 4 $ Var $ Commented [] $ VarRef "a") [("x", intExpr (1,11,1,12) 7, False), ("y", intExpr (1,19,1,20) 8, False)] False
     , testCase "record update (newlines)" $
@@ -180,4 +194,18 @@ tests =
         [ testCase "(1)" $ assertFailure expr "f\n7\n 8"
         , testCase "(2)" $ assertFailure expr "f\n 7\n8"
         ]
+
+    , testCase "parens" $
+        assertParse expr "(1)" $ at 1 1 1 4 $ Parens (intExpr (1,2,1,3) 1) False
+    , testCase "parens (whitespace)" $
+        assertParse expr "( 1 )" $ at 1 1 1 6 $ Parens (intExpr (1,3,1,4) 1) False
+    , testCase "parens (newlines)" $
+        assertParse expr "(\n 1\n )" $ at 1 1 3 3 $ Parens (intExpr (2,2,2,3) 1) True
+    , testGroup "parens (must be indented)"
+        [ testCase "(1)" $ assertFailure expr "(\n1\n )"
+        , testCase "(2)" $ assertFailure expr "(\n 1\n)"
+        ]
+
+    , testCase "unit" $
+        assertParse expr "()" $ at 1 1 1 3 $ Unit
     ]

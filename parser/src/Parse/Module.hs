@@ -92,7 +92,7 @@ listing item =
       listing <-
           choice
             [ const Var.openListing <$> string ".."
-            , Var.Listing <$> commaSep1 item <*> return False
+            , (\x -> Var.Listing $ x [] []) <$> commaSep1 (const . const <$> item) <*> return False
             ]
       whitespace
       char ')'
@@ -104,7 +104,7 @@ value =
     val <|> tipe <?> "a value or type to expose"
   where
     val =
-      Var.Value <$> (addComments (Var.VarRef <$> lowVar) <|> parens (fmap const symOp))
+      Var.Value <$> (addComments (Var.VarRef <$> lowVar) <|> parens' symOp)
 
     tipe =
       do  name <- capVar

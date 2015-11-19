@@ -27,9 +27,7 @@ cabal install -j
 
 ### Running tests
 
-After installing with the instructions above:
-
 ```bash
-cabal install -j --enable-tests
+cabal configure --enable-tests
 ./tests/run-tests.sh
 ```

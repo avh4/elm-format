@@ -47,7 +47,7 @@ type Expr =
 data Expr'
     = Literal (Commented Literal.Literal)
     | Var (Commented Var.Ref)
-    | Range Expr Expr Bool
+    | Range (Commented' Expr) (Commented' Expr) Bool
     | ExplicitList [Expr] Bool
     | Binops Expr [(Commented Var.Ref,Expr)] Bool
     | Unary UnaryOperator Expr
@@ -56,13 +56,14 @@ data Expr'
     | If [(Expr, Bool, Expr)] Expr
     | Let [Def] Expr
     | Case (Expr,Bool) [(Pattern.Pattern, Expr)]
-    | Tuple [Expr] Bool
+    | Tuple [Commented' Expr] Bool
     | TupleFunction Int -- will be 2 (,) or greater, indicating the size of the tuple
     | Access Expr String
     | AccessFunction String
     | RecordUpdate Expr [(String, Expr, Bool)] Bool
     | Record [(String, Expr, Bool)] Bool
     | Parens Expr Bool
+    | Unit
     -- for type checking and code gen only
     | GLShader String String Literal.GLShaderTipe
     deriving (Eq, Show)

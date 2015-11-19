@@ -79,6 +79,7 @@ stack' b1 b2 =
 stack :: [Box] -> Box
 stack children =
     case children of
+        -- [] -> Stack (Text "*****") []
         -- [] -> -- crash? -- TODO?
         (first:[]) ->
             first

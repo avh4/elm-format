@@ -62,14 +62,16 @@ asPattern patternParser =
 
 record :: IParser P.Pattern
 record =
-  addLocation
-    (P.Record <$> brackets (fmap const $ commaSep1 lowVar))
+  addLocation $
+  do
+      v <- brackets ((\f a b _ -> f a b) <$> commaSep1 (const <$> const <$> lowVar))
+      return $ P.Record v -- TODO: use comments
 
 
 tuple :: IParser P.Pattern
 tuple =
   do  (start, patterns, end) <-
-          located (parens (fmap const $ commaSep expr))
+          located (parens $ ((\f a b _ -> f a b) <$> commaSep (const <$> const <$> expr)))
 
       case patterns of
         [pattern] ->
@@ -82,8 +84,8 @@ tuple =
 list :: IParser P.Pattern
 list =
   braces $
-    do  (_, patterns, end) <- located (commaSep expr)
-        return (const $ P.list end patterns)
+    do  (_, patterns, end) <- located (commaSep (const . const <$> expr))
+        return $ \_ _ _ -> P.list end (patterns [] []) -- TODO: use comments
 
 
 term :: IParser P.Pattern
@@ -107,6 +109,6 @@ expr =
     asPattern subPattern <?> "a pattern"
   where
     subPattern =
-      do  patterns <- consSep1 (patternConstructor <|> term)
+      do  patterns <- consSep1 (const . const <$> (patternConstructor <|> term))
           end <- getMyPosition
-          return (P.consMany end patterns)
+          return (P.consMany end (patterns [] [])) -- TODO: pass comments

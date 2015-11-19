@@ -1,6 +1,9 @@
 #!/bin/bash
 
-ELM_FORMAT=".cabal-sandbox/bin/elm-format"
+cabal test || exit 1
+cabal build || exit 1
+
+ELM_FORMAT="./dist/build/elm-format/elm-format"
 if which md5 > /dev/null; then
 	MD5="md5"
 else
@@ -128,9 +131,6 @@ function checkTransformation() {
 	returnCodeShouldEqual 0
 	compareFiles "$EXPECTED" "$OUTPUT"
 }
-
-cabal test
-returnCodeShouldEqual 0
 
 
 echo

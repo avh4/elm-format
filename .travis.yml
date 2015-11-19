@@ -20,7 +20,5 @@ install:
 
 
 script:
- - cabal configure
- - cabal build
- - cabal install --enable-tests
+ - cabal configure --enable-tests
  - ./tests/run-tests.sh

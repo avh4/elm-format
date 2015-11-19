@@ -44,8 +44,8 @@ typeDecl =
                 return (AST.Declaration.TypeAlias name args tipe)
 
         Nothing ->
-            do  tcs <- pipeSep1 Type.constructor <?> "a constructor for a union type"
-                return $ AST.Declaration.Datatype name args tcs
+            do  tcs <- pipeSep1 (const . const <$> Type.constructor) <?> "a constructor for a union type" -- TODO: use comments
+                return $ AST.Declaration.Datatype name args (tcs [] []) -- TODO: pass comments
 
 
 -- INFIX

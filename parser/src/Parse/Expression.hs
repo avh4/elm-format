@@ -59,10 +59,16 @@ listTerm =
     shader' <|> braces (try range <|> commaSeparated)
   where
     range =
-      do  lo <- expr
-          padded (string "..")
+      do  updateState State.clearComments
+          lo <- expr
+          (loPost, _, hiPre) <- padded (string "..")
+          updateState State.clearComments
           hi <- expr
-          return $ \multiline -> E.Range lo hi multiline
+          return $ \loPre hiPost multiline ->
+              E.Range
+                  (Commented' loPre loPost lo)
+                  (Commented' hiPre hiPost hi)
+                  multiline
 
     shader' =
       do  pos <- getPosition
@@ -71,16 +77,16 @@ listTerm =
           return $ E.GLShader uid (filter (/='\r') rawSrc) tipe
 
     commaSeparated =
-      do  term <- commaSep expr
-          return $ \multiline -> E.ExplicitList term multiline
+      do  term <- commaSep (const . const <$> expr) -- TODO: use comments
+          return $ \_ _ multiline -> E.ExplicitList (term [] []) multiline -- TODO: use comments
 
 
 parensTerm :: IParser E.Expr
 parensTerm =
   choice
-    [ try (parens $ fmap const opFn)
+    [ try (parens $ fmap (const . const . const) opFn) -- TODO: use comments
     , do
-          (start, e, end) <- located $ parens (tupleFn <|> parened)
+          (start, e, end) <- located $ parens (tupleFn <|> parened <|> unit)
           return $ A.at start end e
     ]
   where
@@ -93,16 +99,19 @@ parensTerm =
     tupleFn =
       do  commas <- comma >> many (whitespace >> comma)
           return $
-              \_ -> E.TupleFunction (length commas + 2)
+              \_ _ _ -> E.TupleFunction (length commas + 2) -- TODO: use comments
 
     parened =
-      do  expressions <- commaSep expr
+      do  expressions <- commaSep1 ((\e a b -> Commented' a b e) <$> expr)
           return $
-            case expressions of
-              [expression] ->
-                  \multiline -> E.Parens expression multiline
+            case expressions [] [] of -- TODO: pass comments
+              [Commented' _ _ expression] ->
+                  \_ _ multiline -> E.Parens expression multiline -- TODO: use comments
               _ ->
-                  \multiline -> E.Tuple expressions multiline
+                  \pre post multiline -> E.Tuple (expressions pre post) multiline
+
+    unit =
+        return $ \_ _ _ -> E.Unit -- TODO: use comments?
 
 
 recordTerm :: IParser E.Expr
@@ -114,14 +123,14 @@ recordTerm =
             [ update starter
             , literal starter
             ]
-    , return $ \multiline -> E.Record [] multiline
+    , return $ \_ _ multiline -> E.Record [] multiline -- TODO: use comments
     ]
   where
     update (A.A ann starter) =
       do  try (string "|")
           whitespace
           fields <- commaSep1 field
-          return $ \multiline -> (E.RecordUpdate (A.A ann (E.Var $ Commented [] $ Var.VarRef starter)) fields multiline)
+          return $ \_ _ multiline -> (E.RecordUpdate (A.A ann (E.Var $ Commented [] $ Var.VarRef starter)) (fields [] []) multiline) -- TODO: use comments -- TODO: pass comments
 
     literal (A.A _ starter) =
       do  pushNewlineContext
@@ -134,8 +143,8 @@ recordTerm =
             [ do  try comma
                   whitespace
                   fields <- commaSep field
-                  return $ \multiline -> (E.Record ((starter, value, multiline') : fields) multiline)
-            , return $ \multiline -> (E.Record [(starter, value, multiline')] multiline)
+                  return $ \_ _ multiline -> (E.Record ((starter, value, multiline') : (fields [] [])) multiline) -- TODO: use comments -- TODO: pass comments
+            , return $ \_ _ multiline -> (E.Record [(starter, value, multiline')] multiline) -- TODO: use comments
             ]
 
     field =
@@ -144,7 +153,7 @@ recordTerm =
           padded equals
           value <- expr
           multiline <- popNewlineContext
-          return (key, value, multiline)
+          return $ \_ _ -> (key, value, multiline) -- TODO: use comments
 
 
 term :: IParser E.Expr
@@ -234,23 +243,27 @@ caseExpr :: IParser E.Expr'
 caseExpr =
   do  try (reserved "case")
       pushNewlineContext
-      e <- padded expr
+      (_, e, _) <- padded expr -- TODO: use comments
       reserved "of"
       multilineSubject <- popNewlineContext
       whitespace
       updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
-      E.Case (e, multilineSubject) <$> (with <|> without)
+      result <- with <|> without
+      return $ E.Case (e, multilineSubject) (result [] []) -- TODO: pass comments
   where
     case_ =
       do  p <- Pattern.expr
           padded rightArrow
-          (,) p <$> expr
+          result <- (,) p <$> expr
+          return $ \_ _ -> result -- TODO: use comments
 
     with =
-      brackets (fmap const $ semiSep1 (case_ <?> "cases { x -> ... }"))
+      brackets (fmap (const . const . const) $ semiSep1 (case_ <?> "cases { x -> ... }")) -- TODO: use comments
 
     without =
-      block (do c <- case_ ; whitespace ; return c)
+        do
+            result <- block (do c <- case_ ; whitespace ; return c)
+            return $ \_ _ -> fmap (\f -> f [] []) result -- TODO: use comments
 
 
 -- LET
@@ -275,7 +288,7 @@ typeAnnotation =
     addLocation (E.TypeAnnotation <$> try start <*> Type.expr)
   where
     start =
-      do  v <- addComments (Var.VarRef <$> lowVar) <|> parens (fmap const symOp)
+      do  v <- addComments (Var.VarRef <$> lowVar) <|> parens' symOp
           padded hasType
           return v
 
@@ -299,7 +312,7 @@ defStart =
     choice
       [ do  pattern <- try Pattern.term
             infics pattern <|> func pattern
-      , do  opPattern <- addLocation (P.Var <$> parens (fmap const symOp))
+      , do  opPattern <- addLocation (P.Var <$> parens' symOp)
             func opPattern
       ]
       <?> "the definition of a variable (x = ...)"

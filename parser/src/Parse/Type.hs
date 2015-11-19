@@ -19,7 +19,7 @@ tvar =
 
 tuple :: IParser Type.Type
 tuple =
-  do  (start, types, end) <- located (parens (fmap const $ commaSep expr))
+  do  (start, types, end) <- located (parens $ ((\f a b _ -> f a b) <$> commaSep (const . const <$> expr)))
       case types of
         [t] -> return t
         _   -> return (Type.tuple (R.Region start end) types)
@@ -35,7 +35,7 @@ record =
       dumbWhitespace
       char '}'
       sawNewline <- popNewlineContext
-      return $ Type.RRecord ext fields sawNewline
+      return $ Type.RRecord ext (fields [] []) sawNewline -- TODO: pass comments
   where
     normal =
       do  (\fields -> (Nothing, fields) ) <$> commaSep field
@@ -53,7 +53,7 @@ record =
           whitespace >> hasType >> whitespace
           val <- expr
           sawNewline <- popNewlineContext
-          return (lbl, val, sawNewline)
+          return $ \_ _ -> (lbl, val, sawNewline) -- TODO: use comments
 
 
 capTypeVar :: IParser String
@@ -85,7 +85,7 @@ app =
   where
     tupleCtor =
       addLocation $
-      do  ctor <- parens (fmap const $ many1 (char ','))
+      do  ctor <- parens' (many1 (char ','))
           return (Type.RType (Var.VarRef ctor))
 
 

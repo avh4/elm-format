@@ -509,8 +509,8 @@ formatExpression aexpr =
         AST.Expression.Range left right multiline ->
             case
                 ( multiline
-                , isLine $ formatExpression left
-                , isLine $ formatExpression right
+                , isLine $ formatCommented' formatExpression left
+                , isLine $ formatCommented' formatExpression right
                 )
             of
                 (False, Right left', Right right') ->
@@ -524,10 +524,10 @@ formatExpression aexpr =
                 _ ->
                     stack
                         [ line $ punc "["
-                        , formatExpression left
+                        , formatCommented' formatExpression left
                             |> indent
                         , line $ punc ".."
-                        , formatExpression right
+                        , formatCommented' formatExpression right
                             |> indent
                         , line $ punc "]"
                         ]
@@ -719,7 +719,7 @@ formatExpression aexpr =
                     ]
 
         AST.Expression.Tuple exprs multiline ->
-            elmGroup True "(" "," ")" multiline $ map formatExpression exprs
+            elmGroup True "(" "," ")" multiline $ map (formatCommented' formatExpression) exprs
 
         AST.Expression.TupleFunction n ->
             line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
@@ -794,8 +794,28 @@ formatExpression aexpr =
                         , line $ punc ")"
                         ]
 
+        AST.Expression.Unit ->
+            line $ punc "()"
+
         AST.Expression.GLShader _ _ _ ->
             line $ keyword "<TODO: glshader>"
+
+
+formatCommented' :: (a -> Box) -> Commented' a -> Box
+formatCommented' format (Commented' pre post inner) =
+    case
+        ( allSingles $ fmap formatComment pre
+        , allSingles $ fmap formatComment post
+        , isLine $ format inner
+        )
+    of
+        ( Right pre', Right post', Right inner' ) ->
+            line $ row $ List.intersperse space $ concat [pre', [inner'], post']
+        _ -> -- TODO: not tested
+            stack $
+                (map formatComment pre)
+                ++ [ format inner ]
+                ++ ( map formatComment post)
 
 
 formatCommented :: (a -> Box) -> Commented a -> Box
