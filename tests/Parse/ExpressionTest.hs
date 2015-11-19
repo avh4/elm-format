@@ -22,6 +22,10 @@ import Parse.TestHelpers
 commentedIntExpr (a,b,c,d) preComment postComment i =
     Commented' [BlockComment preComment] [BlockComment postComment] $ at a b c d  $ Literal $ Commented [] $ IntNum i
 
+commentedIntExpr' (a,b,c,d) preComment i =
+    Commented' [BlockComment preComment] [] $ at a b c d  $ Literal $ Commented [] $ IntNum i
+
+
 intExpr (a,b,c,d) i = at a b c d $ Literal $ Commented [] $ IntNum i
 
 intExpr' (a,b,c,d) i =
@@ -187,9 +191,13 @@ tests =
         ]
 
     , testCase "function application" $
-        assertParse expr "f 7 8" $ at 1 1 1 6 $ App (at 1 1 1 2 $ Var $ Commented [] $ VarRef "f") [intExpr (1,3,1,4) 7, intExpr (1,5,1,6) 8] False
+        assertParse expr "f 7 8" $ at 1 1 1 6 $ App (at 1 1 1 2 $ Var $ Commented [] $ VarRef "f") [intExpr' (1,3,1,4) 7, intExpr' (1,5,1,6) 8] False
+    , testCase "function application (comments)" $
+        assertParse expr "f{-A-}7{-B-}8" $ at 1 1 1 14 $ App (at 1 1 1 2 $ Var $ Commented [] $ VarRef "f") [commentedIntExpr' (1,7,1,8) "A" 7, commentedIntExpr' (1,13,1,14) "B" 8] False
     , testCase "function application (newlines)" $
-        assertParse expr "f\n 7\n 8" $ at 1 1 3 3 $ App (at 1 1 1 2 $ Var $ Commented [] $ VarRef "f") [intExpr (2,2,2,3) 7, intExpr (3,2,3,3) 8] True
+        assertParse expr "f\n 7\n 8" $ at 1 1 3 3 $ App (at 1 1 1 2 $ Var $ Commented [] $ VarRef "f") [intExpr' (2,2,2,3) 7, intExpr' (3,2,3,3) 8] True
+    , testCase "function application (newlines, comments)" $
+        assertParse expr "f\n {-A-}7\n {-B-}8" $ at 1 1 3 8 $ App (at 1 1 1 2 $ Var $ Commented [] $ VarRef "f") [commentedIntExpr' (2,7,2,8) "A" 7, commentedIntExpr' (3,7,3,8) "B" 8] True
     , testGroup "function application (must be indented)"
         [ testCase "(1)" $ assertFailure expr "f\n7\n 8"
         , testCase "(2)" $ assertFailure expr "f\n 7\n8"

@@ -606,7 +606,7 @@ formatExpression aexpr =
             case
                 ( multiline
                 , isLine $ formatExpression left
-                , allSingles $ map formatExpression args
+                , allSingles $ map (formatCommented' formatExpression) args
                 )
             of
                 (False, Right left', Right args') ->
@@ -616,7 +616,7 @@ formatExpression aexpr =
                     stack
                         [ formatExpression left
                         , args
-                            |> map formatExpression
+                            |> map (formatCommented' formatExpression)
                             |> stack
                             |> indent
                         ]

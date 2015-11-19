@@ -12,7 +12,7 @@ ratio =
 
 myTuple =
     (,,,)
-        {- yes, this is valid! -} 1
+        1
         2
         3
         4

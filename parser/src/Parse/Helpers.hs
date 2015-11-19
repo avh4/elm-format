@@ -210,34 +210,39 @@ dotSep1 p =
   (:) <$> p <*> many (try (char '.') >> p)
 
 
-spaceSep1 :: IParser a -> IParser [a]
+spaceSep1 :: IParser a -> IParser [Commented' a]
 spaceSep1 p =
-  (:) <$> p <*> spacePrefix p
+  (:) <$> (Commented' [] [] <$> p) <*> spacePrefix p
 
 
-spacePrefix :: IParser a -> IParser [a]
+spacePrefix :: IParser a -> IParser [Commented' a]
 spacePrefix p =
   constrainedSpacePrefix' p (\_ -> return ())
 
 
-constrainedSpacePrefix :: IParser a -> IParser [a]
+constrainedSpacePrefix :: IParser a -> IParser [Commented' a]
 constrainedSpacePrefix parser =
   constrainedSpacePrefix' parser constraint
   where
     constraint empty = if empty then notFollowedBy (char '-') else return ()
 
 
-constrainedSpacePrefix' :: IParser a -> (Bool -> IParser b) -> IParser [a]
+constrainedSpacePrefix' :: IParser a -> (Bool -> IParser b) -> IParser [Commented' a]
 constrainedSpacePrefix' parser constraint =
     many $ choice
-      [ try (spacing >> lookAhead (oneOf "[({")) >> parser
-      , try (spacing >> parser)
+      [ comment <$> try (const <$> spacing <*> lookAhead (oneOf "[({")) <*> parser'
+      , try (comment <$> spacing <*> parser')
       ]
     where
+      parser' = updateState State.clearComments >> parser
+
+      comment pre value = Commented' pre [] value
+
       spacing = do
-        (n, _) <- whitespace -- TODO: use comments
-        constraint (not n) <?> Syntax.whitespace
+        (n, comments) <- whitespace
+        _ <- constraint (not n) <?> Syntax.whitespace
         indented
+        return comments
 
 
 -- SURROUNDED BY

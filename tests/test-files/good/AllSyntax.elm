@@ -239,6 +239,10 @@ functionApplication =
     toString 10
 
 
+commentedFunctionApplication =
+    toString {- arg1 -} 10
+
+
 multilineFunctionApplication =
     List.map
         toString

@@ -177,7 +177,7 @@ appExpr =
             [] -> t
             _  ->
                 A.sameAs
-                    (List.foldl' (\f t -> A.merge f t ()) (A.sameAs t ()) ts)
+                    (List.foldl' (\f (Commented' _ _ t) -> A.merge f t ()) (A.sameAs t ()) ts)
                     (E.App t ts sawNewline)
 
 
@@ -232,7 +232,7 @@ lambdaExpr =
   do  pushNewlineContext
       char '\\' <|> char '\x03BB' <?> "an anonymous function"
       whitespace
-      args <- spaceSep1 Pattern.term
+      args <- map (\(Commented' _ _ v) -> v) <$> spaceSep1 Pattern.term -- TODO: use comments
       padded rightArrow
       body <- expr
       multiline <- popNewlineContext
@@ -320,7 +320,7 @@ defStart =
     func pattern =
         case pattern of
           A.A _ (P.Var _) ->
-              (pattern:) <$> spacePrefix Pattern.term
+              (pattern:) <$> map (\(Commented' _ _ v) -> v) <$> spacePrefix Pattern.term -- TODO: use comments
 
           _ ->
               return [pattern]

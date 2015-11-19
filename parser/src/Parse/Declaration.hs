@@ -7,6 +7,7 @@ import qualified AST.Declaration
 import qualified Parse.Expression as Expr
 import Parse.Helpers as Help
 import qualified Parse.Type as Type
+import AST.V0_15
 
 
 declaration :: IParser AST.Declaration.Decl
@@ -35,7 +36,7 @@ typeDecl =
       isAlias <- optionMaybe (string "alias" >> forcedWS)
 
       name <- capVar
-      args <- spacePrefix lowVar
+      args <- map (\(Commented' _ _ v) -> v) <$> spacePrefix lowVar -- TODO: use comments
       padded equals
 
       case isAlias of

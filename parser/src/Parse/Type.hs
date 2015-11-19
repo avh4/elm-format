@@ -9,6 +9,7 @@ import qualified AST.Variable as Var
 import Parse.Helpers
 import qualified Reporting.Annotation as A
 import qualified Reporting.Region as R
+import AST.V0_15
 
 
 tvar :: IParser Type.Type
@@ -77,7 +78,7 @@ app :: IParser Type.Type
 app =
   do  start <- getMyPosition
       f <- constructor0 <|> try tupleCtor <?> "a type constructor"
-      args <- spacePrefix term
+      args <- map (\(Commented' _ _ v) -> v) <$> spacePrefix term -- TODO: use comments
       end <- getMyPosition
       case args of
         [] -> return f
@@ -111,4 +112,4 @@ expr =
 constructor :: IParser (String, [Type.Type])
 constructor =
   (,) <$> (capTypeVar <?> "another type constructor")
-      <*> spacePrefix term
+      <*> (map (\(Commented' _ _ v) -> v) <$> spacePrefix term) -- TODO: use comments

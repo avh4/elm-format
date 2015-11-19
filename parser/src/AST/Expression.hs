@@ -52,7 +52,7 @@ data Expr'
     | Binops Expr [(Commented Var.Ref,Expr)] Bool
     | Unary UnaryOperator Expr
     | Lambda [Pattern.Pattern] Expr Bool
-    | App Expr [Expr] Bool
+    | App Expr [Commented' Expr] Bool -- will only have pre comments
     | If [(Expr, Bool, Expr)] Expr
     | Let [Def] Expr
     | Case (Expr,Bool) [(Pattern.Pattern, Expr)]
