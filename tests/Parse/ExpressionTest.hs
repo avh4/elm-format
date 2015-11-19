@@ -41,12 +41,12 @@ tests =
         assertParse expr "False" $ at 1 1 1 6 $ Literal $ Boolean False
 
     , testCase "var (lowercase)" $
-        assertParse expr "foo" $ at 1 1 1 4 $ Var $ Commented [] $ VarRef "foo"
+        assertParse expr "foo" $ at 1 1 1 4 $ Var $ VarRef "foo"
     , testCase "var (uppercase)" $
-        assertParse expr "Bar" $ at 1 1 1 4 $ Var $ Commented [] $ VarRef "Bar"
+        assertParse expr "Bar" $ at 1 1 1 4 $ Var $ VarRef "Bar"
     , testCase "var (qualified)" $
-        -- assertParse expr "Bar.Baz.foo" $ at 1 1 1 12 $ Var $ Commented [] $ VarRef "Bar.Baz.foo"
-        assertParse expr "Bar.Baz.foo" $ at 1 5 1 12 $ Var $ Commented [] $ VarRef "Bar.Baz.foo"
+        -- assertParse expr "Bar.Baz.foo" $ at 1 1 1 12 $ Var $ VarRef "Bar.Baz.foo"
+        assertParse expr "Bar.Baz.foo" $ at 1 5 1 12 $ Var $ VarRef "Bar.Baz.foo"
 
     , testCase "record access fuction" $
         assertParse expr ".f1" $ at 1 1 1 4 $ AccessFunction "f1"
@@ -95,11 +95,11 @@ tests =
         ]
 
     , testCase "symbolic operator as function" $
-        -- assertParse expr "(+)" $ at 1 1 1 4 $ Var $ Commented [] $ OpRef "+"
-        assertParse expr "(+)" $ at 1 2 1 3 $ Var $ Commented [] $ OpRef "+"
+        -- assertParse expr "(+)" $ at 1 1 1 4 $ Var $ OpRef "+"
+        assertParse expr "(+)" $ at 1 2 1 3 $ Var $ OpRef "+"
     , testCase "symbolic operator as function (whitespace)" $
-        -- assertParse expr "( + )" $ at 1 1 1 6 $ Var $ Commented [] $ OpRef "+"
-        assertParse expr "( + )" $ at 1 3 1 4 $ Var $ Commented [] $ OpRef "+"
+        -- assertParse expr "( + )" $ at 1 1 1 6 $ Var $ OpRef "+"
+        assertParse expr "( + )" $ at 1 3 1 4 $ Var $ OpRef "+"
     , testCase "symbolic operator as function (does not allow newlines)" $
         assertFailure expr "(\n + \n)"
 
@@ -166,13 +166,13 @@ tests =
         ]
 
     , testCase "record update" $
-        assertParse expr "{a|x=7,y=8}" $ at 1 1 1 12 $ RecordUpdate (at 1 2 1 3 $ Var $ Commented [] $ VarRef "a") [("x", intExpr (1,6,1,7) 7, False), ("y", intExpr (1,10,1,11) 8, False)] False
+        assertParse expr "{a|x=7,y=8}" $ at 1 1 1 12 $ RecordUpdate (at 1 2 1 3 $ Var $ VarRef "a") [("x", intExpr (1,6,1,7) 7, False), ("y", intExpr (1,10,1,11) 8, False)] False
     , testCase "record update (single field)" $
-        assertParse expr "{a|x=7}" $ at 1 1 1 8 $ RecordUpdate (at 1 2 1 3 $ Var $ Commented [] $ VarRef "a") [("x", intExpr (1,6,1,7) 7, False)] False
+        assertParse expr "{a|x=7}" $ at 1 1 1 8 $ RecordUpdate (at 1 2 1 3 $ Var $ VarRef "a") [("x", intExpr (1,6,1,7) 7, False)] False
     , testCase "record update (whitespace)" $
-        assertParse expr "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 $ RecordUpdate (at 1 3 1 4 $ Var $ Commented [] $ VarRef "a") [("x", intExpr (1,11,1,12) 7, False), ("y", intExpr (1,19,1,20) 8, False)] False
+        assertParse expr "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 $ RecordUpdate (at 1 3 1 4 $ Var $ VarRef "a") [("x", intExpr (1,11,1,12) 7, False), ("y", intExpr (1,19,1,20) 8, False)] False
     , testCase "record update (newlines)" $
-        assertParse expr "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 $ RecordUpdate (at 2 2 2 3 $ Var $ Commented [] $ VarRef "a") [("x", intExpr (6,2,6,3) 7, True), ("y", intExpr (10,2,10,3) 8, True)] True
+        assertParse expr "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 $ RecordUpdate (at 2 2 2 3 $ Var $ VarRef "a") [("x", intExpr (6,2,6,3) 7, True), ("y", intExpr (10,2,10,3) 8, True)] True
     , testCase "record update (only allows simple base)" $
         assertFailure expr "{9|x=7}"
     , testCase "record update (only allows simple base)" $
@@ -191,13 +191,13 @@ tests =
         ]
 
     , testCase "function application" $
-        assertParse expr "f 7 8" $ at 1 1 1 6 $ App (at 1 1 1 2 $ Var $ Commented [] $ VarRef "f") [intExpr' (1,3,1,4) 7, intExpr' (1,5,1,6) 8] False
+        assertParse expr "f 7 8" $ at 1 1 1 6 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr' (1,3,1,4) 7, intExpr' (1,5,1,6) 8] False
     , testCase "function application (comments)" $
-        assertParse expr "f{-A-}7{-B-}8" $ at 1 1 1 14 $ App (at 1 1 1 2 $ Var $ Commented [] $ VarRef "f") [commentedIntExpr' (1,7,1,8) "A" 7, commentedIntExpr' (1,13,1,14) "B" 8] False
+        assertParse expr "f{-A-}7{-B-}8" $ at 1 1 1 14 $ App (at 1 1 1 2 $ Var $ VarRef "f") [commentedIntExpr' (1,7,1,8) "A" 7, commentedIntExpr' (1,13,1,14) "B" 8] False
     , testCase "function application (newlines)" $
-        assertParse expr "f\n 7\n 8" $ at 1 1 3 3 $ App (at 1 1 1 2 $ Var $ Commented [] $ VarRef "f") [intExpr' (2,2,2,3) 7, intExpr' (3,2,3,3) 8] True
+        assertParse expr "f\n 7\n 8" $ at 1 1 3 3 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr' (2,2,2,3) 7, intExpr' (3,2,3,3) 8] True
     , testCase "function application (newlines, comments)" $
-        assertParse expr "f\n {-A-}7\n {-B-}8" $ at 1 1 3 8 $ App (at 1 1 1 2 $ Var $ Commented [] $ VarRef "f") [commentedIntExpr' (2,7,2,8) "A" 7, commentedIntExpr' (3,7,3,8) "B" 8] True
+        assertParse expr "f\n {-A-}7\n {-B-}8" $ at 1 1 3 8 $ App (at 1 1 1 2 $ Var $ VarRef "f") [commentedIntExpr' (2,7,2,8) "A" 7, commentedIntExpr' (3,7,3,8) "B" 8] True
     , testGroup "function application (must be indented)"
         [ testCase "(1)" $ assertFailure expr "f\n7\n 8"
         , testCase "(2)" $ assertFailure expr "f\n 7\n8"

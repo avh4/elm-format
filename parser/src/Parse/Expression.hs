@@ -24,7 +24,7 @@ import qualified Reporting.Annotation as A
 
 varTerm :: IParser E.Expr'
 varTerm =
-  boolean <|> ((\x -> E.Var $ Commented [] $ Var.VarRef x) <$> var)
+  boolean <|> ((\x -> E.Var $ Var.VarRef x) <$> var)
 
 
 boolean :: IParser E.Expr'
@@ -94,7 +94,7 @@ parensTerm =
       do  (start, op, end) <- located anyOp
           return $
             A.at start end $
-              E.Var op
+              E.Var $ (\(Commented _ v) -> v) op
 
     tupleFn =
       do  commas <- comma >> many (whitespace >> comma)
@@ -130,7 +130,7 @@ recordTerm =
       do  try (string "|")
           whitespace
           fields <- commaSep1 field
-          return $ \_ _ multiline -> (E.RecordUpdate (A.A ann (E.Var $ Commented [] $ Var.VarRef starter)) (fields [] []) multiline) -- TODO: use comments -- TODO: pass comments
+          return $ \_ _ multiline -> (E.RecordUpdate (A.A ann (E.Var $ Var.VarRef starter)) (fields [] []) multiline) -- TODO: use comments -- TODO: pass comments
 
     literal (A.A _ starter) =
       do  pushNewlineContext

@@ -504,7 +504,7 @@ formatExpression aexpr =
             formatLiteral lit
 
         AST.Expression.Var v ->
-            formatCommented (line . formatVar) v -- TODO: comments not tested
+            line $ formatVar v
 
         AST.Expression.Range left right multiline ->
             case

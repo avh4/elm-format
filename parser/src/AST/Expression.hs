@@ -46,7 +46,7 @@ type Expr =
 
 data Expr'
     = Literal Literal.Literal
-    | Var (Commented Var.Ref)
+    | Var Var.Ref
     | Range (Commented' Expr) (Commented' Expr) Bool
     | ExplicitList [Expr] Bool
     | Binops Expr [(Commented Var.Ref,Expr)] Bool
