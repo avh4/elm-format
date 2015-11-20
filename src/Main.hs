@@ -23,6 +23,7 @@ import qualified Reporting.Result as Result
 import qualified System.Directory as Dir
 
 
+r :: Message -> String
 r = renderMessage
 
 showErrors :: [RA.Located Syntax.Error] -> IO ()
