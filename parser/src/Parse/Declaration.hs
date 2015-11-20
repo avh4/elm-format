@@ -13,7 +13,7 @@ import AST.V0_15
 declaration :: IParser AST.Declaration.Decl
 declaration =
   choice
-    [ AST.Declaration.Comment <$> Help.docComment
+    [ AST.Declaration.DocComment <$> Help.docComment
     , AST.Declaration.Decl <$> addLocation (typeDecl <|> infixDecl <|> port <|> definition)
     ]
 

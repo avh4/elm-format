@@ -45,7 +45,7 @@ assocToString assoc =
 
 
 data Decl
-    = Comment String
+    = DocComment String
     | Decl (A.Located Declaration)
     deriving (Eq, Show)
 

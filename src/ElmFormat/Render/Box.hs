@@ -280,7 +280,7 @@ isDefinition def =
 formatDeclaration :: AST.Declaration.Decl -> Box
 formatDeclaration decl =
     case decl of
-        AST.Declaration.Comment docs ->
+        AST.Declaration.DocComment docs ->
             formatDocComment docs
         AST.Declaration.Decl adecl ->
             case RA.drop adecl of
