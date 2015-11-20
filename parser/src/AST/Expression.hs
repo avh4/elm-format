@@ -47,16 +47,16 @@ type Expr =
 data Expr'
     = Literal Literal.Literal
     | Var Var.Ref
-    | Range (Commented' Expr) (Commented' Expr) Bool
+    | Range (Commented Expr) (Commented Expr) Bool
     | ExplicitList [Expr] Bool
-    | Binops Expr [(Commented' Var.Ref, Commented' Expr)] Bool -- will only have pre comments
+    | Binops Expr [(Commented Var.Ref, Commented Expr)] Bool -- will only have pre comments
     | Unary UnaryOperator Expr
     | Lambda [Pattern.Pattern] Expr Bool
-    | App Expr [Commented' Expr] Bool -- will only have pre comments
+    | App Expr [Commented Expr] Bool -- will only have pre comments
     | If [(Expr, Bool, Expr)] Expr
     | Let [Def] Expr
     | Case (Expr,Bool) [(Pattern.Pattern, Expr)]
-    | Tuple [Commented' Expr] Bool
+    | Tuple [Commented Expr] Bool
     | TupleFunction Int -- will be 2 (,) or greater, indicating the size of the tuple
     | Access Expr String
     | AccessFunction String

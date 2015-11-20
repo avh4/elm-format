@@ -36,7 +36,7 @@ typeDecl =
       isAlias <- optionMaybe (string "alias" >> forcedWS)
 
       name <- capVar
-      args <- map (\(Commented' _ _ v) -> v) <$> spacePrefix lowVar -- TODO: use comments
+      args <- map (\(Commented _ _ v) -> v) <$> spacePrefix lowVar -- TODO: use comments
       padded equals
 
       case isAlias of

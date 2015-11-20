@@ -65,8 +65,8 @@ listTerm =
           hi <- expr
           return $ \loPre hiPost multiline ->
               E.Range
-                  (Commented' loPre loPost lo)
-                  (Commented' hiPre hiPost hi)
+                  (Commented loPre loPost lo)
+                  (Commented hiPre hiPost hi)
                   multiline
 
     shader' =
@@ -101,10 +101,10 @@ parensTerm =
               \_ _ _ -> E.TupleFunction (length commas + 2) -- TODO: use comments
 
     parened =
-      do  expressions <- commaSep1 ((\e a b -> Commented' a b e) <$> expr)
+      do  expressions <- commaSep1 ((\e a b -> Commented a b e) <$> expr)
           return $
             case expressions [] [] of -- TODO: pass comments
-              [Commented' _ _ expression] ->
+              [Commented _ _ expression] ->
                   \_ _ multiline -> E.Parens expression multiline -- TODO: use comments
               _ ->
                   \pre post multiline -> E.Tuple (expressions pre post) multiline
@@ -176,7 +176,7 @@ appExpr =
             [] -> t
             _  ->
                 A.sameAs
-                    (List.foldl' (\f (Commented' _ _ t) -> A.merge f t ()) (A.sameAs t ()) ts)
+                    (List.foldl' (\f (Commented _ _ t) -> A.merge f t ()) (A.sameAs t ()) ts)
                     (E.App t ts sawNewline)
 
 
@@ -231,7 +231,7 @@ lambdaExpr =
   do  pushNewlineContext
       char '\\' <|> char '\x03BB' <?> "an anonymous function"
       whitespace
-      args <- map (\(Commented' _ _ v) -> v) <$> spaceSep1 Pattern.term -- TODO: use comments
+      args <- map (\(Commented _ _ v) -> v) <$> spaceSep1 Pattern.term -- TODO: use comments
       padded rightArrow
       body <- expr
       multiline <- popNewlineContext
@@ -319,7 +319,7 @@ defStart =
     func pattern =
         case pattern of
           A.A _ (P.Var _) ->
-              (pattern:) <$> map (\(Commented' _ _ v) -> v) <$> spacePrefix Pattern.term -- TODO: use comments
+              (pattern:) <$> map (\(Commented _ _ v) -> v) <$> spacePrefix Pattern.term -- TODO: use comments
 
           _ ->
               return [pattern]

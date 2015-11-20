@@ -511,8 +511,8 @@ formatExpression aexpr =
         AST.Expression.Range left right multiline ->
             case
                 ( multiline
-                , isLine $ formatCommented' formatExpression left
-                , isLine $ formatCommented' formatExpression right
+                , isLine $ formatCommented formatExpression left
+                , isLine $ formatCommented formatExpression right
                 )
             of
                 (False, Right left', Right right') ->
@@ -526,10 +526,10 @@ formatExpression aexpr =
                 _ ->
                     stack
                         [ line $ punc "["
-                        , formatCommented' formatExpression left
+                        , formatCommented formatExpression left
                             |> indent
                         , line $ punc ".."
-                        , formatCommented' formatExpression right
+                        , formatCommented formatExpression right
                             |> indent
                         , line $ punc "]"
                         ]
@@ -543,10 +543,10 @@ formatExpression aexpr =
                     formatExpression left
 
                 ops' =
-                    ops |> map fst |> map (formatCommented' (line. formatInfixVar)) -- TODO: comments not
+                    ops |> map fst |> map (formatCommented (line. formatInfixVar)) -- TODO: comments not
 
                 es =
-                    ops |> map snd |> map (formatCommented' formatExpression)
+                    ops |> map snd |> map (formatCommented formatExpression)
             in
                 case
                     ( multiline
@@ -608,7 +608,7 @@ formatExpression aexpr =
             case
                 ( multiline
                 , isLine $ formatExpression left
-                , allSingles $ map (formatCommented' formatExpression) args
+                , allSingles $ map (formatCommented formatExpression) args
                 )
             of
                 (False, Right left', Right args') ->
@@ -618,7 +618,7 @@ formatExpression aexpr =
                     stack
                         [ formatExpression left
                         , args
-                            |> map (formatCommented' formatExpression)
+                            |> map (formatCommented formatExpression)
                             |> stack
                             |> indent
                         ]
@@ -721,7 +721,7 @@ formatExpression aexpr =
                     ]
 
         AST.Expression.Tuple exprs multiline ->
-            elmGroup True "(" "," ")" multiline $ map (formatCommented' formatExpression) exprs
+            elmGroup True "(" "," ")" multiline $ map (formatCommented formatExpression) exprs
 
         AST.Expression.TupleFunction n ->
             line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
@@ -803,8 +803,8 @@ formatExpression aexpr =
             line $ keyword "<TODO: glshader>"
 
 
-formatCommented' :: (a -> Box) -> Commented' a -> Box
-formatCommented' format (Commented' pre post inner) =
+formatCommented :: (a -> Box) -> Commented a -> Box
+formatCommented format (Commented pre post inner) =
     case
         ( allSingles $ fmap formatComment pre
         , allSingles $ fmap formatComment post
