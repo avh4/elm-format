@@ -110,15 +110,14 @@ reserved word =
 
 -- INFIX OPERATORS
 
-anyOp :: IParser (Commented AST.Variable.Ref)
+anyOp :: IParser AST.Variable.Ref
 anyOp =
-  addComments (betwixt '`' '`' qualifiedVar <?> "an infix operator like `andThen`")
+  (betwixt '`' '`' qualifiedVar <?> "an infix operator like `andThen`")
   <|> symOp
 
 
-symOp :: IParser (Commented AST.Variable.Ref)
+symOp :: IParser AST.Variable.Ref
 symOp =
-  addComments $
   do  op <- many1 (satisfy Help.isSymbol) <?> "an infix operator like +"
       guard (op `notElem` [ "=", "..", "->", "--", "|", "\8594", ":" ])
       case op of
@@ -164,9 +163,8 @@ parseWhile1 sep parser =
             List.reverse $ (next post):acc
     in
         do
-            updateState State.clearComments
             value <- parser
-            zips <- many ((,) <$> try sep <*> (updateState State.clearComments >> parser))
+            zips <- many ((,) <$> try sep <*> parser)
             return $ \pre post -> done $ List.foldr step ([], value pre, post) (List.reverse zips)
 
 
@@ -230,12 +228,10 @@ constrainedSpacePrefix parser =
 constrainedSpacePrefix' :: IParser a -> (Bool -> IParser b) -> IParser [Commented' a]
 constrainedSpacePrefix' parser constraint =
     many $ choice
-      [ comment <$> try (const <$> spacing <*> lookAhead (oneOf "[({")) <*> parser'
-      , try (comment <$> spacing <*> parser')
+      [ comment <$> try (const <$> spacing <*> lookAhead (oneOf "[({")) <*> parser
+      , try (comment <$> spacing <*> parser)
       ]
     where
-      parser' = updateState State.clearComments >> parser
-
       comment pre value = Commented' pre [] value
 
       spacing = do
@@ -305,14 +301,6 @@ parens' =
 getMyPosition :: IParser R.Position
 getMyPosition =
   R.fromSourcePos <$> getPosition
-
-
-addComments :: IParser a -> IParser (Commented a)
-addComments parser =
-  do  value <- parser
-      state <- getState
-      updateState State.clearComments
-      return $ Commented (reverse $ State.comments state) value
 
 
 addLocation :: IParser a -> IParser (A.Located a)
@@ -455,7 +443,6 @@ multiComment =
   do  try (string "{-" <* notFollowedBy (string "|") )
       many (string " ")
       b <- closeComment
-      updateState $ State.addComment $ BlockComment b
       return $ BlockComment b
 
 

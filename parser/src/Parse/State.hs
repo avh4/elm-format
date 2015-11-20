@@ -1,30 +1,16 @@
 module Parse.State where
 
-import qualified AST.V0_15 as AST
-
 
 data State = State
-  { comments :: [AST.Comment]
-  , newline :: [Bool]
+  { newline :: [Bool]
   }
 
 
 init :: State
 init =
   State
-    { comments = []
-    , newline = [False]
+    { newline = [False]
     }
-
-
-addComment :: AST.Comment -> State -> State
-addComment comment state =
-    state { comments = comment : (comments state) }
-
-
-clearComments :: State -> State
-clearComments state =
-    state { comments = [] }
 
 
 setNewline :: State -> State

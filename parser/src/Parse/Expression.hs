@@ -59,10 +59,9 @@ listTerm =
     shader' <|> braces (try range <|> commaSeparated)
   where
     range =
-      do  updateState State.clearComments
+      do
           lo <- expr
           (loPost, _, hiPre) <- padded (string "..")
-          updateState State.clearComments
           hi <- expr
           return $ \loPre hiPost multiline ->
               E.Range
@@ -94,7 +93,7 @@ parensTerm =
       do  (start, op, end) <- located anyOp
           return $
             A.at start end $
-              E.Var $ (\(Commented _ v) -> v) op
+              E.Var op
 
     tupleFn =
       do  commas <- comma >> many (whitespace >> comma)
@@ -193,7 +192,7 @@ expr =
 
 binaryExpr :: IParser E.Expr
 binaryExpr =
-    Binop.binops appExpr lastExpr ((\(Commented _ v) -> v) <$> anyOp)
+    Binop.binops appExpr lastExpr anyOp
   where
     lastExpr =
         addLocation (choice [ letExpr, caseExpr, ifExpr ])
@@ -288,7 +287,7 @@ typeAnnotation =
     addLocation (E.TypeAnnotation <$> try start <*> Type.expr)
   where
     start =
-      do  v <- (Var.VarRef <$> lowVar) <|> parens' ((\(Commented _ v) -> v) <$> symOp)
+      do  v <- (Var.VarRef <$> lowVar) <|> parens' symOp
           padded hasType
           return v
 
@@ -312,7 +311,7 @@ defStart =
     choice
       [ do  pattern <- try Pattern.term
             infics pattern <|> func pattern
-      , do  opPattern <- addLocation (P.Var <$> parens' ((\(Commented _ v) -> v) <$> symOp))
+      , do  opPattern <- addLocation (P.Var <$> parens' symOp)
             func opPattern
       ]
       <?> "the definition of a variable (x = ...)"
@@ -326,6 +325,6 @@ defStart =
               return [pattern]
 
     infics p1 =
-      do  (start, op, end) <- try (whitespace >> located ((\(Commented _ v) -> v) <$> anyOp))
+      do  (start, op, end) <- try (whitespace >> located anyOp)
           p2 <- (whitespace >> Pattern.term)
           return [ A.at start end (P.Var op), p1, p2 ]

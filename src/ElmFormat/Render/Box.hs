@@ -820,30 +820,6 @@ formatCommented' format (Commented' pre post inner) =
                 ++ ( map formatComment post)
 
 
-formatCommented :: (a -> Box) -> Commented a -> Box
-formatCommented format commented =
-    case commented of
-        Commented comments inner ->
-            case
-                ( allSingles $ map formatComment comments
-                , isLine $ format inner
-                )
-            of
-                (Right [], Right inner') ->
-                    line inner'
-                (Right cs, Right inner') ->
-                    line $ row
-                        [ row cs
-                        , space
-                        , inner'
-                        ]
-                _ ->
-                    stack
-                        [ stack $ map formatComment comments
-                        , format inner
-                        ]
-
-
 formatComment :: Comment -> Box
 formatComment comment =
     case comment of
