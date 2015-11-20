@@ -17,7 +17,7 @@ data Pattern'
     | Tuple [Pattern]
     | Record [String]
     | Alias String Pattern
-    | Var (Commented Var.Ref)
+    | Var Var.Ref
     | Anything
     | Literal L.Literal
     deriving (Eq, Show)

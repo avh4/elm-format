@@ -312,7 +312,7 @@ defStart =
     choice
       [ do  pattern <- try Pattern.term
             infics pattern <|> func pattern
-      , do  opPattern <- addLocation (P.Var <$> parens' symOp)
+      , do  opPattern <- addLocation (P.Var <$> parens' ((\(Commented _ v) -> v) <$> symOp))
             func opPattern
       ]
       <?> "the definition of a variable (x = ...)"
@@ -326,6 +326,6 @@ defStart =
               return [pattern]
 
     infics p1 =
-      do  (start, op, end) <- try (whitespace >> located anyOp)
+      do  (start, op, end) <- try (whitespace >> located ((\(Commented _ v) -> v) <$> anyOp))
           p2 <- (whitespace >> Pattern.term)
           return [ A.at start end (P.Var op), p1, p2 ]

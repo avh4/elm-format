@@ -35,7 +35,7 @@ basic =
               P.Data (Var.VarRef str) []
 
           _ ->
-              P.Var (Commented [] $ Var.VarRef str)
+              P.Var (Var.VarRef str)
 
 
 asPattern :: IParser P.Pattern -> IParser P.Pattern

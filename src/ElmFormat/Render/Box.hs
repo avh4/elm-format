@@ -455,7 +455,7 @@ formatPattern parensRequired apattern =
                     line $ keyword "<TODO-multiline PAttern alias>"
             |> (if parensRequired then addParens else id)
         AST.Pattern.Var var ->
-            formatCommented (line . formatVar) var -- TODO: comments not tested
+            line $ formatVar var
         AST.Pattern.Anything ->
             line $ keyword "_"
         AST.Pattern.Literal lit ->
