@@ -63,7 +63,7 @@ infixDecl =
       forcedWS
       n <- digit
       forcedWS
-      AST.Declaration.Fixity assoc (read [n]) <$> anyOp
+      AST.Declaration.Fixity assoc (read [n]) <$> (\(Commented _ v) -> v) <$> anyOp
 
 
 -- PORT

@@ -356,7 +356,7 @@ formatDeclaration decl =
                         ]
 
                 AST.Declaration.Fixity assoc precedence name ->
-                    case isLine $ formatCommented (line . formatInfixVar) name of
+                    case isLine $ (line $ formatInfixVar name) of
                         Right name' ->
                             line $ row
                                 [ case assoc of
