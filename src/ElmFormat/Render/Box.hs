@@ -406,7 +406,7 @@ formatDefinition compact adef =
                     line $ keyword "<TODO: let binding with multiline name/pattern>"
         AST.Expression.TypeAnnotation name typ ->
             case
-                ( isLine $ formatCommented (line . formatVar) name -- TODO: comments not tested
+                ( isLine $ (line $ formatVar name)
                 , isLine $ formatType typ
                 )
             of

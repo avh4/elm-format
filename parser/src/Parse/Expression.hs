@@ -288,7 +288,7 @@ typeAnnotation =
     addLocation (E.TypeAnnotation <$> try start <*> Type.expr)
   where
     start =
-      do  v <- addComments (Var.VarRef <$> lowVar) <|> parens' symOp
+      do  v <- (Var.VarRef <$> lowVar) <|> parens' ((\(Commented _ v) -> v) <$> symOp)
           padded hasType
           return v
 
