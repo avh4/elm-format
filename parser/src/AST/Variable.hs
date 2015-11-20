@@ -42,7 +42,7 @@ listing xs =
 
 -- | A value that can be imported or exported
 data Value
-    = Value !(Commented Ref)
+    = Value !Ref
     | Alias !String
     | Union !String !(Listing String)
     deriving (Eq, Show)

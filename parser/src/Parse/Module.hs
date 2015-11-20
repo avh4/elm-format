@@ -7,6 +7,7 @@ import qualified AST.Module as Module
 import qualified AST.Module.Name as ModuleName
 import qualified AST.Variable as Var
 import Reporting.Annotation as A
+import AST.V0_15
 
 
 getModuleName :: String -> Maybe String
@@ -104,7 +105,7 @@ value =
     val <|> tipe <?> "a value or type to expose"
   where
     val =
-      Var.Value <$> (addComments (Var.VarRef <$> lowVar) <|> parens' symOp)
+      Var.Value <$> ((Var.VarRef <$> lowVar) <|> parens' ((\(Commented _ v) -> v) <$> symOp))
 
     tipe =
       do  name <- capVar

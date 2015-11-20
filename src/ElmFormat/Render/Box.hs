@@ -252,9 +252,11 @@ formatVarValue :: AST.Variable.Value -> Box
 formatVarValue aval =
     case aval of
         AST.Variable.Value val ->
-            formatCommented (line . formatVar) val -- TODO: comments not tested
+            line $ formatVar val
+
         AST.Variable.Alias name ->
             line $ identifier name
+
         AST.Variable.Union name listing ->
             case formatStringListing listing of
                 Just listing' ->
