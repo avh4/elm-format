@@ -46,7 +46,7 @@ helpInfo =
     mconcat
         [ Opt.fullDesc
         , Opt.header top
-        , Opt.progDesc "Format and Elm source file."
+        , Opt.progDesc "Format an Elm source file."
         , Opt.footerDoc (Just examples)
         ]
   where
