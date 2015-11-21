@@ -21,7 +21,7 @@ type Def =
 
 
 data Def'
-    = Definition Pattern.Pattern [Pattern.Pattern] Expr Bool
+    = Definition Pattern.Pattern [Pattern.Pattern] [Comment] Expr Bool
     | TypeAnnotation Var.Ref Type.Type
     deriving (Eq, Show)
 
@@ -34,8 +34,8 @@ stripRegion d =
 stripRegion' :: Def' -> Def'
 stripRegion' d =
     case d of
-        Definition p ps e b ->
-            Definition (A.stripRegion p) (map A.stripRegion ps) (A.stripRegion e) b
+        Definition p ps c e b ->
+            Definition (A.stripRegion p) (map A.stripRegion ps) c (A.stripRegion e) b
         _ ->
             d
 

@@ -81,12 +81,6 @@ fn =
     "XYZZY"
 
 
-
-----------------
---- Comments ---
-----------------
-
-
 annotatedFn : String
 annotatedFn =
     "XYZZY"
@@ -103,6 +97,17 @@ fn2 :
     -> Int
 fn2 _ _ _ =
     999
+
+
+
+----------------
+--- Comments ---
+----------------
+
+
+comments1 =
+    -- comments inside declaration
+    ()
 
 
 escapedString =

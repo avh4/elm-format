@@ -12,6 +12,7 @@ import Parse.Helpers (IParser, iParse)
 import AST.V0_15
 import AST.Expression
 import AST.Literal
+import qualified AST.Pattern as P
 import AST.Variable
 import Reporting.Annotation hiding (map, at)
 import Reporting.Region
@@ -230,4 +231,12 @@ tests =
 
     , testCase "unit" $
         assertParse expr "()" $ at 1 1 1 3 $ Unit
+
+
+    , testGroup "definition"
+        [ testCase "" $ assertParse definition "x=1" $ at 1 1 1 4 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [] (intExpr (1,3,1,4) 1) False
+        , testCase "comments" $ assertParse definition "x{-A-}={-B-}1" $ at 1 1 1 14 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [BlockComment "B"] (intExpr (1,13,1,14) 1) False
+        , testCase "line comments" $ assertParse definition "x =\n    --X\n    1" $ at 1 1 3 6 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [LineComment "X"] (intExpr (3,5,3,6) 1) True
+
+        ]
     ]

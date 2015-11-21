@@ -300,10 +300,10 @@ definition =
   withPos $
     do  pushNewlineContext
         (name:args) <- defStart
-        padded equals
+        (_, _, postEqualsComments) <- padded equals -- TODO: use pre comments
         body <- expr
         sawNewline <- popNewlineContext
-        return $ E.Definition name args body sawNewline
+        return $ E.Definition name args postEqualsComments body sawNewline
 
 
 defStart :: IParser [P.Pattern]

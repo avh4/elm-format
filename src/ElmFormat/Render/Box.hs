@@ -46,7 +46,7 @@ isDeclaration decl =
             case RA.drop adecl of
                 AST.Declaration.Definition def ->
                     case RA.drop def of
-                        AST.Expression.Definition _ _ _ _ ->
+                        AST.Expression.Definition _ _ _ _ _ ->
                             True
 
                         _ ->
@@ -280,7 +280,7 @@ formatVarValue aval =
 isDefinition :: AST.Expression.Def' -> Bool
 isDefinition def =
     case def of
-        AST.Expression.Definition _ _ _ _ ->
+        AST.Expression.Definition _ _ _ _ _ ->
             True
         _ ->
             False
@@ -390,16 +390,17 @@ formatDeclaration decl =
 formatDefinition :: Bool -> AST.Expression.Def -> Box
 formatDefinition compact adef =
     case RA.drop adef of
-        AST.Expression.Definition name args expr multiline ->
+        AST.Expression.Definition name args comments expr multiline ->
             case
                 ( compact
                 , multiline
                 , isLine $ formatPattern True name
                 , allSingles $ map (formatPattern True) args
+                , comments
                 , isLine $ formatExpression expr
                 )
             of
-                (True, False, Right name', Right args', Right expr') ->
+                (True, False, Right name', Right args', [], Right expr') ->
                     line $ row
                         [ row $ List.intersperse space $ (name':args')
                         , space
@@ -407,18 +408,20 @@ formatDefinition compact adef =
                         , space
                         , expr'
                         ]
-                (_, _, Right name', Right args', _) ->
-                    stack
+                (_, _, Right name', Right args', _, _) ->
+                    stack $
                         [ line $ row
                             [ row $ List.intersperse space $ (name':args')
                             , space
                             , punc "="
                             ]
-                        , formatExpression expr
-                            |> indent
+                        , indent $ stack $
+                            (map formatComment comments)
+                            ++ [ formatExpression expr ]
                         ]
                 _ ->
                     line $ keyword "<TODO: let binding with multiline name/pattern>"
+
         AST.Expression.TypeAnnotation name typ ->
             case
                 ( isLine $ (line $ formatVar name)

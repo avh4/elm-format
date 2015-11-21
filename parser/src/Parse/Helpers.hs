@@ -376,13 +376,13 @@ forcedWS =
     ]
   where
     nl_space =
-      try ((++) <$> (concat <$> many1 (newline >> return [])) <*> spaces) -- TODO: get comments from newline
+      try ((++) <$> (concat <$> many1 newline) <*> spaces)
 
 
 -- Just eats whitespace until the next meaningful character.
 dumbWhitespace :: IParser [Comment]
 dumbWhitespace =
-  concat <$> many (spaces <|> (newline >> return [])) -- TODO: get comments from newline
+  concat <$> many (spaces <|> newline)
 
 
 whitespace :: IParser (Bool, [Comment])
