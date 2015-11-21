@@ -18,14 +18,8 @@ myTuple =
         4
 
 
-foo =
-    (case x of
-        True ->
-            1
 
-        False ->
-            3
-    )
+-- foo=(case x of {True->1;False->3})
 
 
 bar =
