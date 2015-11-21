@@ -6,6 +6,8 @@ import System.Exit (exitFailure, exitSuccess)
 import System.FilePath.Find (find, (==?), extension, always)
 import Control.Monad (when)
 import Data.Maybe (isJust)
+import Messages.Types (Message(..))
+import Messages.Strings (renderMessage)
 
 import qualified AST.Module
 import qualified CommandLine.Helpers as Cmd
@@ -21,9 +23,12 @@ import qualified Reporting.Result as Result
 import qualified System.Directory as Dir
 
 
+r :: Message -> String
+r = renderMessage
+
 showErrors :: [RA.Located Syntax.Error] -> IO ()
 showErrors errs = do
-    putStrLn "ERRORS"
+    putStrLn (r ErrorsHeading)
     mapM_ printError errs
 
 
@@ -54,7 +59,7 @@ formatResult canWriteEmptyFileOnError outputFile result =
 
 printError :: RA.Located Syntax.Error -> IO ()
 printError (RA.A range err) =
-    Report.printError "<location>" range (Syntax.toReport err) ""
+    Report.printError (r ErrorFileLocation) range (Syntax.toReport err) ""
 
 
 getApproval :: Bool -> [FilePath] -> IO Bool
@@ -63,32 +68,32 @@ getApproval autoYes filePaths =
         True ->
             return True
         False -> do
-            putStrLn "This will overwrite the following files to use Elm’s preferred style:\n"
+            putStrLn $ (r FollowingFilesWillBeOverwritten) ++ "\n"
             mapM_ (\filePath -> putStrLn $ "  " ++ filePath) filePaths
-            putStrLn "\nThis cannot be undone! Make sure to back up these files before proceeding.\n"
-            putStr "Are you sure you want to overwrite these files with formatted versions? (y/n) "
+            putStrLn $ "\n" ++ (r BackupFilesBeforeOverwriting) ++ "\n"
+            putStr $ (r ConfirmOverwriting) ++ " "
             Cmd.yesOrNo
 
 
 exitFileNotFound :: FilePath -> IO ()
 exitFileNotFound filePath = do
-    putStrLn "Could not find any .elm files on the specified path:\n"
+    putStrLn $ (r NoElmFilesOnPath) ++ "\n"
     putStrLn $ "  " ++ filePath ++ "\n"
-    putStrLn "Please check the given path."
+    putStrLn (r PleaseCheckPath)
     exitFailure
 
 
 exitOnInputDirAndOutput :: IO ()
 exitOnInputDirAndOutput = do
-    putStrLn "Can't write to the OUTPUT path, because INPUT path is a directory.\n"
-    putStrLn "Please remove the OUTPUT argument. The .elm files in INPUT will be formatted in place."
+    putStrLn $ (r CantWriteToOutputBecauseInputIsDirectory) ++ "\n"
+    putStrLn (r PleaseRemoveOutputArgument)
     exitFailure
 
 
 processFile :: FilePath -> FilePath -> IO ()
 processFile inputFile outputFile =
     do
-        putStrLn $ "Processing file " ++ inputFile
+        putStrLn $ (r ProcessingFile) ++ " " ++ inputFile
         input <- LazyText.readFile inputFile
         Parse.parse input
             |> formatResult canWriteEmptyFileOnError outputFile
