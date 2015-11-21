@@ -17,6 +17,7 @@ import qualified Data.Char as Char
 import qualified Data.List as List
 import qualified Reporting.Annotation as RA
 import Text.Printf (printf)
+import Util.List
 
 
 splitWhere :: (a -> Bool) -> [a] -> [[a]]
@@ -36,16 +37,6 @@ splitWhere predicate list =
           |> uncurry merge
           |> dropWhile null
           |> reverse
-
-
-intersperseMap :: (a -> Bool) -> b -> (a -> b) -> [a] -> [b]
-intersperseMap predicate sep fn list =
-    list
-        |> map (\x -> (predicate x, fn x))
-        |> splitWhere fst
-        |> List.intersperse [(False, sep)]
-        |> concat
-        |> map snd
 
 
 isDeclaration :: AST.Declaration.Decl -> Bool
@@ -105,9 +96,27 @@ formatModule modu =
                   |> List.sortOn (fst . RA.drop)
                   |> map formatImport
 
+        isComment d =
+            case d of
+                AST.Declaration.BodyComment _ ->
+                    True
+                _ ->
+                    False
+
+        spacer first second =
+            case (isDeclaration first, isComment first, isComment second) of
+                (_, False, True) ->
+                    List.replicate 3 blankLine
+                (True, _, _) ->
+                    List.replicate 2 blankLine
+                (False, True, False) ->
+                    List.replicate 2 blankLine
+                _ ->
+                    []
+
         body =
             stack $
-                intersperseMap isDeclaration (stack [blankLine, blankLine]) formatDeclaration $
+                intersperseMap spacer formatDeclaration $
                     AST.Module.body modu
     in
         case (docs, imports) of -- TODO: not all cases are tested
@@ -282,6 +291,10 @@ formatDeclaration decl =
     case decl of
         AST.Declaration.DocComment docs ->
             formatDocComment docs
+
+        AST.Declaration.BodyComment c ->
+            formatComment c
+
         AST.Declaration.Decl adecl ->
             case RA.drop adecl of
                 AST.Declaration.Definition def ->
@@ -665,16 +678,24 @@ formatExpression aexpr =
                     ]
 
         AST.Expression.Let defs expr ->
-            stack
-                [ line $ keyword "let"
-                , defs
-                    |> intersperseMap (isDefinition . RA.drop) blankLine (formatDefinition True)
-                    |> stack
-                    |> indent
-                , line $ keyword "in"
-                , formatExpression expr
-                    |> indent
-                ]
+            let
+                spacer first second =
+                    case isDefinition $ RA.drop first of
+                        True ->
+                            [ blankLine ]
+                        False ->
+                            []
+            in
+                stack
+                    [ line $ keyword "let"
+                    , defs
+                        |> intersperseMap spacer (formatDefinition True)
+                        |> stack
+                        |> indent
+                    , line $ keyword "in"
+                    , formatExpression expr
+                        |> indent
+                    ]
 
         AST.Expression.Case (subject,multiline) clauses ->
             let
@@ -824,7 +845,7 @@ formatComment :: Comment -> Box
 formatComment comment =
     case comment of
         BlockComment c ->
-            case lines c of
+            case lines c of -- TODO: can [] happen with empty string?
                 (l:[]) ->
                     line $ row
                         [ punc "{-"
@@ -843,6 +864,8 @@ formatComment comment =
                         , stack $ map (line . literal) ls
                         , line $ punc "-}"
                         ]
+        LineComment c ->
+            line $ row [ punc "--", literal c ]
 
 
 formatLiteral :: L.Literal -> Box

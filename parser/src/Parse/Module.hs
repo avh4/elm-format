@@ -27,12 +27,12 @@ getModuleName source =
 
 header :: IParser Module.Header
 header =
-  do  optional freshLine
+  do  optional freshLine -- TODO: use comments
       (names, exports) <-
-          option (["Main"], Var.openListing) (moduleDecl `followedBy` freshLine)
+          option (["Main"], Var.openListing) (moduleDecl `followedBy` freshLine) -- TODO: use comments
       docs <-
         choice
-          [ addLocation (Just <$> docComment) `followedBy` freshLine
+          [ addLocation (Just <$> docComment) `followedBy` freshLine -- TODO: use comments
           , addLocation (return Nothing)
           ]
       imports' <- imports
@@ -54,7 +54,7 @@ moduleDecl =
 
 imports :: IParser [Module.UserImport]
 imports =
-  many (import' `followedBy` freshLine)
+  many (import' `followedBy` freshLine) -- TODO: use comments
 
 
 import' :: IParser Module.UserImport
@@ -93,7 +93,7 @@ listing item =
       listing <-
           choice
             [ const Var.openListing <$> string ".."
-            , (\x -> Var.Listing $ x [] []) <$> commaSep1 (const . const <$> item) <*> return False
+            , (\x -> Var.Listing $ x [] []) <$> commaSep1 (const . const <$> item) <*> return False -- TODO: use comments
             ]
       whitespace
       char ')'

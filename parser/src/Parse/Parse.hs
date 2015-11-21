@@ -25,7 +25,7 @@ programParser :: IParser AST.Module.Module
 programParser =
   do  (AST.Module.Header name docs exports imports) <- Module.header
       decls <- declarations
-      optional freshLine
+      optional freshLine -- TODO: use comments
       optional spaces
       eof
 
@@ -34,15 +34,16 @@ programParser =
 
 declarations :: IParser [AST.Declaration.Decl]
 declarations =
-  (:) <$> Decl.declaration
-      <*> many freshDef
+  (++) <$> ((\x -> [x]) <$> Decl.declaration) -- TODO: can there be comments before this?
+      <*> (concat <$> many freshDef)
 
 
-freshDef :: IParser AST.Declaration.Decl
+freshDef :: IParser [AST.Declaration.Decl]
 freshDef =
     commitIf (freshLine >> (letter <|> char '_')) $
-      do  _ <- freshLine
-          Decl.declaration
+      do  comments <- freshLine
+          decl <- Decl.declaration
+          return $ (map AST.Declaration.BodyComment comments) ++ [decl]
 
 
 -- RUN PARSERS

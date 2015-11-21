@@ -390,17 +390,16 @@ whitespace =
   option (False, []) ((,) True <$> forcedWS)
 
 
-freshLine :: IParser ()
+freshLine :: IParser [Comment]
 freshLine =
-    do  try (many1 newline >> many space_nl) <|> try (many1 space_nl) <?> Syntax.freshLine
-        return ()
+      concat <$> (try ((++) <$> many1 newline <*> many space_nl) <|> try (many1 space_nl)) <?> Syntax.freshLine
   where
-    space_nl = try $ spaces >> many1 newline
+    space_nl = try $ (++) <$> spaces <*> (concat <$> many1 newline)
 
 
-newline :: IParser ()
+newline :: IParser [Comment]
 newline =
-  do  result <- simpleNewline <|> lineComment <?> Syntax.newline
+  do  result <- (simpleNewline >> return []) <|> ((\x -> [x]) <$> lineComment) <?> Syntax.newline
       updateState $ State.setNewline
       return result
 
@@ -423,11 +422,11 @@ popNewlineContext =
       return $ State.sawNewline state
 
 
-lineComment :: IParser ()
+lineComment :: IParser Comment
 lineComment =
   do  try (string "--")
-      comment <- anyUntil $ simpleNewline <|> eof
-      return () -- TODO: save LineComments
+      comment <- anyUntil $ (simpleNewline >> return ()) <|> eof
+      return $ LineComment comment
 
 
 docComment :: IParser String
