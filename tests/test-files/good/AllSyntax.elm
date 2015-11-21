@@ -156,6 +156,12 @@ comments5 =
         ()
 
 
+comments6 =
+    \x ->
+        -- we compute using x
+        x * x
+
+
 escapedString =
     let
         normals = "a b'`<>{}/ڥ😀ぁ⾃𝟟"

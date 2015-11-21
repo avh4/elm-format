@@ -593,14 +593,15 @@ formatExpression aexpr =
                             |> stack
                             |> (\body -> stack [left', indent body])
 
-        AST.Expression.Lambda patterns expr multiline ->
+        AST.Expression.Lambda patterns bodyComments expr multiline ->
             case
                 ( multiline
                 , allSingles $ map (formatPattern True) patterns
+                , bodyComments
                 , isLine $ formatExpression expr
                 )
             of
-                (False, Right patterns', Right expr') ->
+                (False, Right patterns', [], Right expr') ->
                     line $ row
                         [ punc "\\"
                         , row $ List.intersperse space $ patterns'
@@ -609,7 +610,7 @@ formatExpression aexpr =
                         , space
                         , expr'
                         ]
-                (_, Right patterns', _) ->
+                (_, Right patterns', _, _) ->
                     stack
                         [ line $ row
                             [ punc "\\"
@@ -617,8 +618,9 @@ formatExpression aexpr =
                             , space
                             , punc "->"
                             ]
-                        , formatExpression expr
-                            |> indent
+                        , indent $ stack $
+                            (map formatComment bodyComments)
+                            ++ [ formatExpression expr ]
                         ]
                 _ ->
                     line $ keyword "<TODO: multiline pattern in lambda>"
