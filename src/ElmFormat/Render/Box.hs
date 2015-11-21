@@ -731,13 +731,14 @@ formatExpression aexpr =
                               , line $ keyword "of"
                               ]
 
-                clause (pat,expr) =
+                clause (pat, bodyComments, expr) =
                     case isLine $ formatPattern True pat of
                         Right pat' ->
                             stack
                                 [ line $ row [ pat', space, keyword "->"]
-                                , formatExpression expr
-                                    |> indent
+                                , indent $ stack $
+                                    (map formatComment bodyComments)
+                                    ++ [ formatExpression expr ]
                                 ]
                         _ ->
                             line $ keyword "<TODO: multiline case pattern>"

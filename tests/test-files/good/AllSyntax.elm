@@ -130,6 +130,17 @@ comments3 =
         x
 
 
+comments4 =
+    case bool of
+        True ->
+            -- return unit
+            ()
+
+        _ ->
+            {- return unit -}
+            ()
+
+
 escapedString =
     let
         normals = "a b'`<>{}/ڥ😀ぁ⾃𝟟"
