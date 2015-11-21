@@ -1,7 +1,7 @@
 module AST.Module
     ( Module(..), Body(..)
     , Header(..)
-    , UserImport, DefaultImport, ImportMethod(..)
+    , UserImport(..), ImportMethod(..)
     , stripRegion
     ) where
 
@@ -9,6 +9,7 @@ import qualified AST.Declaration as Declaration
 import qualified AST.Module.Name as Name
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
+import AST.V0_15
 
 
 -- MODULES
@@ -53,10 +54,10 @@ data Header = Header
 
 -- IMPORTs
 
-type UserImport = A.Located (Name.Raw, ImportMethod)
-
-
-type DefaultImport = (Name.Raw, ImportMethod)
+data UserImport
+    = UserImport (A.Located (Name.Raw, ImportMethod))
+    | ImportComment Comment
+    deriving (Eq, Show)
 
 
 data ImportMethod = ImportMethod

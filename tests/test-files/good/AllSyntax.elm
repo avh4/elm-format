@@ -8,6 +8,12 @@ module AllSyntax (fn, tuple, Type, Union(A, B, C), Union2(..)) where
 
 import Json.Decode as Json
 import List exposing (..)
+
+
+--
+-- Imports starting with S
+--
+
 import Signal exposing (foldp, map)
 import String
 

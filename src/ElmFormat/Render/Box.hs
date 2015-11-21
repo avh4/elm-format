@@ -91,10 +91,20 @@ formatModule modu =
         docs =
             formatModuleDocs (AST.Module.docs modu)
 
+        importSpacer first second =
+              case (first, second) of
+                  (AST.Module.ImportComment _, AST.Module.ImportComment _) ->
+                      []
+                  (AST.Module.ImportComment _, _) ->
+                      List.replicate 1 blankLine
+                  (_, AST.Module.ImportComment _) ->
+                      List.replicate 2 blankLine
+                  (_, _) ->
+                      []
+
         imports =
               AST.Module.imports modu
-                  |> List.sortOn (fst . RA.drop)
-                  |> map formatImport
+                  |> intersperseMap importSpacer formatImport
 
         isComment d =
             case d of
@@ -192,43 +202,48 @@ formatName name =
 
 formatImport :: AST.Module.UserImport -> Box
 formatImport aimport =
-    case RA.drop aimport of
-        (name,method) ->
-            let
-                as =
-                    case AST.Module.alias method of
-                        Nothing ->
-                            formatName name
-                        Just alias ->
-                            row
-                                [ formatName name
-                                , space
-                                , keyword "as"
-                                , space
-                                , identifier alias
-                                ]
-            in
-                case formatListing $ AST.Module.exposedVars method of
-                    Just listing ->
-                        case isLine listing of
-                            Right listing' ->
+    case aimport of
+        AST.Module.UserImport aimport' ->
+            case RA.drop aimport' of
+                (name,method) ->
+                    let
+                        as =
+                            case AST.Module.alias method of
+                                Nothing ->
+                                    formatName name
+                                Just alias ->
+                                    row
+                                        [ formatName name
+                                        , space
+                                        , keyword "as"
+                                        , space
+                                        , identifier alias
+                                        ]
+                    in
+                        case formatListing $ AST.Module.exposedVars method of
+                            Just listing ->
+                                case isLine listing of
+                                    Right listing' ->
+                                        line $ row
+                                            [ keyword "import"
+                                            , space
+                                            , as
+                                            , space
+                                            , keyword "exposing"
+                                            , space
+                                            , listing'
+                                            ]
+                                    _ ->
+                                        line $ keyword "<TODO: multiline exposing>"
+                            Nothing ->
                                 line $ row
                                     [ keyword "import"
                                     , space
                                     , as
-                                    , space
-                                    , keyword "exposing"
-                                    , space
-                                    , listing'
                                     ]
-                            _ ->
-                                line $ keyword "<TODO: multiline exposing>"
-                    Nothing ->
-                        line $ row
-                            [ keyword "import"
-                            , space
-                            , as
-                            ]
+
+        AST.Module.ImportComment c ->
+            formatComment c
 
 
 formatListing :: AST.Variable.Listing AST.Variable.Value-> Maybe Box

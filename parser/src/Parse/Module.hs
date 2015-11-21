@@ -8,6 +8,7 @@ import qualified AST.Module.Name as ModuleName
 import qualified AST.Variable as Var
 import Reporting.Annotation as A
 import AST.V0_15
+import qualified Util.List as List
 
 
 getModuleName :: String -> Maybe String
@@ -27,7 +28,7 @@ getModuleName source =
 
 header :: IParser Module.Header
 header =
-  do  optional freshLine -- TODO: use comments
+  do  option [] freshLine -- TODO: use comments
       (names, exports) <-
           option (["Main"], Var.openListing) (moduleDecl `followedBy` freshLine) -- TODO: use comments
       docs <-
@@ -54,17 +55,19 @@ moduleDecl =
 
 imports :: IParser [Module.UserImport]
 imports =
-  many (import' `followedBy` freshLine) -- TODO: use comments
+  concat <$> many ((:) <$> import' <*> (fmap Module.ImportComment <$> freshLine))
 
 
 import' :: IParser Module.UserImport
 import' =
+  Module.UserImport <$> (
   expecting "an import" $
   addLocation $
   do  try (reserved "import")
       whitespace
       names <- dotSep1 capVar
       (,) names <$> method (ModuleName.toString names)
+  )
   where
     method :: String -> IParser Module.ImportMethod
     method originalName =
