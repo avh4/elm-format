@@ -110,6 +110,14 @@ comments1 =
     ()
 
 
+comments2 =
+    1
+        -- plus
+        -- plus
+        +
+            3
+
+
 escapedString =
     let
         normals = "a b'`<>{}/ڥ😀ぁ⾃𝟟"

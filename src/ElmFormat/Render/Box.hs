@@ -561,18 +561,18 @@ formatExpression aexpr =
                 ops' =
                     ops |> map fst |> map (formatCommented (line. formatInfixVar)) -- TODO: comments not
 
-                es =
+                exprs =
                     ops |> map snd |> map (formatCommented formatExpression)
             in
                 case
                     ( multiline
                     , isLine $ left'
                     , allSingles $ ops'
-                    , allSingles $ es
+                    , allSingles $ exprs
                     )
                 of
-                    (False, Right left'', Right ops'', Right es') ->
-                        zip ops'' es'
+                    (False, Right left'', Right ops'', Right exprs') ->
+                        zip ops'' exprs'
                             |> map (\(op,e) -> row [op, space, e])
                             |> List.intersperse space
                             |> (:) space
@@ -580,12 +580,15 @@ formatExpression aexpr =
                             |> row
                             |> line
                     (_, _, Right ops'', _) ->
-                        zip ops'' es
+                        zip ops'' exprs
                             |> map (\(op,e) -> prefix (row [op, space]) e)
                             |> stack
                             |> (\body -> stack [left', indent body])
                     _ ->
-                        line $ keyword "<TODO: multiline binary operator>"
+                        zip ops' exprs
+                            |> map (\(op,e) -> stack [ op, indent e ])
+                            |> stack
+                            |> (\body -> stack [left', indent body])
 
         AST.Expression.Lambda patterns expr multiline ->
             case
@@ -868,7 +871,7 @@ formatComment comment =
                         , line $ punc "-}"
                         ]
         LineComment c ->
-            line $ row [ punc "--", literal c ]
+            mustBreak $ row [ punc "--", literal c ]
 
 
 formatLiteral :: L.Literal -> Box

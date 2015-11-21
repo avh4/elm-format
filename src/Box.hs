@@ -55,6 +55,7 @@ len l =
 
 data Box
     = Stack Line [Line]
+    | MustBreak Line
     -- | Margin Int
     -- | Empty
 
@@ -69,11 +70,24 @@ line l =
     Stack l []
 
 
+mustBreak :: Line -> Box
+mustBreak l =
+    MustBreak l
+
+
 stack' :: Box -> Box -> Box
 stack' b1 b2 =
-     case (b1, b2) of
-        (Stack l11 l1n, Stack l21 l2n) ->
-            Stack l11 (l1n ++ (l21:l2n))
+    let
+        split b =
+            case b of
+                Stack l1 ln ->
+                    (l1, ln)
+                MustBreak l1 ->
+                    (l1, [])
+        (l11, l1n) = split b1
+        (l21, l2n) = split b2
+    in
+        Stack l11 (l1n ++ (l21:l2n))
 
 
 stack :: [Box] -> Box
@@ -97,6 +111,8 @@ mapFirstLine firstFn restFn b =
     case b of
         Stack l1 ls ->
             Stack (firstFn l1) (map restFn ls)
+        MustBreak l1 ->
+            MustBreak (firstFn l1)
 
 
 indent :: Box -> Box
@@ -119,6 +135,8 @@ destructure b =
     case b of
         Stack first rest ->
             (first, rest)
+        MustBreak first ->
+            (first, [])
 
 
 allSingles :: [Box] -> Either [Box] [Line]
@@ -198,7 +216,7 @@ depr' margin l =
             (0, text s)
         Row items ->
             foldl
-                (\(m,b) l -> let (mm,bb) = depr' m l in (mm, hbox2 b bb))
+                (\(m,b) l' -> let (mm,bb) = depr' m l' in (mm, hbox2 b bb))
                 (margin,empty)
                 items
         Space ->
@@ -212,6 +230,8 @@ depr b =
     case b of
         Stack first rest ->
             vbox (map (snd . depr' 0) (first:rest))
+        MustBreak first ->
+            vbox (map (snd . depr' 0) (first:[]))
 
 
 empty :: Box'
