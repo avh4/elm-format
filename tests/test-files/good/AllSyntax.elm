@@ -143,6 +143,19 @@ comments4 =
             ()
 
 
+comments5 =
+    if True then
+        -- do the right thing
+        ()
+    else if False then
+        -- do something
+        -- redundant
+        ()
+    else
+        {- do the wrong thing -}
+        ()
+
+
 escapedString =
     let
         normals = "a b'`<>{}/ڥ😀ぁ⾃𝟟"

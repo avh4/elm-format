@@ -645,13 +645,13 @@ formatExpression aexpr =
                             |> indent
                         ]
 
-        AST.Expression.If [] els ->
+        AST.Expression.If [] _ els ->
             stack
                 [ line $ keyword "<INVALID IF EXPRESSION>"
                 , formatExpression els
                     |> indent
                 ]
-        AST.Expression.If (if':elseifs) els ->
+        AST.Expression.If (if':elseifs) elsComments els ->
             let
                 opening key multiline cond =
                     case (multiline, isLine cond) of
@@ -670,11 +670,12 @@ formatExpression aexpr =
                                 , line $ keyword "then"
                                 ]
 
-                clause key (cond,multiline,body) =
+                clause key (cond, multiline, bodyComments, body) =
                     stack
                         [ opening key multiline $ formatExpression cond
-                        , formatExpression body
-                            |> indent
+                        , indent $ stack $
+                            (map formatComment bodyComments)
+                            ++ [ formatExpression body ]
                         ]
             in
                 stack $
@@ -682,8 +683,9 @@ formatExpression aexpr =
                     ++ ( elseifs |> map (clause "else if") )
                     ++
                     [ line $ keyword "else"
-                    , formatExpression els
-                        |> indent
+                    , indent $ stack $
+                        (map formatComment elsComments)
+                        ++ [ formatExpression els ]
                     ]
 
         AST.Expression.Let defs bodyComments expr ->

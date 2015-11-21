@@ -207,23 +207,23 @@ ifExpr =
   ifHelp []
 
 
-ifHelp :: [(E.Expr, Bool, E.Expr)] -> IParser E.Expr'
+ifHelp :: [(E.Expr, Bool, [Comment], E.Expr)] -> IParser E.Expr'
 ifHelp branches =
   do  try (reserved "if")
       pushNewlineContext
       whitespace
       condition <- expr
       multilineCondition <- popNewlineContext
-      padded (reserved "then")
+      (_, _, bodyComments) <- padded (reserved "then") -- TODO: use pre comments
       updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
       thenBranch <- expr
       whitespace <?> "an 'else' branch"
       reserved "else" <?> "an 'else' branch"
-      whitespace
-      let newBranches = (condition, multilineCondition, thenBranch) : branches
+      (_, trailingComments) <- whitespace -- TODO: use trailingComments in the newBranch case
+      let newBranches = (condition, multilineCondition, bodyComments, thenBranch) : branches
       choice
         [ ifHelp newBranches
-        , E.If (reverse newBranches) <$> expr
+        , E.If (reverse newBranches) trailingComments <$> expr
         ]
 
 

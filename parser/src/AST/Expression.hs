@@ -54,7 +54,7 @@ data Expr'
     | Unary UnaryOperator Expr
     | Lambda [Pattern.Pattern] Expr Bool
     | App Expr [Commented Expr] Bool -- will only have pre comments
-    | If [(Expr, Bool, Expr)] Expr
+    | If [(Expr, Bool, [Comment], Expr)] [Comment] Expr
     | Let [Def] [Comment] Expr
     | Case (Expr,Bool) [([Comment], Pattern.Pattern, [Comment], Expr)]
     | Tuple [Commented Expr] Bool
