@@ -118,6 +118,14 @@ comments2 =
             3
 
 
+comments3 =
+    let
+        x = ()
+    in
+        {- let body -}
+        x
+
+
 escapedString =
     let
         normals = "a b'`<>{}/ڥ😀ぁ⾃𝟟"

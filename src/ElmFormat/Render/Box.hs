@@ -683,7 +683,7 @@ formatExpression aexpr =
                         |> indent
                     ]
 
-        AST.Expression.Let defs expr ->
+        AST.Expression.Let defs bodyComments expr ->
             let
                 spacer first second =
                     case isDefinition $ RA.drop first of
@@ -699,8 +699,9 @@ formatExpression aexpr =
                         |> stack
                         |> indent
                     , line $ keyword "in"
-                    , formatExpression expr
-                        |> indent
+                    , indent $ stack $
+                        (map formatComment bodyComments)
+                        ++ [formatExpression expr]
                     ]
 
         AST.Expression.Case (subject,multiline) clauses ->

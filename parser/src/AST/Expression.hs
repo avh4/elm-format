@@ -54,7 +54,7 @@ data Expr'
     | Lambda [Pattern.Pattern] Expr Bool
     | App Expr [Commented Expr] Bool -- will only have pre comments
     | If [(Expr, Bool, Expr)] Expr
-    | Let [Def] Expr
+    | Let [Def] [Comment] Expr
     | Case (Expr,Bool) [(Pattern.Pattern, Expr)]
     | Tuple [Commented Expr] Bool
     | TupleFunction Int -- will be 2 (,) or greater, indicating the size of the tuple

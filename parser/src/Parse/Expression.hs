@@ -276,8 +276,8 @@ letExpr =
           do  def <- typeAnnotation <|> definition
               whitespace
               return def
-      padded (reserved "in")
-      E.Let defs <$> expr
+      (_, _, bodyComments) <- padded (reserved "in") -- TODO: use pre comments
+      E.Let defs bodyComments <$> expr
 
 
 -- TYPE ANNOTATION
