@@ -1,5 +1,6 @@
 module Parse.Expression (term, typeAnnotation, definition, expr) where
 
+import Elm.Utils ((|>))
 import qualified Data.List as List
 import Text.Parsec hiding (newline, spaces)
 import Text.Parsec.Indent (block, withPos)
@@ -18,6 +19,7 @@ import qualified AST.Literal as L
 import qualified AST.Pattern as P
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
+import qualified Util.List as List
 
 
 --------  Basic Terms  --------
@@ -245,25 +247,25 @@ caseExpr =
       (_, e, _) <- padded expr -- TODO: use comments
       reserved "of"
       multilineSubject <- popNewlineContext
-      whitespace
+      (_, firstPatternComments) <- whitespace
       updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
       result <- without -- <|> with
-      return $ E.Case (e, multilineSubject) (result) -- TODO: pass comments
+      let (commentedClauses, trailingComments) = List.shift firstPatternComments result -- TODO: use trailingComments
+      return $ E.Case (e, multilineSubject) (List.map (\(c,f) -> f c) commentedClauses)
   where
     case_ =
       do  p <- Pattern.expr
-          (_, _, bodyComments) <- padded rightArrow -- TODO: use pre comments
+          (_, _, bodyComments) <- padded rightArrow -- TODO: use pre arrow comments
           result <- expr
-          return $ \_ _ -> (p, bodyComments, result) -- TODO: use comments from bracketed cases
+          return $ \preComments -> (preComments, p, bodyComments, result)
+
 
     -- bracketed case statements are removed in 0.16
     -- with =
     --   brackets (fmap (const . const . const) $ semiSep1 (case_ <?> "cases { x -> ... }")) -- TODO: use comments
 
     without =
-        do
-            result <- block (do c <- case_ ; whitespace ; return c)
-            return $ fmap (\f -> f [] []) result -- TODO: use comments
+        block ((,) <$> case_ <*> (snd <$> whitespace))
 
 
 -- LET

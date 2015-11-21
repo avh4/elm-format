@@ -19,4 +19,8 @@ tests =
         [ testCase "" $ assertEqual "" [ 21, 20050, 51, 50070, 71 ] $ intersperseMap (\a b -> [1000*a+b]) (\a -> a + 1) [ 20, 50, 70]
         , testCase "empty" $ assertEqual "" [] $ intersperseMap (\a b -> []) id ([] :: [Int])
         ]
+    , testGroup "shift"
+        [ testCase "" $ assertEqual "" ([("a",1), ("b",2)], "c") $ shift "a" [(1,"b"), (2,"c")]
+        , testCase "" $ assertEqual "empty" ([],"x") $ shift "x" ([] :: [(Int,String)])
+        ]
     ]

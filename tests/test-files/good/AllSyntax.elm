@@ -132,10 +132,12 @@ comments3 =
 
 comments4 =
     case bool of
+        -- This case is for True
         True ->
             -- return unit
             ()
 
+        {- Here's a case for anything else -}
         _ ->
             {- return unit -}
             ()

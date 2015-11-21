@@ -731,10 +731,12 @@ formatExpression aexpr =
                               , line $ keyword "of"
                               ]
 
-                clause (pat, bodyComments, expr) =
+                clause (patternComments, pat, bodyComments, expr) =
                     case isLine $ formatPattern True pat of
                         Right pat' ->
-                            stack
+                            stack $
+                                (map formatComment patternComments)
+                                ++
                                 [ line $ row [ pat', space, keyword "->"]
                                 , indent $ stack $
                                     (map formatComment bodyComments)

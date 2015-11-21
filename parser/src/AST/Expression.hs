@@ -56,7 +56,7 @@ data Expr'
     | App Expr [Commented Expr] Bool -- will only have pre comments
     | If [(Expr, Bool, Expr)] Expr
     | Let [Def] [Comment] Expr
-    | Case (Expr,Bool) [(Pattern.Pattern, [Comment], Expr)]
+    | Case (Expr,Bool) [([Comment], Pattern.Pattern, [Comment], Expr)]
     | Tuple [Commented Expr] Bool
     | TupleFunction Int -- will be 2 (,) or greater, indicating the size of the tuple
     | Access Expr String

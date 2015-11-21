@@ -22,7 +22,20 @@ intersperseMap :: (a -> a -> [b]) -> (a -> b) -> [a] -> [b]
 intersperseMap spacer fn list =
     case list of
         [] -> []
-        (first:rest) ->
+        (first:_) ->
             fn first
               : (pairs list
                   |> concatMap (\(a,b) -> spacer a b ++ [fn b]))
+
+
+shift :: a -> [(b,a)] -> ([(a,b)], a)
+shift a list =
+    let
+        init = (a, [])
+        step (holdA, acc) (nextB, nextA) =
+            (nextA, (holdA, nextB) : acc)
+        done (holdA, acc) =
+            (List.reverse acc, holdA)
+    in
+        List.foldl step init list
+            |> done
