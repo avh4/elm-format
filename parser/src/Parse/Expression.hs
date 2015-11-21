@@ -270,14 +270,14 @@ caseExpr =
 letExpr :: IParser E.Expr'
 letExpr =
   do  try (reserved "let")
-      whitespace
+      commentsAfterLet <- map (A.atDontCare . E.LetComment) <$> snd <$> whitespace
       defs <-
         block $
           do  def <- typeAnnotation <|> definition
-              whitespace
-              return def
+              (_, commentsAfterDef) <- whitespace
+              return $ def : (map (A.atDontCare . E.LetComment) commentsAfterDef)
       (_, _, bodyComments) <- padded (reserved "in") -- TODO: use pre comments
-      E.Let defs bodyComments <$> expr
+      E.Let (commentsAfterLet ++ concat defs) bodyComments <$> expr
 
 
 -- TYPE ANNOTATION

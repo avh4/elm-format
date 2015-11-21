@@ -447,6 +447,9 @@ formatDefinition compact adef =
                 _ ->
                     line $ keyword "<TODO: multiline name in type annotation>"
 
+        AST.Expression.LetComment comment ->
+            formatComment comment
+
 
 formatPattern :: Bool -> AST.Pattern.Pattern -> Box
 formatPattern parensRequired apattern =

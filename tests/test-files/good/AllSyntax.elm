@@ -120,6 +120,7 @@ comments2 =
 
 comments3 =
     let
+        -- The return value
         x = ()
     in
         {- let body -}
