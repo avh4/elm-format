@@ -276,7 +276,7 @@ letExpr =
           do  def <- typeAnnotation <|> definition
               (_, commentsAfterDef) <- whitespace
               return $ def : (map (A.atDontCare . E.LetComment) commentsAfterDef)
-      (_, _, bodyComments) <- padded (reserved "in") -- TODO: use pre comments
+      (_, _, bodyComments) <- padded (reserved "in") -- TODO: pre comments are always empty because any whitespace was consumed before padded?
       E.Let (commentsAfterLet ++ concat defs) bodyComments <$> expr
 
 

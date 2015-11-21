@@ -122,6 +122,9 @@ comments3 =
     let
         -- The return value
         x = ()
+
+        {- comment after definitions -}
+        -- ...
     in
         {- let body -}
         x
