@@ -31,13 +31,13 @@ header =
   do  option [] freshLine -- TODO: use comments
       (names, exports) <-
           option (["Main"], Var.openListing) (moduleDecl `followedBy` freshLine) -- TODO: use comments
-      docs <-
+      (docs, postDocsComments) <-
         choice
-          [ addLocation (Just <$> docComment) `followedBy` freshLine -- TODO: use comments
-          , addLocation (return Nothing)
+          [ (,) <$> addLocation (Just <$> docComment) <*> freshLine
+          , (,) <$> addLocation (return Nothing) <*> return []
           ]
       imports' <- imports
-      return (Module.Header names docs exports imports')
+      return (Module.Header names docs exports ((fmap Module.ImportComment postDocsComments) ++ imports'))
 
 
 moduleDecl :: IParser ([String], Var.Listing (A.Located Var.Value))

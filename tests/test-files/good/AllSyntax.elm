@@ -6,6 +6,8 @@ module AllSyntax (fn, tuple, Type, Union(A, B, C), Union2(..)) where
 @docs fn
 -}
 
+-- Comments before imports
+
 import Json.Decode as Json
 import List exposing (..)
 
