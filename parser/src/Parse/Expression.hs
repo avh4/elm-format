@@ -3,7 +3,7 @@ module Parse.Expression (term, typeAnnotation, definition, expr) where
 import Elm.Utils ((|>))
 import qualified Data.List as List
 import Text.Parsec hiding (newline, spaces)
-import Text.Parsec.Indent (block, withPos)
+import Text.Parsec.Indent (block, withPos, checkIndent)
 
 import qualified Parse.Binop as Binop
 import Parse.Helpers
@@ -249,23 +249,31 @@ caseExpr =
       multilineSubject <- popNewlineContext
       (_, firstPatternComments) <- whitespace
       updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
-      result <- without -- <|> with
-      let (commentedClauses, trailingComments) = List.shift firstPatternComments result -- TODO: use trailingComments
-      return $ E.Case (e, multilineSubject) (List.map (\(c,f) -> f c) commentedClauses)
+      result <- without firstPatternComments -- <|> with
+      return $ E.Case (e, multilineSubject) result
   where
-    case_ =
-      do  p <- Pattern.expr
-          (_, _, bodyComments) <- padded rightArrow -- TODO: use pre arrow comments
+    case_ preComments =
+      do
+          ((_, patternComments), p, (_, _, bodyComments)) <-
+              try ((,,)
+                  <$> whitespace
+                  <*> (checkIndent >> Pattern.expr)
+                  <*> padded rightArrow -- TODO: use pre arrow comments
+                  )
           result <- expr
-          return $ \preComments -> (preComments, p, bodyComments, result)
+          return (preComments++patternComments, p, bodyComments, result)
 
 
     -- bracketed case statements are removed in 0.16
     -- with =
     --   brackets (fmap (const . const . const) $ semiSep1 (case_ <?> "cases { x -> ... }")) -- TODO: use comments
 
-    without =
-        block ((,) <$> case_ <*> (snd <$> whitespace))
+    without preComments =
+        withPos $
+            do
+                r1 <- case_ preComments
+                r <- many $ case_ []
+                return $ r1:r
 
 
 -- LET

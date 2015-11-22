@@ -170,6 +170,19 @@ comments6 =
         x * x
 
 
+comments7 =
+    let
+        x =
+            case True of
+                _ ->
+                    ()
+
+        -- comments
+        y = ()
+    in
+        ()
+
+
 escapedString =
     let
         normals = "a b'`<>{}/ڥ😀ぁ⾃𝟟"
