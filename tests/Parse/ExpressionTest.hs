@@ -142,6 +142,32 @@ tests =
         , testCase "(2)" $ assertFailure expr "(\n 7\n)"
         ]
 
+    , testCase "case" $
+        assertParse expr "case 9 of\n 1->10\n _->20" $ at 1 1 3 7 $ Case (intExpr (1,6,1,7) 9, False) [([], at 2 2 2 3 $ P.Literal $ IntNum 1, [], intExpr (2,5,2,7) 10), ([], at 3 2 3 3 $ P.Anything, [], intExpr (3,5,3,7) 20)]
+    , testCase "case (no newline after 'of')" $
+        assertParse expr "case 9 of 1->10\n          _->20" $ at 1 1 2 16 $ Case (intExpr (1,6,1,7) 9, False) [([], at 1 11 1 12 $ P.Literal $ IntNum 1, [], intExpr (1,14,1,16) 10), ([], at 2 11 2 12 $ P.Anything, [], intExpr (2,14,2,16) 20)]
+    , testCase "case (whitespace)" $
+        assertParse expr "case 9 of\n 1 -> 10\n _ -> 20 " $ at 1 1 3 10 $ Case (intExpr (1,6,1,7) 9, False) [([], at 2 2 2 3 $ P.Literal $ IntNum 1, [], intExpr (2,7,2,9) 10), ([], at 3 2 3 3 $ P.Anything, [], intExpr (3,7,3,9) 20)]
+    , testCase "case (comments)" $
+        assertParse expr "case{-A-}9{-B-}of{-C-}\n{-D-}1{-E-}->{-F-}10{-G-}\n{-H-}_{-I-}->{-J-}20{-K-}" $ at 1 1 3 26 $ Case (intExpr (1,10,1,11) 9, False) [([BlockComment "C", BlockComment "D"], at 2 6 2 7 $ P.Literal $ IntNum 1, [BlockComment "F"], intExpr (2,19,2,21) 10), ([BlockComment "G", BlockComment "H"], at 3 6 3 7 $ P.Anything, [BlockComment "J"], intExpr (3,19,3,21) 20)] -- TODO: handle comments A, B, E, I, and don't allow K
+    , testCase "case (newlines)" $ -- TODO: should be able to add a newline at the end
+        assertParse expr "case\n 9\n of\n 1\n ->\n 10\n _\n ->\n 20" $ at 1 1 9 4 $ Case (intExpr (2,2,2,3) 9, True) [([], at 4 2 4 3 $ P.Literal $ IntNum 1, [], intExpr (6,2,6,4) 10), ([], at 7 2 7 3 $ P.Anything, [], intExpr (9,2,9,4) 20)]
+    , testGroup "case (clauses must start at the same column)"
+        [ testCase "(1)" $ assertFailure expr "case 9 of\n 1->10\n_->20"
+        , testCase "(2)" $ assertFailure expr "case 9 of\n 1->10\n  _->20"
+        , testCase "(3)" $ assertFailure expr "case 9 of\n  1->10\n _->20"
+        ]
+    , testGroup "case (must be indented)"
+        [ testCase "(1)" $ assertFailure expr "case\n9\n of\n 1\n ->\n 10\n _\n ->\n 20"
+        , testCase "(2)" $ assertFailure expr "case\n 9\nof\n 1\n ->\n 10\n _\n ->\n 20"
+        , testCase "(3)" $ assertFailure expr "case\n 9\n of\n1\n ->\n 10\n _\n ->\n 20"
+        , testCase "(4)" $ assertFailure expr "case\n 9\n of\n 1\n->\n 10\n _\n ->\n 20"
+        , testCase "(5)" $ assertFailure expr "case\n 9\n of\n 1\n ->\n10\n _\n ->\n 20"
+        , testCase "(6)" $ assertFailure expr "case\n 9\n of\n 1\n ->\n 10\n_\n ->\n 20"
+        , testCase "(7)" $ assertFailure expr "case\n 9\n of\n 1\n ->\n 10\n _\n->\n 20"
+        , testCase "(8)" $ assertFailure expr "case\n 9\n of\n 1\n ->\n 10\n _\n ->\n20"
+        ]
+
     , testCase "tuple" $
         assertParse expr "(1,2)" $ at 1 1 1 6 $ Tuple [intExpr' (1,2,1,3) 1, intExpr' (1,4,1,5) 2] False
     , testCase "tuple (whitespace)" $
