@@ -142,6 +142,7 @@ checkWaysToRun Simple.elm
 checkGood Simple.elm
 checkGood AllSyntax.elm
 checkGood evancz/start-app/StartApp.elm
+checkGood TheSeamau5/elm-check/Check.elm
 
 checkTransformation Examples.elm
 
