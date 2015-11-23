@@ -57,7 +57,6 @@ viewEditorHeader channels currentDoc fullscreen =
     div
         [ id "editor-header" ]
         [ div [ class "toolbar-section toolbar-button flaticon-zoom19" ] []
-
         , div
             [ class "toolbar-section" ]
             [ viewFontControl
@@ -65,20 +64,17 @@ viewEditorHeader channels currentDoc fullscreen =
                 "toggle-bold"
                 "B"
                 "bold"
-
             , viewFontControl
                 channels.execCommand
                 "toggle-italics"
                 "I"
                 "italic"
-
             , viewFontControl
                 channels.execCommand
                 "toggle-strikethrough"
                 "\xA0S\xA0"
                 "strikethrough"
             ]
-
         , lazy2 viewFullscreenButton channels.fullscreen fullscreen
         ]
 
@@ -117,7 +113,6 @@ viewEditorFooter channels currentDoc fullscreen =
                     , onClick channels.remoteSync ()
                     ]
                     []
-
                 , label
                     [ for "toggle-dropbox-sync" ]
                     [ text " sync to Dropbox" ]
@@ -156,7 +151,6 @@ withCommas num =
                 num
                     |> toString
                     |> String.right 3
-
         in
             prefix ++ "," ++ suffix
     else
@@ -174,7 +168,7 @@ pluralize noun quantity =
 viewFullscreenButton : Address FullscreenState -> FullscreenState -> Html
 viewFullscreenButton fullscreenChannel fullscreen =
     let
-        {fullscreenClass, targetMode, fullscreenTitle} =
+        { fullscreenClass, targetMode, fullscreenTitle } =
             case fullscreen of
                 True ->
                     { fullscreenClass = "flaticon-collapsing"
