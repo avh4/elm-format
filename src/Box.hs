@@ -2,10 +2,8 @@
 module Box where
 
 import Elm.Utils ((|>))
-import Text.PrettyPrint.Boxes ((<>), (//))
 
 import qualified Data.List as List
-import qualified Text.PrettyPrint.Boxes as B
 
 
 data Line
@@ -199,71 +197,3 @@ elmGroup innerSpaces left sep right forceMultiline children =
                         : (map (prefix $ row [punc sep, space]) rest)
                         ++ [ line $ punc right ]
 
-
--- DEPRECATED BELOW THIS LINE
-
-data Box' = Box'
-    { box :: B.Box
-    , bottomMargin :: Int
-    , hasSize :: Bool
-    }
-
-
-depr' :: Int -> Line -> (Int, Box')
-depr' margin l =
-    case l of
-        Text s ->
-            (0, text s)
-        Row items ->
-            foldl
-                (\(m,b) l' -> let (mm,bb) = depr' m l' in (mm, hbox2 b bb))
-                (margin,empty)
-                items
-        Space ->
-            (margin + 1, text " ")
-        Tab ->
-            (0, text $ replicate (4 - (margin `mod` 4)) ' ')
-
-
-depr :: Box -> Box'
-depr b =
-    case b of
-        Stack first rest ->
-            vbox (map (snd . depr' 0) (first:rest))
-        MustBreak first ->
-            vbox (map (snd . depr' 0) (first:[]))
-
-
-empty :: Box'
-empty =
-    Box' B.nullBox 0 False
-
-
-text :: String -> Box'
-text s =
-    Box' (B.text s) 0 (s /= "")
-
-
-vbox2 :: Box' -> Box' -> Box'
-vbox2 (Box' a aMargin ae) (Box' b bMargin be) =
-    Box' (a // B.emptyBox aMargin 0 // b) bMargin (ae || be)
-
-
-vbox :: [Box'] -> Box'
-vbox =
-    foldl vbox2 empty
-
-
-hbox2 :: Box' -> Box' -> Box'
-hbox2 (Box' a _ ae) (Box' b _ be) =
-    Box' (a <> b) 0 (ae || be)
-
-
-hbox :: [Box'] -> Box'
-hbox =
-    foldl hbox2 empty
-
-
-render :: Box' -> String
-render (Box' child _ _) =
-    B.render child
