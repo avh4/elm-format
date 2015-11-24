@@ -877,7 +877,7 @@ formatComment :: Comment -> Box
 formatComment comment =
     case comment of
         BlockComment c ->
-            case lines c of -- TODO: can [] happen with empty string?
+            case c of -- TODO: can [] happen with empty string?
                 (l:[]) ->
                     line $ row
                         [ punc "{-"

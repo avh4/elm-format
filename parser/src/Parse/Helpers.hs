@@ -4,7 +4,7 @@ module Parse.Helpers where
 import Prelude hiding (until)
 import Control.Monad (guard, join)
 import Control.Monad.State (State)
-import Data.Char (isUpper)
+import qualified Data.Char as Char
 import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Language.GLSL.Parser as GLP
@@ -336,7 +336,7 @@ accessible exprParser =
                 return . A.at start end $
                     case rootExpr of
                       AST.Expression.Var (AST.Variable.VarRef name@(c:_))
-                        | isUpper c ->
+                        | Char.isUpper c ->
                             AST.Expression.Var $ AST.Variable.VarRef (name ++ '.' : v)
                       _ ->
                         AST.Expression.Access annotatedRootExpr v
@@ -442,7 +442,14 @@ multiComment =
   do  try (string "{-" <* notFollowedBy (string "|") )
       many (string " ")
       b <- closeComment
-      return $ BlockComment b
+      return $ BlockComment $ trimIndent $ lines b
+  where
+      trimIndent [] = []
+      trimIndent (l1:ls) =
+          let
+              depth = minimum $ map (length . takeWhile Char.isSpace) $ ls
+          in
+              l1 : (map (drop depth) ls)
 
 
 closeComment :: IParser String

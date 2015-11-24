@@ -22,10 +22,10 @@ import Parse.TestHelpers
 
 
 commentedIntExpr (a,b,c,d) preComment postComment i =
-    Commented [BlockComment preComment] [BlockComment postComment] $ at a b c d  $ Literal $ IntNum i
+    Commented [BlockComment [preComment]] [BlockComment [postComment]] $ at a b c d  $ Literal $ IntNum i
 
 commentedIntExpr' (a,b,c,d) preComment i =
-    Commented [BlockComment preComment] [] $ at a b c d  $ Literal $ IntNum i
+    Commented [BlockComment [preComment]] [] $ at a b c d  $ Literal $ IntNum i
 
 
 intExpr (a,b,c,d) i = at a b c d $ Literal $ IntNum i
@@ -102,7 +102,7 @@ tests =
     , testCase "binary operator (whitespace)" $
         assertParse expr "7 + 8 <<>> 9" $ at 1 1 1 13 $ Binops (intExpr (1,1,1,2) 7) [(Commented [] [] $ OpRef "+", intExpr' (1,5,1,6) 8), (Commented [] [] $ OpRef "<<>>", intExpr' (1,12,1,13) 9)] False
     , testCase "binary operator (comments)" $
-        assertParse expr "7{-A-}+{-B-}8{-C-}<<>>{-D-}9" $ at 1 1 1 29 $ Binops (intExpr (1,1,1,2) 7) [(Commented [BlockComment "A"] [] $ OpRef "+", commentedIntExpr' (1,13,1,14) "B" 8), (Commented [BlockComment "C"] [] $ OpRef "<<>>", commentedIntExpr' (1,28,1,29) "D" 9)] False
+        assertParse expr "7{-A-}+{-B-}8{-C-}<<>>{-D-}9" $ at 1 1 1 29 $ Binops (intExpr (1,1,1,2) 7) [(Commented [BlockComment ["A"]] [] $ OpRef "+", commentedIntExpr' (1,13,1,14) "B" 8), (Commented [BlockComment ["C"]] [] $ OpRef "<<>>", commentedIntExpr' (1,28,1,29) "D" 9)] False
     , testCase "binary operator (newlines)" $
         assertParse expr "7\n +\n 8\n <<>>\n 9" $ at 1 1 5 3 $ Binops (intExpr (1,1,1,2) 7) [(Commented [] [] $ OpRef "+", intExpr' (3,2,3,3) 8), (Commented [] [] $ OpRef "<<>>", intExpr' (5,2,5,3) 9)] True
     , testGroup "binary operator (must be indented)" $
@@ -150,7 +150,7 @@ tests =
     , testCase "case (whitespace)" $
         assertParse expr "case 9 of\n 1 -> 10\n _ -> 20" $ at 1 1 3 9 $ Case (intExpr (1,6,1,7) 9, False) [([], at 2 2 2 3 $ P.Literal $ IntNum 1, [], intExpr (2,7,2,9) 10), ([], at 3 2 3 3 $ P.Anything, [], intExpr (3,7,3,9) 20)]
     , testCase "case (comments)" $
-        assertParse expr "case{-A-}9{-B-}of{-C-}\n{-D-}1{-E-}->{-F-}10{-G-}\n{-H-}_{-I-}->{-J-}20" $ at 1 1 3 21 $ Case (intExpr (1,10,1,11) 9, False) [([BlockComment "C", BlockComment "D"], at 2 6 2 7 $ P.Literal $ IntNum 1, [BlockComment "F"], intExpr (2,19,2,21) 10), ([BlockComment "G", BlockComment "H"], at 3 6 3 7 $ P.Anything, [BlockComment "J"], intExpr (3,19,3,21) 20)] -- TODO: handle comments A, B, E, I, and don't allow K
+        assertParse expr "case{-A-}9{-B-}of{-C-}\n{-D-}1{-E-}->{-F-}10{-G-}\n{-H-}_{-I-}->{-J-}20" $ at 1 1 3 21 $ Case (intExpr (1,10,1,11) 9, False) [([BlockComment ["C"], BlockComment ["D"]], at 2 6 2 7 $ P.Literal $ IntNum 1, [BlockComment ["F"]], intExpr (2,19,2,21) 10), ([BlockComment ["G"], BlockComment ["H"]], at 3 6 3 7 $ P.Anything, [BlockComment ["J"]], intExpr (3,19,3,21) 20)] -- TODO: handle comments A, B, E, I, and don't allow K
     , testCase "case (newlines)" $ -- TODO: should be able to add a newline at the end
         assertParse expr "case\n 9\n of\n 1\n ->\n 10\n _\n ->\n 20" $ at 1 1 9 4 $ Case (intExpr (2,2,2,3) 9, True) [([], at 4 2 4 3 $ P.Literal $ IntNum 1, [], intExpr (6,2,6,4) 10), ([], at 7 2 7 3 $ P.Anything, [], intExpr (9,2,9,4) 20)]
     , testCase "case (should not fail with trailing whitespace)" $
@@ -264,7 +264,7 @@ tests =
 
     , testGroup "definition"
         [ testCase "" $ assertParse definition "x=1" $ at 1 1 1 4 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [] (intExpr (1,3,1,4) 1) False
-        , testCase "comments" $ assertParse definition "x{-A-}={-B-}1" $ at 1 1 1 14 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [BlockComment "B"] (intExpr (1,13,1,14) 1) False
+        , testCase "comments" $ assertParse definition "x{-A-}={-B-}1" $ at 1 1 1 14 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [BlockComment ["B"]] (intExpr (1,13,1,14) 1) False
         , testCase "line comments" $ assertParse definition "x =\n    --X\n    1" $ at 1 1 3 6 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [LineComment "X"] (intExpr (3,5,3,6) 1) True
 
         ]

@@ -144,6 +144,7 @@ checkGood AllSyntax.elm
 checkGood evancz/start-app/StartApp.elm
 checkGood TheSeamau5/elm-check/Check.elm
 checkGood rtfeldman/dreamwriter/Editor.elm
+checkGood rtfeldman/dreamwriter/WordGraph.elm
 
 checkTransformation Examples.elm
 

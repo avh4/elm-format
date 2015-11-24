@@ -4,7 +4,7 @@ module AST.V0_15 where
 
 
 data Comment
-    = BlockComment String
+    = BlockComment [String]
     | LineComment String
     deriving (Eq, Show)
 
