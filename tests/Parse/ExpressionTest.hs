@@ -118,6 +118,7 @@ tests =
         assertParse expr "(+)" $ at 1 1 1 4 $ Var $ OpRef "+"
     , testCase "symbolic operator as function (whitespace)" $
         assertParse expr "( + )" $ at 1 1 1 6 $ Var $ OpRef "+"
+    -- TODO: comments
     , testCase "symbolic operator as function (does not allow newlines)" $
         assertFailure expr "(\n + \n)"
 
@@ -125,6 +126,7 @@ tests =
         assertParse expr "(,,)" $ at 1 1 1 5 $ TupleFunction 3
     , testCase "tuple function (whitespace)" $
         assertParse expr "( , ,)" $ at 1 1 1 7 $ TupleFunction 3
+    -- TODO: comments
     , testCase "tuple function (newlines)" $
         assertParse expr "(\n ,\n ,)" $ at 1 1 3 4 $ TupleFunction 3
     , testGroup "tuple function (must be indented)"
@@ -138,6 +140,7 @@ tests =
         assertParse expr "(7)" $ at 1 1 1 4 $ Parens (intExpr (1,2,1,3) 7) False
     , testCase "parenthesized expression (whitespace)" $
         assertParse expr "( 7 )" $ at 1 1 1 6 $ Parens (intExpr (1,3,1,4) 7) False
+    -- TODO: comments
     , testCase "parenthesized expression (newlines)" $
         assertParse expr "(\n 7\n )" $ at 1 1 3 3 $ Parens (intExpr (2,2,2,3) 7) True
     , testGroup "parenthesized expression (must be indented)"
@@ -153,7 +156,7 @@ tests =
         assertParse expr "case 9 of\n 1 -> 10\n _ -> 20" $ at 1 1 3 9 $ Case (intExpr (1,6,1,7) 9, False) [([], at 2 2 2 3 $ P.Literal $ IntNum 1, [], intExpr (2,7,2,9) 10), ([], at 3 2 3 3 $ P.Anything, [], intExpr (3,7,3,9) 20)]
     , testCase "case (comments)" $
         assertParse expr "case{-A-}9{-B-}of{-C-}\n{-D-}1{-E-}->{-F-}10{-G-}\n{-H-}_{-I-}->{-J-}20" $ at 1 1 3 21 $ Case (intExpr (1,10,1,11) 9, False) [([BlockComment ["C"], BlockComment ["D"]], at 2 6 2 7 $ P.Literal $ IntNum 1, [BlockComment ["F"]], intExpr (2,19,2,21) 10), ([BlockComment ["G"], BlockComment ["H"]], at 3 6 3 7 $ P.Anything, [BlockComment ["J"]], intExpr (3,19,3,21) 20)] -- TODO: handle comments A, B, E, I, and don't allow K
-    , testCase "case (newlines)" $ -- TODO: should be able to add a newline at the end
+    , testCase "case (newlines)" $
         assertParse expr "case\n 9\n of\n 1\n ->\n 10\n _\n ->\n 20" $ at 1 1 9 4 $ Case (intExpr (2,2,2,3) 9, True) [([], at 4 2 4 3 $ P.Literal $ IntNum 1, [], intExpr (6,2,6,4) 10), ([], at 7 2 7 3 $ P.Anything, [], intExpr (9,2,9,4) 20)]
     , testCase "case (should not fail with trailing whitespace)" $
         assertParse (expr >> string "\nX") "case 9 of\n 1->10\n _->20\nX" $ "\nX"
@@ -192,12 +195,14 @@ tests =
         assertParse expr "{}" $ at 1 1 1 3 $ Record [] False
     , testCase "record (empty, whitespace)" $
         assertParse expr "{ }" $ at 1 1 1 4 $ Record [] False
+    -- TODO: comments
     , testCase "record" $
         assertParse expr "{x=7,y=8}" $ at 1 1 1 10 $ Record [("x", intExpr (1,4,1,5) 7, False), ("y", intExpr (1,8,1,9) 8, False)] False
     , testCase "record (single field)" $
         assertParse expr "{x=7}" $ at 1 1 1 6 $ Record [("x", intExpr (1,4,1,5) 7, False)] False
     , testCase "record (whitespace)" $
         assertParse expr "{ x = 7 , y = 8 }" $ at 1 1 1 18 $ Record [("x", intExpr (1,7,1,8) 7, False), ("y", intExpr (1,15,1,16) 8, False)] False
+    -- TODO: comments
     , testCase "record (newlines)" $
         assertParse expr "{\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 9 3 $ Record [("x", intExpr (4,2,4,3) 7, True), ("y", intExpr (8,2,8,3) 8, True)] True
     , testGroup "record (must be indented)"
@@ -217,6 +222,7 @@ tests =
         assertParse expr "{a|x=7}" $ at 1 1 1 8 $ RecordUpdate (at 1 2 1 3 $ Var $ VarRef "a") [("x", intExpr (1,6,1,7) 7, False)] False
     , testCase "record update (whitespace)" $
         assertParse expr "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 $ RecordUpdate (at 1 3 1 4 $ Var $ VarRef "a") [("x", intExpr (1,11,1,12) 7, False), ("y", intExpr (1,19,1,20) 8, False)] False
+    -- TODO: comments
     , testCase "record update (newlines)" $
         assertParse expr "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 $ RecordUpdate (at 2 2 2 3 $ Var $ VarRef "a") [("x", intExpr (6,2,6,3) 7, True), ("y", intExpr (10,2,10,3) 8, True)] True
     , testCase "record update (only allows simple base)" $
@@ -253,6 +259,7 @@ tests =
         assertParse expr "(1)" $ at 1 1 1 4 $ Parens (intExpr (1,2,1,3) 1) False
     , testCase "parens (whitespace)" $
         assertParse expr "( 1 )" $ at 1 1 1 6 $ Parens (intExpr (1,3,1,4) 1) False
+    -- TODO: comments
     , testCase "parens (newlines)" $
         assertParse expr "(\n 1\n )" $ at 1 1 3 3 $ Parens (intExpr (2,2,2,3) 1) True
     , testGroup "parens (must be indented)"
@@ -262,6 +269,7 @@ tests =
 
     , testCase "unit" $
         assertParse expr "()" $ at 1 1 1 3 $ Unit
+    -- TODO: are whitespace, comments valid?
 
 
     , testGroup "definition"
