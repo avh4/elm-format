@@ -265,6 +265,13 @@ multilineTuple a b =
     )
 
 
+vars =
+    ( Foo
+    , Too
+    , Bar
+    )
+
+
 lists =
     ( [ 1, 2, 3, 4 ], [] )
 

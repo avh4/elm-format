@@ -34,7 +34,7 @@ boolean =
   let t = const (L.Boolean True) <$> string "True"
       f = const (L.Boolean False) <$> string "False"
   in
-    E.Literal <$> (t <|> f)
+    E.Literal <$> try (t <|> f)
 
 
 accessor :: IParser E.Expr'
