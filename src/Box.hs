@@ -49,6 +49,7 @@ len l =
         Text s -> length s
         Row ls -> sum $ map len ls
         Space -> 1
+        -- Tab -> ??? 0 ? TODO
 
 
 data Box
