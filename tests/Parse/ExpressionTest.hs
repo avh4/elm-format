@@ -79,15 +79,17 @@ tests =
         ]
 
     , testCase "list" $
-        assertParse expr "[1,2,3]" $ at 1 1 1 8 $ ExplicitList [intExpr (1,2,1,3) 1, intExpr (1,4,1,5) 2, intExpr (1,6,1,7) 3] False
+        assertParse expr "[1,2,3]" $ at 1 1 1 8 $ ExplicitList [intExpr' (1,2,1,3) 1, intExpr' (1,4,1,5) 2, intExpr' (1,6,1,7) 3] False
     , testCase "list (single element)" $
-        assertParse expr "[1]" $ at 1 1 1 4 $ ExplicitList [intExpr (1,2,1,3) 1] False
+        assertParse expr "[1]" $ at 1 1 1 4 $ ExplicitList [intExpr' (1,2,1,3) 1] False
     , testCase "list (empty)" $
         assertParse expr "[]" $ at 1 1 1 3 $ ExplicitList [] False
     , testCase "list (whitespace)" $
-        assertParse expr "[ 1 , 2 , 3 ]" $ at 1 1 1 14 $ ExplicitList [intExpr (1,3,1,4) 1, intExpr (1,7,1,8) 2, intExpr (1,11,1,12) 3] False
+        assertParse expr "[ 1 , 2 , 3 ]" $ at 1 1 1 14 $ ExplicitList [intExpr' (1,3,1,4) 1, intExpr' (1,7,1,8) 2, intExpr' (1,11,1,12) 3] False
+    , testCase "list (comments)" $
+        assertParse expr "[{-A-}1{-B-},{-C-}2{-D-},{-E-}3{-F-}]" $ at 1 1 1 38 $ ExplicitList [commentedIntExpr (1,7,1,8) "A" "B" 1, commentedIntExpr (1,19,1,20) "C" "D" 2, commentedIntExpr (1,31,1,32) "E" "F" 3] False
     , testCase "list (newlines)" $
-        assertParse expr "[\n 1\n ,\n 2\n ,\n 3\n ]" $ at 1 1 7 3 $ ExplicitList [intExpr (2,2,2,3) 1, intExpr (4,2,4,3) 2, intExpr (6,2,6,3) 3] True
+        assertParse expr "[\n 1\n ,\n 2\n ,\n 3\n ]" $ at 1 1 7 3 $ ExplicitList [intExpr' (2,2,2,3) 1, intExpr' (4,2,4,3) 2, intExpr' (6,2,6,3) 3] True
     , testGroup "list (must be indented)"
         [ testCase "(1)" $ assertFailure expr "[\n1\n ,\n 2\n ]"
         , testCase "(2)" $ assertFailure expr "[\n 1\n,\n 2\n ]"

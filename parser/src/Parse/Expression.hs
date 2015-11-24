@@ -78,8 +78,8 @@ listTerm =
           return $ E.GLShader uid (filter (/='\r') rawSrc) tipe
 
     commaSeparated =
-      do  term <- commaSep (const . const <$> expr) -- TODO: use comments
-          return $ \_ _ multiline -> E.ExplicitList (term [] []) multiline -- TODO: use comments
+      do  term <- commaSep ((\e pre post -> Commented pre post e) <$> expr)
+          return $ \pre post multiline -> E.ExplicitList (term pre post) multiline
 
 
 parensTerm :: IParser E.Expr

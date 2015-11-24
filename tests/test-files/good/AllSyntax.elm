@@ -183,6 +183,16 @@ comments7 =
         ()
 
 
+comments8 =
+    [ {- A -} 7 {- X -}
+    , -- B
+      -- C
+      8
+      -- Y
+      -- Z
+    ]
+
+
 escapedString =
     let
         normals = "a b'`<>{}/ڥ😀ぁ⾃𝟟"

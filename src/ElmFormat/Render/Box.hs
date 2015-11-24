@@ -569,7 +569,7 @@ formatExpression aexpr =
                         ]
 
         AST.Expression.ExplicitList exprs multiline ->
-            elmGroup True "[" "," "]" multiline $ map formatExpression exprs
+            elmGroup True "[" "," "]" multiline $ map (formatCommented formatExpression) exprs
 
         AST.Expression.Binops left ops multiline ->
             let
