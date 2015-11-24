@@ -197,3 +197,18 @@ elmGroup innerSpaces left sep right forceMultiline children =
                         : (map (prefix $ row [punc sep, space]) rest)
                         ++ [ line $ punc right ]
 
+renderLine :: Line -> String
+renderLine (Text text) =
+    text
+renderLine (Row ls) =
+    concat $ map renderLine ls
+renderLine Space =
+    " "
+renderLine Tab =
+    "\t"
+
+render :: Box -> String
+-- render (Stack line children) =
+--     TODO
+render (MustBreak l) =
+    renderLine l ++ "\n"
