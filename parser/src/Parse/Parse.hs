@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 module Parse.Parse (parse, parseSource) where
 
-import Text.Parsec (char, eof, letter, many, optional, (<|>))
+import Text.Parsec (char, eof, letter, many, optional, option, (<|>))
 import qualified Text.Parsec.Error as Parsec
 
 import qualified AST.Declaration
@@ -25,11 +25,13 @@ programParser :: IParser AST.Module.Module
 programParser =
   do  (AST.Module.Header name docs exports imports) <- Module.header
       decls <- declarations
-      optional freshLine -- TODO: use comments
-      optional spaces
+      trailingComments <-
+          (++)
+              <$> option [] freshLine
+              <*> option [] spaces
       eof
 
-      return $ AST.Module.Module name docs exports imports decls
+      return $ AST.Module.Module name docs exports imports (decls ++ (map AST.Declaration.BodyComment trailingComments))
 
 
 declarations :: IParser [AST.Declaration.Decl]
