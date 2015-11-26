@@ -147,6 +147,7 @@ checkGood rtfeldman/dreamwriter/Editor.elm
 checkGood rtfeldman/dreamwriter/LeftSidebar.elm
 checkGood rtfeldman/dreamwriter/RightSidebar.elm
 checkGood rtfeldman/dreamwriter/WordGraph.elm
+checkGood avh4/elm-fifo/Fifo.elm
 
 checkTransformation Examples.elm
 

@@ -137,12 +137,12 @@ tests =
         assertFailure expr "(,, )"
 
     , testCase "parenthesized expression" $
-        assertParse expr "(7)" $ at 1 1 1 4 $ Parens (intExpr (1,2,1,3) 7) False
+        assertParse expr "(7)" $ at 1 1 1 4 $ Parens (intExpr (1,2,1,3) 7)
     , testCase "parenthesized expression (whitespace)" $
-        assertParse expr "( 7 )" $ at 1 1 1 6 $ Parens (intExpr (1,3,1,4) 7) False
+        assertParse expr "( 7 )" $ at 1 1 1 6 $ Parens (intExpr (1,3,1,4) 7)
     -- TODO: comments
     , testCase "parenthesized expression (newlines)" $
-        assertParse expr "(\n 7\n )" $ at 1 1 3 3 $ Parens (intExpr (2,2,2,3) 7) True
+        assertParse expr "(\n 7\n )" $ at 1 1 3 3 $ Parens (intExpr (2,2,2,3) 7)
     , testGroup "parenthesized expression (must be indented)"
         [ testCase "(1)" $ assertFailure expr "(\n7\n )"
         , testCase "(2)" $ assertFailure expr "(\n 7\n)"
@@ -256,12 +256,12 @@ tests =
         ]
 
     , testCase "parens" $
-        assertParse expr "(1)" $ at 1 1 1 4 $ Parens (intExpr (1,2,1,3) 1) False
+        assertParse expr "(1)" $ at 1 1 1 4 $ Parens (intExpr (1,2,1,3) 1)
     , testCase "parens (whitespace)" $
-        assertParse expr "( 1 )" $ at 1 1 1 6 $ Parens (intExpr (1,3,1,4) 1) False
+        assertParse expr "( 1 )" $ at 1 1 1 6 $ Parens (intExpr (1,3,1,4) 1)
     -- TODO: comments
     , testCase "parens (newlines)" $
-        assertParse expr "(\n 1\n )" $ at 1 1 3 3 $ Parens (intExpr (2,2,2,3) 1) True
+        assertParse expr "(\n 1\n )" $ at 1 1 3 3 $ Parens (intExpr (2,2,2,3) 1)
     , testGroup "parens (must be indented)"
         [ testCase "(1)" $ assertFailure expr "(\n1\n )"
         , testCase "(2)" $ assertFailure expr "(\n 1\n)"

@@ -20,6 +20,54 @@ import Text.Printf (printf)
 import Util.List
 
 
+parens :: Box -> Box
+parens b =
+  case isLine b of
+      Right b' ->
+          line $ row [ punc "(", b', punc ")" ]
+      _ ->
+          stack1
+              [ b
+                  |> prefix (punc "(")
+              , line $ punc ")"
+              ]
+
+
+formatBinary :: Bool -> Box -> [ ( Box, Box ) ] -> Box
+formatBinary multiline left ops =
+    case
+        ( ops
+        , multiline
+        , isLine $ left
+        , allSingles $ map fst ops
+        , allSingles $ map snd ops
+        )
+    of
+        ([], _, _, _, _) ->
+            line $ keyword "<INVALID BINARY EXPRESSION -- please report this at https://github.com/avh4/elm-format/issues>"
+
+        (_, False, Right left'', Right ops'', Right exprs') ->
+            zip ops'' exprs'
+                |> map (\(op,e) -> row [op, space, e])
+                |> List.intersperse space
+                |> (:) space
+                |> (:) left''
+                |> row
+                |> line
+
+        (_, _, _, Right ops'', _) ->
+            zip ops'' (map snd ops)
+                |> map (\(op,e) -> prefix (row [op, space]) e)
+                |> stack1
+                |> (\body -> stack1 [left, indent body])
+
+        _ ->
+            ops
+                |> map (\(op,e) -> stack1 [ op, indent e ])
+                |> stack1
+                |> (\body -> stack1 [left, indent body])
+
+
 splitWhere :: (a -> Bool) -> [a] -> [[a]]
 splitWhere predicate list =
     let
@@ -298,7 +346,7 @@ formatDeclaration decl =
                     in
                         case ctors of
                             [] ->
-                                line $ keyword "<INVALID DATA TYPE: no constructors>"
+                                line $ keyword "<INVALID DATA TYPE: no constructors -- please report this at https://github.com/avh4/elm-format/issues>"
                             (first:rest) ->
                                 stack1
                                     [ line $ row
@@ -439,10 +487,25 @@ formatDefinition compact adef =
 formatPattern :: Bool -> AST.Pattern.Pattern -> Box
 formatPattern parensRequired apattern =
     case RA.drop apattern of
+        AST.Pattern.Data (AST.Variable.OpRef symbol) (left:right:[]) ->
+            formatBinary
+                False
+                (formatPattern True left)
+                [ ( line $ formatInfixVar $ AST.Variable.OpRef symbol
+                  , formatPattern True right
+                  )
+                ]
+            |> if parensRequired then parens else id
+
+        AST.Pattern.Data ctor [] ->
+            line $ formatVar ctor
+
         AST.Pattern.Data ctor patterns ->
             elmApplication
                 (line $ formatVar ctor)
                 (map (formatPattern True) patterns)
+            |> if parensRequired then parens else id
+
         AST.Pattern.Tuple patterns ->
             elmGroup True "(" "," ")" False $ map (formatPattern False) patterns
         AST.Pattern.Record fields ->
@@ -458,8 +521,8 @@ formatPattern parensRequired apattern =
                         , identifier name
                         ]
                 _ -> -- TODO
-                    line $ keyword "<TODO-multiline PAttern alias>"
-            |> (if parensRequired then addParens else id)
+                    line $ keyword "<TODO-multiline Pattern alias>"
+            |> (if parensRequired then parens else id)
         AST.Pattern.Var var ->
             line $ formatVar var
         AST.Pattern.Anything ->
@@ -542,46 +605,15 @@ formatExpression aexpr =
 
         AST.Expression.Binops left ops multiline ->
             let
-                left' =
-                    formatExpression left
-
-                ops' =
-                    ops |> map fst |> map (formatCommented (line. formatInfixVar)) -- TODO: comments not tested
-
-                exprs =
-                    ops |> map snd |> map (formatCommented formatExpression)
-            in
-                case
-                    ( ops
-                    , multiline
-                    , isLine $ left'
-                    , allSingles $ ops'
-                    , allSingles $ exprs
+                formatPair ( o, e ) =
+                    ( formatCommented (line . formatInfixVar) o
+                    , formatCommented formatExpression e
                     )
-                of
-                    ([], _, _, _, _) ->
-                        line $ keyword "<INVALID BINARY OPERATOR EXPRESSION>"
-
-                    (_, False, Right left'', Right ops'', Right exprs') ->
-                        zip ops'' exprs'
-                            |> map (\(op,e) -> row [op, space, e])
-                            |> List.intersperse space
-                            |> (:) space
-                            |> (:) left''
-                            |> row
-                            |> line
-
-                    (_, _, _, Right ops'', _) ->
-                        zip ops'' exprs
-                            |> map (\(op,e) -> prefix (row [op, space]) e)
-                            |> stack1
-                            |> (\body -> stack1 [left', indent body])
-
-                    _ ->
-                        zip ops' exprs
-                            |> map (\(op,e) -> stack1 [ op, indent e ])
-                            |> stack1
-                            |> (\body -> stack1 [left', indent body])
+            in
+                formatBinary
+                    multiline
+                    (formatExpression left)
+                    (map formatPair ops)
 
         AST.Expression.Lambda patterns bodyComments expr multiline ->
             case
@@ -634,7 +666,7 @@ formatExpression aexpr =
 
         AST.Expression.If [] _ els ->
             stack1
-                [ line $ keyword "<INVALID IF EXPRESSION>"
+                [ line $ keyword "<INVALID IF EXPRESSION -- please report this at https://github.com/avh4/elm-format/issues>"
                 , formatExpression els
                     |> indent
                 ]
@@ -721,7 +753,7 @@ formatExpression aexpr =
                               ]
 
                 clause (patternComments, pat, bodyComments, expr) =
-                    case isLine $ formatPattern True pat of
+                    case isLine $ formatPattern False pat of
                         Right pat' ->
                             stack1 $
                                 (map formatComment patternComments)
@@ -777,7 +809,7 @@ formatExpression aexpr =
                 _ ->
                     case map formatRecordPair pairs of
                         [] ->
-                            line $ keyword "<INVALID RECORD EXTENSION>"
+                            line $ keyword "<INVALID RECORD EXTENSION -- please report this at https://github.com/avh4/elm-format/issues>"
                         (first:rest) ->
                             stack1
                                 [ formatExpression base
@@ -805,16 +837,8 @@ formatExpression aexpr =
                 _ ->
                     elmGroup True "{" "," "}" multiline $ map formatRecordPair pairs
 
-        AST.Expression.Parens expr multiline ->
-            case (multiline, isLine $ formatExpression expr) of
-                (False, Right expr') ->
-                    line $ row [ punc "(", expr', punc ")" ]
-                _ ->
-                    stack1
-                        [ formatExpression expr
-                            |> prefix (punc "(")
-                        , line $ punc ")"
-                        ]
+        AST.Expression.Parens expr ->
+            parens $ formatExpression expr
 
         AST.Expression.Unit ->
             line $ punc "()"
@@ -951,26 +975,6 @@ formatType =
     formatType' NotRequired
 
 
-wrap :: Line -> Line -> [Line] -> Line -> Box
-wrap left first rest right =
-    (line $ row [left, first])
-        |> andThen (map (\l -> line $ row [space, space, l]) rest)
-        |> andThen [ line $ right ]
-
-
-addParens :: Box -> Box
-addParens b =
-    case destructure b of
-        (l, []) ->
-            line $ row
-                [ punc "("
-                , l
-                , punc ")"
-                ]
-        (first, rest) ->
-            wrap (punc "(") first rest (punc ")")
-
-
 commaSpace :: Line
 commaSpace =
     row
@@ -995,7 +999,7 @@ formatType' requireParens atype =
                                 |> map (formatType' ForLambda)
                                 |> map (prefix (row [keyword "->", space]))
                             )
-            |> (if requireParens /= NotRequired then addParens else id)
+            |> (if requireParens /= NotRequired then parens else id)
         AST.Type.RVar var ->
             line $ identifier var
         AST.Type.RType var ->
@@ -1004,7 +1008,7 @@ formatType' requireParens atype =
             elmApplication
                 (formatType' ForCtor ctor)
                 (map (formatType' ForCtor) args)
-                |> (if requireParens == ForCtor then addParens else id)
+                |> (if requireParens == ForCtor then parens else id)
         AST.Type.RTuple (first:rest) ->
             elmGroup True "(" "," ")" False (map formatType (first:rest))
         AST.Type.RTuple [] ->
@@ -1034,7 +1038,7 @@ formatType' requireParens atype =
             in
                 case (ext, fields) of
                     (Just _, []) ->
-                        line $ keyword "<INVALID RECORD EXTENSION>"
+                        line $ keyword "<INVALID RECORD EXTENSION -- please report this at https://github.com/avh4/elm-format/issues>"
                     (Just typ, first:rest) ->
                         case
                             ( multiline

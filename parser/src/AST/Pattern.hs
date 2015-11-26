@@ -27,7 +27,7 @@ list :: R.Position -> [Pattern] -> Pattern
 list end patterns =
   case patterns of
     [] ->
-        A.at end end (Data (Var.OpRef "[]") [])
+        A.at end end (Data (Var.VarRef "[]") [])
 
     pattern@(A.A (R.Region start _) _) : rest ->
         A.at start end (Data (Var.OpRef "::") [pattern, list end rest])

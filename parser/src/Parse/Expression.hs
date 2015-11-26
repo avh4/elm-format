@@ -107,7 +107,7 @@ parensTerm =
           return $
             case expressions [] [] of -- TODO: pass comments
               [Commented _ _ expression] ->
-                  \_ _ multiline -> E.Parens expression multiline -- TODO: use comments
+                  \_ _ _ -> E.Parens expression -- TODO: use comments
               _ ->
                   \pre post multiline -> E.Tuple (expressions pre post) multiline
 
