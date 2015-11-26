@@ -38,7 +38,7 @@ word =
 
 block :: String -> Box
 block text =
-    stack
+    stack1
         [ line $ row [ w, w ]
         , line $ row [ w, w ]
         ]
@@ -60,15 +60,15 @@ tests =
     , testCase "space" $
         assertLineOutput "a b" $ row [ identifier "a", space, identifier "b" ]
 
-    , testCase "stack" $
+    , testCase "stack1" $
         assertOutput "foo\nbar\n" $
-            stack
+            stack1
                 [ word "foo"
                 , word "bar"
                 ]
     , testCase "indent" $
         assertOutput "    a\n    b\n" $
-            indent $ stack
+            indent $ stack1
                 [ word "a"
                 , word "b"
                 ]

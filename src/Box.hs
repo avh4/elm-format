@@ -90,11 +90,16 @@ stack' b1 b2 =
         Stack l11 (l1n ++ (l21:l2n))
 
 
-stack :: [Box] -> Box
-stack children =
+andThen :: [Box] -> Box -> Box
+andThen rest first =
+    foldl stack' first rest
+
+
+stack1 :: [Box] -> Box
+stack1 children =
     case children of
-        -- [] -> Stack (Text "*****") []
-        -- [] -> -- crash? -- TODO?
+        [] ->
+            error "stack1: empty structure"
         (first:[]) ->
             first
         (first:rest) ->
@@ -167,7 +172,7 @@ elmApplication first rest =
                 |> row
                 |> line
         _ ->
-            stack
+            stack1
                 $ first : (map indent rest)
 
 
@@ -194,7 +199,7 @@ elmGroup innerSpaces left sep right forceMultiline children =
                 [] ->
                     line $ row [ punc left, punc right]
                 (first:rest) ->
-                    stack $
+                    stack1 $
                         (prefix (row [punc left, space]) first)
                         : (map (prefix $ row [punc sep, space]) rest)
                         ++ [ line $ punc right ]

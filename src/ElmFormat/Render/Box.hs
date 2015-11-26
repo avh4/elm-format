@@ -125,47 +125,21 @@ formatModule modu =
                     []
 
         body =
-            stack $
-                intersperseMap spacer formatDeclaration $
-                    AST.Module.body modu
+            intersperseMap spacer formatDeclaration $
+                AST.Module.body modu
+
+        mapIf fn m a =
+            case m of
+                Just x ->
+                    fn x a
+                Nothing ->
+                    a
     in
-        case (docs, imports) of -- TODO: not all cases are tested
-            (Just docs', []) ->
-                stack
-                    [ moduleLine
-                    , blankLine
-                    , docs'
-                    , blankLine
-                    , blankLine
-                    , body
-                    ]
-            (Just docs', _) ->
-                stack
-                    [ moduleLine
-                    , blankLine
-                    , docs'
-                    , blankLine
-                    , stack imports
-                    , blankLine
-                    , blankLine
-                    , body
-                    ]
-            (Nothing, []) ->
-                stack
-                    [ moduleLine
-                    , blankLine
-                    , blankLine
-                    , body
-                    ]
-            (Nothing, _) ->
-                stack
-                    [ moduleLine
-                    , blankLine
-                    , stack imports
-                    , blankLine
-                    , blankLine
-                    , body
-                    ]
+        moduleLine
+            |> mapIf (\x -> andThen [ blankLine, x ]) docs
+            |> (if null imports then id else andThen imports . andThen [blankLine])
+            |> andThen [ blankLine, blankLine ]
+            |> andThen body
 
 
 formatModuleDocs :: RA.Located (Maybe String) -> Maybe Box
@@ -183,16 +157,14 @@ formatDocComment docs =
         [] ->
             line $ row [ punc "{-|", space, punc "-}" ]
         (first:[]) ->
-            stack
+            stack1
                 [ line $ row [ punc "{-|", space, literal first ]
                 , line $ punc "-}"
                 ]
         (first:rest) ->
-            stack
-                [ line $ row [ punc "{-|", space, literal first ]
-                , stack $ map (line . literal) rest
-                , line $ punc "-}"
-                ]
+            (line $ row [ punc "{-|", space, literal first ])
+                |> andThen (map (line . literal) rest)
+                |> andThen [ line $ punc "-}" ]
 
 
 formatName :: MN.Raw -> Line
@@ -328,22 +300,20 @@ formatDeclaration decl =
                             [] ->
                                 line $ keyword "<INVALID DATA TYPE: no constructors>"
                             (first:rest) ->
-                                stack
+                                stack1
                                     [ line $ row
                                         [ keyword "type"
                                         , space
                                         , row $ List.intersperse space $ map identifier (name:args)
                                         ]
-                                    , stack
-                                        [ ctor first
-                                            |> prefix (row [punc "=", space])
-                                        , stack $ map (prefix (row [punc "|", space]) . ctor) rest
-                                        ]
+                                    , ctor first
+                                        |> prefix (row [punc "=", space])
+                                        |> andThen (map (prefix (row [punc "|", space]) . ctor) rest)
                                         |> indent
                                     ]
 
                 AST.Declaration.TypeAlias name args typ ->
-                    stack
+                    stack1
                         [ line $ row
                             [ keyword "type"
                             , space
@@ -373,7 +343,7 @@ formatDeclaration decl =
                             line $ keyword "<TODO: multiline type in port annotation>"
 
                 AST.Declaration.PortDefinition name expr ->
-                    stack
+                    stack1
                         [ line $ row
                             [ keyword "port"
                             , space
@@ -424,13 +394,13 @@ formatDefinition compact adef =
                         , expr'
                         ]
                 (_, _, Right name', Right args', _, _) ->
-                    stack $
+                    stack1 $
                         [ line $ row
                             [ row $ List.intersperse space $ (name':args')
                             , space
                             , punc "="
                             ]
-                        , indent $ stack $
+                        , indent $ stack1 $
                             (map formatComment comments)
                             ++ [ formatExpression expr ]
                         ]
@@ -453,7 +423,7 @@ formatDefinition compact adef =
                         ]
 
                 (Right name', Left typ') ->
-                    stack
+                    stack1
                         [ line $ row [ name', space, punc ":" ]
                         , typ'
                             |> indent
@@ -504,10 +474,9 @@ addSuffix suffix b =
         (l,[]) ->
             line $ row [ l, suffix ]
         (l1,ls) ->
-            stack $
-                [ line l1 ]
-                ++ (map line $ init ls)
-                ++ [ line $ row [ last ls, suffix ] ]
+            line l1
+                |> andThen (map line $ init ls)
+                |> andThen [ line $ row [ last ls, suffix ] ]
 
 
 formatRecordPair :: (String, AST.Expression.Expr, Bool) -> Box
@@ -526,7 +495,7 @@ formatRecordPair (k,v,multiline') =
                 , v'
                 ]
         _ ->
-            stack
+            stack1
                 [ line $ row [ identifier k, space, punc "=" ]
                 , formatExpression v
                     |> indent
@@ -558,7 +527,7 @@ formatExpression aexpr =
                         , punc "]"
                         ]
                 _ ->
-                    stack
+                    stack1
                         [ line $ punc "["
                         , formatCommented formatExpression left
                             |> indent
@@ -577,19 +546,23 @@ formatExpression aexpr =
                     formatExpression left
 
                 ops' =
-                    ops |> map fst |> map (formatCommented (line. formatInfixVar)) -- TODO: comments not
+                    ops |> map fst |> map (formatCommented (line. formatInfixVar)) -- TODO: comments not tested
 
                 exprs =
                     ops |> map snd |> map (formatCommented formatExpression)
             in
                 case
-                    ( multiline
+                    ( ops
+                    , multiline
                     , isLine $ left'
                     , allSingles $ ops'
                     , allSingles $ exprs
                     )
                 of
-                    (False, Right left'', Right ops'', Right exprs') ->
+                    ([], _, _, _, _) ->
+                        line $ keyword "<INVALID BINARY OPERATOR EXPRESSION>"
+
+                    (_, False, Right left'', Right ops'', Right exprs') ->
                         zip ops'' exprs'
                             |> map (\(op,e) -> row [op, space, e])
                             |> List.intersperse space
@@ -597,16 +570,18 @@ formatExpression aexpr =
                             |> (:) left''
                             |> row
                             |> line
-                    (_, _, Right ops'', _) ->
+
+                    (_, _, _, Right ops'', _) ->
                         zip ops'' exprs
                             |> map (\(op,e) -> prefix (row [op, space]) e)
-                            |> stack
-                            |> (\body -> stack [left', indent body])
+                            |> stack1
+                            |> (\body -> stack1 [left', indent body])
+
                     _ ->
                         zip ops' exprs
-                            |> map (\(op,e) -> stack [ op, indent e ])
-                            |> stack
-                            |> (\body -> stack [left', indent body])
+                            |> map (\(op,e) -> stack1 [ op, indent e ])
+                            |> stack1
+                            |> (\body -> stack1 [left', indent body])
 
         AST.Expression.Lambda patterns bodyComments expr multiline ->
             case
@@ -626,14 +601,14 @@ formatExpression aexpr =
                         , expr'
                         ]
                 (_, Right patterns', _, _) ->
-                    stack
+                    stack1
                         [ line $ row
                             [ punc "\\"
                             , row $ List.intersperse space $ patterns'
                             , space
                             , punc "->"
                             ]
-                        , indent $ stack $
+                        , indent $ stack1 $
                             (map formatComment bodyComments)
                             ++ [ formatExpression expr ]
                         ]
@@ -654,16 +629,11 @@ formatExpression aexpr =
                   line $ row
                       $ List.intersperse space $ (left':args')
                 _ ->
-                    stack
-                        [ formatExpression left
-                        , args
-                            |> map (formatCommented formatExpression)
-                            |> stack
-                            |> indent
-                        ]
+                    formatExpression left
+                        |> andThen (map (indent . formatCommented formatExpression) args)
 
         AST.Expression.If [] _ els ->
-            stack
+            stack1
                 [ line $ keyword "<INVALID IF EXPRESSION>"
                 , formatExpression els
                     |> indent
@@ -681,29 +651,28 @@ formatExpression aexpr =
                                 , keyword "then"
                                 ]
                         _ ->
-                            stack
+                            stack1
                                 [ line $ keyword key
                                 , cond |> indent
                                 , line $ keyword "then"
                                 ]
 
                 clause key (cond, multiline, bodyComments, body) =
-                    stack
+                    stack1
                         [ opening key multiline $ formatExpression cond
-                        , indent $ stack $
+                        , indent $ stack1 $
                             (map formatComment bodyComments)
                             ++ [ formatExpression body ]
                         ]
             in
-                stack $
-                    [ clause "if" if']
-                    ++ ( elseifs |> map (clause "else if") )
-                    ++
-                    [ line $ keyword "else"
-                    , indent $ stack $
-                        (map formatComment elsComments)
-                        ++ [ formatExpression els ]
-                    ]
+                clause "if" if'
+                    |> andThen (map (clause "else if") elseifs)
+                    |> andThen
+                        [ line $ keyword "else"
+                        , indent $ stack1 $
+                            (map formatComment elsComments)
+                            ++ [ formatExpression els ]
+                        ]
 
         AST.Expression.Let defs bodyComments expr ->
             let
@@ -714,17 +683,18 @@ formatExpression aexpr =
                         False ->
                             []
             in
-                stack
-                    [ line $ keyword "let"
-                    , defs
-                        |> intersperseMap spacer (formatDefinition True)
-                        |> stack
-                        |> indent
-                    , line $ keyword "in"
-                    , indent $ stack $
-                        (map formatComment bodyComments)
-                        ++ [formatExpression expr]
-                    ]
+                (line $ keyword "let")
+                    |> andThen
+                        (defs
+                            |> intersperseMap spacer (formatDefinition True)
+                            |> map indent
+                        )
+                    |> andThen
+                        [ line $ keyword "in"
+                        , indent $ stack1 $
+                            (map formatComment bodyComments)
+                            ++ [formatExpression expr]
+                        ]
 
         AST.Expression.Case (subject,multiline) clauses ->
             let
@@ -743,7 +713,7 @@ formatExpression aexpr =
                               , keyword "of"
                               ]
                       _ ->
-                          stack
+                          stack1
                               [ line $ keyword "case"
                               , formatExpression subject
                                   |> indent
@@ -753,25 +723,24 @@ formatExpression aexpr =
                 clause (patternComments, pat, bodyComments, expr) =
                     case isLine $ formatPattern True pat of
                         Right pat' ->
-                            stack $
+                            stack1 $
                                 (map formatComment patternComments)
                                 ++
                                 [ line $ row [ pat', space, keyword "->"]
-                                , indent $ stack $
+                                , indent $ stack1 $
                                     (map formatComment bodyComments)
                                     ++ [ formatExpression expr ]
                                 ]
                         _ ->
                             line $ keyword "<TODO: multiline case pattern>"
             in
-                stack
-                    [ opening
-                    , clauses
-                        |> map clause
-                        |> List.intersperse blankLine
-                        |> stack
-                        |> indent
-                    ]
+                opening
+                    |> andThen
+                        (clauses
+                            |> map clause
+                            |> List.intersperse blankLine
+                            |> map indent
+                        )
 
         AST.Expression.Tuple exprs multiline ->
             elmGroup True "(" "," ")" multiline $ map (formatCommented formatExpression) exprs
@@ -810,13 +779,11 @@ formatExpression aexpr =
                         [] ->
                             line $ keyword "<INVALID RECORD EXTENSION>"
                         (first:rest) ->
-                            stack
+                            stack1
                                 [ formatExpression base
                                     |> prefix (row [punc "{", space])
-                                , stack
-                                    [ prefix (row [punc "|", space]) first
-                                    , stack $ map (prefix (row [punc ",", space])) rest
-                                    ]
+                                , prefix (row [punc "|", space]) first
+                                    |> andThen (map (prefix (row [punc ",", space])) rest)
                                     |> indent
                                 , line $ punc "}"
                                 ]
@@ -843,7 +810,7 @@ formatExpression aexpr =
                 (False, Right expr') ->
                     line $ row [ punc "(", expr', punc ")" ]
                 _ ->
-                    stack
+                    stack1
                         [ formatExpression expr
                             |> prefix (punc "(")
                         , line $ punc ")"
@@ -867,7 +834,7 @@ formatCommented format (Commented pre post inner) =
         ( Right pre', Right post', Right inner' ) ->
             line $ row $ List.intersperse space $ concat [pre', [inner'], post']
         _ -> -- TODO: not tested
-            stack $
+            stack1 $
                 (map formatComment pre)
                 ++ [ format inner ]
                 ++ ( map formatComment post)
@@ -887,13 +854,13 @@ formatComment comment =
                         , punc "-}"
                         ]
                 (l1:ls) -> -- TODO: not tested
-                    stack
+                    stack1
                         [ line $ row
                             [ punc "{-"
                             , space
                             , literal l1
                             ]
-                        , stack $ map (line . literal) ls
+                        , stack1 $ map (line . literal) ls
                         , line $ punc "-}"
                         ]
         LineComment c ->
@@ -986,11 +953,9 @@ formatType =
 
 wrap :: Line -> Line -> [Line] -> Line -> Box
 wrap left first rest right =
-    stack
-        [ line $ row [left, first]
-        , stack (map (\l -> line $ row [space, space, l]) rest)
-        , line $ right
-        ]
+    (line $ row [left, first])
+        |> andThen (map (\l -> line $ row [space, space, l]) rest)
+        |> andThen [ line $ right ]
 
 
 addParens :: Box -> Box
@@ -1024,13 +989,12 @@ formatType' requireParens atype =
                 Right typs ->
                     line $ row $ List.intersperse (row [ space, keyword "->", space]) typs
                 _ -> -- TODO: not tested
-                    stack
-                        [ formatType' ForLambda first
-                        , rest
-                            |> map (formatType' ForLambda)
-                            |> map (prefix (row [keyword "->", space]))
-                            |> stack
-                        ]
+                    formatType' ForLambda first
+                        |> andThen
+                            (rest
+                                |> map (formatType' ForLambda)
+                                |> map (prefix (row [keyword "->", space]))
+                            )
             |> (if requireParens /= NotRequired then addParens else id)
         AST.Type.RVar var ->
             line $ identifier var
@@ -1058,7 +1022,7 @@ formatType' requireParens atype =
                                 , first
                                 ]
                         _ ->
-                            stack
+                            stack1
                                 [ line $ row
                                     [ identifier name
                                     , space
@@ -1091,9 +1055,9 @@ formatType' requireParens atype =
                                     , punc "}"
                                     ]
                             _ ->
-                                stack
+                                stack1
                                     [ prefix (row [punc "{", space]) (formatType typ)
-                                    , stack
+                                    , stack1
                                         ([ prefix (row [punc "|", space]) $ formatField first ]
                                         ++ (map (prefix (row [punc ",", space]) . formatField) rest))
                                         |> indent
