@@ -3,3 +3,4 @@
 /formatted.elm
 /_input.elm
 /.cabal-sandbox/
+*.tix
