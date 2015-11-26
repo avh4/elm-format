@@ -32,12 +32,12 @@ definition =
 typeDecl :: IParser AST.Declaration.Declaration
 typeDecl =
   do  try (reserved "type") <?> "a type declaration"
-      forcedWS
-      isAlias <- optionMaybe (string "alias" >> forcedWS)
+      forcedWS -- TODO: use comments
+      isAlias <- optionMaybe (string "alias" >> forcedWS) -- TODO: use comments
 
       name <- capVar
       args <- map (\(Commented _ _ v) -> v) <$> spacePrefix lowVar -- TODO: use comments
-      padded equals
+      padded equals -- TODO: use comments
 
       case isAlias of
         Just _ ->
@@ -60,9 +60,9 @@ infixDecl =
             , try (reserved "infixr") >> return AST.Declaration.R
             , try (reserved "infix")  >> return AST.Declaration.N
             ]
-      forcedWS
+      forcedWS -- TODO: use comments
       n <- digit
-      forcedWS
+      forcedWS -- TODO: use comments
       AST.Declaration.Fixity assoc (read [n]) <$> anyOp
 
 
@@ -72,19 +72,19 @@ port :: IParser AST.Declaration.Declaration
 port =
   expecting "a port declaration" $
   do  try (reserved "port")
-      whitespace
+      whitespace -- TODO: use comments
       name <- lowVar
-      whitespace
+      whitespace -- TODO: use comments
       choice [ portAnnotation name, portDefinition name ]
   where
     portAnnotation name =
       do  try hasType
-          whitespace
+          whitespace -- TODO: use comments
           tipe <- Type.expr <?> "a type"
           return (AST.Declaration.PortAnnotation name tipe)
 
     portDefinition name =
       do  try equals
-          whitespace
+          whitespace -- TODO: use comments
           expr <- Expr.expr
           return (AST.Declaration.PortDefinition name expr)

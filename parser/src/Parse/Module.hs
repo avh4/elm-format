@@ -44,11 +44,11 @@ moduleDecl :: IParser ([String], Var.Listing (A.Located Var.Value))
 moduleDecl =
   expecting "a module declaration" $
   do  try (reserved "module")
-      whitespace
+      whitespace -- TODO: use comments
       names <- dotSep1 capVar <?> "the name of this module"
-      whitespace
+      whitespace -- TODO: use comments
       exports <- option Var.openListing (listing (addLocation value))
-      whitespace
+      whitespace -- TODO: use comments
       reserved "where"
       return (names, exports)
 
@@ -64,7 +64,7 @@ import' =
   expecting "an import" $
   addLocation $
   do  try (reserved "import")
-      whitespace
+      whitespace -- TODO: use comments
       names <- dotSep1 capVar
       (,) names <$> method (ModuleName.toString names)
   )
@@ -77,28 +77,28 @@ import' =
 
     as' :: String -> IParser String
     as' moduleName =
-      do  try (whitespace >> reserved "as")
-          whitespace
+      do  try (whitespace >> reserved "as") -- TODO: use comments
+          whitespace -- TODO: use comments
           capVar <?> ("an alias for module `" ++ moduleName ++ "`")
 
     exposing :: IParser (Var.Listing Var.Value)
     exposing =
-      do  try (whitespace >> reserved "exposing")
-          whitespace
+      do  try (whitespace >> reserved "exposing") -- TODO: use comments
+          whitespace -- TODO: use comments
           listing value
 
 
 listing :: IParser a -> IParser (Var.Listing a)
 listing item =
   expecting "a listing of values and types to expose, like (..)" $
-  do  try (whitespace >> char '(')
-      whitespace
+  do  try (whitespace >> char '(') -- TODO: use comments
+      whitespace -- TODO: use comments
       listing <-
           choice
             [ const Var.openListing <$> string ".."
             , (\x -> Var.Listing $ x [] []) <$> commaSep1 (const . const <$> item) <*> return False -- TODO: use comments
             ]
-      whitespace
+      whitespace -- TODO: use comments
       char ')'
       return listing
 

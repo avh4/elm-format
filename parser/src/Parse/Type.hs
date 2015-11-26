@@ -20,7 +20,7 @@ tvar =
 
 tuple :: IParser Type.Type
 tuple =
-  do  (start, types, end) <- located (parens $ ((\f a b _ -> f a b) <$> commaSep (const . const <$> expr)))
+  do  (start, types, end) <- located (parens $ ((\f a b _ -> f a b) <$> commaSep (const . const <$> expr))) -- TODO: use comments
       case types of
         [t] -> return t
         _   -> return (Type.tuple (R.Region start end) types)
@@ -31,9 +31,9 @@ record =
   addLocation $
   do  char '{'
       pushNewlineContext
-      whitespace
+      whitespace -- TODO: use comments
       (ext, fields) <- extended <|> normal
-      dumbWhitespace
+      dumbWhitespace -- TODO: use comments
       char '}'
       sawNewline <- popNewlineContext
       return $ Type.RRecord ext (fields [] []) sawNewline -- TODO: pass comments
@@ -43,15 +43,15 @@ record =
 
     -- extended record types require at least one field
     extended =
-      do  ext <- try (addLocation lowVar <* (whitespace >> string "|"))
-          whitespace
+      do  ext <- try (addLocation lowVar <* (whitespace >> string "|")) -- TODO: use comments
+          whitespace -- TODO: use comments
           fields <- commaSep1 field
           return ((Just (A.map Type.RVar ext)), fields)
 
     field =
       do  pushNewlineContext
           lbl <- rLabel
-          whitespace >> hasType >> whitespace
+          whitespace >> hasType >> whitespace -- TODO: use comments
           val <- expr
           sawNewline <- popNewlineContext
           return $ \_ _ -> (lbl, val, sawNewline) -- TODO: use comments
@@ -94,12 +94,12 @@ expr :: IParser Type.Type
 expr =
   do  start <- getMyPosition
       t1 <- app <|> term
-      arr <- optionMaybe $ try (whitespace >> rightArrow)
+      arr <- optionMaybe $ try (whitespace >> rightArrow) -- TODO: use comments
       case arr of
         Nothing ->
             return t1
         Just _ ->
-            do  whitespace
+            do  whitespace -- TODO: use comments
                 t2 <- expr
                 end <- getMyPosition
                 case A.drop t2 of

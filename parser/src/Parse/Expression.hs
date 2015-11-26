@@ -98,7 +98,7 @@ parensTerm =
               E.Var op
 
     tupleFn =
-      do  commas <- comma >> many (whitespace >> comma)
+      do  commas <- comma >> many (whitespace >> comma) -- TODO: use comments
           return $
               \_ _ _ -> E.TupleFunction (length commas + 2) -- TODO: use comments
 
@@ -119,7 +119,7 @@ recordTerm :: IParser E.Expr
 recordTerm =
   addLocation $ brackets $ choice
     [ do  starter <- try (addLocation rLabel)
-          whitespace
+          whitespace -- TODO: use comments
           choice
             [ update starter
             , literal starter
@@ -129,20 +129,20 @@ recordTerm =
   where
     update (A.A ann starter) =
       do  try (string "|")
-          whitespace
+          whitespace -- TODO: use comments
           fields <- commaSep1 field
           return $ \_ _ multiline -> (E.RecordUpdate (A.A ann (E.Var $ Var.VarRef starter)) (fields [] []) multiline) -- TODO: use comments -- TODO: pass comments
 
     literal (A.A _ starter) =
       do  pushNewlineContext
           try equals -- TODO: can the try break newline tracking?
-          whitespace
+          whitespace -- TODO: use comments
           value <- expr
           multiline' <- popNewlineContext
-          whitespace
+          whitespace -- TODO: use comments
           choice
             [ do  try comma
-                  whitespace
+                  whitespace -- TODO: use comments
                   fields <- commaSep field
                   return $ \_ _ multiline -> (E.Record ((starter, value, multiline') : (fields [] [])) multiline) -- TODO: use comments -- TODO: pass comments
             , return $ \_ _ multiline -> (E.Record [(starter, value, multiline')] multiline) -- TODO: use comments
@@ -151,7 +151,7 @@ recordTerm =
     field =
       do  pushNewlineContext
           key <- rLabel
-          padded equals
+          padded equals -- TODO: use comments
           value <- expr
           multiline <- popNewlineContext
           return $ \_ _ -> (key, value, multiline) -- TODO: use comments
@@ -178,7 +178,7 @@ appExpr =
             [] -> t
             _  ->
                 A.sameAs
-                    (List.foldl' (\f (Commented _ _ t) -> A.merge f t ()) (A.sameAs t ()) ts)
+                    (List.foldl' (\f (Commented _ _ t) -> A.merge f t ()) (A.sameAs t ()) ts) -- TODO: simplify this code to merge the region annotations
                     (E.App t ts sawNewline)
 
 
@@ -211,13 +211,13 @@ ifHelp :: [(E.Expr, Bool, [Comment], E.Expr)] -> IParser E.Expr'
 ifHelp branches =
   do  try (reserved "if")
       pushNewlineContext
-      whitespace
+      whitespace -- TODO: use comments
       condition <- expr
       multilineCondition <- popNewlineContext
       (_, _, bodyComments) <- padded (reserved "then") -- TODO: use pre comments
       updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
       thenBranch <- expr
-      whitespace <?> "an 'else' branch"
+      whitespace <?> "an 'else' branch" -- TODO: use comments
       reserved "else" <?> "an 'else' branch"
       (_, trailingComments) <- whitespace -- TODO: use trailingComments in the newBranch case
       let newBranches = (condition, multilineCondition, bodyComments, thenBranch) : branches
@@ -232,7 +232,7 @@ lambdaExpr =
   addLocation $
   do  pushNewlineContext
       char '\\' <|> char '\x03BB' <?> "an anonymous function"
-      whitespace
+      whitespace -- TODO: use comments
       args <- map (\(Commented _ _ v) -> v) <$> spaceSep1 Pattern.term -- TODO: use comments
       (_, _, bodyComments) <- padded rightArrow -- TODO: use pre comments
       body <- expr
@@ -299,7 +299,7 @@ typeAnnotation =
   where
     start =
       do  v <- (Var.VarRef <$> lowVar) <|> parens' symOp
-          padded hasType
+          padded hasType -- TODO: use comments
           return v
 
 
@@ -336,6 +336,6 @@ defStart =
               return [pattern]
 
     infics p1 =
-      do  (start, op, end) <- try (whitespace >> located anyOp)
-          p2 <- (whitespace >> Pattern.term)
+      do  (start, op, end) <- try (whitespace >> located anyOp) -- TODO: use comments
+          p2 <- (whitespace >> Pattern.term) -- TODO: use comments
           return [ A.at start end (P.Var op), p1, p2 ]

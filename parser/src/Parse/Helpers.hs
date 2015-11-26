@@ -485,57 +485,6 @@ anyUntil end =
       (end >> return "") <|> (:) <$> anyChar <*> go
 
 
-ignoreUntil :: IParser a -> IParser (Maybe a)
-ignoreUntil end =
-    go
-  where
-    ignore p =
-      const () <$> p
-
-    filler =
-      choice
-        [ try (ignore chr) <|> ignore str
-        , ignore multiComment
-        , ignore docComment
-        , ignore anyChar
-        ]
-
-    go =
-      choice
-        [ Just <$> end
-        , filler `until` choice [ const Nothing <$> eof, newline >> go ]
-        ]
-
-
-onFreshLines :: (a -> b -> b) -> b -> IParser a -> IParser b
-onFreshLines insert init thing =
-    go init
-  where
-    go values =
-      do  optionValue <- ignoreUntil thing
-          case optionValue of
-            Nothing -> return values
-            Just v  -> go (insert v values)
-
-
-withSource :: IParser a -> IParser (String, a)
-withSource p =
-  do  start  <- getParserState
-      result <- p
-      endPos <- getPosition
-      setParserState start
-      raw <- anyUntilPos endPos
-      return (raw, result)
-
-
-anyUntilPos :: SourcePos -> IParser String
-anyUntilPos pos =
-  do  currentPos <- getPosition
-      if currentPos == pos
-        then return []
-        else (:) <$> anyChar <*> anyUntilPos pos
-
-
 -- BASIC LANGUAGE LITERALS
 
 shader :: IParser (String, L.GLShaderTipe)
