@@ -63,6 +63,7 @@ data Expr'
     | AccessFunction String
     | RecordUpdate Expr [(Commented String, Commented Expr, Bool)] Bool
     | Record [(Commented String, Commented Expr, Bool)] Bool
+    | EmptyRecord [Comment]
     | Parens (Commented Expr)
     | Unit [Comment]
     -- for type checking and code gen only

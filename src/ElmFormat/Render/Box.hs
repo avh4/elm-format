@@ -840,6 +840,17 @@ formatExpression aexpr =
                 _ ->
                     elmGroup True "{" "," "}" multiline $ map formatRecordPair pairs
 
+        AST.Expression.EmptyRecord [] ->
+            line $ punc "{}"
+
+        AST.Expression.EmptyRecord comments ->
+            case isLine $ stack1 $ map formatComment comments of
+                Right comments' ->
+                    line $ row [ punc "{", comments', punc "}" ]
+
+                Left comments' ->
+                    comments'
+
         AST.Expression.Parens expr ->
             parens $ formatCommented formatExpression expr
 

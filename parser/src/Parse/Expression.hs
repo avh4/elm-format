@@ -125,7 +125,7 @@ recordTerm =
             [ update starter postStarter
             , literal starter postStarter
             ]
-    , return $ \_ _ multiline -> E.Record [] multiline -- TODO: use comments
+    , return $ \pre post multiline -> E.EmptyRecord (pre ++ post)
     ]
   where
     update (A.A ann starter) postStarter =

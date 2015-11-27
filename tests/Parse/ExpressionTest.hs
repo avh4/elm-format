@@ -182,10 +182,11 @@ tests =
         ]
 
     , testCase "record (empty)" $
-        assertParse expr "{}" $ at 1 1 1 3 $ Record [] False
+        assertParse expr "{}" $ at 1 1 1 3 $ EmptyRecord []
     , testCase "record (empty, whitespace)" $
-        assertParse expr "{ }" $ at 1 1 1 4 $ Record [] False
-    -- TODO: comments
+        assertParse expr "{ }" $ at 1 1 1 4 $ EmptyRecord []
+    , testCase "record (empty, comments)" $
+        assertParse expr "{{-A-}}" $ at 1 1 1 8 $ EmptyRecord [BlockComment ["A"]]
     , testCase "record" $
         assertParse expr "{x=7,y=8}" $ at 1 1 1 10 $ Record [(Commented [] [] "x", intExpr' (1,4,1,5) 7, False), (Commented [] [] "y", intExpr' (1,8,1,9) 8, False)] False
     , testCase "record (single field)" $
