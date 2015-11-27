@@ -63,7 +63,7 @@ data Expr'
     | AccessFunction String
     | RecordUpdate Expr [(String, Expr, Bool)] Bool
     | Record [(String, Expr, Bool)] Bool
-    | Parens Expr
+    | Parens (Commented Expr)
     | Unit
     -- for type checking and code gen only
     | GLShader String String Literal.GLShaderTipe

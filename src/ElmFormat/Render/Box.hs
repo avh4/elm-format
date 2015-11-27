@@ -838,7 +838,7 @@ formatExpression aexpr =
                     elmGroup True "{" "," "}" multiline $ map formatRecordPair pairs
 
         AST.Expression.Parens expr ->
-            parens $ formatExpression expr
+            parens $ formatCommented formatExpression expr
 
         AST.Expression.Unit ->
             line $ punc "()"

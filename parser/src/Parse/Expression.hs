@@ -104,12 +104,13 @@ parensTerm =
 
     parened =
       do  expressions <- commaSep1 ((\e a b -> Commented a b e) <$> expr)
-          return $
-            case expressions [] [] of -- TODO: pass comments
-              [Commented _ _ expression] ->
-                  \_ _ _ -> E.Parens expression -- TODO: use comments
-              _ ->
-                  \pre post multiline -> E.Tuple (expressions pre post) multiline
+          return $ \pre post multiline ->
+            case expressions pre post of
+              [single] ->
+                  E.Parens single
+
+              expressions' ->
+                  E.Tuple expressions' multiline
 
     unit =
         return $ \_ _ _ -> E.Unit -- TODO: use comments?

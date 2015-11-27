@@ -138,18 +138,6 @@ tests =
     , testCase "tuple function (does not allow trailing inner whitespace)" $
         assertFailure expr "(,, )"
 
-    , testCase "parenthesized expression" $
-        assertParse expr "(7)" $ at 1 1 1 4 $ Parens (intExpr (1,2,1,3) 7)
-    , testCase "parenthesized expression (whitespace)" $
-        assertParse expr "( 7 )" $ at 1 1 1 6 $ Parens (intExpr (1,3,1,4) 7)
-    -- TODO: comments
-    , testCase "parenthesized expression (newlines)" $
-        assertParse expr "(\n 7\n )" $ at 1 1 3 3 $ Parens (intExpr (2,2,2,3) 7)
-    , testGroup "parenthesized expression (must be indented)"
-        [ testCase "(1)" $ assertFailure expr "(\n7\n )"
-        , testCase "(2)" $ assertFailure expr "(\n 7\n)"
-        ]
-
     , testCase "case" $
         assertParse expr "case 9 of\n 1->10\n _->20" $ at 1 1 3 7 $ Case (intExpr (1,6,1,7) 9, False) [([], at 2 2 2 3 $ P.Literal $ IntNum 1, [], intExpr (2,5,2,7) 10), ([], at 3 2 3 3 $ P.Anything, [], intExpr (3,5,3,7) 20)]
     , testCase "case (no newline after 'of')" $
@@ -260,12 +248,13 @@ tests =
         ]
 
     , testCase "parens" $
-        assertParse expr "(1)" $ at 1 1 1 4 $ Parens (intExpr (1,2,1,3) 1)
+        assertParse expr "(1)" $ at 1 1 1 4 $ Parens $ intExpr' (1,2,1,3) 1
     , testCase "parens (whitespace)" $
-        assertParse expr "( 1 )" $ at 1 1 1 6 $ Parens (intExpr (1,3,1,4) 1)
-    -- TODO: comments
+        assertParse expr "( 1 )" $ at 1 1 1 6 $ Parens $ intExpr' (1,3,1,4) 1
+    , testCase "parens (comments)" $
+        assertParse expr "({-A-}1{-B-})" $ at 1 1 1 14 $ Parens $ commentedIntExpr (1,7,1,8) "A" "B" 1
     , testCase "parens (newlines)" $
-        assertParse expr "(\n 1\n )" $ at 1 1 3 3 $ Parens (intExpr (2,2,2,3) 1)
+        assertParse expr "(\n 1\n )" $ at 1 1 3 3 $ Parens $ intExpr' (2,2,2,3) 1
     , testGroup "parens (must be indented)"
         [ testCase "(1)" $ assertFailure expr "(\n1\n )"
         , testCase "(2)" $ assertFailure expr "(\n 1\n)"
