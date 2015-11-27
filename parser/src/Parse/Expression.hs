@@ -113,7 +113,7 @@ parensTerm =
                   E.Tuple expressions' multiline
 
     unit =
-        return $ \_ _ _ -> E.Unit -- TODO: use comments?
+        return $ \pre post _ -> E.Unit (pre ++ post)
 
 
 recordTerm :: IParser E.Expr

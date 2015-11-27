@@ -261,9 +261,15 @@ tests =
         ]
 
     , testCase "unit" $
-        assertParse expr "()" $ at 1 1 1 3 $ Unit
-    -- TODO: are whitespace, comments valid?
-
+        assertParse expr "()" $ at 1 1 1 3 $ Unit []
+    , testCase "unit (whitespace)" $
+        assertParse expr "( )" $ at 1 1 1 4 $ Unit []
+    , testCase "unit (comments)" $
+        assertParse expr "({-A-})" $ at 1 1 1 8 $ Unit [BlockComment ["A"]]
+    , testCase "unit (newlines)" $
+        assertParse expr "(\n )" $ at 1 1 2 3 $ Unit []
+    , testGroup "unit (must be indented)"
+        [ testCase "(1)" $ assertFailure expr "(\n)" ]
 
     , testGroup "definition"
         [ testCase "" $ assertParse definition "x=1" $ at 1 1 1 4 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [] (intExpr (1,3,1,4) 1) False

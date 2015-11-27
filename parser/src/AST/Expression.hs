@@ -64,7 +64,7 @@ data Expr'
     | RecordUpdate Expr [(String, Expr, Bool)] Bool
     | Record [(String, Expr, Bool)] Bool
     | Parens (Commented Expr)
-    | Unit
+    | Unit [Comment]
     -- for type checking and code gen only
     | GLShader String String Literal.GLShaderTipe
     deriving (Eq, Show)

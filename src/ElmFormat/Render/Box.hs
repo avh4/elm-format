@@ -840,8 +840,11 @@ formatExpression aexpr =
         AST.Expression.Parens expr ->
             parens $ formatCommented formatExpression expr
 
-        AST.Expression.Unit ->
+        AST.Expression.Unit [] ->
             line $ punc "()"
+
+        AST.Expression.Unit (comments) ->
+            parens $ stack1 $ map formatComment comments
 
         AST.Expression.GLShader _ _ _ ->
             line $ keyword "<TODO: glshader>"
@@ -868,7 +871,9 @@ formatComment :: Comment -> Box
 formatComment comment =
     case comment of
         BlockComment c ->
-            case c of -- TODO: can [] happen with empty string?
+            case c of
+                [] ->
+                    error "Unexpected empty list of comments -- please report this at https://github.com/avh4/elm-format/issues"
                 (l:[]) ->
                     line $ row
                         [ punc "{-"
