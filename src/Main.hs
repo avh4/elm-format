@@ -3,7 +3,6 @@ module Main where
 
 import Elm.Utils ((|>))
 import System.Exit (exitFailure, exitSuccess)
-import System.FilePath.Find (find, (==?), extension, always)
 import Control.Monad (when)
 import Data.Maybe (isJust)
 import Messages.Types (Message(..))
@@ -16,6 +15,7 @@ import qualified Data.Text.Lazy as LazyText
 import qualified Data.Text.Lazy.IO as LazyText
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
+import qualified ElmFormat.Filesystem as FS
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Report as Report
@@ -112,11 +112,6 @@ decideOutputFile autoYes inputFile outputFile =
         Just outputFile' -> return outputFile'
 
 
-findAllElmFiles :: FilePath -> IO [FilePath]
-findAllElmFiles inputFile =
-    find always (extension ==? ".elm") inputFile
-
-
 main :: IO ()
 main =
     do
@@ -139,7 +134,7 @@ main =
                 when (isJust outputFile)
                     exitOnInputDirAndOutput
 
-                elmFiles <- findAllElmFiles inputFile
+                elmFiles <- FS.findAllElmFiles inputFile
                 when (null elmFiles) $
                     exitFileNotFound inputFile
 
