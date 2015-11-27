@@ -120,42 +120,42 @@ recordTerm :: IParser E.Expr
 recordTerm =
   addLocation $ brackets $ choice
     [ do  starter <- try (addLocation rLabel)
-          whitespace -- TODO: use comments
+          (_, postStarter) <- whitespace
           choice
-            [ update starter
-            , literal starter
+            [ update starter postStarter
+            , literal starter postStarter
             ]
     , return $ \_ _ multiline -> E.Record [] multiline -- TODO: use comments
     ]
   where
-    update (A.A ann starter) =
+    update (A.A ann starter) postStarter =
       do  try (string "|")
           whitespace -- TODO: use comments
           fields <- commaSep1 field
           return $ \_ _ multiline -> (E.RecordUpdate (A.A ann (E.Var $ Var.VarRef starter)) (fields [] []) multiline) -- TODO: use comments -- TODO: pass comments
 
-    literal (A.A _ starter) =
+    literal (A.A _ starter) postStarter =
       do  pushNewlineContext
           try equals -- TODO: can the try break newline tracking?
-          whitespace -- TODO: use comments
+          (_, preExpr) <- whitespace
           value <- expr
           multiline' <- popNewlineContext
-          whitespace -- TODO: use comments
+          (_, postExpr) <- whitespace
           choice
             [ do  try comma
-                  whitespace -- TODO: use comments
+                  (_, preNext) <- whitespace
                   fields <- commaSep field
-                  return $ \_ _ multiline -> (E.Record ((starter, value, multiline') : (fields [] [])) multiline) -- TODO: use comments -- TODO: pass comments
-            , return $ \_ _ multiline -> (E.Record [(starter, value, multiline')] multiline) -- TODO: use comments
+                  return $ \pre post multiline -> (E.Record ((Commented pre postStarter starter, Commented preExpr postExpr value, multiline') : (fields preNext post)) multiline)
+            , return $ \pre post multiline -> (E.Record [(Commented pre postStarter starter, Commented preExpr (postExpr ++ post) value, multiline')] multiline)
             ]
 
     field =
       do  pushNewlineContext
           key <- rLabel
-          padded equals -- TODO: use comments
+          (postKey, _, preExpr) <- padded equals
           value <- expr
           multiline <- popNewlineContext
-          return $ \_ _ -> (key, value, multiline) -- TODO: use comments
+          return $ \pre post -> (Commented pre postKey key, Commented preExpr post value, multiline)
 
 
 term :: IParser E.Expr

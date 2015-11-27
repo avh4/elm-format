@@ -61,8 +61,8 @@ data Expr'
     | TupleFunction Int -- will be 2 (,) or greater, indicating the size of the tuple
     | Access Expr String
     | AccessFunction String
-    | RecordUpdate Expr [(String, Expr, Bool)] Bool
-    | Record [(String, Expr, Bool)] Bool
+    | RecordUpdate Expr [(Commented String, Commented Expr, Bool)] Bool
+    | Record [(Commented String, Commented Expr, Bool)] Bool
     | Parens (Commented Expr)
     | Unit [Comment]
     -- for type checking and code gen only

@@ -542,27 +542,30 @@ addSuffix suffix b =
                 |> andThen [ line $ row [ last ls, suffix ] ]
 
 
-formatRecordPair :: (String, AST.Expression.Expr, Bool) -> Box
+formatRecordPair :: (Commented String, Commented AST.Expression.Expr, Bool) -> Box
 formatRecordPair (k,v,multiline') =
     case
         ( multiline'
-        , isLine $ formatExpression v
+        , isLine $ formatCommented (line . identifier) k
+        , isLine $ formatCommented formatExpression v
         )
     of
-        (False, Right v') ->
+        (False, Right k', Right v') ->
             line $ row
-                [ identifier k
+                [ k'
                 , space
                 , punc "="
                 , space
                 , v'
                 ]
-        _ ->
+        (_, Right k', _) ->
             stack1
-                [ line $ row [ identifier k, space, punc "=" ]
-                , formatExpression v
+                [ line $ row [ k', space, punc "=" ]
+                , formatCommented formatExpression v
                     |> indent
                 ]
+        _ ->
+            line $ keyword "<TODO: multiline record field>"
 
 
 formatExpression :: AST.Expression.Expr -> Box
