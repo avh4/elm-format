@@ -99,6 +99,8 @@ tests =
 
     , testCase "binary operator" $
         assertParse expr "7+8<<>>9" $ at 1 1 1 9 $ Binops (intExpr (1,1,1,2) 7) [(Commented [] [] $ OpRef "+", intExpr' (1,3,1,4) 8), (Commented [] [] $ OpRef "<<>>", intExpr' (1,8,1,9) 9)] False
+    , testCase "binary operator (minus with no whitespace)" $
+        assertParse expr "9-1" $ at 1 1 1 4 $ Binops (intExpr (1,1,1,2) 9) [(Commented [] [] $ OpRef "-", intExpr' (1,3,1,4) 1)] False
     , testCase "binary operator (named function)" $
         assertParse expr "7`plus`8`shift`9" $ at 1 1 1 17 $ Binops (intExpr (1,1,1,2) 7) [(Commented [] [] $ VarRef "plus", intExpr' (1,8,1,9) 8), (Commented [] [] $ VarRef "shift", intExpr' (1,16,1,17) 9)] False
     , testCase "binary operator (whitespace)" $
@@ -244,6 +246,8 @@ tests =
 
     , testCase "function application" $
         assertParse expr "f 7 8" $ at 1 1 1 6 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr' (1,3,1,4) 7, intExpr' (1,5,1,6) 8] False
+    , testCase "function application (argument starts with minus)" $
+        assertParse expr "f -9 -x" $ at 1 1 1 8 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr' (1,3,1,5) (-9), Commented [] [] $ at 1 6 1 8 $ Unary Negative $ at 1 7 1 8 $ Var $ VarRef "x"] False
     , testCase "function application (comments)" $
         assertParse expr "f{-A-}7{-B-}8" $ at 1 1 1 14 $ App (at 1 1 1 2 $ Var $ VarRef "f") [commentedIntExpr' (1,7,1,8) "A" 7, commentedIntExpr' (1,13,1,14) "B" 8] False
     , testCase "function application (newlines)" $

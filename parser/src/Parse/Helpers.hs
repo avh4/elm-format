@@ -372,7 +372,7 @@ forcedWS :: IParser [Comment]
 forcedWS =
   choice
     [ (++) <$> spaces <*> (concat <$> many nl_space)
-    , concat <$> many nl_space
+    , concat <$> many1 nl_space
     ]
   where
     nl_space =
