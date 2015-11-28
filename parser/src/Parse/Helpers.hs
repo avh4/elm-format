@@ -208,11 +208,6 @@ dotSep1 p =
   (:) <$> p <*> many (try (char '.') >> p)
 
 
-spaceSep1 :: IParser a -> IParser [Commented a]
-spaceSep1 p =
-  (:) <$> (Commented [] [] <$> p) <*> spacePrefix p
-
-
 spacePrefix :: IParser a -> IParser [Commented a]
 spacePrefix p =
   constrainedSpacePrefix' p (\_ -> return ())

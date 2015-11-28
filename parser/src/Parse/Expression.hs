@@ -231,12 +231,11 @@ lambdaExpr =
   addLocation $
   do  pushNewlineContext
       char '\\' <|> char '\x03BB' <?> "an anonymous function"
-      whitespace -- TODO: use comments
-      args <- map (\(Commented _ _ v) -> v) <$> spaceSep1 Pattern.term -- TODO: use comments
-      (_, _, bodyComments) <- padded rightArrow -- TODO: use pre comments
+      args <- map (\(Commented pre _ v) -> (pre, v)) <$> spacePrefix Pattern.term
+      (preArrowComments, _, bodyComments) <- padded rightArrow
       body <- expr
       multiline <- popNewlineContext
-      return $ E.Lambda args bodyComments body multiline
+      return $ E.Lambda args (preArrowComments ++ bodyComments) body multiline
 
 
 caseExpr :: IParser E.Expr'

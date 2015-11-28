@@ -621,7 +621,7 @@ formatExpression aexpr =
         AST.Expression.Lambda patterns bodyComments expr multiline ->
             case
                 ( multiline
-                , allSingles $ map (formatPattern True) patterns
+                , allSingles $ map (formatCommented (formatPattern True) . (\(c,p) -> Commented c [] p)) patterns
                 , bodyComments
                 , isLine $ formatExpression expr
                 )

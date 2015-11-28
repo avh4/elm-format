@@ -64,13 +64,15 @@ tests =
         assertFailure expr "-.foo"
 
     , testCase "labmda" $
-        assertParse expr "\\x y->9" $ at 1 1 1 8 $ Lambda [at 1 2 1 3 $ P.Var $ VarRef "x", at 1 4 1 5 $ P.Var $ VarRef "y"] [] (intExpr (1,7,1,8) 9) False
+        assertParse expr "\\x y->9" $ at 1 1 1 8 $ Lambda [([], at 1 2 1 3 $ P.Var $ VarRef "x"), ([], at 1 4 1 5 $ P.Var $ VarRef "y")] [] (intExpr (1,7,1,8) 9) False
     , testCase "labmda (single parameter)" $
-        assertParse expr "\\x->9" $ at 1 1 1 6 $ Lambda [at 1 2 1 3 $ P.Var $ VarRef "x"] [] (intExpr (1,5,1,6) 9) False
+        assertParse expr "\\x->9" $ at 1 1 1 6 $ Lambda [([], at 1 2 1 3 $ P.Var $ VarRef "x")] [] (intExpr (1,5,1,6) 9) False
     , testCase "labmda (whitespace)" $
-        assertParse expr "\\ x y -> 9" $ at 1 1 1 11 $ Lambda [at 1 3 1 4 $ P.Var $ VarRef "x", at 1 5 1 6 $ P.Var $ VarRef "y"] [] (intExpr (1,10,1,11) 9) False
+        assertParse expr "\\ x y -> 9" $ at 1 1 1 11 $ Lambda [([], at 1 3 1 4 $ P.Var $ VarRef "x"), ([], at 1 5 1 6 $ P.Var $ VarRef "y")] [] (intExpr (1,10,1,11) 9) False
+    , testCase "labmda (comments)" $
+        assertParse expr "\\{-A-}x{-B-}y{-C-}->{-D-}9" $ at 1 1 1 27 $ Lambda [([BlockComment ["A"]], at 1 7 1 8 $ P.Var $ VarRef "x"), ([BlockComment ["B"]], at 1 13 1 14 $ P.Var $ VarRef "y")] [BlockComment ["C"], BlockComment ["D"]] (intExpr (1,26,1,27) 9) False
     , testCase "labmda (newlines)" $
-        assertParse expr "\\\n x\n y\n ->\n 9" $ at 1 1 5 3 $ Lambda [at 2 2 2 3 $ P.Var $ VarRef "x", at 3 2 3 3 $ P.Var $ VarRef "y"] [] (intExpr (5,2,5,3) 9) True
+        assertParse expr "\\\n x\n y\n ->\n 9" $ at 1 1 5 3 $ Lambda [([], at 2 2 2 3 $ P.Var $ VarRef "x"), ([], at 3 2 3 3 $ P.Var $ VarRef "y")] [] (intExpr (5,2,5,3) 9) True
     , testGroup "lambda (must be indented)"
         [ testCase "(1)" $ assertFailure expr "\\\nx\n y\n ->\n 9"
         , testCase "(2)" $ assertFailure expr "\\\n x\ny\n ->\n 9"
