@@ -63,6 +63,23 @@ tests =
     , testCase "negative (does not apply to '.')" $
         assertFailure expr "-.foo"
 
+    , testCase "labmda" $
+        assertParse expr "\\x y->9" $ at 1 1 1 8 $ Lambda [at 1 2 1 3 $ P.Var $ VarRef "x", at 1 4 1 5 $ P.Var $ VarRef "y"] [] (intExpr (1,7,1,8) 9) False
+    , testCase "labmda (single parameter)" $
+        assertParse expr "\\x->9" $ at 1 1 1 6 $ Lambda [at 1 2 1 3 $ P.Var $ VarRef "x"] [] (intExpr (1,5,1,6) 9) False
+    , testCase "labmda (whitespace)" $
+        assertParse expr "\\ x y -> 9" $ at 1 1 1 11 $ Lambda [at 1 3 1 4 $ P.Var $ VarRef "x", at 1 5 1 6 $ P.Var $ VarRef "y"] [] (intExpr (1,10,1,11) 9) False
+    , testCase "labmda (newlines)" $
+        assertParse expr "\\\n x\n y\n ->\n 9" $ at 1 1 5 3 $ Lambda [at 2 2 2 3 $ P.Var $ VarRef "x", at 3 2 3 3 $ P.Var $ VarRef "y"] [] (intExpr (5,2,5,3) 9) True
+    , testGroup "lambda (must be indented)"
+        [ testCase "(1)" $ assertFailure expr "\\\nx\n y\n ->\n 9"
+        , testCase "(2)" $ assertFailure expr "\\\n x\ny\n ->\n 9"
+        , testCase "(3)" $ assertFailure expr "\\\n x\n y\n->\n 9"
+        , testCase "(4)" $ assertFailure expr "\\\n x\n y\n ->\n9"
+        ]
+    , testCase "lambda (arrow must not contain whitespace)" $
+        assertFailure expr "\\x y - > 9"
+
     , testCase "range" $
         assertParse expr "[7..9]" $ at 1 1 1 7 $ Range (intExpr' (1,2,1,3) 7) (intExpr' (1,5,1,6) 9) False
     , testCase "range (whitespace)" $
