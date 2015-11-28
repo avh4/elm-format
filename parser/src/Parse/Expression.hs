@@ -231,7 +231,7 @@ lambdaExpr =
   addLocation $
   do  pushNewlineContext
       char '\\' <|> char '\x03BB' <?> "an anonymous function"
-      args <- map (\(Commented pre _ v) -> (pre, v)) <$> spacePrefix Pattern.term
+      args <- map (\(Commented pre _ v) -> (pre, v)) <$> spacePrefix Pattern.term -- TODO: spacePrefix should return ([Comment], a) instead of (Commented a)
       (preArrowComments, _, bodyComments) <- padded rightArrow
       body <- expr
       multiline <- popNewlineContext
