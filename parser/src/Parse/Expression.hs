@@ -1,6 +1,5 @@
 module Parse.Expression (term, typeAnnotation, definition, expr) where
 
-import Elm.Utils ((|>))
 import qualified Data.List as List
 import Text.Parsec hiding (newline, spaces)
 import Text.Parsec.Indent (block, withPos, checkIndent)
@@ -19,7 +18,6 @@ import qualified AST.Literal as L
 import qualified AST.Pattern as P
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
-import qualified Util.List as List
 
 
 --------  Basic Terms  --------
@@ -125,14 +123,14 @@ recordTerm =
             [ update starter postStarter
             , literal starter postStarter
             ]
-    , return $ \pre post multiline -> E.EmptyRecord (pre ++ post)
+    , return $ \pre post _ -> E.EmptyRecord (pre ++ post)
     ]
   where
     update (A.A ann starter) postStarter =
       do  try (string "|")
-          whitespace -- TODO: use comments
+          (_, postBar) <- whitespace
           fields <- commaSep1 field
-          return $ \_ _ multiline -> (E.RecordUpdate (A.A ann (E.Var $ Var.VarRef starter)) (fields [] []) multiline) -- TODO: use comments -- TODO: pass comments
+          return $ \pre post multiline -> (E.RecordUpdate (Commented pre postStarter $ A.A ann (E.Var $ Var.VarRef starter)) (fields postBar post) multiline)
 
     literal (A.A _ starter) postStarter =
       do  pushNewlineContext

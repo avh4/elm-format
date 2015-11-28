@@ -211,14 +211,15 @@ tests =
         ]
 
     , testCase "record update" $
-        assertParse expr "{a|x=7,y=8}" $ at 1 1 1 12 $ RecordUpdate (at 1 2 1 3 $ Var $ VarRef "a") [(Commented [] [] "x", intExpr' (1,6,1,7) 7, False), (Commented [] [] "y", intExpr' (1,10,1,11) 8, False)] False
+        assertParse expr "{a|x=7,y=8}" $ at 1 1 1 12 $ RecordUpdate (Commented [] [] $ at 1 2 1 3 $ Var $ VarRef "a") [(Commented [] [] "x", intExpr' (1,6,1,7) 7, False), (Commented [] [] "y", intExpr' (1,10,1,11) 8, False)] False
     , testCase "record update (single field)" $
-        assertParse expr "{a|x=7}" $ at 1 1 1 8 $ RecordUpdate (at 1 2 1 3 $ Var $ VarRef "a") [(Commented [] [] "x", intExpr' (1,6,1,7) 7, False)] False
+        assertParse expr "{a|x=7}" $ at 1 1 1 8 $ RecordUpdate (Commented [] [] $ at 1 2 1 3 $ Var $ VarRef "a") [(Commented [] [] "x", intExpr' (1,6,1,7) 7, False)] False
     , testCase "record update (whitespace)" $
-        assertParse expr "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 $ RecordUpdate (at 1 3 1 4 $ Var $ VarRef "a") [(Commented [] [] "x", intExpr' (1,11,1,12) 7, False), (Commented [] [] "y", intExpr' (1,19,1,20) 8, False)] False
-    -- TODO: comments
+        assertParse expr "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 $ RecordUpdate (Commented [] [] $ at 1 3 1 4 $ Var $ VarRef "a") [(Commented [] [] "x", intExpr' (1,11,1,12) 7, False), (Commented [] [] "y", intExpr' (1,19,1,20) 8, False)] False
+    , testCase "record update (comments)" $
+        assertParse expr "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}" $ at 1 1 1 62 $ RecordUpdate (Commented [BlockComment ["A"]] [BlockComment ["B"]] $ at 1 7 1 8 $ Var $ VarRef "a") [(Commented [BlockComment ["C"]] [BlockComment ["D"]] "x", commentedIntExpr (1,31,1,32) "E" "F" 7, False), (Commented [BlockComment ["G"]] [BlockComment ["H"]] "y", commentedIntExpr (1,55,1,56) "I" "J" 8, False)] False
     , testCase "record update (newlines)" $
-        assertParse expr "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 $ RecordUpdate (at 2 2 2 3 $ Var $ VarRef "a") [(Commented [] [] "x", intExpr' (6,2,6,3) 7, True), (Commented [] [] "y", intExpr' (10,2,10,3) 8, True)] True
+        assertParse expr "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 $ RecordUpdate (Commented [] [] $ at 2 2 2 3 $ Var $ VarRef "a") [(Commented [] [] "x", intExpr' (6,2,6,3) 7, True), (Commented [] [] "y", intExpr' (10,2,10,3) 8, True)] True
     , testCase "record update (only allows simple base)" $
         assertFailure expr "{9|x=7}"
     , testCase "record update (only allows simple base)" $

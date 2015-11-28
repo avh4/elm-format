@@ -793,7 +793,7 @@ formatExpression aexpr =
         AST.Expression.RecordUpdate base pairs multiline ->
             case
                 ( multiline
-                , isLine $ formatExpression base
+                , isLine $ formatCommented formatExpression base
                 , allSingles $ map formatRecordPair pairs
                 )
             of
@@ -815,7 +815,7 @@ formatExpression aexpr =
                             line $ keyword "<INVALID RECORD EXTENSION -- please report this at https://github.com/avh4/elm-format/issues>"
                         (first:rest) ->
                             stack1
-                                [ formatExpression base
+                                [ formatCommented formatExpression base
                                     |> prefix (row [punc "{", space])
                                 , prefix (row [punc "|", space]) first
                                     |> andThen (map (prefix (row [punc ",", space])) rest)
