@@ -113,6 +113,11 @@ decideOutputFile autoYes inputFile outputFile =
                 False -> exitSuccess
         Just outputFile' -> return outputFile'
 
+isEitherFileOrDirectory :: FilePath -> IO Bool
+isEitherFileOrDirectory path = do
+    fileExists <- Dir.doesFileExist path
+    dirExists <- Dir.doesDirectoryExist path
+    return $ fileExists || dirExists
 
 main :: IO ()
 main =
@@ -122,13 +127,20 @@ main =
         let outputFile = (Flags._output config)
         let autoYes = (Flags._yes config)
 
-        fileExists <- all (id) <$> mapM Dir.doesFileExist inputFiles
-        dirExists <- all (id) <$> mapM Dir.doesDirectoryExist inputFiles
+        filesExist <-
+            all (id) <$> mapM isEitherFileOrDirectory inputFiles
 
-        when (not (fileExists || dirExists)) $
+        isSingleDirectory <-
+            case inputFiles of
+                file:[] ->
+                    Dir.doesDirectoryExist file
+                _ ->
+                    return False
+
+        when (not filesExist) $
             exitFilesNotFound inputFiles
 
-        if fileExists
+        if (filesExist) && (not isSingleDirectory)
             then do
                 case inputFiles of
                     inputFile:[] ->
@@ -141,7 +153,7 @@ main =
                             mapM_ (\file -> processFile file file) inputFiles
 
 
-            else do -- dirExists
+            else do -- multiple input files or folders
                 when (isJust outputFile)
                     exitOnInputDirAndOutput
 
