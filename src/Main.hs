@@ -140,27 +140,18 @@ main =
         when (not filesExist) $
             exitFilesNotFound inputFiles
 
-        if (filesExist) && (not isSingleDirectory)
-            then do
-                case inputFiles of
-                    inputFile:[] ->
-                        do
-                            realOutputFile <- decideOutputFile autoYes inputFile outputFile
-                            processFile inputFile realOutputFile
-                    otherwise ->
-                        do
-                            canOverwriteFiles <- getApproval autoYes inputFiles
-                            mapM_ (\file -> processFile file file) inputFiles
+        elmFiles <- concat <$> mapM FS.findAllElmFiles inputFiles
 
+        when (null elmFiles) $
+            exitFilesNotFound inputFiles
 
-            else do -- multiple input files or folders
+        case elmFiles of
+            inputFile:[] -> do
+                realOutputFile <- decideOutputFile autoYes inputFile outputFile
+                processFile inputFile realOutputFile
+            _ -> do
                 when (isJust outputFile)
                     exitOnInputDirAndOutput
-
-                elmFiles <- concat <$> mapM FS.findAllElmFiles inputFiles
-
-                when (null elmFiles) $
-                    exitFilesNotFound inputFiles
 
                 canOverwriteFiles <- getApproval autoYes elmFiles
                 when canOverwriteFiles $
