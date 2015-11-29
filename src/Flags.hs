@@ -9,7 +9,7 @@ import qualified Text.PrettyPrint.ANSI.Leijen as PP
 
 
 data Config = Config
-    { _input :: FilePath
+    { _input :: [FilePath]
     , _output :: Maybe FilePath
     , _yes :: Bool
     }
@@ -34,7 +34,7 @@ parse =
 flags :: Opt.Parser Config
 flags =
     Config
-      <$> input
+      <$> Opt.some input
       <*> output
       <*> yes
 
