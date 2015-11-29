@@ -113,25 +113,6 @@ decideOutputFile autoYes inputFile outputFile =
                 False -> exitSuccess
         Just outputFile' -> return outputFile'
 
-doPathsExist :: (FilePath -> IO Bool) -> [FilePath] -> IO Bool
-doPathsExist exists paths =
-    do
-        case paths of
-            [] -> return False
-            file:tails -> do
-                fileExists <- exists file
-
-                if fileExists
-                    then
-                        doPathsExist exists tails
-                    else
-                        return False
-
-doFilesExist :: [FilePath] -> IO Bool
-doFilesExist = doPathsExist Dir.doesFileExist
-
-doDirsExist :: [FilePath] -> IO Bool
-doDirsExist = doPathsExist Dir.doesDirectoryExist
 
 main :: IO ()
 main =
@@ -141,8 +122,8 @@ main =
         let outputFile = (Flags._output config)
         let autoYes = (Flags._yes config)
 
-        fileExists <- doFilesExist inputFiles
-        dirExists <- doDirsExist inputFiles
+        fileExists <- all (id) <$> mapM Dir.doesFileExist inputFiles
+        dirExists <- all (id) <$> mapM Dir.doesDirectoryExist inputFiles
 
         when (not (fileExists || dirExists)) $
             exitFilesNotFound inputFiles
