@@ -6,6 +6,13 @@ import Elm.Utils ((|>))
 import qualified Data.List as List
 
 
+{-
+A line is ALWAYS just one line.
+
+Space and Tab are self-explanatory,
+  Text brings any string into the data structure,
+  Row joins more of these elements onto one line.
+-}
 data Line
     = Text String
     | Row [Line]
@@ -33,6 +40,7 @@ literal =
     Text
 
 
+-- join more Line elements into one
 row :: [Line] -> Line
 row =
     Row
@@ -43,20 +51,35 @@ space =
     Space
 
 
-len :: Line -> Int
-len l =
-    case l of
-        Text s -> length s
-        Row ls -> sum $ map len ls
-        Space -> 1
-        -- Tab -> ??? 0 ? TODO
+lineLength :: Int -> Line -> Int
+lineLength startColumn l =
+   startColumn +
+      case l of
+         Text s -> length s
+         Row ls -> sum $ map (lineLength 0) ls
+         Space -> 1
+         Tab -> 0
 
 
+{-
+Box contains Lines (at least one - can't be empty).
+Box either:
+  - can appear in the middle of a line
+      (Stack someLine [], thus can be joined without problems), or
+  - has to appear on its own
+      (Stack someLine moreLines OR MustBreak someLine).
+
+MustBreak is only used for `--` comments.
+
+Stack doesn't allow zero-line stacks.
+
+Sometimes (see `prefix`) the first line of Stack
+  gets different treatment than the other lines.
+-}
 data Box
     = Stack Line [Line]
     | MustBreak Line
     -- | Margin Int
-    -- | Empty
 
 
 blankLine :: Box
@@ -170,11 +193,28 @@ elmApplication first rest =
                 $ first : (map indent rest)
 
 
+{-
+Add the prefix to the first line,
+pad the other lines with spaces of the same length
+
+EXAMPLE:
+abcde
+xyz
+----->
+myPrefix abcde
+         xyz
+-}
 prefix :: Line -> Box -> Box
 prefix pref =
     mapFirstLine
-        (\l -> row [ pref, l ])
-        (\l -> row [ row $ replicate (len pref) space, l ])
+        addPrefixToLine
+        padLineWithSpaces
+    where
+        addPrefixToLine l = row [ pref, l ]
+        padLineWithSpaces l = row [ row paddingSpaces, l ]
+
+        prefixLength = lineLength 0 pref
+        paddingSpaces = replicate prefixLength space
 
 
 elmGroup :: Bool -> String -> String -> String -> Bool -> [Box] -> Box
@@ -209,7 +249,7 @@ renderLine Tab =
     "\t"
 
 render :: Box -> String
--- render (Stack line children) =
---     TODO
+render (Stack firstLine moreLines) =
+    unlines $ map renderLine (firstLine : moreLines)
 render (MustBreak l) =
     renderLine l ++ "\n"
