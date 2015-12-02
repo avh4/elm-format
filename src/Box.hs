@@ -9,7 +9,8 @@ import qualified Data.List as List
 {-
 A line is ALWAYS just one line.
 
-Space and Tab are self-explanatory,
+Space is self-explanatory,
+  Tab aligns to the nearest multiple of 4 spaces,
   Text brings any string into the data structure,
   Row joins more of these elements onto one line.
 -}
@@ -49,16 +50,6 @@ row =
 space :: Line
 space =
     Space
-
-
-lineLength :: Int -> Line -> Int
-lineLength startColumn l =
-   startColumn +
-      case l of
-         Text s -> length s
-         Row ls -> sum $ map (lineLength 0) ls
-         Space -> 1
-         Tab -> 0
 
 
 {-
@@ -238,18 +229,105 @@ elmGroup innerSpaces left sep right forceMultiline children =
                         : (map (prefix $ row [punc sep, space]) rest)
                         ++ [ line $ punc right ]
 
-renderLine :: Line -> String
-renderLine (Text text) =
+
+renderLine :: Int -> Line -> String
+renderLine _ (Text text) =
     text
-renderLine (Row ls) =
-    concat $ map renderLine ls
-renderLine Space =
+renderLine _ Space =
     " "
-renderLine Tab =
-    "\t"
+renderLine startColumn Tab =
+    replicate (tabLength startColumn) ' '
+renderLine startColumn (Row lines') =
+    renderRow startColumn lines'
+
 
 render :: Box -> String
 render (Stack firstLine moreLines) =
-    unlines $ map renderLine (firstLine : moreLines)
-render (MustBreak l) =
-    renderLine l ++ "\n"
+    unlines $ map (renderLine 0) (firstLine : moreLines)
+render (MustBreak line') =
+    renderLine 0 line' ++ "\n"
+
+
+-- TODO couldn't we just run renderLine and get the length of the resulting string?
+lineLength :: Int -> Line -> Int
+lineLength startColumn line' =
+   startColumn +
+      case line' of
+         Text string -> length string
+         Space -> 1
+         Tab -> tabLength startColumn
+         Row lines' -> rowLength startColumn lines'
+
+
+
+
+
+initRow :: Int -> (String, Int)
+initRow startColumn =
+  ("", startColumn)
+
+spacesInTab :: Int
+spacesInTab =
+  4
+
+spacesToNextTab :: Int -> Int
+spacesToNextTab startColumn =
+  startColumn `mod` spacesInTab
+
+tabLength :: Int -> Int
+tabLength startColumn =
+  spacesInTab - (spacesToNextTab startColumn)
+
+{-
+What happens here is we take a row and start building its contents
+  along with the resulting length of the string. We need to have that
+  because of Tabs, which need to be passed the current column in arguments
+  in order to determine how many Spaces are they going to span.
+  (See `tabLength`.)
+
+So for example if we have a Box [Space, Tab, Text "abc", Tab, Text "x"],
+  it goes like this:
+
+string      | column | todo
+""          | 0      | [Space, Tab, Text "abc", Tab, Text "x"]
+" "         | 1      | [Tab, Text "abc", Tab, Text "x"]
+"    "      | 4      | [Text "abc", Tab, Text "x"]
+"    abc"   | 7      | [Tab, Text "x"]
+"    abc "  | 8      | [Text "x"]
+"    abc x" | 9      | []
+
+Thus we get the result string with correctly rendered Tabs.
+
+The (String, Int) type here means the (string, column) from the table above.
+
+Then we just need to do one final modification to get from endColumn to resultLength,
+  which is what we are after in the function `rowLength`.
+-}
+renderRow' :: Int -> [Line] -> (String, Int)
+renderRow' startColumn lines' =
+  (result, resultLength)
+  where
+    (result, endColumn) = foldl addLine (initRow startColumn) lines'
+    resultLength = endColumn - startColumn
+
+{-
+A step function for renderRow'.
+
+addLine (" ",1) Tab == ("    ",4)
+-}
+addLine :: (String, Int) -> Line -> (String, Int)
+addLine (string, startColumn') line' =
+  (newString, newStartColumn)
+  where
+    newString = string ++ renderLine startColumn' line'
+    newStartColumn = lineLength startColumn' line'
+
+-- Extract the final string from renderRow'
+renderRow :: Int -> [Line] -> String
+renderRow startColumn lines' =
+  fst $ renderRow' startColumn lines'
+
+-- Extract the final length from renderRow'
+rowLength :: Int -> [Line] -> Int
+rowLength startColumn lines' =
+  snd $ renderRow' startColumn lines'
