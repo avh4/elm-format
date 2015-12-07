@@ -15,7 +15,11 @@ renderMessage ConfirmOverwriting = "Are you sure you want to overwrite these fil
 renderMessage NoElmFilesOnPath = "Could not find any .elm files on the specified path:"
 renderMessage PleaseCheckPath = "Please check the given path."
 
-renderMessage CantWriteToOutputBecauseInputIsDirectory = "Can't write to the OUTPUT path, because INPUT path is a directory."
-renderMessage PleaseRemoveOutputArgument = "Please remove the OUTPUT argument. The .elm files in INPUT will be formatted in place."
+renderMessage CantWriteToOutputBecauseInputIsDirectory =
+  unlines
+    [ "Can't write to the OUTPUT path, because multiple .elm files have been specified."
+    , ""
+    , "Please remove the --output argument. The .elm files in INPUT will be formatted in place."
+    ]
 
 renderMessage ProcessingFile = "Processing file"

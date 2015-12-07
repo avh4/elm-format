@@ -16,6 +16,5 @@ data Message
   | PleaseCheckPath
 
   | CantWriteToOutputBecauseInputIsDirectory
-  | PleaseRemoveOutputArgument
 
   | ProcessingFile

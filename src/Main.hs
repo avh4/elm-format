@@ -93,8 +93,7 @@ exitFilesNotFound [] = do -- TODO: added this to prevent crashes.  make sure the
 
 exitOnInputDirAndOutput :: IO ()
 exitOnInputDirAndOutput = do
-    putStrLn $ (r CantWriteToOutputBecauseInputIsDirectory) ++ "\n"
-    putStrLn (r PleaseRemoveOutputArgument)
+    putStrLn $ r CantWriteToOutputBecauseInputIsDirectory
     exitFailure
 
 
