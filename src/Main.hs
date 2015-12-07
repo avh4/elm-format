@@ -84,6 +84,12 @@ exitFilesNotFound (filePath:filePaths) = do
     case filePaths of
         [] -> exitFailure
         _ -> exitFilesNotFound filePaths
+exitFilesNotFound [] = do -- TODO: added this to prevent crashes.  make sure the error message here makes sense
+    putStrLn $ (r NoElmFilesOnPath) ++ "\n"
+    putStrLn $ "\n"
+    putStrLn (r PleaseCheckPath)
+    exitFailure
+
 
 exitOnInputDirAndOutput :: IO ()
 exitOnInputDirAndOutput = do
@@ -129,13 +135,6 @@ main =
 
         filesExist <-
             all (id) <$> mapM isEitherFileOrDirectory inputFiles
-
-        isSingleDirectory <-
-            case inputFiles of
-                file:[] ->
-                    Dir.doesDirectoryExist file
-                _ ->
-                    return False
 
         when (not filesExist) $
             exitFilesNotFound inputFiles
