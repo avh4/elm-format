@@ -11,8 +11,9 @@ import Messages.Strings (renderMessage)
 import qualified AST.Module
 import qualified CommandLine.Helpers as Cmd
 import qualified Flags
+import qualified Data.ByteString.Lazy as ByteString
 import qualified Data.Text.Lazy as LazyText
-import qualified Data.Text.Lazy.IO as LazyText
+import qualified Data.Text.Lazy.Encoding as LazyText
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.Filesystem as FS
@@ -32,9 +33,14 @@ showErrors errs = do
     mapM_ printError errs
 
 
+writeFile' :: FilePath -> LazyText.Text -> IO ()
+writeFile' filename contents =
+    ByteString.writeFile filename $ LazyText.encodeUtf8 contents
+
+
 writeEmptyFile :: FilePath -> IO ()
 writeEmptyFile filePath =
-    LazyText.writeFile filePath $ LazyText.pack ""
+    writeFile' filePath $ LazyText.pack ""
 
 
 formatResult
@@ -46,7 +52,7 @@ formatResult canWriteEmptyFileOnError outputFile result =
     case result of
         Result.Result _ (Result.Ok modu) ->
             Render.render modu
-                |> LazyText.writeFile outputFile
+                |> writeFile' outputFile
 
         Result.Result _ (Result.Err errs) ->
             do
@@ -101,7 +107,7 @@ processFile :: FilePath -> FilePath -> IO ()
 processFile inputFile outputFile =
     do
         putStrLn $ (r ProcessingFile) ++ " " ++ inputFile
-        input <- LazyText.readFile inputFile
+        input <- fmap LazyText.decodeUtf8 $ ByteString.readFile inputFile
         Parse.parse input
             |> formatResult canWriteEmptyFileOnError outputFile
     where
