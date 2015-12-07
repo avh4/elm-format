@@ -28,7 +28,7 @@ assertLineOutput expected actual =
 assertOutput :: String -> Box -> Assertion
 assertOutput expected actual =
     assertEqual expected expected $
-        trim $ render $ depr $ actual
+        trim $ render $ actual
 
 
 word :: String -> Box

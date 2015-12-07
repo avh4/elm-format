@@ -19,6 +19,6 @@ render modu =
                 |> LazyText.unlines
     in
         Render.formatModule modu
-            |> Box.render . Box.depr
+            |> Box.render
             |> LazyText.pack
             |> trimSpaces

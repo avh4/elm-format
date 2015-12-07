@@ -2,12 +2,18 @@
 module Box where
 
 import Elm.Utils ((|>))
-import Text.PrettyPrint.Boxes ((<>), (//))
 
 import qualified Data.List as List
-import qualified Text.PrettyPrint.Boxes as B
 
 
+{-
+A line is ALWAYS just one line.
+
+Space is self-explanatory,
+  Tab aligns to the nearest multiple of 4 spaces,
+  Text brings any string into the data structure,
+  Row joins more of these elements onto one line.
+-}
 data Line
     = Text String
     | Row [Line]
@@ -35,6 +41,7 @@ literal =
     Text
 
 
+-- join more Line elements into one
 row :: [Line] -> Line
 row =
     Row
@@ -45,19 +52,25 @@ space =
     Space
 
 
-len :: Line -> Int
-len l =
-    case l of
-        Text s -> length s
-        Row ls -> sum $ map len ls
-        Space -> 1
+{-
+Box contains Lines (at least one - can't be empty).
+Box either:
+  - can appear in the middle of a line
+      (Stack someLine [], thus can be joined without problems), or
+  - has to appear on its own
+      (Stack someLine moreLines OR MustBreak someLine).
 
+MustBreak is only used for `--` comments.
 
+Stack doesn't allow zero-line stacks.
+
+Sometimes (see `prefix`) the first line of Stack
+  gets different treatment than the other lines.
+-}
 data Box
     = Stack Line [Line]
     | MustBreak Line
     -- | Margin Int
-    -- | Empty
 
 
 blankLine :: Box
@@ -176,11 +189,28 @@ elmApplication first rest =
                 $ first : (map indent rest)
 
 
+{-
+Add the prefix to the first line,
+pad the other lines with spaces of the same length
+
+EXAMPLE:
+abcde
+xyz
+----->
+myPrefix abcde
+         xyz
+-}
 prefix :: Line -> Box -> Box
 prefix pref =
     mapFirstLine
-        (\l -> row [ pref, l ])
-        (\l -> row [ row $ replicate (len pref) space, l ])
+        addPrefixToLine
+        padLineWithSpaces
+    where
+        addPrefixToLine l = row [ pref, l ]
+        padLineWithSpaces l = row [ row paddingSpaces, l ]
+
+        prefixLength = lineLength 0 pref
+        paddingSpaces = replicate prefixLength space
 
 
 elmGroup :: Bool -> String -> String -> String -> Bool -> [Box] -> Box
@@ -205,70 +235,104 @@ elmGroup innerSpaces left sep right forceMultiline children =
                         ++ [ line $ punc right ]
 
 
--- DEPRECATED BELOW THIS LINE
-
-data Box' = Box'
-    { box :: B.Box
-    , bottomMargin :: Int
-    , hasSize :: Bool
-    }
-
-
-depr' :: Int -> Line -> (Int, Box')
-depr' margin l =
-    case l of
-        Text s ->
-            (0, text s)
-        Row items ->
-            foldl
-                (\(m,b) l' -> let (mm,bb) = depr' m l' in (mm, hbox2 b bb))
-                (margin,empty)
-                items
-        Space ->
-            (margin + 1, text " ")
-        Tab ->
-            (0, text $ replicate (4 - (margin `mod` 4)) ' ')
+renderLine :: Int -> Line -> String
+renderLine _ (Text text) =
+    text
+renderLine _ Space =
+    " "
+renderLine startColumn Tab =
+    replicate (tabLength startColumn) ' '
+renderLine startColumn (Row lines') =
+    renderRow startColumn lines'
 
 
-depr :: Box -> Box'
-depr b =
-    case b of
-        Stack first rest ->
-            vbox (map (snd . depr' 0) (first:rest))
-        MustBreak first ->
-            vbox (map (snd . depr' 0) (first:[]))
+render :: Box -> String
+render (Stack firstLine moreLines) =
+    unlines $ map (renderLine 0) (firstLine : moreLines)
+render (MustBreak line') =
+    renderLine 0 line' ++ "\n"
 
 
-empty :: Box'
-empty =
-    Box' B.nullBox 0 False
+-- TODO couldn't we just run renderLine and get the length of the resulting string?
+lineLength :: Int -> Line -> Int
+lineLength startColumn line' =
+   startColumn +
+      case line' of
+         Text string -> length string
+         Space -> 1
+         Tab -> tabLength startColumn
+         Row lines' -> rowLength startColumn lines'
 
 
-text :: String -> Box'
-text s =
-    Box' (B.text s) 0 (s /= "")
 
 
-vbox2 :: Box' -> Box' -> Box'
-vbox2 (Box' a aMargin ae) (Box' b bMargin be) =
-    Box' (a // B.emptyBox aMargin 0 // b) bMargin (ae || be)
 
+initRow :: Int -> (String, Int)
+initRow startColumn =
+  ("", startColumn)
 
-vbox :: [Box'] -> Box'
-vbox =
-    foldl vbox2 empty
+spacesInTab :: Int
+spacesInTab =
+  4
 
+spacesToNextTab :: Int -> Int
+spacesToNextTab startColumn =
+  startColumn `mod` spacesInTab
 
-hbox2 :: Box' -> Box' -> Box'
-hbox2 (Box' a _ ae) (Box' b _ be) =
-    Box' (a <> b) 0 (ae || be)
+tabLength :: Int -> Int
+tabLength startColumn =
+  spacesInTab - (spacesToNextTab startColumn)
 
+{-
+What happens here is we take a row and start building its contents
+  along with the resulting length of the string. We need to have that
+  because of Tabs, which need to be passed the current column in arguments
+  in order to determine how many Spaces are they going to span.
+  (See `tabLength`.)
 
-hbox :: [Box'] -> Box'
-hbox =
-    foldl hbox2 empty
+So for example if we have a Box [Space, Tab, Text "abc", Tab, Text "x"],
+  it goes like this:
 
+string      | column | todo
+""          | 0      | [Space, Tab, Text "abc", Tab, Text "x"]
+" "         | 1      | [Tab, Text "abc", Tab, Text "x"]
+"    "      | 4      | [Text "abc", Tab, Text "x"]
+"    abc"   | 7      | [Tab, Text "x"]
+"    abc "  | 8      | [Text "x"]
+"    abc x" | 9      | []
 
-render :: Box' -> String
-render (Box' child _ _) =
-    B.render child
+Thus we get the result string with correctly rendered Tabs.
+
+The (String, Int) type here means the (string, column) from the table above.
+
+Then we just need to do one final modification to get from endColumn to resultLength,
+  which is what we are after in the function `rowLength`.
+-}
+renderRow' :: Int -> [Line] -> (String, Int)
+renderRow' startColumn lines' =
+  (result, resultLength)
+  where
+    (result, endColumn) = foldl addLine (initRow startColumn) lines'
+    resultLength = endColumn - startColumn
+
+{-
+A step function for renderRow'.
+
+addLine (" ",1) Tab == ("    ",4)
+-}
+addLine :: (String, Int) -> Line -> (String, Int)
+addLine (string, startColumn') line' =
+  (newString, newStartColumn)
+  where
+    newString = string ++ renderLine startColumn' line'
+    newStartColumn = lineLength startColumn' line'
+
+-- Extract the final string from renderRow'
+renderRow :: Int -> [Line] -> String
+renderRow startColumn lines' =
+  fst $ renderRow' startColumn lines'
+
+-- Extract the final length from renderRow'
+rowLength :: Int -> [Line] -> Int
+rowLength startColumn lines' =
+  snd $ renderRow' startColumn lines'
