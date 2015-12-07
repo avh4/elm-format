@@ -75,13 +75,15 @@ getApproval autoYes filePaths =
             Cmd.yesOrNo
 
 
-exitFileNotFound :: FilePath -> IO ()
-exitFileNotFound filePath = do
+exitFilesNotFound :: [FilePath] -> IO ()
+exitFilesNotFound (filePath:filePaths) = do
     putStrLn $ (r NoElmFilesOnPath) ++ "\n"
     putStrLn $ "  " ++ filePath ++ "\n"
     putStrLn (r PleaseCheckPath)
-    exitFailure
 
+    case filePaths of
+        [] -> exitFailure
+        _ -> exitFilesNotFound filePaths
 
 exitOnInputDirAndOutput :: IO ()
 exitOnInputDirAndOutput = do
@@ -111,32 +113,45 @@ decideOutputFile autoYes inputFile outputFile =
                 False -> exitSuccess
         Just outputFile' -> return outputFile'
 
+isEitherFileOrDirectory :: FilePath -> IO Bool
+isEitherFileOrDirectory path = do
+    fileExists <- Dir.doesFileExist path
+    dirExists <- Dir.doesDirectoryExist path
+    return $ fileExists || dirExists
 
 main :: IO ()
 main =
     do
         config <- Flags.parse
-        let inputFile = (Flags._input config)
+        let inputFiles = (Flags._input config)
         let outputFile = (Flags._output config)
         let autoYes = (Flags._yes config)
 
-        fileExists <- Dir.doesFileExist inputFile
-        dirExists <- Dir.doesDirectoryExist inputFile
+        filesExist <-
+            all (id) <$> mapM isEitherFileOrDirectory inputFiles
 
-        when (not (fileExists || dirExists)) $
-            exitFileNotFound inputFile
+        isSingleDirectory <-
+            case inputFiles of
+                file:[] ->
+                    Dir.doesDirectoryExist file
+                _ ->
+                    return False
 
-        if fileExists
-            then do
+        when (not filesExist) $
+            exitFilesNotFound inputFiles
+
+        elmFiles <- concat <$> mapM FS.findAllElmFiles inputFiles
+
+        when (null elmFiles) $
+            exitFilesNotFound inputFiles
+
+        case elmFiles of
+            inputFile:[] -> do
                 realOutputFile <- decideOutputFile autoYes inputFile outputFile
                 processFile inputFile realOutputFile
-            else do -- dirExists
+            _ -> do
                 when (isJust outputFile)
                     exitOnInputDirAndOutput
-
-                elmFiles <- FS.findAllElmFiles inputFile
-                when (null elmFiles) $
-                    exitFileNotFound inputFile
 
                 canOverwriteFiles <- getApproval autoYes elmFiles
                 when canOverwriteFiles $
