@@ -38,4 +38,5 @@ renderMessage CantWriteToOutputBecauseInputIsDirectory =
     , "Please remove the --output argument. The .elm files in INPUT will be formatted in place."
     ]
 
-renderMessage ProcessingFile = "Processing file"
+renderMessage (ProcessingFile file) =
+    "Processing file " ++ file

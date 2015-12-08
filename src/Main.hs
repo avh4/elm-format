@@ -93,7 +93,7 @@ exitOnInputDirAndOutput = do
 processFile :: FilePath -> FilePath -> IO ()
 processFile inputFile outputFile =
     do
-        putStrLn $ (r ProcessingFile) ++ " " ++ inputFile
+        putStrLn $ (r $ ProcessingFile inputFile)
         input <- fmap LazyText.decodeUtf8 $ ByteString.readFile inputFile
         Parse.parse input
             |> formatResult canWriteEmptyFileOnError outputFile

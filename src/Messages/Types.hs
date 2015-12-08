@@ -11,4 +11,4 @@ data Message
   | FilesWillBeOverwritten [FilePath]
   | NoElmFilesFound [FilePath]
   | CantWriteToOutputBecauseInputIsDirectory
-  | ProcessingFile
+  | ProcessingFile FilePath
