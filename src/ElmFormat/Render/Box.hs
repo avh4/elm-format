@@ -20,9 +20,14 @@ import Text.Printf (printf)
 import Util.List
 
 
+pleaseReport' :: String -> String -> Line
+pleaseReport' what details =
+    keyword $ "<" ++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
+
+
 pleaseReport :: String -> String -> Box
 pleaseReport what details =
-    line $ keyword $ "<" ++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
+    line $ pleaseReport' what details
 
 
 parens :: Box -> Box
@@ -134,9 +139,9 @@ formatModule modu =
                             Right listing' ->
                                 row [ space, listing' ]
                             _ ->
-                                keyword "<TODO: multiline module listing>"
+                                pleaseReport' "TODO" "multiline module listing"
                     _ ->
-                        keyword "<TODO: no listing>"
+                        pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
                 , space
                 , keyword "where"
                 ]
@@ -259,7 +264,7 @@ formatImport aimport =
                                             , listing'
                                             ]
                                     _ ->
-                                        line $ keyword "<TODO: multiline exposing>"
+                                        pleaseReport "TODO" "multiline exposing"
                             Nothing ->
                                 line $ row
                                     [ keyword "import"
@@ -399,7 +404,7 @@ formatDeclaration decl =
                                 , typ'
                                 ]
                         _ ->
-                            line $ keyword "<TODO: multiline type in port annotation>"
+                            pleaseReport "TODO" "multiline type in port annotation"
 
                 AST.Declaration.PortDefinition name expr ->
                     stack1
@@ -463,8 +468,10 @@ formatDefinition compact adef =
                             (map formatComment comments)
                             ++ [ formatExpression expr ]
                         ]
+                (_, _, _, Left _, _, _) ->
+                    pleaseReport "TODO" "multiline pattern in let binding"
                 _ ->
-                    line $ keyword "<TODO: let binding with multiline name/pattern>"
+                    pleaseReport "UNEXPECTED TYPE ANNOTATION" "multiline name in let binding"
 
         AST.Expression.TypeAnnotation name typ ->
             case
@@ -489,7 +496,7 @@ formatDefinition compact adef =
                         ]
 
                 _ ->
-                    line $ keyword "<TODO: multiline name in type annotation>"
+                    pleaseReport "UNEXPECTED TYPE ANNOTATION" "multiline name"
 
         AST.Expression.LetComment comment ->
             formatComment comment
@@ -531,8 +538,8 @@ formatPattern parensRequired apattern =
                         , space
                         , identifier name
                         ]
-                _ -> -- TODO
-                    line $ keyword "<TODO-multiline Pattern alias>"
+                _ ->
+                    pleaseReport "TODO" "multiline pattern alias"
             |> (if parensRequired then parens else id)
         AST.Pattern.Var var ->
             line $ formatVar var
@@ -576,7 +583,7 @@ formatRecordPair (k,v,multiline') =
                     |> indent
                 ]
         _ ->
-            line $ keyword "<TODO: multiline record field>"
+            pleaseReport "TODO" "multiline record field"
 
 
 formatExpression :: AST.Expression.Expr -> Box
@@ -659,7 +666,7 @@ formatExpression aexpr =
                             ++ [ formatExpression expr ]
                         ]
                 _ ->
-                    line $ keyword "<TODO: multiline pattern in lambda>"
+                    pleaseReport "TODO" "multiline pattern in lambda"
 
         AST.Expression.Unary AST.Expression.Negative e ->
             prefix (punc "-") $ formatExpression e
@@ -778,7 +785,7 @@ formatExpression aexpr =
                                     ++ [ formatExpression expr ]
                                 ]
                         _ ->
-                            line $ keyword "<TODO: multiline case pattern>"
+                            pleaseReport "TODO" "multiline case pattern"
             in
                 opening
                     |> andThen
@@ -872,7 +879,7 @@ formatExpression aexpr =
             parens $ stack1 $ map formatComment comments
 
         AST.Expression.GLShader _ _ _ ->
-            line $ keyword "<TODO: glshader>"
+            pleaseReport "TODO" "glshader"
 
 
 formatCommented :: (a -> Box) -> Commented a -> Box
@@ -1120,4 +1127,4 @@ formatInfixVar var =
         AST.Variable.OpRef name ->
             identifier name
         AST.Variable.WildcardRef ->
-            keyword "_" -- TODO: should never happen
+            pleaseReport' "INVALID INFIX OPERATOR" "wildcard used as infix"
