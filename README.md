@@ -3,9 +3,15 @@
 
 # elm-format
 
-`elm-format` is the official source code formatter for Elm.
+> `elm-format` is still in alpha.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues/new).
 
-`elm-format` is still in alpha.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues/new).
+`elm-format` formats [Elm](http://elm-lang.org) source code according to a standard set of rules. It is inspired by the popular [gofmt](https://blog.golang.org/go-fmt-your-code).
+
+The benefits of `elm-format`:
+ - It makes code **easier to write**, because you never have to worry about minor formatting concerns while powering out new code.
+ - It makes code **easier to read**, because there are no longer distracting minor stylistic differences between different code bases. As such, your brain can map more efficiently from source to mental model.
+ - It makes code **easier to maintain**, because you can no longer have diffs related only to formatting; every diff necessary involves a material change.
+ - It **saves your team time** debating how to format things, because there is a standard tool that formats everything the same way.
 
 
 ## Basic Usage
