@@ -12,8 +12,7 @@ data Message
   | BackupFilesBeforeOverwriting
   | ConfirmOverwriting
 
-  | NoElmFilesOnPath
-  | PleaseCheckPath
+  | NoElmFilesFound [FilePath]
 
   | CantWriteToOutputBecauseInputIsDirectory
 

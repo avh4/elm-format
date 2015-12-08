@@ -82,18 +82,8 @@ getApproval autoYes filePaths =
 
 
 exitFilesNotFound :: [FilePath] -> IO ()
-exitFilesNotFound (filePath:filePaths) = do
-    putStrLn $ (r NoElmFilesOnPath) ++ "\n"
-    putStrLn $ "  " ++ filePath ++ "\n"
-    putStrLn (r PleaseCheckPath)
-
-    case filePaths of
-        [] -> exitFailure
-        _ -> exitFilesNotFound filePaths
-exitFilesNotFound [] = do -- TODO: added this to prevent crashes.  make sure the error message here makes sense
-    putStrLn $ (r NoElmFilesOnPath) ++ "\n"
-    putStrLn $ "\n"
-    putStrLn (r PleaseCheckPath)
+exitFilesNotFound filePaths = do
+    putStrLn $ (r $ NoElmFilesFound filePaths)
     exitFailure
 
 

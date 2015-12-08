@@ -12,8 +12,13 @@ renderMessage FollowingFilesWillBeOverwritten = "This will overwrite the followi
 renderMessage BackupFilesBeforeOverwriting = "This cannot be undone! Make sure to back up these files before proceeding."
 renderMessage ConfirmOverwriting = "Are you sure you want to overwrite these files with formatted versions? (y/n)"
 
-renderMessage NoElmFilesOnPath = "Could not find any .elm files on the specified path:"
-renderMessage PleaseCheckPath = "Please check the given path."
+renderMessage (NoElmFilesFound filePaths) =
+  unlines
+    [ "Could not find any .elm files on the specified paths:"
+    , ""
+    , unlines $ map ((++) "    ") filePaths
+    , "Please check the given paths."
+    ]
 
 renderMessage CantWriteToOutputBecauseInputIsDirectory =
   unlines
