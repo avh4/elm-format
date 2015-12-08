@@ -2,7 +2,7 @@
 
 set -ex
 
-VERSION="0.1-alpha2"
+VERSION="$(sed -ne "s/^Version: //p" elm-format.cabal)"
 
 ## Run tests
 
