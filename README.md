@@ -3,7 +3,9 @@
 
 # elm-format
 
-`elm-format` is the official source code formatter for Elm.  `elm-format` is still in alpha.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues/new).
+`elm-format` is the official source code formatter for Elm.
+
+`elm-format` is still in alpha.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues/new).
 
 
 ## Basic Usage
