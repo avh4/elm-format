@@ -20,6 +20,11 @@ import Text.Printf (printf)
 import Util.List
 
 
+pleaseReport :: String -> String -> Box
+pleaseReport what details =
+    line $ keyword $ "<" ++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
+
+
 parens :: Box -> Box
 parens b =
   case isLine b of
@@ -44,7 +49,7 @@ formatBinary multiline left ops =
         )
     of
         ([], _, _, _, _) ->
-            line $ keyword "<INVALID BINARY EXPRESSION -- please report this at https://github.com/avh4/elm-format/issues>"
+            pleaseReport "INVALID BINARY EXPRESSION" "no operators"
 
         (_, False, Right left'', Right ops'', Right exprs') ->
             zip ops'' exprs'
@@ -352,7 +357,7 @@ formatDeclaration decl =
                     in
                         case ctors of
                             [] ->
-                                line $ keyword "<INVALID DATA TYPE: no constructors -- please report this at https://github.com/avh4/elm-format/issues>"
+                                pleaseReport "INVALID DATA TYPE" "no constructors"
                             (first:rest) ->
                                 stack1
                                     [ line $ row
@@ -423,7 +428,7 @@ formatDeclaration decl =
                                 , name'
                                 ]
                         _ ->
-                            line $ keyword "<TODO: multiline name in fixity declaration>"
+                            pleaseReport "INVALID INFIX DECLARATION" "multiline name"
 
 
 formatDefinition :: Bool -> AST.Expression.Def -> Box
@@ -675,7 +680,7 @@ formatExpression aexpr =
 
         AST.Expression.If [] _ els ->
             stack1
-                [ line $ keyword "<INVALID IF EXPRESSION -- please report this at https://github.com/avh4/elm-format/issues>"
+                [ pleaseReport "INVALID IF EXPRESSION" "no if branch"
                 , formatExpression els
                     |> indent
                 ]
@@ -717,7 +722,7 @@ formatExpression aexpr =
 
         AST.Expression.Let defs bodyComments expr ->
             let
-                spacer first second =
+                spacer first _ =
                     case isDefinition $ RA.drop first of
                         True ->
                             [ blankLine ]
@@ -796,14 +801,14 @@ formatExpression aexpr =
         AST.Expression.AccessFunction field ->
             line $ identifier $ "." ++ field
 
-        AST.Expression.RecordUpdate base pairs multiline ->
+        AST.Expression.RecordUpdate base pairs' multiline ->
             case
                 ( multiline
                 , isLine $ formatCommented formatExpression base
-                , allSingles $ map formatRecordPair pairs
+                , allSingles $ map formatRecordPair pairs'
                 )
             of
-                (False, Right base', Right pairs') ->
+                (False, Right base', Right pairs'') ->
                     line $ row
                         [ punc "{"
                         , space
@@ -811,14 +816,14 @@ formatExpression aexpr =
                         , space
                         , punc "|"
                         , space
-                        , row $ List.intersperse commaSpace pairs'
+                        , row $ List.intersperse commaSpace pairs''
                         , space
                         , punc "}"
                         ]
                 _ ->
-                    case map formatRecordPair pairs of
+                    case map formatRecordPair pairs' of
                         [] ->
-                            line $ keyword "<INVALID RECORD EXTENSION -- please report this at https://github.com/avh4/elm-format/issues>"
+                            pleaseReport "INVALID RECORD UPDATE" "no fields"
                         (first:rest) ->
                             stack1
                                 [ formatCommented formatExpression base
@@ -829,22 +834,22 @@ formatExpression aexpr =
                                 , line $ punc "}"
                                 ]
 
-        AST.Expression.Record pairs multiline ->
+        AST.Expression.Record pairs' multiline ->
             case
                 ( multiline
-                , allSingles $ map formatRecordPair pairs
+                , allSingles $ map formatRecordPair pairs'
                 )
             of
-                (False, Right pairs') ->
+                (False, Right pairs'') ->
                     line $ row
                         [ punc "{"
                         , space
-                        , row $ List.intersperse commaSpace pairs'
+                        , row $ List.intersperse commaSpace pairs''
                         , space
                         , punc "}"
                         ]
                 _ ->
-                    elmGroup True "{" "," "}" multiline $ map formatRecordPair pairs
+                    elmGroup True "{" "," "}" multiline $ map formatRecordPair pairs'
 
         AST.Expression.EmptyRecord [] ->
             line $ punc "{}"
@@ -1063,7 +1068,7 @@ formatType' requireParens atype =
             in
                 case (ext, fields) of
                     (Just _, []) ->
-                        line $ keyword "<INVALID RECORD EXTENSION -- please report this at https://github.com/avh4/elm-format/issues>"
+                        pleaseReport "INVALID RECORD TYPE EXTENSION" "no fields"
                     (Just typ, first:rest) ->
                         case
                             ( multiline
