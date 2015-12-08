@@ -8,12 +8,7 @@ data Message
   = ErrorsHeading
   | ErrorFileLocation
 
-  | FollowingFilesWillBeOverwritten
-  | BackupFilesBeforeOverwriting
-  | ConfirmOverwriting
-
+  | FilesWillBeOverwritten [FilePath]
   | NoElmFilesFound [FilePath]
-
   | CantWriteToOutputBecauseInputIsDirectory
-
   | ProcessingFile

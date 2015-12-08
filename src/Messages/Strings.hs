@@ -3,20 +3,31 @@ module Messages.Strings where
 
 import Messages.Types (Message(..))
 
+
+showFiles :: [FilePath] -> String
+showFiles = unlines . map ((++) "    ")
+
 renderMessage :: Message -> String
 
 renderMessage ErrorsHeading = "ERRORS"
 renderMessage ErrorFileLocation = "<location>"
 
-renderMessage FollowingFilesWillBeOverwritten = "This will overwrite the following files to use Elm’s preferred style:"
-renderMessage BackupFilesBeforeOverwriting = "This cannot be undone! Make sure to back up these files before proceeding."
-renderMessage ConfirmOverwriting = "Are you sure you want to overwrite these files with formatted versions? (y/n)"
+renderMessage (FilesWillBeOverwritten filePaths) =
+  unlines
+    [ "This will overwrite the following files to use Elm’s preferred style:"
+    , ""
+    , showFiles filePaths
+    , "This cannot be undone! Make sure to back up these files before proceeding."
+    , ""
+    , "Are you sure you want to overwrite these files with formatted versions? (y/n)"
+    ]
+
 
 renderMessage (NoElmFilesFound filePaths) =
   unlines
     [ "Could not find any .elm files on the specified paths:"
     , ""
-    , unlines $ map ((++) "    ") filePaths
+    , showFiles filePaths
     , "Please check the given paths."
     ]
 

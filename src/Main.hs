@@ -74,10 +74,7 @@ getApproval autoYes filePaths =
         True ->
             return True
         False -> do
-            putStrLn $ (r FollowingFilesWillBeOverwritten) ++ "\n"
-            mapM_ (\filePath -> putStrLn $ "  " ++ filePath) filePaths
-            putStrLn $ "\n" ++ (r BackupFilesBeforeOverwriting) ++ "\n"
-            putStr $ (r ConfirmOverwriting) ++ " "
+            putStrLn $ (r $ FilesWillBeOverwritten filePaths)
             Cmd.yesOrNo
 
 
