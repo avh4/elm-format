@@ -341,8 +341,14 @@ formatDeclaration decl =
                             case allSingles $ map (formatType' ForCtor) args' of
                                 Right args'' ->
                                     line $ row $ List.intersperse space $ (identifier tag):args''
-                                _ ->
-                                    line $ keyword "<TODO: multiline type in constructor argument>"
+                                Left [] ->
+                                    line $ identifier tag
+                                Left args'' ->
+                                    stack1
+                                        [ line $ identifier tag
+                                        , stack1 args''
+                                            |> indent
+                                        ]
                     in
                         case ctors of
                             [] ->

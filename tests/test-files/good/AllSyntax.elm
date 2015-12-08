@@ -28,6 +28,13 @@ type Data x y z
     | E (y -> z)
 
 
+type MultilineData
+    = MultilineData
+        { f1 : ()
+        , f2 : Int -> Float
+        }
+
+
 type alias Type =
     String
 
