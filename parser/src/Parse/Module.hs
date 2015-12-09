@@ -8,7 +8,6 @@ import qualified AST.Module.Name as ModuleName
 import qualified AST.Variable as Var
 import Reporting.Annotation as A
 import AST.V0_15
-import qualified Util.List as List
 
 
 getModuleName :: String -> Maybe String

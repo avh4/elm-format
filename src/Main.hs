@@ -38,18 +38,11 @@ writeFile' filename contents =
     ByteString.writeFile filename $ Text.encodeUtf8 contents
 
 
--- TODO: remove this: we shouldn't need to write a file on error
-writeEmptyFile :: FilePath -> IO ()
-writeEmptyFile filePath =
-    writeFile' filePath $ Text.empty
-
-
 formatResult
-    :: Bool
-    -> FilePath
+    :: FilePath
     -> Result.Result () Syntax.Error AST.Module.Module
     -> IO ()
-formatResult canWriteEmptyFileOnError outputFile result =
+formatResult outputFile result =
     case result of
         Result.Result _ (Result.Ok modu) ->
             Render.render modu
@@ -57,9 +50,6 @@ formatResult canWriteEmptyFileOnError outputFile result =
 
         Result.Result _ (Result.Err errs) ->
             do
-                when canWriteEmptyFileOnError $
-                    writeEmptyFile outputFile
-
                 showErrors errs
                 exitFailure
 
@@ -97,9 +87,7 @@ processFile inputFile outputFile =
         putStrLn $ (r $ ProcessingFile inputFile)
         input <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
         Parse.parse input
-            |> formatResult canWriteEmptyFileOnError outputFile
-    where
-        canWriteEmptyFileOnError = outputFile /= inputFile
+            |> formatResult outputFile
 
 
 decideOutputFile :: Bool -> FilePath -> Maybe FilePath -> IO FilePath
