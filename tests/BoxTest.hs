@@ -6,6 +6,7 @@ import Test.HUnit (Assertion, assertEqual)
 import Test.Framework
 import Test.Framework.Providers.HUnit
 import qualified Data.Text.Lazy as LazyText
+import qualified Data.Text as Text
 
 import Box
 
@@ -28,7 +29,7 @@ assertLineOutput expected actual =
 assertOutput :: String -> Box -> Assertion
 assertOutput expected actual =
     assertEqual expected expected $
-        trim $ render $ actual
+        trim $ Text.unpack $ render $ actual
 
 
 word :: String -> Box

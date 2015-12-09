@@ -4,6 +4,7 @@ module Box where
 import Elm.Utils ((|>))
 
 import qualified Data.List as List
+import qualified Data.Text as T
 
 
 {-
@@ -15,7 +16,7 @@ Space is self-explanatory,
   Row joins more of these elements onto one line.
 -}
 data Line
-    = Text String
+    = Text T.Text
     | Row [Line]
     | Space
     | Tab
@@ -23,21 +24,41 @@ data Line
 
 identifier :: String -> Line
 identifier =
+    identifier' . T.pack
+
+
+identifier' :: T.Text -> Line
+identifier' =
     Text
 
 
 keyword :: String -> Line
 keyword =
+    keyword' . T.pack
+
+
+keyword' :: T.Text -> Line
+keyword' =
     Text
 
 
 punc :: String -> Line
 punc =
+    punc' . T.pack
+
+
+punc' :: T.Text -> Line
+punc' =
     Text
 
 
 literal :: String -> Line
 literal =
+    literal' . T.pack
+
+
+literal' :: T.Text -> Line
+literal' =
     Text
 
 
@@ -235,22 +256,22 @@ elmGroup innerSpaces left sep right forceMultiline children =
                         ++ [ line $ punc right ]
 
 
-renderLine :: Int -> Line -> String
+renderLine :: Int -> Line -> T.Text
 renderLine _ (Text text) =
     text
 renderLine _ Space =
-    " "
+    T.singleton ' '
 renderLine startColumn Tab =
-    replicate (tabLength startColumn) ' '
+    T.pack $ replicate (tabLength startColumn) ' '
 renderLine startColumn (Row lines') =
     renderRow startColumn lines'
 
 
-render :: Box -> String
+render :: Box -> T.Text
 render (Stack firstLine moreLines) =
-    unlines $ map (renderLine 0) (firstLine : moreLines)
+    T.unlines $ map (renderLine 0) (firstLine : moreLines)
 render (MustBreak line') =
-    renderLine 0 line' ++ "\n"
+    T.snoc (renderLine 0 line') '\n'
 
 
 -- TODO couldn't we just run renderLine and get the length of the resulting string?
@@ -258,7 +279,7 @@ lineLength :: Int -> Line -> Int
 lineLength startColumn line' =
    startColumn +
       case line' of
-         Text string -> length string
+         Text string -> T.length string
          Space -> 1
          Tab -> tabLength startColumn
          Row lines' -> rowLength startColumn lines'
@@ -267,9 +288,9 @@ lineLength startColumn line' =
 
 
 
-initRow :: Int -> (String, Int)
+initRow :: Int -> (T.Text, Int)
 initRow startColumn =
-  ("", startColumn)
+  (T.empty, startColumn)
 
 spacesInTab :: Int
 spacesInTab =
@@ -303,12 +324,12 @@ string      | column | todo
 
 Thus we get the result string with correctly rendered Tabs.
 
-The (String, Int) type here means the (string, column) from the table above.
+The (T.Text, Int) type here means the (string, column) from the table above.
 
 Then we just need to do one final modification to get from endColumn to resultLength,
   which is what we are after in the function `rowLength`.
 -}
-renderRow' :: Int -> [Line] -> (String, Int)
+renderRow' :: Int -> [Line] -> (T.Text, Int)
 renderRow' startColumn lines' =
   (result, resultLength)
   where
@@ -320,15 +341,15 @@ A step function for renderRow'.
 
 addLine (" ",1) Tab == ("    ",4)
 -}
-addLine :: (String, Int) -> Line -> (String, Int)
+addLine :: (T.Text, Int) -> Line -> (T.Text, Int)
 addLine (string, startColumn') line' =
   (newString, newStartColumn)
   where
-    newString = string ++ renderLine startColumn' line'
+    newString = T.append string $ renderLine startColumn' line'
     newStartColumn = lineLength startColumn' line'
 
 -- Extract the final string from renderRow'
-renderRow :: Int -> [Line] -> String
+renderRow :: Int -> [Line] -> T.Text
 renderRow startColumn lines' =
   fst $ renderRow' startColumn lines'
 

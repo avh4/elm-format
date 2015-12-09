@@ -20,5 +20,5 @@ render modu =
     in
         Render.formatModule modu
             |> Box.render
-            |> LazyText.pack
+            |> LazyText.fromStrict
             |> trimSpaces
