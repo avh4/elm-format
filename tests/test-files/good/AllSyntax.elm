@@ -1,4 +1,4 @@
-module AllSyntax (fn, tuple, Type, Union(A, B, C), Union2(..)) where
+module AllSyntax (fn, tuple, Type, Data(A, B, C), MultilineData(..)) where
 
 {-| An example of all valid Elm syntax.
 
@@ -10,6 +10,7 @@ import Json.Decode as Json
 import List exposing (..)
 import Signal exposing (foldp, map)
 import String
+import Task
 
 
 type Data x y z
@@ -25,6 +26,12 @@ type MultilineData
         { f1 : ()
         , f2 : Int -> Float
         }
+
+
+type Data2
+    = Foo
+    | Too
+    | Bar
 
 
 type alias Type =
@@ -221,7 +228,7 @@ commentedLiterals =
 
 
 infixOperator =
-    1 + 2 * 3 / 4 // 5 |> (+) 0
+    1 + 2 * 3 / 4 <> 5 |> (+) 0
 
 
 multilineInfixOperators =
@@ -229,7 +236,7 @@ multilineInfixOperators =
         + 2
         * 3
         / 4
-        // 5
+        <> 5
         |> (+) 0
 
 
@@ -297,7 +304,7 @@ parenthesizedExpressions =
     (1 + (2 * 3) / 4) |> ((+) 0)
 
 
-multilineParenthesizedExpressions =
+multilineParenthesizedExpressions graphHeight range =
     graphHeight
         / (if range == 0 then
             0.1
@@ -316,7 +323,7 @@ multilineParenthesizedExpressions =
              )
 
 
-multilineParenthesizedExpressions =
+multilineParenthesizedExpressions2 range =
     (if range == 0 then
         0.1
      else
@@ -345,7 +352,7 @@ multilineRecordUpdate r f =
     }.f2
 
 
-multilineRecordAccess r f =
+multilineRecordAccess2 r f =
     { f1 = 1
     , f2 = 2
     }.f2
@@ -363,8 +370,8 @@ multilineRecordLiteral =
     }
 
 
-singleLineRecord =
-    (addStatus { id = 50 }.f1)
+singleLineRecord addStatus =
+    (addStatus { f1 = 50 }.f1)
 
 
 singleLineRecordUpdate x =
@@ -414,27 +421,28 @@ multilineExpressionsInsideList =
     [ let
         x = 1
       in
-        x
+        always x
     , if True then
-        2
+        always 2
       else if False then
-        3
+        always 3
       else
-        4
+        always 4
     , case True of
         _ ->
-            5
+            always 5
     , [ 6
       , 7
       ]
         |> head
         |> Maybe.withDefault 8
+        |> always
     , \a ->
         9
     ]
 
 
-multilineExpressionsInsideTuple =
+multilineExpressionsInsideTuple a foo =
     ( let
         x = 1
       in
@@ -499,7 +507,7 @@ multilineExpressionsInsideRecord =
     }
 
 
-multilineIfCondition a =
+multilineIfCondition a b =
     if
         if a == Nothing then
             True
@@ -563,9 +571,9 @@ nestedMultilineRange =
     ]
 
 
-indentedMultilineInsideMultilineInfixApplication =
+indentedMultilineInsideMultilineInfixApplication div id =
     div [ id "page" ]
-        + { x = 1
+        @ { x = 1
           , y = 2
           }
         <| { x = 1
@@ -584,14 +592,33 @@ indentedMultilineInsideMultilineInfixApplication =
 
 port runner : Signal (Task.Task x ())
 port runner =
-    Console.run console
+    Signal.constant (Task.succeed ())
 
 
 infixl 4 |.
-(|.) : D3 a b -> D3 b c -> D3 a c
+(|.) : Data a b z -> Data b c z -> Data a b z
 (|.) =
-    chain
+    always
 
 
 infix 1 <>
+(<>) =
+    always
+
+
+infixr 8 <<>>
+(<<>>) =
+    always
+
+
 infixr 9 ==/==
+(==/==) =
+    always
+
+
+(***) =
+    always
+
+
+(@) =
+    always

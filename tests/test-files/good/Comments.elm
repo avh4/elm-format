@@ -50,7 +50,7 @@ comments3 =
         x
 
 
-comments4 =
+comments4 bool =
     case bool of
         -- This case is for True
         True ->
