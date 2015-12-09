@@ -14,8 +14,8 @@ data Declaration
     = Definition Expression.Def
     | Datatype String [String] [(String, [Type.Type])]
     | TypeAlias String [String] Type.Type
-    | PortAnnotation String Type.Type
-    | PortDefinition String Expression.Expr
+    | PortAnnotation (Commented String) [Comment] Type.Type
+    | PortDefinition (Commented String) [Comment] Expression.Expr
     | Fixity Assoc Int Var.Ref
     deriving (Eq, Show)
 

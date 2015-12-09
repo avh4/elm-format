@@ -116,7 +116,7 @@ isDeclaration decl =
                 AST.Declaration.TypeAlias _ _ _ ->
                     True
 
-                AST.Declaration.PortDefinition _ _ ->
+                AST.Declaration.PortDefinition _ _ _ ->
                     True
 
                 _ ->
@@ -391,13 +391,17 @@ formatDeclaration decl =
                             |> indent
                         ]
 
-                AST.Declaration.PortAnnotation name typ ->
-                    case isLine $ formatType typ of
-                        Right typ' ->
+                AST.Declaration.PortAnnotation name typeComments typ ->
+                    case
+                        ( isLine $ formatCommented' typeComments formatType typ
+                        , isLine $ formatCommented (line . identifier) name
+                        )
+                    of
+                        (Right typ', Right name') ->
                             line $ row
                                 [ keyword "port"
                                 , space
-                                , identifier name
+                                , name'
                                 , space
                                 , punc ":"
                                 , space
@@ -406,18 +410,22 @@ formatDeclaration decl =
                         _ ->
                             pleaseReport "TODO" "multiline type in port annotation"
 
-                AST.Declaration.PortDefinition name expr ->
-                    stack1
-                        [ line $ row
-                            [ keyword "port"
-                            , space
-                            , identifier name
-                            , space
-                            , punc "="
-                            ]
-                        , formatExpression expr
-                            |> indent
-                        ]
+                AST.Declaration.PortDefinition name bodyComments expr ->
+                    case isLine $ formatCommented (line . identifier) name of
+                        Right name' ->
+                            stack1
+                                [ line $ row
+                                    [ keyword "port"
+                                    , space
+                                    , name'
+                                    , space
+                                    , punc "="
+                                    ]
+                                , formatCommented' bodyComments formatExpression expr
+                                    |> indent
+                                ]
+                        _ ->
+                            pleaseReport "TODO" "multiline name in port definition"
 
                 AST.Declaration.Fixity assoc precedence name ->
                     case isLine $ (line $ formatInfixVar name) of
@@ -897,6 +905,11 @@ formatCommented format (Commented pre post inner) =
                 (map formatComment pre)
                 ++ [ format inner ]
                 ++ ( map formatComment post)
+
+
+formatCommented' :: [Comment] -> (a -> Box) -> a -> Box
+formatCommented' pre format inner =
+    formatCommented format (Commented pre [] inner)
 
 
 formatComment :: Comment -> Box
