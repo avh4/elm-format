@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
 ![experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
-![latest version: 0.1-alpha2](https://img.shields.io/badge/version-0.1--alpha2-blue.svg)
+[![latest version: 0.1-alpha2](https://img.shields.io/badge/version-0.1--alpha2-blue.svg)](https://github.com/avh4/elm-format/releases/tag/0.1-alpha2)
 
 # elm-format
 
