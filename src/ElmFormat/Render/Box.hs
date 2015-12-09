@@ -634,9 +634,9 @@ formatExpression aexpr =
 
         AST.Expression.Binops left ops multiline ->
             let
-                formatPair ( o, e ) =
-                    ( formatCommented (line . formatInfixVar) o
-                    , formatCommented formatExpression e
+                formatPair ( po, o, pe, e ) =
+                    ( formatCommented' po (line . formatInfixVar) o
+                    , formatCommented' pe formatExpression e
                     )
             in
                 formatBinary

@@ -117,17 +117,17 @@ tests =
         ]
 
     , testCase "binary operator" $
-        assertParse expr "7+8<<>>9" $ at 1 1 1 9 $ Binops (intExpr (1,1,1,2) 7) [(Commented [] [] $ OpRef "+", intExpr' (1,3,1,4) 8), (Commented [] [] $ OpRef "<<>>", intExpr' (1,8,1,9) 9)] False
+        assertParse expr "7+8<<>>9" $ at 1 1 1 9 $ Binops (intExpr (1,1,1,2) 7) [([], OpRef "+", [], intExpr (1,3,1,4) 8), ([], OpRef "<<>>", [], intExpr (1,8,1,9) 9)] False
     , testCase "binary operator (minus with no whitespace)" $
-        assertParse expr "9-1" $ at 1 1 1 4 $ Binops (intExpr (1,1,1,2) 9) [(Commented [] [] $ OpRef "-", intExpr' (1,3,1,4) 1)] False
+        assertParse expr "9-1" $ at 1 1 1 4 $ Binops (intExpr (1,1,1,2) 9) [([], OpRef "-", [], intExpr (1,3,1,4) 1)] False
     , testCase "binary operator (named function)" $
-        assertParse expr "7`plus`8`shift`9" $ at 1 1 1 17 $ Binops (intExpr (1,1,1,2) 7) [(Commented [] [] $ VarRef "plus", intExpr' (1,8,1,9) 8), (Commented [] [] $ VarRef "shift", intExpr' (1,16,1,17) 9)] False
+        assertParse expr "7`plus`8`shift`9" $ at 1 1 1 17 $ Binops (intExpr (1,1,1,2) 7) [([], VarRef "plus", [], intExpr (1,8,1,9) 8), ([], VarRef "shift", [], intExpr (1,16,1,17) 9)] False
     , testCase "binary operator (whitespace)" $
-        assertParse expr "7 + 8 <<>> 9" $ at 1 1 1 13 $ Binops (intExpr (1,1,1,2) 7) [(Commented [] [] $ OpRef "+", intExpr' (1,5,1,6) 8), (Commented [] [] $ OpRef "<<>>", intExpr' (1,12,1,13) 9)] False
+        assertParse expr "7 + 8 <<>> 9" $ at 1 1 1 13 $ Binops (intExpr (1,1,1,2) 7) [([], OpRef "+", [], intExpr (1,5,1,6) 8), ([], OpRef "<<>>", [], intExpr (1,12,1,13) 9)] False
     , testCase "binary operator (comments)" $
-        assertParse expr "7{-A-}+{-B-}8{-C-}<<>>{-D-}9" $ at 1 1 1 29 $ Binops (intExpr (1,1,1,2) 7) [(Commented [BlockComment ["A"]] [] $ OpRef "+", commentedIntExpr' (1,13,1,14) "B" 8), (Commented [BlockComment ["C"]] [] $ OpRef "<<>>", commentedIntExpr' (1,28,1,29) "D" 9)] False
+        assertParse expr "7{-A-}+{-B-}8{-C-}<<>>{-D-}9" $ at 1 1 1 29 $ Binops (intExpr (1,1,1,2) 7) [([BlockComment ["A"]], OpRef "+", [BlockComment ["B"]], intExpr (1,13,1,14) 8), ([BlockComment ["C"]], OpRef "<<>>", [BlockComment ["D"]], intExpr (1,28,1,29) 9)] False
     , testCase "binary operator (newlines)" $
-        assertParse expr "7\n +\n 8\n <<>>\n 9" $ at 1 1 5 3 $ Binops (intExpr (1,1,1,2) 7) [(Commented [] [] $ OpRef "+", intExpr' (3,2,3,3) 8), (Commented [] [] $ OpRef "<<>>", intExpr' (5,2,5,3) 9)] True
+        assertParse expr "7\n +\n 8\n <<>>\n 9" $ at 1 1 5 3 $ Binops (intExpr (1,1,1,2) 7) [([], OpRef "+", [], intExpr (3,2,3,3) 8), ([], OpRef "<<>>", [], intExpr (5,2,5,3) 9)] True
     , testGroup "binary operator (must be indented)" $
         [ testCase "(1)" $ assertFailure expr "7\n+\n 8\n <<>>\n 9"
         , testCase "(2)" $ assertFailure expr "7\n +\n8\n <<>>\n 9"

@@ -27,43 +27,42 @@ binops term last anyOp =
         [ commitIf (whitespace >> anyOp) $
             do  (_, preOpComments) <- whitespace
                 op <- anyOp
-                let op' = Commented preOpComments [] op
                 (_, preExpressionComments) <- whitespace
                 expr <- Left <$> try term <|> Right <$> last
                 case expr of
-                  Left t -> (:) (op',Commented preExpressionComments [] t) <$> nextOps
-                  Right e -> return [(op', Commented preExpressionComments [] e)]
+                  Left t -> (:) (preOpComments, op, preExpressionComments, t) <$> nextOps
+                  Right e -> return [(preOpComments, op, preExpressionComments, e)]
         , return []
         ]
 
 
 split
     :: E.Expr
-    -> [(Commented Var.Ref, Commented E.Expr)]
+    -> [([Comment], Var.Ref, [Comment], E.Expr)]
     -> Bool
     -> E.Expr
 split e0 [] _ = e0
 split e0 ops multiline =
     let
-        init :: A.Located (E.Expr,[(Commented Var.Ref, Commented E.Expr)])
+        init :: A.Located (E.Expr,[([Comment], Var.Ref, [Comment], E.Expr)])
         init = A.sameAs e0 (e0,[])
 
         merge'
-          :: (Commented Var.Ref, Commented E.Expr)
+          :: ([Comment], Var.Ref, [Comment], E.Expr)
           -> A.Located x
-          -> (E.Expr,[(Commented Var.Ref, Commented E.Expr)])
-          -> A.Located (E.Expr,[(Commented Var.Ref, Commented E.Expr)])
-        merge' (o,e) loc (e0,ops) =
-          A.merge ((\(Commented _ _ v) -> v) $ e) loc (e0,(o,e):ops)
+          -> (E.Expr,[([Comment], Var.Ref, [Comment], E.Expr)])
+          -> A.Located (E.Expr,[([Comment], Var.Ref, [Comment], E.Expr)])
+        merge' (po,o,pe,e) loc (e0,ops) =
+          A.merge e loc (e0,(po,o,pe,e):ops)
 
         merge
-          :: (Commented Var.Ref, Commented E.Expr)
-          -> A.Located (E.Expr,[(Commented Var.Ref, Commented E.Expr)])
-          -> A.Located (E.Expr,[(Commented Var.Ref, Commented E.Expr)])
-        merge (o,e) loc =
-          merge' (o,e) loc (A.drop loc)
+          :: ([Comment], Var.Ref, [Comment], E.Expr)
+          -> A.Located (E.Expr,[([Comment], Var.Ref, [Comment], E.Expr)])
+          -> A.Located (E.Expr,[([Comment], Var.Ref, [Comment], E.Expr)])
+        merge x loc =
+          merge' x loc (A.drop loc)
 
-        wrap :: (E.Expr,[(Commented Var.Ref, Commented E.Expr)]) -> E.Expr'
+        wrap :: (E.Expr,[([Comment], Var.Ref, [Comment], E.Expr)]) -> E.Expr'
         wrap (e',ops) = E.Binops e' ops multiline
     in
       A.map wrap $ List.foldr merge init ops
