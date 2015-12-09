@@ -141,6 +141,7 @@ checkWaysToRun Simple.elm
 
 checkGood Simple.elm
 checkGood AllSyntax.elm
+checkGood Comments.elm
 checkGood evancz/start-app/StartApp.elm
 checkGood TheSeamau5/elm-check/Check.elm
 checkGood rtfeldman/dreamwriter/Editor.elm
