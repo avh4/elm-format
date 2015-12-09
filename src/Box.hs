@@ -24,42 +24,22 @@ data Line
 
 identifier :: String -> Line
 identifier =
-    identifier' . T.pack
-
-
-identifier' :: T.Text -> Line
-identifier' =
-    Text
+    Text . T.pack
 
 
 keyword :: String -> Line
 keyword =
-    keyword' . T.pack
-
-
-keyword' :: T.Text -> Line
-keyword' =
-    Text
+    Text . T.pack
 
 
 punc :: String -> Line
 punc =
-    punc' . T.pack
-
-
-punc' :: T.Text -> Line
-punc' =
-    Text
+    Text . T.pack
 
 
 literal :: String -> Line
 literal =
-    literal' . T.pack
-
-
-literal' :: T.Text -> Line
-literal' =
-    Text
+    Text . T.pack
 
 
 -- join more Line elements into one
@@ -91,7 +71,6 @@ Sometimes (see `prefix`) the first line of Stack
 data Box
     = Stack Line [Line]
     | MustBreak Line
-    -- | Margin Int
 
 
 blankLine :: Box
