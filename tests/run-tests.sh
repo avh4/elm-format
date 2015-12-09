@@ -115,7 +115,7 @@ function checkGood() {
 
 	echo
 	echo "## good/$1"
-	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT" 1>/dev/null
+	time "$ELM_FORMAT" "$INPUT" --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 0
 	compareFiles "$INPUT" "$OUTPUT"
 }
@@ -127,7 +127,7 @@ function checkTransformation() {
 
 	echo
 	echo "## transform/$1"
-	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT" 1>/dev/null
+	time "$ELM_FORMAT" "$INPUT" --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 0
 	compareFiles "$EXPECTED" "$OUTPUT"
 }
