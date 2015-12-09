@@ -5,20 +5,19 @@ import Elm.Utils ((|>))
 
 import qualified AST.Module
 import qualified Box
-import qualified Data.Text.Lazy as LazyText
+import qualified Data.Text as Text
 import qualified ElmFormat.Render.Box as Render
 
 
-render :: AST.Module.Module -> LazyText.Text
+render :: AST.Module.Module -> Text.Text
 render modu =
     let
         trimSpaces text =
             text
-                |> LazyText.lines
-                |> map LazyText.stripEnd
-                |> LazyText.unlines
+                |> Text.lines
+                |> map Text.stripEnd
+                |> Text.unlines
     in
         Render.formatModule modu
             |> Box.render
-            |> LazyText.fromStrict
             |> trimSpaces

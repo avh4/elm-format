@@ -11,9 +11,9 @@ import Messages.Strings (renderMessage)
 import qualified AST.Module
 import qualified CommandLine.Helpers as Cmd
 import qualified Flags
-import qualified Data.ByteString.Lazy as ByteString
-import qualified Data.Text.Lazy as LazyText
-import qualified Data.Text.Lazy.Encoding as LazyText
+import qualified Data.ByteString as ByteString
+import qualified Data.Text as Text
+import qualified Data.Text.Encoding as Text
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.Filesystem as FS
@@ -33,14 +33,15 @@ showErrors errs = do
     mapM_ printError errs
 
 
-writeFile' :: FilePath -> LazyText.Text -> IO ()
+writeFile' :: FilePath -> Text.Text -> IO ()
 writeFile' filename contents =
-    ByteString.writeFile filename $ LazyText.encodeUtf8 contents
+    ByteString.writeFile filename $ Text.encodeUtf8 contents
 
 
+-- TODO: remove this: we shouldn't need to write a file on error
 writeEmptyFile :: FilePath -> IO ()
 writeEmptyFile filePath =
-    writeFile' filePath $ LazyText.pack ""
+    writeFile' filePath $ Text.empty
 
 
 formatResult
@@ -94,7 +95,7 @@ processFile :: FilePath -> FilePath -> IO ()
 processFile inputFile outputFile =
     do
         putStrLn $ (r $ ProcessingFile inputFile)
-        input <- fmap LazyText.decodeUtf8 $ ByteString.readFile inputFile
+        input <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
         Parse.parse input
             |> formatResult canWriteEmptyFileOnError outputFile
     where

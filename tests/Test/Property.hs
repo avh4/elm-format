@@ -12,7 +12,7 @@ import Test.QuickCheck
 import AST.Module (stripRegion)
 
 import qualified AST.Module
-import qualified Data.Text.Lazy as LazyText
+import qualified Data.Text as Text
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified Test.Generators
@@ -21,7 +21,7 @@ import qualified Test.Generators
 assertStringToString :: String -> Assertion
 assertStringToString source =
     let
-        source' = LazyText.pack source
+        source' = Text.pack source
 
         result =
             Parse.parse source'
@@ -44,14 +44,18 @@ astToAst ast =
 
 
 simpleAst =
-    case Parse.toEither $ Parse.parse $ LazyText.pack "module Main (..) where\n\n\nfoo =\n    8\n" of
+    case Parse.toEither $ Parse.parse $ Text.pack "module Main (..) where\n\n\nfoo =\n    8\n" of
         Right ast -> ast
 
 
 reportFailedAst ast =
     let
-        rendering = Render.render ast |> LazyText.unpack
-        result = Render.render ast |> Parse.parse |> fmap stripRegion |> show
+        rendering = Render.render ast |> Text.unpack
+        result =
+            Render.render ast
+                |> Parse.parse
+                |> fmap stripRegion
+                |> show
     in
         concat
             [ "=== Parsed as:\n"

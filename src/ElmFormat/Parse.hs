@@ -4,16 +4,16 @@ module ElmFormat.Parse where
 import Elm.Utils ((|>))
 
 import qualified AST.Module
-import qualified Data.Text.Lazy as LazyText
+import qualified Data.Text as Text
 import qualified Parse.Parse as Parse
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Result as Result
 import qualified Reporting.Annotation as RA
 
 
-parse :: LazyText.Text -> Result.Result () Syntax.Error AST.Module.Module
+parse :: Text.Text -> Result.Result () Syntax.Error AST.Module.Module
 parse input =
-    LazyText.unpack input
+    Text.unpack input
         |> Parse.parseSource
 
 
