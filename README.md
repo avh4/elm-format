@@ -1,9 +1,10 @@
 [![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
 ![experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
+![latest version: 0.1-alpha2](https://img.shields.io/badge/version-0.1--alpha2-blue.svg)
 
 # elm-format
 
-> `elm-format` is still in alpha.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues/new).
+> `elm-format` is still in alpha.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
 
 `elm-format` formats [Elm](http://elm-lang.org) source code according to a standard set of rules. It is inspired by the popular [gofmt](https://blog.golang.org/go-fmt-your-code).
 
@@ -63,9 +64,9 @@ autocmd BufWritePost *.elm silent execute "!elm-format --yes %" | edit! | set fi
             "cmd": ["/usr/local/bin/elm-format", "$file", "--yes"]
         }
 
-3. Save that file as elm-format.sublime-build
-4. Open a .elm file and go to Tools -> Build System -> elm-format
-5. Install the SublimeOnSaveBuild plugin
+3. Save that file as `elm-format.sublime-build`
+4. Open a `.elm` file and go to Tools -> Build System -> elm-format
+5. Install the [SublimeOnSaveBuild](https://packagecontrol.io/packages/SublimeOnSaveBuild) plugin
 6. Go to Preferences -> Package Preferences -> SublimeOnSaveBuild -> User
 7. Paste this in:
 
@@ -78,7 +79,7 @@ autocmd BufWritePost *.elm silent execute "!elm-format --yes %" | edit! | set fi
 
 	        "show_panel_on_build": false
 
-9. Make sure the elm-format binary is on your PATH
+9. Make sure the `elm-format` binary is on your `PATH`
 10. Profit!
 
 ## Development info
@@ -89,8 +90,8 @@ autocmd BufWritePost *.elm silent execute "!elm-format --yes %" | edit! | set fi
 git clone https://github.com/avh4/elm-format.git
 cd elm-format
 cabal sandbox init --sandbox=.cabal-sandbox
-cabal install -j
-.cabal-sandbox/bin/elm-format --help
+cabal build
+./dist/build/elm-format/elm-format --help
 ```
 
 ### Running tests
