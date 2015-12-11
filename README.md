@@ -39,6 +39,10 @@ If you can simplify or improve the installation instructions or add instructions
 
 #### Integration with [Atom](https://atom.io/)
 
+> [atom-beautify](https://atom.io/packages/atom-beautify) 0.28.20 (not yet released) will support `elm-format`.
+
+In the meantime:
+
 ```bash
 git clone https://github.com/avh4/atom-elm-format.git
 cd atom-elm-format
@@ -51,7 +55,7 @@ If you can help improve the the [atom-elm-format package](https://github.com/avh
 
 Use the [elm-light](https://github.com/rundis/elm-light) plugin.
 
-> If you can add more specific instructions for installing and configuring the elm-light pluging to work with `elm-format`, please [make a pull request](https://github.com/avh4/elm-format/edit/master/README.md).
+> If you can add more specific instructions for installing and configuring the elm-light plugin to work with `elm-format`, please [make a pull request](https://github.com/avh4/elm-format/edit/master/README.md).
 
 #### Integration with Vim
 
