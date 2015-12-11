@@ -60,10 +60,10 @@ infixDecl =
             , try (reserved "infixr") >> return AST.Declaration.R
             , try (reserved "infix")  >> return AST.Declaration.N
             ]
-      forcedWS -- TODO: use comments
+      digitComments <- forcedWS
       n <- digit
-      forcedWS -- TODO: use comments
-      AST.Declaration.Fixity assoc (read [n]) <$> anyOp
+      opComments <- forcedWS
+      AST.Declaration.Fixity assoc digitComments (read [n]) opComments <$> anyOp
 
 
 -- PORT

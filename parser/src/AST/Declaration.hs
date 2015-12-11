@@ -16,7 +16,7 @@ data Declaration
     | TypeAlias String [String] Type.Type
     | PortAnnotation (Commented String) [Comment] Type.Type
     | PortDefinition (Commented String) [Comment] Expression.Expr
-    | Fixity Assoc Int Var.Ref
+    | Fixity Assoc [Comment] Int [Comment] Var.Ref
     deriving (Eq, Show)
 
 

@@ -105,6 +105,11 @@ comments8 =
     ]
 
 
+infix {- A -} 7 {- B -} ===
+(===) =
+    always
+
+
 port {- A -} runner {- B -} : {- C -} Signal (Task.Task x ())
 port {- A -} runner {- B -} =
     -- C

@@ -427,21 +427,25 @@ formatDeclaration decl =
                         _ ->
                             pleaseReport "TODO" "multiline name in port definition"
 
-                AST.Declaration.Fixity assoc precedence name ->
-                    case isLine $ (line $ formatInfixVar name) of
-                        Right name' ->
+                AST.Declaration.Fixity assoc precedenceComments precedence nameComments name ->
+                    case
+                        ( isLine $ (formatCommented' nameComments (line . formatInfixVar) name)
+                        , isLine $ (formatCommented' precedenceComments (line . literal . show) precedence)
+                        )
+                    of
+                        (Right name', Right precedence') ->
                             line $ row
                                 [ case assoc of
                                       AST.Declaration.L -> keyword "infixl"
                                       AST.Declaration.R -> keyword "infixr"
                                       AST.Declaration.N -> keyword "infix"
                                 , space
-                                , literal $ show precedence
+                                , precedence'
                                 , space
                                 , name'
                                 ]
                         _ ->
-                            pleaseReport "INVALID INFIX DECLARATION" "multiline name"
+                            pleaseReport "TODO" "multiline fixity declaration"
 
 
 formatDefinition :: Bool -> AST.Expression.Def -> Box
