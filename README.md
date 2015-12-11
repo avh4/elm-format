@@ -47,6 +47,12 @@ apm install
 
 If you can help improve the the [atom-elm-format package](https://github.com/avh4/atom-elm-format), or make a better package please do so!
 
+#### Integration with [Light Table](http://lighttable.com/)
+
+Use the [elm-light](https://github.com/rundis/elm-light) plugin.
+
+> If you can add more specific instructions for installing and configuring the elm-light pluging to work with `elm-format`, please [make a pull request](https://github.com/avh4/elm-format/edit/master/README.md).
+
 #### Integration with Vim
 
 Add the following to your vim config:
