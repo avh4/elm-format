@@ -67,30 +67,18 @@ autocmd BufWritePost *.elm silent execute "!elm-format --yes %" | edit! | set fi
 
 #### Integration with Sublime Text
 
-1. Tools -> Build System -> New Build System...
-2. Paste this in:
+1. Go to Tools -> Build System -> New Build System... and enter the following:
 
-        {
-            "cmd": ["/usr/local/bin/elm-format", "$file", "--yes"]
-        }
+        { "cmd": ["/replace/this/with/your/path/to/elm-format", "$file", "--yes"] }
+       
+1. Save it as `elm-format.sublime-build`
+1. Install the [SublimeOnSaveBuild](https://packagecontrol.io/packages/SublimeOnSaveBuild) package
+1. Go to Preferences -> Package Settings -> SublimeOnSaveBuild -> User and enter this:
 
-3. Save that file as `elm-format.sublime-build`
-4. Open a `.elm` file and go to Tools -> Build System -> elm-format
-5. Install the [SublimeOnSaveBuild](https://packagecontrol.io/packages/SublimeOnSaveBuild) plugin
-6. Go to Preferences -> Package Preferences -> SublimeOnSaveBuild -> User
-7. Paste this in:
-
-        {
-            "filename_filter": "\\.(elm)$",
-            "build_on_save": 1
-        }
-
-8. Add this to your User preferences:
-
-	        "show_panel_on_build": false
-
-9. Make sure the `elm-format` binary is on your `PATH`
-10. Profit!
+        { "filename_filter": "\\.elm$", "build_on_save": 1 }
+        
+1. To prevent it from bringing up the panel every time you build, open Preferences -> Settings -> User and add this setting:
+`"show_panel_on_build": false`
 
 ## Development info
 
