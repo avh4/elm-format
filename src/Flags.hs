@@ -3,13 +3,15 @@ module Flags where
 
 import Data.Monoid ((<>))
 import Data.Version (showVersion)
+import Options.Applicative ((<|>))
+
 import qualified Options.Applicative as Opt
 import qualified Paths_elm_format as This
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
 
 
 data Config = Config
-    { _input :: [FilePath]
+    { _input :: Maybe [FilePath]
     , _output :: Maybe FilePath
     , _yes :: Bool
     }
@@ -19,14 +21,19 @@ data Config = Config
 parse :: IO Config
 parse =
     Opt.customExecParser preferences parser
-  where
-    preferences :: Opt.ParserPrefs
-    preferences =
-        Opt.prefs (mempty <> Opt.showHelpOnError)
 
-    parser :: Opt.ParserInfo Config
-    parser =
-        Opt.info (Opt.helper <*> flags) helpInfo
+preferences :: Opt.ParserPrefs
+preferences =
+    Opt.prefs (mempty <> Opt.showHelpOnError)
+
+parser :: Opt.ParserInfo Config
+parser =
+    Opt.info (Opt.helper <*> flags) helpInfo
+
+showHelpText :: IO ()
+showHelpText = Opt.handleParseResult . Opt.Failure $
+  Opt.parserFailure preferences parser Opt.ShowHelpText mempty
+
 
 
 -- COMMANDS
@@ -34,7 +41,7 @@ parse =
 flags :: Opt.Parser Config
 flags =
     Config
-      <$> Opt.some input
+      <$> someInput input stdin
       <*> output
       <*> yes
 
@@ -67,6 +74,30 @@ linesToDoc :: [String] -> PP.Doc
 linesToDoc lineList =
     PP.vcat (map PP.text lineList)
 
+-- joins the use of
+someInput
+    :: Opt.Mod Opt.ArgumentFields FilePath
+    -> Opt.Mod Opt.FlagFields Bool
+    -> Opt.Parser (Maybe [FilePath])
+someInput flags others =
+    Just <$> Opt.some argInput <|> stdinSwitch
+        where
+            -- if there's a switch value of true, then
+            -- return the stdin path
+            -- otherwise Nothing
+            stdinSwitch :: Opt.Parser (Maybe [FilePath])
+            stdinSwitch =
+                switchToMaybe <$> Opt.switch others
+
+            argInput :: Opt.Parser FilePath
+            argInput =
+                Opt.strArgument flags
+
+            switchToMaybe xs =
+                case xs of
+                    True -> Just ["-"]
+                    False -> Nothing
+
 
 yes :: Opt.Parser Bool
 yes =
@@ -75,7 +106,6 @@ yes =
         [ Opt.long "yes"
         , Opt.help "Reply 'yes' to all automated prompts."
         ]
-
 
 dependencies :: Opt.Parser Bool
 dependencies =
@@ -95,6 +125,13 @@ output =
         , Opt.help "Write output to FILE instead of overwriting the given source file."
         ]
 
-input :: Opt.Parser FilePath
+input :: Opt.Mod Opt.ArgumentFields FilePath
 input =
-    Opt.strArgument $ Opt.metavar "INPUT"
+    Opt.metavar "INPUT"
+
+stdin :: Opt.Mod Opt.FlagFields Bool
+stdin =
+    mconcat
+    [ Opt.long "stdin"
+    , Opt.help "Read from stdin, output to stdout."
+    ]
