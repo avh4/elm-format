@@ -79,7 +79,7 @@ someInput
     :: Opt.Mod Opt.ArgumentFields FilePath
     -> Opt.Mod Opt.FlagFields Bool
     -> Opt.Parser (Maybe [FilePath])
-someInput flags others =
+someInput argumentFields flagFields =
     Just <$> Opt.some argInput <|> stdinSwitch
         where
             -- if there's a switch value of true, then
@@ -87,11 +87,11 @@ someInput flags others =
             -- otherwise Nothing
             stdinSwitch :: Opt.Parser (Maybe [FilePath])
             stdinSwitch =
-                switchToMaybe <$> Opt.switch others
+                switchToMaybe <$> Opt.switch flagFields
 
             argInput :: Opt.Parser FilePath
             argInput =
-                Opt.strArgument flags
+                Opt.strArgument argumentFields
 
             switchToMaybe xs =
                 case xs of

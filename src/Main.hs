@@ -12,13 +12,13 @@ import qualified AST.Module
 import qualified CommandLine.Helpers as Cmd
 import qualified Flags
 import qualified Data.ByteString as ByteString
+import qualified Data.ByteString.Char8 as Char8
 import qualified Data.ByteString.Lazy as Lazy
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.Filesystem as FS
-import qualified Options.Applicative as Opt
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Report as Report
@@ -125,7 +125,7 @@ handleStdinInput outputFile = do
 
                 case outputFile of
                     Nothing ->
-                        ByteString.putStrLn rendered
+                        Char8.putStrLn rendered
 
                     Just path -> do
                         formatResult path parsedText
