@@ -28,12 +28,13 @@ writeFile' :: FilePath -> Text.Text -> IO ()
 writeFile' filename contents =
     ByteString.writeFile filename $ Text.encodeUtf8 contents
 
-
-formatResult
+-- If elm-format was successful, writes the results to the output
+-- file. Otherwise, display errors and exit
+writeResult
     :: FilePath
     -> Result.Result () Syntax.Error AST.Module.Module
     -> IO ()
-formatResult outputFile result =
+writeResult outputFile result =
     case result of
         Result.Result _ (Result.Ok modu) ->
             Render.render modu
@@ -50,7 +51,7 @@ processFile inputFile outputFile =
         putStrLn $ (r $ ProcessingFile inputFile)
         input <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
         Parse.parse input
-            |> formatResult outputFile
+            |> writeResult outputFile
 
 
 isEitherFileOrDirectory :: FilePath -> IO Bool
@@ -82,7 +83,7 @@ handleStdinInput outputFile = do
                         Char8.putStrLn rendered
 
                     Just path -> do
-                        formatResult path parsedText
+                        writeResult path parsedText
 
         Result.Result _ (Result.Err errs) ->
             do
