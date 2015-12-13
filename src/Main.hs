@@ -109,6 +109,10 @@ isEitherFileOrDirectory path = do
     dirExists <- Dir.doesDirectoryExist path
     return $ fileExists || dirExists
 
+isStdinInput :: FilePath -> Bool
+isStdinInput path =
+    path == "-"
+
 -- read input from stdin
 -- if given an output file, then write there
 -- otherwise, stdout
@@ -135,31 +139,9 @@ handleStdinInput outputFile = do
                 showErrors errs
                 exitFailure
 
-isStdinInput :: FilePath -> Bool
-isStdinInput path =
-    path == "-"
-
-main :: IO ()
-main =
+handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> IO ()
+handleFilesInput inputFiles outputFile autoYes =
     do
-        config <- Flags.parse
-        let maybeInputFiles = (Flags._input config)
-        let outputFile = (Flags._output config)
-        let autoYes = (Flags._yes config)
-
-        -- when we don't have any input, stdin or otherwise
-        when (not $ isJust maybeInputFiles) $ do
-            Flags.showHelpText
-            exitFailure
-
-        let inputFiles = fromJust maybeInputFiles
-        let isStdin = length inputFiles == 1 && (isStdinInput $ head inputFiles)
-
-        -- when we have just one file and it's stdin, handle it then exit
-        when (isStdin) $ do
-            handleStdinInput outputFile
-            exitSuccess
-
         filesExist <-
             all (id) <$> mapM isEitherFileOrDirectory inputFiles
 
@@ -182,3 +164,26 @@ main =
                 canOverwriteFiles <- getApproval autoYes elmFiles
                 when canOverwriteFiles $
                     mapM_ (\file -> processFile file file) elmFiles
+
+main :: IO ()
+main =
+    do
+        config <- Flags.parse
+        let maybeInputFiles = (Flags._input config)
+        let outputFile = (Flags._output config)
+        let autoYes = (Flags._yes config)
+
+        -- when we don't have any input, stdin or otherwise
+        when (not $ isJust maybeInputFiles) $ do
+            Flags.showHelpText
+            exitFailure
+
+        let inputFiles = fromJust maybeInputFiles
+        let isStdin = length inputFiles == 1 && (isStdinInput $ head inputFiles)
+
+        -- when we have just one file and it's stdin, handle it then exit
+        when (isStdin) $ do
+            handleStdinInput outputFile
+            exitSuccess
+
+        handleFilesInput inputFiles outputFile autoYes
