@@ -54,7 +54,7 @@ function checkWaysToRun() {
 
 	echo "## elm-format"
 	NOARGS=$("$ELM_FORMAT" 2>&1)
-	returnCodeShouldEqual 1
+	returnCodeShouldEqual 0
 	shouldOutputTheSame "$HELP" "$NOARGS"
 
 	echo "## elm-format INPUT (answer = y)"
