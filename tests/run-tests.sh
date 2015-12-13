@@ -82,6 +82,17 @@ function checkWaysToRun() {
 	returnCodeShouldEqual 0
 	compareFiles "$INPUT" "$OUTPUT" 1>/dev/null
 
+	echo "## cat INPUT | elm-format --stdin"
+	STDOUT=$(cat "$INPUT" | "$ELM_FORMAT" --stdin 2>&1)
+	echo $STDOUT
+	returnCodeShouldEqual 0
+	cat "$INPUT" | shouldOutputTheSame "$STDOUT"
+
+	echo "## cat INPUT | elm-format --stdin --output OUTPUT"
+	cat "$INPUT" | "$ELM_FORMAT" --stdin --output "$OUTPUT" 1>/dev/null
+	returnCodeShouldEqual 0
+	compareFiles "$INPUT" "$OUTPUT" 1>/dev/null
+
 	echo "## elm-format DIRECTORY --output OUTPUT"
 	"$ELM_FORMAT" "$DIRECTORY" --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 1
