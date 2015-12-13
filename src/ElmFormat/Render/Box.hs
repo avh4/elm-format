@@ -527,6 +527,13 @@ formatPattern parensRequired apattern =
                 ]
             |> if parensRequired then parens else id
 
+        AST.Pattern.Data (AST.Variable.VarRef ctor) [] ->
+            if any ((==) '.') ctor then
+                (line $ formatVar $ AST.Variable.VarRef ctor)
+                    |> if parensRequired then parens else id
+            else
+                line $ formatVar $ AST.Variable.VarRef ctor
+
         AST.Pattern.Data ctor [] ->
             line $ formatVar ctor
 

@@ -282,6 +282,27 @@ patternAlias ({ x, y } as r) ( a, { b } as r' ) =
     r.x == y
 
 
+patternWithQualifiedConstructorAsCosntructorArgument m =
+    case m of
+        Maybe.Just (Maybe.Nothing) ->
+            ()
+
+        Maybe.Just _ ->
+            ()
+
+        Maybe.Nothing ->
+            ()
+
+
+patternWithUnqualifiedConstructorAsCosntructorArgument m =
+    case m of
+        Maybe.Just Nothing ->
+            ()
+
+        _ ->
+            ()
+
+
 fnAsLambda =
     (\a -> a)
 
