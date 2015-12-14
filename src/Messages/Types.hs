@@ -10,5 +10,6 @@ data Message
 
   | FilesWillBeOverwritten [FilePath]
   | NoElmFilesFound [FilePath]
+  | TooManyInputSources
   | CantWriteToOutputBecauseInputIsDirectory
   | ProcessingFile FilePath

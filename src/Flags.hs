@@ -3,6 +3,8 @@ module Flags where
 
 import Data.Monoid ((<>))
 import Data.Version (showVersion)
+import Options.Applicative ((<|>))
+
 import qualified Options.Applicative as Opt
 import qualified Paths_elm_format as This
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
@@ -12,6 +14,7 @@ data Config = Config
     { _input :: [FilePath]
     , _output :: Maybe FilePath
     , _yes :: Bool
+    , _stdin :: Bool
     }
 
 -- PARSE ARGUMENTS
@@ -19,14 +22,19 @@ data Config = Config
 parse :: IO Config
 parse =
     Opt.customExecParser preferences parser
-  where
-    preferences :: Opt.ParserPrefs
-    preferences =
-        Opt.prefs (mempty <> Opt.showHelpOnError)
 
-    parser :: Opt.ParserInfo Config
-    parser =
-        Opt.info (Opt.helper <*> flags) helpInfo
+preferences :: Opt.ParserPrefs
+preferences =
+    Opt.prefs (mempty <> Opt.showHelpOnError)
+
+parser :: Opt.ParserInfo Config
+parser =
+    Opt.info (Opt.helper <*> flags) helpInfo
+
+showHelpText :: IO ()
+showHelpText = Opt.handleParseResult . Opt.Failure $
+  Opt.parserFailure preferences parser Opt.ShowHelpText mempty
+
 
 
 -- COMMANDS
@@ -34,9 +42,10 @@ parse =
 flags :: Opt.Parser Config
 flags =
     Config
-      <$> Opt.some input
+      <$> Opt.many input
       <*> output
       <*> yes
+      <*> stdin
 
 
 -- HELP
@@ -67,7 +76,6 @@ linesToDoc :: [String] -> PP.Doc
 linesToDoc lineList =
     PP.vcat (map PP.text lineList)
 
-
 yes :: Opt.Parser Bool
 yes =
     Opt.switch $
@@ -75,7 +83,6 @@ yes =
         [ Opt.long "yes"
         , Opt.help "Reply 'yes' to all automated prompts."
         ]
-
 
 dependencies :: Opt.Parser Bool
 dependencies =
@@ -98,3 +105,11 @@ output =
 input :: Opt.Parser FilePath
 input =
     Opt.strArgument $ Opt.metavar "INPUT"
+
+stdin :: Opt.Parser Bool
+stdin =
+    Opt.switch $
+        mconcat
+        [ Opt.long "stdin"
+        , Opt.help "Read from stdin, output to stdout."
+        ]

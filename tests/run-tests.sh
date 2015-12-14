@@ -54,7 +54,7 @@ function checkWaysToRun() {
 
 	echo "## elm-format"
 	NOARGS=$("$ELM_FORMAT" 2>&1)
-	returnCodeShouldEqual 1
+	returnCodeShouldEqual 0
 	shouldOutputTheSame "$HELP" "$NOARGS"
 
 	echo "## elm-format INPUT (answer = y)"
@@ -81,6 +81,24 @@ function checkWaysToRun() {
 	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 0
 	compareFiles "$INPUT" "$OUTPUT" 1>/dev/null
+
+	echo "## cat INPUT | elm-format --stdin"
+	STDOUT=$(cat "$INPUT" | "$ELM_FORMAT" --stdin 2>&1)
+	returnCodeShouldEqual 0
+	cat "$INPUT" | shouldOutputTheSame "$STDOUT" 1>/dev/null
+
+	echo "## cat INPUT | elm-format --stdin INPUT"
+	STDOUT=$(cat "$INPUT" | "$ELM_FORMAT" --stdin "$INPUT" 2>&1)
+	returnCodeShouldEqual 1
+
+	echo "## cat INPUT | elm-format --stdin --output OUTPUT"
+	cat "$INPUT" | "$ELM_FORMAT" --stdin --output "$OUTPUT" 1>/dev/null
+	returnCodeShouldEqual 0
+	compareFiles "$INPUT" "$OUTPUT" 1>/dev/null
+
+	echo "## cat INPUT | elm-format INPUT --stdin --output OUTPUT"
+	cat "$INPUT" | "$ELM_FORMAT" "$INPUT" --stdin --output "$OUTPUT" 1>/dev/null
+	returnCodeShouldEqual 1
 
 	echo "## elm-format DIRECTORY --output OUTPUT"
 	"$ELM_FORMAT" "$DIRECTORY" --output "$OUTPUT" 1>/dev/null
