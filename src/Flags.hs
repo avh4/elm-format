@@ -11,9 +11,10 @@ import qualified Text.PrettyPrint.ANSI.Leijen as PP
 
 
 data Config = Config
-    { _input :: Maybe [FilePath]
+    { _input :: [FilePath]
     , _output :: Maybe FilePath
     , _yes :: Bool
+    , _stdin :: Bool
     }
 
 -- PARSE ARGUMENTS
@@ -41,9 +42,10 @@ showHelpText = Opt.handleParseResult . Opt.Failure $
 flags :: Opt.Parser Config
 flags =
     Config
-      <$> someInput input stdin
+      <$> Opt.many input
       <*> output
       <*> yes
+      <*> stdin
 
 
 -- HELP
@@ -74,31 +76,6 @@ linesToDoc :: [String] -> PP.Doc
 linesToDoc lineList =
     PP.vcat (map PP.text lineList)
 
--- joins the use of
-someInput
-    :: Opt.Mod Opt.ArgumentFields FilePath
-    -> Opt.Mod Opt.FlagFields Bool
-    -> Opt.Parser (Maybe [FilePath])
-someInput argumentFields flagFields =
-    Just <$> Opt.some argInput <|> stdinSwitch
-        where
-            -- if there's a switch value of true, then
-            -- return the stdin path
-            -- otherwise Nothing
-            stdinSwitch :: Opt.Parser (Maybe [FilePath])
-            stdinSwitch =
-                switchToMaybe <$> Opt.switch flagFields
-
-            argInput :: Opt.Parser FilePath
-            argInput =
-                Opt.strArgument argumentFields
-
-            switchToMaybe xs =
-                case xs of
-                    True -> Just ["-"]
-                    False -> Nothing
-
-
 yes :: Opt.Parser Bool
 yes =
     Opt.switch $
@@ -125,13 +102,14 @@ output =
         , Opt.help "Write output to FILE instead of overwriting the given source file."
         ]
 
-input :: Opt.Mod Opt.ArgumentFields FilePath
+input :: Opt.Parser FilePath
 input =
-    Opt.metavar "INPUT"
+    Opt.strArgument $ Opt.metavar "INPUT"
 
-stdin :: Opt.Mod Opt.FlagFields Bool
+stdin :: Opt.Parser Bool
 stdin =
-    mconcat
-    [ Opt.long "stdin"
-    , Opt.help "Read from stdin, output to stdout."
-    ]
+    Opt.switch $
+        mconcat
+        [ Opt.long "stdin"
+        , Opt.help "Read from stdin, output to stdout."
+        ]

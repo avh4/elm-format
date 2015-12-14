@@ -40,3 +40,6 @@ renderMessage CantWriteToOutputBecauseInputIsDirectory =
 
 renderMessage (ProcessingFile file) =
     "Processing file " ++ file
+
+renderMessage TooManyInputSources =
+    "Too many input sources! Please only provide one of either INPUT or --stdin"

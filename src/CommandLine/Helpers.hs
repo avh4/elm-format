@@ -51,6 +51,12 @@ exitFilesNotFound filePaths = do
     exitFailure
 
 
+exitTooManyInputSources :: IO ()
+exitTooManyInputSources = do
+    putStrLn $ (r $ TooManyInputSources)
+    exitFailure
+
+
 exitOnInputDirAndOutput :: IO ()
 exitOnInputDirAndOutput = do
     putStrLn $ r CantWriteToOutputBecauseInputIsDirectory

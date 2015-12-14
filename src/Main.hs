@@ -5,7 +5,7 @@ import Elm.Utils ((|>))
 import System.Exit (exitFailure, exitSuccess)
 import Messages.Types (Message(..))
 import Control.Monad (when)
-import Data.Maybe (isJust, fromJust)
+import Data.Maybe (isJust, fromJust, isNothing)
 import CommandLine.Helpers
 
 
@@ -59,10 +59,6 @@ isEitherFileOrDirectory path = do
     fileExists <- Dir.doesFileExist path
     dirExists <- Dir.doesDirectoryExist path
     return $ fileExists || dirExists
-
-isStdinInput :: FilePath -> Bool
-isStdinInput path =
-    path == "-"
 
 -- read input from stdin
 -- if given an output file, then write there
@@ -120,19 +116,22 @@ main :: IO ()
 main =
     do
         config <- Flags.parse
-        let maybeInputFiles = (Flags._input config)
+        let inputFiles = (Flags._input config)
+        let isStdin = (Flags._stdin config)
         let outputFile = (Flags._output config)
         let autoYes = (Flags._yes config)
 
+        let noInputSource = null inputFiles && not isStdin
+        let twoInputSources = (not $ null inputFiles) && isStdin
+
         -- when we don't have any input, stdin or otherwise
-        when (not $ isJust maybeInputFiles) $ do
+        when (noInputSource) $ do
             Flags.showHelpText
             exitFailure
 
-        let inputFiles = fromJust maybeInputFiles
-        let isStdin = length inputFiles == 1 && (isStdinInput $ head inputFiles)
+        when (twoInputSources) $ do
+            exitTooManyInputSources
 
-        -- when we have just one file and it's stdin, handle it then exit
         when (isStdin) $ do
             handleStdinInput outputFile
             exitSuccess
