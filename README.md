@@ -15,10 +15,36 @@ The benefits of `elm-format`:
  - It **saves your team time** debating how to format things, because there is a standard tool that formats everything the same way.
 
 
-## Basic Usage
+## Usage
+
+#### Format a file, saving to the same file after prompting to check if it's okay
 
 ```bash
 elm-format Main.elm
+```
+
+#### Format a file, saving to the same file
+
+```bash
+elm-format Main.elm --yes
+```
+
+#### Format all files in a directory
+
+```bash
+elm-format src/
+```
+
+#### Format input from stdin and write to stdout
+
+```bash
+elm-format --stdin
+```
+
+#### Format input from stdin and write to file
+
+```bash
+elm-format --stdin --output Main.elm
 ```
 
 ## Installation (0.1-alpha2)
