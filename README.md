@@ -72,8 +72,10 @@ In the meantime:
 ```bash
 git clone https://github.com/avh4/atom-elm-format.git
 cd atom-elm-format
-apm install
+apm link
 ```
+
+Then in the Atom menu, View -> Reload.
 
 If you can help improve the the [atom-elm-format package](https://github.com/avh4/atom-elm-format), or make a better package please do so!
 
