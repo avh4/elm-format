@@ -17,34 +17,13 @@ The benefits of `elm-format`:
 
 ## Usage
 
-#### Format a file, saving to the same file after prompting to check if it's okay
-
 ```bash
-elm-format Main.elm
-```
-
-#### Format a file, saving to the same file
-
-```bash
-elm-format Main.elm --yes
-```
-
-#### Format all files in a directory
-
-```bash
-elm-format src/
-```
-
-#### Format input from stdin and write to stdout
-
-```bash
-elm-format --stdin
-```
-
-#### Format input from stdin and write to file
-
-```bash
-elm-format --stdin --output Main.elm
+elm-format Main.elm  # Format a single file
+elm-format Main.elm --yes  # Overwrite the file without prompting
+elm-format src/  # Format all *.elm files in a directory
+elm-format --stdin  # Format input from stdin and write to stdout
+elm-format --stdin --output Main.elm  # Format input from stdin and write to file
+elm-format --help  # See other command line options
 ```
 
 ## Installation (0.1-alpha2)
@@ -65,19 +44,15 @@ If you can simplify or improve the installation instructions or add instructions
 
 #### Integration with [Atom](https://atom.io/)
 
-> [atom-beautify](https://atom.io/packages/atom-beautify) 0.28.20 (not yet released) will support `elm-format`.
-
-In the meantime:
+[atom-beautify](https://atom.io/packages/atom-beautify) 0.28.20 (not yet released) will support `elm-format`.  In the meantime, you can install the development version:
 
 ```bash
-git clone https://github.com/avh4/atom-elm-format.git
-cd atom-elm-format
+git clone https://github.com/Glavin001/atom-beautify.git
+cd atom-beautify
 apm link
 ```
 
 Then in the Atom menu, View -> Reload.
-
-If you can help improve the the [atom-elm-format package](https://github.com/avh4/atom-elm-format), or make a better package please do so!
 
 #### Integration with [Light Table](http://lighttable.com/)
 
@@ -95,18 +70,12 @@ autocmd BufWritePost *.elm silent execute "!elm-format --yes %" | edit! | set fi
 
 #### Integration with Sublime Text
 
-1. Go to Tools -> Build System -> New Build System... and enter the following:
+Use the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language%20Support) package.
 
-        { "cmd": ["/replace/this/with/your/path/to/elm-format", "$file", "--yes"] }
-       
-1. Save it as `elm-format.sublime-build`
+1. Make sure elm-format is in your PATH
+1. Run the “Elm Language Support: Run elm-format” command from the Command Palette to run elm-format on the current file
 1. Install the [SublimeOnSaveBuild](https://packagecontrol.io/packages/SublimeOnSaveBuild) package
-1. Go to Preferences -> Package Settings -> SublimeOnSaveBuild -> User and enter this:
-
-        { "filename_filter": "\\.elm$", "build_on_save": 1 }
-        
-1. To prevent it from bringing up the panel every time you build, open Preferences -> Settings -> User and add this setting:
-`"show_panel_on_build": false`
+1. To enable automatic formatting on every save, Go to Preferences -> Package Settings -> SublimeOnSaveBuild -> User and add this setting: `"elm_format_on_save": true`
 
 ## Development info
 
