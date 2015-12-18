@@ -147,6 +147,26 @@ isLine b =
             Left b
 
 
+isLine' :: Either Box Line -> Either Box Line -> Either (Box, Box) (Line, Either Box Line)
+isLine' primary secondary =
+    case (primary, secondary ) of
+        (Right primary', Right secondary') ->
+            Right (primary', Right secondary')
+        (Right primary', Left secondary') ->
+            Right (primary', Left secondary')
+        (Left primary', Right secondary') ->
+            Left (primary', line secondary')
+        (Left primary', Left secondary') ->
+            Left (primary', secondary')
+
+
+force :: Bool -> Either Box Line -> Either Box Line
+force b e =
+    case (b, e) of
+        (True, Right l) -> Left $ line l
+        _ -> e
+
+
 -- TODO: replace with isLine?
 destructure :: Box -> (Line, [Line])
 destructure b =
