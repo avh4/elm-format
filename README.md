@@ -42,6 +42,8 @@ If you need PGP signatures, see the [release page](https://github.com/avh4/elm-f
 
 If you can simplify or improve the installation instructions or add instructions for another editor, please [make a pull request](https://github.com/avh4/elm-format/edit/master/README.md).
 
+<!-- Open-source editors will be listed before closed-source editors. -->
+
 #### Integration with [Atom](https://atom.io/)
 
 [atom-beautify](https://atom.io/packages/atom-beautify) 0.28.20 (not yet released) will support `elm-format`.  In the meantime, you can install the development version:
@@ -68,6 +70,10 @@ Add the following to your vim config:
 autocmd BufWritePost *.elm silent execute "!elm-format --yes %" | edit! | set filetype=elm
 ```
 
+#### Integration with Emacs
+
+Use [elm-mode](https://github.com/jcollard/elm-mode#elm-format).
+
 #### Integration with Sublime Text
 
 Use the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language%20Support) package.
@@ -76,9 +82,6 @@ Use the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language
 1. Run the “Elm Language Support: Run elm-format” command from the Command Palette to run elm-format on the current file
 1. To enable automatic formatting on every save, Go to Preferences -> Package Settings -> Elm Language Support -> User and add this setting: `"elm_format_on_save": true`
 
-#### Integration with Emacs
-
-Use [elm-mode](https://github.com/jcollard/elm-mode#elm-format).
 
 ## Development info
 
