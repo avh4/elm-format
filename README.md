@@ -20,31 +20,11 @@ The benefits of `elm-format`:
 #### Format a file, saving to the same file after prompting to check if it's okay
 
 ```bash
-elm-format Main.elm
-```
-
-#### Format a file, saving to the same file
-
-```bash
-elm-format Main.elm --yes
-```
-
-#### Format all files in a directory
-
-```bash
-elm-format src/
-```
-
-#### Format input from stdin and write to stdout
-
-```bash
-elm-format --stdin
-```
-
-#### Format input from stdin and write to file
-
-```bash
-elm-format --stdin --output Main.elm
+elm-format Main.elm  # Format a single file
+elm-format Main.elm --yes  # Overwrite the file without prompting
+elm-format src/  # Format all *.elm files in a directory
+elm-format --stdin  # Format input from stdin and write to stdout
+elm-format --stdin --output Main.elm  # Format input from stdin and write to file
 ```
 
 ## Installation (0.1-alpha2)
