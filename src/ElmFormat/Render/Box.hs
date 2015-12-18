@@ -3,6 +3,7 @@ module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
 import Box
+import Data.Version (showVersion)
 
 import AST.V0_15
 import qualified AST.Declaration
@@ -15,6 +16,7 @@ import qualified AST.Type
 import qualified AST.Variable
 import qualified Data.Char as Char
 import qualified Data.List as List
+import qualified Paths_elm_format as This
 import qualified Reporting.Annotation as RA
 import Text.Printf (printf)
 import Util.List
@@ -22,7 +24,7 @@ import Util.List
 
 pleaseReport' :: String -> String -> Line
 pleaseReport' what details =
-    keyword $ "<" ++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
+    keyword $ "<elm-format-" ++ (showVersion This.version) ++ ": "++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
 
 
 pleaseReport :: String -> String -> Box
