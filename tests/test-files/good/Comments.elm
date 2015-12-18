@@ -38,6 +38,16 @@ comments2 =
             3
 
 
+records =
+    { -- before a field
+      f1 = ()
+    , f2
+      -- after a field
+        = ()
+    , f3 = ()
+    }
+
+
 comments3 =
     let
         -- The return value

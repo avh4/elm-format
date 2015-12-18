@@ -207,17 +207,17 @@ tests =
     , testCase "record (empty, comments)" $
         assertParse expr "{{-A-}}" $ at 1 1 1 8 $ EmptyRecord [BlockComment ["A"]]
     , testCase "record" $
-        assertParse expr "{x=7,y=8}" $ at 1 1 1 10 $ Record [(Commented [] [] "x", intExpr' (1,4,1,5) 7, False), (Commented [] [] "y", intExpr' (1,8,1,9) 8, False)] False
+        assertParse expr "{x=7,y=8}" $ at 1 1 1 10 $ Record [([], "x", [], intExpr' (1,4,1,5) 7, False), ([], "y", [], intExpr' (1,8,1,9) 8, False)] False
     , testCase "record (single field)" $
-        assertParse expr "{x=7}" $ at 1 1 1 6 $ Record [(Commented [] [] "x", intExpr' (1,4,1,5) 7, False)] False
+        assertParse expr "{x=7}" $ at 1 1 1 6 $ Record [([], "x", [], intExpr' (1,4,1,5) 7, False)] False
     , testCase "record (whitespace)" $
-        assertParse expr "{ x = 7 , y = 8 }" $ at 1 1 1 18 $ Record [(Commented [] [] "x", intExpr' (1,7,1,8) 7, False), (Commented [] [] "y", intExpr' (1,15,1,16) 8, False)] False
+        assertParse expr "{ x = 7 , y = 8 }" $ at 1 1 1 18 $ Record [([], "x", [], intExpr' (1,7,1,8) 7, False), ([], "y", [], intExpr' (1,15,1,16) 8, False)] False
     , testCase "record (comments)" $
-        assertParse expr "{{-A-}x{-B-}={-C-}7{-D-},{-E-}y{-F-}={-G-}8{-H-}}" $ at 1 1 1 50 $ Record [( Commented [BlockComment ["A"]] [BlockComment ["B"]] "x", commentedIntExpr (1,19,1,20) "C" "D" 7, False), (Commented [BlockComment ["E"]] [BlockComment ["F"]] "y", commentedIntExpr (1,43,1,44) "G" "H" 8, False)] False
+        assertParse expr "{{-A-}x{-B-}={-C-}7{-D-},{-E-}y{-F-}={-G-}8{-H-}}" $ at 1 1 1 50 $ Record [([BlockComment ["A"]], "x", [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False), ([BlockComment ["E"]], "y", [BlockComment ["F"]], commentedIntExpr (1,43,1,44) "G" "H" 8, False)] False
     , testCase "record (single field, comments)" $
-        assertParse expr "{{-A-}x{-B-}={-C-}7{-D-}}" $ at 1 1 1 26 $ Record [( Commented [BlockComment ["A"]] [BlockComment ["B"]] "x", commentedIntExpr (1,19,1,20) "C" "D" 7, False)] False
+        assertParse expr "{{-A-}x{-B-}={-C-}7{-D-}}" $ at 1 1 1 26 $ Record [([BlockComment ["A"]], "x", [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False)] False
     , testCase "record (newlines)" $
-        assertParse expr "{\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 9 3 $ Record [(Commented [] [] "x", intExpr' (4,2,4,3) 7, True), (Commented [] [] "y", intExpr' (8,2,8,3) 8, True)] True
+        assertParse expr "{\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 9 3 $ Record [([], "x", [], intExpr' (4,2,4,3) 7, True), ([], "y", [], intExpr' (8,2,8,3) 8, True)] True
     , testGroup "record (must be indented)"
         [ testCase "(1)" $ assertFailure expr "{\nx\n =\n 7\n ,\n y\n =\n 8\n }"
         , testCase "(2)" $ assertFailure expr "{\n x\n=\n 7\n ,\n y\n =\n 8\n }"
@@ -230,15 +230,15 @@ tests =
         ]
 
     , testCase "record update" $
-        assertParse expr "{a|x=7,y=8}" $ at 1 1 1 12 $ RecordUpdate (Commented [] [] $ at 1 2 1 3 $ Var $ VarRef "a") [(Commented [] [] "x", intExpr' (1,6,1,7) 7, False), (Commented [] [] "y", intExpr' (1,10,1,11) 8, False)] False
+        assertParse expr "{a|x=7,y=8}" $ at 1 1 1 12 $ RecordUpdate (Commented [] [] $ at 1 2 1 3 $ Var $ VarRef "a") [([], "x", [], intExpr' (1,6,1,7) 7, False), ([], "y", [], intExpr' (1,10,1,11) 8, False)] False
     , testCase "record update (single field)" $
-        assertParse expr "{a|x=7}" $ at 1 1 1 8 $ RecordUpdate (Commented [] [] $ at 1 2 1 3 $ Var $ VarRef "a") [(Commented [] [] "x", intExpr' (1,6,1,7) 7, False)] False
+        assertParse expr "{a|x=7}" $ at 1 1 1 8 $ RecordUpdate (Commented [] [] $ at 1 2 1 3 $ Var $ VarRef "a") [([], "x", [], intExpr' (1,6,1,7) 7, False)] False
     , testCase "record update (whitespace)" $
-        assertParse expr "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 $ RecordUpdate (Commented [] [] $ at 1 3 1 4 $ Var $ VarRef "a") [(Commented [] [] "x", intExpr' (1,11,1,12) 7, False), (Commented [] [] "y", intExpr' (1,19,1,20) 8, False)] False
+        assertParse expr "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 $ RecordUpdate (Commented [] [] $ at 1 3 1 4 $ Var $ VarRef "a") [([], "x", [], intExpr' (1,11,1,12) 7, False), ([], "y", [], intExpr' (1,19,1,20) 8, False)] False
     , testCase "record update (comments)" $
-        assertParse expr "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}" $ at 1 1 1 62 $ RecordUpdate (Commented [BlockComment ["A"]] [BlockComment ["B"]] $ at 1 7 1 8 $ Var $ VarRef "a") [(Commented [BlockComment ["C"]] [BlockComment ["D"]] "x", commentedIntExpr (1,31,1,32) "E" "F" 7, False), (Commented [BlockComment ["G"]] [BlockComment ["H"]] "y", commentedIntExpr (1,55,1,56) "I" "J" 8, False)] False
+        assertParse expr "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}" $ at 1 1 1 62 $ RecordUpdate (Commented [BlockComment ["A"]] [BlockComment ["B"]] $ at 1 7 1 8 $ Var $ VarRef "a") [([BlockComment ["C"]], "x", [BlockComment ["D"]], commentedIntExpr (1,31,1,32) "E" "F" 7, False), ([BlockComment ["G"]], "y", [BlockComment ["H"]], commentedIntExpr (1,55,1,56) "I" "J" 8, False)] False
     , testCase "record update (newlines)" $
-        assertParse expr "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 $ RecordUpdate (Commented [] [] $ at 2 2 2 3 $ Var $ VarRef "a") [(Commented [] [] "x", intExpr' (6,2,6,3) 7, True), (Commented [] [] "y", intExpr' (10,2,10,3) 8, True)] True
+        assertParse expr "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 $ RecordUpdate (Commented [] [] $ at 2 2 2 3 $ Var $ VarRef "a") [([], "x", [], intExpr' (6,2,6,3) 7, True), ([], "y", [], intExpr' (10,2,10,3) 8, True)] True
     , testCase "record update (only allows simple base)" $
         assertFailure expr "{9|x=7}"
     , testCase "record update (only allows simple base)" $

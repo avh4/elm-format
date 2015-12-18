@@ -579,11 +579,11 @@ addSuffix suffix b =
                 |> andThen [ line $ row [ last ls, suffix ] ]
 
 
-formatRecordPair :: (Commented String, Commented AST.Expression.Expr, Bool) -> Box
-formatRecordPair (k,v,multiline') =
+formatRecordPair :: ([Comment], String, [Comment], Commented AST.Expression.Expr, Bool) -> Box
+formatRecordPair (pre, k, postK, v, multiline') =
     case
         isLine'
-            (isLine $ formatCommented (line . identifier) k)
+            (isLine $ formatCommented (line . identifier) $ Commented [] postK k)
             (force multiline' $ isLine $ formatCommented formatExpression v)
     of
         Right (k', Right v') ->
@@ -600,7 +600,11 @@ formatRecordPair (k,v,multiline') =
                 , indent v'
                 ]
         Left (k', v') ->
-            pleaseReport "TODO" "multiline record field"
+            stack1
+                [ k'
+                , indent $ prefix (row [punc "=", space]) v'
+                ]
+    |> Commented pre [] |> formatCommented id
 
 
 formatExpression :: AST.Expression.Expr -> Box
