@@ -65,19 +65,15 @@ If you can simplify or improve the installation instructions or add instructions
 
 #### Integration with [Atom](https://atom.io/)
 
-> [atom-beautify](https://atom.io/packages/atom-beautify) 0.28.20 (not yet released) will support `elm-format`.
-
-In the meantime:
+[atom-beautify](https://atom.io/packages/atom-beautify) 0.28.20 (not yet released) will support `elm-format`.  In the meantime, you can install the development version:
 
 ```bash
-git clone https://github.com/avh4/atom-elm-format.git
-cd atom-elm-format
+git clone https://github.com/Glavin001/atom-beautify.git
+cd atom-beautify
 apm link
 ```
 
 Then in the Atom menu, View -> Reload.
-
-If you can help improve the the [atom-elm-format package](https://github.com/avh4/atom-elm-format), or make a better package please do so!
 
 #### Integration with [Light Table](http://lighttable.com/)
 
