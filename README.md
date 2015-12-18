@@ -23,6 +23,7 @@ elm-format Main.elm --yes  # Overwrite the file without prompting
 elm-format src/  # Format all *.elm files in a directory
 elm-format --stdin  # Format input from stdin and write to stdout
 elm-format --stdin --output Main.elm  # Format input from stdin and write to file
+elm-format --help  # See other command line options
 ```
 
 ## Installation (0.1-alpha2)
