@@ -17,8 +17,6 @@ The benefits of `elm-format`:
 
 ## Usage
 
-#### Format a file, saving to the same file after prompting to check if it's okay
-
 ```bash
 elm-format Main.elm  # Format a single file
 elm-format Main.elm --yes  # Overwrite the file without prompting
