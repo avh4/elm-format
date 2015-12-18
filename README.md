@@ -95,18 +95,12 @@ autocmd BufWritePost *.elm silent execute "!elm-format --yes %" | edit! | set fi
 
 #### Integration with Sublime Text
 
-1. Go to Tools -> Build System -> New Build System... and enter the following:
+Use the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language%20Support) package.
 
-        { "cmd": ["/replace/this/with/your/path/to/elm-format", "$file", "--yes"] }
-       
-1. Save it as `elm-format.sublime-build`
+1. Make sure elm-format is in your PATH
+1. Run the “Elm Language Support: Run elm-format” command from the Command Palette to run elm-format on the current file
 1. Install the [SublimeOnSaveBuild](https://packagecontrol.io/packages/SublimeOnSaveBuild) package
-1. Go to Preferences -> Package Settings -> SublimeOnSaveBuild -> User and enter this:
-
-        { "filename_filter": "\\.elm$", "build_on_save": 1 }
-        
-1. To prevent it from bringing up the panel every time you build, open Preferences -> Settings -> User and add this setting:
-`"show_panel_on_build": false`
+1. To enable automatic formatting on every save, Go to Preferences -> Package Settings -> SublimeOnSaveBuild -> User and add this setting: `"elm_format_on_save": true`
 
 ## Development info
 
