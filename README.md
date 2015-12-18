@@ -74,8 +74,7 @@ Use the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language
 
 1. Make sure elm-format is in your PATH
 1. Run the “Elm Language Support: Run elm-format” command from the Command Palette to run elm-format on the current file
-1. Install the [SublimeOnSaveBuild](https://packagecontrol.io/packages/SublimeOnSaveBuild) package
-1. To enable automatic formatting on every save, Go to Preferences -> Package Settings -> SublimeOnSaveBuild -> User and add this setting: `"elm_format_on_save": true`
+1. To enable automatic formatting on every save, Go to Preferences -> Package Settings -> Elm Language Support -> User and add this setting: `"elm_format_on_save": true`
 
 ## Development info
 
