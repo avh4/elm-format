@@ -21,7 +21,7 @@ type Def =
 
 
 data Def'
-    = Definition Pattern.Pattern [Pattern.Pattern] [Comment] Expr Bool
+    = Definition Pattern.Pattern [([Comment], Pattern.Pattern)] [Comment] Expr Bool
     | TypeAnnotation Var.Ref Type.Type
     | LetComment Comment
     deriving (Eq, Show)
@@ -36,7 +36,7 @@ stripRegion' :: Def' -> Def'
 stripRegion' d =
     case d of
         Definition p ps c e b ->
-            Definition (A.stripRegion p) (map A.stripRegion ps) c (A.stripRegion e) b
+            Definition (A.stripRegion p) (map (\(a,b') -> (a,A.stripRegion b')) ps) c (A.stripRegion e) b
         _ ->
             d
 
@@ -53,7 +53,7 @@ data Expr'
     | Binops Expr [([Comment], Var.Ref, [Comment], Expr)] Bool
     | Unary UnaryOperator Expr
     | Lambda [([Comment], Pattern.Pattern)] [Comment] Expr Bool
-    | App Expr [Commented Expr] Bool -- will only have pre comments
+    | App Expr [([Comment], Expr)] Bool
     | If [(Expr, Bool, [Comment], Expr)] [Comment] Expr
     | Let [Def] [Comment] Expr
     | Case (Expr,Bool) [([Comment], Pattern.Pattern, [Comment], Expr)]

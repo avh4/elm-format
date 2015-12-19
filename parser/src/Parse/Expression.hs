@@ -177,7 +177,7 @@ appExpr =
             [] -> t
             _  ->
                 A.sameAs
-                    (List.foldl' (\f (Commented _ _ t) -> A.merge f t ()) (A.sameAs t ()) ts) -- TODO: simplify this code to merge the region annotations
+                    (List.foldl' (\f (_,t) -> A.merge f t ()) (A.sameAs t ()) ts) -- TODO: simplify this code to merge the region annotations
                     (E.App t ts sawNewline)
 
 
@@ -231,7 +231,7 @@ lambdaExpr =
   addLocation $
   do  pushNewlineContext
       char '\\' <|> char '\x03BB' <?> "an anonymous function"
-      args <- map (\(Commented pre _ v) -> (pre, v)) <$> spacePrefix Pattern.term -- TODO: spacePrefix should return ([Comment], a) instead of (Commented a)
+      args <- spacePrefix Pattern.term
       (preArrowComments, _, bodyComments) <- padded rightArrow
       body <- expr
       multiline <- popNewlineContext
@@ -308,14 +308,14 @@ definition =
   addLocation $
   withPos $
     do  pushNewlineContext
-        (name:args) <- defStart
-        (_, _, postEqualsComments) <- padded equals -- TODO: use pre comments
+        (name, args) <- defStart
+        (preEqualsComments, _, postEqualsComments) <- padded equals
         body <- expr
         sawNewline <- popNewlineContext
-        return $ E.Definition name args postEqualsComments body sawNewline
+        return $ E.Definition name args (preEqualsComments ++ postEqualsComments) body sawNewline
 
 
-defStart :: IParser [P.Pattern]
+defStart :: IParser (P.Pattern, [([Comment], P.Pattern)])
 defStart =
     choice
       [ do  pattern <- try Pattern.term
@@ -328,12 +328,12 @@ defStart =
     func pattern =
         case pattern of
           A.A _ (P.Var _) ->
-              (pattern:) <$> map (\(Commented _ _ v) -> v) <$> spacePrefix Pattern.term -- TODO: use comments
+              ((,) pattern) <$> spacePrefix Pattern.term
 
           _ ->
-              return [pattern]
+              return (pattern, [])
 
     infics p1 =
       do  (start, op, end) <- try (whitespace >> located anyOp) -- TODO: use comments
           p2 <- (whitespace >> Pattern.term) -- TODO: use comments
-          return [ A.at start end (P.Var op), p1, p2 ]
+          return (A.at start end (P.Var op), [([], p1), ([], p2) ])

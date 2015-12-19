@@ -458,7 +458,7 @@ formatDefinition compact adef =
                 ( compact
                 , multiline
                 , isLine $ formatPattern True name
-                , allSingles $ map (formatPattern True) args
+                , allSingles $ map (\(x,y) -> formatCommented' x (formatPattern True) y) args
                 , comments
                 , isLine $ formatExpression expr
                 )
@@ -698,7 +698,7 @@ formatExpression aexpr =
             case
                 ( multiline
                 , isLine $ formatExpression left
-                , allSingles $ map (formatCommented formatExpression) args
+                , allSingles $ map (\(x,y) -> formatCommented' x formatExpression y) args
                 )
             of
                 (False, Right left', Right args') ->
@@ -706,7 +706,7 @@ formatExpression aexpr =
                       $ List.intersperse space $ (left':args')
                 _ ->
                     formatExpression left
-                        |> andThen (map (indent . formatCommented formatExpression) args)
+                        |> andThen (map (\(x,y) -> indent $ formatCommented' x formatExpression y) args)
 
         AST.Expression.If [] _ els ->
             stack1
@@ -933,7 +933,7 @@ formatComment comment =
         BlockComment c ->
             case c of
                 [] ->
-                    error "Unexpected empty list of comments -- please report this at https://github.com/avh4/elm-format/issues"
+                    line $ punc "{- -}"
                 (l:[]) ->
                     line $ row
                         [ punc "{-"

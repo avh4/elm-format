@@ -78,7 +78,7 @@ app :: IParser Type.Type
 app =
   do  start <- getMyPosition
       f <- constructor0 <|> try tupleCtor <?> "a type constructor"
-      args <- map (\(Commented _ _ v) -> v) <$> spacePrefix term -- TODO: use comments
+      args <- map (\(_,v) -> v) <$> spacePrefix term -- TODO: use comments
       end <- getMyPosition
       case args of
         [] -> return f
@@ -112,4 +112,4 @@ expr =
 constructor :: IParser (String, [Type.Type])
 constructor =
   (,) <$> (capTypeVar <?> "another type constructor")
-      <*> (map (\(Commented _ _ v) -> v) <$> spacePrefix term) -- TODO: use comments
+      <*> (map (\(_,v) -> v) <$> spacePrefix term) -- TODO: use comments

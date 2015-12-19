@@ -208,26 +208,26 @@ dotSep1 p =
   (:) <$> p <*> many (try (char '.') >> p)
 
 
-spacePrefix :: IParser a -> IParser [Commented a]
+spacePrefix :: IParser a -> IParser [([Comment], a)]
 spacePrefix p =
   constrainedSpacePrefix' p (\_ -> return ())
 
 
-constrainedSpacePrefix :: IParser a -> IParser [Commented a]
+constrainedSpacePrefix :: IParser a -> IParser [([Comment], a)]
 constrainedSpacePrefix parser =
   constrainedSpacePrefix' parser constraint
   where
     constraint empty = if empty then notFollowedBy (char '-') else return ()
 
 
-constrainedSpacePrefix' :: IParser a -> (Bool -> IParser b) -> IParser [Commented a]
+constrainedSpacePrefix' :: IParser a -> (Bool -> IParser b) -> IParser [([Comment], a)]
 constrainedSpacePrefix' parser constraint =
     many $ choice
       [ comment <$> try (const <$> spacing <*> lookAhead (oneOf "[({")) <*> parser
       , try (comment <$> spacing <*> parser)
       ]
     where
-      comment pre value = Commented pre [] value
+      comment pre value = (pre, value)
 
       spacing = do
         (n, comments) <- whitespace

@@ -115,6 +115,12 @@ comments8 =
     ]
 
 
+expressionDefinition {- F -} _ {- G -} _ =
+    {- H -}
+    {- I -}
+    ()
+
+
 infix {- A -} 7 {- B -} ===
 (===) =
     always

@@ -28,10 +28,17 @@ commentedIntExpr' (a,b,c,d) preComment i =
     Commented [BlockComment [preComment]] [] $ at a b c d  $ Literal $ IntNum i
 
 
+commentedIntExpr'' (a,b,c,d) preComment i =
+    (,) [BlockComment [preComment]] $ at a b c d  $ Literal $ IntNum i
+
+
 intExpr (a,b,c,d) i = at a b c d $ Literal $ IntNum i
 
 intExpr' (a,b,c,d) i =
     Commented [] [] $ at a b c d  $ Literal $ IntNum i
+
+intExpr'' (a,b,c,d) i =
+    (,) [] $ at a b c d  $ Literal $ IntNum i
 
 
 tests :: Test
@@ -257,15 +264,15 @@ tests =
         ]
 
     , testCase "function application" $
-        assertParse expr "f 7 8" $ at 1 1 1 6 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr' (1,3,1,4) 7, intExpr' (1,5,1,6) 8] False
+        assertParse expr "f 7 8" $ at 1 1 1 6 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr'' (1,3,1,4) 7, intExpr'' (1,5,1,6) 8] False
     , testCase "function application (argument starts with minus)" $
-        assertParse expr "f -9 -x" $ at 1 1 1 8 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr' (1,3,1,5) (-9), Commented [] [] $ at 1 6 1 8 $ Unary Negative $ at 1 7 1 8 $ Var $ VarRef "x"] False
+        assertParse expr "f -9 -x" $ at 1 1 1 8 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr'' (1,3,1,5) (-9), (,) [] $ at 1 6 1 8 $ Unary Negative $ at 1 7 1 8 $ Var $ VarRef "x"] False
     , testCase "function application (comments)" $
-        assertParse expr "f{-A-}7{-B-}8" $ at 1 1 1 14 $ App (at 1 1 1 2 $ Var $ VarRef "f") [commentedIntExpr' (1,7,1,8) "A" 7, commentedIntExpr' (1,13,1,14) "B" 8] False
+        assertParse expr "f{-A-}7{-B-}8" $ at 1 1 1 14 $ App (at 1 1 1 2 $ Var $ VarRef "f") [commentedIntExpr'' (1,7,1,8) "A" 7, commentedIntExpr'' (1,13,1,14) "B" 8] False
     , testCase "function application (newlines)" $
-        assertParse expr "f\n 7\n 8" $ at 1 1 3 3 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr' (2,2,2,3) 7, intExpr' (3,2,3,3) 8] True
+        assertParse expr "f\n 7\n 8" $ at 1 1 3 3 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr'' (2,2,2,3) 7, intExpr'' (3,2,3,3) 8] True
     , testCase "function application (newlines, comments)" $
-        assertParse expr "f\n {-A-}7\n {-B-}8" $ at 1 1 3 8 $ App (at 1 1 1 2 $ Var $ VarRef "f") [commentedIntExpr' (2,7,2,8) "A" 7, commentedIntExpr' (3,7,3,8) "B" 8] True
+        assertParse expr "f\n {-A-}7\n {-B-}8" $ at 1 1 3 8 $ App (at 1 1 1 2 $ Var $ VarRef "f") [commentedIntExpr'' (2,7,2,8) "A" 7, commentedIntExpr'' (3,7,3,8) "B" 8] True
     , testGroup "function application (must be indented)"
         [ testCase "(1)" $ assertFailure expr "f\n7\n 8"
         , testCase "(2)" $ assertFailure expr "f\n 7\n8"
@@ -297,8 +304,8 @@ tests =
 
     , testGroup "definition"
         [ testCase "" $ assertParse definition "x=1" $ at 1 1 1 4 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [] (intExpr (1,3,1,4) 1) False
-        , testCase "comments" $ assertParse definition "x{-A-}={-B-}1" $ at 1 1 1 14 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [BlockComment ["B"]] (intExpr (1,13,1,14) 1) False
-        , testCase "line comments" $ assertParse definition "x =\n    --X\n    1" $ at 1 1 3 6 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [LineComment "X"] (intExpr (3,5,3,6) 1) True
+        , testCase "comments" $ assertParse definition "x{-A-}={-B-}1" $ at 1 1 1 14 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [BlockComment ["A"], BlockComment ["B"]] (intExpr (1,13,1,14) 1) False
+        , testCase "line comments" $ assertParse definition "x\n--Y\n =\n    --X\n    1" $ at 1 1 5 6 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [LineComment "Y", LineComment "X"] (intExpr (5,5,5,6) 1) True
 
         ]
     ]

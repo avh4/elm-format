@@ -101,7 +101,7 @@ patternConstructor =
         case v of
           "True"  -> return $ P.Literal (L.Boolean True)
           "False" -> return $ P.Literal (L.Boolean False)
-          _       -> P.Data (Var.VarRef v) <$> map (\(Commented _ _ v) -> v) <$> spacePrefix term -- TODO: use comments
+          _       -> P.Data (Var.VarRef v) <$> map (\(_,v) -> v) <$> spacePrefix term -- TODO: use comments
 
 
 expr :: IParser P.Pattern
