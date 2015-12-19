@@ -14,14 +14,14 @@ data Located a =
 
 
 instance (Show a) => Show (Located a) where
-    show (A r a) =
-        String.unwords
+    showsPrec p (A r a) = showParen (p > 10) $
+        showString $ String.unwords
             [ "at"
             , show (R.line $ R.start r)
             , show (R.column $ R.start r)
             , show (R.line $ R.end r)
             , show (R.column $ R.end r)
-            , show a
+            , showsPrec 99 a ""
             ]
 
 

@@ -13,13 +13,13 @@ type Pattern =
 
 
 data Pattern'
-    = Data Var.Ref [Pattern]
+    = Anything
+    | Literal L.Literal
+    | Var Var.Ref
+    | Data Var.Ref [Pattern]
     | Tuple [Pattern]
     | Record [String]
     | Alias String Pattern
-    | Var Var.Ref
-    | Anything
-    | Literal L.Literal
     deriving (Eq, Show)
 
 
