@@ -16,59 +16,65 @@ import Reporting.Region
 import Parse.TestHelpers
 
 
+pending = at 0 0 0 0 $ IntNum 0
+
+
+example name input expected =
+    testCase name $
+        assertParse literal input expected
+
+
 tests :: Test
 tests =
     testGroup "Parse.Literal"
-    [ testCase "Int" $
-        assertParse literal "99" $ IntNum 99
-    , testCase "Int (negative)" $
-        assertParse literal "-99" $ IntNum (-99)
-    , testCase "Int (hexadecimal)" $
-        assertParse literal "0xfF" $ IntNum 255
-    , testCase "Int (hexadecimal, must start with 0)" $
-        assertFailure literal "xFF"
-    , testCase "Int (hexadecimal, must contain digits)" $
-        assertFailure literal "0x"
+    [ testGroup "Int"
+        [ example "" "99" $ IntNum 99
+        , example "negative" "-99" $ IntNum (-99)
+        , example "hexadecimal" "0xfF" $ IntNum 255
+        , testCase "hexadecimal must start with 0" $
+            assertFailure literal "xFF"
+        , testCase "hexadecimal, must contain digits" $
+            assertFailure literal "0x"
+        ]
 
-    , testCase "Float" $
-        assertParse literal "0.1" $ FloatNum 0.1
-    , testCase "Float (negative)" $
-        assertParse literal "-0.1" $ FloatNum (-0.1)
-    , testCase "Float (exponent)" $
-        assertParse literal "9e3" $ FloatNum 9000.0
-    , testCase "Float (positive exponent)" $
-        assertParse literal "9e+3" $ FloatNum 9000.0
-    , testCase "Float (negative exponent)" $
-        assertParse literal "9e-3" $ FloatNum 0.009
-    , testCase "Float (capital exponent)" $
-        assertParse literal "9E3" $ FloatNum 9000.0
-    , testCase "Float (exponent, must have exponent digits)" $
-        assertFailure literal "9E"
-    , testCase "Float (exponent, must have digits)" $
-        assertFailure literal "e3"
-    , testCase "Float (exponent and decimal)" $
-        assertParse literal "9.1e3" $ FloatNum 9100.0
-    , testCase "Float (exponent and decimal, must have decimal digits)" $
-        assertFailure literal "9.e3"
-    , testCase "Float (must have digits)" $
-        assertFailure literal "."
-    , testCase "Float (must start with a digit)" $
-        assertFailure literal ".1"
-    , testCase "Float (decimal, must have decimal digits)" $
-        assertFailure literal "99."
+    , testGroup "Float"
+        [ example "" "0.1" $ FloatNum 0.1
+        , example "negative" "-0.1" $ FloatNum (-0.1)
+        , example "exponent" "9e3" $ FloatNum 9000.0
+        , example "positive exponent" "9e+3" $ FloatNum 9000.0
+        , example "negative exponent" "9e-3" $ FloatNum 0.009
+        , example "capital exponent" "9E3" $ FloatNum 9000.0
+        , testCase "exponent must have exponent digits" $
+            assertFailure literal "9E"
+        , testCase "exponent must have digits" $
+            assertFailure literal "e3"
+        , example "exponent and decimal" "9.1e3" $ FloatNum 9100.0
+        , testCase "exponent and decimal, must have decimal digits" $
+            assertFailure literal "9.e3"
+        , testCase "must have digits" $
+            assertFailure literal "."
+        , testCase "must start with a digit" $
+            assertFailure literal ".1"
+        , testCase "decimal, must have decimal digits" $
+            assertFailure literal "99."
+        ]
 
-    , testCase "String" $
-        assertParse literal "\"hello\"" $ Str "hello" False
-    , testCase "String (empty)" $
-        assertParse literal "\"\"" $ Str "" False
+    , testGroup "String"
+        [ example "" "\"hello\"" $ Str "hello" False
+        , example "empty" "\"\"" $ Str "" False
+        , example "escaped double quote" "\"\\\"\"" $ Str "\"" False
+        ]
 
-    , testCase "String (multiline)" $
-        assertParse literal "\"\"\"hello\n\"\n\"\"\"" $ Str "hello\n\"\n" True
+    , testGroup "multiline String"
+        [ example "" "\"\"\"hello\n\"\n\"\"\"" $ Str "hello\n\"\n" True
+        ]
 
-    , testCase "Char" $
-        assertParse literal "\'a\'" $ Chr 'a'
-    , testCase "Char (must have one character)" $
-        assertFailure literal "\'\'"
-    , testCase "Char (must have only one character)" $
-        assertFailure literal "\'ab\'"
+    , testGroup "Char"
+        [ example "" "\'a\'" $ Chr 'a'
+        , example "escaped single quote" "\'\\\'\'" $ Chr '\''
+        , testCase "Char (must have one character)" $
+            assertFailure literal "\'\'"
+        , testCase "Char (must have only one character)" $
+            assertFailure literal "\'ab\'"
+        ]
     ]
