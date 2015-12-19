@@ -299,6 +299,15 @@ patternWithUnqualifiedConstructorAsCosntructorArgument m =
         Maybe.Just Nothing ->
             ()
 
+        (Just _) as x ->
+            ()
+
+        Nothing as x ->
+            ()
+
+        ((Maybe.Nothing) as y) as x ->
+            ()
+
         _ ->
             ()
 
