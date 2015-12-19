@@ -334,6 +334,6 @@ defStart =
               return (pattern, [])
 
     infics p1 =
-      do  (start, op, end) <- try (whitespace >> located anyOp) -- TODO: use comments
-          p2 <- (whitespace >> Pattern.term) -- TODO: use comments
-          return (A.at start end (P.Var op), [([], p1), ([], p2) ])
+      do  (c1, (start, op, end)) <- try ((,) <$> (snd <$> whitespace) <*> located anyOp)
+          p2 <- (,) <$> (snd <$> whitespace) <*> Pattern.term
+          return (A.at start end (P.Var op), [(c1, p1), p2 ])
