@@ -7,13 +7,9 @@ import qualified Reporting.Region as R
 
 -- ANNOTATION
 
-data Annotated annotation a
-    = A annotation a
+data Located a =
+    A R.Region a
     deriving (Show, Eq)
-
-
-type Located a =
-    Annotated R.Region a
 
 
 -- CREATE
@@ -33,30 +29,30 @@ merge (A region1 _) (A region2 _) value =
     A (R.merge region1 region2) value
 
 
-sameAs :: Annotated info a -> b -> Annotated info b
+sameAs :: Located a -> b -> Located b
 sameAs (A annotation _) value =
     A annotation value
 
 
 -- MANIPULATE
 
-map :: (a -> b) -> Annotated info a -> Annotated info b
+map :: (a -> b) -> Located a -> Located b
 map f (A annotation value) =
     A annotation (f value)
 
 
-drop :: Annotated info a -> a
+drop :: Located a -> a
 drop (A _ value) =
     value
 
 
-stripRegion :: Annotated R.Region a -> Annotated R.Region a
+stripRegion :: Located a -> Located a
 stripRegion (A _ value) =
     A (R.Region (R.Position 0 0) (R.Position 0 0)) value
 
 
 -- PRETTY PRINT
 
-instance (P.Pretty a) => P.Pretty (Annotated info a) where
+instance (P.Pretty a) => P.Pretty (Located a) where
   pretty dealiaser parens (A _ value) =
       P.pretty dealiaser parens value

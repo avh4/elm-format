@@ -64,7 +64,7 @@ instance Arbitrary Reporting.Region.Region where
         return $ Reporting.Region.Region nowhere nowhere
 
 
-instance (Arbitrary ann, Arbitrary a) => Arbitrary (Reporting.Annotation.Annotated ann a) where
+instance (Arbitrary a) => Arbitrary (Reporting.Annotation.Located a) where
     arbitrary =
         do
             ann <- arbitrary
