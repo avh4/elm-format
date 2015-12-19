@@ -6,6 +6,7 @@ import qualified Test.Property
 import qualified BoxTest
 import qualified Parse.ExpressionTest
 import qualified Parse.LiteralTest
+import qualified Parse.PatternTest
 import qualified Util.ListTest
 
 
@@ -16,5 +17,6 @@ main =
     , BoxTest.tests
     , Parse.ExpressionTest.tests
     , Parse.LiteralTest.tests
+    , Parse.PatternTest.tests
     , Util.ListTest.tests
     ]

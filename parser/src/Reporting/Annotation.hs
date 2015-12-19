@@ -3,13 +3,26 @@ module Reporting.Annotation where
 import Prelude hiding (map)
 import qualified Reporting.PrettyPrint as P
 import qualified Reporting.Region as R
+import qualified Data.String as String
 
 
 -- ANNOTATION
 
 data Located a =
     A R.Region a
-    deriving (Show, Eq)
+    deriving (Eq)
+
+
+instance (Show a) => Show (Located a) where
+    show (A r a) =
+        String.unwords
+            [ "at"
+            , show (R.line $ R.start r)
+            , show (R.column $ R.start r)
+            , show (R.line $ R.end r)
+            , show (R.column $ R.end r)
+            , show a
+            ]
 
 
 -- CREATE
