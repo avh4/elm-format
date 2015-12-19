@@ -519,6 +519,15 @@ formatDefinition compact adef =
 formatPattern :: Bool -> AST.Pattern.Pattern -> Box
 formatPattern parensRequired apattern =
     case RA.drop apattern of
+        AST.Pattern.Anything ->
+            line $ keyword "_"
+
+        AST.Pattern.Literal lit ->
+            formatLiteral lit
+
+        AST.Pattern.Var var ->
+            line $ formatVar var
+
         AST.Pattern.Data (AST.Variable.OpRef symbol) (left:right:[]) ->
             formatBinary
                 False
@@ -547,8 +556,13 @@ formatPattern parensRequired apattern =
 
         AST.Pattern.Tuple patterns ->
             elmGroup True "(" "," ")" False $ map (formatPattern False) patterns
+
+        AST.Pattern.List patterns ->
+            elmGroup True "[" "," "]" False $ map (formatPattern False) patterns
+
         AST.Pattern.Record fields ->
             elmGroup True "{" "," "}" False $ map (line . identifier) fields
+
         AST.Pattern.Alias name pattern ->
             case isLine $ formatPattern True pattern of
                 Right pattern' ->
@@ -562,12 +576,6 @@ formatPattern parensRequired apattern =
                 _ ->
                     pleaseReport "TODO" "multiline pattern alias"
             |> (if parensRequired then parens else id)
-        AST.Pattern.Var var ->
-            line $ formatVar var
-        AST.Pattern.Anything ->
-            line $ keyword "_"
-        AST.Pattern.Literal lit ->
-            formatLiteral lit
 
 
 addSuffix :: Line -> Box -> Box

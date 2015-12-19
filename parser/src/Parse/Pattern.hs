@@ -78,14 +78,14 @@ tuple =
             return pattern
 
         _ ->
-            return (A.at start end (P.tuple patterns))
+            return (A.at start end (P.Tuple patterns))
 
 
 list :: IParser P.Pattern
 list =
   braces $
-    do  (_, patterns, end) <- located (commaSep (const . const <$> expr)) -- TODO: use comments
-        return $ \_ _ _ -> P.list end (patterns [] []) -- TODO: use comments
+    do  (start, patterns, end) <- located (commaSep (const . const <$> expr)) -- TODO: use comments
+        return $ \_ _ _ -> A.at start end $ P.List (patterns [] []) -- TODO: use comments
 
 
 term :: IParser P.Pattern

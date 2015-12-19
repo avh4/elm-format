@@ -18,19 +18,10 @@ data Pattern'
     | Var Var.Ref
     | Data Var.Ref [Pattern]
     | Tuple [Pattern]
+    | List [Pattern]
     | Record [String]
     | Alias String Pattern
     deriving (Eq, Show)
-
-
-list :: R.Position -> [Pattern] -> Pattern
-list end patterns =
-  case patterns of
-    [] ->
-        A.at end end (Data (Var.VarRef "[]") [])
-
-    pattern@(A.A (R.Region start _) _) : rest ->
-        A.at start end (Data (Var.OpRef "::") [pattern, list end rest])
 
 
 consMany :: R.Position -> [Pattern] -> Pattern
@@ -39,8 +30,3 @@ consMany end patterns =
           A.at start end (Data (Var.OpRef "::") [hd, tl])
   in
       foldr1 cons patterns
-
-
-tuple :: [Pattern] -> Pattern'
-tuple patterns =
-  Tuple patterns
