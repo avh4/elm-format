@@ -46,26 +46,32 @@ type Expr =
 
 
 data Expr'
-    = Literal Literal.Literal
+    = Unit [Comment]
+    | Literal Literal.Literal
     | Var Var.Ref
-    | Range (Commented Expr) (Commented Expr) Bool
-    | ExplicitList [Commented Expr] Bool
-    | Binops Expr [([Comment], Var.Ref, [Comment], Expr)] Bool
-    | Unary UnaryOperator Expr
-    | Lambda [([Comment], Pattern.Pattern)] [Comment] Expr Bool
+
     | App Expr [([Comment], Expr)] Bool
+    | Unary UnaryOperator Expr
+    | Binops Expr [([Comment], Var.Ref, [Comment], Expr)] Bool
+    | Parens (Commented Expr)
+
+    | ExplicitList [Commented Expr] Bool
+    | Range (Commented Expr) (Commented Expr) Bool
+
+    | Tuple [Commented Expr] Bool
+    | TupleFunction Int -- will be 2 (,) or greater, indicating the size of the tuple
+
+    | EmptyRecord [Comment]
+    | Record [([Comment], String, [Comment], Commented Expr, Bool)] Bool
+    | RecordUpdate (Commented Expr) [([Comment], String, [Comment], Commented Expr, Bool)] Bool
+    | Access Expr String
+    | AccessFunction String
+
+    | Lambda [([Comment], Pattern.Pattern)] [Comment] Expr Bool
     | If [(Expr, Bool, [Comment], Expr)] [Comment] Expr
     | Let [Def] [Comment] Expr
     | Case (Expr,Bool) [([Comment], Pattern.Pattern, [Comment], Expr)]
-    | Tuple [Commented Expr] Bool
-    | TupleFunction Int -- will be 2 (,) or greater, indicating the size of the tuple
-    | Access Expr String
-    | AccessFunction String
-    | RecordUpdate (Commented Expr) [([Comment], String, [Comment], Commented Expr, Bool)] Bool
-    | Record [([Comment], String, [Comment], Commented Expr, Bool)] Bool
-    | EmptyRecord [Comment]
-    | Parens (Commented Expr)
-    | Unit [Comment]
+
     -- for type checking and code gen only
     | GLShader String String Literal.GLShaderTipe
     deriving (Eq, Show)
