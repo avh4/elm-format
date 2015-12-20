@@ -7,7 +7,7 @@ import qualified AST.Declaration
 import qualified Parse.Expression as Expr
 import Parse.Helpers as Help
 import qualified Parse.Type as Type
-import AST.V0_15
+import AST.V0_16
 
 
 declaration :: IParser AST.Declaration.Decl

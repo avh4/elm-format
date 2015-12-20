@@ -12,9 +12,8 @@ import qualified Parse.Pattern as Pattern
 import qualified Parse.State as State
 import qualified Parse.Type as Type
 
-import AST.V0_15
+import AST.V0_16
 import qualified AST.Expression as E
-import qualified AST.Literal as L
 import qualified AST.Pattern as P
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
@@ -29,8 +28,8 @@ varTerm =
 
 boolean :: IParser E.Expr'
 boolean =
-  let t = const (L.Boolean True) <$> string "True"
-      f = const (L.Boolean False) <$> string "False"
+  let t = const (Boolean True) <$> string "True"
+      f = const (Boolean False) <$> string "False"
   in
     E.Literal <$> try (t <|> f)
 

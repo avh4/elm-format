@@ -1,34 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
-module AST.Literal where
+module AST.GLShader where
 
 import qualified Data.Map as Map
-import qualified Text.PrettyPrint as P
-
-import qualified Reporting.PrettyPrint as P
-
-
-data Literal
-    = IntNum Int
-    | FloatNum Double
-    | Chr Char
-    | Str String Bool
-    | Boolean Bool
-    deriving (Eq, Ord, Show)
-
-
-instance P.Pretty Literal where
-  pretty _ _ literal =
-      P.text (toString literal)
-
-
-toString :: Literal -> String
-toString literal =
-    case literal of
-      IntNum n -> show n
-      FloatNum n -> show n
-      Chr c -> show c
-      Str s _ -> show s
-      Boolean bool -> show bool
 
 
 data GLTipe

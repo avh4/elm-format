@@ -2,11 +2,11 @@
 
 module AST.Expression where
 
-import AST.V0_15
-import qualified AST.Literal as Literal
+import AST.V0_16
 import qualified AST.Pattern as Pattern
 import qualified AST.Type as Type
 import qualified AST.Variable as Var
+import qualified AST.GLShader as L
 import qualified Reporting.Annotation as A
 
 
@@ -47,7 +47,7 @@ type Expr =
 
 data Expr'
     = Unit [Comment]
-    | Literal Literal.Literal
+    | Literal Literal
     | Var Var.Ref
 
     | App Expr [([Comment], Expr)] Bool
@@ -73,5 +73,5 @@ data Expr'
     | Case (Expr,Bool) [([Comment], Pattern.Pattern, [Comment], Expr)]
 
     -- for type checking and code gen only
-    | GLShader String String Literal.GLShaderTipe
+    | GLShader String String L.GLShaderTipe
     deriving (Eq, Show)

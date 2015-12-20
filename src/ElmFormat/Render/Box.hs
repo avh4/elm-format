@@ -5,10 +5,9 @@ import Elm.Utils ((|>))
 import Box
 import Data.Version (showVersion)
 
-import AST.V0_15
+import AST.V0_16
 import qualified AST.Declaration
 import qualified AST.Expression
-import qualified AST.Literal as L
 import qualified AST.Module
 import qualified AST.Module.Name as MN
 import qualified AST.Pattern
@@ -964,20 +963,20 @@ formatComment comment =
             mustBreak $ row [ punc "--", literal c ]
 
 
-formatLiteral :: L.Literal -> Box
+formatLiteral :: Literal -> Box
 formatLiteral lit =
     case lit of
-        L.IntNum i ->
+        IntNum i ->
             line $ literal $ show i
-        L.FloatNum f ->
+        FloatNum f ->
             line $ literal $ show f
-        L.Chr c ->
+        Chr c ->
             formatString SChar [c]
-        L.Str s multi ->
+        Str s multi ->
             formatString (if multi then SMulti else SString) s
-        L.Boolean True ->
+        Boolean True ->
             line $ literal "True"
-        L.Boolean False ->
+        Boolean False ->
             line $ literal "False" -- TODO: not tested
 
 

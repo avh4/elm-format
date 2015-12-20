@@ -13,11 +13,11 @@ import Text.Parsec hiding (newline, spaces, State)
 import Text.Parsec.Indent (indented, runIndent)
 import qualified Text.Parsec.Token as T
 
-import AST.V0_15
+import AST.V0_16
 import qualified AST.Expression
 import qualified AST.Helpers as Help
-import qualified AST.Literal as L
 import qualified AST.Variable
+import qualified AST.GLShader as L
 import qualified Parse.State as State
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax

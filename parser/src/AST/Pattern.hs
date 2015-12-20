@@ -1,8 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 module AST.Pattern where
 
-import AST.V0_15
-import qualified AST.Literal as L
+import AST.V0_16
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
 import qualified Reporting.Region as R
@@ -14,7 +13,7 @@ type Pattern =
 
 data Pattern'
     = Anything
-    | Literal L.Literal
+    | Literal Literal
     | Var Var.Ref
     | Data Var.Ref [Pattern]
     | Tuple [Pattern]

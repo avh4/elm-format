@@ -3,7 +3,7 @@ module Parse.Binop (binops) where
 import qualified Data.List as List
 import Text.Parsec ((<|>), choice, try)
 
-import AST.V0_15
+import AST.V0_16
 import qualified AST.Expression as E
 import qualified AST.Variable as Var
 import Parse.Helpers (IParser, commitIf, whitespace, popNewlineContext, pushNewlineContext, located)

@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 module AST.Declaration where
 
-import AST.V0_15
+import AST.V0_16
 import qualified AST.Expression as Expression
 import qualified AST.Type as Type
 import qualified AST.Variable as Var

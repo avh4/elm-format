@@ -9,9 +9,8 @@ import qualified Data.Text.Lazy as LazyText
 
 import Parse.Pattern
 import Parse.Helpers (IParser, iParse)
-import AST.V0_15
+import AST.V0_16
 import AST.Pattern
-import AST.Literal
 import AST.Variable hiding (Alias)
 import Reporting.Annotation hiding (map, at)
 import Reporting.Region

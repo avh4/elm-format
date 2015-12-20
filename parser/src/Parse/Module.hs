@@ -7,7 +7,7 @@ import qualified AST.Module as Module
 import qualified AST.Module.Name as ModuleName
 import qualified AST.Variable as Var
 import Reporting.Annotation as A
-import AST.V0_15
+import AST.V0_16
 
 
 getModuleName :: String -> Maybe String

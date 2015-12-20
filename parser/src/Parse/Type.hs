@@ -9,7 +9,7 @@ import qualified AST.Variable as Var
 import Parse.Helpers
 import qualified Reporting.Annotation as A
 import qualified Reporting.Region as R
-import AST.V0_15
+import AST.V0_16
 
 
 tvar :: IParser Type.Type

@@ -3,24 +3,25 @@ module Parse.Literal (literal) where
 import Prelude hiding (exponent)
 import Text.Parsec ((<|>), (<?>), digit, hexDigit, lookAhead, many1, option, string, try)
 import Parse.Helpers (IParser, chr, str)
-import qualified AST.Literal as L
+
+import AST.V0_16
 
 
-literal :: IParser L.Literal
+literal :: IParser Literal
 literal =
-  num <|> ((\(s,b) -> L.Str s b) <$> str) <|> (L.Chr <$> chr)
+  num <|> ((\(s,b) -> Str s b) <$> str) <|> (Chr <$> chr)
 
 
-num :: IParser L.Literal
+num :: IParser Literal
 num =
   toLiteral <$> (rawNumber <?> "a number")
 
 
-toLiteral :: String -> L.Literal
+toLiteral :: String -> Literal
 toLiteral n
-  | 'x' `elem` n         = L.IntNum (read n)
-  | any (`elem` ".eE") n = L.FloatNum (read n)
-  | otherwise            = L.IntNum (read n)
+  | 'x' `elem` n         = IntNum (read n)
+  | any (`elem` ".eE") n = FloatNum (read n)
+  | otherwise            = IntNum (read n)
 
 
 rawNumber :: IParser String

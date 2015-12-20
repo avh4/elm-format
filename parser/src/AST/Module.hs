@@ -9,7 +9,7 @@ import qualified AST.Declaration as Declaration
 import qualified AST.Module.Name as Name
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
-import AST.V0_15
+import AST.V0_16
 
 
 -- MODULES

@@ -9,9 +9,8 @@ import qualified Data.Text.Lazy as LazyText
 
 import Parse.Expression
 import Parse.Helpers (IParser, iParse)
-import AST.V0_15
+import AST.V0_16
 import AST.Expression
-import AST.Literal
 import qualified AST.Pattern as P
 import AST.Variable
 import Reporting.Annotation hiding (map, at)

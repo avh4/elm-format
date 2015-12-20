@@ -4,8 +4,7 @@ import Data.Char (isUpper)
 import qualified Data.List as List
 import Text.Parsec ((<|>), (<?>), char, choice, optionMaybe, try)
 
-import AST.V0_15
-import qualified AST.Literal as L
+import AST.V0_16
 import qualified AST.Pattern as P
 import qualified AST.Variable as Var
 import Parse.Helpers
@@ -26,10 +25,10 @@ basic =
     stringToPattern str =
         case str of
           "True" ->
-              P.Literal (L.Boolean True)
+              P.Literal (Boolean True)
 
           "False" ->
-              P.Literal (L.Boolean False)
+              P.Literal (Boolean False)
 
           c:_ | isUpper c ->
               P.Data (Var.VarRef str) []
@@ -99,8 +98,8 @@ patternConstructor =
   addLocation $
     do  v <- List.intercalate "." <$> dotSep1 capVar
         case v of
-          "True"  -> return $ P.Literal (L.Boolean True)
-          "False" -> return $ P.Literal (L.Boolean False)
+          "True"  -> return $ P.Literal (Boolean True)
+          "False" -> return $ P.Literal (Boolean False)
           _       -> P.Data (Var.VarRef v) <$> map (\(_,v) -> v) <$> spacePrefix term -- TODO: use comments
 
 
