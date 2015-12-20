@@ -371,7 +371,7 @@ forcedWS =
     ]
   where
     nl_space =
-      try ((++) <$> (concat <$> many1 newline) <*> spaces)
+      try ((++) <$> (concat <$> many1 newline) <*> option [] spaces)
 
 
 -- Just eats whitespace until the next meaningful character.

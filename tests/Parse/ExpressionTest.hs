@@ -57,7 +57,6 @@ tests =
         , example "whitespace" "( )" $ at 1 1 1 4 $ Unit []
         , example "comments" "({-A-})" $ at 1 1 1 8 $ Unit [BlockComment ["A"]]
         , example "newlines" "(\n )" $ at 1 1 2 3 $ Unit []
-        , mustBeIndented expr "(\n )"
         ]
 
     , testGroup "Literal"
@@ -79,8 +78,7 @@ tests =
             , example "whitespace" "( + )" $ at 1 1 1 6 $ Var $ OpRef "+"
             -- TODO: parse comments
             , example "comments" "({-A-}+{-B-})" $ at 1 1 1 14 (Var (OpRef "+"))
-            , testCase "does not allow newlines" $
-                assertFailure expr "(\n + \n)"
+            , example "newlines" "(\n + \n)" $ at 1 1 3 2 (Var (OpRef "+"))
             ]
         ]
 
@@ -90,7 +88,6 @@ tests =
         , example "comments" "f{-A-}7{-B-}8" $ at 1 1 1 14 $ App (at 1 1 1 2 $ Var $ VarRef "f") [commentedIntExpr'' (1,7,1,8) "A" 7, commentedIntExpr'' (1,13,1,14) "B" 8] False
         , example "newlines" "f\n 7\n 8" $ at 1 1 3 3 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr'' (2,2,2,3) 7, intExpr'' (3,2,3,3) 8] True
         , example "newlines and comments" "f\n {-A-}7\n {-B-}8" $ at 1 1 3 8 $ App (at 1 1 1 2 $ Var $ VarRef "f") [commentedIntExpr'' (2,7,2,8) "A" 7, commentedIntExpr'' (3,7,3,8) "B" 8] True
-        , mustBeIndented expr "f\n 7\n 8"
         ]
 
     , testGroup "unary operators"
@@ -114,7 +111,6 @@ tests =
         , example "whitespace" "7 + 8 <<>> 9" $ at 1 1 1 13 $ Binops (intExpr (1,1,1,2) 7) [([], OpRef "+", [], intExpr (1,5,1,6) 8), ([], OpRef "<<>>", [], intExpr (1,12,1,13) 9)] False
         , example "comments" "7{-A-}+{-B-}8{-C-}<<>>{-D-}9" $ at 1 1 1 29 $ Binops (intExpr (1,1,1,2) 7) [([BlockComment ["A"]], OpRef "+", [BlockComment ["B"]], intExpr (1,13,1,14) 8), ([BlockComment ["C"]], OpRef "<<>>", [BlockComment ["D"]], intExpr (1,28,1,29) 9)] False
         , example "newlines" "7\n +\n 8\n <<>>\n 9" $ at 1 1 5 3 $ Binops (intExpr (1,1,1,2) 7) [([], OpRef "+", [], intExpr (3,2,3,3) 8), ([], OpRef "<<>>", [], intExpr (5,2,5,3) 9)] True
-        , mustBeIndented expr "7\n +\n 8\n <<>>\n 9"
         ]
 
     , testGroup "parentheses"
@@ -122,7 +118,6 @@ tests =
         , example "whitespace" "( 1 )" $ at 1 1 1 6 $ Parens $ intExpr' (1,3,1,4) 1
         , example "comments" "({-A-}1{-B-})" $ at 1 1 1 14 $ Parens $ commentedIntExpr (1,7,1,8) "A" "B" 1
         , example "newlines" "(\n 1\n )" $ at 1 1 3 3 $ Parens $ intExpr' (2,2,2,3) 1
-        , mustBeIndented expr "(\n 1\n )"
         ]
 
     , testGroup "List"
@@ -132,7 +127,6 @@ tests =
         , example "whitespace" "[ 1 , 2 , 3 ]" $ at 1 1 1 14 $ ExplicitList [intExpr' (1,3,1,4) 1, intExpr' (1,7,1,8) 2, intExpr' (1,11,1,12) 3] False
         , example "comments" "[{-A-}1{-B-},{-C-}2{-D-},{-E-}3{-F-}]" $ at 1 1 1 38 $ ExplicitList [commentedIntExpr (1,7,1,8) "A" "B" 1, commentedIntExpr (1,19,1,20) "C" "D" 2, commentedIntExpr (1,31,1,32) "E" "F" 3] False
         , example "newlines" "[\n 1\n ,\n 2\n ,\n 3\n ]" $ at 1 1 7 3 $ ExplicitList [intExpr' (2,2,2,3) 1, intExpr' (4,2,4,3) 2, intExpr' (6,2,6,3) 3] True
-        , mustBeIndented expr "[\n 1\n ,\n 2\n ,\n 3\n ]"
         ]
 
     , testGroup "Range"
@@ -140,7 +134,6 @@ tests =
         , example "whitespace" "[ 7 .. 9 ]" $ at 1 1 1 11 $ Range (intExpr' (1,3,1,4) 7) (intExpr' (1,8,1,9) 9) False
         , example "comments" "[{-A-}7{-B-}..{-C-}9{-D-}]" $ at 1 1 1 27 $ Range (commentedIntExpr (1,7,1,8) "A" "B" 7) (commentedIntExpr (1,20,1,21) "C" "D" 9) False
         , example "newlines" "[\n 7\n ..\n 9\n ]" $ at 1 1 5 3 $ Range (intExpr' (2,2,2,3) 7) (intExpr' (4,2,4,3) 9) True
-        , mustBeIndented expr "[\n 7\n ..\n 9\n ]"
         ]
 
     , testGroup "Tuple"
@@ -148,7 +141,6 @@ tests =
         , example "whitespace" "( 1 , 2 )" $ at 1 1 1 10 $ Tuple [intExpr' (1,3,1,4) 1, intExpr' (1,7,1,8) 2] False
         , example "comments" "({-A-}1{-B-},{-C-}2{-D-})" $ at 1 1 1 26 $ Tuple [commentedIntExpr (1,7,1,8) "A" "B" 1, commentedIntExpr (1,19,1,20) "C" "D" 2] False
         , example "newlines" "(\n 1\n ,\n 2\n )" $ at 1 1 5 3 $ Tuple [intExpr' (2,2,2,3) 1, intExpr' (4,2,4,3) 2] True
-        , mustBeIndented expr "(\n 1\n ,\n 2\n )"
         ]
 
     , testGroup "tuple constructor"
@@ -157,7 +149,6 @@ tests =
         -- TODO: parse comments
         , example "comments" "({-A-},{-B-},)" $ at 1 1 1 15 (TupleFunction 3)
         , example "newlines" "(\n ,\n ,)" $ at 1 1 3 4 $ TupleFunction 3
-        , mustBeIndented expr "(\n ,\n ,)"
         , testCase "does not allow trailing inner whitespace" $
             assertFailure expr "(,, )"
         ]
@@ -175,7 +166,6 @@ tests =
         , example "comments" "{{-A-}x{-B-}={-C-}7{-D-},{-E-}y{-F-}={-G-}8{-H-}}" $ at 1 1 1 50 $ Record [([BlockComment ["A"]], "x", [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False), ([BlockComment ["E"]], "y", [BlockComment ["F"]], commentedIntExpr (1,43,1,44) "G" "H" 8, False)] False
         , example "single field with comments" "{{-A-}x{-B-}={-C-}7{-D-}}" $ at 1 1 1 26 $ Record [([BlockComment ["A"]], "x", [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False)] False
         , example "newlines" "{\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 9 3 $ Record [([], "x", [], intExpr' (4,2,4,3) 7, True), ([], "y", [], intExpr' (8,2,8,3) 8, True)] True
-        , mustBeIndented expr "{\n x\n =\n 7\n ,\n y\n =\n 8\n }"
         ]
 
     , testGroup "Record update"
@@ -184,7 +174,6 @@ tests =
         , example "whitespace" "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 $ RecordUpdate (Commented [] [] $ at 1 3 1 4 $ Var $ VarRef "a") [([], "x", [], intExpr' (1,11,1,12) 7, False), ([], "y", [], intExpr' (1,19,1,20) 8, False)] False
         , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}" $ at 1 1 1 62 $ RecordUpdate (Commented [BlockComment ["A"]] [BlockComment ["B"]] $ at 1 7 1 8 $ Var $ VarRef "a") [([BlockComment ["C"]], "x", [BlockComment ["D"]], commentedIntExpr (1,31,1,32) "E" "F" 7, False), ([BlockComment ["G"]], "y", [BlockComment ["H"]], commentedIntExpr (1,55,1,56) "I" "J" 8, False)] False
         , example "newlines" "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 $ RecordUpdate (Commented [] [] $ at 2 2 2 3 $ Var $ VarRef "a") [([], "x", [], intExpr' (6,2,6,3) 7, True), ([], "y", [], intExpr' (10,2,10,3) 8, True)] True
-        , mustBeIndented expr "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }"
         , testCase "only allows simple base" $
             assertFailure expr "{9|x=7}"
         , testCase "only allows simple base" $
@@ -206,57 +195,58 @@ tests =
         [ example "" ".f1" $ at 1 1 1 4 $ AccessFunction "f1"
         ]
 
-    , testCase "labmda" $
-        assertParse expr "\\x y->9" $ at 1 1 1 8 $ Lambda [([], at 1 2 1 3 $ P.Var $ VarRef "x"), ([], at 1 4 1 5 $ P.Var $ VarRef "y")] [] (intExpr (1,7,1,8) 9) False
-    , testCase "labmda (single parameter)" $
-        assertParse expr "\\x->9" $ at 1 1 1 6 $ Lambda [([], at 1 2 1 3 $ P.Var $ VarRef "x")] [] (intExpr (1,5,1,6) 9) False
-    , testCase "labmda (whitespace)" $
-        assertParse expr "\\ x y -> 9" $ at 1 1 1 11 $ Lambda [([], at 1 3 1 4 $ P.Var $ VarRef "x"), ([], at 1 5 1 6 $ P.Var $ VarRef "y")] [] (intExpr (1,10,1,11) 9) False
-    , testCase "labmda (comments)" $
-        assertParse expr "\\{-A-}x{-B-}y{-C-}->{-D-}9" $ at 1 1 1 27 $ Lambda [([BlockComment ["A"]], at 1 7 1 8 $ P.Var $ VarRef "x"), ([BlockComment ["B"]], at 1 13 1 14 $ P.Var $ VarRef "y")] [BlockComment ["C"], BlockComment ["D"]] (intExpr (1,26,1,27) 9) False
-    , testCase "labmda (newlines)" $
-        assertParse expr "\\\n x\n y\n ->\n 9" $ at 1 1 5 3 $ Lambda [([], at 2 2 2 3 $ P.Var $ VarRef "x"), ([], at 3 2 3 3 $ P.Var $ VarRef "y")] [] (intExpr (5,2,5,3) 9) True
-    , testGroup "lambda (must be indented)"
-        [ testCase "(1)" $ assertFailure expr "\\\nx\n y\n ->\n 9"
-        , testCase "(2)" $ assertFailure expr "\\\n x\ny\n ->\n 9"
-        , testCase "(3)" $ assertFailure expr "\\\n x\n y\n->\n 9"
-        , testCase "(4)" $ assertFailure expr "\\\n x\n y\n ->\n9"
+    , testGroup "lambda"
+        [ example "" "\\x y->9" $ at 1 1 1 8 $ Lambda [([], at 1 2 1 3 $ P.Var $ VarRef "x"), ([], at 1 4 1 5 $ P.Var $ VarRef "y")] [] (intExpr (1,7,1,8) 9) False
+        , example "single parameter" "\\x->9" $ at 1 1 1 6 $ Lambda [([], at 1 2 1 3 $ P.Var $ VarRef "x")] [] (intExpr (1,5,1,6) 9) False
+        , example "whitespace" "\\ x y -> 9" $ at 1 1 1 11 $ Lambda [([], at 1 3 1 4 $ P.Var $ VarRef "x"), ([], at 1 5 1 6 $ P.Var $ VarRef "y")] [] (intExpr (1,10,1,11) 9) False
+        , example "comments" "\\{-A-}x{-B-}y{-C-}->{-D-}9" $ at 1 1 1 27 $ Lambda [([BlockComment ["A"]], at 1 7 1 8 $ P.Var $ VarRef "x"), ([BlockComment ["B"]], at 1 13 1 14 $ P.Var $ VarRef "y")] [BlockComment ["C"], BlockComment ["D"]] (intExpr (1,26,1,27) 9) False
+        , example "newlines" "\\\n x\n y\n ->\n 9" $ at 1 1 5 3 $ Lambda [([], at 2 2 2 3 $ P.Var $ VarRef "x"), ([], at 3 2 3 3 $ P.Var $ VarRef "y")] [] (intExpr (5,2,5,3) 9) True
+        , testCase "arrow must not contain whitespace" $
+            assertFailure expr "\\x y - > 9"
         ]
-    , testCase "lambda (arrow must not contain whitespace)" $
-        assertFailure expr "\\x y - > 9"
 
-    , testCase "case" $
-        assertParse expr "case 9 of\n 1->10\n _->20" $ at 1 1 3 7 $ Case (intExpr (1,6,1,7) 9, False) [([], at 2 2 2 3 $ P.Literal $ IntNum 1, [], intExpr (2,5,2,7) 10), ([], at 3 2 3 3 $ P.Anything, [], intExpr (3,5,3,7) 20)]
-    , testCase "case (no newline after 'of')" $
-        assertParse expr "case 9 of 1->10\n          _->20" $ at 1 1 2 16 $ Case (intExpr (1,6,1,7) 9, False) [([], at 1 11 1 12 $ P.Literal $ IntNum 1, [], intExpr (1,14,1,16) 10), ([], at 2 11 2 12 $ P.Anything, [], intExpr (2,14,2,16) 20)]
-    , testCase "case (whitespace)" $
-        assertParse expr "case 9 of\n 1 -> 10\n _ -> 20" $ at 1 1 3 9 $ Case (intExpr (1,6,1,7) 9, False) [([], at 2 2 2 3 $ P.Literal $ IntNum 1, [], intExpr (2,7,2,9) 10), ([], at 3 2 3 3 $ P.Anything, [], intExpr (3,7,3,9) 20)]
-    , testCase "case (comments)" $
-        assertParse expr "case{-A-}9{-B-}of{-C-}\n{-D-}1{-E-}->{-F-}10{-G-}\n{-H-}_{-I-}->{-J-}20" $ at 1 1 3 21 $ Case (intExpr (1,10,1,11) 9, False) [([BlockComment ["C"], BlockComment ["D"]], at 2 6 2 7 $ P.Literal $ IntNum 1, [BlockComment ["F"]], intExpr (2,19,2,21) 10), ([BlockComment ["G"], BlockComment ["H"]], at 3 6 3 7 $ P.Anything, [BlockComment ["J"]], intExpr (3,19,3,21) 20)] -- TODO: handle comments A, B, E, I, and don't allow K
-    , testCase "case (newlines)" $
-        assertParse expr "case\n 9\n of\n 1\n ->\n 10\n _\n ->\n 20" $ at 1 1 9 4 $ Case (intExpr (2,2,2,3) 9, True) [([], at 4 2 4 3 $ P.Literal $ IntNum 1, [], intExpr (6,2,6,4) 10), ([], at 7 2 7 3 $ P.Anything, [], intExpr (9,2,9,4) 20)]
-    , testCase "case (should not fail with trailing whitespace)" $
-        assertParse (expr >> string "\nX") "case 9 of\n 1->10\n _->20\nX" $ "\nX"
-    , testGroup "case (clauses must start at the same column)"
-        [ testCase "(1)" $ assertFailure expr "case 9 of\n 1->10\n_->20"
-        , testCase "(2)" $ assertFailure expr "case 9 of\n 1->10\n  _->20"
-        , testCase "(3)" $ assertFailure expr "case 9 of\n  1->10\n _->20"
+    , testGroup "if statement"
+        [ example "" "if x then y else z" $ at 1 1 1 19 (If [(at 1 4 1 5 (Var (VarRef "x")),False,[],at 1 11 1 12 (Var (VarRef "y")))] [] (at 1 18 1 19 (Var (VarRef "z"))))
+        , example "comments" "if{-A-}x{-B-}then{-C-}y{-D-}else{-E-}z" $ at 1 1 1 39 (If [(at 1 8 1 9 (Var (VarRef "x")),False,[BlockComment ["C"]],at 1 23 1 24 (Var (VarRef "y")))] [BlockComment ["E"]] (at 1 38 1 39 (Var (VarRef "z"))))
+        , example "else if" "if x then y else if x' then y' else if x'' then y'' else z" $ at 1 1 1 59 (If [(at 1 4 1 5 (Var (VarRef "x")),False,[],at 1 11 1 12 (Var (VarRef "y"))),(at 1 21 1 23 (Var (VarRef "x'")),False,[],at 1 29 1 31 (Var (VarRef "y'"))),(at 1 40 1 43 (Var (VarRef "x''")),False,[],at 1 49 1 52 (Var (VarRef "y''")))] [] (at 1 58 1 59 (Var (VarRef "z"))))
+        , example "newlines" "if\n x\n then\n y\n else\n z" $ at 1 1 6 3 (If [(at 2 2 2 3 (Var (VarRef "x")),True,[],at 4 2 4 3 (Var (VarRef "y")))] [] (at 6 2 6 3 (Var (VarRef "z"))))
         ]
-    , testGroup "case (must be indented)"
-        [ testCase "(1)" $ assertFailure expr "case\n9\n of\n 1\n ->\n 10\n _\n ->\n 20"
-        , testCase "(2)" $ assertFailure expr "case\n 9\nof\n 1\n ->\n 10\n _\n ->\n 20"
-        , testCase "(3)" $ assertFailure expr "case\n 9\n of\n1\n ->\n 10\n _\n ->\n 20"
-        , testCase "(4)" $ assertFailure expr "case\n 9\n of\n 1\n->\n 10\n _\n ->\n 20"
-        , testCase "(5)" $ assertFailure expr "case\n 9\n of\n 1\n ->\n10\n _\n ->\n 20"
-        , testCase "(6)" $ assertFailure expr "case\n 9\n of\n 1\n ->\n 10\n_\n ->\n 20"
-        , testCase "(7)" $ assertFailure expr "case\n 9\n of\n 1\n ->\n 10\n _\n->\n 20"
-        , testCase "(8)" $ assertFailure expr "case\n 9\n of\n 1\n ->\n 10\n _\n ->\n20"
+
+    , testGroup "let statement"
+        [ example "" "let a=b in z" $ at 1 1 1 13 (Let [at 1 5 1 8 (Definition (at 1 5 1 6 (P.Var (VarRef "a"))) [] [] (at 1 7 1 8 (Var (VarRef "b"))) False)] [] (at 1 12 1 13 (Var (VarRef "z"))))
+        , example "multiple declarations" "let a=b\n    c=d\nin z" $ at 1 1 3 5 (Let [at 1 5 1 8 (Definition (at 1 5 1 6 (P.Var (VarRef "a"))) [] [] (at 1 7 1 8 (Var (VarRef "b"))) False),at 2 5 2 8 (Definition (at 2 5 2 6 (P.Var (VarRef "c"))) [] [] (at 2 7 2 8 (Var (VarRef "d"))) False)] [] (at 3 4 3 5 (Var (VarRef "z"))))
+        , example "multiple declarations" "let\n a=b\n c=d\nin z" $ at 1 1 4 5 (Let [at 2 2 2 5 (Definition (at 2 2 2 3 (P.Var (VarRef "a"))) [] [] (at 2 4 2 5 (Var (VarRef "b"))) False),at 3 2 3 5 (Definition (at 3 2 3 3 (P.Var (VarRef "c"))) [] [] (at 3 4 3 5 (Var (VarRef "d"))) False)] [] (at 4 4 4 5 (Var (VarRef "z"))))
+        , example "whitespace" "let a = b in z" $ at 1 1 1 15 (Let [at 1 5 1 10 (Definition (at 1 5 1 6 (P.Var (VarRef "a"))) [] [] (at 1 9 1 10 (Var (VarRef "b"))) False)] [] (at 1 14 1 15 (Var (VarRef "z"))))
+        , example "comments" "let{-A-}a{-B-}={-C-}b{-D-}in{-E-}z" $ at 1 1 1 35 (Let [at 0 0 0 0 (LetComment (BlockComment ["A"])),at 1 9 1 22 (Definition (at 1 9 1 10 (P.Var (VarRef "a"))) [] [BlockComment ["B"],BlockComment ["C"]] (at 1 21 1 22 (Var (VarRef "b"))) False),at 0 0 0 0 (LetComment (BlockComment ["D"]))] [BlockComment ["E"]] (at 1 34 1 35 (Var (VarRef "z"))))
+        , example "newlines" "let\n a\n =\n b\nin\n z" $ at 1 1 6 3 (Let [at 2 2 4 3 (Definition (at 2 2 2 3 (P.Var (VarRef "a"))) [] [] (at 4 2 4 3 (Var (VarRef "b"))) True)] [] (at 6 2 6 3 (Var (VarRef "z"))))
+        , testCase "must have at least one definition" $
+            assertFailure expr "let in z"
+        , testGroup "declarations must start at the same column" $
+            [ testCase "(1)" $ assertFailure expr "let a=b\n   c=d\nin z"
+            , testCase "(2)" $ assertFailure expr "let a=b\n     c=d\nin z"
+            , testCase "(3)" $ assertFailure expr "let  a=b\n   c=d\nin z"
+            ]
+        ]
+
+    , testGroup "case statement"
+        [ example "" "case 9 of\n 1->10\n _->20" $ at 1 1 3 7 $ Case (intExpr (1,6,1,7) 9, False) [([], at 2 2 2 3 $ P.Literal $ IntNum 1, [], intExpr (2,5,2,7) 10), ([], at 3 2 3 3 $ P.Anything, [], intExpr (3,5,3,7) 20)]
+        , example "no newline after 'of'" "case 9 of 1->10\n          _->20" $ at 1 1 2 16 $ Case (intExpr (1,6,1,7) 9, False) [([], at 1 11 1 12 $ P.Literal $ IntNum 1, [], intExpr (1,14,1,16) 10), ([], at 2 11 2 12 $ P.Anything, [], intExpr (2,14,2,16) 20)]
+        , example "whitespace" "case 9 of\n 1 -> 10\n _ -> 20" $ at 1 1 3 9 $ Case (intExpr (1,6,1,7) 9, False) [([], at 2 2 2 3 $ P.Literal $ IntNum 1, [], intExpr (2,7,2,9) 10), ([], at 3 2 3 3 $ P.Anything, [], intExpr (3,7,3,9) 20)]
+         -- TODO: handle comments A, B, E, I, and don't allow K
+        , example "comments" "case{-A-}9{-B-}of{-C-}\n{-D-}1{-E-}->{-F-}10{-G-}\n{-H-}_{-I-}->{-J-}20" $ at 1 1 3 21 $ Case (intExpr (1,10,1,11) 9, False) [([BlockComment ["C"], BlockComment ["D"]], at 2 6 2 7 $ P.Literal $ IntNum 1, [BlockComment ["F"]], intExpr (2,19,2,21) 10), ([BlockComment ["G"], BlockComment ["H"]], at 3 6 3 7 $ P.Anything, [BlockComment ["J"]], intExpr (3,19,3,21) 20)]
+        , example "newlines" "case\n 9\n of\n 1\n ->\n 10\n _\n ->\n 20" $ at 1 1 9 4 $ Case (intExpr (2,2,2,3) 9, True) [([], at 4 2 4 3 $ P.Literal $ IntNum 1, [], intExpr (6,2,6,4) 10), ([], at 7 2 7 3 $ P.Anything, [], intExpr (9,2,9,4) 20)]
+        , testCase "should not consume trailing whitespace" $
+            assertParse (expr >> string "\nX") "case 9 of\n 1->10\n _->20\nX" $ "\nX"
+        , testGroup "clauses must start at the same column"
+            [ testCase "(1)" $ assertFailure expr "case 9 of\n 1->10\n_->20"
+            , testCase "(2)" $ assertFailure expr "case 9 of\n 1->10\n  _->20"
+            , testCase "(3)" $ assertFailure expr "case 9 of\n  1->10\n _->20"
+            ]
         ]
 
     , testGroup "definition"
         [ testCase "" $ assertParse definition "x=1" $ at 1 1 1 4 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [] (intExpr (1,3,1,4) 1) False
         , testCase "comments" $ assertParse definition "x{-A-}={-B-}1" $ at 1 1 1 14 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [BlockComment ["A"], BlockComment ["B"]] (intExpr (1,13,1,14) 1) False
         , testCase "line comments" $ assertParse definition "x\n--Y\n =\n    --X\n    1" $ at 1 1 5 6 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [LineComment "Y", LineComment "X"] (intExpr (5,5,5,6) 1) True
-
         ]
     ]
