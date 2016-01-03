@@ -59,7 +59,7 @@ data Expr'
     | Range (Commented Expr) (Commented Expr) Bool
 
     | Tuple [Commented Expr] Bool
-    | TupleFunction Int -- will be 2 (,) or greater, indicating the size of the tuple
+    | TupleFunction Int -- will be 2 or greater, indicating the number of elements in the tuple
 
     | EmptyRecord [Comment]
     | Record [([Comment], String, [Comment], Commented Expr, Bool)] Bool

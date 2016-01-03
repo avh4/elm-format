@@ -161,6 +161,7 @@ checkGood Simple.elm
 checkGood AllSyntax.elm
 checkGood AllSyntaxDeclarations.elm
 checkGood AllSyntaxPatterns.elm
+checkGood AllSyntaxTypes.elm
 checkGood Comments.elm
 checkGood evancz/start-app/StartApp.elm
 checkGood TheSeamau5/elm-check/Check.elm

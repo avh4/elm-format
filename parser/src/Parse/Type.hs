@@ -5,7 +5,6 @@ import Data.List (intercalate)
 import Text.Parsec ((<|>), (<?>), char, many1, optionMaybe, string, try)
 
 import qualified AST.Type as Type
-import qualified AST.Variable as Var
 import Parse.Helpers
 import qualified Reporting.Annotation as A
 import qualified Reporting.Region as R
@@ -66,7 +65,7 @@ constructor0 :: IParser Type.Type
 constructor0 =
   addLocation $
   do  name <- capTypeVar
-      return (Type.RType (Var.VarRef name))
+      return (Type.RVar name)
 
 
 term :: IParser Type.Type
@@ -87,7 +86,7 @@ app =
     tupleCtor =
       addLocation $
       do  ctor <- parens' (many1 (char ','))
-          return (Type.RType (Var.VarRef ctor))
+          return (Type.RTupleFunction (length ctor + 1))
 
 
 expr :: IParser Type.Type

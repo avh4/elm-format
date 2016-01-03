@@ -1074,8 +1074,8 @@ formatType' requireParens atype =
             |> (if requireParens /= NotRequired then parens else id)
         AST.Type.RVar var ->
             line $ identifier var
-        AST.Type.RType var ->
-            line $ formatVar var
+        AST.Type.RTupleFunction n ->
+            line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
         AST.Type.RApp ctor args ->
             elmApplication
                 (formatType' ForCtor ctor)

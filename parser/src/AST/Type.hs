@@ -7,7 +7,6 @@ module AST.Type
 
 import qualified Data.Map as Map
 
-import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
 import qualified Reporting.Region as R
 
@@ -19,12 +18,12 @@ type Type =
 
 
 data Type'
-    = RLambda Type [Type]
-    | RVar String
-    | RType Var.Ref
+    = RVar String
+    | RTupleFunction Int -- will be 2 or greater, indicating the number of elements in the tuple
     | RApp Type [Type]
     | RTuple [Type]
     | RRecord (Maybe Type) [(String, Type, Bool)] Bool
+    | RLambda Type [Type]
     deriving (Eq, Show)
 
 
