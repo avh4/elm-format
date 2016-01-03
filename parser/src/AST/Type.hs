@@ -22,7 +22,7 @@ data Type'
     | RTupleFunction Int -- will be 2 or greater, indicating the number of elements in the tuple
     | RApp Type [Type]
     | RTuple [Type]
-    | RRecord (Maybe Type) [(String, Type, Bool)] Bool
+    | RRecord (Maybe String) [(String, Type, Bool)] Bool
     | RLambda Type [Type]
     deriving (Eq, Show)
 

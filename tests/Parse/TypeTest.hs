@@ -73,11 +73,11 @@ tests =
         ]
 
     , testGroup "record extension"
-        [ example "" "{a|x:Int,y:Bool}" $ at 1 1 1 17 (RRecord (Just (at 1 2 1 3 (RVar "a"))) [("x",at 1 6 1 9 (RVar "Int"),False),("y",at 1 12 1 16 (RVar "Bool"),False)] False)
-        , example "single field" "{a|x:Int}" $ at 1 1 1 10 (RRecord (Just (at 1 2 1 3 (RVar "a"))) [("x",at 1 6 1 9 (RVar "Int"),False)] False)
-        , example "whitespace" "{ a | x : Int , y : Bool }" $ at 1 1 1 27 (RRecord (Just (at 1 3 1 4 (RVar "a"))) [("x",at 1 11 1 14 (RVar "Int"),False),("y",at 1 21 1 25 (RVar "Bool"),False)] False)
-        , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}:{-E-}Int{-F-},{-G-}y{-H-}:{-I-}Bool{-J-}}" $ at 1 1 1 67 (RRecord (Just (at 1 7 1 8 (RVar "a"))) [("x",at 1 31 1 34 (RVar "Int"),False),("y",at 1 57 1 61 (RVar "Bool"),False)] False)
-        , example "newlines" "{\n a\n |\n x\n :\n Int\n ,\n y\n :\n Bool\n }" $ at 1 1 11 3 (RRecord (Just (at 2 2 2 3 (RVar "a"))) [("x",at 6 2 6 5 (RVar "Int"),True),("y",at 10 2 10 6 (RVar "Bool"),True)] True)
+        [ example "" "{a|x:Int,y:Bool}" $ at 1 1 1 17 (RRecord (Just "a") [("x",at 1 6 1 9 (RVar "Int"),False),("y",at 1 12 1 16 (RVar "Bool"),False)] False)
+        , example "single field" "{a|x:Int}" $ at 1 1 1 10 (RRecord (Just "a") [("x",at 1 6 1 9 (RVar "Int"),False)] False)
+        , example "whitespace" "{ a | x : Int , y : Bool }" $ at 1 1 1 27 (RRecord (Just "a") [("x",at 1 11 1 14 (RVar "Int"),False),("y",at 1 21 1 25 (RVar "Bool"),False)] False)
+        , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}:{-E-}Int{-F-},{-G-}y{-H-}:{-I-}Bool{-J-}}" $ at 1 1 1 67 (RRecord (Just "a") [("x",at 1 31 1 34 (RVar "Int"),False),("y",at 1 57 1 61 (RVar "Bool"),False)] False)
+        , example "newlines" "{\n a\n |\n x\n :\n Int\n ,\n y\n :\n Bool\n }" $ at 1 1 11 3 (RRecord (Just "a") [("x",at 6 2 6 5 (RVar "Int"),True),("y",at 10 2 10 6 (RVar "Bool"),True)] True)
         , testCase "only allows simple base" $
             assertFailure expr "{()|x:Int}"
         , testCase "only allows simple base" $

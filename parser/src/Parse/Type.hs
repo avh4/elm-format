@@ -42,10 +42,10 @@ record =
 
     -- extended record types require at least one field
     extended =
-      do  ext <- try (addLocation lowVar <* (whitespace >> string "|")) -- TODO: use comments
+      do  ext <- try (lowVar <* (whitespace >> string "|")) -- TODO: use comments
           whitespace -- TODO: use comments
           fields <- commaSep1 field
-          return ((Just (A.map Type.RVar ext)), fields)
+          return (Just ext, fields)
 
     field =
       do  pushNewlineContext

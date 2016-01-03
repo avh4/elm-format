@@ -1114,7 +1114,7 @@ formatType' requireParens atype =
                     (Just typ, first:rest) ->
                         case
                             ( multiline
-                            , isLine $ formatType typ
+                            , Right $ identifier typ
                             , allSingles $ map formatField fields
                             )
                         of
@@ -1132,7 +1132,7 @@ formatType' requireParens atype =
                                     ]
                             _ ->
                                 stack1
-                                    [ prefix (row [punc "{", space]) (formatType typ)
+                                    [ prefix (row [punc "{", space]) (line $ identifier typ)
                                     , stack1
                                         ([ prefix (row [punc "|", space]) $ formatField first ]
                                         ++ (map (prefix (row [punc ",", space]) . formatField) rest))
