@@ -1058,6 +1058,9 @@ commaSpace =
 formatType' :: TypeParensRequired -> AST.Type.Type -> Box
 formatType' requireParens atype =
     case RA.drop atype of
+        AST.Type.RUnit ->
+            line $ punc "()"
+
         AST.Type.RLambda first rest ->
             case
                 allSingles $ map (formatType' ForLambda) (first:rest)

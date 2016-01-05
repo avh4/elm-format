@@ -21,8 +21,9 @@ tuple :: IParser Type.Type
 tuple =
   do  (start, types, end) <- located (parens $ ((\f a b _ -> f a b) <$> commaSep (const . const <$> expr))) -- TODO: use comments
       case types of
+        [] -> return $ A.A (R.Region start end) $ Type.RUnit
         [t] -> return t
-        _   -> return (Type.tuple (R.Region start end) types)
+        _   -> return $ A.A (R.Region start end) $ Type.RTuple types
 
 
 record :: IParser Type.Type

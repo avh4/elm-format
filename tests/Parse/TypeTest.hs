@@ -28,10 +28,10 @@ tests :: Test
 tests =
     testGroup "Parse.Type"
     [ testGroup "unit"
-        [ example "" "()" $ at 1 1 1 3 (RTuple [])
-        , example "whitespace" "( )" $ at 1 1 1 4 (RTuple [])
-        , example "comments" "({-A-})" $ at 1 1 1 8 (RTuple [])
-        , example "newlines" "(\n)" $ at 1 1 2 2 (RTuple [])
+        [ example "" "()" $ at 1 1 1 3 (RUnit)
+        , example "whitespace" "( )" $ at 1 1 1 4 (RUnit)
+        , example "comments" "({-A-})" $ at 1 1 1 8 (RUnit)
+        , example "newlines" "(\n)" $ at 1 1 2 2 (RUnit)
         ]
 
     , testGroup "type variable"
