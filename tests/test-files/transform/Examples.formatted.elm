@@ -2,20 +2,20 @@ module Main (..) where
 
 
 ratio =
-    graphHeight
-        / (if range == 0 then
-            0.1
-           else
-            toFloat range
-          )
+  graphHeight
+    / (if range == 0 then
+        0.1
+       else
+        toFloat range
+      )
 
 
 myTuple =
-    (,,,)
-        1
-        2
-        3
-        4
+  (,,,)
+    1
+    2
+    3
+    4
 
 
 
@@ -23,20 +23,20 @@ myTuple =
 
 
 bar =
-    (if
-        if a then
-            True
-        else
-            False
-     then
-        "a"
-     else
-        "b"
-    )
+  (if
+    if a then
+      True
+    else
+      False
+   then
+    "a"
+   else
+    "b"
+  )
 
 
 multilineList =
-    [ 1
-    , 2
-    , 3
-    ]
+  [ 1
+  , 2
+  , 3
+  ]

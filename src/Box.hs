@@ -291,9 +291,11 @@ initRow :: Int -> (T.Text, Int)
 initRow startColumn =
   (T.empty, startColumn)
 
+
 spacesInTab :: Int
 spacesInTab =
-  4
+  2
+
 
 spacesToNextTab :: Int -> Int
 spacesToNextTab startColumn =
