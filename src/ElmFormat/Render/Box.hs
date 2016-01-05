@@ -1068,10 +1068,10 @@ formatTypeConstructor ctor =
 formatType' :: TypeParensRequired -> AST.Type.Type -> Box
 formatType' requireParens atype =
     case RA.drop atype of
-        AST.Type.RUnit ->
+        AST.Type.UnitType ->
             line $ punc "()"
 
-        AST.Type.RLambda first rest ->
+        AST.Type.FunctionType first rest ->
             case
                 allSingles $ map (formatType' ForLambda) (first:rest)
             of
@@ -1086,19 +1086,19 @@ formatType' requireParens atype =
                             )
             |> (if requireParens /= NotRequired then parens else id)
 
-        AST.Type.RVar var ->
+        AST.Type.TypeVariable var ->
             line $ identifier var
 
-        AST.Type.RApp ctor args ->
+        AST.Type.TypeConstruction ctor args ->
             elmApplication
                 (formatTypeConstructor ctor)
                 (map (formatType' ForCtor) args)
                 |> (if requireParens == ForCtor then parens else id)
-        AST.Type.RTuple (first:rest) ->
+        AST.Type.TupleType (first:rest) ->
             elmGroup True "(" "," ")" False (map formatType (first:rest))
-        AST.Type.RTuple [] ->
+        AST.Type.TupleType [] ->
             line $ keyword "()"
-        AST.Type.RRecord ext fields multiline ->
+        AST.Type.RecordType ext fields multiline ->
             let
                 formatField (name, typ, multiline') =
                     case (multiline', destructure (formatType typ)) of

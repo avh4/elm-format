@@ -19,12 +19,12 @@ data TypeConstructor
 
 
 data Type'
-    = RUnit
-    | RVar String
-    | RApp TypeConstructor [Type]
-    | RTuple [Type]
-    | RRecord (Maybe String) [(String, Type, Bool)] Bool
-    | RLambda Type [Type]
+    = UnitType
+    | TypeVariable String
+    | TypeConstruction TypeConstructor [Type]
+    | TupleType [Type]
+    | RecordType (Maybe String) [(String, Type, Bool)] Bool
+    | FunctionType Type [Type]
     deriving (Eq, Show)
 
 
