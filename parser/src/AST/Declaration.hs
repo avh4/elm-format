@@ -3,7 +3,6 @@ module AST.Declaration where
 
 import AST.V0_16
 import qualified AST.Expression as Expression
-import qualified AST.Type as Type
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
 
@@ -12,9 +11,9 @@ import qualified Reporting.Annotation as A
 
 data Declaration
     = Definition Expression.Def
-    | Datatype String [String] [(String, [Type.Type])]
-    | TypeAlias String [String] Type.Type
-    | PortAnnotation (Commented String) [Comment] Type.Type
+    | Datatype String [String] [(String, [Type])]
+    | TypeAlias String [String] Type
+    | PortAnnotation (Commented String) [Comment] Type
     | PortDefinition (Commented String) [Comment] Expression.Expr
     | Fixity Assoc [Comment] Int [Comment] Var.Ref
     deriving (Eq, Show)

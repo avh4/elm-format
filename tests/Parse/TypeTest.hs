@@ -9,7 +9,6 @@ import Test.Framework.Providers.HUnit
 import Parse.Type
 import Text.ParserCombinators.Parsec.Combinator (eof)
 import AST.V0_16
-import AST.Type
 import Reporting.Annotation hiding (map, at)
 import Reporting.Region
 

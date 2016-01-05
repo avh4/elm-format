@@ -11,7 +11,6 @@ import qualified AST.Expression
 import qualified AST.Module
 import qualified AST.Module.Name as MN
 import qualified AST.Pattern
-import qualified AST.Type
 import qualified AST.Variable
 import qualified Data.Char as Char
 import qualified Data.List as List
@@ -1042,7 +1041,7 @@ data TypeParensRequired
     deriving (Eq)
 
 
-formatType :: AST.Type.Type -> Box
+formatType :: Type -> Box
 formatType =
     formatType' NotRequired
 
@@ -1055,23 +1054,23 @@ commaSpace =
         ]
 
 
-formatTypeConstructor :: AST.Type.TypeConstructor -> Box
+formatTypeConstructor :: TypeConstructor -> Box
 formatTypeConstructor ctor =
     case ctor of
-        AST.Type.NamedConstructor name ->
+        NamedConstructor name ->
             line $ identifier name
 
-        AST.Type.TupleConstructor n ->
+        TupleConstructor n ->
             line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
 
 
-formatType' :: TypeParensRequired -> AST.Type.Type -> Box
+formatType' :: TypeParensRequired -> Type -> Box
 formatType' requireParens atype =
     case RA.drop atype of
-        AST.Type.UnitType ->
+        UnitType ->
             line $ punc "()"
 
-        AST.Type.FunctionType first rest ->
+        FunctionType first rest ->
             case
                 allSingles $ map (formatType' ForLambda) (first:rest)
             of
@@ -1086,19 +1085,19 @@ formatType' requireParens atype =
                             )
             |> (if requireParens /= NotRequired then parens else id)
 
-        AST.Type.TypeVariable var ->
+        TypeVariable var ->
             line $ identifier var
 
-        AST.Type.TypeConstruction ctor args ->
+        TypeConstruction ctor args ->
             elmApplication
                 (formatTypeConstructor ctor)
                 (map (formatType' ForCtor) args)
                 |> (if requireParens == ForCtor then parens else id)
-        AST.Type.TupleType (first:rest) ->
+        TupleType (first:rest) ->
             elmGroup True "(" "," ")" False (map formatType (first:rest))
-        AST.Type.TupleType [] ->
+        TupleType [] ->
             line $ keyword "()"
-        AST.Type.RecordType ext fields multiline ->
+        RecordType ext fields multiline ->
             let
                 formatField (name, typ, multiline') =
                     case (multiline', destructure (formatType typ)) of
