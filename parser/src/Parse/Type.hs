@@ -14,16 +14,16 @@ import AST.V0_16
 tvar :: IParser Type.Type
 tvar =
   addLocation
-    (Type.RVar <$> lowVar <?> "a type variable")
+    (Type.TypeVariable <$> lowVar <?> "a type variable")
 
 
 tuple :: IParser Type.Type
 tuple =
   do  (start, types, end) <- located (parens $ ((\f a b _ -> f a b) <$> commaSep (const . const <$> expr))) -- TODO: use comments
       case types of
-        [] -> return $ A.A (R.Region start end) $ Type.RUnit
+        [] -> return $ A.A (R.Region start end) $ Type.UnitType
         [t] -> return t
-        _   -> return $ A.A (R.Region start end) $ Type.RTuple types
+        _   -> return $ A.A (R.Region start end) $ Type.TupleType types
 
 
 record :: IParser Type.Type
@@ -36,7 +36,7 @@ record =
       dumbWhitespace -- TODO: use comments
       char '}'
       sawNewline <- popNewlineContext
-      return $ Type.RRecord ext (fields [] []) sawNewline -- TODO: pass comments
+      return $ Type.RecordType ext (fields [] []) sawNewline -- TODO: pass comments
   where
     normal =
       do  (\fields -> (Nothing, fields) ) <$> commaSep field
@@ -72,7 +72,7 @@ constructor0' :: IParser Type.Type
 constructor0' =
     addLocation $
     do  ctor <- capTypeVar
-        return (Type.RVar ctor)
+        return (Type.TypeVariable ctor)
 
 
 term :: IParser Type.Type
@@ -92,7 +92,7 @@ app =
       f <- constructor0 <|> try tupleCtor <?> "a type constructor"
       args <- map (\(_,v) -> v) <$> spacePrefix term -- TODO: use comments
       end <- getMyPosition
-      return (A.A (R.Region start end) (Type.RApp f args))
+      return (A.A (R.Region start end) (Type.TypeConstruction f args))
 
 
 expr :: IParser Type.Type
@@ -108,10 +108,10 @@ expr =
                 t2 <- expr
                 end <- getMyPosition
                 case A.drop t2 of
-                    Type.RLambda t2' ts ->
-                        return (A.A (R.Region start end) (Type.RLambda t1 (t2':ts)))
+                    Type.FunctionType t2' ts ->
+                        return (A.A (R.Region start end) (Type.FunctionType t1 (t2':ts)))
                     _ ->
-                        return (A.A (R.Region start end) (Type.RLambda t1 [t2]))
+                        return (A.A (R.Region start end) (Type.FunctionType t1 [t2]))
 
 
 constructor :: IParser (String, [Type.Type])
