@@ -928,6 +928,11 @@ formatCommented format (Commented pre post inner) =
                 ++ ( map formatComment post)
 
 
+formatCommented'' :: (a -> Box) -> ([Comment], a) -> Box
+formatCommented'' format (pre, inner) =
+    formatCommented' pre format inner
+
+
 formatCommented' :: [Comment] -> (a -> Box) -> a -> Box
 formatCommented' pre format inner =
     formatCommented format (Commented pre [] inner)
@@ -1091,7 +1096,7 @@ formatType' requireParens atype =
         TypeConstruction ctor args ->
             elmApplication
                 (formatTypeConstructor ctor)
-                (map (formatType' ForCtor) args)
+                (map (formatCommented'' $ formatType' ForCtor) args)
                 |> (if requireParens == ForCtor then parens else id)
         TupleType (first:rest) ->
             elmGroup True "(" "," ")" False (map formatType (first:rest))

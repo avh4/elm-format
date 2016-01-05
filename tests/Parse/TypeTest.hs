@@ -38,15 +38,15 @@ tests =
         ]
 
     , testGroup "constructor"
-        [ example "" "Foo a b" $ at 1 1 1 8 (TypeConstruction (NamedConstructor "Foo") [at 1 5 1 6 (TypeVariable "a"),at 1 7 1 8 (TypeVariable "b")])
+        [ example "" "Foo a b" $ at 1 1 1 8 (TypeConstruction (NamedConstructor "Foo") [([],at 1 5 1 6 (TypeVariable "a")),([],at 1 7 1 8 (TypeVariable "b"))])
         , example "no arguments" "Foo" $ at 1 1 1 4 (TypeConstruction (NamedConstructor "Foo") [])
-        , example "comments" "Foo{-A-}a{-B-}b" $ at 1 1 1 16 (TypeConstruction (NamedConstructor "Foo") [at 1 9 1 10 (TypeVariable "a"),at 1 15 1 16 (TypeVariable "b")]) -- TODO: parse comments
-        , example "newlines" "Foo\n a\n b" $ at 1 1 3 3 (TypeConstruction (NamedConstructor "Foo") [at 2 2 2 3 (TypeVariable "a"),at 3 2 3 3 (TypeVariable "b")])
+        , example "comments" "Foo{-A-}a{-B-}b" $ at 1 1 1 16 (TypeConstruction (NamedConstructor "Foo") [([BlockComment ["A"]],at 1 9 1 10 (TypeVariable "a")),([BlockComment ["B"]],at 1 15 1 16 (TypeVariable "b"))])
+        , example "newlines" "Foo\n a\n b" $ at 1 1 3 3 (TypeConstruction (NamedConstructor "Foo") [([],at 2 2 2 3 (TypeVariable "a")),([],at 3 2 3 3 (TypeVariable "b"))])
         ]
 
     , testGroup "tuple constructor"
-        [ example "single comma" "(,) a b" $ at 1 1 1 8 (TypeConstruction (TupleConstructor 2) [at 1 5 1 6 (TypeVariable "a"),at 1 7 1 8 (TypeVariable "b")])
-        , example "multiple commas" "(,,,) a b c d" $ at 1 1 1 14 (TypeConstruction (TupleConstructor 4) [at 1 7 1 8 (TypeVariable "a"),at 1 9 1 10 (TypeVariable "b"),at 1 11 1 12 (TypeVariable "c"),at 1 13 1 14 (TypeVariable "d")])
+        [ example "single comma" "(,) a b" $ at 1 1 1 8 (TypeConstruction (TupleConstructor 2) [([],at 1 5 1 6 (TypeVariable "a")),([],at 1 7 1 8 (TypeVariable "b"))])
+        , example "multiple commas" "(,,,) a b c d" $ at 1 1 1 14 (TypeConstruction (TupleConstructor 4) [([],at 1 7 1 8 (TypeVariable "a")),([],at 1 9 1 10 (TypeVariable "b")),([],at 1 11 1 12 (TypeVariable "c")),([],at 1 13 1 14 (TypeVariable "d"))])
         ]
 
     , testGroup "tuple type"
