@@ -1055,6 +1055,16 @@ commaSpace =
         ]
 
 
+formatTypeConstructor :: AST.Type.TypeConstructor -> Box
+formatTypeConstructor ctor =
+    case ctor of
+        AST.Type.NamedConstructor name ->
+            line $ identifier name
+
+        AST.Type.TupleConstructor n ->
+            line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
+
+
 formatType' :: TypeParensRequired -> AST.Type.Type -> Box
 formatType' requireParens atype =
     case RA.drop atype of
@@ -1075,13 +1085,13 @@ formatType' requireParens atype =
                                 |> map (prefix (row [keyword "->", space]))
                             )
             |> (if requireParens /= NotRequired then parens else id)
+
         AST.Type.RVar var ->
             line $ identifier var
-        AST.Type.RTupleFunction n ->
-            line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
+
         AST.Type.RApp ctor args ->
             elmApplication
-                (formatType' ForCtor ctor)
+                (formatTypeConstructor ctor)
                 (map (formatType' ForCtor) args)
                 |> (if requireParens == ForCtor then parens else id)
         AST.Type.RTuple (first:rest) ->

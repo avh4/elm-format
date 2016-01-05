@@ -62,16 +62,28 @@ capTypeVar =
   intercalate "." <$> dotSep1 capVar
 
 
-constructor0 :: IParser Type.Type
+constructor0 :: IParser Type.TypeConstructor
 constructor0 =
-  addLocation $
   do  name <- capTypeVar
-      return (Type.RVar name)
+      return (Type.NamedConstructor name)
+
+
+constructor0' :: IParser Type.Type
+constructor0' =
+    addLocation $
+    do  ctor <- capTypeVar
+        return (Type.RVar ctor)
 
 
 term :: IParser Type.Type
 term =
-  tuple <|> record <|> tvar <|> constructor0
+  tuple <|> record <|> tvar <|> constructor0'
+
+
+tupleCtor :: IParser Type.TypeConstructor
+tupleCtor =
+    do  ctor <- parens' (many1 (char ','))
+        return (Type.TupleConstructor (length ctor + 1))
 
 
 app :: IParser Type.Type
@@ -80,14 +92,7 @@ app =
       f <- constructor0 <|> try tupleCtor <?> "a type constructor"
       args <- map (\(_,v) -> v) <$> spacePrefix term -- TODO: use comments
       end <- getMyPosition
-      case args of
-        [] -> return f
-        _  -> return (A.A (R.Region start end) (Type.RApp f args))
-  where
-    tupleCtor =
-      addLocation $
-      do  ctor <- parens' (many1 (char ','))
-          return (Type.RTupleFunction (length ctor + 1))
+      return (A.A (R.Region start end) (Type.RApp f args))
 
 
 expr :: IParser Type.Type
