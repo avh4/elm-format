@@ -1,6 +1,5 @@
 module AST.Type
     ( Type, Type'(..), TypeConstructor(..)
-    , Port(..), getPortType
     ) where
 
 import qualified Reporting.Annotation as A
@@ -26,16 +25,3 @@ data Type'
     | RecordType (Maybe String) [(String, Type, Bool)] Bool
     | FunctionType Type [Type]
     deriving (Eq, Show)
-
-
-data Port
-    = Normal Type
-    | Signal { root :: Type, arg :: Type }
-    deriving (Show)
-
-
-getPortType :: Port -> Type
-getPortType portType =
-  case portType of
-    Normal tipe -> tipe
-    Signal tipe _ -> tipe
