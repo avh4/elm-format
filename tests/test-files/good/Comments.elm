@@ -26,107 +26,107 @@ import String
 
 
 comments1 =
-    -- comments inside declaration
-    ()
+  -- comments inside declaration
+  ()
 
 
 comments2 =
-    1
-        -- plus
-        -- plus
-        +
-            3
+  1
+    -- plus
+    -- plus
+    +
+      3
 
 
 records =
-    { -- before a field
-      f1 = ()
-    , f2
-      -- after a field
-        = ()
-    , f3 = ()
-    }
+  { -- before a field
+    f1 = ()
+  , f2
+    -- after a field
+      = ()
+  , f3 = ()
+  }
 
 
 comments3 =
-    let
-        -- The return value
-        x = ()
+  let
+    -- The return value
+    x = ()
 
-        {- comment after definitions -}
-        -- ...
-    in
-        {- let body -}
-        x
+    {- comment after definitions -}
+    -- ...
+  in
+    {- let body -}
+    x
 
 
 comments4 bool =
-    case bool of
-        -- This case is for True
-        True ->
-            -- return unit
-            ()
+  case bool of
+    -- This case is for True
+    True ->
+      -- return unit
+      ()
 
-        {- Here's a case for anything else -}
-        _ ->
-            {- return unit -}
-            ()
+    {- Here's a case for anything else -}
+    _ ->
+      {- return unit -}
+      ()
 
 
 comments5 =
-    if True then
-        -- do the right thing
-        ()
-    else if False then
-        -- do something
-        -- redundant
-        ()
-    else
-        {- do the wrong thing -}
-        ()
+  if True then
+    -- do the right thing
+    ()
+  else if False then
+    -- do something
+    -- redundant
+    ()
+  else
+    {- do the wrong thing -}
+    ()
 
 
 comments6 =
-    \x ->
-        -- we compute using x
-        x * x
+  \x ->
+    -- we compute using x
+    x * x
 
 
 comments7 =
-    let
-        x =
-            case True of
-                _ ->
-                    ()
+  let
+    x =
+      case True of
+        _ ->
+          ()
 
-        -- comments
-        y = ()
-    in
-        ()
+    -- comments
+    y = ()
+  in
+    ()
 
 
 comments8 =
-    [ {- A -} 7 {- X -}
-    , -- B
-      -- C
-      8
-      -- Y
-      -- Z
-    ]
+  [ {- A -} 7 {- X -}
+  , -- B
+    -- C
+    8
+    -- Y
+    -- Z
+  ]
 
 
 expressionDefinition {- F -} _ {- G -} _ =
-    {- H -}
-    {- I -}
-    ()
+  {- H -}
+  {- I -}
+  ()
 
 
 infix {- A -} 7 {- B -} ===
 (===) =
-    always
+  always
 
 
 port {- A -} runner {- B -} : {- C -} Signal (Task.Task x ())
 port {- A -} runner {- B -} =
-    -- C
-    Signal.constant (Task.succeed ())
+  -- C
+  Signal.constant (Task.succeed ())

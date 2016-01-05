@@ -68,13 +68,13 @@ tests =
                 , word "bar"
                 ]
     , testCase "indent" $
-        assertOutput "    a\n    b\n" $
+        assertOutput "  a\n  b\n" $
             indent $ stack1
                 [ word "a"
                 , word "b"
                 ]
     , testCase "indent (with leading spaces)" $
-        assertOutput "    a\n" $
+        assertOutput "  a\n" $
             line $ row [ space, Tab, identifier "a" ]
 
     , testCase "elmApplication (single line)" $
@@ -86,9 +86,9 @@ tests =
             ( unlines
                 [ "aa"
                 , "aa"
-                , "    bb"
-                , "    bb"
-                , "    c"
+                , "  bb"
+                , "  bb"
+                , "  c"
                 ]
             ) $
             elmApplication
