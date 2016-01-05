@@ -1,5 +1,5 @@
 module AST.Type
-    ( Type, Type'(..)
+    ( Type, Type'(..), TypeConstructor(..)
     , Port(..), getPortType
     ) where
 
@@ -12,11 +12,16 @@ type Type =
     A.Located Type'
 
 
+data TypeConstructor
+    = NamedConstructor String
+    | TupleConstructor Int -- will be 2 or greater, indicating the number of elements in the tuple
+    deriving (Eq, Show)
+
+
 data Type'
     = RUnit
     | RVar String
-    | RTupleFunction Int -- will be 2 or greater, indicating the number of elements in the tuple
-    | RApp Type [Type]
+    | RApp TypeConstructor [Type]
     | RTuple [Type]
     | RRecord (Maybe String) [(String, Type, Bool)] Bool
     | RLambda Type [Type]
