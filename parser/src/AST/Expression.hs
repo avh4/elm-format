@@ -4,7 +4,6 @@ module AST.Expression where
 
 import AST.V0_16
 import qualified AST.Pattern as Pattern
-import qualified AST.Type as Type
 import qualified AST.Variable as Var
 import qualified AST.GLShader as L
 import qualified Reporting.Annotation as A
@@ -22,7 +21,7 @@ type Def =
 
 data Def'
     = Definition Pattern.Pattern [([Comment], Pattern.Pattern)] [Comment] Expr Bool
-    | TypeAnnotation Var.Ref Type.Type
+    | TypeAnnotation Var.Ref Type
     | LetComment Comment
     deriving (Eq, Show)
 

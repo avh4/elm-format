@@ -1,7 +1,5 @@
 module AST.Variable where
 
-import AST.V0_16
-
 
 data Ref
     = VarRef String
