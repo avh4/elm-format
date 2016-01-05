@@ -33,7 +33,7 @@ data TypeConstructor
 data Type'
     = UnitType
     | TypeVariable String
-    | TypeConstruction TypeConstructor [Type]
+    | TypeConstruction TypeConstructor [([Comment], Type)]
     | TupleType [Type]
     | RecordType (Maybe String) [(String, Type, Bool)] Bool
     | FunctionType Type [Type]

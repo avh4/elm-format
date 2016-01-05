@@ -18,12 +18,26 @@ variable _ =
   ()
 
 
-constructor : Dict.Dict String Int -> ()
+constructor :
+  Dict.Dict
+    -- A
+    String
+    -- B
+    Int
+  -> ()
 constructor _ =
   ()
 
 
-tupleFn : (,,) Int String Bool -> ()
+tupleFn :
+  (,,)
+    -- C
+    Int
+    -- D
+    String
+    --E
+    Bool
+  -> ()
 tupleFn _ =
   ()
 

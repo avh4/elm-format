@@ -89,7 +89,7 @@ app :: IParser Type
 app =
   do  start <- getMyPosition
       f <- constructor0 <|> try tupleCtor <?> "a type constructor"
-      args <- map (\(_,v) -> v) <$> spacePrefix term -- TODO: use comments
+      args <- spacePrefix term
       end <- getMyPosition
       return (A.A (R.Region start end) (TypeConstruction f args))
 
