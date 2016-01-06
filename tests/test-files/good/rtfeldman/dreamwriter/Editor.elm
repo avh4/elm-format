@@ -22,15 +22,17 @@ type alias Addresses a =
 
 
 type alias Model =
-  { currentDoc : Doc
-  , fullscreen : FullscreenState
+  {
+    currentDoc : Doc,
+    fullscreen : FullscreenState
   }
 
 
 initialModel : Model
 initialModel =
-  { currentDoc = emptyDoc
-  , fullscreen = False
+  {
+    currentDoc = emptyDoc,
+    fullscreen = False
   }
 
 
@@ -43,11 +45,13 @@ viewEditor : Addresses a -> Doc -> FullscreenState -> Html
 viewEditor channels currentDoc fullscreen =
   div
     [ id "editor-container" ]
-    [ div
+    [
+      div
         [ id "editor-frame" ]
-        [ viewEditorHeader channels currentDoc fullscreen
-        , viewOutline channels currentDoc fullscreen
-        , viewEditorFooter channels currentDoc fullscreen
+        [
+          viewEditorHeader channels currentDoc fullscreen,
+          viewOutline channels currentDoc fullscreen,
+          viewEditorFooter channels currentDoc fullscreen
         ]
     ]
 
@@ -56,26 +60,31 @@ viewEditorHeader : Addresses a -> Doc -> FullscreenState -> Html
 viewEditorHeader channels currentDoc fullscreen =
   div
     [ id "editor-header" ]
-    [ div [ class "toolbar-section toolbar-button flaticon-zoom19" ] []
-    , div
+    [
+      div [ class "toolbar-section toolbar-button flaticon-zoom19" ] [],
+      div
         [ class "toolbar-section" ]
-        [ viewFontControl
+        [
+          viewFontControl
             channels.execCommand
             "toggle-bold"
             "B"
             "bold"
-        , viewFontControl
+          ,
+          viewFontControl
             channels.execCommand
             "toggle-italics"
             "I"
             "italic"
-        , viewFontControl
+          ,
+          viewFontControl
             channels.execCommand
             "toggle-strikethrough"
             "\xA0S\xA0"
             "strikethrough"
         ]
-    , lazy2 viewFullscreenButton channels.fullscreen fullscreen
+      ,
+      lazy2 viewFullscreenButton channels.fullscreen fullscreen
     ]
 
 
@@ -100,20 +109,26 @@ viewEditorFooter channels currentDoc fullscreen =
   in
     div
       [ id "editor-footer" ]
-      [ div
+      [
+        div
           [ id "doc-word-count" ]
-          [ text wordCountLabel
-          , WordGraph.viewWordGraph currentDoc.dailyWords
+          [
+            text wordCountLabel,
+            WordGraph.viewWordGraph currentDoc.dailyWords
           ]
-      , div
+        ,
+        div
           [ id "dropbox-sync" ]
-          [ input
-              [ id "toggle-dropbox-sync"
-              , property "type" (string "checkbox")
-              , onClick channels.remoteSync ()
+          [
+            input
+              [
+                id "toggle-dropbox-sync",
+                property "type" (string "checkbox"),
+                onClick channels.remoteSync ()
               ]
               []
-          , label
+            ,
+            label
               [ for "toggle-dropbox-sync" ]
               [ text " sync to Dropbox" ]
           ]
@@ -124,8 +139,9 @@ viewOutline : Addresses a -> Doc -> FullscreenState -> Html
 viewOutline channels currentDoc fullscreen =
   let
     outlineHeadingNodes =
-      [ h1 [ id "edit-title" ] []
-      , div [ id "edit-description" ] []
+      [
+        h1 [ id "edit-title" ] [],
+        div [ id "edit-description" ] []
       ]
 
     outlineChapterNodes =
@@ -171,38 +187,43 @@ viewFullscreenButton fullscreenChannel fullscreen =
     { fullscreenClass, targetMode, fullscreenTitle } =
       case fullscreen of
         True ->
-          { fullscreenClass = "flaticon-collapsing"
-          , targetMode = False
-          , fullscreenTitle = "Leave Fullscreen Mode"
+          {
+            fullscreenClass = "flaticon-collapsing",
+            targetMode = False,
+            fullscreenTitle = "Leave Fullscreen Mode"
           }
 
         False ->
-          { fullscreenClass = "flaticon-expand"
-          , targetMode = True
-          , fullscreenTitle = "Enter Fullscreen Mode"
+          {
+            fullscreenClass = "flaticon-expand",
+            targetMode = True,
+            fullscreenTitle = "Enter Fullscreen Mode"
           }
   in
     div
-      [ class ("toolbar-section toolbar-button " ++ fullscreenClass)
-      , title fullscreenTitle
-      , onClick fullscreenChannel targetMode
+      [
+        class ("toolbar-section toolbar-button " ++ fullscreenClass),
+        title fullscreenTitle,
+        onClick fullscreenChannel targetMode
       ]
       []
 
 
 lazyViewChapter : Identifier -> List Html
 lazyViewChapter chapterId =
-  [ lazy viewChapterHeading chapterId
-  , lazy viewChapterBody chapterId
+  [
+    lazy viewChapterHeading chapterId,
+    lazy viewChapterBody chapterId
   ]
 
 
 viewChapterBody : Identifier -> Html
 viewChapterBody chapterId =
   div
-    [ key ("chapter-body-" ++ chapterId)
-    , id ("edit-chapter-body-" ++ chapterId)
-    , class "chapter-body"
+    [
+      key ("chapter-body-" ++ chapterId),
+      id ("edit-chapter-body-" ++ chapterId),
+      class "chapter-body"
     ]
     []
 
@@ -210,9 +231,10 @@ viewChapterBody chapterId =
 viewChapterHeading : Identifier -> Html
 viewChapterHeading chapterId =
   h2
-    [ key ("chapter-heading-" ++ chapterId)
-    , id ("edit-chapter-heading-" ++ chapterId)
-    , class "chapter-heading"
+    [
+      key ("chapter-heading-" ++ chapterId),
+      id ("edit-chapter-heading-" ++ chapterId),
+      class "chapter-heading"
     ]
     []
 
@@ -220,9 +242,10 @@ viewChapterHeading chapterId =
 viewFontControl : Address String -> String -> String -> String -> Html
 viewFontControl execCommandChannel idAttr label command =
   span
-    [ class "font-control toolbar-button toolbar-font-button"
-    , id idAttr
-    , (property "unselectable" (string "on"))
-    , onClick execCommandChannel command
+    [
+      class "font-control toolbar-button toolbar-font-button",
+      id idAttr,
+      (property "unselectable" (string "on")),
+      onClick execCommandChannel command
     ]
     [ text label ]

@@ -39,12 +39,15 @@ comments2 =
 
 
 records =
-  { -- before a field
+  {
+    -- before a field
     f1 = ()
-  , f2
+    ,
+    f2
     -- after a field
       = ()
-  , f3 = ()
+    ,
+    f3 = ()
   }
 
 
@@ -106,8 +109,9 @@ comments7 =
 
 
 comments8 =
-  [ {- A -} 7 {- X -}
-  , -- B
+  [
+    {- A -} 7 {- X -},
+    -- B
     -- C
     8
     -- Y

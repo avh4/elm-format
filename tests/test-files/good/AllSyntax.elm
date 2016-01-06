@@ -23,8 +23,9 @@ type Data x y z
 
 type MultilineData
   = MultilineData
-      { f1 : ()
-      , f2 : Int -> Float
+      {
+        f1 : (),
+        f2 : Int -> Float
       }
 
 
@@ -47,20 +48,22 @@ type alias MoreTypes x y z =
 
 
 type alias ParensInTypes a b c =
-  { f1 : a -> b
-  , f2 : (a -> b) -> c
-  , f3 : c -> List (a -> b)
-  , f4 : List (List (List b))
-  , f5 : List Type
-  , f6 : ( a -> b, List (List c) )
-  , f7 : List Type -> (a -> List b) -> List c
+  {
+    f1 : a -> b,
+    f2 : (a -> b) -> c,
+    f3 : c -> List (a -> b),
+    f4 : List (List (List b)),
+    f5 : List Type,
+    f6 : ( a -> b, List (List c) ),
+    f7 : List Type -> (a -> List b) -> List c
   }
 
 
 type alias MultilineRecordType =
-  { x : Int
-  , y : Int
-  , z : Int
+  {
+    x : Int,
+    y : Int,
+    z : Int
   }
 
 
@@ -72,19 +75,23 @@ type alias MultilineRecordExtension a =
 
 
 type alias NestedRecords a =
-  { f1 : Int
-  , f2 : { singleLine : () }
-  , f3 :
-      { multiline1 : ( (), () )
-      , multiline2 : { inner : List Char }
-      , multiline3 :
+  {
+    f1 : Int,
+    f2 : { singleLine : () },
+    f3 :
+      {
+        multiline1 : ( (), () ),
+        multiline2 : { inner : List Char },
+        multiline3 :
           { a
             | multiline' : Bool
           }
       }
-  , f4 :
+    ,
+    f4 :
       { single : {} }
-  , f5 :
+    ,
+    f5 :
       MoreTypes Int Float Bool
   }
 
@@ -101,8 +108,9 @@ annotatedFn =
 
 
 fn2 :
-  { x : Int
-  , y : String
+  {
+    x : Int,
+    y : String
   }
   -> String
   -> { a
@@ -174,21 +182,24 @@ tupleFunction =
 
 
 multilineTuple a b =
-  ( 1
-  , if b then
+  (
+    1,
+    if b then
       2
     else
       3
-  , (+) 3 4
-  , 7
+    ,
+    (+) 3 4,
+    7
       + 9
   )
 
 
 vars =
-  ( Foo
-  , Too
-  , Bar
+  (
+    Foo,
+    Too,
+    Bar
   )
 
 
@@ -197,26 +208,34 @@ lists =
 
 
 multilineLists =
-  [ "one"
-  , "two"
-  , "three"
+  [
+    "one",
+    "two",
+    "three"
   ]
 
 
 nestedMultilineLists =
-  [ []
-  , [ [], [ "1" ] ]
-  , [ [ "a"
-      , "b"
+  [
+    [],
+    [ [], [ "1" ] ],
+    [
+      [
+        "a",
+        "b"
       ]
     ]
-  , [ [] ]
+    ,
+    [ [] ]
   ]
 
 
 functionCallInMultilineList =
-  [ [ [ toString "a" ] ]
-  , [ [ toString
+  [
+    [ [ toString "a" ] ],
+    [
+      [
+        toString
           "a"
       ]
     ]
@@ -383,8 +402,9 @@ multilineRecordUpdate r f =
 
 
 multilineRecordAccess2 r f =
-  { f1 = 1
-  , f2 = 2
+  {
+    f1 = 1,
+    f2 = 2
   }.f2
 
 
@@ -395,8 +415,9 @@ chainedRecordAccess r =
 
 
 multilineRecordLiteral =
-  { f1 = ()
-  , f2 = 2
+  {
+    f1 = (),
+    f2 = 2
   }
 
 
@@ -448,60 +469,78 @@ caseStatement mb =
 
 
 multilineExpressionsInsideList =
-  [ let
+  [
+    let
       x = 1
     in
       always x
-  , if True then
+    ,
+    if True then
       always 2
     else if False then
       always 3
     else
       always 4
-  , case True of
+    ,
+    case True of
       _ ->
         always 5
-  , [ 6
-    , 7
+    ,
+    [
+      6,
+      7
     ]
       |> head
       |> Maybe.withDefault 8
       |> always
-  , \a ->
+    ,
+    \a ->
       9
   ]
 
 
 multilineExpressionsInsideTuple a foo =
-  ( let
+  (
+    let
       x = 1
     in
       x
-  , if True then
+    ,
+    if True then
       2
     else if False then
       3
     else
       4
-  , case True of
+    ,
+    case True of
       _ ->
         5
-  , [ 6
-    , 7
+    ,
+    [
+      6,
+      7
     ]
       |> head
       |> Maybe.withDefault 8
-  , \a ->
+    ,
+    \a ->
       9
-  , foo
+    ,
+    foo
       10
-  , ( 11
-    , 12
+    ,
+    (
+      11,
+      12
     )
-  , { x = 13
-    , y = 14
+    ,
+    {
+      x = 13,
+      y = 14
     }
-  , { a
+    ,
+    { a
       | x = 15
       , y = 16
     }
@@ -509,29 +548,35 @@ multilineExpressionsInsideTuple a foo =
 
 
 multilineExpressionsInsideRecord =
-  { a =
+  {
+    a =
       let
         x = 1
       in
         x
-  , b =
+    ,
+    b =
       if True then
         2
       else if False then
         3
       else
         4
-  , c =
+    ,
+    c =
       case True of
         _ ->
           5
-  , d =
-      [ 6
-      , 7
+    ,
+    d =
+      [
+        6,
+        7
       ]
         |> head
         |> Maybe.withDefault 8
-  , e =
+    ,
+    e =
       \a ->
         9
   }
@@ -586,7 +631,8 @@ multilineRange =
 
 
 nestedMultilineRange =
-  [ [
+  [
+    [
       if True then
         1
       else
@@ -597,26 +643,32 @@ nestedMultilineRange =
       else
         5
     ]
-  , [4..2]
+    ,
+    [4..2]
   ]
 
 
 indentedMultilineInsideMultilineInfixApplication div id =
   div [ id "page" ]
-    @ { x = 1
-      , y = 2
+    @ {
+        x = 1,
+        y = 2
       }
-    <| { x = 1
-       , y = 2
+    <| {
+        x = 1,
+        y = 2
        }
-    *** { x = 1
-        , y = 2
+    *** {
+          x = 1,
+          y = 2
         }
-    <<>> { x = 1
-         , y = 2
+    <<>> {
+          x = 1,
+          y = 2
          }
-    ==/== { x = 1
-          , y = 2
+    ==/== {
+            x = 1,
+            y = 2
           }
 
 

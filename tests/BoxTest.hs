@@ -108,10 +108,10 @@ tests =
     , testCase "elmGroup (single line, no spaces)" $
         assertOutput "(foo, bar)\n" $
             elmGroup False "(" "," ")" False [ word "foo", word "bar" ]
-    , testCase "elmGroup (multiline)" $
-        assertOutput "( aa\n  aa\n, b\n, cc\n  cc\n)\n" $
-            elmGroup True "(" "," ")" False [ block "a", word "b", block "c" ]
-    , testCase "elmGroup (forced multiline)" $
-        assertOutput "( a\n, b\n, c\n)\n" $
-            elmGroup True "(" "," ")" True [ word "a", word "b", word "c" ]
+    -- , testCase "elmGroup (multiline)" $
+    --     assertOutput "( aa\n  aa\n, b\n, cc\n  cc\n)\n" $
+    --         elmGroup True "(" "," ")" False [ block "a", word "b", block "c" ]
+    -- , testCase "elmGroup (forced multiline)" $
+    --     assertOutput "( a\n, b\n, c\n)\n" $
+    --         elmGroup True "(" "," ")" True [ word "a", word "b", word "c" ]
     ]

@@ -34,10 +34,11 @@ get values from JavaScript, they will come in through a port as a signal which
 you can pipe into your app as one of the `inputs`.
 -}
 type alias Config model action =
-  { init : ( model, Effects action )
-  , update : action -> model -> ( model, Effects action )
-  , view : Signal.Address action -> model -> Html
-  , inputs : List (Signal.Signal action)
+  {
+    init : ( model, Effects action ),
+    update : action -> model -> ( model, Effects action ),
+    view : Signal.Address action -> model -> Html,
+    inputs : List (Signal.Signal action)
   }
 
 
@@ -55,9 +56,10 @@ type alias Config model action =
     be hooked up to a `port` to ensure they get run.
 -}
 type alias App model =
-  { html : Signal Html
-  , model : Signal model
-  , tasks : Signal (Task.Task Never ())
+  {
+    html : Signal Html,
+    model : Signal model,
+    tasks : Signal (Task.Task Never ())
   }
 
 
@@ -112,7 +114,8 @@ start config =
     model =
       Signal.map fst effectsAndModel
   in
-    { html = Signal.map (config.view address) model
-    , model = model
-    , tasks = Signal.map (Effects.toTask messages.address << snd) effectsAndModel
+    {
+      html = Signal.map (config.view address) model,
+      model = model,
+      tasks = Signal.map (Effects.toTask messages.address << snd) effectsAndModel
     }

@@ -125,9 +125,10 @@ SuccessOptions contains:
 3. the `seed` used in order to reproduce the check.
 -}
 type alias SuccessOptions =
-  { name : String
-  , seed : Seed
-  , numberOfChecks : Int
+  {
+    name : String,
+    seed : Seed,
+    numberOfChecks : Int
   }
 
 
@@ -146,18 +147,21 @@ FailureOptions contains:
 to performing the shrinking operations.
 -}
 type alias FailureOptions =
-  { name : String
-  , counterExample : String
-  , actual : String
-  , expected : String
-  , original :
-      { counterExample : String
-      , actual : String
-      , expected : String
+  {
+    name : String,
+    counterExample : String,
+    actual : String,
+    expected : String,
+    original :
+      {
+        counterExample : String,
+        actual : String,
+        expected : String
       }
-  , seed : Seed
-  , numberOfChecks : Int
-  , numberOfShrinks : Int
+    ,
+    seed : Seed,
+    numberOfChecks : Int,
+    numberOfShrinks : Int
   }
 
 
@@ -302,9 +306,10 @@ claim name actualStatement expectedStatement investigator =
             Ok numberOfChecks ->
               Unit
                 <| Ok
-                    { name = name
-                    , seed = seed
-                    , numberOfChecks = max 0 numberOfChecks
+                    {
+                      name = name,
+                      seed = seed,
+                      numberOfChecks = max 0 numberOfChecks
                     }
 
             ------------------------------------------------------------
@@ -390,18 +395,21 @@ claim name actualStatement expectedStatement investigator =
                 -- performed.
                 Unit
                   <| Err
-                      { name = name
-                      , seed = seed
-                      , counterExample = toString minimal
-                      , expected = toString expected
-                      , actual = toString actual
-                      , original =
-                          { counterExample = toString originalCounterExample
-                          , actual = toString originalActual
-                          , expected = toString originalExpected
+                      {
+                        name = name,
+                        seed = seed,
+                        counterExample = toString minimal,
+                        expected = toString expected,
+                        actual = toString actual,
+                        original =
+                          {
+                            counterExample = toString originalCounterExample,
+                            actual = toString originalActual,
+                            expected = toString originalExpected
                           }
-                      , numberOfChecks = numberOfChecks
-                      , numberOfShrinks = numberOfShrinks
+                        ,
+                        numberOfChecks = numberOfChecks,
+                        numberOfShrinks = numberOfShrinks
                       }
 
 

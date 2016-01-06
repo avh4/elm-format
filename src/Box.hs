@@ -233,6 +233,23 @@ prefix pref =
         paddingSpaces = replicate prefixLength space
 
 
+addCommas :: [Box] -> [Box]
+addCommas list =
+    let
+        addComma b =
+            case isLine b of
+                Right b' ->
+                    line $ row [ b', punc "," ]
+                Left b' ->
+                    stack1
+                        [ b'
+                        , line $ punc ","
+                        ]
+    in
+        (map addComma $ init list)
+          ++ [(last list)]
+
+
 elmGroup :: Bool -> String -> String -> String -> Bool -> [Box] -> Box
 elmGroup innerSpaces left sep right forceMultiline children =
     case (forceMultiline, allSingles children) of
@@ -249,10 +266,11 @@ elmGroup innerSpaces left sep right forceMultiline children =
                 [] ->
                     line $ row [ punc left, punc right]
                 (first:rest) ->
-                    stack1 $
-                        (prefix (row [punc left, space]) first)
-                        : (map (prefix $ row [punc sep, space]) rest)
-                        ++ [ line $ punc right ]
+                    stack1
+                        [ line $ punc left
+                        , indent $ stack1 $ addCommas (first:rest)
+                        , line $ punc right
+                        ]
 
 
 renderLine :: Int -> Line -> T.Text

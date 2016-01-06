@@ -5,15 +5,17 @@ import Svg.Attributes exposing (..)
 
 
 type alias Entry =
-  { words : Int
-  , day : String
+  {
+    words : Int,
+    day : String
   }
 
 
 type alias Day =
-  { amount : Float
-  , day : String
-  , xOffset : Int
+  {
+    amount : Float,
+    day : String,
+    xOffset : Int
   }
 
 
@@ -36,15 +38,17 @@ maxDays =
 bar : Day -> Float -> Svg
 bar day yOffset =
   rect
-    [ x <| toString <| (day.xOffset * (barWidth + barMargin))
-    , y
+    [
+      x <| toString <| (day.xOffset * (barWidth + barMargin)),
+      y
         <| toString
         <| if day.amount <= 0 then
             yOffset
            else
             yOffset - day.amount
-    , height <| toString <| abs day.amount
-    , width <| toString barWidth
+      ,
+      height <| toString <| abs day.amount,
+      width <| toString barWidth
     ]
     [ Svg.title [] [ text day.day ] ]
 
@@ -56,20 +60,24 @@ graph yOffset days =
 
     axis =
       line
-        [ x1 "0"
-        , y1 <| toString yOffset
-        , x2 <| toString (graphWidth - barMargin)
-        , y2 <| toString yOffset
+        [
+          x1 "0",
+          y1 <| toString yOffset,
+          x2 <| toString (graphWidth - barMargin),
+          y2 <| toString yOffset
         ]
         []
   in
     svg
-      [ id "doc-word-count-graph"
-      , width <| toString graphWidth
-      , height <| toString graphHeight
+      [
+        id "doc-word-count-graph",
+        width <| toString graphWidth,
+        height <| toString graphHeight
       ]
-      [ g
-          [ y <| toString yOffset
+      [
+        g
+          [
+            y <| toString yOffset
           ]
           {- SVG uses a painter algorithm, so we need axis at the end of
           the list to keep bars from overlapping the axis, which gets
@@ -124,9 +132,10 @@ viewWordGraph list =
     days =
       List.map2
         (\offset entry ->
-          { amount = scale max min entry.words
-          , day = entry.day
-          , xOffset = offset
+          {
+            amount = scale max min entry.words,
+            day = entry.day,
+            xOffset = offset
           }
         )
         [0..maxDays - 1]
