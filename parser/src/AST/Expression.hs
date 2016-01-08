@@ -61,8 +61,8 @@ data Expr'
     | TupleFunction Int -- will be 2 or greater, indicating the number of elements in the tuple
 
     | EmptyRecord [Comment]
-    | Record [([Comment], String, [Comment], Commented Expr, Bool)] Bool
-    | RecordUpdate (Commented Expr) [([Comment], String, [Comment], Commented Expr, Bool)] Bool
+    | Record [(Commented String, Commented Expr, Bool)] Bool
+    | RecordUpdate (Commented Expr) [(Commented String, Commented Expr, Bool)] Bool
     | Access Expr String
     | AccessFunction String
 

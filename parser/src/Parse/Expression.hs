@@ -142,8 +142,8 @@ recordTerm =
             [ do  try comma
                   (_, preNext) <- whitespace
                   fields <- commaSep field
-                  return $ \pre post multiline -> (E.Record ((pre, starter, postStarter, Commented preExpr value postExpr, multiline') : (fields preNext post)) multiline)
-            , return $ \pre post multiline -> (E.Record [(pre, starter, postStarter, Commented preExpr value (postExpr ++ post), multiline')] multiline)
+                  return $ \pre post multiline -> (E.Record ((Commented pre starter postStarter, Commented preExpr value postExpr, multiline') : (fields preNext post)) multiline)
+            , return $ \pre post multiline -> (E.Record [(Commented pre starter postStarter, Commented preExpr value (postExpr ++ post), multiline')] multiline)
             ]
 
     field =
@@ -152,7 +152,7 @@ recordTerm =
           (postKey, _, preExpr) <- padded equals
           value <- expr
           multiline <- popNewlineContext
-          return $ \pre post -> (pre, key, postKey, Commented preExpr value post, multiline)
+          return $ \pre post -> (Commented pre key postKey, Commented preExpr value post, multiline)
 
 
 term :: IParser E.Expr

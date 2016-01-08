@@ -587,8 +587,8 @@ addSuffix suffix b =
                 |> andThen [ line $ row [ last ls, suffix ] ]
 
 
-formatRecordPair :: ([Comment], String, [Comment], Commented AST.Expression.Expr, Bool) -> Box
-formatRecordPair (pre, k, postK, v, multiline') =
+formatRecordPair :: (Commented String, Commented AST.Expression.Expr, Bool) -> Box
+formatRecordPair (Commented pre k postK, v, multiline') =
     case
         isLine'
             (isLine $ formatCommented (line . identifier) $ Commented [] k postK)

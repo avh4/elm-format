@@ -159,20 +159,20 @@ tests =
             , example "comments" "{{-A-}}" $ at 1 1 1 8 $ EmptyRecord [BlockComment ["A"]]
             ]
 
-        , example "" "{x=7,y=8}" $ at 1 1 1 10 $ Record [([], "x", [], intExpr' (1,4,1,5) 7, False), ([], "y", [], intExpr' (1,8,1,9) 8, False)] False
-        , example "single field" "{x=7}" $ at 1 1 1 6 $ Record [([], "x", [], intExpr' (1,4,1,5) 7, False)] False
-        , example "whitespace" "{ x = 7 , y = 8 }" $ at 1 1 1 18 $ Record [([], "x", [], intExpr' (1,7,1,8) 7, False), ([], "y", [], intExpr' (1,15,1,16) 8, False)] False
-        , example "comments" "{{-A-}x{-B-}={-C-}7{-D-},{-E-}y{-F-}={-G-}8{-H-}}" $ at 1 1 1 50 $ Record [([BlockComment ["A"]], "x", [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False), ([BlockComment ["E"]], "y", [BlockComment ["F"]], commentedIntExpr (1,43,1,44) "G" "H" 8, False)] False
-        , example "single field with comments" "{{-A-}x{-B-}={-C-}7{-D-}}" $ at 1 1 1 26 $ Record [([BlockComment ["A"]], "x", [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False)] False
-        , example "newlines" "{\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 9 3 $ Record [([], "x", [], intExpr' (4,2,4,3) 7, True), ([], "y", [], intExpr' (8,2,8,3) 8, True)] True
+        , example "" "{x=7,y=8}" $ at 1 1 1 10 $ Record [(Commented [] "x" [], intExpr' (1,4,1,5) 7, False), (Commented [] "y" [], intExpr' (1,8,1,9) 8, False)] False
+        , example "single field" "{x=7}" $ at 1 1 1 6 $ Record [(Commented [] "x" [], intExpr' (1,4,1,5) 7, False)] False
+        , example "whitespace" "{ x = 7 , y = 8 }" $ at 1 1 1 18 $ Record [(Commented [] "x" [], intExpr' (1,7,1,8) 7, False), (Commented [] "y" [], intExpr' (1,15,1,16) 8, False)] False
+        , example "comments" "{{-A-}x{-B-}={-C-}7{-D-},{-E-}y{-F-}={-G-}8{-H-}}" $ at 1 1 1 50 $ Record [(Commented [BlockComment ["A"]] "x" [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False), (Commented [BlockComment ["E"]] "y" [BlockComment ["F"]], commentedIntExpr (1,43,1,44) "G" "H" 8, False)] False
+        , example "single field with comments" "{{-A-}x{-B-}={-C-}7{-D-}}" $ at 1 1 1 26 $ Record [(Commented [BlockComment ["A"]] "x" [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False)] False
+        , example "newlines" "{\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 9 3 $ Record [(Commented [] "x" [], intExpr' (4,2,4,3) 7, True), (Commented [] "y" [], intExpr' (8,2,8,3) 8, True)] True
         ]
 
     , testGroup "Record update"
-        [ example "" "{a|x=7,y=8}" $ at 1 1 1 12 (RecordUpdate (Commented [] (at 1 2 1 3 (Var (VarRef "a"))) []) [([],"x",[],Commented [] (at 1 6 1 7 (Literal (IntNum 7))) [],False),([],"y",[],Commented [] (at 1 10 1 11 (Literal (IntNum 8))) [],False)] False)
-        , example "single field" "{a|x=7}" $ at 1 1 1 8 (RecordUpdate (Commented [] (at 1 2 1 3 (Var (VarRef "a"))) []) [([],"x",[],Commented [] (at 1 6 1 7 (Literal (IntNum 7))) [],False)] False)
-        , example "whitespace" "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 (RecordUpdate (Commented [] (at 1 3 1 4 (Var (VarRef "a"))) []) [([],"x",[],Commented [] (at 1 11 1 12 (Literal (IntNum 7))) [],False),([],"y",[],Commented [] (at 1 19 1 20 (Literal (IntNum 8))) [],False)] False)
-        , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}" $ at 1 1 1 62 (RecordUpdate (Commented [BlockComment ["A"]] (at 1 7 1 8 (Var (VarRef "a"))) [BlockComment ["B"]]) [([BlockComment ["C"]],"x",[BlockComment ["D"]],Commented [BlockComment ["E"]] (at 1 31 1 32 (Literal (IntNum 7))) [BlockComment ["F"]],False),([BlockComment ["G"]],"y",[BlockComment ["H"]],Commented [BlockComment ["I"]] (at 1 55 1 56 (Literal (IntNum 8))) [BlockComment ["J"]],False)] False)
-        , example "newlines" "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 (RecordUpdate (Commented [] (at 2 2 2 3 (Var (VarRef "a"))) []) [([],"x",[],Commented [] (at 6 2 6 3 (Literal (IntNum 7))) [],True),([],"y",[],Commented [] (at 10 2 10 3 (Literal (IntNum 8))) [],True)] True)
+        [ example "" "{a|x=7,y=8}" $ at 1 1 1 12 (RecordUpdate (Commented [] (at 1 2 1 3 (Var (VarRef "a"))) []) [(Commented [] "x" [],Commented [] (at 1 6 1 7 (Literal (IntNum 7))) [],False),(Commented [] "y" [], Commented [] (at 1 10 1 11 (Literal (IntNum 8))) [],False)] False)
+        , example "single field" "{a|x=7}" $ at 1 1 1 8 (RecordUpdate (Commented [] (at 1 2 1 3 (Var (VarRef "a"))) []) [(Commented [] "x" [], Commented [] (at 1 6 1 7 (Literal (IntNum 7))) [],False)] False)
+        , example "whitespace" "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 (RecordUpdate (Commented [] (at 1 3 1 4 (Var (VarRef "a"))) []) [(Commented [] "x" [], Commented [] (at 1 11 1 12 (Literal (IntNum 7))) [],False),(Commented [] "y" [], Commented [] (at 1 19 1 20 (Literal (IntNum 8))) [],False)] False)
+        , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}" $ at 1 1 1 62 (RecordUpdate (Commented [BlockComment ["A"]] (at 1 7 1 8 (Var (VarRef "a"))) [BlockComment ["B"]]) [(Commented [BlockComment ["C"]] "x" [BlockComment ["D"]],Commented [BlockComment ["E"]] (at 1 31 1 32 (Literal (IntNum 7))) [BlockComment ["F"]],False),(Commented [BlockComment ["G"]] "y" [BlockComment ["H"]],Commented [BlockComment ["I"]] (at 1 55 1 56 (Literal (IntNum 8))) [BlockComment ["J"]],False)] False)
+        , example "newlines" "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 (RecordUpdate (Commented [] (at 2 2 2 3 (Var (VarRef "a"))) []) [(Commented [] "x" [], Commented [] (at 6 2 6 3 (Literal (IntNum 7))) [],True),(Commented [] "y" [], Commented [] (at 10 2 10 3 (Literal (IntNum 8))) [],True)] True)
         , testCase "only allows simple base" $
             assertFailure expr "{9|x=7}"
         , testCase "only allows simple base" $
