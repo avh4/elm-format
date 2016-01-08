@@ -65,9 +65,9 @@ tests =
 
     , testGroup "record type"
         [ testGroup "empty"
-            [ example "" "{}" $ at 1 1 1 3 (RecordType Nothing [] False)
-            , example "whitespace" "{ }" $ at 1 1 1 4 (RecordType Nothing [] False)
-            , example "comments" "{{-A-}}" $ at 1 1 1 8 (RecordType Nothing [] False)
+            [ example "" "{}" $ at 1 1 1 3 (EmptyRecordType [])
+            , example "whitespace" "{ }" $ at 1 1 1 4 (EmptyRecordType [])
+            , example "comments" "{{-A-}}" $ at 1 1 1 8 (EmptyRecordType [BlockComment ["A"]])
             ]
 
         , example "" "{x:m,y:n}" $ at 1 1 1 10 (RecordType Nothing [("x",at 1 4 1 5 (TypeVariable "m"),False),("y",at 1 8 1 9 (TypeVariable "n"),False)] False)

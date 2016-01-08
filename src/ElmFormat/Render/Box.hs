@@ -30,17 +30,25 @@ pleaseReport what details =
     line $ pleaseReport' what details
 
 
-parens :: Box -> Box
-parens b =
-  case isLine b of
+surround :: Char -> Char -> Box -> Box
+surround left right b =
+  let
+    left' = punc (left : [])
+    right' = punc (right : [])
+  in
+    case isLine b of
       Right b' ->
-          line $ row [ punc "(", b', punc ")" ]
+          line $ row [ left', b', right' ]
       _ ->
           stack1
               [ b
-                  |> prefix (punc "(")
-              , line $ punc ")"
+                  |> prefix left'
+              , line $ right'
               ]
+
+
+parens :: Box -> Box
+parens = surround '(' ')'
 
 
 formatBinary :: Bool -> Box -> [ ( Box, Box ) ] -> Box
@@ -902,20 +910,23 @@ formatExpression aexpr =
             parens $ formatCommented formatExpression expr
 
         AST.Expression.Unit comments ->
-            formatUnit comments
+            formatUnit '(' ')' comments
 
         AST.Expression.GLShader _ _ _ ->
             pleaseReport "TODO" "glshader"
 
 
-formatUnit :: [Comment] -> Box
-formatUnit comments =
-  case comments of
-    [] ->
-      line $ punc "()"
+formatUnit :: Char -> Char -> [Comment] -> Box
+formatUnit left right comments =
+  case (left, comments) of
+    (_, []) ->
+      line $ punc (left : right : [])
+
+    ('{', (LineComment _):_) ->
+      surround left right $ prefix space $ stack1 $ map formatComment comments
 
     _ ->
-      parens $ stack1 $ map formatComment comments
+      surround left right $ stack1 $ map formatComment comments
 
 
 formatCommented :: (a -> Box) -> Commented a -> Box
@@ -1080,7 +1091,7 @@ formatType' :: TypeParensRequired -> Type -> Box
 formatType' requireParens atype =
     case RA.drop atype of
         UnitType comments ->
-          formatUnit comments
+          formatUnit '(' ')' comments
 
         FunctionType first rest ->
             case
@@ -1111,6 +1122,9 @@ formatType' requireParens atype =
 
         TupleType types ->
           elmGroup True "(" "," ")" False (map (formatCommented formatType) types)
+
+        EmptyRecordType comments ->
+          formatUnit '{' '}' comments
 
         RecordType ext fields multiline ->
             let

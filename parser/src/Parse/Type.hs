@@ -38,12 +38,16 @@ record =
   addLocation $
   do  char '{'
       pushNewlineContext
-      whitespace -- TODO: use comments
+      (_, pre) <- whitespace -- TODO: use comments
       (ext, fields) <- extended <|> normal
-      dumbWhitespace -- TODO: use comments
+      post <- dumbWhitespace -- TODO: use comments
       char '}'
       sawNewline <- popNewlineContext
-      return $ RecordType ext (fields [] []) sawNewline -- TODO: pass comments
+      case (ext, fields [] []) of
+        (Nothing, []) ->
+          return $ EmptyRecordType (pre ++ post)
+        _ ->
+          return $ RecordType ext (fields [] []) sawNewline -- TODO: pass comments
   where
     normal =
       do  (\fields -> (Nothing, fields) ) <$> commaSep field

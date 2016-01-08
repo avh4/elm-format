@@ -36,6 +36,7 @@ data Type'
     | TypeConstruction TypeConstructor [([Comment], Type)]
     | TypeParens (Commented Type)
     | TupleType [Commented Type]
+    | EmptyRecordType [Comment]
     | RecordType (Maybe String) [(String, Type, Bool)] Bool
     | FunctionType Type [Type]
     deriving (Eq, Show)
