@@ -28,12 +28,12 @@ tests :: Test
 tests =
     testGroup "Parse.Helpers"
     [ testGroup "parens''"
-        [ example (parens'' x) "single term" "(x)" $ Right [([], "x", [])]
-        , example (parens'' x) "whitespace" "( x )" $ Right [([], "x", [])]
-        , example (parens'' x) "comments" "({-A-}x{-B-})" $ Right [([BlockComment ["A"]], "x", [BlockComment ["B"]])]
+        [ example (parens'' x) "single term" "(x)" $ Right [Commented [] [] "x"]
+        , example (parens'' x) "whitespace" "( x )" $ Right [Commented [] [] "x"]
+        , example (parens'' x) "comments" "({-A-}x{-B-})" $ Right [Commented [BlockComment ["A"]] [BlockComment ["B"]] "x"]
 
-        , example (parens'' x) "multiple terms" "(a,b,c)" $ Right [([], "a", []), ([], "b", []), ([], "c", [])]
-        , example (parens'' x) "whitespace" "( a , b , c )" $ Right [([], "a", []), ([], "b", []), ([], "c", [])]
+        , example (parens'' x) "multiple terms" "(a,b,c)" $ Right [Commented [] [] "a", Commented [] [] "b", Commented [] [] "c"]
+        , example (parens'' x) "whitespace" "( a , b , c )" $ Right [Commented [] [] "a", Commented [] [] "b", Commented [] [] "c"]
 
         , example (parens'' x) "no terms" "()" $ Left []
         , example (parens'' x) "whitespace" "( )" $ Left []
