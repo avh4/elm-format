@@ -78,3 +78,8 @@ emptyRecord _ =
 record : { x : Int, y : () } -> ()
 record _ =
   ()
+
+
+recordExtension : { a | x : Int, y : Int } -> ()
+recordExtension _ =
+  ()
