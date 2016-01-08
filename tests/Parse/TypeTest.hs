@@ -49,6 +49,13 @@ tests =
         , example "multiple commas" "(,,,) a b c d" $ at 1 1 1 14 (TypeConstruction (TupleConstructor 4) [([],at 1 7 1 8 (TypeVariable "a")),([],at 1 9 1 10 (TypeVariable "b")),([],at 1 11 1 12 (TypeVariable "c")),([],at 1 13 1 14 (TypeVariable "d"))])
         ]
 
+    , testGroup "parens"
+        [ example "" "(a)" $ at 1 1 1 4 (TypeVariable "a")
+        , example "whitespace" "( a )" $ at 1 1 1 6 (TypeVariable "a")
+        , example "comments" "({-A-}a{-B-})" $ at 1 1 1 14 (TypeParens (Commented [BlockComment ["A"]] [BlockComment ["B"]] (at 1 7 1 8 (TypeVariable "a"))))
+        , example "newlines" "(\n a\n )" $ at 1 1 3 3 (TypeVariable "a")
+        ]
+
     , testGroup "tuple type"
         [ example "" "(a,b)" $ at 1 1 1 6 (TupleType [Commented [] [] (at 1 2 1 3 (TypeVariable "a")),Commented [] [] (at 1 4 1 5 (TypeVariable "b"))])
         , example "whitespace" "( a , b )" $ at 1 1 1 10 (TupleType [Commented [] [] (at 1 3 1 4 (TypeVariable "a")),Commented [] [] (at 1 7 1 8 (TypeVariable "b"))])

@@ -1106,6 +1106,9 @@ formatType' requireParens atype =
                 (map (formatCommented'' $ formatType' ForCtor) args)
                 |> (if requireParens == ForCtor then parens else id)
 
+        TypeParens type' ->
+          parens $ formatCommented formatType type'
+
         TupleType types ->
           elmGroup True "(" "," ")" False (map (formatCommented formatType) types)
 

@@ -23,6 +23,11 @@ constructor _ =
   ()
 
 
+parens : a -> ()
+parens _ =
+  ()
+
+
 tupleFn : (,,) Int String Bool -> ()
 tupleFn _ =
   ()
