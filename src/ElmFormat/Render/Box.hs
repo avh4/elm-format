@@ -901,14 +901,21 @@ formatExpression aexpr =
         AST.Expression.Parens expr ->
             parens $ formatCommented formatExpression expr
 
-        AST.Expression.Unit [] ->
-            line $ punc "()"
-
-        AST.Expression.Unit (comments) ->
-            parens $ stack1 $ map formatComment comments
+        AST.Expression.Unit comments ->
+            formatUnit comments
 
         AST.Expression.GLShader _ _ _ ->
             pleaseReport "TODO" "glshader"
+
+
+formatUnit :: [Comment] -> Box
+formatUnit comments =
+  case comments of
+    [] ->
+      line $ punc "()"
+
+    _ ->
+      parens $ stack1 $ map formatComment comments
 
 
 formatCommented :: (a -> Box) -> Commented a -> Box
@@ -1072,8 +1079,8 @@ formatTypeConstructor ctor =
 formatType' :: TypeParensRequired -> Type -> Box
 formatType' requireParens atype =
     case RA.drop atype of
-        UnitType ->
-            line $ punc "()"
+        UnitType comments ->
+          formatUnit comments
 
         FunctionType first rest ->
             case

@@ -31,7 +31,7 @@ data TypeConstructor
 
 
 data Type'
-    = UnitType
+    = UnitType [Comment]
     | TypeVariable String
     | TypeConstruction TypeConstructor [([Comment], Type)]
     | TupleType [Type]
