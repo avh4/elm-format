@@ -91,6 +91,7 @@ Use the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language
 git clone https://github.com/avh4/elm-format.git
 cd elm-format
 cabal sandbox init --sandbox=.cabal-sandbox
+cabal install
 cabal build
 ./dist/build/elm-format/elm-format --help
 ```
