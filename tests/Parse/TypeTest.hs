@@ -52,15 +52,15 @@ tests =
     , testGroup "parens"
         [ example "" "(a)" $ at 1 1 1 4 (TypeVariable "a")
         , example "whitespace" "( a )" $ at 1 1 1 6 (TypeVariable "a")
-        , example "comments" "({-A-}a{-B-})" $ at 1 1 1 14 (TypeParens (Commented [BlockComment ["A"]] [BlockComment ["B"]] (at 1 7 1 8 (TypeVariable "a"))))
+        , example "comments" "({-A-}a{-B-})" $ at 1 1 1 14 (TypeParens (Commented [BlockComment ["A"]] (at 1 7 1 8 (TypeVariable "a")) [BlockComment ["B"]]))
         , example "newlines" "(\n a\n )" $ at 1 1 3 3 (TypeVariable "a")
         ]
 
     , testGroup "tuple type"
-        [ example "" "(a,b)" $ at 1 1 1 6 (TupleType [Commented [] [] (at 1 2 1 3 (TypeVariable "a")),Commented [] [] (at 1 4 1 5 (TypeVariable "b"))])
-        , example "whitespace" "( a , b )" $ at 1 1 1 10 (TupleType [Commented [] [] (at 1 3 1 4 (TypeVariable "a")),Commented [] [] (at 1 7 1 8 (TypeVariable "b"))])
-        , example "comments" "({-A-}a{-B-},{-C-}b{-D-})" $ at 1 1 1 26 (TupleType [Commented [BlockComment ["A"]] [BlockComment ["B"]] (at 1 7 1 8 (TypeVariable "a")),Commented [BlockComment ["C"]] [BlockComment ["D"]] (at 1 19 1 20 (TypeVariable "b"))])
-        , example "newlines" "(\n a\n ,\n b\n )" $ at 1 1 5 3 (TupleType [Commented [] [] (at 2 2 2 3 (TypeVariable "a")),Commented [] [] (at 4 2 4 3 (TypeVariable "b"))])
+        [ example "" "(a,b)" $ at 1 1 1 6 (TupleType [Commented [] (at 1 2 1 3 (TypeVariable "a")) [],Commented [] (at 1 4 1 5 (TypeVariable "b")) []])
+        , example "whitespace" "( a , b )" $ at 1 1 1 10 (TupleType [Commented [] (at 1 3 1 4 (TypeVariable "a")) [],Commented [] (at 1 7 1 8 (TypeVariable "b")) []])
+        , example "comments" "({-A-}a{-B-},{-C-}b{-D-})" $ at 1 1 1 26 (TupleType [Commented [BlockComment ["A"]] (at 1 7 1 8 (TypeVariable "a")) [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 19 1 20 (TypeVariable "b")) [BlockComment ["D"]]])
+        , example "newlines" "(\n a\n ,\n b\n )" $ at 1 1 5 3 (TupleType [Commented [] (at 2 2 2 3 (TypeVariable "a")) [],Commented [] (at 4 2 4 3 (TypeVariable "b")) []])
         ]
 
     , testGroup "record type"

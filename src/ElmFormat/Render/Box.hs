@@ -591,7 +591,7 @@ formatRecordPair :: ([Comment], String, [Comment], Commented AST.Expression.Expr
 formatRecordPair (pre, k, postK, v, multiline') =
     case
         isLine'
-            (isLine $ formatCommented (line . identifier) $ Commented [] postK k)
+            (isLine $ formatCommented (line . identifier) $ Commented [] k postK)
             (force multiline' $ isLine $ formatCommented formatExpression v)
     of
         Right (k', Right v') ->
@@ -612,7 +612,7 @@ formatRecordPair (pre, k, postK, v, multiline') =
                 [ k'
                 , indent $ prefix (row [punc "=", space]) v'
                 ]
-    |> Commented pre [] |> formatCommented id
+    |> (\x -> Commented pre x []) |> formatCommented id
 
 
 formatExpression :: AST.Expression.Expr -> Box
@@ -668,7 +668,7 @@ formatExpression aexpr =
         AST.Expression.Lambda patterns bodyComments expr multiline ->
             case
                 ( multiline
-                , allSingles $ map (formatCommented (formatPattern True) . (\(c,p) -> Commented c [] p)) patterns
+                , allSingles $ map (formatCommented (formatPattern True) . (\(c,p) -> Commented c p [])) patterns
                 , bodyComments
                 , isLine $ formatExpression expr
                 )
@@ -919,7 +919,7 @@ formatUnit comments =
 
 
 formatCommented :: (a -> Box) -> Commented a -> Box
-formatCommented format (Commented pre post inner) =
+formatCommented format (Commented pre inner post) =
     case
         ( allSingles $ fmap formatComment pre
         , allSingles $ fmap formatComment post
@@ -942,7 +942,7 @@ formatCommented'' format (pre, inner) =
 
 formatCommented' :: [Comment] -> (a -> Box) -> a -> Box
 formatCommented' pre format inner =
-    formatCommented format (Commented pre [] inner)
+    formatCommented format (Commented pre inner [])
 
 
 formatComment :: Comment -> Box

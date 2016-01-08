@@ -11,7 +11,7 @@ data Comment
 
 
 data Commented a =
-    Commented [Comment] [Comment] a
+    Commented [Comment] a [Comment]
     deriving (Eq, Show)
 
 

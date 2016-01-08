@@ -297,12 +297,12 @@ parens'' inner =
     whitespace' = (\(_,w) -> w) <$> whitespace
     sep''' =
       do
-        v <- (\pre x post -> Commented pre post x) <$> whitespace' <*> inner <*> whitespace'
+        v <- Commented <$> whitespace' <*> inner <*> whitespace'
         option [v] ((\x -> v : x) <$> (char ',' >> sep'''))
     sep'' =
       do
           pre <- whitespace'
-          v <- optionMaybe ((\x post -> Commented pre post x) <$> inner <*> whitespace')
+          v <- optionMaybe (Commented pre <$> inner <*> whitespace')
           case v of
               Nothing ->
                   return $ Left pre

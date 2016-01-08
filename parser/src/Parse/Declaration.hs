@@ -75,7 +75,7 @@ port =
       (_, preNameComments) <- whitespace
       name <- lowVar
       (_, postNameComments) <- whitespace
-      let name' = Commented preNameComments postNameComments name
+      let name' = Commented preNameComments name postNameComments
       choice [ portAnnotation name', portDefinition name' ]
   where
     portAnnotation name =
