@@ -115,41 +115,54 @@ fn2 _ _ _ =
 
 escapedString =
   let
-    normals = "a b'`<>{}/ڥ😀ぁ⾃𝟟"
+    normals =
+      "a b'`<>{}/ڥ😀ぁ⾃𝟟"
 
-    specials = "\t\n\\\""
+    specials =
+      "\t\n\\\""
 
-    controls1 = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C\x0D\x0E\x0F"
+    controls1 =
+      "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C\x0D\x0E\x0F"
 
-    controls2 = "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F"
+    controls2 =
+      "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F"
 
-    controls3 = "\x7F"
+    controls3 =
+      "\x7F"
 
-    otherNonPrint = "\x06DD\xFFFB\x110BD\xE007F"
+    otherNonPrint =
+      "\x06DD\xFFFB\x110BD\xE007F"
 
-    whitespace = "\xA0\x2000\x205F"
+    whitespace =
+      "\xA0\x2000\x205F"
   in
     ()
 
 
 escapedChar =
   let
-    normals = [ 'a', ' ', '/', '"', 'ڥ', '😀', 'ぁ', '⾃', '𝟟' ]
+    normals =
+      [ 'a', ' ', '/', '"', 'ڥ', '😀', 'ぁ', '⾃', '𝟟' ]
 
-    specials = [ '\t', '\n', '\\', '\'' ]
+    specials =
+      [ '\t', '\n', '\\', '\'' ]
 
-    controls = [ '\x00', '\x1F', '\x7F' ]
+    controls =
+      [ '\x00', '\x1F', '\x7F' ]
 
-    otherNonPrint = [ '\x06DD', '\xFFFB', '\x110BD', '\xE007F' ]
+    otherNonPrint =
+      [ '\x06DD', '\xFFFB', '\x110BD', '\xE007F' ]
 
-    whitespace = [ '\xA0', '\x2000', '\x205F' ]
+    whitespace =
+      [ '\xA0', '\x2000', '\x205F' ]
   in
     ()
 
 
 mutltiString =
   let
-    s = """normals = "a b'`<>{}/ڥ😀ぁ⾃𝟟"
+    s =
+      """normals = "a b'`<>{}/ڥ😀ぁ⾃𝟟"
 "\t\\
 \x00\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C\x0D\x0E\x0F
 \x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F
@@ -410,7 +423,8 @@ singleLineRecordUpdate x =
 
 letExpression =
   let
-    x = 1
+    x =
+      1
   in
     x
 
@@ -449,7 +463,8 @@ caseStatement mb =
 
 multilineExpressionsInsideList =
   [ let
-      x = 1
+      x =
+        1
     in
       always x
   , if True then
@@ -474,7 +489,8 @@ multilineExpressionsInsideList =
 
 multilineExpressionsInsideTuple a foo =
   ( let
-      x = 1
+      x =
+        1
     in
       x
   , if True then
@@ -511,7 +527,8 @@ multilineExpressionsInsideTuple a foo =
 multilineExpressionsInsideRecord =
   { a =
       let
-        x = 1
+        x =
+          1
       in
         x
   , b =

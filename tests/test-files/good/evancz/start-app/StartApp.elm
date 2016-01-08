@@ -80,7 +80,8 @@ tasks into a `port` that will run them all.
 start : Config model action -> App model
 start config =
   let
-    singleton action = [ action ]
+    singleton action =
+      [ action ]
 
     -- messages : Signal.Mailbox (List action)
     messages =
@@ -93,7 +94,8 @@ start config =
     -- updateStep : action -> ( model, Effects action ) -> ( model, Effects action )
     updateStep action ( oldModel, accumulatedEffects ) =
       let
-        ( newModel, additionalEffects ) = config.update action oldModel
+        ( newModel, additionalEffects ) =
+          config.update action oldModel
       in
         ( newModel, Effects.batch [ accumulatedEffects, additionalEffects ] )
 

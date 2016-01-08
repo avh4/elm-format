@@ -351,7 +351,7 @@ formatDeclaration decl =
         AST.Declaration.Decl adecl ->
             case RA.drop adecl of
                 AST.Declaration.Definition def ->
-                    formatDefinition False def
+                    formatDefinition def
 
                 AST.Declaration.Datatype name args ctors ->
                     let
@@ -456,28 +456,19 @@ formatDeclaration decl =
                             pleaseReport "TODO" "multiline fixity declaration"
 
 
-formatDefinition :: Bool -> AST.Expression.Def -> Box
-formatDefinition compact adef =
+formatDefinition :: AST.Expression.Def -> Box
+formatDefinition adef =
     case RA.drop adef of
         AST.Expression.Definition name args comments expr multiline ->
             case
-                ( compact
-                , multiline
+                ( multiline
                 , isLine $ formatPattern True name
                 , allSingles $ map (\(x,y) -> formatCommented' x (formatPattern True) y) args
                 , comments
                 , isLine $ formatExpression expr
                 )
             of
-                (True, False, Right name', Right args', [], Right expr') ->
-                    line $ row
-                        [ row $ List.intersperse space $ (name':args')
-                        , space
-                        , punc "="
-                        , space
-                        , expr'
-                        ]
-                (_, _, Right name', Right args', _, _) ->
+                (_, Right name', Right args', _, _) ->
                     stack1 $
                         [ line $ row
                             [ row $ List.intersperse space $ (name':args')
@@ -488,7 +479,7 @@ formatDefinition compact adef =
                             (map formatComment comments)
                             ++ [ formatExpression expr ]
                         ]
-                (_, _, _, Left _, _, _) ->
+                (_, _, Left _, _, _) ->
                     pleaseReport "TODO" "multiline pattern in let binding"
                 _ ->
                     pleaseReport "UNEXPECTED TYPE ANNOTATION" "multiline name in let binding"
@@ -776,7 +767,7 @@ formatExpression aexpr =
                 (line $ keyword "let")
                     |> andThen
                         (defs
-                            |> intersperseMap spacer (formatDefinition True)
+                            |> intersperseMap spacer formatDefinition
                             |> map indent
                         )
                     |> andThen

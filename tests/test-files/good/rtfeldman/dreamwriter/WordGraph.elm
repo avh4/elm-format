@@ -52,7 +52,8 @@ bar day yOffset =
 graph : Float -> List Day -> Svg
 graph yOffset days =
   let
-    graphWidth = (List.length days) * (barWidth + barMargin)
+    graphWidth =
+      (List.length days) * (barWidth + barMargin)
 
     axis =
       line
@@ -85,7 +86,8 @@ graph yOffset days =
 scale : Int -> Int -> Int -> Float
 scale top bot value =
   let
-    range = top - bot
+    range =
+      top - bot
 
     ratio =
       graphHeight
@@ -101,7 +103,8 @@ scale top bot value =
 viewWordGraph : List Entry -> Svg
 viewWordGraph list =
   let
-    lastTwoWeeks = List.take maxDays list
+    lastTwoWeeks =
+      List.take maxDays list
 
     max =
       List.map (\x -> x.words) lastTwoWeeks
@@ -119,7 +122,8 @@ viewWordGraph list =
                 x
            )
 
-    yOffset = scale max min max
+    yOffset =
+      scale max min max
 
     days =
       List.map2
