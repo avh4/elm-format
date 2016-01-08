@@ -25,10 +25,10 @@ tuple =
             return $ UnitType comments
         Right [] ->
             return $ UnitType []
-        Right [(_, t, _)] ->
+        Right [Commented _ _ t] ->
             return $ A.drop t -- TODO: use comments
         Right types' ->
-            return $ TupleType $ map (\(_,t,_) -> t) types' -- TODO: use comments
+            return $ TupleType types'
 
 
 record :: IParser Type

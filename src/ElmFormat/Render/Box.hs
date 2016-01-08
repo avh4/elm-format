@@ -1105,10 +1105,10 @@ formatType' requireParens atype =
                 (formatTypeConstructor ctor)
                 (map (formatCommented'' $ formatType' ForCtor) args)
                 |> (if requireParens == ForCtor then parens else id)
-        TupleType (first:rest) ->
-            elmGroup True "(" "," ")" False (map formatType (first:rest))
-        TupleType [] ->
-            line $ keyword "()"
+
+        TupleType types ->
+          elmGroup True "(" "," ")" False (map (formatCommented formatType) types)
+
         RecordType ext fields multiline ->
             let
                 formatField (name, typ, multiline') =

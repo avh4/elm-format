@@ -291,18 +291,18 @@ parens' =
   surround' '(' ')' "paren"
 
 
-parens'' :: IParser a -> IParser (Either [Comment] [([Comment], a, [Comment])])
+parens'' :: IParser a -> IParser (Either [Comment] [Commented a])
 parens'' inner =
   let
     whitespace' = (\(_,w) -> w) <$> whitespace
     sep''' =
       do
-        v <- (,,) <$> whitespace' <*> inner <*> whitespace'
+        v <- (\pre x post -> Commented pre post x) <$> whitespace' <*> inner <*> whitespace'
         option [v] ((\x -> v : x) <$> (char ',' >> sep'''))
     sep'' =
       do
           pre <- whitespace'
-          v <- optionMaybe ((\x post -> (pre, x, post)) <$> inner <*> whitespace')
+          v <- optionMaybe ((\x post -> Commented pre post x) <$> inner <*> whitespace')
           case v of
               Nothing ->
                   return $ Left pre

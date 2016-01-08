@@ -44,7 +44,15 @@ tupleFn _ =
   ()
 
 
-tuple : ( a, b ) -> ()
+tuple :
+  ( --G
+    a
+    --H
+  , --I
+    b
+    --J
+  )
+  -> ()
 tuple _ =
   ()
 
