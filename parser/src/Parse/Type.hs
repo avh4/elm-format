@@ -25,7 +25,7 @@ tuple =
             return $ UnitType comments
         Right [] ->
             return $ UnitType []
-        Right [Commented [] [] t] ->
+        Right [Commented [] t []] ->
             return $ A.drop t
         Right [t] ->
             return $ TypeParens t

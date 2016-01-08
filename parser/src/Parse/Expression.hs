@@ -64,8 +64,8 @@ listTerm =
           hi <- expr
           return $ \loPre hiPost multiline ->
               E.Range
-                  (Commented loPre loPost lo)
-                  (Commented hiPre hiPost hi)
+                  (Commented loPre lo loPost)
+                  (Commented hiPre hi hiPost)
                   multiline
 
     shader' =
@@ -75,7 +75,7 @@ listTerm =
           return $ E.GLShader uid (filter (/='\r') rawSrc) tipe
 
     commaSeparated =
-      do  term <- commaSep ((\e pre post -> Commented pre post e) <$> expr)
+      do  term <- commaSep ((\e pre post -> Commented pre e post) <$> expr)
           return $ \pre post multiline -> E.ExplicitList (term pre post) multiline
 
 
@@ -100,7 +100,7 @@ parensTerm =
               \_ _ _ -> E.TupleFunction (length commas + 2) -- TODO: use comments
 
     parened =
-      do  expressions <- commaSep1 ((\e a b -> Commented a b e) <$> expr)
+      do  expressions <- commaSep1 ((\e a b -> Commented a e b) <$> expr)
           return $ \pre post multiline ->
             case expressions pre post of
               [single] ->
@@ -129,7 +129,7 @@ recordTerm =
       do  try (string "|")
           (_, postBar) <- whitespace
           fields <- commaSep1 field
-          return $ \pre post multiline -> (E.RecordUpdate (Commented pre postStarter $ A.A ann (E.Var $ Var.VarRef starter)) (fields postBar post) multiline)
+          return $ \pre post multiline -> (E.RecordUpdate (Commented pre (A.A ann $ E.Var $ Var.VarRef starter) postStarter) (fields postBar post) multiline)
 
     literal (A.A _ starter) postStarter =
       do  pushNewlineContext
@@ -142,8 +142,8 @@ recordTerm =
             [ do  try comma
                   (_, preNext) <- whitespace
                   fields <- commaSep field
-                  return $ \pre post multiline -> (E.Record ((pre, starter, postStarter, Commented preExpr postExpr value, multiline') : (fields preNext post)) multiline)
-            , return $ \pre post multiline -> (E.Record [(pre, starter, postStarter, Commented preExpr (postExpr ++ post) value, multiline')] multiline)
+                  return $ \pre post multiline -> (E.Record ((pre, starter, postStarter, Commented preExpr value postExpr, multiline') : (fields preNext post)) multiline)
+            , return $ \pre post multiline -> (E.Record [(pre, starter, postStarter, Commented preExpr value (postExpr ++ post), multiline')] multiline)
             ]
 
     field =
@@ -152,7 +152,7 @@ recordTerm =
           (postKey, _, preExpr) <- padded equals
           value <- expr
           multiline <- popNewlineContext
-          return $ \pre post -> (pre, key, postKey, Commented preExpr post value, multiline)
+          return $ \pre post -> (pre, key, postKey, Commented preExpr value post, multiline)
 
 
 term :: IParser E.Expr

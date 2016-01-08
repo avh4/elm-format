@@ -29,10 +29,10 @@ example name input expected =
 
 
 commentedIntExpr (a,b,c,d) preComment postComment i =
-    Commented [BlockComment [preComment]] [BlockComment [postComment]] $ at a b c d  $ Literal $ IntNum i
+    Commented [BlockComment [preComment]] (at a b c d  $ Literal $ IntNum i) [BlockComment [postComment]]
 
 commentedIntExpr' (a,b,c,d) preComment i =
-    Commented [BlockComment [preComment]] [] $ at a b c d  $ Literal $ IntNum i
+    Commented [BlockComment [preComment]] (at a b c d  $ Literal $ IntNum i) []
 
 
 commentedIntExpr'' (a,b,c,d) preComment i =
@@ -42,7 +42,7 @@ commentedIntExpr'' (a,b,c,d) preComment i =
 intExpr (a,b,c,d) i = at a b c d $ Literal $ IntNum i
 
 intExpr' (a,b,c,d) i =
-    Commented [] [] $ at a b c d  $ Literal $ IntNum i
+    Commented [] (at a b c d  $ Literal $ IntNum i) []
 
 intExpr'' (a,b,c,d) i =
     (,) [] $ at a b c d  $ Literal $ IntNum i
@@ -168,11 +168,11 @@ tests =
         ]
 
     , testGroup "Record update"
-        [ example "" "{a|x=7,y=8}" $ at 1 1 1 12 $ RecordUpdate (Commented [] [] $ at 1 2 1 3 $ Var $ VarRef "a") [([], "x", [], intExpr' (1,6,1,7) 7, False), ([], "y", [], intExpr' (1,10,1,11) 8, False)] False
-        , example "single field" "{a|x=7}" $ at 1 1 1 8 $ RecordUpdate (Commented [] [] $ at 1 2 1 3 $ Var $ VarRef "a") [([], "x", [], intExpr' (1,6,1,7) 7, False)] False
-        , example "whitespace" "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 $ RecordUpdate (Commented [] [] $ at 1 3 1 4 $ Var $ VarRef "a") [([], "x", [], intExpr' (1,11,1,12) 7, False), ([], "y", [], intExpr' (1,19,1,20) 8, False)] False
-        , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}" $ at 1 1 1 62 $ RecordUpdate (Commented [BlockComment ["A"]] [BlockComment ["B"]] $ at 1 7 1 8 $ Var $ VarRef "a") [([BlockComment ["C"]], "x", [BlockComment ["D"]], commentedIntExpr (1,31,1,32) "E" "F" 7, False), ([BlockComment ["G"]], "y", [BlockComment ["H"]], commentedIntExpr (1,55,1,56) "I" "J" 8, False)] False
-        , example "newlines" "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 $ RecordUpdate (Commented [] [] $ at 2 2 2 3 $ Var $ VarRef "a") [([], "x", [], intExpr' (6,2,6,3) 7, True), ([], "y", [], intExpr' (10,2,10,3) 8, True)] True
+        [ example "" "{a|x=7,y=8}" $ at 1 1 1 12 (RecordUpdate (Commented [] (at 1 2 1 3 (Var (VarRef "a"))) []) [([],"x",[],Commented [] (at 1 6 1 7 (Literal (IntNum 7))) [],False),([],"y",[],Commented [] (at 1 10 1 11 (Literal (IntNum 8))) [],False)] False)
+        , example "single field" "{a|x=7}" $ at 1 1 1 8 (RecordUpdate (Commented [] (at 1 2 1 3 (Var (VarRef "a"))) []) [([],"x",[],Commented [] (at 1 6 1 7 (Literal (IntNum 7))) [],False)] False)
+        , example "whitespace" "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 (RecordUpdate (Commented [] (at 1 3 1 4 (Var (VarRef "a"))) []) [([],"x",[],Commented [] (at 1 11 1 12 (Literal (IntNum 7))) [],False),([],"y",[],Commented [] (at 1 19 1 20 (Literal (IntNum 8))) [],False)] False)
+        , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}" $ at 1 1 1 62 (RecordUpdate (Commented [BlockComment ["A"]] (at 1 7 1 8 (Var (VarRef "a"))) [BlockComment ["B"]]) [([BlockComment ["C"]],"x",[BlockComment ["D"]],Commented [BlockComment ["E"]] (at 1 31 1 32 (Literal (IntNum 7))) [BlockComment ["F"]],False),([BlockComment ["G"]],"y",[BlockComment ["H"]],Commented [BlockComment ["I"]] (at 1 55 1 56 (Literal (IntNum 8))) [BlockComment ["J"]],False)] False)
+        , example "newlines" "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 (RecordUpdate (Commented [] (at 2 2 2 3 (Var (VarRef "a"))) []) [([],"x",[],Commented [] (at 6 2 6 3 (Literal (IntNum 7))) [],True),([],"y",[],Commented [] (at 10 2 10 3 (Literal (IntNum 8))) [],True)] True)
         , testCase "only allows simple base" $
             assertFailure expr "{9|x=7}"
         , testCase "only allows simple base" $
