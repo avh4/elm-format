@@ -27,10 +27,10 @@ tests :: Test
 tests =
     testGroup "Parse.Type"
     [ testGroup "unit"
-        [ example "" "()" $ at 1 1 1 3 (UnitType)
-        , example "whitespace" "( )" $ at 1 1 1 4 (UnitType)
-        , example "comments" "({-A-})" $ at 1 1 1 8 (UnitType)
-        , example "newlines" "(\n)" $ at 1 1 2 2 (UnitType)
+        [ example "" "()" $ at 1 1 1 3 (UnitType [])
+        , example "whitespace" "( )" $ at 1 1 1 4 (UnitType [])
+        , example "comments" "({-A-})" $ at 1 1 1 8 (UnitType [BlockComment ["A"]])
+        , example "newlines" "(\n)" $ at 1 1 2 2 (UnitType [])
         ]
 
     , testGroup "type variable"

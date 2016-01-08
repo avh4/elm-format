@@ -291,6 +291,31 @@ parens' =
   surround' '(' ')' "paren"
 
 
+parens'' :: IParser a -> IParser (Either [Comment] [([Comment], a, [Comment])])
+parens'' inner =
+  let
+    whitespace' = (\(_,w) -> w) <$> whitespace
+    sep''' =
+      do
+        v <- (,,) <$> whitespace' <*> inner <*> whitespace'
+        option [v] ((\x -> v : x) <$> (char ',' >> sep'''))
+    sep'' =
+      do
+          pre <- whitespace'
+          v <- optionMaybe ((\x post -> (pre, x, post)) <$> inner <*> whitespace')
+          case v of
+              Nothing ->
+                  return $ Left pre
+              Just v' ->
+                  Right <$> option [v'] ((\x -> v' : x) <$> (char ',' >> sep'''))
+  in
+    do
+      char '('
+      vs <- sep''
+      char ')'
+      return vs
+
+
 -- HELPERS FOR EXPRESSIONS
 
 getMyPosition :: IParser R.Position

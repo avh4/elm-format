@@ -5,6 +5,7 @@ import Test.Framework
 import qualified Test.Property
 import qualified BoxTest
 import qualified Parse.ExpressionTest
+import qualified Parse.HelpersTest
 import qualified Parse.LiteralTest
 import qualified Parse.PatternTest
 import qualified Parse.TypeTest
@@ -18,6 +19,7 @@ main =
     [ Test.Property.propertyTests
     , BoxTest.tests
     , Parse.ExpressionTest.tests
+    , Parse.HelpersTest.tests
     , Parse.LiteralTest.tests
     , Parse.PatternTest.tests
     , Parse.TypeTest.tests

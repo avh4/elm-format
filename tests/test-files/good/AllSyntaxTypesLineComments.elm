@@ -3,7 +3,9 @@ module AllSyntaxTypes (..) where
 import Dict
 
 
-unit : ()
+unit :
+  (-- F
+  )
 unit =
   ()
 

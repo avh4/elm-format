@@ -18,11 +18,17 @@ tvar =
 
 tuple :: IParser Type
 tuple =
-  do  (start, types, end) <- located (parens $ ((\f a b _ -> f a b) <$> commaSep (const . const <$> expr))) -- TODO: use comments
+  addLocation $
+  do  types <- parens'' expr
       case types of
-        [] -> return $ A.A (R.Region start end) $ UnitType
-        [t] -> return t
-        _   -> return $ A.A (R.Region start end) $ TupleType types
+        Left comments ->
+            return $ UnitType comments
+        Right [] ->
+            return $ UnitType []
+        Right [(_, t, _)] ->
+            return $ A.drop t -- TODO: use comments
+        Right types' ->
+            return $ TupleType $ map (\(_,t,_) -> t) types' -- TODO: use comments
 
 
 record :: IParser Type
