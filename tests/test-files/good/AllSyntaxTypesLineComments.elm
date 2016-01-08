@@ -67,7 +67,10 @@ tuple _ =
   ()
 
 
-emptyRecord : {} -> ()
+emptyRecord :
+  { --M
+  }
+  -> ()
 emptyRecord _ =
   ()
 
