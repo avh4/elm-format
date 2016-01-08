@@ -34,6 +34,7 @@ data Type'
     = UnitType [Comment]
     | TypeVariable String
     | TypeConstruction TypeConstructor [([Comment], Type)]
+    | TypeParens (Commented Type)
     | TupleType [Commented Type]
     | RecordType (Maybe String) [(String, Type, Bool)] Bool
     | FunctionType Type [Type]

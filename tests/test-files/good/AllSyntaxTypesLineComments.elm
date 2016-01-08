@@ -31,6 +31,16 @@ constructor _ =
   ()
 
 
+parens :
+  (--K
+   a
+   --L
+  )
+  -> ()
+parens _ =
+  ()
+
+
 tupleFn :
   (,,)
     -- C

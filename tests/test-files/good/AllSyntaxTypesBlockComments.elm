@@ -23,6 +23,11 @@ constructor _ =
   ()
 
 
+parens : ({- K -} a {- L -}) -> ()
+parens _ =
+  ()
+
+
 tupleFn : (,,) {- C -} Int {- D -} String {- E -} Bool -> ()
 tupleFn _ =
   ()
