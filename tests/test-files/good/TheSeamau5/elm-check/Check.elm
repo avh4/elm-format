@@ -278,11 +278,14 @@ claim name actualStatement expectedStatement investigator =
                 --    checks
                 -- 5. Else, we have found our counter example.
                 --------------------------------------------------------------
-                ( value, nextSeed ) = Random.generate investigator.generator seed
+                ( value, nextSeed ) =
+                  Random.generate investigator.generator seed
 
-                actual = actualStatement value
+                actual =
+                  actualStatement value
 
-                expected = expectedStatement value
+                expected =
+                  expectedStatement value
               in
                 if actual == expected then
                   Continue (\() -> originalCounterExample' nextSeed (currentNumberOfChecks + 1))
@@ -337,7 +340,8 @@ claim name actualStatement expectedStatement investigator =
                     -- the given `counterExample`.
                     --
                     -- shrunkenCounterExamples : List a
-                    shrunkenCounterExamples = investigator.shrinker counterExample
+                    shrunkenCounterExamples =
+                      investigator.shrinker counterExample
 
                     -- Keep only the counter examples that disprove the claim.
                     -- (i.e. they violate `actual == expected`)
@@ -375,10 +379,12 @@ claim name actualStatement expectedStatement investigator =
                   trampoline (shrink originalCounterExample 0)
 
                 -- actual : b
-                actual = actualStatement minimal
+                actual =
+                  actualStatement minimal
 
                 -- expected : b
-                expected = expectedStatement minimal
+                expected =
+                  expectedStatement minimal
               in
                 -- Here, we return an `Err` signifying that a counter example was
                 -- found. The returned record contains a number of fields and

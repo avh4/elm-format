@@ -11,7 +11,11 @@ expressionDefinitionNoPatterns =
 
 expressionDefinitionsInLet =
   let
-    compactDefinition = ()
+    def1 =
+      ()
+
+    def2 =
+      ()
   in
     ()
 

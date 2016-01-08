@@ -51,7 +51,8 @@ records =
 comments3 =
   let
     -- The return value
-    x = ()
+    x =
+      ()
 
     {- comment after definitions -}
     -- ...
@@ -100,7 +101,8 @@ comments7 =
           ()
 
     -- comments
-    y = ()
+    y =
+      ()
   in
     ()
 
