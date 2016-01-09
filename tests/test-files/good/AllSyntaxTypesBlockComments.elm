@@ -43,7 +43,7 @@ emptyRecord _ =
   ()
 
 
-record : { x : Int, y : () } -> ()
+record : { {- N -} x {- O -} : {- P -} Int {- Q -}, {- R -} y {- S -} : {- T -} () {- U -} } -> ()
 record _ =
   ()
 
