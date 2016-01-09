@@ -70,19 +70,19 @@ tests =
             , example "comments" "{{-A-}}" $ at 1 1 1 8 (EmptyRecordType [BlockComment ["A"]])
             ]
 
-        , example "" "{x:m,y:n}" $ at 1 1 1 10 (RecordType Nothing [(Commented [] "x" [],Commented [] (at 1 4 1 5 (TypeVariable "m")) [],False),(Commented [] "y" [],Commented [] (at 1 8 1 9 (TypeVariable "n")) [],False)] False)
-        , example "whitespace" "{ x : m , y : n }" $ at 1 1 1 18 (RecordType Nothing [(Commented [] "x" [],Commented [] (at 1 7 1 8 (TypeVariable "m")) [],False),(Commented [] "y" [],Commented [] (at 1 15 1 16 (TypeVariable "n")) [],False)] False)
-        , example "comments" "{{-A-}x{-B-}:{-C-}m{-D-},{-E-}y{-F-}:{-G-}n{-H-}}" $ at 1 1 1 50 (RecordType Nothing [(Commented [BlockComment ["A"]] "x" [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 19 1 20 (TypeVariable "m")) [BlockComment ["D"]],False),(Commented [BlockComment ["E"]] "y" [BlockComment ["F"]],Commented [BlockComment ["G"]] (at 1 43 1 44 (TypeVariable "n")) [BlockComment ["H"]],False)] False)
-        , example "single field with comments" "{{-A-}x{-B-}:{-C-}m{-D-}}" $ at 1 1 1 26 (RecordType Nothing [(Commented [BlockComment ["A"]] "x" [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 19 1 20 (TypeVariable "m")) [BlockComment ["D"]],False)] False)
-        , example "newlines" "{\n x\n :\n m\n ,\n y\n :\n n\n }" $ at 1 1 9 3 (RecordType Nothing [(Commented [] "x" [],Commented [] (at 4 2 4 3 (TypeVariable "m")) [],True),(Commented [] "y" [],Commented [] (at 8 2 8 3 (TypeVariable "n")) [],True)] True)
+        , example "" "{x:m,y:n}" $ at 1 1 1 10 (RecordType [(Commented [] "x" [],Commented [] (at 1 4 1 5 (TypeVariable "m")) [],False),(Commented [] "y" [],Commented [] (at 1 8 1 9 (TypeVariable "n")) [],False)] False)
+        , example "whitespace" "{ x : m , y : n }" $ at 1 1 1 18 (RecordType [(Commented [] "x" [],Commented [] (at 1 7 1 8 (TypeVariable "m")) [],False),(Commented [] "y" [],Commented [] (at 1 15 1 16 (TypeVariable "n")) [],False)] False)
+        , example "comments" "{{-A-}x{-B-}:{-C-}m{-D-},{-E-}y{-F-}:{-G-}n{-H-}}" $ at 1 1 1 50 (RecordType [(Commented [BlockComment ["A"]] "x" [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 19 1 20 (TypeVariable "m")) [BlockComment ["D"]],False),(Commented [BlockComment ["E"]] "y" [BlockComment ["F"]],Commented [BlockComment ["G"]] (at 1 43 1 44 (TypeVariable "n")) [BlockComment ["H"]],False)] False)
+        , example "single field with comments" "{{-A-}x{-B-}:{-C-}m{-D-}}" $ at 1 1 1 26 (RecordType [(Commented [BlockComment ["A"]] "x" [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 19 1 20 (TypeVariable "m")) [BlockComment ["D"]],False)] False)
+        , example "newlines" "{\n x\n :\n m\n ,\n y\n :\n n\n }" $ at 1 1 9 3 (RecordType [(Commented [] "x" [],Commented [] (at 4 2 4 3 (TypeVariable "m")) [],True),(Commented [] "y" [],Commented [] (at 8 2 8 3 (TypeVariable "n")) [],True)] True)
         ]
 
     , testGroup "record extension"
-        [ example "" "{a|x:m,y:n}" $ at 1 1 1 12 (RecordType (Just "a") [(Commented [] "x" [],Commented [] (at 1 6 1 7 (TypeVariable "m")) [],False),(Commented [] "y" [],Commented [] (at 1 10 1 11 (TypeVariable "n")) [],False)] False)
-        , example "single field" "{a|x:m}" $ at 1 1 1 8 (RecordType (Just "a") [(Commented [] "x" [],Commented [] (at 1 6 1 7 (TypeVariable "m")) [],False)] False)
-        , example "whitespace" "{ a | x : m , y : n }" $ at 1 1 1 22 (RecordType (Just "a") [(Commented [] "x" [],Commented [] (at 1 11 1 12 (TypeVariable "m")) [],False),(Commented [] "y" [],Commented [] (at 1 19 1 20 (TypeVariable "n")) [],False)] False)
-        , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}:{-E-}m{-F-},{-G-}y{-H-}:{-I-}n{-J-}}" $ at 1 1 1 62 (RecordType (Just "a") [(Commented [BlockComment ["C"]] "x" [BlockComment ["D"]],Commented [BlockComment ["E"]] (at 1 31 1 32 (TypeVariable "m")) [BlockComment ["F"]],False),(Commented [BlockComment ["G"]] "y" [BlockComment ["H"]],Commented [BlockComment ["I"]] (at 1 55 1 56 (TypeVariable "n")) [BlockComment ["J"]],False)] False)
-        , example "newlines" "{\n a\n |\n x\n :\n m\n ,\n y\n :\n n\n }" $ at 1 1 11 3 (RecordType (Just "a") [(Commented [] "x" [],Commented [] (at 6 2 6 3 (TypeVariable "m")) [],True),(Commented [] "y" [],Commented [] (at 10 2 10 3 (TypeVariable "n")) [],True)] True)
+        [ example "" "{a|x:m,y:n}" $ at 1 1 1 12 (RecordExtensionType "a" [(Commented [] "x" [],Commented [] (at 1 6 1 7 (TypeVariable "m")) [],False),(Commented [] "y" [],Commented [] (at 1 10 1 11 (TypeVariable "n")) [],False)] False)
+        , example "single field" "{a|x:m}" $ at 1 1 1 8 (RecordExtensionType "a" [(Commented [] "x" [],Commented [] (at 1 6 1 7 (TypeVariable "m")) [],False)] False)
+        , example "whitespace" "{ a | x : m , y : n }" $ at 1 1 1 22 (RecordExtensionType "a" [(Commented [] "x" [],Commented [] (at 1 11 1 12 (TypeVariable "m")) [],False),(Commented [] "y" [],Commented [] (at 1 19 1 20 (TypeVariable "n")) [],False)] False)
+        , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}:{-E-}m{-F-},{-G-}y{-H-}:{-I-}n{-J-}}" $ at 1 1 1 62 (RecordExtensionType "a" [(Commented [BlockComment ["C"]] "x" [BlockComment ["D"]],Commented [BlockComment ["E"]] (at 1 31 1 32 (TypeVariable "m")) [BlockComment ["F"]],False),(Commented [BlockComment ["G"]] "y" [BlockComment ["H"]],Commented [BlockComment ["I"]] (at 1 55 1 56 (TypeVariable "n")) [BlockComment ["J"]],False)] False)
+        , example "newlines" "{\n a\n |\n x\n :\n m\n ,\n y\n :\n n\n }" $ at 1 1 11 3 (RecordExtensionType "a" [(Commented [] "x" [],Commented [] (at 6 2 6 3 (TypeVariable "m")) [],True),(Commented [] "y" [],Commented [] (at 10 2 10 3 (TypeVariable "n")) [],True)] True)
         , testCase "only allows simple base" $
             assertFailure expr "{()|x:m}"
         , testCase "only allows simple base" $

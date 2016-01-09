@@ -37,7 +37,8 @@ data Type'
     | TypeParens (Commented Type)
     | TupleType [Commented Type]
     | EmptyRecordType [Comment]
-    | RecordType (Maybe String) [(Commented String, Commented Type, Bool)] Bool
+    | RecordType [(Commented String, Commented Type, Bool)] Bool
+    | RecordExtensionType String [(Commented String, Commented Type, Bool)] Bool
     | FunctionType Type [Type]
     deriving (Eq, Show)
 

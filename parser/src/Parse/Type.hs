@@ -43,11 +43,13 @@ record =
       post <- dumbWhitespace
       char '}'
       sawNewline <- popNewlineContext
-      case (ext, fields [] []) of
+      case (ext, fields pre post) of
         (Nothing, []) ->
           return $ EmptyRecordType (pre ++ post)
-        _ ->
-          return $ RecordType ext (fields pre post) sawNewline
+        (Nothing, fields') ->
+          return $ RecordType fields' sawNewline
+        (Just ext', fields') ->
+          return $ RecordExtensionType ext' fields' sawNewline
   where
     normal =
       do  (\fields -> (Nothing, fields) ) <$> commaSep field
