@@ -255,11 +255,11 @@ elmGroup innerSpaces left sep right forceMultiline children =
                         ++ [ line $ punc right ]
 
 
-elmExtensionGroup :: Bool -> String-> Box -> [Box] -> Box
+elmExtensionGroup :: Bool -> Box-> Box -> [Box] -> Box
 elmExtensionGroup multiline base first rest =
   case
       ( multiline
-      , Right $ identifier base
+      , isLine base
       , allSingles $ (first:rest)
       )
   of
@@ -278,7 +278,7 @@ elmExtensionGroup multiline base first rest =
 
       _ ->
           stack1
-              [ prefix (row [punc "{", space]) (line $ identifier base)
+              [ prefix (row [punc "{", space]) base
               , stack1
                   ([ prefix (row [punc "|", space]) first ]
                   ++ (map (prefix (row [punc ",", space])) rest))

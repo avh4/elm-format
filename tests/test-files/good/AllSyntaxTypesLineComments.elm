@@ -94,6 +94,23 @@ record _ =
   ()
 
 
-recordExtension : { a | x : Int, y : Int } -> ()
+recordExtension :
+  { --V
+    a
+    --W
+    | --X
+      x
+      --Y
+        : --Z
+          Int
+          --AA
+    , --AB
+      y
+      --AC
+        : --AD
+          Int
+          --AE
+  }
+  -> ()
 recordExtension _ =
   ()
