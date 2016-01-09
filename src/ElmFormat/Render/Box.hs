@@ -1127,33 +1127,11 @@ formatType' requireParens atype =
           pleaseReport "INVALID RECORD TYPE EXTENSION" "no fields"
 
         RecordExtensionType ext (first:rest) multiline ->
-          case
-              ( multiline
-              , Right $ identifier ext
-              , allSingles $ map (formatRecordPair ':' formatType) (first:rest)
-              )
-          of
-              (False, Right typ', Right fields') ->
-                  line $ row
-                      [ punc "{"
-                      , space
-                      , typ'
-                      , space
-                      , punc "|"
-                      , space
-                      , row (List.intersperse commaSpace fields')
-                      , space
-                      , punc "}"
-                      ]
-              _ ->
-                  stack1
-                      [ prefix (row [punc "{", space]) (line $ identifier ext)
-                      , stack1
-                          ([ prefix (row [punc "|", space]) $ (formatRecordPair ':' formatType) first ]
-                          ++ (map (prefix (row [punc ",", space]) . (formatRecordPair ':' formatType)) rest))
-                          |> indent
-                      , line $ punc "}"
-                      ]
+          elmExtensionGroup
+            multiline
+            ext
+            (formatRecordPair ':' formatType first)
+            (map (formatRecordPair ':' formatType) rest)
 
 
 formatVar :: AST.Variable.Ref -> Line
