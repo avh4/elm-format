@@ -839,55 +839,18 @@ formatExpression aexpr =
         AST.Expression.AccessFunction field ->
             line $ identifier $ "." ++ field
 
-        AST.Expression.RecordUpdate base pairs' multiline ->
-            case
-                ( multiline
-                , isLine $ formatCommented formatExpression base
-                , allSingles $ map (formatRecordPair '=' formatExpression) pairs'
-                )
-            of
-                (False, Right base', Right pairs'') ->
-                    line $ row
-                        [ punc "{"
-                        , space
-                        , base'
-                        , space
-                        , punc "|"
-                        , space
-                        , row $ List.intersperse commaSpace pairs''
-                        , space
-                        , punc "}"
-                        ]
-                _ ->
-                    case map (formatRecordPair '=' formatExpression) pairs' of
-                        [] ->
-                            pleaseReport "INVALID RECORD UPDATE" "no fields"
-                        (first:rest) ->
-                            stack1
-                                [ formatCommented formatExpression base
-                                    |> prefix (row [punc "{", space])
-                                , prefix (row [punc "|", space]) first
-                                    |> andThen (map (prefix (row [punc ",", space])) rest)
-                                    |> indent
-                                , line $ punc "}"
-                                ]
+        AST.Expression.RecordUpdate _ [] _ ->
+          pleaseReport "INVALID RECORD UPDATE" "no fields"
+
+        AST.Expression.RecordUpdate base (first:rest) multiline ->
+          elmExtensionGroup
+            multiline
+            (formatCommented formatExpression base)
+            (formatRecordPair '=' formatExpression first)
+            (map (formatRecordPair '=' formatExpression) rest)
 
         AST.Expression.Record pairs' multiline ->
-            case
-                ( multiline
-                , allSingles $ map (formatRecordPair '=' formatExpression) pairs'
-                )
-            of
-                (False, Right pairs'') ->
-                    line $ row
-                        [ punc "{"
-                        , space
-                        , row $ List.intersperse commaSpace pairs''
-                        , space
-                        , punc "}"
-                        ]
-                _ ->
-                    elmGroup True "{" "," "}" multiline $ map (formatRecordPair '=' formatExpression) pairs'
+          elmGroup True "{" "," "}" multiline $ map (formatRecordPair '=' formatExpression) pairs'
 
         AST.Expression.EmptyRecord [] ->
             line $ punc "{}"
