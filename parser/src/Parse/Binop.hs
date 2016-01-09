@@ -6,7 +6,7 @@ import Text.Parsec ((<|>), choice, try)
 import AST.V0_16
 import qualified AST.Expression as E
 import qualified AST.Variable as Var
-import Parse.Helpers (IParser, commitIf, whitespace, popNewlineContext, pushNewlineContext, located)
+import Parse.Helpers (IParser, commitIf, whitespace, popNewlineContext, pushNewlineContext, addLocation)
 import qualified Reporting.Annotation as A
 
 
@@ -16,11 +16,12 @@ binops
     -> IParser Var.Ref
     -> IParser E.Expr
 binops term last anyOp =
+  addLocation $
   do  pushNewlineContext
-      (start, e, _) <- located term
-      (_, ops, end) <- located nextOps
+      e <- term
+      ops <- nextOps
       sawNewline <- popNewlineContext
-      return $ A.at start end $ A.drop $ split e ops sawNewline -- TODO: the main purpose of split is to merge the annotations, which it does incorrectly and is overridden here, so it should probably go away
+      return $ A.drop $ split e ops sawNewline -- TODO: the main purpose of split is to merge the annotations, which it does incorrectly and is overridden here, so it should probably go away
   where
     nextOps =
       choice
