@@ -39,27 +39,38 @@ record =
   do  char '{'
       pushNewlineContext
       (_, pre) <- whitespace
-      (ext, fields) <- extended <|> normal
+      body <- extended <|> normal
       post <- dumbWhitespace
       char '}'
       sawNewline <- popNewlineContext
-      case (ext, fields pre post) of
-        (Nothing, []) ->
-          return $ EmptyRecordType (pre ++ post)
-        (Nothing, fields') ->
-          return $ RecordType fields' sawNewline
-        (Just ext', fields') ->
-          return $ RecordExtensionType ext' fields' sawNewline
+      return $ body pre post sawNewline
   where
     normal =
-      do  (\fields -> (Nothing, fields) ) <$> commaSep field
+      do
+          fields <- commaSep field
+          return $ \pre post sawNewline ->
+            case fields pre post of
+              [] ->
+                EmptyRecordType (pre ++ post)
+              fields' ->
+                RecordType fields' sawNewline
 
     -- extended record types require at least one field
     extended =
-      do  ext <- try (lowVar <* (whitespace >> string "|")) -- TODO: use comments
+      do  (ext, postBase) <-
+            try $
+              do
+                ext <- lowVar
+                (_, postBase) <- whitespace
+                _ <- string "|"
+                return (ext, postBase)
           (_, preFields) <- whitespace
           fields <- commaSep1 field
-          return (Just ext, const $ fields preFields)
+          return $ \pre post sawNewline ->
+            RecordExtensionType
+              (Commented pre ext postBase)
+              (fields preFields post)
+              sawNewline
 
     field =
       do  pushNewlineContext

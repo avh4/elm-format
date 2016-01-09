@@ -1129,7 +1129,7 @@ formatType' requireParens atype =
         RecordExtensionType ext (first:rest) multiline ->
           elmExtensionGroup
             multiline
-            ext
+            (formatCommented (line . identifier) ext)
             (formatRecordPair ':' formatType first)
             (map (formatRecordPair ':' formatType) rest)
 
