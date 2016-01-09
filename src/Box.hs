@@ -255,7 +255,7 @@ elmGroup innerSpaces left sep right forceMultiline children =
                         ++ [ line $ punc right ]
 
 
-elmExtensionGroup :: Bool -> Box-> Box -> [Box] -> Box
+elmExtensionGroup :: Bool -> Box -> Box -> [Box] -> Box
 elmExtensionGroup multiline base first rest =
   case
       ( multiline
