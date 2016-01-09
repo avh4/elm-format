@@ -586,32 +586,35 @@ addSuffix suffix b =
                 |> andThen [ line $ row [ last ls, suffix ] ]
 
 
-formatRecordPair :: (Commented String, Commented AST.Expression.Expr, Bool) -> Box
-formatRecordPair (Commented pre k postK, v, multiline') =
+formatRecordPair :: Char -> (v -> Box) -> (Commented String, Commented v, Bool) -> Box
+formatRecordPair delim formatValue (Commented pre k postK, v, multiline') =
     case
         isLine'
             (isLine $ formatCommented (line . identifier) $ Commented [] k postK)
-            (force multiline' $ isLine $ formatCommented formatExpression v)
+            (force multiline' $ isLine $ formatCommented formatValue v)
     of
         Right (k', Right v') ->
             line $ row
                 [ k'
                 , space
-                , punc "="
+                , delim'
                 , space
                 , v'
                 ]
         Right (k', Left v') ->
             stack1
-                [ line $ row [ k', space, punc "=" ]
+                [ line $ row [ k', space, delim' ]
                 , indent v'
                 ]
         Left (k', v') ->
             stack1
                 [ k'
-                , indent $ prefix (row [punc "=", space]) v'
+                , indent $ prefix (row [delim', space]) v'
                 ]
     |> (\x -> Commented pre x []) |> formatCommented id
+      where
+        delim' =
+          punc (delim : [])
 
 
 formatExpression :: AST.Expression.Expr -> Box
@@ -840,7 +843,7 @@ formatExpression aexpr =
             case
                 ( multiline
                 , isLine $ formatCommented formatExpression base
-                , allSingles $ map formatRecordPair pairs'
+                , allSingles $ map (formatRecordPair '=' formatExpression) pairs'
                 )
             of
                 (False, Right base', Right pairs'') ->
@@ -856,7 +859,7 @@ formatExpression aexpr =
                         , punc "}"
                         ]
                 _ ->
-                    case map formatRecordPair pairs' of
+                    case map (formatRecordPair '=' formatExpression) pairs' of
                         [] ->
                             pleaseReport "INVALID RECORD UPDATE" "no fields"
                         (first:rest) ->
@@ -872,7 +875,7 @@ formatExpression aexpr =
         AST.Expression.Record pairs' multiline ->
             case
                 ( multiline
-                , allSingles $ map formatRecordPair pairs'
+                , allSingles $ map (formatRecordPair '=' formatExpression) pairs'
                 )
             of
                 (False, Right pairs'') ->
@@ -884,7 +887,7 @@ formatExpression aexpr =
                         , punc "}"
                         ]
                 _ ->
-                    elmGroup True "{" "," "}" multiline $ map formatRecordPair pairs'
+                    elmGroup True "{" "," "}" multiline $ map (formatRecordPair '=' formatExpression) pairs'
 
         AST.Expression.EmptyRecord [] ->
             line $ punc "{}"
@@ -1118,61 +1121,39 @@ formatType' requireParens atype =
           formatUnit '{' '}' comments
 
         RecordType ext fields multiline ->
-            let
-                formatField (name, typ, multiline') =
-                    case (multiline', destructure (formatType typ)) of
-                        (False, (first, [])) ->
-                            line $ row
-                                [ identifier name
-                                , space
-                                , punc ":"
-                                , space
-                                , first
-                                ]
-                        _ ->
-                            stack1
-                                [ line $ row
-                                    [ identifier name
-                                    , space
-                                    , punc ":"
-                                    ]
-                                , formatType typ
-                                    |> indent
-                                ]
-            in
-                case (ext, fields) of
-                    (Just _, []) ->
-                        pleaseReport "INVALID RECORD TYPE EXTENSION" "no fields"
-                    (Just typ, first:rest) ->
-                        case
-                            ( multiline
-                            , Right $ identifier typ
-                            , allSingles $ map formatField fields
-                            )
-                        of
-                            (False, Right typ', Right fields') ->
-                                line $ row
-                                    [ punc "{"
-                                    , space
-                                    , typ'
-                                    , space
-                                    , punc "|"
-                                    , space
-                                    , row (List.intersperse commaSpace fields')
-                                    , space
-                                    , punc "}"
-                                    ]
-                            _ ->
-                                stack1
-                                    [ prefix (row [punc "{", space]) (line $ identifier typ)
-                                    , stack1
-                                        ([ prefix (row [punc "|", space]) $ formatField first ]
-                                        ++ (map (prefix (row [punc ",", space]) . formatField) rest))
-                                        |> indent
-                                    , line $ punc "}"
-                                    ]
-                    (Nothing, _) ->
-                        elmGroup True "{" "," "}" multiline (map formatField fields)
+          case (ext, fields) of
+              (Just _, []) ->
+                  pleaseReport "INVALID RECORD TYPE EXTENSION" "no fields"
+              (Just typ, first:rest) ->
+                  case
+                      ( multiline
+                      , Right $ identifier typ
+                      , allSingles $ map (formatRecordPair ':' formatType) fields
+                      )
+                  of
+                      (False, Right typ', Right fields') ->
+                          line $ row
+                              [ punc "{"
+                              , space
+                              , typ'
+                              , space
+                              , punc "|"
+                              , space
+                              , row (List.intersperse commaSpace fields')
+                              , space
+                              , punc "}"
+                              ]
+                      _ ->
+                          stack1
+                              [ prefix (row [punc "{", space]) (line $ identifier typ)
+                              , stack1
+                                  ([ prefix (row [punc "|", space]) $ (formatRecordPair ':' formatType) first ]
+                                  ++ (map (prefix (row [punc ",", space]) . (formatRecordPair ':' formatType)) rest))
+                                  |> indent
+                              , line $ punc "}"
+                              ]
+              (Nothing, _) ->
+                  elmGroup True "{" "," "}" multiline (map (formatRecordPair ':' formatType) fields)
 
 
 formatVar :: AST.Variable.Ref -> Line

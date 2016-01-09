@@ -38,16 +38,16 @@ record =
   addLocation $
   do  char '{'
       pushNewlineContext
-      (_, pre) <- whitespace -- TODO: use comments
+      (_, pre) <- whitespace
       (ext, fields) <- extended <|> normal
-      post <- dumbWhitespace -- TODO: use comments
+      post <- dumbWhitespace
       char '}'
       sawNewline <- popNewlineContext
       case (ext, fields [] []) of
         (Nothing, []) ->
           return $ EmptyRecordType (pre ++ post)
         _ ->
-          return $ RecordType ext (fields [] []) sawNewline -- TODO: pass comments
+          return $ RecordType ext (fields pre post) sawNewline
   where
     normal =
       do  (\fields -> (Nothing, fields) ) <$> commaSep field
@@ -55,17 +55,23 @@ record =
     -- extended record types require at least one field
     extended =
       do  ext <- try (lowVar <* (whitespace >> string "|")) -- TODO: use comments
-          whitespace -- TODO: use comments
+          (_, preFields) <- whitespace
           fields <- commaSep1 field
-          return (Just ext, fields)
+          return (Just ext, const $ fields preFields)
 
     field =
       do  pushNewlineContext
           lbl <- rLabel
-          whitespace >> hasType >> whitespace -- TODO: use comments
+          (_, postLbl) <- whitespace
+          _ <- hasType
+          (_, preExpr) <- whitespace
           val <- expr
           sawNewline <- popNewlineContext
-          return $ \_ _ -> (lbl, val, sawNewline) -- TODO: use comments
+          return $ \preLbl postExpr ->
+            ( Commented preLbl lbl postLbl
+            , Commented preExpr val postExpr
+            , sawNewline
+            )
 
 
 capTypeVar :: IParser String
