@@ -1120,40 +1120,40 @@ formatType' requireParens atype =
         EmptyRecordType comments ->
           formatUnit '{' '}' comments
 
-        RecordType ext fields multiline ->
-          case (ext, fields) of
-              (Just _, []) ->
-                  pleaseReport "INVALID RECORD TYPE EXTENSION" "no fields"
-              (Just typ, first:rest) ->
-                  case
-                      ( multiline
-                      , Right $ identifier typ
-                      , allSingles $ map (formatRecordPair ':' formatType) fields
-                      )
-                  of
-                      (False, Right typ', Right fields') ->
-                          line $ row
-                              [ punc "{"
-                              , space
-                              , typ'
-                              , space
-                              , punc "|"
-                              , space
-                              , row (List.intersperse commaSpace fields')
-                              , space
-                              , punc "}"
-                              ]
-                      _ ->
-                          stack1
-                              [ prefix (row [punc "{", space]) (line $ identifier typ)
-                              , stack1
-                                  ([ prefix (row [punc "|", space]) $ (formatRecordPair ':' formatType) first ]
-                                  ++ (map (prefix (row [punc ",", space]) . (formatRecordPair ':' formatType)) rest))
-                                  |> indent
-                              , line $ punc "}"
-                              ]
-              (Nothing, _) ->
-                  elmGroup True "{" "," "}" multiline (map (formatRecordPair ':' formatType) fields)
+        RecordType fields multiline ->
+          elmGroup True "{" "," "}" multiline (map (formatRecordPair ':' formatType) fields)
+
+        RecordExtensionType _ [] _ ->
+          pleaseReport "INVALID RECORD TYPE EXTENSION" "no fields"
+
+        RecordExtensionType ext (first:rest) multiline ->
+          case
+              ( multiline
+              , Right $ identifier ext
+              , allSingles $ map (formatRecordPair ':' formatType) (first:rest)
+              )
+          of
+              (False, Right typ', Right fields') ->
+                  line $ row
+                      [ punc "{"
+                      , space
+                      , typ'
+                      , space
+                      , punc "|"
+                      , space
+                      , row (List.intersperse commaSpace fields')
+                      , space
+                      , punc "}"
+                      ]
+              _ ->
+                  stack1
+                      [ prefix (row [punc "{", space]) (line $ identifier ext)
+                      , stack1
+                          ([ prefix (row [punc "|", space]) $ (formatRecordPair ':' formatType) first ]
+                          ++ (map (prefix (row [punc ",", space]) . (formatRecordPair ':' formatType)) rest))
+                          |> indent
+                      , line $ punc "}"
+                      ]
 
 
 formatVar :: AST.Variable.Ref -> Line
