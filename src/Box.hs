@@ -255,6 +255,38 @@ elmGroup innerSpaces left sep right forceMultiline children =
                         ++ [ line $ punc right ]
 
 
+elmExtensionGroup :: Bool -> String-> Box -> [Box] -> Box
+elmExtensionGroup multiline base first rest =
+  case
+      ( multiline
+      , Right $ identifier base
+      , allSingles $ (first:rest)
+      )
+  of
+      (False, Right base', Right fields') ->
+          line $ row
+              [ punc "{"
+              , space
+              , base'
+              , space
+              , punc "|"
+              , space
+              , row (List.intersperse (row [punc ",", space]) fields')
+              , space
+              , punc "}"
+              ]
+
+      _ ->
+          stack1
+              [ prefix (row [punc "{", space]) (line $ identifier base)
+              , stack1
+                  ([ prefix (row [punc "|", space]) first ]
+                  ++ (map (prefix (row [punc ",", space])) rest))
+                  |> indent
+              , line $ punc "}"
+              ]
+
+
 renderLine :: Int -> Line -> T.Text
 renderLine _ (Text text) =
     text
