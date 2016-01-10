@@ -203,6 +203,30 @@ consSep1 =
   spaceySepBy1 (string "::" <?> "a cons operator '::'")
 
 
+separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (e,Comments), [Commented e], (Comments,e)))
+separated sep expr' =
+  do  start <- getMyPosition
+      t1 <- expr'
+      arrow <- optionMaybe $ try (whitespace <* sep)
+      case arrow of
+        Nothing ->
+            return $ Left t1
+        Just (_, preArrow) ->
+            do  (_, postArrow) <- whitespace
+                t2 <- (separated sep expr')
+                end <- getMyPosition
+                return $ Right $
+                  case t2 of
+                    Right (_, (t2',postT2), ts, tlast) ->
+                      ( R.Region start end
+                      , (t1, preArrow)
+                      , ((Commented postArrow t2' postT2):ts)
+                      , tlast
+                      )
+                    Left t2' ->
+                      (R.Region start end, (t1, preArrow), [], (postArrow, t2'))
+
+
 dotSep1 :: IParser a -> IParser [a]
 dotSep1 p =
   (:) <$> p <*> many (try (char '.') >> p)
