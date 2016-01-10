@@ -1,4 +1,4 @@
-module AllSyntaxPatterns (..) where
+module AllSyntax.Patterns (..) where
 
 
 wildcard _ =

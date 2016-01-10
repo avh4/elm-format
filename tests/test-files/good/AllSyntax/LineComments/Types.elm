@@ -1,4 +1,4 @@
-module AllSyntaxTypes (..) where
+module AllSyntax.LineComments.Types (..) where
 
 import Dict
 
