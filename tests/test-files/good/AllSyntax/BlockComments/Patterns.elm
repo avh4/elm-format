@@ -41,7 +41,7 @@ list [ {- G -} a {- H -}, {- I -} b {- J -} ] =
   ()
 
 
-consList (a :: b :: c) =
+consList (a {- S -} :: {- T -} b {- U -} :: {- V -} c) =
   ()
 
 

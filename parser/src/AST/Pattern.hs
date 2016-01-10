@@ -19,7 +19,7 @@ data Pattern'
     | Tuple [Commented Pattern]
     | EmptyListPattern Comments
     | List [Commented Pattern]
-    | ConsPattern Pattern [Pattern] Pattern
+    | ConsPattern (Pattern, Comments) [Commented Pattern] (Comments, Pattern)
     | Record [Commented String]
     | Alias (Pattern, Comments) (Comments, String)
     deriving (Eq, Show)
