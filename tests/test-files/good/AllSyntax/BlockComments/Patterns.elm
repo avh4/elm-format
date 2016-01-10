@@ -41,5 +41,5 @@ record { {- K -} a {- L -}, {- M -} b {- N -} } =
   ()
 
 
-asAlias (() as x) =
+asAlias (() {- O -} as {- P -} x) =
   ()

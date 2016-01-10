@@ -21,5 +21,5 @@ data Pattern'
     | List [Commented Pattern]
     | ConsPattern Pattern [Pattern] Pattern
     | Record [Commented String]
-    | Alias String Pattern
+    | Alias (Pattern, [Comment]) ([Comment], String)
     deriving (Eq, Show)

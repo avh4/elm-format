@@ -71,5 +71,12 @@ record
   ()
 
 
-asAlias (() as x) =
+asAlias
+  (()
+   --O
+   as
+    --P
+    x
+  )
+  =
   ()
