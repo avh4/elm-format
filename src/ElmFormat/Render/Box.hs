@@ -530,7 +530,7 @@ formatPattern parensRequired apattern =
                 False
                 (formatPattern True left)
                 [ ( line $ formatInfixVar $ AST.Variable.OpRef symbol
-                  , formatPattern True right
+                  , formatPattern False right
                   )
                 ]
             |> if parensRequired then parens else id
