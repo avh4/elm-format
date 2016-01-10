@@ -63,7 +63,7 @@ record :: IParser P.Pattern
 record =
   addLocation $
   do
-      v <- brackets ((\f a b _ -> f a b) <$> commaSep1 (const <$> const <$> lowVar)) -- TODO: use comments
+      v <- brackets ((\f a b _ -> f a b) <$> commaSep1 ((\x pre post -> Commented pre x post) <$> lowVar))
       return $ P.Record v
 
 

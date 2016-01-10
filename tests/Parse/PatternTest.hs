@@ -89,12 +89,11 @@ tests =
         ]
 
     , testGroup "record"
-        [ example "" "{a,b}" $ at 1 1 1 6 (Record ["a","b"])
-        , example "single element" "{a}" $ at 1 1 1 4 (Record ["a"])
-        , example "whitespace" "{ a , b }" $ at 1 1 1 10 (Record ["a","b"])
-        -- TODO: parse comments
-        , example "comments" "{{-A-}a{-B-},{-C-}b{-D-}}" $ at 1 1 1 26 (Record ["a","b"])
-        , example "newlines" "{\n a\n ,\n b\n }" $ at 1 1 5 3 (Record ["a","b"])
+        [ example "" "{a,b}" $ at 1 1 1 6 (Record [Commented [] "a" [],Commented [] "b" []])
+        , example "single element" "{a}" $ at 1 1 1 4 (Record [Commented [] "a" []])
+        , example "whitespace" "{ a , b }" $ at 1 1 1 10 (Record [Commented [] "a" [],Commented [] "b" []])
+        , example "comments" "{{-A-}a{-B-},{-C-}b{-D-}}" $ at 1 1 1 26 (Record [Commented [BlockComment ["A"]] "a" [BlockComment ["B"]],Commented [BlockComment ["C"]] "b" [BlockComment ["D"]]])
+        , example "newlines" "{\n a\n ,\n b\n }" $ at 1 1 5 3 (Record [Commented [] "a" [],Commented [] "b" []])
         , testCase "must have at least one field" $
             assertFailure expr "{}"
         ]

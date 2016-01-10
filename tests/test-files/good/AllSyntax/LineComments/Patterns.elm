@@ -59,7 +59,15 @@ consList (a :: b :: c) =
   ()
 
 
-record { a, b } =
+record
+  { --K
+    a
+    --L
+  , --M
+    b
+    --N
+  }
+  =
   ()
 
 

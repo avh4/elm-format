@@ -20,6 +20,6 @@ data Pattern'
     | EmptyListPattern [Comment]
     | List [Commented Pattern]
     | ConsPattern Pattern [Pattern] Pattern
-    | Record [String]
+    | Record [Commented String]
     | Alias String Pattern
     deriving (Eq, Show)
