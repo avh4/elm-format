@@ -16,7 +16,7 @@ data Pattern'
     | Literal Literal
     | Var Var.Ref
     | Data Var.Ref [Pattern]
-    | Tuple [Pattern]
+    | Tuple [Commented Pattern]
     | List [Pattern]
     | ConsPattern Pattern [Pattern] Pattern
     | Record [String]

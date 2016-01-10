@@ -58,11 +58,10 @@ tests =
         ]
 
     , testGroup "tuple"
-        [ example "" "(_,_)" $ at 1 1 1 6 (Tuple [at 1 2 1 3 Anything,at 1 4 1 5 Anything])
-        , example "whitespace" "( _ , _ )" $ at 1 1 1 10 (Tuple [at 1 3 1 4 Anything,at 1 7 1 8 Anything])
-        -- TODO: parse comments
-        , example "comments" "({-A-}_{-B-},{-C-}_{-D-})" $ at 1 1 1 26 (Tuple [at 1 7 1 8 Anything,at 1 19 1 20 Anything])
-        , example "newlines" "(\n _\n ,\n _\n )" $ at 1 1 5 3 (Tuple [at 2 2 2 3 Anything,at 4 2 4 3 Anything])
+        [ example "" "(x,y)" $ at 1 1 1 6 (Tuple [Commented [] (at 1 2 1 3 (Var (VarRef "x"))) [],Commented [] (at 1 4 1 5 (Var (VarRef "y"))) []])
+        , example "whitespace" "( x , y )" $ at 1 1 1 10 (Tuple [Commented [] (at 1 3 1 4 (Var (VarRef "x"))) [],Commented [] (at 1 7 1 8 (Var (VarRef "y"))) []])
+        , example "comments" "({-A-}x{-B-},{-C-}y{-D-})" $ at 1 1 1 26 (Tuple [Commented [BlockComment ["A"]] (at 1 7 1 8 (Var (VarRef "x"))) [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 19 1 20 (Var (VarRef "y"))) [BlockComment ["D"]]])
+        , example "newlines" "(\n x\n ,\n y\n )" $ at 1 1 5 3 (Tuple [Commented [] (at 2 2 2 3 (Var (VarRef "x"))) [],Commented [] (at 4 2 4 3 (Var (VarRef "y"))) []])
         ]
 
     , testGroup "list"

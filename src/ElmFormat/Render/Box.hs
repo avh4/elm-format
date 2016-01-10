@@ -565,7 +565,7 @@ formatPattern parensRequired apattern =
             |> if parensRequired then parens else id
 
         AST.Pattern.Tuple patterns ->
-            elmGroup True "(" "," ")" False $ map (formatPattern False) patterns
+            elmGroup True "(" "," ")" False $ map (formatCommented $ formatPattern False) patterns
 
         AST.Pattern.List patterns ->
             elmGroup True "[" "," "]" False $ map (formatPattern False) patterns
