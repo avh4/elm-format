@@ -10,7 +10,6 @@ import qualified AST.Variable as Var
 import Parse.Helpers
 import qualified Parse.Literal as Literal
 import qualified Reporting.Annotation as A
-import qualified Reporting.Region as R
 
 
 basic :: IParser P.Pattern
@@ -119,10 +118,11 @@ expr =
     asPattern subPattern <?> "a pattern"
   where
     subPattern =
-      do  (start, patterns, end) <- located $ consSep1 (const . const <$> (patternConstructor <|> term)) -- TODO: use comments
-          return $
-            case patterns [] [] of -- TODO: pass comments
-              [pattern] ->
-                pattern
-              (first:second:rest) ->
-                A.A (R.Region start end) $ P.ConsPattern first (init $ second:rest) (last $ second:rest)
+      do
+        result <- separated cons (patternConstructor <|> term)
+        return $
+          case result of
+            Left pattern ->
+              pattern
+            Right (region, first, rest, final) ->
+              A.A region $ P.ConsPattern first rest final

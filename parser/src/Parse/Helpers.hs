@@ -137,6 +137,11 @@ rightArrow =
   string "->" <|> string "\8594" <?> "->"
 
 
+cons :: IParser String
+cons =
+  string "::" <?> "a cons operator '::'"
+
+
 hasType :: IParser String
 hasType =
   string ":" <?> "the \"has type\" symbol ':'"
@@ -196,11 +201,6 @@ semiSep1 =
 pipeSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 pipeSep1 =
   spaceySepBy1 (char '|' <?> "a vertical bar '|'")
-
-
-consSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
-consSep1 =
-  spaceySepBy1 (string "::" <?> "a cons operator '::'")
 
 
 separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (e,Comments), [Commented e], (Comments,e)))

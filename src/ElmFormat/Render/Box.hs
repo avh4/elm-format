@@ -542,11 +542,16 @@ formatPattern parensRequired apattern =
             line $ formatVar var
 
         AST.Pattern.ConsPattern first rest final ->
-            formatBinary
-                False
-                (formatPattern True first)
-                (map (\x -> (line $ punc "::", formatPattern False x)) (rest++[final]))
-            |> if parensRequired then parens else id
+            let
+              first' = formatTailCommented (formatPattern True) first
+              rest' = map (formatCommented (formatPattern False)) rest
+              final' = formatHeadCommented (formatPattern False) final
+            in
+              formatBinary
+                  False
+                  first'
+                  (map ((,) (line $ punc "::")) (rest'++[final']))
+              |> if parensRequired then parens else id
 
         AST.Pattern.Data ctor [] ->
             if any ((==) '.') ctor then

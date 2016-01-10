@@ -70,7 +70,16 @@ list
   ()
 
 
-consList (a :: b :: c) =
+consList
+  (a
+   --T
+    :: --U
+       b
+       --V
+    :: --W
+       c
+  )
+  =
   ()
 
 

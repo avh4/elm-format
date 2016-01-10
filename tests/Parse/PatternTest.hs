@@ -81,12 +81,11 @@ tests =
         ]
 
     , testGroup "cons pattern"
-        [ example "" "a::b::c" $ at 1 1 1 8 (ConsPattern (at 1 1 1 2 (Var (VarRef "a"))) [at 1 4 1 5 (Var (VarRef "b"))] (at 1 7 1 8 (Var (VarRef "c"))))
-        , example "two patterns" "a::b" $ at 1 1 1 5 (ConsPattern (at 1 1 1 2 (Var (VarRef "a"))) [] (at 1 4 1 5 (Var (VarRef "b"))))
-        , example "whitespace" "a :: b :: c" $ at 1 1 1 12 (ConsPattern (at 1 1 1 2 (Var (VarRef "a"))) [at 1 6 1 7 (Var (VarRef "b"))] (at 1 11 1 12 (Var (VarRef "c"))))
-        -- TODO: parse comments
-        , example "comments" "a{-A-}::{-B-}b{-C-}::{-D-}c" $ at 1 1 1 28 (ConsPattern (at 1 1 1 2 (Var (VarRef "a"))) [at 1 14 1 15 (Var (VarRef "b"))] (at 1 27 1 28 (Var (VarRef "c"))))
-        , example "newlines" "a\n ::\n b\n ::\n c" $ at 1 1 5 3 (ConsPattern (at 1 1 1 2 (Var (VarRef "a"))) [at 3 2 3 3 (Var (VarRef "b"))] (at 5 2 5 3 (Var (VarRef "c"))))
+        [ example "" "a::b::c" $ at 1 1 1 8 (ConsPattern (at 1 1 1 2 (Var (VarRef "a")),[]) [Commented [] (at 1 4 1 5 (Var (VarRef "b"))) []] ([],at 1 7 1 8 (Var (VarRef "c"))))
+        , example "two patterns" "a::b" $ at 1 1 1 5 (ConsPattern (at 1 1 1 2 (Var (VarRef "a")),[]) [] ([],at 1 4 1 5 (Var (VarRef "b"))))
+        , example "whitespace" "a :: b :: c" $ at 1 1 1 12 (ConsPattern (at 1 1 1 2 (Var (VarRef "a")),[]) [Commented [] (at 1 6 1 7 (Var (VarRef "b"))) []] ([],at 1 11 1 12 (Var (VarRef "c"))))
+        , example "comments" "a{-A-}::{-B-}b{-C-}::{-D-}c" $ at 1 1 1 28 (ConsPattern (at 1 1 1 2 (Var (VarRef "a")),[BlockComment ["A"]]) [Commented [BlockComment ["B"]] (at 1 14 1 15 (Var (VarRef "b"))) [BlockComment ["C"]]] ([BlockComment ["D"]],at 1 27 1 28 (Var (VarRef "c"))))
+        , example "newlines" "a\n ::\n b\n ::\n c" $ at 1 1 5 3 (ConsPattern (at 1 1 1 2 (Var (VarRef "a")),[]) [Commented [] (at 3 2 3 3 (Var (VarRef "b"))) []] ([],at 5 2 5 3 (Var (VarRef "c"))))
         ]
 
     , testGroup "record"
