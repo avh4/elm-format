@@ -548,19 +548,16 @@ formatPattern parensRequired apattern =
                 (map (\x -> (line $ punc "::", formatPattern False x)) (rest++[final]))
             |> if parensRequired then parens else id
 
-        AST.Pattern.Data (AST.Variable.VarRef ctor) [] ->
+        AST.Pattern.Data ctor [] ->
             if any ((==) '.') ctor then
-                (line $ formatVar $ AST.Variable.VarRef ctor)
+                (line $ identifier ctor)
                     |> if parensRequired then parens else id
             else
-                line $ formatVar $ AST.Variable.VarRef ctor
-
-        AST.Pattern.Data ctor [] ->
-            line $ formatVar ctor
+                line $ identifier ctor
 
         AST.Pattern.Data ctor patterns ->
             elmApplication
-                (line $ formatVar ctor)
+                (line $ identifier ctor)
                 (map (formatPattern True) patterns)
             |> if parensRequired then parens else id
 
