@@ -292,7 +292,15 @@ parens' =
 
 
 parens'' :: IParser a -> IParser (Either [Comment] [Commented a])
-parens'' inner =
+parens'' = surround'' '(' ')'
+
+
+braces'' :: IParser a -> IParser (Either [Comment] [Commented a])
+braces'' = surround'' '[' ']'
+
+
+surround'' :: Char -> Char -> IParser a -> IParser (Either [Comment] [Commented a])
+surround'' leftDelim rightDelim inner =
   let
     whitespace' = (\(_,w) -> w) <$> whitespace
     sep''' =
@@ -310,9 +318,9 @@ parens'' inner =
                   Right <$> option [v'] ((\x -> v' : x) <$> (char ',' >> sep'''))
   in
     do
-      char '('
+      char leftDelim
       vs <- sep''
-      char ')'
+      char rightDelim
       return vs
 
 

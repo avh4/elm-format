@@ -25,7 +25,7 @@ tuple ( {- B -} a {- C -}, {- D -} b {- E -} ) =
   ()
 
 
-emptyList [] =
+emptyList [{- F -}] =
   ()
 
 
