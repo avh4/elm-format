@@ -15,7 +15,7 @@ data Pattern'
     | UnitPattern [Comment]
     | Literal Literal
     | Var Var.Ref
-    | Data String [Pattern]
+    | Data String [([Comment], Pattern)]
     | Tuple [Commented Pattern]
     | EmptyListPattern [Comment]
     | List [Commented Pattern]

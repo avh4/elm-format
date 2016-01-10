@@ -558,7 +558,7 @@ formatPattern parensRequired apattern =
         AST.Pattern.Data ctor patterns ->
             elmApplication
                 (line $ identifier ctor)
-                (map (formatPattern True) patterns)
+                (map (formatHeadCommented $ formatPattern True) patterns)
             |> if parensRequired then parens else id
 
         AST.Pattern.Tuple patterns ->
