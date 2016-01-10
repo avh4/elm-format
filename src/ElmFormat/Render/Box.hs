@@ -571,7 +571,7 @@ formatPattern parensRequired apattern =
             elmGroup True "[" "," "]" False $ map (formatCommented $ formatPattern False) patterns
 
         AST.Pattern.Record fields ->
-            elmGroup True "{" "," "}" False $ map (line . identifier) fields
+            elmGroup True "{" "," "}" False $ map (formatCommented $ line . identifier) fields
 
         AST.Pattern.Alias name pattern ->
             case isLine $ formatPattern True pattern of
