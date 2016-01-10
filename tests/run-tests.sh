@@ -138,6 +138,12 @@ function checkGood() {
 	compareFiles "$INPUT" "$OUTPUT"
 }
 
+function checkGoodAllSyntax() {
+	checkGood "AllSyntax/$1.elm"
+	checkGood "AllSyntax/BlockComments/$1.elm"
+	checkGood "AllSyntax/LineComments/$1.elm"
+}
+
 function checkTransformation() {
 	INPUT="tests/test-files/transform/$1"
 	OUTPUT="formatted.elm"
@@ -160,10 +166,8 @@ checkWaysToRun Simple.elm
 checkGood Simple.elm
 checkGood AllSyntax/AllSyntax.elm
 checkGood AllSyntax/Declarations.elm
-checkGood AllSyntax/Patterns.elm
-checkGood AllSyntax/Types.elm
-checkGood AllSyntax/BlockComments/Types.elm
-checkGood AllSyntax/LineComments/Types.elm
+checkGoodAllSyntax Patterns
+checkGoodAllSyntax Types
 checkGood Comments.elm
 
 checkGood evancz/start-app/StartApp.elm
