@@ -20,7 +20,7 @@ type Def =
 
 
 data Def'
-    = Definition Pattern.Pattern [([Comment], Pattern.Pattern)] [Comment] Expr Bool
+    = Definition Pattern.Pattern [(Comments, Pattern.Pattern)] Comments Expr Bool
     | TypeAnnotation Var.Ref Type
     | LetComment Comment
     deriving (Eq, Show)
@@ -45,13 +45,13 @@ type Expr =
 
 
 data Expr'
-    = Unit [Comment]
+    = Unit Comments
     | Literal Literal
     | Var Var.Ref
 
-    | App Expr [([Comment], Expr)] Bool
+    | App Expr [(Comments, Expr)] Bool
     | Unary UnaryOperator Expr
-    | Binops Expr [([Comment], Var.Ref, [Comment], Expr)] Bool
+    | Binops Expr [(Comments, Var.Ref, Comments, Expr)] Bool
     | Parens (Commented Expr)
 
     | ExplicitList [Commented Expr] Bool
@@ -60,16 +60,16 @@ data Expr'
     | Tuple [Commented Expr] Bool
     | TupleFunction Int -- will be 2 or greater, indicating the number of elements in the tuple
 
-    | EmptyRecord [Comment]
+    | EmptyRecord Comments
     | Record [(Commented String, Commented Expr, Bool)] Bool
     | RecordUpdate (Commented Expr) [(Commented String, Commented Expr, Bool)] Bool
     | Access Expr String
     | AccessFunction String
 
-    | Lambda [([Comment], Pattern.Pattern)] [Comment] Expr Bool
-    | If [(Expr, Bool, [Comment], Expr)] [Comment] Expr
-    | Let [Def] [Comment] Expr
-    | Case (Expr,Bool) [([Comment], Pattern.Pattern, [Comment], Expr)]
+    | Lambda [(Comments, Pattern.Pattern)] Comments Expr Bool
+    | If [(Expr, Bool, Comments, Expr)] Comments Expr
+    | Let [Def] Comments Expr
+    | Case (Expr,Bool) [(Comments, Pattern.Pattern, Comments, Expr)]
 
     -- for type checking and code gen only
     | GLShader String String L.GLShaderTipe

@@ -896,7 +896,7 @@ formatExpression aexpr =
             pleaseReport "TODO" "glshader"
 
 
-formatUnit :: Char -> Char -> [Comment] -> Box
+formatUnit :: Char -> Char -> Comments -> Box
 formatUnit left right comments =
   case (left, comments) of
     (_, []) ->
@@ -926,17 +926,17 @@ formatCommented format (Commented pre inner post) =
                 ++ ( map formatComment post)
 
 
-formatHeadCommented :: (a -> Box) -> ([Comment], a) -> Box
+formatHeadCommented :: (a -> Box) -> (Comments, a) -> Box
 formatHeadCommented format (pre, inner) =
     formatCommented' pre format inner
 
 
-formatCommented' :: [Comment] -> (a -> Box) -> a -> Box
+formatCommented' :: Comments -> (a -> Box) -> a -> Box
 formatCommented' pre format inner =
     formatCommented format (Commented pre inner [])
 
 
-formatTailCommented :: (a -> Box) -> (a, [Comment]) -> Box
+formatTailCommented :: (a -> Box) -> (a, Comments) -> Box
 formatTailCommented format (inner, post) =
   formatCommented format (Commented [] inner post)
 

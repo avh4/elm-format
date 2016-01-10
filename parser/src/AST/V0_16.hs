@@ -10,8 +10,11 @@ data Comment
     deriving (Eq, Show)
 
 
+type Comments = [Comment]
+
+
 data Commented a =
-    Commented [Comment] a [Comment]
+    Commented Comments a Comments
     deriving (Eq, Show)
 
 
@@ -31,15 +34,15 @@ data TypeConstructor
 
 
 data Type'
-    = UnitType [Comment]
+    = UnitType Comments
     | TypeVariable String
-    | TypeConstruction TypeConstructor [([Comment], Type)]
+    | TypeConstruction TypeConstructor [(Comments, Type)]
     | TypeParens (Commented Type)
     | TupleType [Commented Type]
-    | EmptyRecordType [Comment]
+    | EmptyRecordType Comments
     | RecordType [(Commented String, Commented Type, Bool)] Bool
     | RecordExtensionType (Commented String) [(Commented String, Commented Type, Bool)] Bool
-    | FunctionType (Type, [Comment]) [Commented Type] ([Comment], Type)
+    | FunctionType (Type, Comments) [Commented Type] (Comments, Type)
     deriving (Eq, Show)
 
 

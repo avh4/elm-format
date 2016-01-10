@@ -205,7 +205,7 @@ ifExpr =
   ifHelp []
 
 
-ifHelp :: [(E.Expr, Bool, [Comment], E.Expr)] -> IParser E.Expr'
+ifHelp :: [(E.Expr, Bool, Comments, E.Expr)] -> IParser E.Expr'
 ifHelp branches =
   do  try (reserved "if")
       pushNewlineContext
@@ -314,7 +314,7 @@ definition =
         return $ E.Definition name args (preEqualsComments ++ postEqualsComments) body sawNewline
 
 
-defStart :: IParser (P.Pattern, [([Comment], P.Pattern)])
+defStart :: IParser (P.Pattern, [(Comments, P.Pattern)])
 defStart =
     choice
       [ do  pattern <- try Pattern.term
