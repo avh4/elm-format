@@ -77,7 +77,7 @@ tests =
         , example "newlines" "{\n x\n :\n m\n ,\n y\n :\n n\n }" $ at 1 1 9 3 (RecordType [(Commented [] "x" [],Commented [] (at 4 2 4 3 (TypeVariable "m")) [],True),(Commented [] "y" [],Commented [] (at 8 2 8 3 (TypeVariable "n")) [],True)] True)
         ]
 
-    , testGroup "record extension"
+    , testGroup "record extension type"
         [ example "" "{a|x:m,y:n}" $ at 1 1 1 12 (RecordExtensionType (Commented [] "a" []) [(Commented [] "x" [],Commented [] (at 1 6 1 7 (TypeVariable "m")) [],False),(Commented [] "y" [],Commented [] (at 1 10 1 11 (TypeVariable "n")) [],False)] False)
         , example "single field" "{a|x:m}" $ at 1 1 1 8 (RecordExtensionType (Commented [] "a" []) [(Commented [] "x" [],Commented [] (at 1 6 1 7 (TypeVariable "m")) [],False)] False)
         , example "whitespace" "{ a | x : m , y : n }" $ at 1 1 1 22 (RecordExtensionType (Commented [] "a" []) [(Commented [] "x" [],Commented [] (at 1 11 1 12 (TypeVariable "m")) [],False),(Commented [] "y" [],Commented [] (at 1 19 1 20 (TypeVariable "n")) [],False)] False)
@@ -90,4 +90,14 @@ tests =
         , testCase "must have fields" $
             assertFailure expr "{a|}"
         ]
+
+    , testGroup "function type"
+      [ example "" "a->b->c" $ at 1 1 1 8 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[]) [Commented [] (at 1 4 1 5 (TypeVariable "b")) []] ([],at 1 7 1 8 (TypeVariable "c")))
+      , example "single argument" "a->b" $ at 1 1 1 5 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[]) [] ([],at 1 4 1 5 (TypeVariable "b")))
+      , example "whitespace" "a->b->c" $ at 1 1 1 8 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[]) [Commented [] (at 1 4 1 5 (TypeVariable "b")) []] ([],at 1 7 1 8 (TypeVariable "c")))
+      , example "comments" "a{-A-}->{-B-}b{-C-}->{-D-}c" $ at 1 1 1 28 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[BlockComment ["A"]]) [Commented [BlockComment ["B"]] (at 1 14 1 15 (TypeVariable "b")) [BlockComment ["C"]]] ([BlockComment ["D"]],at 1 27 1 28 (TypeVariable "c")))
+      , example "newlines" "a\n ->\n b\n ->\n c" $ at 1 1 5 3 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[]) [Commented [] (at 3 2 3 3 (TypeVariable "b")) []] ([],at 5 2 5 3 (TypeVariable "c")))
+      , testCase "does not allow space in the arrow" $
+          assertFailure expr "a - > b"
+      ]
     ]

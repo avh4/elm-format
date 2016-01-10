@@ -128,19 +128,20 @@ expr :: IParser Type
 expr =
   do  start <- getMyPosition
       t1 <- app <|> term
-      arr <- optionMaybe $ try (whitespace >> rightArrow) -- TODO: use comments
-      case arr of
+      arrow <- optionMaybe $ try (whitespace <* rightArrow)
+      case arrow of
         Nothing ->
             return t1
-        Just _ ->
-            do  whitespace -- TODO: use comments
+        Just (_, preArrow) ->
+            do  (_, postArrow) <- whitespace
                 t2 <- expr
                 end <- getMyPosition
-                case A.drop t2 of
-                    FunctionType t2' ts ->
-                        return (A.A (R.Region start end) (FunctionType t1 (t2':ts)))
-                    _ ->
-                        return (A.A (R.Region start end) (FunctionType t1 [t2]))
+                return $ A.A (R.Region start end) $
+                  case A.drop t2 of
+                      FunctionType (t2',postT2) ts tlast ->
+                          FunctionType (t1, preArrow) ((Commented postArrow t2' postT2):ts) tlast
+                      _ ->
+                          FunctionType (t1, preArrow) [] (postArrow, t2)
 
 
 constructor :: IParser (String, [Type])

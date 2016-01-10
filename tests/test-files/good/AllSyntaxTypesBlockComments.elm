@@ -8,8 +8,8 @@ unit =
   ()
 
 
-lambda : () -> ()
-lambda _ =
+lambda : () {- AF -} -> {- AG -} () {- AH -} -> {- AI -} ()
+lambda _ _ =
   ()
 
 
