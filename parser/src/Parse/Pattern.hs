@@ -31,7 +31,7 @@ basic =
               P.Literal (Boolean False)
 
           c:_ | isUpper c ->
-              P.Data (Var.VarRef str) []
+              P.Data str []
 
           _ ->
               P.Var (Var.VarRef str)
@@ -106,7 +106,7 @@ patternConstructor =
         case v of
           "True"  -> return $ P.Literal (Boolean True)
           "False" -> return $ P.Literal (Boolean False)
-          _       -> P.Data (Var.VarRef v) <$> map (\(_,v) -> v) <$> spacePrefix term -- TODO: use comments
+          _       -> P.Data v <$> map (\(_,v) -> v) <$> spacePrefix term -- TODO: use comments
 
 
 expr :: IParser P.Pattern

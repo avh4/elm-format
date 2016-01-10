@@ -37,9 +37,9 @@ tests =
     , example "variable" "a" $ at 1 1 1 2 (Var (VarRef "a"))
 
     , testGroup "data"
-        [ example "" "Just _" $ at 1 1 1 7 (Data (VarRef "Just") [at 1 6 1 7 Anything])
-        , example "comments" "Just{-A-}_" $ at 1 1 1 11 (Data (VarRef "Just") [at 1 10 1 11 Anything])
-        , example "newlines" "Just\n _" $ at 1 1 2 3 (Data (VarRef "Just") [at 2 2 2 3 Anything])
+        [ example "" "Just _" $ at 1 1 1 7 (Data "Just" [at 1 6 1 7 Anything])
+        , example "comments" "Just{-A-}_" $ at 1 1 1 11 (Data "Just" [at 1 10 1 11 Anything])
+        , example "newlines" "Just\n _" $ at 1 1 2 3 (Data "Just" [at 2 2 2 3 Anything])
         ]
 
     , testGroup "unit"
@@ -96,8 +96,8 @@ tests =
 
     , testGroup "alias"
         [ example "" "_ as x" $ at 1 1 1 7 (Alias "x" (at 1 1 1 2 Anything))
-        , example "left side has whitespace" "A b as x" $ at 1 1 1 9 (Alias "x" (at 1 1 1 4 (Data (VarRef "A") [at 1 3 1 4 (Var (VarRef "b"))])))
-        , example "left side ctor without whitespace" "A as x" $ at 1 1 1 7 (Alias "x" (at 1 1 1 2 (Data (VarRef "A") [])))
+        , example "left side has whitespace" "A b as x" $ at 1 1 1 9 (Alias "x" (at 1 1 1 4 (Data "A" [at 1 3 1 4 (Var (VarRef "b"))])))
+        , example "left side ctor without whitespace" "A as x" $ at 1 1 1 7 (Alias "x" (at 1 1 1 2 (Data "A" [])))
         -- TODO: parse comments
         , example "comments" "_{-A-}as{-B-}x" $ at 1 1 1 15 (Alias "x" (at 1 1 1 2 Anything))
         , example "newlines" "_\n as\n x" $ at 1 1 3 3 (Alias "x" (at 1 1 1 2 Anything))
