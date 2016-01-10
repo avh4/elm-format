@@ -51,11 +51,10 @@ tests =
         ]
 
     , testGroup "unit"
-        [ example "" "()" $ at 1 1 1 3 (Tuple [])
-        , example "whitespace" "( )" $ at 1 1 1 4 (Tuple [])
-        -- TODO: parse comments
-        , example "comments" "({-A-})" $ at 1 1 1 8 (Tuple [])
-        , example "newlines" "(\n )" $ at 1 1 2 3 (Tuple [])
+        [ example "" "()" $ at 1 1 1 3 (UnitPattern [])
+        , example "whitespace" "( )" $ at 1 1 1 4 (UnitPattern [])
+        , example "comments" "({-A-})" $ at 1 1 1 8 (UnitPattern [BlockComment ["A"]])
+        , example "newlines" "(\n )" $ at 1 1 2 3 (UnitPattern [])
         ]
 
     , testGroup "parentheses"

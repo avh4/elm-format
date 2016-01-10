@@ -13,7 +13,7 @@ variable v =
   ()
 
 
-unit () =
+unit ({- A -}) =
   ()
 
 

@@ -460,27 +460,40 @@ formatDefinition :: AST.Expression.Def -> Box
 formatDefinition adef =
     case RA.drop adef of
         AST.Expression.Definition name args comments expr multiline ->
-            case
-                ( multiline
+            let
+              body =
+                stack1 $ concat
+                  [ map formatComment comments
+                  , [ formatExpression expr ]
+                  ]
+            in
+              case
+                ( multiline --TODO: can this be removed?
                 , isLine $ formatPattern True name
                 , allSingles $ map (\(x,y) -> formatCommented' x (formatPattern True) y) args
-                , comments
-                , isLine $ formatExpression expr
                 )
-            of
-                (_, Right name', Right args', _, _) ->
+              of
+                (_, Right name', Right args') ->
                     stack1 $
                         [ line $ row
                             [ row $ List.intersperse space $ (name':args')
                             , space
                             , punc "="
                             ]
-                        , indent $ stack1 $
-                            (map formatComment comments)
-                            ++ [ formatExpression expr ]
+                        , indent $ body
                         ]
-                (_, _, Left _, _, _) ->
-                    pleaseReport "TODO" "multiline pattern in let binding"
+
+                (_, Right name', Left args') ->
+                    stack1
+                      [ line $ name'
+                      , indent $ stack1 $ concat
+                          [ args'
+                          , [ line $ punc "="
+                            , body
+                            ]
+                          ]
+                      ]
+
                 _ ->
                     pleaseReport "UNEXPECTED TYPE ANNOTATION" "multiline name in let binding"
 
@@ -518,6 +531,9 @@ formatPattern parensRequired apattern =
     case RA.drop apattern of
         AST.Pattern.Anything ->
             line $ keyword "_"
+
+        AST.Pattern.UnitPattern comments ->
+            formatUnit '(' ')' comments
 
         AST.Pattern.Literal lit ->
             formatLiteral lit
