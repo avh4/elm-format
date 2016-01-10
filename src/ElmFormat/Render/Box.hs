@@ -903,14 +903,19 @@ formatCommented format (Commented pre inner post) =
                 ++ ( map formatComment post)
 
 
-formatCommented'' :: (a -> Box) -> ([Comment], a) -> Box
-formatCommented'' format (pre, inner) =
+formatHeadCommented :: (a -> Box) -> ([Comment], a) -> Box
+formatHeadCommented format (pre, inner) =
     formatCommented' pre format inner
 
 
 formatCommented' :: [Comment] -> (a -> Box) -> a -> Box
 formatCommented' pre format inner =
     formatCommented format (Commented pre inner [])
+
+
+formatTailCommented :: (a -> Box) -> (a, [Comment]) -> Box
+formatTailCommented format (inner, post) =
+  formatCommented format (Commented [] inner post)
 
 
 formatComment :: Comment -> Box
@@ -1050,19 +1055,23 @@ formatType' requireParens atype =
         UnitType comments ->
           formatUnit '(' ')' comments
 
-        FunctionType first rest ->
+        FunctionType first rest final ->
             case
-                allSingles $ map (formatType' ForLambda) (first:rest)
+              allSingles $
+                concat
+                  [ [formatTailCommented (formatType' ForLambda) first]
+                  , map (formatCommented $ formatType' ForLambda) rest
+                  , [formatHeadCommented (formatType' ForLambda) final]
+                  ]
             of
                 Right typs ->
-                    line $ row $ List.intersperse (row [ space, keyword "->", space]) typs
-                _ -> -- TODO: not tested
-                    formatType' ForLambda first
-                        |> andThen
-                            (rest
-                                |> map (formatType' ForLambda)
-                                |> map (prefix (row [keyword "->", space]))
-                            )
+                  line $ row $ List.intersperse (row [ space, keyword "->", space]) typs
+                Left [] ->
+                  pleaseReport "INVALID FUNCTION TYPE" "no terms"
+                Left (first':rest') ->
+                  first'
+                    |> andThen (rest' |> map (prefix $ row [keyword "->", space]))
+
             |> (if requireParens /= NotRequired then parens else id)
 
         TypeVariable var ->
@@ -1071,7 +1080,7 @@ formatType' requireParens atype =
         TypeConstruction ctor args ->
             elmApplication
                 (formatTypeConstructor ctor)
-                (map (formatCommented'' $ formatType' ForCtor) args)
+                (map (formatHeadCommented $ formatType' ForCtor) args)
                 |> (if requireParens == ForCtor then parens else id)
 
         TypeParens type' ->
