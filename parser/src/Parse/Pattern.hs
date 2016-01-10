@@ -114,6 +114,10 @@ expr =
     asPattern subPattern <?> "a pattern"
   where
     subPattern =
-      do  patterns <- consSep1 (const . const <$> (patternConstructor <|> term)) -- TODO: use comments
-          end <- getMyPosition
-          return (P.consMany end (patterns [] [])) -- TODO: pass comments
+      do  (start, patterns, end) <- located $ consSep1 (const . const <$> (patternConstructor <|> term)) -- TODO: use comments
+          return $
+            case patterns [] [] of -- TODO: pass comments
+              [pattern] ->
+                pattern
+              (first:second:rest) ->
+                A.A (R.Region start end) $ P.ConsPattern first (init $ second:rest) (last $ second:rest)

@@ -541,14 +541,11 @@ formatPattern parensRequired apattern =
         AST.Pattern.Var var ->
             line $ formatVar var
 
-        AST.Pattern.Data (AST.Variable.OpRef symbol) (left:right:[]) ->
+        AST.Pattern.ConsPattern first rest final ->
             formatBinary
                 False
-                (formatPattern True left)
-                [ ( line $ formatInfixVar $ AST.Variable.OpRef symbol
-                  , formatPattern False right
-                  )
-                ]
+                (formatPattern True first)
+                (map (\x -> (line $ punc "::", formatPattern False x)) (rest++[final]))
             |> if parensRequired then parens else id
 
         AST.Pattern.Data (AST.Variable.VarRef ctor) [] ->
