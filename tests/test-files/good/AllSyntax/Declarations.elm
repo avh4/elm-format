@@ -1,4 +1,4 @@
-module AllSyntaxDeclarations (..) where
+module AllSyntax.Declarations (..) where
 
 
 expressionDefinition _ _ =

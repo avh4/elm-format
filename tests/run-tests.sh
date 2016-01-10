@@ -158,13 +158,14 @@ echo "# elm-format test suite"
 checkWaysToRun Simple.elm
 
 checkGood Simple.elm
-checkGood AllSyntax.elm
-checkGood AllSyntaxDeclarations.elm
-checkGood AllSyntaxPatterns.elm
-checkGood AllSyntaxTypes.elm
-checkGood AllSyntaxTypesBlockComments.elm
-checkGood AllSyntaxTypesLineComments.elm
+checkGood AllSyntax/AllSyntax.elm
+checkGood AllSyntax/Declarations.elm
+checkGood AllSyntax/Patterns.elm
+checkGood AllSyntax/Types.elm
+checkGood AllSyntax/BlockComments/Types.elm
+checkGood AllSyntax/LineComments/Types.elm
 checkGood Comments.elm
+
 checkGood evancz/start-app/StartApp.elm
 checkGood TheSeamau5/elm-check/Check.elm
 checkGood rtfeldman/dreamwriter/Editor.elm

@@ -1,4 +1,4 @@
-module AllSyntaxTypes (..) where
+module AllSyntax.Types (..) where
 
 import Dict
 
