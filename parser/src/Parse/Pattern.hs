@@ -83,7 +83,7 @@ tuple =
             pattern
 
           Right patterns ->
-            A.at start end $ P.Tuple (map (\(Commented _ x _) -> x) patterns) -- TODO: use comments
+            A.at start end $ P.Tuple patterns
 
 
 list :: IParser P.Pattern

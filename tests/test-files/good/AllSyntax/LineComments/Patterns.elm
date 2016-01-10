@@ -24,7 +24,15 @@ parens v =
   ()
 
 
-tuple ( a, b ) =
+tuple
+  ( --B
+    a
+    --C
+  , --D
+    b
+    --E
+  )
+  =
   ()
 
 
