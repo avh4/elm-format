@@ -13,6 +13,7 @@ type Pattern =
 
 data Pattern'
     = Anything
+    | UnitPattern [Comment]
     | Literal Literal
     | Var Var.Ref
     | Data Var.Ref [Pattern]

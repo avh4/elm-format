@@ -69,15 +69,21 @@ record =
 
 tuple :: IParser P.Pattern
 tuple =
-  do  (start, patterns, end) <-
-          located (parens $ ((\f a b _ -> f a b) <$> commaSep (const <$> const <$> expr))) -- TODO: use comments
+  do  (start, patterns, end) <- located $ parens'' expr
 
-      case patterns of
-        [pattern] ->
-            return pattern
+      return $
+        case patterns of
+          Left comments ->
+            A.at start end $ P.UnitPattern comments
 
-        _ ->
-            return (A.at start end (P.Tuple patterns))
+          Right [] ->
+            A.at start end $ P.UnitPattern []
+
+          Right [Commented _ pattern _] -> -- TODO: use comments
+            pattern
+
+          Right patterns ->
+            A.at start end $ P.Tuple (map (\(Commented _ x _) -> x) patterns) -- TODO: use comments
 
 
 list :: IParser P.Pattern
