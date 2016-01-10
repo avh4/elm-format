@@ -96,7 +96,7 @@ list =
         Left comments ->
           P.EmptyListPattern comments
         Right patterns ->
-          P.List (map (\(Commented _ x _) -> x) patterns) -- TODO: use comments
+          P.List patterns
 
 
 term :: IParser P.Pattern

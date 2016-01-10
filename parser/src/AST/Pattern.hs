@@ -18,7 +18,7 @@ data Pattern'
     | Data String [Pattern]
     | Tuple [Commented Pattern]
     | EmptyListPattern [Comment]
-    | List [Pattern]
+    | List [Commented Pattern]
     | ConsPattern Pattern [Pattern] Pattern
     | Record [String]
     | Alias String Pattern

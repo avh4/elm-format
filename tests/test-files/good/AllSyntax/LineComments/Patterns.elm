@@ -43,7 +43,15 @@ emptyList
   ()
 
 
-list [ a, b ] =
+list
+  [ --G
+    a
+    --H
+  , --I
+    b
+    --J
+  ]
+  =
   ()
 
 

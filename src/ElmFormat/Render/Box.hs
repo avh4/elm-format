@@ -568,7 +568,7 @@ formatPattern parensRequired apattern =
             formatUnit '[' ']' comments
 
         AST.Pattern.List patterns ->
-            elmGroup True "[" "," "]" False $ map (formatPattern False) patterns
+            elmGroup True "[" "," "]" False $ map (formatCommented $ formatPattern False) patterns
 
         AST.Pattern.Record fields ->
             elmGroup True "{" "," "}" False $ map (line . identifier) fields
