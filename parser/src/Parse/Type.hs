@@ -2,11 +2,10 @@
 module Parse.Type where
 
 import Data.List (intercalate)
-import Text.Parsec ((<|>), (<?>), char, many1, optionMaybe, string, try)
+import Text.Parsec ((<|>), (<?>), char, many1, string, try)
 
 import Parse.Helpers
 import qualified Reporting.Annotation as A
-import qualified Reporting.Region as R
 import AST.V0_16
 
 
@@ -126,22 +125,14 @@ app =
 
 expr :: IParser Type
 expr =
-  do  start <- getMyPosition
-      t1 <- app <|> term
-      arrow <- optionMaybe $ try (whitespace <* rightArrow)
-      case arrow of
-        Nothing ->
-            return t1
-        Just (_, preArrow) ->
-            do  (_, postArrow) <- whitespace
-                t2 <- expr
-                end <- getMyPosition
-                return $ A.A (R.Region start end) $
-                  case A.drop t2 of
-                      FunctionType (t2',postT2) ts tlast ->
-                          FunctionType (t1, preArrow) ((Commented postArrow t2' postT2):ts) tlast
-                      _ ->
-                          FunctionType (t1, preArrow) [] (postArrow, t2)
+  do
+    result <- separated rightArrow (app <|> term)
+    return $
+      case result of
+        Left t ->
+          t
+        Right (region, first, rest, final) ->
+          A.A region $ FunctionType first rest final
 
 
 constructor :: IParser (String, [Type])
