@@ -72,12 +72,11 @@ tests =
         ]
 
     , testGroup "list"
-        [ example "" "[x,y]" $ at 1 1 1 6 (List [at 1 2 1 3 (Var (VarRef "x")),at 1 4 1 5 (Var (VarRef "y"))])
-        , example "single element" "[x]" $ at 1 1 1 4 (List [at 1 2 1 3 (Var (VarRef "x"))])
-        , example "whitespace" "[ x , y ]" $ at 1 1 1 10 (List [at 1 3 1 4 (Var (VarRef "x")),at 1 7 1 8 (Var (VarRef "y"))])
-        -- TODO: parse comments
-        , example "comments" "[{-A-}x{-B-},{-C-}y{-D-}]" $ at 1 1 1 26 (List [at 1 7 1 8 (Var (VarRef "x")),at 1 19 1 20 (Var (VarRef "y"))])
-        , example "newlines" "[\n x\n ,\n y\n ]" $ at 1 1 5 3 (List [at 2 2 2 3 (Var (VarRef "x")),at 4 2 4 3 (Var (VarRef "y"))])
+        [ example "" "[x,y]" $ at 1 1 1 6 (List [Commented [] (at 1 2 1 3 (Var (VarRef "x"))) [],Commented [] (at 1 4 1 5 (Var (VarRef "y"))) []])
+        , example "single element" "[x]" $ at 1 1 1 4 (List [Commented [] (at 1 2 1 3 (Var (VarRef "x"))) []])
+        , example "whitespace" "[ x , y ]" $ at 1 1 1 10 (List [Commented [] (at 1 3 1 4 (Var (VarRef "x"))) [],Commented [] (at 1 7 1 8 (Var (VarRef "y"))) []])
+        , example "comments" "[{-A-}x{-B-},{-C-}y{-D-}]" $ at 1 1 1 26 (List [Commented [BlockComment ["A"]] (at 1 7 1 8 (Var (VarRef "x"))) [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 19 1 20 (Var (VarRef "y"))) [BlockComment ["D"]]])
+        , example "newlines" "[\n x\n ,\n y\n ]" $ at 1 1 5 3 (List [Commented [] (at 2 2 2 3 (Var (VarRef "x"))) [],Commented [] (at 4 2 4 3 (Var (VarRef "y"))) []])
         ]
 
     , testGroup "cons pattern"
