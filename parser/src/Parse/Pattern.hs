@@ -77,8 +77,11 @@ tuple =
           Right [] ->
             A.at start end $ P.UnitPattern []
 
-          Right [Commented _ pattern _] -> -- TODO: use comments
+          Right [Commented [] pattern []] ->
             pattern
+
+          Right [pattern] ->
+            A.at start end $ P.PatternParens pattern
 
           Right patterns ->
             A.at start end $ P.Tuple patterns

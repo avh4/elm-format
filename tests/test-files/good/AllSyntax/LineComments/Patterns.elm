@@ -35,7 +35,12 @@ unit
   ()
 
 
-parens v =
+parens
+  (--W
+   v
+   --X
+  )
+  =
   ()
 
 

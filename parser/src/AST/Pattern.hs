@@ -16,6 +16,7 @@ data Pattern'
     | Literal Literal
     | Var Var.Ref
     | Data String [(Comments, Pattern)]
+    | PatternParens (Commented Pattern)
     | Tuple [Commented Pattern]
     | EmptyListPattern Comments
     | List [Commented Pattern]
