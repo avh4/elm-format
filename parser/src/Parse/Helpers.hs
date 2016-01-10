@@ -168,7 +168,7 @@ parseWhile1 sep parser =
             return $ \pre post -> done $ List.foldr step ([], value pre, post) (List.reverse zips)
 
 
-spaceySepBy1 :: IParser sep -> IParser ([Comment] -> [Comment] -> a) -> IParser ([Comment] -> [Comment] -> [a])
+spaceySepBy1 :: IParser sep -> IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 spaceySepBy1 sep parser =
     parseWhile1 (padded sep) parser
 
@@ -178,27 +178,27 @@ comma =
   char ',' <?> "a comma ','"
 
 
-commaSep1 :: IParser ([Comment] -> [Comment] -> a) -> IParser ([Comment] -> [Comment] -> [a])
+commaSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 commaSep1 =
   spaceySepBy1 comma
 
 
-commaSep :: IParser ([Comment] -> [Comment] -> a) -> IParser ([Comment] -> [Comment] -> [a])
+commaSep :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 commaSep =
   option (\_ _ -> []) . commaSep1 -- TODO: use comments for empty list
 
 
-semiSep1 :: IParser ([Comment] -> [Comment] -> a) -> IParser ([Comment] -> [Comment] -> [a])
+semiSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 semiSep1 =
   spaceySepBy1 (char ';' <?> "a semicolon ';'")
 
 
-pipeSep1 :: IParser ([Comment] -> [Comment] -> a) -> IParser ([Comment] -> [Comment] -> [a])
+pipeSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 pipeSep1 =
   spaceySepBy1 (char '|' <?> "a vertical bar '|'")
 
 
-consSep1 :: IParser ([Comment] -> [Comment] -> a) -> IParser ([Comment] -> [Comment] -> [a])
+consSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 consSep1 =
   spaceySepBy1 (string "::" <?> "a cons operator '::'")
 
@@ -208,19 +208,19 @@ dotSep1 p =
   (:) <$> p <*> many (try (char '.') >> p)
 
 
-spacePrefix :: IParser a -> IParser [([Comment], a)]
+spacePrefix :: IParser a -> IParser [(Comments, a)]
 spacePrefix p =
   constrainedSpacePrefix' p (\_ -> return ())
 
 
-constrainedSpacePrefix :: IParser a -> IParser [([Comment], a)]
+constrainedSpacePrefix :: IParser a -> IParser [(Comments, a)]
 constrainedSpacePrefix parser =
   constrainedSpacePrefix' parser constraint
   where
     constraint empty = if empty then notFollowedBy (char '-') else return ()
 
 
-constrainedSpacePrefix' :: IParser a -> (Bool -> IParser b) -> IParser [([Comment], a)]
+constrainedSpacePrefix' :: IParser a -> (Bool -> IParser b) -> IParser [(Comments, a)]
 constrainedSpacePrefix' parser constraint =
     many $ choice
       [ comment <$> try (const <$> spacing <*> lookAhead (oneOf "[({")) <*> parser
@@ -252,7 +252,7 @@ betwixt a b c =
       return out
 
 
-surround :: Char -> Char -> String -> IParser ([Comment] -> [Comment] -> Bool -> a) -> IParser a
+surround :: Char -> Char -> String -> IParser (Comments -> Comments -> Bool -> a) -> IParser a
 surround a z name p = do
   pushNewlineContext
   char a
@@ -262,17 +262,17 @@ surround a z name p = do
   return $ v pre post multiline
 
 
-braces :: IParser ([Comment] -> [Comment] -> Bool -> a) -> IParser a
+braces :: IParser (Comments -> Comments -> Bool -> a) -> IParser a
 braces =
   surround '[' ']' "brace"
 
 
-parens :: IParser ([Comment] -> [Comment] -> Bool -> a) -> IParser a
+parens :: IParser (Comments -> Comments -> Bool -> a) -> IParser a
 parens =
   surround '(' ')' "paren"
 
 
-brackets :: IParser ([Comment] -> [Comment] -> Bool -> a) -> IParser a
+brackets :: IParser (Comments -> Comments -> Bool -> a) -> IParser a
 brackets =
   surround '{' '}' "bracket"
 
@@ -291,15 +291,15 @@ parens' =
   surround' '(' ')' "paren"
 
 
-parens'' :: IParser a -> IParser (Either [Comment] [Commented a])
+parens'' :: IParser a -> IParser (Either Comments [Commented a])
 parens'' = surround'' '(' ')'
 
 
-braces'' :: IParser a -> IParser (Either [Comment] [Commented a])
+braces'' :: IParser a -> IParser (Either Comments [Commented a])
 braces'' = surround'' '[' ']'
 
 
-surround'' :: Char -> Char -> IParser a -> IParser (Either [Comment] [Commented a])
+surround'' :: Char -> Char -> IParser a -> IParser (Either Comments [Commented a])
 surround'' leftDelim rightDelim inner =
   let
     whitespace' = (\(_,w) -> w) <$> whitespace
@@ -378,7 +378,7 @@ dot =
 
 -- WHITESPACE
 
-padded :: IParser a -> IParser ([Comment], a, [Comment])
+padded :: IParser a -> IParser (Comments, a, Comments)
 padded p =
   do  (_, pre) <- whitespace
       out <- p
@@ -386,7 +386,7 @@ padded p =
       return (pre, out, post)
 
 
-spaces :: IParser [Comment]
+spaces :: IParser Comments
 spaces =
   let
       blank = string " " >> return []
@@ -396,7 +396,7 @@ spaces =
       concat <$> many1 space
 
 
-forcedWS :: IParser [Comment]
+forcedWS :: IParser Comments
 forcedWS =
   choice
     [ (++) <$> spaces <*> (concat <$> many nl_space)
@@ -408,24 +408,24 @@ forcedWS =
 
 
 -- Just eats whitespace until the next meaningful character.
-dumbWhitespace :: IParser [Comment]
+dumbWhitespace :: IParser Comments
 dumbWhitespace =
   concat <$> many (spaces <|> newline)
 
 
-whitespace :: IParser (Bool, [Comment])
+whitespace :: IParser (Bool, Comments)
 whitespace =
   option (False, []) ((,) True <$> forcedWS)
 
 
-freshLine :: IParser [Comment]
+freshLine :: IParser Comments
 freshLine =
       concat <$> (try ((++) <$> many1 newline <*> many space_nl) <|> try (many1 space_nl)) <?> Syntax.freshLine
   where
     space_nl = try $ (++) <$> spaces <*> (concat <$> many1 newline)
 
 
-newline :: IParser [Comment]
+newline :: IParser Comments
 newline =
   do  result <- (simpleNewline >> return []) <|> ((\x -> [x]) <$> lineComment) <?> Syntax.newline
       updateState $ State.setNewline

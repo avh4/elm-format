@@ -12,14 +12,14 @@ type Pattern =
 
 data Pattern'
     = Anything
-    | UnitPattern [Comment]
+    | UnitPattern Comments
     | Literal Literal
     | Var Var.Ref
-    | Data String [([Comment], Pattern)]
+    | Data String [(Comments, Pattern)]
     | Tuple [Commented Pattern]
-    | EmptyListPattern [Comment]
+    | EmptyListPattern Comments
     | List [Commented Pattern]
     | ConsPattern Pattern [Pattern] Pattern
     | Record [Commented String]
-    | Alias (Pattern, [Comment]) ([Comment], String)
+    | Alias (Pattern, Comments) (Comments, String)
     deriving (Eq, Show)
