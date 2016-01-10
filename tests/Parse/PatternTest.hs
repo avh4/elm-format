@@ -37,9 +37,10 @@ tests =
     , example "variable" "a" $ at 1 1 1 2 (Var (VarRef "a"))
 
     , testGroup "data"
-        [ example "" "Just _" $ at 1 1 1 7 (Data "Just" [at 1 6 1 7 Anything])
-        , example "comments" "Just{-A-}_" $ at 1 1 1 11 (Data "Just" [at 1 10 1 11 Anything])
-        , example "newlines" "Just\n _" $ at 1 1 2 3 (Data "Just" [at 2 2 2 3 Anything])
+        [ example "" "Just x y" $ at 1 1 1 9 (Data "Just" [([],at 1 6 1 7 (Var (VarRef "x"))),([],at 1 8 1 9 (Var (VarRef "y")))])
+        , example "single parameter" "Just x" $ at 1 1 1 7 (Data "Just" [([],at 1 6 1 7 (Var (VarRef "x")))])
+        , example "comments" "Just{-A-}x{-B-}y" $ at 1 1 1 17 (Data "Just" [([BlockComment ["A"]],at 1 10 1 11 (Var (VarRef "x"))),([BlockComment ["B"]],at 1 16 1 17 (Var (VarRef "y")))])
+        , example "newlines" "Just\n x\n y" $ at 1 1 3 3 (Data "Just" [([],at 2 2 2 3 (Var (VarRef "x"))),([],at 3 2 3 3 (Var (VarRef "y")))])
         ]
 
     , testGroup "unit"
@@ -100,7 +101,7 @@ tests =
 
     , testGroup "alias"
         [ example "" "_ as x" $ at 1 1 1 7 (Alias (at 1 1 1 2 Anything,[]) ([],"x"))
-        , example "left side has whitespace" "A b as x" $ at 1 1 1 9 (Alias (at 1 1 1 4 (Data "A" [at 1 3 1 4 (Var (VarRef "b"))]),[]) ([],"x"))
+        , example "left side has whitespace" "A b as x" $ at 1 1 1 9 (Alias (at 1 1 1 4 (Data "A" [([], at 1 3 1 4 (Var (VarRef "b")))]),[]) ([],"x"))
         , example "left side ctor without whitespace" "A as x" $ at 1 1 1 7 (Alias (at 1 1 1 2 (Data "A" []),[]) ([],"x"))
         , example "comments" "_{-A-}as{-B-}x" $ at 1 1 1 15 (Alias (at 1 1 1 2 Anything,[BlockComment ["A"]]) ([BlockComment ["B"]],"x"))
         , example "newlines" "_\n as\n x" $ at 1 1 3 3 (Alias (at 1 1 1 2 Anything,[]) ([],"x"))
