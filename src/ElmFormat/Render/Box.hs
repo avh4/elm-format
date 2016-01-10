@@ -566,6 +566,10 @@ formatPattern parensRequired apattern =
                 (map (formatHeadCommented $ formatPattern True) patterns)
             |> if parensRequired then parens else id
 
+        AST.Pattern.PatternParens pattern ->
+            formatCommented (formatPattern False) pattern
+              |> parens
+
         AST.Pattern.Tuple patterns ->
             elmGroup True "(" "," ")" False $ map (formatCommented $ formatPattern False) patterns
 

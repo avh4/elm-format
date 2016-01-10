@@ -53,8 +53,7 @@ tests =
     , testGroup "parentheses"
         [ example "" "(_)" $ at 1 2 1 3 Anything
         , example "whitespace" "( _ )" $ at 1 3 1 4 Anything
-        -- TODO: parse comments
-        , example "comments" "({-A-}_{-B-})" $ at 1 7 1 8 Anything
+        , example "comments" "({-A-}_{-B-})" $ at 1 1 1 14 (PatternParens (Commented [BlockComment ["A"]] (at 1 7 1 8 Anything) [BlockComment ["B"]]))
         , example "newlines" "(\n _\n )" $ at 2 2 2 3 Anything
         ]
 
