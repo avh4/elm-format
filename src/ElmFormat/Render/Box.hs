@@ -573,19 +573,29 @@ formatPattern parensRequired apattern =
         AST.Pattern.Record fields ->
             elmGroup True "{" "," "}" False $ map (formatCommented $ line . identifier) fields
 
-        AST.Pattern.Alias name pattern ->
-            case isLine $ formatPattern True pattern of
-                Right pattern' ->
-                    line $ row
-                        [ pattern'
-                        , space
-                        , keyword "as"
-                        , space
-                        , identifier name
-                        ]
-                _ ->
-                    pleaseReport "TODO" "multiline pattern alias"
-            |> (if parensRequired then parens else id)
+        AST.Pattern.Alias pattern name ->
+          case
+            allSingles2
+              (formatTailCommented (formatPattern True) pattern)
+              (formatHeadCommented (line . identifier) name )
+          of
+            Right (pattern', name') ->
+              line $ row
+                [ pattern'
+                , space
+                , keyword "as"
+                , space
+                , name'
+                ]
+
+            Left (pattern', name') ->
+              stack1
+                [ pattern'
+                , line $ keyword "as"
+                , indent name'
+                ]
+
+          |> (if parensRequired then parens else id)
 
 
 addSuffix :: Line -> Box -> Box

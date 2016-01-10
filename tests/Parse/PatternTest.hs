@@ -99,14 +99,13 @@ tests =
         ]
 
     , testGroup "alias"
-        [ example "" "_ as x" $ at 1 1 1 7 (Alias "x" (at 1 1 1 2 Anything))
-        , example "left side has whitespace" "A b as x" $ at 1 1 1 9 (Alias "x" (at 1 1 1 4 (Data "A" [at 1 3 1 4 (Var (VarRef "b"))])))
-        , example "left side ctor without whitespace" "A as x" $ at 1 1 1 7 (Alias "x" (at 1 1 1 2 (Data "A" [])))
-        -- TODO: parse comments
-        , example "comments" "_{-A-}as{-B-}x" $ at 1 1 1 15 (Alias "x" (at 1 1 1 2 Anything))
-        , example "newlines" "_\n as\n x" $ at 1 1 3 3 (Alias "x" (at 1 1 1 2 Anything))
-        , example "nested" "(_ as x)as y" $ at 1 2 1 13 (Alias "y" (at 1 2 1 8 (Alias "x" (at 1 2 1 3 Anything))))
-        , example "nested (whitespace)" "(_ as x) as y" $ at 1 2 1 14 (Alias "y" (at 1 2 1 8 (Alias "x" (at 1 2 1 3 Anything))))
+        [ example "" "_ as x" $ at 1 1 1 7 (Alias (at 1 1 1 2 Anything,[]) ([],"x"))
+        , example "left side has whitespace" "A b as x" $ at 1 1 1 9 (Alias (at 1 1 1 4 (Data "A" [at 1 3 1 4 (Var (VarRef "b"))]),[]) ([],"x"))
+        , example "left side ctor without whitespace" "A as x" $ at 1 1 1 7 (Alias (at 1 1 1 2 (Data "A" []),[]) ([],"x"))
+        , example "comments" "_{-A-}as{-B-}x" $ at 1 1 1 15 (Alias (at 1 1 1 2 Anything,[BlockComment ["A"]]) ([BlockComment ["B"]],"x"))
+        , example "newlines" "_\n as\n x" $ at 1 1 3 3 (Alias (at 1 1 1 2 Anything,[]) ([],"x"))
+        , example "nested" "(_ as x)as y" $ at 1 1 1 13 (Alias (at 1 2 1 8 (Alias (at 1 2 1 3 Anything,[]) ([],"x")),[]) ([],"y"))
+        , example "nested (whitespace)" "(_ as x) as y" $ at 1 1 1 14 (Alias (at 1 2 1 8 (Alias (at 1 2 1 3 Anything,[]) ([],"x")),[]) ([],"y"))
         , testCase "nesting required parentheses" $
             assertFailure expr "_ as x as y"
         ]

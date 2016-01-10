@@ -39,24 +39,23 @@ basic =
 
 asPattern :: IParser P.Pattern -> IParser P.Pattern
 asPattern patternParser =
-  do  pattern <- patternParser
-
-      let (A.A (R.Region start _) _) = pattern
+  do  (start, pattern, _) <- located patternParser
 
       maybeAlias <- optionMaybe asAlias
 
       case maybeAlias of
-        Just alias ->
+        Just (postPattern, alias) ->
             do  end <- getMyPosition
-                return (A.at start end (P.Alias alias pattern))
+                return $ A.at start end $ P.Alias (pattern, postPattern) alias
 
         Nothing ->
             return pattern
   where
     asAlias =
-      do  try (whitespace >> reserved "as") -- TODO: use comments
-          whitespace -- TODO: use comments
-          lowVar
+      do  (_, preAs) <- try (whitespace <* reserved "as")
+          (_, postAs) <- whitespace
+          var <- lowVar
+          return (preAs, (postAs, var))
 
 
 record :: IParser P.Pattern
