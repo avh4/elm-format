@@ -88,9 +88,15 @@ tuple =
 
 list :: IParser P.Pattern
 list =
-  braces $
-    do  (start, patterns, end) <- located (commaSep (const . const <$> expr)) -- TODO: use comments
-        return $ \_ _ _ -> A.at start end $ P.List (patterns [] []) -- TODO: use comments
+  addLocation $
+  do
+    result <- braces'' expr
+    return $
+      case result of
+        Left comments ->
+          P.EmptyListPattern comments
+        Right patterns ->
+          P.List (map (\(Commented _ x _) -> x) patterns) -- TODO: use comments
 
 
 term :: IParser P.Pattern

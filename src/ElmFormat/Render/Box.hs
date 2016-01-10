@@ -564,6 +564,9 @@ formatPattern parensRequired apattern =
         AST.Pattern.Tuple patterns ->
             elmGroup True "(" "," ")" False $ map (formatCommented $ formatPattern False) patterns
 
+        AST.Pattern.EmptyListPattern comments ->
+            formatUnit '[' ']' comments
+
         AST.Pattern.List patterns ->
             elmGroup True "[" "," "]" False $ map (formatPattern False) patterns
 

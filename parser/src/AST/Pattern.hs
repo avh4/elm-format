@@ -17,6 +17,7 @@ data Pattern'
     | Var Var.Ref
     | Data String [Pattern]
     | Tuple [Commented Pattern]
+    | EmptyListPattern [Comment]
     | List [Pattern]
     | ConsPattern Pattern [Pattern] Pattern
     | Record [String]

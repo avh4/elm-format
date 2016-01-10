@@ -64,14 +64,20 @@ tests =
         , example "newlines" "(\n x\n ,\n y\n )" $ at 1 1 5 3 (Tuple [Commented [] (at 2 2 2 3 (Var (VarRef "x"))) [],Commented [] (at 4 2 4 3 (Var (VarRef "y"))) []])
         ]
 
+    , testGroup "empty list pattern"
+        [ example "" "[]" $ at 1 1 1 3 (EmptyListPattern [])
+        , example "whitespace" "[ ]" $ at 1 1 1 4 (EmptyListPattern [])
+        , example "comments" "[{-A-}]" $ at 1 1 1 8 (EmptyListPattern [BlockComment ["A"]])
+        , example "newlines" "[\n ]" $ at 1 1 2 3 (EmptyListPattern [])
+        ]
+
     , testGroup "list"
-        [ example "" "[_,_]" $ at 1 2 1 5 (List [at 1 2 1 3 Anything,at 1 4 1 5 Anything])
-        , example "no elements" "[]" $ at 1 2 1 2 (List [])
-        , example "single element" "[_]" $ at 1 2 1 3 (List [at 1 2 1 3 Anything])
-        , example "whitespace" "[ _ , _ ]" $ at 1 3 1 8 (List [at 1 3 1 4 Anything,at 1 7 1 8 Anything])
+        [ example "" "[x,y]" $ at 1 1 1 6 (List [at 1 2 1 3 (Var (VarRef "x")),at 1 4 1 5 (Var (VarRef "y"))])
+        , example "single element" "[x]" $ at 1 1 1 4 (List [at 1 2 1 3 (Var (VarRef "x"))])
+        , example "whitespace" "[ x , y ]" $ at 1 1 1 10 (List [at 1 3 1 4 (Var (VarRef "x")),at 1 7 1 8 (Var (VarRef "y"))])
         -- TODO: parse comments
-        , example "comments" "[{-A-}_{-B-},{-C-}_{-D-}]" $ at 1 7 1 20 (List [at 1 7 1 8 Anything,at 1 19 1 20 Anything])
-        , example "newlines" "[\n _\n ,\n _\n ]" $ at 2 2 4 3 (List [at 2 2 2 3 Anything,at 4 2 4 3 Anything])
+        , example "comments" "[{-A-}x{-B-},{-C-}y{-D-}]" $ at 1 1 1 26 (List [at 1 7 1 8 (Var (VarRef "x")),at 1 19 1 20 (Var (VarRef "y"))])
+        , example "newlines" "[\n x\n ,\n y\n ]" $ at 1 1 5 3 (List [at 2 2 2 3 (Var (VarRef "x")),at 4 2 4 3 (Var (VarRef "y"))])
         ]
 
     , testGroup "cons pattern"
