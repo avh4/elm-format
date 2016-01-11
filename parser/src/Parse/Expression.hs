@@ -82,7 +82,7 @@ listTerm =
 parensTerm :: IParser E.Expr
 parensTerm =
   choice
-    [ try (parens' opFn)
+    [ try (addLocation $ parens' opFn)
     , try (addLocation $ parens' tupleFn)
     , do
           (start, e, end) <- located $ parens (parened <|> unit)
@@ -90,10 +90,7 @@ parensTerm =
     ]
   where
     opFn =
-      do  (start, op, end) <- located anyOp
-          return $
-            A.at start end $
-              E.Var op
+      E.Var <$> anyOp
 
     tupleFn =
       do  commas <- many1 comma
