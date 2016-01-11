@@ -303,7 +303,6 @@ brackets =
 
 surround' :: Char -> Char -> String -> IParser a -> IParser a
 surround' a z name p = do
-  pushNewlineContext
   char a
   v <- p
   char z <?> unwords ["a closing", name, show z]

@@ -82,7 +82,7 @@ listTerm =
 parensTerm :: IParser E.Expr
 parensTerm =
   choice
-    [ try (parens $ fmap (const . const . const) opFn) -- TODO: use comments
+    [ try (parens' opFn)
     , do
           (start, e, end) <- located $ parens (tupleFn <|> parened <|> unit)
           return $ A.at start end e
