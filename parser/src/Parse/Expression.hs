@@ -55,7 +55,7 @@ negative =
 
 listTerm :: IParser E.Expr'
 listTerm =
-    shader' <|> braces (try range <|> commaSeparated)
+    shader' <|> try (braces range) <|> commaSeparated
   where
     range =
       do
@@ -75,8 +75,16 @@ listTerm =
           return $ E.GLShader uid (filter (/='\r') rawSrc) tipe
 
     commaSeparated =
-      do  term <- commaSep ((\e pre post -> Commented pre e post) <$> expr)
-          return $ \pre post multiline -> E.ExplicitList (term pre post) multiline
+      do
+        pushNewlineContext
+        result <- braces'' expr
+        sawNewline <- popNewlineContext
+        return $
+          case result of
+            Left comments ->
+              E.EmptyList comments
+            Right terms ->
+              E.ExplicitList terms sawNewline
 
 
 parensTerm :: IParser E.Expr
