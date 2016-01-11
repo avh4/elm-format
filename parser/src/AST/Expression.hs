@@ -68,7 +68,7 @@ data Expr'
     | AccessFunction String
 
     | Lambda [(Comments, Pattern.Pattern)] Comments Expr Bool
-    | If [(Expr, Bool, Comments, Expr)] Comments Expr
+    | If [(Commented Expr, Bool, Comments, Expr)] Comments Expr
     | Let [Def] Comments Expr
     | Case (Expr,Bool) [(Comments, Pattern.Pattern, Comments, Expr)]
 
