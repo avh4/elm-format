@@ -10,14 +10,6 @@ ratio =
       )
 
 
-myTuple =
-  (,,,)
-    1
-    2
-    3
-    4
-
-
 
 -- foo=(case x of {True->1;False->3})
 

@@ -83,8 +83,9 @@ parensTerm :: IParser E.Expr
 parensTerm =
   choice
     [ try (parens' opFn)
+    , try (addLocation $ parens' tupleFn)
     , do
-          (start, e, end) <- located $ parens (tupleFn <|> parened <|> unit)
+          (start, e, end) <- located $ parens (parened <|> unit)
           return $ A.at start end e
     ]
   where
@@ -95,9 +96,8 @@ parensTerm =
               E.Var op
 
     tupleFn =
-      do  commas <- comma >> many (whitespace >> comma) -- TODO: use comments
-          return $
-              \_ _ _ -> E.TupleFunction (length commas + 2) -- TODO: use comments
+      do  commas <- many1 comma
+          return $ E.TupleFunction (length commas + 1)
 
     parened =
       do  expressions <- commaSep1 ((\e a b -> Commented a e b) <$> expr)

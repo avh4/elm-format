@@ -144,12 +144,12 @@ tests =
 
     , testGroup "tuple constructor"
         [ example "" "(,,)" $ at 1 1 1 5 $ TupleFunction 3
-        , example "whitespace" "( , ,)" $ at 1 1 1 7 $ TupleFunction 3
-        -- TODO: parse comments
-        , example "comments" "({-A-},{-B-},)" $ at 1 1 1 15 (TupleFunction 3)
-        , example "newlines" "(\n ,\n ,)" $ at 1 1 3 4 $ TupleFunction 3
-        , testCase "does not allow trailing inner whitespace" $
-            assertFailure expr "(,, )"
+        , testCase "does not allow whitespace (1)" $ assertFailure expr "( ,,)"
+        , testCase "does not allow whitespace (2)" $ assertFailure expr "(, ,)"
+        , testCase "does not allow whitespace (3)" $ assertFailure expr "(,, )"
+        , testCase "does not allow comments (1)" $ assertFailure expr "({-A-},,)"
+        , testCase "does not allow comments (2)" $ assertFailure expr "(,{-A-},)"
+        , testCase "does not allow comments (3)" $ assertFailure expr "(,,{-A-})"
         ]
 
     , testGroup "Record"
