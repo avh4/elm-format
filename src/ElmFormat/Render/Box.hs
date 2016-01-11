@@ -751,13 +751,10 @@ formatExpression aexpr =
                     formatExpression left
                         |> andThen (map (\(x,y) -> indent $ formatCommented' x formatExpression y) args)
 
-        AST.Expression.If [] _ els ->
-            stack1
-                [ pleaseReport "INVALID IF EXPRESSION" "no if branch"
-                , formatExpression els
-                    |> indent
-                ]
-        AST.Expression.If (if':elseifs) elsComments els ->
+        AST.Expression.If [] _ ->
+          pleaseReport "INVALID IF EXPRESSION" "no if branch"
+
+        AST.Expression.If (if':elseifs) (elsComments, els) ->
             let
                 opening key multiline cond =
                     case (multiline, isLine cond) of
@@ -776,21 +773,17 @@ formatExpression aexpr =
                                 , line $ keyword "then"
                                 ]
 
-                clause key (cond, multiline, bodyComments, body) =
+                clause key (cond, multiline, body) =
                     stack1
                         [ opening key multiline $ formatCommented formatExpression cond
-                        , indent $ stack1 $
-                            (map formatComment bodyComments)
-                            ++ [ formatExpression body ]
+                        , indent $ formatCommented_ True formatExpression body
                         ]
             in
                 clause "if" if'
                     |> andThen (map (clause "else if") elseifs)
                     |> andThen
                         [ line $ keyword "else"
-                        , indent $ stack1 $
-                            (map formatComment elsComments)
-                            ++ [ formatExpression els ]
+                        , indent $ formatCommented_ True formatExpression (Commented elsComments els [])
                         ]
 
         AST.Expression.Let defs bodyComments expr ->
@@ -921,21 +914,27 @@ formatUnit left right comments =
       surround left right $ stack1 $ map formatComment comments
 
 
-formatCommented :: (a -> Box) -> Commented a -> Box
-formatCommented format (Commented pre inner post) =
+formatCommented_ :: Bool -> (a -> Box) -> Commented a -> Box
+formatCommented_ forceMultiline format (Commented pre inner post) =
     case
-        ( allSingles $ fmap formatComment pre
+        ( forceMultiline
+        , allSingles $ fmap formatComment pre
         , allSingles $ fmap formatComment post
         , isLine $ format inner
         )
     of
-        ( Right pre', Right post', Right inner' ) ->
+        ( False, Right pre', Right post', Right inner' ) ->
             line $ row $ List.intersperse space $ concat [pre', [inner'], post']
-        _ -> -- TODO: not tested
+        _ ->
             stack1 $
                 (map formatComment pre)
                 ++ [ format inner ]
                 ++ ( map formatComment post)
+
+
+formatCommented :: (a -> Box) -> Commented a -> Box
+formatCommented =
+  formatCommented_ False
 
 
 formatHeadCommented :: (a -> Box) -> (Comments, a) -> Box

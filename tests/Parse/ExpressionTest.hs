@@ -211,10 +211,10 @@ tests =
         ]
 
     , testGroup "if statement"
-        [ example "" "if x then y else z" $ at 1 1 1 19 (If [(Commented [] (at 1 4 1 5 (Var (VarRef "x"))) [],False,[],at 1 11 1 12 (Var (VarRef "y")))] [] (at 1 18 1 19 (Var (VarRef "z"))))
-        , example "comments" "if{-A-}x{-B-}then{-C-}y{-D-}else{-E-}z" $ at 1 1 1 39 (If [(Commented [BlockComment ["A"]] (at 1 8 1 9 (Var (VarRef "x"))) [BlockComment ["B"]],False,[BlockComment ["C"]],at 1 23 1 24 (Var (VarRef "y")))] [BlockComment ["E"]] (at 1 38 1 39 (Var (VarRef "z"))))
-        , example "else if" "if x then y else if x' then y' else if x'' then y'' else z" $ at 1 1 1 59 (If [(Commented [] (at 1 4 1 5 (Var (VarRef "x"))) [],False,[],at 1 11 1 12 (Var (VarRef "y"))),(Commented [] (at 1 21 1 23 (Var (VarRef "x'"))) [],False,[],at 1 29 1 31 (Var (VarRef "y'"))),(Commented [] (at 1 40 1 43 (Var (VarRef "x''"))) [],False,[],at 1 49 1 52 (Var (VarRef "y''")))] [] (at 1 58 1 59 (Var (VarRef "z"))))
-        , example "newlines" "if\n x\n then\n y\n else\n z" $ at 1 1 6 3 (If [(Commented [] (at 2 2 2 3 (Var (VarRef "x"))) [],True,[],at 4 2 4 3 (Var (VarRef "y")))] [] (at 6 2 6 3 (Var (VarRef "z"))))
+        [ example "" "if x then y else z" $ at 1 1 1 19 (If [(Commented [] (at 1 4 1 5 (Var (VarRef "x"))) [],False,Commented [] (at 1 11 1 12 (Var (VarRef "y"))) [])] ([],at 1 18 1 19 (Var (VarRef "z"))))
+        , example "comments" "if{-A-}x{-B-}then{-C-}y{-D-}else{-E-}if{-F-}x'{-G-}then{-H-}y'{-I-}else{-J-}z" $ at 1 1 1 78 (If [(Commented [BlockComment ["A"]] (at 1 8 1 9 (Var (VarRef "x"))) [BlockComment ["B"]],False,Commented [BlockComment ["C"]] (at 1 23 1 24 (Var (VarRef "y"))) [BlockComment ["D"]]),(Commented [BlockComment ["F"]] (at 1 45 1 47 (Var (VarRef "x'"))) [BlockComment ["G"]],False,Commented [BlockComment ["H"]] (at 1 61 1 63 (Var (VarRef "y'"))) [BlockComment ["I"]])] ([BlockComment ["J"]],at 1 77 1 78 (Var (VarRef "z"))))
+        , example "else if" "if x then y else if x' then y' else if x'' then y'' else z" $ at 1 1 1 59 (If [(Commented [] (at 1 4 1 5 (Var (VarRef "x"))) [],False,Commented [] (at 1 11 1 12 (Var (VarRef "y"))) []),(Commented [] (at 1 21 1 23 (Var (VarRef "x'"))) [],False,Commented [] (at 1 29 1 31 (Var (VarRef "y'"))) []),(Commented [] (at 1 40 1 43 (Var (VarRef "x''"))) [],False,Commented [] (at 1 49 1 52 (Var (VarRef "y''"))) [])] ([],at 1 58 1 59 (Var (VarRef "z"))))
+        , example "newlines" "if\n x\n then\n y\n else\n z" $ at 1 1 6 3 (If [(Commented [] (at 2 2 2 3 (Var (VarRef "x"))) [],True,Commented [] (at 4 2 4 3 (Var (VarRef "y"))) [])] ([],at 6 2 6 3 (Var (VarRef "z"))))
         ]
 
     , testGroup "let statement"
