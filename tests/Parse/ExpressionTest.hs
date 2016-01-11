@@ -74,10 +74,10 @@ tests =
 
         , testGroup "symbolic operator"
             [ example "" "(+)" $ at 1 1 1 4 $ Var $ OpRef "+"
-            , example "whitespace" "( + )" $ at 1 1 1 6 $ Var $ OpRef "+"
-            -- TODO: parse comments
-            , example "comments" "({-A-}+{-B-})" $ at 1 1 1 14 (Var (OpRef "+"))
-            , example "newlines" "(\n + \n)" $ at 1 1 3 2 (Var (OpRef "+"))
+            , testCase "does not allow whitespace" $
+                assertFailure expr "( + )"
+            , testCase "doew not allow comments" $
+                assertFailure expr "({-A-}+{-B-})"
             ]
         ]
 
