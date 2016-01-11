@@ -168,7 +168,7 @@ checkGood AllSyntax/AllSyntax.elm
 checkGood AllSyntax/Declarations.elm
 checkGoodAllSyntax Patterns
 checkGoodAllSyntax Types
-checkGood AllSyntax/Expressions.elm
+checkGoodAllSyntax Expressions
 checkGood Comments.elm
 
 checkGood evancz/start-app/StartApp.elm
