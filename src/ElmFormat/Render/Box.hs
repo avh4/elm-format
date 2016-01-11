@@ -778,7 +778,7 @@ formatExpression aexpr =
 
                 clause key (cond, multiline, bodyComments, body) =
                     stack1
-                        [ opening key multiline $ formatExpression cond
+                        [ opening key multiline $ formatCommented formatExpression cond
                         , indent $ stack1 $
                             (map formatComment bodyComments)
                             ++ [ formatExpression body ]
