@@ -684,6 +684,9 @@ formatExpression aexpr =
                         , line $ punc "]"
                         ]
 
+        AST.Expression.EmptyList comments ->
+          formatUnit '[' ']' comments
+
         AST.Expression.ExplicitList exprs multiline ->
             elmGroup True "[" "," "]" multiline $ map (formatCommented formatExpression) exprs
 

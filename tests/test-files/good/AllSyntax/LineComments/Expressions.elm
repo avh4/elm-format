@@ -39,7 +39,8 @@ parens x =
 
 
 emptyList =
-  []
+  [--B
+  ]
 
 
 list =

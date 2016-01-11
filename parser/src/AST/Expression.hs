@@ -54,6 +54,7 @@ data Expr'
     | Binops Expr [(Comments, Var.Ref, Comments, Expr)] Bool
     | Parens (Commented Expr)
 
+    | EmptyList Comments
     | ExplicitList [Commented Expr] Bool
     | Range (Commented Expr) (Commented Expr) Bool
 

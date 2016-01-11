@@ -119,10 +119,16 @@ tests =
         , example "newlines" "(\n 1\n )" $ at 1 1 3 3 $ Parens $ intExpr' (2,2,2,3) 1
         ]
 
+    , testGroup "empty list"
+        [ example "empty" "[]" $ at 1 1 1 3 (EmptyList [])
+        , example "whitespace" "[ ]" $ at 1 1 1 4 (EmptyList [])
+        , example "comments" "[{-A-}]" $ at 1 1 1 8 (EmptyList [BlockComment ["A"]])
+        , example "newlines" "[\n ]" $ at 1 1 2 3 (EmptyList [])
+        ]
+
     , testGroup "List"
         [ example "" "[1,2,3]" $ at 1 1 1 8 $ ExplicitList [intExpr' (1,2,1,3) 1, intExpr' (1,4,1,5) 2, intExpr' (1,6,1,7) 3] False
         , example "single element" "[1]" $ at 1 1 1 4 $ ExplicitList [intExpr' (1,2,1,3) 1] False
-        , example "empty" "[]" $ at 1 1 1 3 $ ExplicitList [] False
         , example "whitespace" "[ 1 , 2 , 3 ]" $ at 1 1 1 14 $ ExplicitList [intExpr' (1,3,1,4) 1, intExpr' (1,7,1,8) 2, intExpr' (1,11,1,12) 3] False
         , example "comments" "[{-A-}1{-B-},{-C-}2{-D-},{-E-}3{-F-}]" $ at 1 1 1 38 $ ExplicitList [commentedIntExpr (1,7,1,8) "A" "B" 1, commentedIntExpr (1,19,1,20) "C" "D" 2, commentedIntExpr (1,31,1,32) "E" "F" 3] False
         , example "newlines" "[\n 1\n ,\n 2\n ,\n 3\n ]" $ at 1 1 7 3 $ ExplicitList [intExpr' (2,2,2,3) 1, intExpr' (4,2,4,3) 2, intExpr' (6,2,6,3) 3] True
