@@ -224,16 +224,13 @@ ifClause :: IParser E.IfClause
 ifClause =
   do
     try (reserved "if")
-    pushNewlineContext
     (_ , preCondition) <- whitespace
     condition <- expr
-    multilineCondition <- popNewlineContext
     (postCondition, _, bodyComments) <- padded (reserved "then")
     thenBranch <- expr
     (_, preElse) <- whitespace <?> "an 'else' branch"
     return
       ( Commented preCondition condition postCondition
-      , multilineCondition
       , Commented bodyComments thenBranch preElse
       )
 
