@@ -753,9 +753,9 @@ formatExpression aexpr =
 
         AST.Expression.If if' elseifs (elsComments, els) ->
             let
-                opening key multiline cond =
-                    case (isLine key, multiline, isLine cond) of
-                        (Right key', False, Right cond') ->
+                opening key cond =
+                    case (isLine key, isLine cond) of
+                        (Right key', Right cond') ->
                             line $ row
                                 [ key'
                                 , space
@@ -770,13 +770,13 @@ formatExpression aexpr =
                                 , line $ keyword "then"
                                 ]
 
-                formatIf (cond, multiline, body) =
+                formatIf (cond, body) =
                     stack1
-                        [ opening (line $ keyword "if") multiline $ formatCommented formatExpression cond
+                        [ opening (line $ keyword "if") $ formatCommented formatExpression cond
                         , indent $ formatCommented_ True formatExpression body
                         ]
 
-                formatElseIf (ifComments, (cond, multiline, body)) =
+                formatElseIf (ifComments, (cond, body)) =
                   let
                     key =
                       case (isLine $ formatHeadCommented id (ifComments, line $ keyword "if")) of
@@ -789,7 +789,7 @@ formatExpression aexpr =
                             ]
                   in
                     stack1
-                      [ opening key multiline $ formatCommented formatExpression cond
+                      [ opening key $ formatCommented formatExpression cond
                       , indent $ formatCommented_ True formatExpression body
                       ]
             in

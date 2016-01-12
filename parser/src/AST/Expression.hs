@@ -45,7 +45,7 @@ type Expr =
 
 
 type IfClause =
-  (Commented Expr, Bool, Commented Expr)
+  (Commented Expr, Commented Expr)
 
 
 data Expr'
