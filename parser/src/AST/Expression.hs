@@ -44,6 +44,10 @@ type Expr =
     A.Located Expr'
 
 
+type IfClause =
+  (Commented Expr, Bool, Commented Expr)
+
+
 data Expr'
     = Unit Comments
     | Literal Literal
@@ -68,10 +72,7 @@ data Expr'
     | AccessFunction String
 
     | Lambda [(Comments, Pattern.Pattern)] Comments Expr Bool
-    | If
-        (Commented Expr, Bool, Commented Expr)
-        [(Comments, (Commented Expr, Bool, Commented Expr))]
-        (Comments, Expr)
+    | If IfClause [(Comments, IfClause)] (Comments, Expr)
     | Let [Def] Comments Expr
     | Case (Expr,Bool) [(Comments, Pattern.Pattern, Comments, Expr)]
 
