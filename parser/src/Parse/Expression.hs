@@ -207,33 +207,35 @@ binaryExpr =
 
 ifExpr :: IParser E.Expr'
 ifExpr =
-  ifHelp []
+  let
+    elseKeyword =
+      (reserved "else" <?> "an 'else' branch")
+        >> (snd <$> whitespace)
+  in
+    do
+      first <- ifClause
+      rest <- many (try $ (,) <$> elseKeyword <*> ifClause)
+      final <- (,) <$> elseKeyword <*> expr
+
+      return $ E.If first rest final
 
 
-ifHelp :: [(Commented E.Expr, Bool, Commented E.Expr)] -> IParser E.Expr'
-ifHelp branches =
-  do  try (reserved "if")
-      pushNewlineContext
-      (_ , preCondition) <- whitespace
-      condition <- expr
-      multilineCondition <- popNewlineContext
-      (postCondition, _, bodyComments) <- padded (reserved "then")
-      updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
-      thenBranch <- expr
-      (_, preElse) <- whitespace <?> "an 'else' branch"
-      reserved "else" <?> "an 'else' branch"
-      (_, trailingComments) <- whitespace -- TODO: use trailingComments in the newBranch case
-      let
-        newBranches =
-          ( Commented preCondition condition postCondition
-          , multilineCondition
-          , Commented bodyComments thenBranch preElse
-          )
-            : branches
-      choice
-        [ ifHelp newBranches
-        , E.If (reverse newBranches) <$> (,) trailingComments <$> expr
-        ]
+ifClause :: IParser (Commented E.Expr, Bool, Commented E.Expr)
+ifClause =
+  do
+    try (reserved "if")
+    pushNewlineContext
+    (_ , preCondition) <- whitespace
+    condition <- expr
+    multilineCondition <- popNewlineContext
+    (postCondition, _, bodyComments) <- padded (reserved "then")
+    thenBranch <- expr
+    (_, preElse) <- whitespace <?> "an 'else' branch"
+    return
+      ( Commented preCondition condition postCondition
+      , multilineCondition
+      , Commented bodyComments thenBranch preElse
+      )
 
 
 lambdaExpr :: IParser E.Expr
