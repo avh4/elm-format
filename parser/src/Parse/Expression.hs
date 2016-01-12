@@ -220,7 +220,7 @@ ifExpr =
       return $ E.If first rest final
 
 
-ifClause :: IParser (Commented E.Expr, Bool, Commented E.Expr)
+ifClause :: IParser E.IfClause
 ifClause =
   do
     try (reserved "if")
