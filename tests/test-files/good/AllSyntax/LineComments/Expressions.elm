@@ -84,11 +84,26 @@ lambda =
 
 
 ifStatement =
-  if True then
+  if
+    --C
+    True
+    --D
+  then
+    --E
     1
-  else if False then
-    2
+    --F
   else
+  --G
+  if
+    --H
+    False
+    --I
+  then
+    --J
+    2
+    --K
+  else
+    --L
     3
 
 

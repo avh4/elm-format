@@ -751,16 +751,13 @@ formatExpression aexpr =
                     formatExpression left
                         |> andThen (map (\(x,y) -> indent $ formatCommented' x formatExpression y) args)
 
-        AST.Expression.If [] _ ->
-          pleaseReport "INVALID IF EXPRESSION" "no if branch"
-
-        AST.Expression.If (if':elseifs) (elsComments, els) ->
+        AST.Expression.If if' elseifs (elsComments, els) ->
             let
                 opening key multiline cond =
-                    case (multiline, isLine cond) of
-                        (False, Right cond') ->
+                    case (isLine key, multiline, isLine cond) of
+                        (Right key', False, Right cond') ->
                             line $ row
-                                [ keyword key
+                                [ key'
                                 , space
                                 , cond'
                                 , space
@@ -768,19 +765,36 @@ formatExpression aexpr =
                                 ]
                         _ ->
                             stack1
-                                [ line $ keyword key
+                                [ key
                                 , cond |> indent
                                 , line $ keyword "then"
                                 ]
 
-                clause key (cond, multiline, body) =
+                formatIf (cond, multiline, body) =
                     stack1
-                        [ opening key multiline $ formatCommented formatExpression cond
+                        [ opening (line $ keyword "if") multiline $ formatCommented formatExpression cond
                         , indent $ formatCommented_ True formatExpression body
                         ]
+
+                formatElseIf (ifComments, (cond, multiline, body)) =
+                  let
+                    key =
+                      case (isLine $ formatHeadCommented id (ifComments, line $ keyword "if")) of
+                        Right key' ->
+                          line $ row [ keyword "else", space, key' ]
+                        Left key' ->
+                          stack1
+                            [ line $ keyword "else"
+                            , key'
+                            ]
+                  in
+                    stack1
+                      [ opening key multiline $ formatCommented formatExpression cond
+                      , indent $ formatCommented_ True formatExpression body
+                      ]
             in
-                clause "if" if'
-                    |> andThen (map (clause "else if") elseifs)
+                formatIf if'
+                    |> andThen (map formatElseIf elseifs)
                     |> andThen
                         [ line $ keyword "else"
                         , indent $ formatCommented_ True formatExpression (Commented elsComments els [])
