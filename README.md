@@ -46,13 +46,7 @@ If you can simplify or improve the installation instructions or add instructions
 
 #### Integration with [Atom](https://atom.io/)
 
-[atom-beautify](https://atom.io/packages/atom-beautify) 0.28.20 (not yet released) will support `elm-format`.  In the meantime, you can install the development version:
-
-```bash
-git clone https://github.com/Glavin001/atom-beautify.git
-cd atom-beautify
-apm link
-```
+[atom-beautify](https://atom.io/packages/atom-beautify) 0.28.20 and above supports `elm-format`.  You can install `atom-beautify` using `apm` or the Atom package manager in Atom's settings.
 
 Then in the Atom menu, View -> Reload.
 
