@@ -48,8 +48,6 @@ If you can simplify or improve the installation instructions or add instructions
 
 [atom-beautify](https://atom.io/packages/atom-beautify) 0.28.20 and above supports `elm-format`.  You can install `atom-beautify` using `apm` or the Atom package manager in Atom's settings.
 
-Then in the Atom menu, View -> Reload.
-
 #### Integration with [Light Table](http://lighttable.com/)
 
 Use the [elm-light](https://github.com/rundis/elm-light) plugin.
