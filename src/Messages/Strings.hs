@@ -14,7 +14,7 @@ renderMessage ErrorFileLocation = "<location>"
 
 renderMessage (FilesWillBeOverwritten filePaths) =
   unlines
-    [ "This will overwrite the following files to use Elm’s preferred style:"
+    [ "This will overwrite the following files to use Elm's preferred style:"
     , ""
     , showFiles filePaths
     , "This cannot be undone! Make sure to back up these files before proceeding."
