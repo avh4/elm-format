@@ -291,21 +291,21 @@ caseExpr =
 letExpr :: IParser E.Expr'
 letExpr =
   do  try (reserved "let")
-      commentsAfterLet <- map (A.atDontCare . E.LetComment) <$> snd <$> whitespace
+      commentsAfterLet <- map E.LetComment <$> snd <$> whitespace
       defs <-
         block $
-          do  def <- typeAnnotation <|> definition
+          do  def <- typeAnnotation E.LetAnnotation <|> definition E.LetDefinition
               (_, commentsAfterDef) <- whitespace
-              return $ def : (map (A.atDontCare . E.LetComment) commentsAfterDef)
+              return $ def : (map E.LetComment commentsAfterDef)
       (_, _, bodyComments) <- padded (reserved "in") -- TODO: pre comments are always empty because any whitespace was consumed before padded?
       E.Let (commentsAfterLet ++ concat defs) bodyComments <$> expr
 
 
 -- TYPE ANNOTATION
 
-typeAnnotation :: IParser E.Def
-typeAnnotation =
-    addLocation (E.TypeAnnotation <$> try start <*> Type.expr)
+typeAnnotation :: (Var.Ref -> Type -> a) -> IParser a
+typeAnnotation fn =
+    fn <$> try start <*> Type.expr
   where
     start =
       do  v <- (Var.VarRef <$> lowVar) <|> parens' symOp
@@ -315,16 +315,15 @@ typeAnnotation =
 
 -- DEFINITION
 
-definition :: IParser E.Def
-definition =
-  addLocation $
+definition :: (P.Pattern -> [(Comments, P.Pattern)] -> Comments -> E.Expr -> Bool -> a) -> IParser a
+definition fn =
   withPos $
     do  pushNewlineContext
         (name, args) <- defStart
         (preEqualsComments, _, postEqualsComments) <- padded equals
         body <- expr
         sawNewline <- popNewlineContext
-        return $ E.Definition name args (preEqualsComments ++ postEqualsComments) body sawNewline
+        return $ fn name args (preEqualsComments ++ postEqualsComments) body sawNewline
 
 
 defStart :: IParser (P.Pattern, [(Comments, P.Pattern)])

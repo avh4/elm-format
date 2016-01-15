@@ -219,12 +219,12 @@ tests =
         ]
 
     , testGroup "let statement"
-        [ example "" "let a=b in z" $ at 1 1 1 13 (Let [at 1 5 1 8 (Definition (at 1 5 1 6 (P.Var (VarRef "a"))) [] [] (at 1 7 1 8 (Var (VarRef "b"))) False)] [] (at 1 12 1 13 (Var (VarRef "z"))))
-        , example "multiple declarations" "let a=b\n    c=d\nin z" $ at 1 1 3 5 (Let [at 1 5 1 8 (Definition (at 1 5 1 6 (P.Var (VarRef "a"))) [] [] (at 1 7 1 8 (Var (VarRef "b"))) False),at 2 5 2 8 (Definition (at 2 5 2 6 (P.Var (VarRef "c"))) [] [] (at 2 7 2 8 (Var (VarRef "d"))) False)] [] (at 3 4 3 5 (Var (VarRef "z"))))
-        , example "multiple declarations" "let\n a=b\n c=d\nin z" $ at 1 1 4 5 (Let [at 2 2 2 5 (Definition (at 2 2 2 3 (P.Var (VarRef "a"))) [] [] (at 2 4 2 5 (Var (VarRef "b"))) False),at 3 2 3 5 (Definition (at 3 2 3 3 (P.Var (VarRef "c"))) [] [] (at 3 4 3 5 (Var (VarRef "d"))) False)] [] (at 4 4 4 5 (Var (VarRef "z"))))
-        , example "whitespace" "let a = b in z" $ at 1 1 1 15 (Let [at 1 5 1 10 (Definition (at 1 5 1 6 (P.Var (VarRef "a"))) [] [] (at 1 9 1 10 (Var (VarRef "b"))) False)] [] (at 1 14 1 15 (Var (VarRef "z"))))
-        , example "comments" "let{-A-}a{-B-}={-C-}b{-D-}in{-E-}z" $ at 1 1 1 35 (Let [at 0 0 0 0 (LetComment (BlockComment ["A"])),at 1 9 1 22 (Definition (at 1 9 1 10 (P.Var (VarRef "a"))) [] [BlockComment ["B"],BlockComment ["C"]] (at 1 21 1 22 (Var (VarRef "b"))) False),at 0 0 0 0 (LetComment (BlockComment ["D"]))] [BlockComment ["E"]] (at 1 34 1 35 (Var (VarRef "z"))))
-        , example "newlines" "let\n a\n =\n b\nin\n z" $ at 1 1 6 3 (Let [at 2 2 4 3 (Definition (at 2 2 2 3 (P.Var (VarRef "a"))) [] [] (at 4 2 4 3 (Var (VarRef "b"))) True)] [] (at 6 2 6 3 (Var (VarRef "z"))))
+        [ example "" "let a=b in z" $ at 1 1 1 13 (Let [LetDefinition (at 1 5 1 6 (P.Var (VarRef "a"))) [] [] (at 1 7 1 8 (Var (VarRef "b"))) False] [] (at 1 12 1 13 (Var (VarRef "z"))))
+        , example "multiple declarations" "let a=b\n    c=d\nin z" $ at 1 1 3 5 (Let [LetDefinition (at 1 5 1 6 (P.Var (VarRef "a"))) [] [] (at 1 7 1 8 (Var (VarRef "b"))) False,LetDefinition (at 2 5 2 6 (P.Var (VarRef "c"))) [] [] (at 2 7 2 8 (Var (VarRef "d"))) False] [] (at 3 4 3 5 (Var (VarRef "z"))))
+        , example "multiple declarations" "let\n a=b\n c=d\nin z" $ at 1 1 4 5 (Let [LetDefinition (at 2 2 2 3 (P.Var (VarRef "a"))) [] [] (at 2 4 2 5 (Var (VarRef "b"))) False,LetDefinition (at 3 2 3 3 (P.Var (VarRef "c"))) [] [] (at 3 4 3 5 (Var (VarRef "d"))) False] [] (at 4 4 4 5 (Var (VarRef "z"))))
+        , example "whitespace" "let a = b in z" $ at 1 1 1 15 (Let [LetDefinition (at 1 5 1 6 (P.Var (VarRef "a"))) [] [] (at 1 9 1 10 (Var (VarRef "b"))) False] [] (at 1 14 1 15 (Var (VarRef "z"))))
+        , example "comments" "let{-A-}a{-B-}={-C-}b{-D-}in{-E-}z" $ at 1 1 1 35 (Let [LetComment (BlockComment ["A"]),LetDefinition (at 1 9 1 10 (P.Var (VarRef "a"))) [] [BlockComment ["B"],BlockComment ["C"]] (at 1 21 1 22 (Var (VarRef "b"))) False,LetComment (BlockComment ["D"])] [BlockComment ["E"]] (at 1 34 1 35 (Var (VarRef "z"))))
+        , example "newlines" "let\n a\n =\n b\nin\n z" $ at 1 1 6 3 (Let [LetDefinition (at 2 2 2 3 (P.Var (VarRef "a"))) [] [] (at 4 2 4 3 (Var (VarRef "b"))) True] [] (at 6 2 6 3 (Var (VarRef "z"))))
         , testCase "must have at least one definition" $
             assertFailure expr "let in z"
         , testGroup "declarations must start at the same column" $
@@ -247,11 +247,5 @@ tests =
             , testCase "(2)" $ assertFailure expr "case 9 of\n 1->10\n  _->20"
             , testCase "(3)" $ assertFailure expr "case 9 of\n  1->10\n _->20"
             ]
-        ]
-
-    , testGroup "definition"
-        [ testCase "" $ assertParse definition "x=1" $ at 1 1 1 4 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [] (intExpr (1,3,1,4) 1) False
-        , testCase "comments" $ assertParse definition "x{-A-}={-B-}1" $ at 1 1 1 14 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [BlockComment ["A"], BlockComment ["B"]] (intExpr (1,13,1,14) 1) False
-        , testCase "line comments" $ assertParse definition "x\n--Y\n =\n    --X\n    1" $ at 1 1 5 6 $ Definition (at 1 1 1 2 $ P.Var $ VarRef "x") [] [LineComment "Y", LineComment "X"] (intExpr (5,5,5,6) 1) True
         ]
     ]

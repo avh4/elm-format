@@ -3,6 +3,7 @@ module AST.Declaration where
 
 import AST.V0_16
 import qualified AST.Expression as Expression
+import qualified AST.Pattern as Pattern
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
 
@@ -10,7 +11,8 @@ import qualified Reporting.Annotation as A
 -- DECLARATIONS
 
 data Declaration
-    = Definition Expression.Def
+    = Definition Pattern.Pattern [(Comments, Pattern.Pattern)] Comments Expression.Expr Bool
+    | TypeAnnotation Var.Ref Type
     | Datatype String [String] [(String, [Type])]
     | TypeAlias String [String] Type
     | PortAnnotation (Commented String) Comments Type
@@ -22,8 +24,8 @@ data Declaration
 stripRegion :: Declaration -> Declaration
 stripRegion d =
     case d of
-        Definition e ->
-            Definition $ Expression.stripRegion e
+        Definition a b c e z ->
+            Definition (A.stripRegion a) b c (A.stripRegion e) z
         _ -> d
 
 -- INFIX STUFF
