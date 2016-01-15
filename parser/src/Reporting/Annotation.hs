@@ -32,11 +32,6 @@ at start end value =
     A (R.Region start end) value
 
 
-atDontCare :: a -> Located a
-atDontCare value =
-    A (R.Region (R.Position 0 0) (R.Position 0 0 )) value
-
-
 merge :: Located a -> Located b -> value -> Located value
 merge (A region1 _) (A region2 _) value =
     A (R.merge region1 region2) value

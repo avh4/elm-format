@@ -15,29 +15,12 @@ data UnaryOperator =
     Negative
     deriving (Eq, Show)
 
-type Def =
-    A.Located Def'
 
-
-data Def'
-    = Definition Pattern.Pattern [(Comments, Pattern.Pattern)] Comments Expr Bool
-    | TypeAnnotation Var.Ref Type
-    | LetComment Comment
-    deriving (Eq, Show)
-
-
-stripRegion :: Def -> Def
-stripRegion d =
-    A.stripRegion $ A.map stripRegion' d
-
-
-stripRegion' :: Def' -> Def'
-stripRegion' d =
-    case d of
-        Definition p ps c e b ->
-            Definition (A.stripRegion p) (map (\(a,b') -> (a,A.stripRegion b')) ps) c (A.stripRegion e) b
-        _ ->
-            d
+data LetDeclaration
+  = LetDefinition Pattern.Pattern [(Comments, Pattern.Pattern)] Comments Expr Bool
+  | LetAnnotation Var.Ref Type
+  | LetComment Comment
+  deriving (Eq, Show)
 
 
 type Expr =
@@ -73,7 +56,7 @@ data Expr'
 
     | Lambda [(Comments, Pattern.Pattern)] Comments Expr Bool
     | If IfClause [(Comments, IfClause)] (Comments, Expr)
-    | Let [Def] Comments Expr
+    | Let [LetDeclaration] Comments Expr
     | Case (Commented Expr, Bool) [(Commented Pattern.Pattern, (Comments, Expr))]
 
     -- for type checking and code gen only

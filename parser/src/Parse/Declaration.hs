@@ -3,6 +3,7 @@ module Parse.Declaration where
 
 import Text.Parsec ( (<|>), (<?>), choice, digit, optionMaybe, string, try )
 
+import AST.Declaration
 import qualified AST.Declaration
 import qualified Parse.Expression as Expr
 import Parse.Helpers as Help
@@ -22,8 +23,7 @@ declaration =
 
 definition :: IParser AST.Declaration.Declaration
 definition =
-  AST.Declaration.Definition
-    <$> (Expr.typeAnnotation <|> Expr.definition)
+    (Expr.typeAnnotation TypeAnnotation <|> Expr.definition Definition)
     <?> "a value definition"
 
 
