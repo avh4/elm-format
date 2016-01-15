@@ -1,6 +1,5 @@
 module Parse.Expression (term, typeAnnotation, definition, expr) where
 
-import qualified Data.List as List
 import Text.Parsec hiding (newline, spaces)
 import Text.Parsec.Indent (block, withPos, checkIndent)
 
@@ -173,16 +172,17 @@ appExpr :: IParser E.Expr
 appExpr =
   expecting "an expression" $
   do  pushNewlineContext
+      start <- getMyPosition
       t <- term
       ts <- constrainedSpacePrefix term
+      end <- getMyPosition
       sawNewline <- popNewlineContext
       return $
           case ts of
-            [] -> t
+            [] ->
+              t
             _  ->
-                A.sameAs
-                    (List.foldl' (\f (_,t) -> A.merge f t ()) (A.sameAs t ()) ts) -- TODO: simplify this code to merge the region annotations
-                    (E.App t ts sawNewline)
+              A.at start end $ E.App t ts sawNewline
 
 
 --------  Normal Expressions  --------
@@ -265,7 +265,7 @@ caseExpr =
               try ((,,)
                   <$> whitespace
                   <*> (checkIndent >> Pattern.expr)
-                  <*> padded rightArrow -- TODO: use pre arrow comments
+                  <*> padded rightArrow
                   )
           result <- expr
           return
