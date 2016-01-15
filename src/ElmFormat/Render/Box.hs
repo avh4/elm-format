@@ -826,11 +826,11 @@ formatExpression aexpr =
             let
                 opening =
                   case
-                      ( multiline
-                      , isLine $ formatExpression subject
-                      )
+                    isLineForce
+                      multiline
+                      (formatCommented formatExpression subject)
                   of
-                      (False, Right subject') ->
+                      Right subject' ->
                           line $ row
                               [ keyword "case"
                               , space
@@ -838,27 +838,38 @@ formatExpression aexpr =
                               , space
                               , keyword "of"
                               ]
-                      _ ->
+                      Left subject' ->
                           stack1
                               [ line $ keyword "case"
-                              , formatExpression subject
-                                  |> indent
+                              , indent subject'
                               , line $ keyword "of"
                               ]
 
-                clause (patternComments, pat, bodyComments, expr) =
-                    case isLine $ formatPattern False pat of
-                        Right pat' ->
-                            stack1 $
-                                (map formatComment patternComments)
-                                ++
+                clause (pat, expr) =
+                    case
+                      ( pat
+                      , isLine $ formatPattern False $ (\(Commented _ x _) -> x) pat
+                      , isLine $ formatCommentedStack (formatPattern False) pat
+                      , formatHeadCommentedStack formatExpression expr
+                      )
+                    of
+                        (_, _, Right pat', body') ->
+                            stack1
                                 [ line $ row [ pat', space, keyword "->"]
-                                , indent $ stack1 $
-                                    (map formatComment bodyComments)
-                                    ++ [ formatExpression expr ]
+                                , indent body'
                                 ]
-                        _ ->
-                            pleaseReport "TODO" "multiline case pattern"
+                        (Commented pre _ [], Right pat', _, body') ->
+                            stack1 $
+                                (map formatComment pre)
+                                ++ [ line $ row [ pat', space, keyword "->"]
+                                   , indent body'
+                                   ]
+                        (_, _, Left pat', body') ->
+                            stack1 $
+                              [ pat'
+                              , line $ keyword "->"
+                              , indent body'
+                              ]
             in
                 opening
                     |> andThen
@@ -964,6 +975,19 @@ formatCommented' pre format inner =
 formatTailCommented :: (a -> Box) -> (a, Comments) -> Box
 formatTailCommented format (inner, post) =
   formatCommented format (Commented [] inner post)
+
+
+formatCommentedStack :: (a -> Box) -> Commented a -> Box
+formatCommentedStack format (Commented pre inner post) =
+  stack1 $
+    (map formatComment pre)
+      ++ [ format inner ]
+      ++ (map formatComment post)
+
+
+formatHeadCommentedStack :: (a -> Box) -> (Comments, a) -> Box
+formatHeadCommentedStack format (pre, inner) =
+  formatCommentedStack format (Commented pre inner [])
 
 
 formatComment :: Comment -> Box
