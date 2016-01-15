@@ -5,7 +5,7 @@ import Elm.Utils ((|>))
 import System.Exit (exitFailure, exitSuccess)
 import Messages.Types (Message(..))
 import Control.Monad (when)
-import Data.Maybe (isJust, fromJust, isNothing)
+import Data.Maybe (isJust)
 import CommandLine.Helpers
 
 

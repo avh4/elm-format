@@ -3,7 +3,6 @@ module Flags where
 
 import Data.Monoid ((<>))
 import Data.Version (showVersion)
-import Options.Applicative ((<|>))
 
 import qualified Options.Applicative as Opt
 import qualified Paths_elm_format as This
