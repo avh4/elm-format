@@ -107,9 +107,17 @@ letStatement =
 
 
 caseStatement =
-  case Just 1 of
-    Just x ->
+  case {- M -} Just 1 {- N -} of
+    {- O -}
+    Just x
+    {- P -}
+    ->
+      {- Q -}
       x
 
-    _ ->
+    {- R -}
+    _
+    {- S -}
+    ->
+      {- T -}
       2

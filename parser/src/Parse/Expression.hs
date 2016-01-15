@@ -251,7 +251,7 @@ caseExpr :: IParser E.Expr'
 caseExpr =
   do  try (reserved "case")
       pushNewlineContext
-      (_, e, _) <- padded expr -- TODO: use comments
+      e <- (\(pre, e, post) -> Commented pre e post) <$> padded expr
       reserved "of"
       multilineSubject <- popNewlineContext
       (_, firstPatternComments) <- whitespace
@@ -261,14 +261,17 @@ caseExpr =
   where
     case_ preComments =
       do
-          ((_, patternComments), p, (_, _, bodyComments)) <-
+          ((_, patternComments), p, (preArrowComments, _, bodyComments)) <-
               try ((,,)
                   <$> whitespace
                   <*> (checkIndent >> Pattern.expr)
                   <*> padded rightArrow -- TODO: use pre arrow comments
                   )
           result <- expr
-          return (preComments++patternComments, p, bodyComments, result)
+          return
+            ( Commented (preComments ++ patternComments) p preArrowComments
+            , (bodyComments, result)
+            )
 
 
     -- bracketed case statements are removed in 0.16

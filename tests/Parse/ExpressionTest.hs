@@ -11,6 +11,7 @@ import Parse.Expression
 import Parse.Helpers (IParser, iParse)
 import AST.V0_16
 import AST.Expression
+import AST.Pattern (Pattern'(Anything))
 import qualified AST.Pattern as P
 import AST.Variable
 import Reporting.Annotation hiding (map, at)
@@ -234,12 +235,11 @@ tests =
         ]
 
     , testGroup "case statement"
-        [ example "" "case 9 of\n 1->10\n _->20" $ at 1 1 3 7 $ Case (intExpr (1,6,1,7) 9, False) [([], at 2 2 2 3 $ P.Literal $ IntNum 1, [], intExpr (2,5,2,7) 10), ([], at 3 2 3 3 $ P.Anything, [], intExpr (3,5,3,7) 20)]
-        , example "no newline after 'of'" "case 9 of 1->10\n          _->20" $ at 1 1 2 16 $ Case (intExpr (1,6,1,7) 9, False) [([], at 1 11 1 12 $ P.Literal $ IntNum 1, [], intExpr (1,14,1,16) 10), ([], at 2 11 2 12 $ P.Anything, [], intExpr (2,14,2,16) 20)]
-        , example "whitespace" "case 9 of\n 1 -> 10\n _ -> 20" $ at 1 1 3 9 $ Case (intExpr (1,6,1,7) 9, False) [([], at 2 2 2 3 $ P.Literal $ IntNum 1, [], intExpr (2,7,2,9) 10), ([], at 3 2 3 3 $ P.Anything, [], intExpr (3,7,3,9) 20)]
-         -- TODO: handle comments A, B, E, I, and don't allow K
-        , example "comments" "case{-A-}9{-B-}of{-C-}\n{-D-}1{-E-}->{-F-}10{-G-}\n{-H-}_{-I-}->{-J-}20" $ at 1 1 3 21 $ Case (intExpr (1,10,1,11) 9, False) [([BlockComment ["C"], BlockComment ["D"]], at 2 6 2 7 $ P.Literal $ IntNum 1, [BlockComment ["F"]], intExpr (2,19,2,21) 10), ([BlockComment ["G"], BlockComment ["H"]], at 3 6 3 7 $ P.Anything, [BlockComment ["J"]], intExpr (3,19,3,21) 20)]
-        , example "newlines" "case\n 9\n of\n 1\n ->\n 10\n _\n ->\n 20" $ at 1 1 9 4 $ Case (intExpr (2,2,2,3) 9, True) [([], at 4 2 4 3 $ P.Literal $ IntNum 1, [], intExpr (6,2,6,4) 10), ([], at 7 2 7 3 $ P.Anything, [], intExpr (9,2,9,4) 20)]
+        [ example "" "case 9 of\n 1->10\n _->20" $ at 1 1 3 7 (Case (Commented [] (at 1 6 1 7 (Literal (IntNum 9))) [],False) [(Commented [] (at 2 2 2 3 (P.Literal (IntNum 1))) [],([],at 2 5 2 7 (Literal (IntNum 10)))),(Commented [] (at 3 2 3 3 Anything) [],([],at 3 5 3 7 (Literal (IntNum 20))))])
+        , example "no newline after 'of'" "case 9 of 1->10\n          _->20" $ at 1 1 2 16 (Case (Commented [] (at 1 6 1 7 (Literal (IntNum 9))) [],False) [(Commented [] (at 1 11 1 12 (P.Literal (IntNum 1))) [],([],at 1 14 1 16 (Literal (IntNum 10)))),(Commented [] (at 2 11 2 12 Anything) [],([],at 2 14 2 16 (Literal (IntNum 20))))])
+        , example "whitespace" "case 9 of\n 1 -> 10\n _ -> 20" $ at 1 1 3 9 (Case (Commented [] (at 1 6 1 7 (Literal (IntNum 9))) [],False) [(Commented [] (at 2 2 2 3 (P.Literal (IntNum 1))) [],([],at 2 7 2 9 (Literal (IntNum 10)))),(Commented [] (at 3 2 3 3 Anything) [],([],at 3 7 3 9 (Literal (IntNum 20))))])
+        , example "comments" "case{-A-}9{-B-}of{-C-}\n{-D-}1{-E-}->{-F-}10{-G-}\n{-H-}_{-I-}->{-J-}20" $ at 1 1 3 21 (Case (Commented [BlockComment ["A"]] (at 1 10 1 11 (Literal (IntNum 9))) [BlockComment ["B"]],False) [(Commented [BlockComment ["C"],BlockComment ["D"]] (at 2 6 2 7 (P.Literal (IntNum 1))) [BlockComment ["E"]],([BlockComment ["F"]],at 2 19 2 21 (Literal (IntNum 10)))),(Commented [BlockComment ["G"],BlockComment ["H"]] (at 3 6 3 7 Anything) [BlockComment ["I"]],([BlockComment ["J"]],at 3 19 3 21 (Literal (IntNum 20))))])
+        , example "newlines" "case\n 9\n of\n 1\n ->\n 10\n _\n ->\n 20" $ at 1 1 9 4 (Case (Commented [] (at 2 2 2 3 (Literal (IntNum 9))) [],True) [(Commented [] (at 4 2 4 3 (P.Literal (IntNum 1))) [],([],at 6 2 6 4 (Literal (IntNum 10)))),(Commented [] (at 7 2 7 3 Anything) [],([],at 9 2 9 4 (Literal (IntNum 20))))])
         , testCase "should not consume trailing whitespace" $
             assertParse (expr >> string "\nX") "case 9 of\n 1->10\n _->20\nX" $ "\nX"
         , testGroup "clauses must start at the same column"
