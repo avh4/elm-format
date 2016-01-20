@@ -356,14 +356,6 @@ formatDeclaration decl =
                                         , stack1 args''
                                             |> indent
                                         ]
-                        formatNameWithArgs (name, args) =
-                          case allSingles $ map (formatHeadCommented (line . identifier)) args of
-                            Right args' ->
-                              line $ row $ List.intersperse space $ ((identifier name):args')
-                            Left args' ->
-                              stack1 $
-                                [ line $ identifier name ]
-                                ++ (map indent args')
                     in
                         case
                           (map (formatCommented ctor) rest) ++ [formatHeadCommented ctor last]
@@ -392,20 +384,47 @@ formatDeclaration decl =
                                         |> indent
                                     ]
 
-                AST.Declaration.TypeAlias name args typ ->
-                    stack1
-                        [ line $ row
-                            [ keyword "type"
-                            , space
-                            , keyword "alias"
-                            , space
-                            , row $ List.intersperse space $ map identifier $ name:args
-                            , space
-                            , punc "="
-                            ]
-                        , formatType typ
-                            |> indent
-                        ]
+                AST.Declaration.TypeAlias preAlias nameWithArgs typ ->
+                  stack1
+                    [ case
+                        ( isLine $ formatHeadCommented (line . keyword) (preAlias, "alias")
+                        , isLine $ formatCommented formatNameWithArgs nameWithArgs
+                        )
+                      of
+                      (Right alias, Right nameWithArgs') ->
+                        line $ row
+                          [ keyword "type"
+                          , space
+                          , alias
+                          , space
+                          , nameWithArgs'
+                          , space
+                          , punc "="
+                          ]
+                      (Right alias, Left nameWithArgs') -> -- TODO: not tested
+                        stack1
+                          [ line $ row [keyword "type", space, alias]
+                          , indent $ nameWithArgs'
+                          , indent $ line $ punc "="
+                          ]
+                      (Left alias, Right nameWithArgs') -> -- TODO: not tested
+                        stack1
+                          [ line $ keyword "type"
+                          , indent $ alias
+                          , indent $ line $ nameWithArgs'
+                          , indent $ line $ punc "="
+                          ]
+                      (Left alias, Left nameWithArgs') ->
+                        stack1
+                          [ line $ keyword "type"
+                          , indent $ alias
+                          , indent $ nameWithArgs'
+                          , indent $ line $ punc "="
+                          ]
+                    , formatHeadCommentedStack formatType typ
+                        |> indent
+                    ]
+
 
                 AST.Declaration.PortAnnotation name typeComments typ ->
                     case
@@ -462,6 +481,17 @@ formatDeclaration decl =
                                 ]
                         _ ->
                             pleaseReport "TODO" "multiline fixity declaration"
+
+
+formatNameWithArgs (name, args) =
+  case allSingles $ map (formatHeadCommented (line . identifier)) args of
+    Right args' ->
+      line $ row $ List.intersperse space $ ((identifier name):args')
+    Left args' ->
+      stack1 $
+        [ line $ identifier name ]
+        ++ (map indent args')
+
 
 formatDefinition :: AST.Pattern.Pattern
                       -> [(Comments, AST.Pattern.Pattern)]
