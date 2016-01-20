@@ -13,7 +13,10 @@ import qualified Reporting.Annotation as A
 data Declaration
     = Definition Pattern.Pattern [(Comments, Pattern.Pattern)] Comments Expression.Expr Bool
     | TypeAnnotation Var.Ref Type
-    | Datatype String [String] [(String, [Type])]
+    | Datatype
+        (Commented (String, [String]))
+        [Commented (String, [Type])]
+        (Comments, (String, [Type]))
     | TypeAlias String [String] Type
     | PortAnnotation (Commented String) Comments Type
     | PortDefinition (Commented String) Comments Expression.Expr

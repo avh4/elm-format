@@ -165,7 +165,7 @@ checkWaysToRun Simple.elm
 
 checkGood Simple.elm
 checkGood AllSyntax/AllSyntax.elm
-checkGood AllSyntax/Declarations.elm
+checkGoodAllSyntax Declarations
 checkGoodAllSyntax Patterns
 checkGoodAllSyntax Types
 checkGoodAllSyntax Expressions

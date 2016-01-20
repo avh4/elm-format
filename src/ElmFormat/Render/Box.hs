@@ -342,7 +342,7 @@ formatDeclaration decl =
                 AST.Declaration.TypeAnnotation name typ ->
                     formatTypeAnnotation name typ
 
-                AST.Declaration.Datatype name args ctors ->
+                AST.Declaration.Datatype nameWithArgs rest last ->
                     let
                         ctor (tag,args') =
                             case allSingles $ map (formatType' ForCtor) args' of
@@ -356,20 +356,33 @@ formatDeclaration decl =
                                         , stack1 args''
                                             |> indent
                                         ]
+                        formatNameWithArgs (name, args) =
+                          line $ row $ List.intersperse space $ map identifier (name:args)
                     in
-                        case ctors of
-                            [] ->
-                                pleaseReport "INVALID DATA TYPE" "no constructors"
-                            (first:rest) ->
-                                stack1
+                        case
+                          (map (formatCommented ctor) rest) ++ [formatHeadCommented ctor last]
+                        of
+                          (first:rest) ->
+                              case isLine $ formatCommented formatNameWithArgs nameWithArgs of
+                                Right nameWithArgs' ->
+                                  stack1
                                     [ line $ row
                                         [ keyword "type"
                                         , space
-                                        , row $ List.intersperse space $ map identifier (name:args)
+                                        , nameWithArgs'
                                         ]
-                                    , ctor first
+                                    , first
                                         |> prefix (row [punc "=", space])
-                                        |> andThen (map (prefix (row [punc "|", space]) . ctor) rest)
+                                        |> andThen (map (prefix (row [punc "|", space])) rest)
+                                        |> indent
+                                    ]
+                                Left nameWithArgs' ->
+                                  stack1
+                                    [ line $ keyword "type"
+                                    , indent $ nameWithArgs'
+                                    , first
+                                        |> prefix (row [punc "=", space])
+                                        |> andThen (map (prefix (row [punc "|", space])) rest)
                                         |> indent
                                     ]
 
