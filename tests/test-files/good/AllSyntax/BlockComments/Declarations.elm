@@ -13,8 +13,9 @@ type {- K -} DataTypeWithParams {- L -} a {- M -} b {- N -} c {- O -}
   | Ctor3' b c
 
 
-type alias TypeAlias =
-  { x : Int, y : Int }
+type {- P -} alias {- Q -} TypeAlias {- R -} a {- S -} b {- T -} =
+  {- U -}
+  { x : Int, y : Int, z : ( a, b ) }
 
 
 expressionDefinition _ _ =

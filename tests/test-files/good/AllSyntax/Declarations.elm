@@ -13,8 +13,8 @@ type DataTypeWithParams a b c
   | Ctor3' b c
 
 
-type alias TypeAlias =
-  { x : Int, y : Int }
+type alias TypeAlias a b =
+  { x : Int, y : Int, z : ( a, b ) }
 
 
 expressionDefinition _ _ =

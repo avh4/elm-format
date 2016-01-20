@@ -17,7 +17,9 @@ data Declaration
         (Commented (String, [(Comments, String)]))
         [Commented (String, [(Comments, Type)])]
         (Comments, (String, [(Comments, Type)]))
-    | TypeAlias String [String] Type
+    | TypeAlias Comments
+        (Commented (String, [(Comments, String)]))
+        (Comments, Type)
     | PortAnnotation (Commented String) Comments Type
     | PortDefinition (Commented String) Comments Expression.Expr
     | Fixity Assoc Comments Int Comments Var.Ref
