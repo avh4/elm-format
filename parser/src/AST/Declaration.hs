@@ -12,7 +12,7 @@ import qualified Reporting.Annotation as A
 
 data Declaration
     = Definition Pattern.Pattern [(Comments, Pattern.Pattern)] Comments Expression.Expr Bool
-    | TypeAnnotation Var.Ref Type
+    | TypeAnnotation (Var.Ref, Comments) (Comments, Type)
     | Datatype
         (Commented (String, [(Comments, String)]))
         [Commented (String, [(Comments, Type)])]

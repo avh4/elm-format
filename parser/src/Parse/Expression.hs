@@ -303,14 +303,14 @@ letExpr =
 
 -- TYPE ANNOTATION
 
-typeAnnotation :: (Var.Ref -> Type -> a) -> IParser a
+typeAnnotation :: ((Var.Ref, Comments) -> (Comments, Type) -> a) -> IParser a
 typeAnnotation fn =
-    fn <$> try start <*> Type.expr
+    (\(v, pre, post) e -> fn (v, pre) (post, e)) <$> try start <*> Type.expr
   where
     start =
       do  v <- (Var.VarRef <$> lowVar) <|> parens' symOp
-          padded hasType -- TODO: use comments
-          return v
+          (preColon, _, postColon) <- padded hasType
+          return (v, preColon, postColon)
 
 
 -- DEFINITION

@@ -37,6 +37,6 @@ expressionDefinitionsInLet =
     ()
 
 
-expressionTypeAnnotation : ()
+expressionTypeAnnotation {- V -} : {- W -} ()
 expressionTypeAnnotation =
   ()
