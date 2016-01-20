@@ -135,7 +135,7 @@ expr =
           A.A region $ FunctionType first rest final
 
 
-constructor :: IParser (String, [Type])
+constructor :: IParser (String, [(Comments, Type)])
 constructor =
   (,) <$> (capTypeVar <?> "another type constructor")
-      <*> (map (\(_,v) -> v) <$> spacePrefix term) -- TODO: use comments
+      <*> spacePrefix term

@@ -15,8 +15,8 @@ data Declaration
     | TypeAnnotation Var.Ref Type
     | Datatype
         (Commented (String, [(Comments, String)]))
-        [Commented (String, [Type])]
-        (Comments, (String, [Type]))
+        [Commented (String, [(Comments, Type)])]
+        (Comments, (String, [(Comments, Type)]))
     | TypeAlias String [String] Type
     | PortAnnotation (Commented String) Comments Type
     | PortDefinition (Commented String) Comments Expression.Expr

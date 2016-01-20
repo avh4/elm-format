@@ -345,7 +345,7 @@ formatDeclaration decl =
                 AST.Declaration.Datatype nameWithArgs rest last ->
                     let
                         ctor (tag,args') =
-                            case allSingles $ map (formatType' ForCtor) args' of
+                            case allSingles $ map (formatHeadCommented $ formatType' ForCtor) args' of
                                 Right args'' ->
                                     line $ row $ List.intersperse space $ (identifier tag):args''
                                 Left [] ->
