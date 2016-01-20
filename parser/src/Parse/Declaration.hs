@@ -32,21 +32,27 @@ definition =
 typeDecl :: IParser AST.Declaration.Declaration
 typeDecl =
   do  try (reserved "type") <?> "a type declaration"
-      forcedWS -- TODO: use comments
+      postType <- forcedWS
       isAlias <- optionMaybe (string "alias" >> forcedWS) -- TODO: use comments
 
       name <- capVar
       args <- map (\(_,v) -> v) <$> spacePrefix lowVar -- TODO: use comments
-      padded equals -- TODO: use comments
+      (preEquals, _, postEquals) <- padded equals
 
       case isAlias of
         Just _ ->
             do  tipe <- Type.expr <?> "a type"
-                return (AST.Declaration.TypeAlias name args tipe)
+                return (AST.Declaration.TypeAlias name args tipe) -- TODO: use comments
 
         Nothing ->
-            do  tcs <- pipeSep1 (const . const <$> Type.constructor) <?> "a constructor for a union type" -- TODO: use comments
-                return $ AST.Declaration.Datatype name args (tcs [] []) -- TODO: pass comments
+            do  tcs <- pipeSep1 ((\x pre post -> Commented pre x post) <$> Type.constructor) <?> "a constructor for a union type"
+                let tcs' = tcs postEquals []
+                return $
+                  case (init tcs', last tcs') of
+                    (rest, (Commented pre lst [])) ->
+                      AST.Declaration.Datatype
+                        (Commented postType (name, args) preEquals)
+                        rest (pre,lst)
 
 
 -- INFIX
