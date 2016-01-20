@@ -36,13 +36,13 @@ typeDecl =
       isAlias <- optionMaybe (string "alias" >> forcedWS) -- TODO: use comments
 
       name <- capVar
-      args <- map (\(_,v) -> v) <$> spacePrefix lowVar -- TODO: use comments
+      args <- spacePrefix lowVar
       (preEquals, _, postEquals) <- padded equals
 
       case isAlias of
         Just _ ->
             do  tipe <- Type.expr <?> "a type"
-                return (AST.Declaration.TypeAlias name args tipe) -- TODO: use comments
+                return (AST.Declaration.TypeAlias name (map (\(_,v) -> v) args) tipe) -- TODO: use comments
 
         Nothing ->
             do  tcs <- pipeSep1 ((\x pre post -> Commented pre x post) <$> Type.constructor) <?> "a constructor for a union type"
