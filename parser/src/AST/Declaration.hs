@@ -14,7 +14,7 @@ data Declaration
     = Definition Pattern.Pattern [(Comments, Pattern.Pattern)] Comments Expression.Expr Bool
     | TypeAnnotation Var.Ref Type
     | Datatype
-        (Commented (String, [String]))
+        (Commented (String, [(Comments, String)]))
         [Commented (String, [Type])]
         (Comments, (String, [Type]))
     | TypeAlias String [String] Type

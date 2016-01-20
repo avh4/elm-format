@@ -357,7 +357,13 @@ formatDeclaration decl =
                                             |> indent
                                         ]
                         formatNameWithArgs (name, args) =
-                          line $ row $ List.intersperse space $ map identifier (name:args)
+                          case allSingles $ map (formatHeadCommented (line . identifier)) args of
+                            Right args' ->
+                              line $ row $ List.intersperse space $ ((identifier name):args')
+                            Left args' ->
+                              stack1 $
+                                [ line $ identifier name ]
+                                ++ (map indent args')
                     in
                         case
                           (map (formatCommented ctor) rest) ++ [formatHeadCommented ctor last]
