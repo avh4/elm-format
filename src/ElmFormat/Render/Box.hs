@@ -538,11 +538,11 @@ formatDefinition name args comments expr multiline =
           pleaseReport "UNEXPECTED TYPE ANNOTATION" "multiline name in let binding"
 
 
-formatTypeAnnotation :: AST.Variable.Ref -> Type -> Box
+formatTypeAnnotation :: (AST.Variable.Ref, Comments) -> (Comments, Type) -> Box
 formatTypeAnnotation name typ =
   case
-      ( isLine $ (line $ formatVar name)
-      , isLine $ formatType typ
+      ( isLine $ (formatTailCommented (line . formatVar) name)
+      , isLine $ formatHeadCommented formatType typ
       )
   of
       (Right name', Right typ') ->
@@ -561,8 +561,19 @@ formatTypeAnnotation name typ =
                   |> indent
               ]
 
-      _ ->
-          pleaseReport "UNEXPECTED TYPE ANNOTATION" "multiline name"
+      (Left name', Right typ') ->
+        stack1
+          [ name'
+          , indent $ line $ punc ":"
+          , indent $ line typ'
+          ]
+
+      (Left name', Left typ') ->
+        stack1
+          [ name'
+          , indent $ line $ punc ":"
+          , indent $ typ'
+          ]
 
 
 formatPattern :: Bool -> AST.Pattern.Pattern -> Box

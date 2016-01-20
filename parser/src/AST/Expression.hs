@@ -18,7 +18,7 @@ data UnaryOperator =
 
 data LetDeclaration
   = LetDefinition Pattern.Pattern [(Comments, Pattern.Pattern)] Comments Expr Bool
-  | LetAnnotation Var.Ref Type
+  | LetAnnotation (Var.Ref, Comments) (Comments, Type)
   | LetComment Comment
   deriving (Eq, Show)
 
