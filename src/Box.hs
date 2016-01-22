@@ -63,13 +63,14 @@ Box either:
 
 MustBreak is only used for `--` comments.
 
-Stack doesn't allow zero-line stacks.
+Stack contains two or more lines.
 
 Sometimes (see `prefix`) the first line of Stack
   gets different treatment than the other lines.
 -}
 data Box
-    = Stack Line [Line]
+    = SingleLine Line
+    | Stack Line Line [Line]
     | MustBreak Line
 
 
@@ -80,7 +81,7 @@ blankLine =
 
 line :: Line -> Box
 line l =
-    Stack l []
+    SingleLine l
 
 
 mustBreak :: Line -> Box
@@ -93,14 +94,20 @@ stack' b1 b2 =
     let
         split b =
             case b of
-                Stack l1 ln ->
-                    (l1, ln)
+                SingleLine l1 ->
+                    (l1, [])
+                Stack l1 l2 ln ->
+                    (l1, l2:ln)
                 MustBreak l1 ->
                     (l1, [])
         (l11, l1n) = split b1
         (l21, l2n) = split b2
     in
-        Stack l11 (l1n ++ (l21:l2n))
+      case (l1n ++ (l21:l2n)) of
+        [] ->
+          error "the list will contain at least l21"
+        l2 : ln ->
+          Stack l11 l2 ln
 
 
 andThen :: [Box] -> Box -> Box
@@ -127,8 +134,10 @@ mapLines fn =
 mapFirstLine :: (Line -> Line) -> (Line -> Line) -> Box -> Box
 mapFirstLine firstFn restFn b =
     case b of
-        Stack l1 ls ->
-            Stack (firstFn l1) (map restFn ls)
+        SingleLine l1 ->
+            SingleLine (firstFn l1)
+        Stack l1 l2 ls ->
+            Stack (firstFn l1) (restFn l2) (map restFn ls)
         MustBreak l1 ->
             MustBreak (firstFn l1)
 
@@ -141,7 +150,7 @@ indent =
 isLine :: Box -> Either Box Line
 isLine b =
     case b of
-        Stack l [] ->
+        SingleLine l ->
             Right l
         _ ->
             Left b
@@ -179,10 +188,12 @@ force b e =
 destructure :: Box -> (Line, [Line])
 destructure b =
     case b of
-        Stack first rest ->
-            (first, rest)
-        MustBreak first ->
-            (first, [])
+        SingleLine l1 ->
+            (l1, [])
+        Stack l1 l2 rest ->
+            (l1, l2 : rest)
+        MustBreak l1 ->
+            (l1, [])
 
 
 allSingles :: [Box] -> Either [Box] [Line]
@@ -307,8 +318,10 @@ renderLine startColumn (Row lines') =
 
 
 render :: Box -> T.Text
-render (Stack firstLine moreLines) =
-    T.unlines $ map (renderLine 0) (firstLine : moreLines)
+render (SingleLine l1) =
+    T.snoc (renderLine 0 l1) '\n'
+render (Stack l1 l2 rest) =
+    T.unlines $ map (renderLine 0) (l1 : l2 : rest)
 render (MustBreak line') =
     T.snoc (renderLine 0 line') '\n'
 

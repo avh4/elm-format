@@ -36,8 +36,8 @@ surround left right b =
     left' = punc (left : [])
     right' = punc (right : [])
   in
-    case isLine b of
-      Right b' ->
+    case b of
+      SingleLine b' ->
           line $ row [ left', b', right' ]
       _ ->
           stack1
