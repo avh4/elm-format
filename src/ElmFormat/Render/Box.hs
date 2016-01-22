@@ -697,11 +697,12 @@ addSuffix suffix b =
 formatRecordPair :: Char -> (v -> Box) -> (Commented String, Commented v, Bool) -> Box
 formatRecordPair delim formatValue (Commented pre k postK, v, multiline') =
     case
-        isLine'
-            (isLine $ formatCommented (line . identifier) $ Commented [] k postK)
-            (force multiline' $ isLine $ formatCommented formatValue v)
+      ( formatCommented (line . identifier) $ Commented [] k postK
+      , multiline'
+      , formatCommented formatValue v
+      )
     of
-        Right (k', Right v') ->
+      (SingleLine k', False, SingleLine v') ->
             line $ row
                 [ k'
                 , space
@@ -709,12 +710,12 @@ formatRecordPair delim formatValue (Commented pre k postK, v, multiline') =
                 , space
                 , v'
                 ]
-        Right (k', Left v') ->
+      (SingleLine k', _, v') ->
             stack1
                 [ line $ row [ k', space, delim' ]
                 , indent v'
                 ]
-        Left (k', v') ->
+      (k', _, v') ->
             stack1
                 [ k'
                 , indent $ prefix (row [delim', space]) v'
