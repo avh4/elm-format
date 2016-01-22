@@ -660,11 +660,11 @@ formatPattern parensRequired apattern =
 
         AST.Pattern.Alias pattern name ->
           case
-            allSingles2
-              (formatTailCommented (formatPattern True) pattern)
-              (formatHeadCommented (line . identifier) name )
+            ( formatTailCommented (formatPattern True) pattern
+            , formatHeadCommented (line . identifier) name
+            )
           of
-            Right (pattern', name') ->
+            (SingleLine pattern', SingleLine name') ->
               line $ row
                 [ pattern'
                 , space
@@ -673,7 +673,7 @@ formatPattern parensRequired apattern =
                 , name'
                 ]
 
-            Left (pattern', name') ->
+            (pattern', name') ->
               stack1
                 [ pattern'
                 , line $ keyword "as"

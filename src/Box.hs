@@ -197,16 +197,6 @@ allSingles boxes =
             Left boxes
 
 
-allSingles2 :: Box -> Box -> Either (Box, Box) (Line, Line)
-allSingles2 a b =
-    case (isLine a, isLine b) of
-        (Right a', Right b') ->
-            Right (a', b')
-
-        _ ->
-            Left (a, b)
-
-
 elmApplication :: Box -> [Box] -> Box
 elmApplication first rest =
     case allSingles (first:rest) of
