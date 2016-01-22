@@ -913,11 +913,11 @@ formatExpression aexpr =
             let
                 opening =
                   case
-                    isLineForce
-                      multiline
-                      (formatCommented formatExpression subject)
+                    ( multiline
+                    , formatCommented formatExpression subject
+                    )
                   of
-                      Right subject' ->
+                      (False, SingleLine subject') ->
                           line $ row
                               [ keyword "case"
                               , space
@@ -925,7 +925,7 @@ formatExpression aexpr =
                               , space
                               , keyword "of"
                               ]
-                      Left subject' ->
+                      (_, subject') ->
                           stack1
                               [ line $ keyword "case"
                               , indent subject'

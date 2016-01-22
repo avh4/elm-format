@@ -156,14 +156,6 @@ isLine b =
             Left b
 
 
-isLineForce :: Bool -> Box -> Either Box Line
-isLineForce forceMultiline b =
-  if forceMultiline then
-    Left b
-  else
-    isLine b
-
-
 isLine' :: Either Box Line -> Either Box Line -> Either (Box, Box) (Line, Either Box Line)
 isLine' primary secondary =
     case (primary, secondary ) of
