@@ -2,7 +2,7 @@
 module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
-import Box hiding (isLine)
+import Box
 import Data.Version (showVersion)
 
 import AST.V0_16
@@ -665,17 +665,6 @@ formatPattern parensRequired apattern =
                 ]
 
           |> (if parensRequired then parens else id)
-
-
-addSuffix :: Line -> Box -> Box
-addSuffix suffix b =
-    case destructure b of
-        (l,[]) ->
-            line $ row [ l, suffix ]
-        (l1,ls) ->
-            line l1
-                |> andThen (map line $ init ls)
-                |> andThen [ line $ row [ last ls, suffix ] ]
 
 
 formatRecordPair :: Char -> (v -> Box) -> (Commented String, Commented v, Bool) -> Box

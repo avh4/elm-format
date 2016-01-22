@@ -1,5 +1,12 @@
 {-# OPTIONS_GHC -Wall #-}
-module Box where
+module Box
+  ( Line, identifier, keyword, punc, literal, row, space
+  , Box(SingleLine), blankLine, line, mustBreak, stack1, andThen
+  , allSingles
+  , indent, prefix, addSuffix
+  , elmApplication, elmGroup, elmExtensionGroup
+  , render
+  ) where
 
 import Elm.Utils ((|>))
 
@@ -156,14 +163,6 @@ isLine b =
             Left b
 
 
-force :: Bool -> Either Box Line -> Either Box Line
-force b e =
-    case (b, e) of
-        (True, Right l) -> Left $ line l
-        _ -> e
-
-
--- TODO: replace with isLine?
 destructure :: Box -> (Line, [Line])
 destructure b =
     case b of
@@ -219,6 +218,17 @@ prefix pref =
 
         prefixLength = lineLength 0 pref
         paddingSpaces = replicate prefixLength space
+
+
+addSuffix :: Line -> Box -> Box
+addSuffix suffix b =
+    case destructure b of
+        (l,[]) ->
+            line $ row [ l, suffix ]
+        (l1,ls) ->
+            line l1
+                |> andThen (map line $ init ls)
+                |> andThen [ line $ row [ last ls, suffix ] ]
 
 
 elmGroup :: Bool -> String -> String -> String -> Bool -> [Box] -> Box

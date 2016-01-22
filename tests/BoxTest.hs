@@ -75,7 +75,7 @@ tests =
                 ]
     , testCase "indent (with leading spaces)" $
         assertOutput "  a\n" $
-            line $ row [ space, Tab, identifier "a" ]
+            prefix space $ indent $ line $ identifier "a"
 
     , testCase "elmApplication (single line)" $
         assertOutput "a b c\n" $
