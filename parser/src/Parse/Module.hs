@@ -42,18 +42,18 @@ freshDef =
 header :: IParser Module.Header
 header =
   do  option [] freshLine -- TODO: use comments
-      (names, exports) <-
-          option (Commented [] ["Main"] [], Var.openListing) (moduleDecl `followedBy` freshLine) -- TODO: use comments
+      (names, exports, postExports) <-
+          option (Commented [] ["Main"] [], Var.openListing, []) (moduleDecl `followedBy` freshLine) -- TODO: use comments
       (docs, postDocsComments) <-
         choice
           [ (,) <$> addLocation (Just <$> docComment) <*> freshLine
           , (,) <$> addLocation (return Nothing) <*> return []
           ]
       imports' <- imports
-      return (Module.Header names docs exports ((fmap Module.ImportComment postDocsComments) ++ imports'))
+      return (Module.Header names docs exports postExports ((fmap Module.ImportComment postDocsComments) ++ imports'))
 
 
-moduleDecl :: IParser (Commented ModuleName.Raw, Var.Listing (A.Located Var.Value))
+moduleDecl :: IParser (Commented ModuleName.Raw, Var.Listing (A.Located Var.Value), Comments)
 moduleDecl =
   expecting "a module declaration" $
   do  try (reserved "module")
@@ -61,9 +61,9 @@ moduleDecl =
       names <- dotSep1 capVar <?> "the name of this module"
       (_, postName) <- whitespace
       exports <- option Var.openListing (listing (addLocation value))
-      whitespace -- TODO: use comments
+      (_, preWhere) <- whitespace
       reserved "where"
-      return (Commented preName names postName, exports)
+      return (Commented preName names postName, exports, preWhere)
 
 
 imports :: IParser [Module.UserImport]
