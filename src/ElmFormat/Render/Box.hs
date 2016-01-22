@@ -2,7 +2,7 @@
 module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
-import Box
+import Box hiding (isLine)
 import Data.Version (showVersion)
 
 import AST.V0_16
@@ -56,7 +56,7 @@ formatBinary multiline left ops =
     case
         ( ops
         , multiline
-        , isLine $ left
+        , left
         , allSingles $ map fst ops
         , allSingles $ map snd ops
         )
@@ -64,20 +64,20 @@ formatBinary multiline left ops =
         ([], _, _, _, _) ->
             pleaseReport "INVALID BINARY EXPRESSION" "no operators"
 
-        (_, False, Right left'', Right ops'', Right exprs') ->
+        (_, False, SingleLine left', Right ops'', Right exprs') ->
             zip ops'' exprs'
                 |> map (\(op,e) -> row [op, space, e])
                 |> List.intersperse space
                 |> (:) space
-                |> (:) left''
+                |> (:) left'
                 |> row
                 |> line
 
-        (_, _, _, Right ops'', _) ->
+        (_, _, left', Right ops'', _) ->
             zip ops'' (map snd ops)
                 |> map (\(op,e) -> prefix (row [op, space]) e)
                 |> stack1
-                |> (\body -> stack1 [left, indent body])
+                |> (\body -> stack1 [left', indent body])
 
         _ ->
             ops
@@ -144,12 +144,12 @@ formatModuleHeader header =
 
       moduleLine =
         case
-          ( isLine $ formatCommented (line . formatName) $ AST.Module.name header
-          , isLine formatExports
-          , isLine $ whereClause
+          ( formatCommented (line . formatName) $ AST.Module.name header
+          , formatExports
+          , whereClause
           )
         of
-          (Right name', Right exports', Right where') ->
+          (SingleLine name', SingleLine exports', SingleLine where') ->
             line $ row
               [ keyword "module"
               , space
@@ -158,7 +158,7 @@ formatModuleHeader header =
               , space
               , where'
               ]
-          (Left name', Right exports', _) ->
+          (name', SingleLine exports', _) ->
             stack1
               [ line $ keyword "module"
               , indent $ name'
@@ -280,20 +280,18 @@ formatImport aimport =
                                         ]
                     in
                         case formatListing $ AST.Module.exposedVars method of
-                            Just listing ->
-                                case isLine listing of
-                                    Right listing' ->
-                                        line $ row
-                                            [ keyword "import"
-                                            , space
-                                            , as
-                                            , space
-                                            , keyword "exposing"
-                                            , space
-                                            , listing'
-                                            ]
-                                    _ ->
-                                        pleaseReport "TODO" "multiline exposing"
+                            Just (SingleLine listing) ->
+                              line $ row
+                                [ keyword "import"
+                                , space
+                                , as
+                                , space
+                                , keyword "exposing"
+                                , space
+                                , listing
+                                ]
+                            Just _ ->
+                              pleaseReport "TODO" "multiline exposing"
                             Nothing ->
                                 line $ row
                                     [ keyword "import"
@@ -387,8 +385,8 @@ formatDeclaration decl =
                           (map (formatCommented ctor) rest) ++ [formatHeadCommented ctor last]
                         of
                           (first:rest) ->
-                              case isLine $ formatCommented formatNameWithArgs nameWithArgs of
-                                Right nameWithArgs' ->
+                              case formatCommented formatNameWithArgs nameWithArgs of
+                                SingleLine nameWithArgs' ->
                                   stack1
                                     [ line $ row
                                         [ keyword "type"
@@ -400,7 +398,7 @@ formatDeclaration decl =
                                         |> andThen (map (prefix (row [punc "|", space])) rest)
                                         |> indent
                                     ]
-                                Left nameWithArgs' ->
+                                nameWithArgs' ->
                                   stack1
                                     [ line $ keyword "type"
                                     , indent $ nameWithArgs'
@@ -413,11 +411,11 @@ formatDeclaration decl =
                 AST.Declaration.TypeAlias preAlias nameWithArgs typ ->
                   stack1
                     [ case
-                        ( isLine $ formatHeadCommented (line . keyword) (preAlias, "alias")
-                        , isLine $ formatCommented formatNameWithArgs nameWithArgs
+                        ( formatHeadCommented (line . keyword) (preAlias, "alias")
+                        , formatCommented formatNameWithArgs nameWithArgs
                         )
                       of
-                      (Right alias, Right nameWithArgs') ->
+                      (SingleLine alias, SingleLine nameWithArgs') ->
                         line $ row
                           [ keyword "type"
                           , space
@@ -427,20 +425,13 @@ formatDeclaration decl =
                           , space
                           , punc "="
                           ]
-                      (Right alias, Left nameWithArgs') -> -- TODO: not tested
+                      (SingleLine alias, nameWithArgs') -> -- TODO: not tested
                         stack1
                           [ line $ row [keyword "type", space, alias]
                           , indent $ nameWithArgs'
                           , indent $ line $ punc "="
                           ]
-                      (Left alias, Right nameWithArgs') -> -- TODO: not tested
-                        stack1
-                          [ line $ keyword "type"
-                          , indent $ alias
-                          , indent $ line $ nameWithArgs'
-                          , indent $ line $ punc "="
-                          ]
-                      (Left alias, Left nameWithArgs') ->
+                      (alias, nameWithArgs') ->
                         stack1
                           [ line $ keyword "type"
                           , indent $ alias
@@ -454,11 +445,11 @@ formatDeclaration decl =
 
                 AST.Declaration.PortAnnotation name typeComments typ ->
                     case
-                        ( isLine $ formatCommented' typeComments formatType typ
-                        , isLine $ formatCommented (line . identifier) name
+                        ( formatCommented' typeComments formatType typ
+                        , formatCommented (line . identifier) name
                         )
                     of
-                        (Right typ', Right name') ->
+                        (SingleLine typ', SingleLine name') ->
                             line $ row
                                 [ keyword "port"
                                 , space
@@ -472,8 +463,8 @@ formatDeclaration decl =
                             pleaseReport "TODO" "multiline type in port annotation"
 
                 AST.Declaration.PortDefinition name bodyComments expr ->
-                    case isLine $ formatCommented (line . identifier) name of
-                        Right name' ->
+                    case formatCommented (line . identifier) name of
+                        SingleLine name' ->
                             stack1
                                 [ line $ row
                                     [ keyword "port"
@@ -490,11 +481,11 @@ formatDeclaration decl =
 
                 AST.Declaration.Fixity assoc precedenceComments precedence nameComments name ->
                     case
-                        ( isLine $ (formatCommented' nameComments (line . formatInfixVar) name)
-                        , isLine $ (formatCommented' precedenceComments (line . literal . show) precedence)
+                        ( formatCommented' nameComments (line . formatInfixVar) name
+                        , formatCommented' precedenceComments (line . literal . show) precedence
                         )
                     of
-                        (Right name', Right precedence') ->
+                        (SingleLine name', SingleLine precedence') ->
                             line $ row
                                 [ case assoc of
                                       AST.Declaration.L -> keyword "infixl"
@@ -535,11 +526,11 @@ formatDefinition name args comments expr multiline =
   in
     case
       ( multiline --TODO: can this be removed?
-      , isLine $ formatPattern True name
+      , formatPattern True name
       , allSingles $ map (\(x,y) -> formatCommented' x (formatPattern True) y) args
       )
     of
-      (_, Right name', Right args') ->
+      (_, SingleLine name', Right args') ->
           stack1 $
               [ line $ row
                   [ row $ List.intersperse space $ (name':args')
@@ -549,7 +540,7 @@ formatDefinition name args comments expr multiline =
               , indent $ body
               ]
 
-      (_, Right name', Left args') ->
+      (_, SingleLine name', Left args') ->
           stack1
             [ line $ name'
             , indent $ stack1 $ concat
@@ -567,11 +558,11 @@ formatDefinition name args comments expr multiline =
 formatTypeAnnotation :: (AST.Variable.Ref, Comments) -> (Comments, Type) -> Box
 formatTypeAnnotation name typ =
   case
-      ( isLine $ (formatTailCommented (line . formatVar) name)
-      , isLine $ formatHeadCommented formatType typ
+      ( formatTailCommented (line . formatVar) name
+      , formatHeadCommented formatType typ
       )
   of
-      (Right name', Right typ') ->
+      (SingleLine name', SingleLine typ') ->
           line $ row
               [ name'
               , space
@@ -580,21 +571,14 @@ formatTypeAnnotation name typ =
               , typ'
               ]
 
-      (Right name', Left typ') ->
+      (SingleLine name', typ') ->
           stack1
               [ line $ row [ name', space, punc ":" ]
               , typ'
                   |> indent
               ]
 
-      (Left name', Right typ') ->
-        stack1
-          [ name'
-          , indent $ line $ punc ":"
-          , indent $ line typ'
-          ]
-
-      (Left name', Left typ') ->
+      (name', typ') ->
         stack1
           [ name'
           , indent $ line $ punc ":"
@@ -738,11 +722,11 @@ formatExpression aexpr =
         AST.Expression.Range left right multiline ->
             case
                 ( multiline
-                , isLine $ formatCommented formatExpression left
-                , isLine $ formatCommented formatExpression right
+                , formatCommented formatExpression left
+                , formatCommented formatExpression right
                 )
             of
-                (False, Right left', Right right') ->
+                (False, SingleLine left', SingleLine right') ->
                     line $ row
                         [ punc "["
                         , left'
@@ -750,14 +734,12 @@ formatExpression aexpr =
                         , right'
                         , punc "]"
                         ]
-                _ ->
+                (_, left', right') ->
                     stack1
                         [ line $ punc "["
-                        , formatCommented formatExpression left
-                            |> indent
+                        , indent left'
                         , line $ punc ".."
-                        , formatCommented formatExpression right
-                            |> indent
+                        , indent right'
                         , line $ punc "]"
                         ]
 
@@ -784,10 +766,10 @@ formatExpression aexpr =
                 ( multiline
                 , allSingles $ map (formatCommented (formatPattern True) . (\(c,p) -> Commented c p [])) patterns
                 , bodyComments
-                , isLine $ formatExpression expr
+                , formatExpression expr
                 )
             of
-                (False, Right patterns', [], Right expr') ->
+                (False, Right patterns', [], SingleLine expr') ->
                     line $ row
                         [ punc "\\"
                         , row $ List.intersperse space $ patterns'
@@ -817,22 +799,22 @@ formatExpression aexpr =
         AST.Expression.App left args multiline ->
             case
                 ( multiline
-                , isLine $ formatExpression left
+                , formatExpression left
                 , allSingles $ map (\(x,y) -> formatCommented' x formatExpression y) args
                 )
             of
-                (False, Right left', Right args') ->
+                (False, SingleLine left', Right args') ->
                   line $ row
                       $ List.intersperse space $ (left':args')
-                _ ->
-                    formatExpression left
+                (_, left', _) ->
+                    left'
                         |> andThen (map (\(x,y) -> indent $ formatCommented' x formatExpression y) args)
 
         AST.Expression.If if' elseifs (elsComments, els) ->
             let
                 opening key cond =
-                    case (isLine key, isLine cond) of
-                        (Right key', Right cond') ->
+                    case (key, cond) of
+                        (SingleLine key', SingleLine cond') ->
                             line $ row
                                 [ key'
                                 , space
@@ -856,10 +838,10 @@ formatExpression aexpr =
                 formatElseIf (ifComments, (cond, body)) =
                   let
                     key =
-                      case (isLine $ formatHeadCommented id (ifComments, line $ keyword "if")) of
-                        Right key' ->
+                      case (formatHeadCommented id (ifComments, line $ keyword "if")) of
+                        SingleLine key' ->
                           line $ row [ keyword "else", space, key' ]
-                        Left key' ->
+                        key' ->
                           stack1
                             [ line $ keyword "else"
                             , key'
@@ -936,23 +918,23 @@ formatExpression aexpr =
                 clause (pat, expr) =
                     case
                       ( pat
-                      , isLine $ formatPattern False $ (\(Commented _ x _) -> x) pat
-                      , isLine $ formatCommentedStack (formatPattern False) pat
+                      , formatPattern False $ (\(Commented _ x _) -> x) pat
+                      , formatCommentedStack (formatPattern False) pat
                       , formatHeadCommentedStack formatExpression expr
                       )
                     of
-                        (_, _, Right pat', body') ->
+                        (_, _, SingleLine pat', body') ->
                             stack1
                                 [ line $ row [ pat', space, keyword "->"]
                                 , indent body'
                                 ]
-                        (Commented pre _ [], Right pat', _, body') ->
+                        (Commented pre _ [], SingleLine pat', _, body') ->
                             stack1 $
                                 (map formatComment pre)
                                 ++ [ line $ row [ pat', space, keyword "->"]
                                    , indent body'
                                    ]
-                        (_, _, Left pat', body') ->
+                        (_, _, pat', body') ->
                             stack1 $
                               [ pat'
                               , line $ keyword "->"
@@ -997,11 +979,11 @@ formatExpression aexpr =
             line $ punc "{}"
 
         AST.Expression.EmptyRecord comments ->
-            case isLine $ stack1 $ map formatComment comments of
-                Right comments' ->
+            case stack1 $ map formatComment comments of
+                SingleLine comments' ->
                     line $ row [ punc "{", comments', punc "}" ]
 
-                Left comments' ->
+                comments' ->
                     comments'
 
         AST.Expression.Parens expr ->
@@ -1033,15 +1015,15 @@ formatCommented_ forceMultiline format (Commented pre inner post) =
         ( forceMultiline
         , allSingles $ fmap formatComment pre
         , allSingles $ fmap formatComment post
-        , isLine $ format inner
+        , format inner
         )
     of
-        ( False, Right pre', Right post', Right inner' ) ->
+        ( False, Right pre', Right post', SingleLine inner' ) ->
             line $ row $ List.intersperse space $ concat [pre', [inner'], post']
-        _ ->
+        (_, _, _, inner') ->
             stack1 $
                 (map formatComment pre)
-                ++ [ format inner ]
+                ++ [ inner' ]
                 ++ ( map formatComment post)
 
 
