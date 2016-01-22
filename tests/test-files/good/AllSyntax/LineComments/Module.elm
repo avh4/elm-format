@@ -3,6 +3,7 @@ module
   AllSyntax.LineComments.Module
   --B
   (a, b, c)
+  -- I
   where
 
 

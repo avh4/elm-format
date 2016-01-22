@@ -1,4 +1,4 @@
-module {- A -} AllSyntax.BlockComments.Module {- B -} (a, b, c) where
+module {- A -} AllSyntax.BlockComments.Module {- B -} (a, b, c) {- I -} where
 
 
 a =

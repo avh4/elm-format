@@ -139,27 +139,31 @@ formatModuleHeader header =
             _ ->
                 line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
 
+      whereClause =
+        formatHeadCommented (line . keyword) (AST.Module.postExportComments header, "where")
+
       moduleLine =
         case
           ( isLine $ formatCommented (line . formatName) $ AST.Module.name header
           , isLine formatExports
+          , isLine $ whereClause
           )
         of
-          (Right name', Right exports') ->
+          (Right name', Right exports', Right where') ->
             line $ row
               [ keyword "module"
               , space
               , name'
               , row [ space, exports' ]
               , space
-              , keyword "where"
+              , where'
               ]
-          (Left name', Right exports') ->
+          (Left name', Right exports', _) ->
             stack1
               [ line $ keyword "module"
               , indent $ name'
               , indent $ line $ exports'
-              , indent $ line $ keyword "where"
+              , indent $ whereClause
               ]
           _ ->
             line $ pleaseReport' "TODO" "multiline module listing"
