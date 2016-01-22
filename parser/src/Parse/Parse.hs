@@ -16,36 +16,7 @@ import qualified Reporting.Result as Result
 
 parseSource :: String -> Result.Result () Error.Error AST.Module.Module
 parseSource src =
-  parse src programParser
-
-
--- HEADERS AND DECLARATIONS
-
-programParser :: IParser AST.Module.Module
-programParser =
-  do  (AST.Module.Header name docs exports imports) <- Module.header
-      decls <- declarations
-      trailingComments <-
-          (++)
-              <$> option [] freshLine
-              <*> option [] spaces
-      eof
-
-      return $ AST.Module.Module name docs exports imports (decls ++ (map AST.Declaration.BodyComment trailingComments))
-
-
-declarations :: IParser [AST.Declaration.Decl]
-declarations =
-  (++) <$> ((\x -> [x]) <$> Decl.declaration) -- TODO: can there be comments before this?
-      <*> (concat <$> many freshDef)
-
-
-freshDef :: IParser [AST.Declaration.Decl]
-freshDef =
-    commitIf (freshLine >> (letter <|> char '_')) $
-      do  comments <- freshLine
-          decl <- Decl.declaration
-          return $ (map AST.Declaration.BodyComment comments) ++ [decl]
+  parse src Module.elmModule
 
 
 -- RUN PARSERS

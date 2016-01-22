@@ -128,45 +128,62 @@ isDeclaration decl =
         _ ->
             False
 
+
+formatModuleHeader :: AST.Module.Header -> Box
+formatModuleHeader header =
+  let
+      moduleLine =
+          line $ row
+              [ keyword "module"
+              , space
+              , formatName $ AST.Module.name header
+              , case formatListing $ fmap RA.drop $ AST.Module.exports header of
+                  Just listing ->
+                      case isLine listing of
+                          Right listing' ->
+                              row [ space, listing' ]
+                          _ ->
+                              pleaseReport' "TODO" "multiline module listing"
+                  _ ->
+                      pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
+              , space
+              , keyword "where"
+              ]
+
+      docs =
+          formatModuleDocs (AST.Module.docs header)
+
+      importSpacer first second =
+            case (first, second) of
+                (AST.Module.ImportComment _, AST.Module.ImportComment _) ->
+                    []
+                (AST.Module.ImportComment _, _) ->
+                    List.replicate 1 blankLine
+                (_, AST.Module.ImportComment _) ->
+                    List.replicate 2 blankLine
+                (_, _) ->
+                    []
+
+      imports =
+            AST.Module.imports header
+                |> intersperseMap importSpacer formatImport
+
+      mapIf fn m a =
+          case m of
+              Just x ->
+                  fn x a
+              Nothing ->
+                  a
+  in
+      moduleLine
+          |> mapIf (\x -> andThen [ blankLine, x ]) docs
+          |> (if null imports then id else andThen imports . andThen [blankLine])
+          |> andThen [ blankLine, blankLine ]
+
+
 formatModule :: AST.Module.Module -> Box
 formatModule modu =
     let
-        moduleLine =
-            line $ row
-                [ keyword "module"
-                , space
-                , formatName $ AST.Module.name modu
-                , case formatListing $ fmap RA.drop $ AST.Module.exports modu of
-                    Just listing ->
-                        case isLine listing of
-                            Right listing' ->
-                                row [ space, listing' ]
-                            _ ->
-                                pleaseReport' "TODO" "multiline module listing"
-                    _ ->
-                        pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
-                , space
-                , keyword "where"
-                ]
-
-        docs =
-            formatModuleDocs (AST.Module.docs modu)
-
-        importSpacer first second =
-              case (first, second) of
-                  (AST.Module.ImportComment _, AST.Module.ImportComment _) ->
-                      []
-                  (AST.Module.ImportComment _, _) ->
-                      List.replicate 1 blankLine
-                  (_, AST.Module.ImportComment _) ->
-                      List.replicate 2 blankLine
-                  (_, _) ->
-                      []
-
-        imports =
-              AST.Module.imports modu
-                  |> intersperseMap importSpacer formatImport
-
         isComment d =
             case d of
                 AST.Declaration.BodyComment _ ->
@@ -188,19 +205,10 @@ formatModule modu =
         body =
             intersperseMap spacer formatDeclaration $
                 AST.Module.body modu
-
-        mapIf fn m a =
-            case m of
-                Just x ->
-                    fn x a
-                Nothing ->
-                    a
     in
-        moduleLine
-            |> mapIf (\x -> andThen [ blankLine, x ]) docs
-            |> (if null imports then id else andThen imports . andThen [blankLine])
-            |> andThen [ blankLine, blankLine ]
-            |> andThen body
+      stack1 $
+        (formatModuleHeader $ AST.Module.header modu)
+          : body
 
 
 formatModuleDocs :: RA.Located (Maybe String) -> Maybe Box
