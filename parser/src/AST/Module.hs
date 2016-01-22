@@ -1,6 +1,5 @@
 module AST.Module
-    ( Module(..), Body(..)
-    , Header(..)
+    ( Module(..), Header(..)
     , UserImport(..), ImportMethod(..)
     , stripRegion
     ) where
@@ -16,28 +15,22 @@ import AST.V0_16
 
 
 data Module = Module
-    { name    :: Name.Raw
-    , docs    :: A.Located (Maybe String)
-    , exports :: Var.Listing (A.Located Var.Value)
-    , imports :: [UserImport]
-    , body    :: [Declaration.Decl]
+    { header :: Header
+    , body :: [Declaration.Decl]
     }
     deriving (Eq, Show)
 
 
 stripRegion m =
     Module
-    { name = name m
-    , docs = A.stripRegion $ docs m
-    , exports = fmap A.stripRegion $ exports m
-    , imports = imports m
+    { header =
+        Header
+          { name = name $ header m
+          , docs = A.stripRegion $ docs $ header m
+          , exports = fmap A.stripRegion $ exports $ header m
+          , imports = imports $ header m
+          }
     , body = map Declaration.stripRegion' $ body m
-    }
-
-data Body expr = Body
-    { program   :: expr
-    , fixities  :: [(Declaration.Assoc, Int, String)]
-    , ports     :: [String]
     }
 
 
@@ -45,11 +38,12 @@ data Body expr = Body
 
 {-| Basic info needed to identify modules and determine dependencies. -}
 data Header = Header
-    { _name :: Name.Raw
-    , _docs :: A.Located (Maybe String)
-    , _exports :: Var.Listing (A.Located Var.Value)
-    , _imports :: [UserImport]
+    { name :: Name.Raw
+    , docs :: A.Located (Maybe String)
+    , exports :: Var.Listing (A.Located Var.Value)
+    , imports :: [UserImport]
     }
+    deriving (Eq, Show)
 
 
 -- IMPORTs

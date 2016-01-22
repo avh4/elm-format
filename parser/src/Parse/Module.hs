@@ -1,28 +1,42 @@
-module Parse.Module (moduleDecl, header, getModuleName) where
+module Parse.Module (moduleDecl, elmModule) where
 
 import Text.Parsec hiding (newline, spaces)
 
 import Parse.Helpers
+import Parse.Declaration as Decl
+import qualified AST.Declaration
 import qualified AST.Module as Module
 import qualified AST.Module.Name as ModuleName
 import qualified AST.Variable as Var
-import Reporting.Annotation as A
+import Reporting.Annotation as A hiding (map)
 import AST.V0_16
 
 
-getModuleName :: String -> Maybe String
-getModuleName source =
-  case iParse getModuleName source of
-    Right name ->
-        Just name
+elmModule :: IParser Module.Module
+elmModule =
+  do  h <- header
+      decls <- declarations
+      trailingComments <-
+          (++)
+              <$> option [] freshLine
+              <*> option [] spaces
+      eof
 
-    Left _ ->
-        Nothing
-  where
-    getModuleName =
-      do  optional freshLine
-          (names, _) <- moduleDecl
-          return (ModuleName.toString names)
+      return $ Module.Module h (decls ++ (map AST.Declaration.BodyComment trailingComments))
+
+
+declarations :: IParser [AST.Declaration.Decl]
+declarations =
+  (++) <$> ((\x -> [x]) <$> Decl.declaration) -- TODO: can there be comments before this?
+      <*> (concat <$> many freshDef)
+
+
+freshDef :: IParser [AST.Declaration.Decl]
+freshDef =
+    commitIf (freshLine >> (letter <|> char '_')) $
+      do  comments <- freshLine
+          decl <- Decl.declaration
+          return $ (map AST.Declaration.BodyComment comments) ++ [decl]
 
 
 header :: IParser Module.Header

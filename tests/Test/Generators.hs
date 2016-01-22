@@ -94,8 +94,10 @@ instance Arbitrary AST.Module.Module where
             name <- listOf1 $ capIdentifier
             listing <- arbitrary
             return $ AST.Module.Module
-                name
-                (located Nothing)
-                listing
-                []
+                (AST.Module.Header
+                  name
+                  (located Nothing)
+                  listing
+                  []
+                )
                 [ AST.Declaration.Decl $ located $ AST.Declaration.Definition (located $ AST.Pattern.Anything) [] [] (located $ AST.Expression.TupleFunction 2) True]
