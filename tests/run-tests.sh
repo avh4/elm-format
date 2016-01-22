@@ -165,6 +165,7 @@ checkWaysToRun Simple.elm
 
 checkGood Simple.elm
 checkGood AllSyntax/AllSyntax.elm
+checkGoodAllSyntax Module
 checkGoodAllSyntax Declarations
 checkGoodAllSyntax Patterns
 checkGoodAllSyntax Types
