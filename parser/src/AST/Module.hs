@@ -38,7 +38,7 @@ stripRegion m =
 
 {-| Basic info needed to identify modules and determine dependencies. -}
 data Header = Header
-    { name :: Name.Raw
+    { name :: Commented Name.Raw
     , docs :: A.Located (Maybe String)
     , exports :: Var.Listing (A.Located Var.Value)
     , imports :: [UserImport]

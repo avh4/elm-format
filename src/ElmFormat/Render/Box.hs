@@ -132,23 +132,37 @@ isDeclaration decl =
 formatModuleHeader :: AST.Module.Header -> Box
 formatModuleHeader header =
   let
+      formatExports =
+        case formatListing $ fmap RA.drop $ AST.Module.exports header of
+            Just listing ->
+              listing
+            _ ->
+                line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
+
       moduleLine =
-          line $ row
+        case
+          ( isLine $ formatCommented (line . formatName) $ AST.Module.name header
+          , isLine formatExports
+          )
+        of
+          (Right name', Right exports') ->
+            line $ row
               [ keyword "module"
               , space
-              , formatName $ AST.Module.name header
-              , case formatListing $ fmap RA.drop $ AST.Module.exports header of
-                  Just listing ->
-                      case isLine listing of
-                          Right listing' ->
-                              row [ space, listing' ]
-                          _ ->
-                              pleaseReport' "TODO" "multiline module listing"
-                  _ ->
-                      pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
+              , name'
+              , row [ space, exports' ]
               , space
               , keyword "where"
               ]
+          (Left name', Right exports') ->
+            stack1
+              [ line $ keyword "module"
+              , indent $ name'
+              , indent $ line $ exports'
+              , indent $ line $ keyword "where"
+              ]
+          _ ->
+            line $ pleaseReport' "TODO" "multiline module listing"
 
       docs =
           formatModuleDocs (AST.Module.docs header)

@@ -2,6 +2,7 @@ module Test.Generators where
 
 import Test.QuickCheck
 
+import AST.V0_16
 import qualified AST.Declaration
 import qualified AST.Expression
 import qualified AST.Module
@@ -95,7 +96,7 @@ instance Arbitrary AST.Module.Module where
             listing <- arbitrary
             return $ AST.Module.Module
                 (AST.Module.Header
-                  name
+                  (Commented [] name [])
                   (located Nothing)
                   listing
                   []
