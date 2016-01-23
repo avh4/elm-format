@@ -600,8 +600,8 @@ formatPattern parensRequired apattern =
         AST.Pattern.ConsPattern first rest final ->
             let
               first' = formatTailCommented (formatPattern True) first
-              rest' = map (formatCommented (formatPattern False)) rest
-              final' = formatHeadCommented (formatPattern False) final
+              rest' = map (formatCommented (formatPattern True)) rest
+              final' = formatHeadCommented (formatPattern True) final
             in
               formatBinary
                   False

@@ -51,3 +51,7 @@ record { a, b } =
 
 asAlias (() as x) =
   ()
+
+
+complexCons (a :: (x :: []) :: ((b :: _) as blah)) =
+  ()
