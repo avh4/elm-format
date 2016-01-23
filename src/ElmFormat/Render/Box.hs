@@ -133,7 +133,7 @@ formatModuleHeader :: AST.Module.Header -> Box
 formatModuleHeader header =
   let
       formatExports =
-        case formatListing $ fmap RA.drop $ AST.Module.exports header of
+        case formatListing $ AST.Module.exports header of
             Just listing ->
               listing
             _ ->
@@ -158,15 +158,13 @@ formatModuleHeader header =
               , space
               , where'
               ]
-          (name', SingleLine exports', _) ->
+          (name', exports', _) ->
             stack1
               [ line $ keyword "module"
               , indent $ name'
-              , indent $ line $ exports'
+              , indent $ exports'
               , indent $ whereClause
               ]
-          _ ->
-            line $ pleaseReport' "TODO" "multiline module listing"
 
       docs =
           formatModuleDocs (AST.Module.docs header)
@@ -311,22 +309,18 @@ formatListing listing =
         AST.Variable.Listing _ True -> -- Not possible for first arg to be non-empty
             Just $ line $ keyword "(..)"
         AST.Variable.Listing vars False ->
-            Just $ elmGroup False "(" "," ")" False $ map formatVarValue vars
+            Just $ elmGroup False "(" "," ")" False $ map (formatCommented formatVarValue) vars
 
 
-formatStringListing :: AST.Variable.Listing String -> Maybe Line
+formatStringListing :: AST.Variable.Listing String -> Maybe Box
 formatStringListing listing =
     case listing of
         AST.Variable.Listing [] False ->
             Nothing
         AST.Variable.Listing _ True -> -- Not possible for first arg to be non-empty
-            Just $ keyword "(..)"
+            Just $ line $ keyword "(..)"
         AST.Variable.Listing vars False ->
-            Just $ row
-                [ punc "("
-                , row $ List.intersperse (row [punc ",", space]) $ map identifier vars
-                , punc ")"
-                ]
+            Just $ elmGroup False "(" "," ")" False $ map (formatCommented (line . identifier)) vars
 
 
 formatVarValue :: AST.Variable.Value -> Box
@@ -340,11 +334,13 @@ formatVarValue aval =
 
         AST.Variable.Union name listing ->
             case formatStringListing listing of
-                Just listing' ->
+                Just (SingleLine listing') ->
                     line $ row
                         [ identifier name
                         , listing'
                         ]
+                Just listing' ->
+                    pleaseReport "TODO" "multiline var in string union type listing"
                 Nothing ->
                     line $ identifier name
 

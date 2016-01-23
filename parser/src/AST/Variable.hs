@@ -1,5 +1,7 @@
 module AST.Variable where
 
+import AST.V0_16
+
 
 data Ref
     = VarRef String
@@ -12,15 +14,10 @@ data Ref
 
 -- | A listing of values. Something like (a,b,c) or (..) or (a,b,..)
 data Listing a = Listing
-    { _explicits :: [a]
+    { _explicits :: [Commented a]
     , _open :: Bool
     }
-    deriving (Eq, Ord, Show)
-
-
-instance Functor Listing where
-    fmap fn (Listing explicits open) =
-        Listing (map fn explicits) open
+    deriving (Eq, Show)
 
 
 openListing :: Listing a
@@ -33,7 +30,7 @@ closedListing =
     Listing [] False
 
 
-listing :: [a] -> Listing a
+listing :: [Commented a] -> Listing a
 listing xs =
     Listing xs False
 
