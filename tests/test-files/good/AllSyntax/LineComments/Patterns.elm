@@ -109,3 +109,7 @@ asAlias
   )
   =
   ()
+
+
+complexCons (a :: (x :: []) :: ((b :: _) as blah)) =
+  ()

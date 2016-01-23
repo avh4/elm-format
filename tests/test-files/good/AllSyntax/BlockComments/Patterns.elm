@@ -51,3 +51,7 @@ record { {- K -} a {- L -}, {- M -} b {- N -} } =
 
 asAlias (() {- O -} as {- P -} x) =
   ()
+
+
+complexCons (a :: (x :: []) :: ((b :: _) as blah)) =
+  ()
