@@ -16,6 +16,7 @@ import qualified Data.Text as Text
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified Test.Generators
+import qualified Test.ElmSourceGenerators
 
 
 assertStringToString :: String -> Assertion
@@ -41,6 +42,22 @@ astToAst ast =
                 |> Parse.toEither
     in
         (fmap stripRegion result) == (Right $ stripRegion ast)
+
+
+canParse :: String -> Bool
+canParse source =
+  let
+    result =
+      source
+        |> Text.pack
+        |> Parse.parse
+        |> Parse.toEither
+  in
+    case result of
+      Right _ ->
+        True
+      _ ->
+        False
 
 
 simpleAst =
@@ -74,6 +91,9 @@ propertyTests =
         assertBool "" (astToAst simpleAst)
     , testProperty "rendered AST should parse as equivalent AST"
         $ verbose (\s -> counterexample (reportFailedAst s) $ astToAst s)
+
+    , testProperty "random source"
+        $ verbose $ forAll Test.ElmSourceGenerators.elmModule $ (\s -> counterexample s $ canParse s)
 
     , testCase "simple round trip" $
         assertStringToString "module Main (..) where\n\n\nfoo =\n  8\n"
