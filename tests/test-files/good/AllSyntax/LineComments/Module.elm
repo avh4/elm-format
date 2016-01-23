@@ -2,7 +2,16 @@ module
   --A
   AllSyntax.LineComments.Module
   --B
-  (a, b, c)
+  ( --C
+    a
+    --D
+  , --E
+    b
+    --F
+  , --G
+    c
+    --H
+  )
   -- I
   where
 

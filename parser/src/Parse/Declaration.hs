@@ -4,7 +4,6 @@ module Parse.Declaration where
 import Text.Parsec ( (<|>), (<?>), choice, digit, optionMaybe, string, try )
 
 import AST.Declaration
-import qualified AST.Declaration
 import qualified Parse.Expression as Expr
 import Parse.Helpers as Help
 import qualified Parse.Type as Type

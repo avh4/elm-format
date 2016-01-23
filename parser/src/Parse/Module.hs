@@ -8,7 +8,6 @@ import qualified AST.Declaration
 import qualified AST.Module as Module
 import qualified AST.Module.Name as ModuleName
 import qualified AST.Variable as Var
-import Reporting.Annotation as A hiding (map)
 import AST.V0_16
 
 
@@ -53,14 +52,14 @@ header =
       return (Module.Header names docs exports postExports ((fmap Module.ImportComment postDocsComments) ++ imports'))
 
 
-moduleDecl :: IParser (Commented ModuleName.Raw, Var.Listing (A.Located Var.Value), Comments)
+moduleDecl :: IParser (Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
 moduleDecl =
   expecting "a module declaration" $
   do  try (reserved "module")
       (_, preName) <- whitespace
       names <- dotSep1 capVar <?> "the name of this module"
       (_, postName) <- whitespace
-      exports <- option Var.openListing (listing (addLocation value))
+      exports <- option Var.openListing (listing value)
       (_, preWhere) <- whitespace
       reserved "where"
       return (Commented preName names postName, exports, preWhere)
@@ -105,15 +104,15 @@ listing :: IParser a -> IParser (Var.Listing a)
 listing item =
   expecting "a listing of values and types to expose, like (..)" $
   do  try (whitespace >> char '(') -- TODO: use comments
-      whitespace -- TODO: use comments
+      (_, pre) <- whitespace
       listing <-
           choice
-            [ const Var.openListing <$> string ".."
-            , (\x -> Var.Listing $ x [] []) <$> commaSep1 (const . const <$> item) <*> return False -- TODO: use comments
+            [ const . const . const Var.openListing <$> string ".." -- TODO: use comments
+            , (\x pre post -> Var.Listing (x pre post) False) <$> commaSep1' item
             ]
-      whitespace -- TODO: use comments
+      (_, post) <- whitespace
       char ')'
-      return listing
+      return $ listing pre post
 
 
 value :: IParser Var.Value

@@ -27,7 +27,7 @@ stripRegion m =
         Header
           { name = name $ header m
           , docs = A.stripRegion $ docs $ header m
-          , exports = fmap A.stripRegion $ exports $ header m
+          , exports = exports $ header m
           , postExportComments = postExportComments $ header m
           , imports = imports $ header m
           }
@@ -41,7 +41,7 @@ stripRegion m =
 data Header = Header
     { name :: Commented Name.Raw
     , docs :: A.Located (Maybe String)
-    , exports :: Var.Listing (A.Located Var.Value)
+    , exports :: Var.Listing Var.Value
     , postExportComments :: Comments
     , imports :: [UserImport]
     }

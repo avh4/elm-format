@@ -178,6 +178,11 @@ spaceySepBy1 sep parser =
     parseWhile1 (padded sep) parser
 
 
+spaceySepBy1' :: IParser sep -> IParser a -> IParser (Comments -> Comments -> [Commented a])
+spaceySepBy1' sep parser =
+    parseWhile1 (padded sep) ((\x pre post -> Commented pre x post) <$> parser)
+
+
 comma :: IParser Char
 comma =
   char ',' <?> "a comma ','"
@@ -186,6 +191,11 @@ comma =
 commaSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 commaSep1 =
   spaceySepBy1 comma
+
+
+commaSep1' :: IParser a -> IParser (Comments -> Comments -> [Commented a])
+commaSep1' =
+  spaceySepBy1' comma
 
 
 commaSep :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
