@@ -41,15 +41,17 @@ freshDef =
 header :: IParser Module.Header
 header =
   do  option [] freshLine -- TODO: use comments
-      (names, exports, postExports) <-
-          option (Commented [] ["Main"] [], Var.openListing, []) (moduleDecl `followedBy` freshLine) -- TODO: use comments
+      ((names, exports, postExports), preDocsComments) <-
+          option
+            ((Commented [] ["Main"] [], Var.openListing, []), [])
+            ((,) <$> moduleDecl <*> freshLine)
       (docs, postDocsComments) <-
         choice
           [ (,) <$> addLocation (Just <$> docComment) <*> freshLine
           , (,) <$> addLocation (return Nothing) <*> return []
           ]
       imports' <- imports
-      return (Module.Header names docs exports postExports ((fmap Module.ImportComment postDocsComments) ++ imports'))
+      return (Module.Header names docs exports postExports ((fmap Module.ImportComment (preDocsComments ++ postDocsComments)) ++ imports'))
 
 
 moduleDecl :: IParser (Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
