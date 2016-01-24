@@ -315,15 +315,14 @@ typeAnnotation fn =
 
 -- DEFINITION
 
-definition :: (P.Pattern -> [(Comments, P.Pattern)] -> Comments -> E.Expr -> Bool -> a) -> IParser a
+definition :: (P.Pattern -> [(Comments, P.Pattern)] -> Comments -> E.Expr -> a) -> IParser a
 definition fn =
   withPos $
-    do  pushNewlineContext
+    do
         (name, args) <- defStart
         (preEqualsComments, _, postEqualsComments) <- padded equals
         body <- expr
-        sawNewline <- popNewlineContext
-        return $ fn name args (preEqualsComments ++ postEqualsComments) body sawNewline
+        return $ fn name args (preEqualsComments ++ postEqualsComments) body
 
 
 defStart :: IParser (P.Pattern, [(Comments, P.Pattern)])

@@ -11,7 +11,7 @@ import qualified Reporting.Annotation as A
 -- DECLARATIONS
 
 data Declaration
-    = Definition Pattern.Pattern [(Comments, Pattern.Pattern)] Comments Expression.Expr Bool
+    = Definition Pattern.Pattern [(Comments, Pattern.Pattern)] Comments Expression.Expr
     | TypeAnnotation (Var.Ref, Comments) (Comments, Type)
     | Datatype
         (Commented (String, [(Comments, String)]))
@@ -29,8 +29,8 @@ data Declaration
 instance A.Strippable Declaration where
   stripRegion d =
     case d of
-        Definition a b c e z ->
-            Definition (A.stripRegion a) b c (A.stripRegion e) z
+        Definition a b c e ->
+            Definition (A.stripRegion a) b c (A.stripRegion $ A.map A.stripRegion e)
         _ -> d
 
 -- INFIX STUFF

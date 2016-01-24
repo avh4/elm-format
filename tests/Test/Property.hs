@@ -1,18 +1,22 @@
 module Test.Property where
 
-import Elm.Utils ((|>))
+import Prelude hiding ((>>))
+import Elm.Utils ((|>), (>>))
 
 import Data.Char
-import Test.HUnit (Assertion, assertEqual, assertBool)
+import Test.HUnit (Assertion, assertEqual, assertBool, assertFailure)
 import Test.Framework
 import Test.Framework.Providers.HUnit
 import Test.Framework.Providers.QuickCheck2
 import Test.QuickCheck
+import Test.QuickCheck.IO ()
 
 import Reporting.Annotation (stripRegion)
 
 import qualified AST.Module
+import qualified Data.Either as Either
 import qualified Data.Text as Text
+import qualified Data.Maybe as Maybe
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified Test.Generators
@@ -32,7 +36,7 @@ assertStringToString source =
         assertEqual "" (Right source') result
 
 
-astToAst :: AST.Module.Module -> Bool
+astToAst :: AST.Module.Module -> Assertion
 astToAst ast =
     let
         result =
@@ -41,23 +45,9 @@ astToAst ast =
                 |> Parse.parse
                 |> Parse.toEither
     in
-        (fmap stripRegion result) == (Right $ stripRegion ast)
-
-
-canParse :: String -> Bool
-canParse source =
-  let
-    result =
-      source
-        |> Text.pack
-        |> Parse.parse
-        |> Parse.toEither
-  in
-    case result of
-      Right _ ->
-        True
-      _ ->
-        False
+        assertEqual ""
+          (Right $ stripRegion ast)
+          (fmap stripRegion result)
 
 
 simpleAst =
@@ -83,17 +73,29 @@ reportFailedAst ast =
             , "=== END OF failed AST rendering\n"
             ]
 
+withCounterexample fn prop =
+  (\s -> counterexample (fn s) $ prop s)
+
 
 propertyTests :: Test
 propertyTests =
     testGroup "example test group"
     [ testCase "simple AST round trip" $
-        assertBool "" (astToAst simpleAst)
+        astToAst simpleAst
     , testProperty "rendered AST should parse as equivalent AST"
-        $ verbose (\s -> counterexample (reportFailedAst s) $ astToAst s)
+        $ withCounterexample reportFailedAst astToAst
 
-    , testProperty "random source"
-        $ verbose $ forAll Test.ElmSourceGenerators.elmModule $ (\s -> counterexample s $ canParse s)
+    , testGroup "valid Elm files"
+        [ testProperty "should parse"
+            $ forAll Test.ElmSourceGenerators.elmModule $ withCounterexample id
+              $ Text.pack >> Parse.parse >> Parse.toMaybe >> Maybe.isJust
+
+        , testProperty "should parse to the same AST after formatting"
+            $ forAll Test.ElmSourceGenerators.elmModule $ withCounterexample id
+              $ Text.pack >> Parse.parse >> Parse.toMaybe
+                >> fmap astToAst
+                >> Maybe.fromMaybe (assertFailure "failed to parse original")
+        ]
 
     , testCase "simple round trip" $
         assertStringToString "module Main (..) where\n\n\nfoo =\n  8\n"

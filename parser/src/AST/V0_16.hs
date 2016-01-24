@@ -18,6 +18,11 @@ data Commented a =
     deriving (Eq, Show)
 
 
+instance Functor Commented where
+  fmap f (Commented pre a post) =
+    Commented pre (f a) post
+
+
 data Literal
     = IntNum Int
     | FloatNum Double

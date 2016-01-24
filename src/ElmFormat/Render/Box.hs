@@ -110,7 +110,7 @@ isDeclaration decl =
     case decl of
         AST.Declaration.Decl adecl ->
             case RA.drop adecl of
-                AST.Declaration.Definition _ _ _ _ _ ->
+                AST.Declaration.Definition _ _ _ _ ->
                     True
 
                 AST.Declaration.Datatype _ _ _ ->
@@ -356,8 +356,8 @@ formatDeclaration decl =
 
         AST.Declaration.Decl adecl ->
             case RA.drop adecl of
-                AST.Declaration.Definition name args comments expr multiline ->
-                    formatDefinition name args comments expr multiline
+                AST.Declaration.Definition name args comments expr ->
+                    formatDefinition name args comments expr
 
                 AST.Declaration.TypeAnnotation name typ ->
                     formatTypeAnnotation name typ
@@ -510,9 +510,8 @@ formatDefinition :: AST.Pattern.Pattern
                       -> [(Comments, AST.Pattern.Pattern)]
                       -> [Comment]
                       -> AST.Expression.Expr
-                      -> Bool
                       -> Box
-formatDefinition name args comments expr multiline =
+formatDefinition name args comments expr =
   let
     body =
       stack1 $ concat
@@ -521,12 +520,11 @@ formatDefinition name args comments expr multiline =
         ]
   in
     case
-      ( multiline --TODO: can this be removed?
-      , formatPattern True name
+      ( formatPattern True name
       , allSingles $ map (\(x,y) -> formatCommented' x (formatPattern True) y) args
       )
     of
-      (_, SingleLine name', Right args') ->
+      (SingleLine name', Right args') ->
           stack1 $
               [ line $ row
                   [ row $ List.intersperse space $ (name':args')
@@ -536,7 +534,7 @@ formatDefinition name args comments expr multiline =
               , indent $ body
               ]
 
-      (_, SingleLine name', Left args') ->
+      (SingleLine name', Left args') ->
           stack1
             [ line $ name'
             , indent $ stack1 $ concat
@@ -548,7 +546,7 @@ formatDefinition name args comments expr multiline =
             ]
 
       _ ->
-          pleaseReport "UNEXPECTED TYPE ANNOTATION" "multiline name in let binding"
+          pleaseReport "TODO" "multiline name in let binding"
 
 
 formatTypeAnnotation :: (AST.Variable.Ref, Comments) -> (Comments, Type) -> Box
@@ -848,15 +846,15 @@ formatExpression aexpr =
             let
                 spacer first _ =
                     case first of
-                        AST.Expression.LetDefinition _ _ _ _ _ ->
+                        AST.Expression.LetDefinition _ _ _ _ ->
                             [ blankLine ]
                         _ ->
                             []
 
                 formatDefinition' def =
                   case def of
-                    AST.Expression.LetDefinition name args comments expr' multiline ->
-                      formatDefinition name args comments expr' multiline
+                    AST.Expression.LetDefinition name args comments expr' ->
+                      formatDefinition name args comments expr'
 
                     AST.Expression.LetAnnotation name typ ->
                       formatTypeAnnotation name typ

@@ -1,11 +1,12 @@
 {-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE FlexibleContexts #-}
 module Elm.Utils
-    ( (|>), (<|)
+    ( (|>), (<|), (>>)
     , run, unwrappedRun
     , CommandError(..)
     ) where
 
+import Prelude hiding ((>>))
 import Control.Monad.Except (MonadError, MonadIO, liftIO, throwError)
 import System.Exit (ExitCode(ExitSuccess, ExitFailure))
 import System.Process (readProcessWithExitCode)
@@ -27,6 +28,10 @@ f <| x = f x
 
 infixr 0 <|
 infixl 0 |>
+
+
+(>>) :: (a -> b) -> (b -> c) -> (a -> c)
+f >> g = \x -> f x |> g
 
 
 -- RUN EXECUTABLES

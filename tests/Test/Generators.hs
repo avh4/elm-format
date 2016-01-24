@@ -102,4 +102,4 @@ instance Arbitrary AST.Module.Module where
                   []
                   []
                 )
-                [ AST.Declaration.Decl $ located $ AST.Declaration.Definition (located $ AST.Pattern.Anything) [] [] (located $ AST.Expression.TupleFunction 2) True]
+                [ AST.Declaration.Decl $ located $ AST.Declaration.Definition (located $ AST.Pattern.Anything) [] [] (located $ AST.Expression.TupleFunction 2)]
