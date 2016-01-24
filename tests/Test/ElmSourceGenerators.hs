@@ -3,6 +3,35 @@ module Test.ElmSourceGenerators where
 import Test.QuickCheck
 
 
+wsRequired :: Gen String
+wsRequired =
+  elements
+    [ " "
+    , "\n "
+    , "{-A-}"
+    , "{-A-}{-B-}"
+    , " --A\n "
+    ]
+
+
+wsOptional :: Gen String
+wsOptional =
+  oneof [ wsRequired, return "" ]
+
+
+withWhitespace :: Gen String -> [String] -> Gen String
+withWhitespace ws components =
+  let
+    step :: String -> Gen String -> Gen String
+    step a b =
+      do
+        b' <- b
+        ws' <- ws
+        return $ a ++ ws' ++ b'
+  in
+    foldr step (return "") components
+
+
 elmModule :: Gen String
 elmModule =
   do
@@ -15,15 +44,15 @@ moduleHeader :: Gen String
 moduleHeader =
   do
     exports <- exportListing
-    return $ "module Main " ++ exports ++ " where"
+    withWhitespace wsRequired [ "module", "Main", exports, "where" ]
 
 
 exportListing :: Gen String
 exportListing =
-  elements
-    [ "(..)"
-    , "(a, b, c)"
-    , ""
+  oneof
+    [ return "(..)"
+    , withWhitespace wsOptional $ words "( a , b , c )"
+    , return ""
     ]
 
 
@@ -31,14 +60,14 @@ declaration :: Gen String
 declaration =
   do
     e <- expression
-    return $ "foo = " ++ e
+    withWhitespace wsOptional ["foo", "=", e]
 
 
 expression :: Gen String
 expression =
   let
-    unit = return "()"
-    tuple = return "(a, b, c)"
+    unit = withWhitespace wsOptional ["(", ")"]
+    tuple = withWhitespace wsOptional $ words "( a , b , c )"
     literal =
       elements
         [ "1"
