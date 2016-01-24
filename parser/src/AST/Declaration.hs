@@ -26,8 +26,8 @@ data Declaration
     deriving (Eq, Show)
 
 
-stripRegion :: Declaration -> Declaration
-stripRegion d =
+instance A.Strippable Declaration where
+  stripRegion d =
     case d of
         Definition a b c e z ->
             Definition (A.stripRegion a) b c (A.stripRegion e) z
@@ -57,9 +57,9 @@ data Decl
     deriving (Eq, Show)
 
 
-stripRegion' :: Decl -> Decl
-stripRegion' d =
+instance A.Strippable Decl where
+  stripRegion d =
     case d of
         Decl d' ->
-            Decl $ A.stripRegion $ A.map stripRegion d'
+            Decl $ A.stripRegion $ A.map A.stripRegion d'
         _ -> d

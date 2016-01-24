@@ -1,7 +1,6 @@
 module AST.Module
     ( Module(..), Header(..)
     , UserImport(..), ImportMethod(..)
-    , stripRegion
     ) where
 
 import qualified AST.Declaration as Declaration
@@ -21,7 +20,8 @@ data Module = Module
     deriving (Eq, Show)
 
 
-stripRegion m =
+instance A.Strippable Module where
+  stripRegion m =
     Module
     { header =
         Header
@@ -31,7 +31,7 @@ stripRegion m =
           , postExportComments = postExportComments $ header m
           , imports = imports $ header m
           }
-    , body = map Declaration.stripRegion' $ body m
+    , body = map A.stripRegion $ body m
     }
 
 

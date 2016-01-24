@@ -9,7 +9,7 @@ import Test.Framework.Providers.HUnit
 import Test.Framework.Providers.QuickCheck2
 import Test.QuickCheck
 
-import AST.Module (stripRegion)
+import Reporting.Annotation (stripRegion)
 
 import qualified AST.Module
 import qualified Data.Text as Text

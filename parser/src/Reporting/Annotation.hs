@@ -54,8 +54,12 @@ drop (A _ value) =
     value
 
 
-stripRegion :: Located a -> Located a
-stripRegion (A _ value) =
+class Strippable a where
+  stripRegion :: a -> a
+
+
+instance Strippable (Located a) where
+  stripRegion (A _ value) =
     A (R.Region (R.Position 0 0) (R.Position 0 0)) value
 
 
