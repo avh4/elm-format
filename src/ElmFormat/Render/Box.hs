@@ -16,6 +16,7 @@ import qualified Data.Char as Char
 import qualified Data.List as List
 import qualified Paths_elm_format as This
 import qualified Reporting.Annotation as RA
+import qualified Data.List.Split as Split
 import Text.Printf (printf)
 import Util.List
 
@@ -1126,6 +1127,21 @@ formatString style s =
                 hex c
             else
                 [c]
+
+        escapeMultiQuotes multi =
+            let
+                isQuote =
+                  ('"' ==)
+
+                escape :: Int -> String -> String
+                escape i quotes@('"':'"':'"':xs)
+                  | odd i && (all isQuote xs) =
+                      concat (map (\_ -> "\\\"") quotes)
+                escape _ x = x
+            in
+                Split.split (Split.condense $ Split.whenElt isQuote) multi
+                    |> zipWith escape [0..]
+                    |> concat
     in
         case style of
             SChar ->
@@ -1141,7 +1157,11 @@ formatString style s =
                     , punc "\""
                     ]
             SMulti ->
-                line $ literal $ "\"\"\"" ++ concatMap fix s ++ "\"\"\""
+                line $ row
+                    [ punc "\"\"\""
+                    , literal $ escapeMultiQuotes $ concatMap fix s
+                    , punc "\"\"\""
+                    ]
 
 
 data TypeParensRequired
