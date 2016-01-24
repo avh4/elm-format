@@ -24,34 +24,44 @@ import qualified Reporting.Result as Result
 import qualified System.Directory as Dir
 
 
-writeFile' :: FilePath -> Text.Text -> IO ()
-writeFile' filename contents =
-    ByteString.writeFile filename $ Text.encodeUtf8 contents
-
 -- If elm-format was successful, writes the results to the output
 -- file. Otherwise, display errors and exit
 writeResult
-    :: FilePath
+    :: Maybe FilePath
     -> Result.Result () Syntax.Error AST.Module.Module
     -> IO ()
 writeResult outputFile result =
     case result of
         Result.Result _ (Result.Ok modu) ->
-            Render.render modu
-                |> writeFile' outputFile
+            let rendered =
+                    Render.render modu
+                        |> Text.encodeUtf8
+            in
+                case outputFile of
+                    Nothing ->
+                        Char8.putStrLn rendered
+
+                    Just path -> do
+                        ByteString.writeFile path rendered
 
         Result.Result _ (Result.Err errs) ->
             do
                 showErrors errs
                 exitFailure
 
-processFile :: FilePath -> FilePath -> IO ()
-processFile inputFile outputFile =
+
+processTextInput :: Maybe FilePath -> Text.Text -> IO ()
+processTextInput outputFile inputText  =
+    Parse.parse inputText
+        |> writeResult outputFile
+
+
+processFileInput :: FilePath -> Maybe FilePath -> IO ()
+processFileInput inputFile outputFile =
     do
         putStrLn $ (r $ ProcessingFile inputFile)
-        input <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
-        Parse.parse input
-            |> writeResult outputFile
+        inputText <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
+        processTextInput outputFile inputText
 
 
 isEitherFileOrDirectory :: FilePath -> IO Bool
@@ -67,24 +77,10 @@ handleStdinInput :: Maybe FilePath -> IO ()
 handleStdinInput outputFile = do
     input <- Lazy.getContents
 
-    let parsedText = Parse.parse $ Text.decodeUtf8 $ Lazy.toStrict input
+    Lazy.toStrict input
+        |> Text.decodeUtf8
+        |> processTextInput outputFile
 
-    case parsedText of
-        Result.Result _ (Result.Ok modu) ->
-            do
-                let rendered = Render.render modu |> Text.encodeUtf8
-
-                case outputFile of
-                    Nothing ->
-                        Char8.putStrLn rendered
-
-                    Just path -> do
-                        writeResult path parsedText
-
-        Result.Result _ (Result.Err errs) ->
-            do
-                showErrors errs
-                exitFailure
 
 handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> IO ()
 handleFilesInput inputFiles outputFile autoYes =
@@ -103,14 +99,14 @@ handleFilesInput inputFiles outputFile autoYes =
         case elmFiles of
             inputFile:[] -> do
                 realOutputFile <- decideOutputFile autoYes inputFile outputFile
-                processFile inputFile realOutputFile
+                processFileInput inputFile (Just realOutputFile)
             _ -> do
                 when (isJust outputFile)
                     exitOnInputDirAndOutput
 
                 canOverwriteFiles <- getApproval autoYes elmFiles
                 when canOverwriteFiles $
-                    mapM_ (\file -> processFile file file) elmFiles
+                    mapM_ (\file -> processFileInput file (Just file)) elmFiles
 
 main :: IO ()
 main =
