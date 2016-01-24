@@ -1,12 +1,9 @@
 {-# OPTIONS_GHC -Wall #-}
 module Parse.Parse (parse, parseSource) where
 
-import Text.Parsec (char, eof, letter, many, option, (<|>))
 import qualified Text.Parsec.Error as Parsec
 
-import qualified AST.Declaration
 import qualified AST.Module
-import qualified Parse.Declaration as Decl
 import Parse.Helpers
 import qualified Parse.Module as Module
 import qualified Reporting.Region as R

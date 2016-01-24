@@ -56,6 +56,8 @@ typeDecl =
                       AST.Declaration.Datatype
                         (Commented postType (name, args) preEquals)
                         rest (pre,lst)
+                    (_, (Commented _ _ (_:_))) ->
+                      error "closing comments will never be provided to tcs"
 
 
 -- INFIX
