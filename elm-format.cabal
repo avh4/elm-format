@@ -82,6 +82,7 @@ Test-Suite elm-format-tests
         test-framework-quickcheck2 >= 0.3 && < 0.4,
         HUnit >= 1.1 && < 2,
         QuickCheck >= 2 && < 3,
+        quickcheck-io >= 0.1.2 && < 0.2,
         aeson >= 0.7 && < 0.9,
         ansi-terminal >= 0.6.2.1 && < 0.7,
         base >= 4.2 && < 5,
