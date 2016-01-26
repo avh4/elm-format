@@ -16,6 +16,7 @@ import qualified Data.Char as Char
 import qualified Data.List as List
 import qualified Paths_elm_format as This
 import qualified Reporting.Annotation as RA
+import qualified Text.Regex.Applicative as Regex
 import Text.Printf (printf)
 import Util.List
 
@@ -1126,6 +1127,19 @@ formatString style s =
                 hex c
             else
                 [c]
+
+        escapeMultiQuote =
+            let
+                quote =
+                    Regex.sym '"'
+
+                oneOrMoreQuotes =
+                    Regex.some quote
+
+                escape =
+                    ("\\\"\\\"\\" ++) . (List.intersperse '\\')
+            in
+                Regex.replace $ escape <$> oneOrMoreQuotes <* quote <* quote
     in
         case style of
             SChar ->
@@ -1141,7 +1155,11 @@ formatString style s =
                     , punc "\""
                     ]
             SMulti ->
-                line $ literal $ "\"\"\"" ++ concatMap fix s ++ "\"\"\""
+                line $ row
+                    [ punc "\"\"\""
+                    , literal $ escapeMultiQuote $ concatMap fix s
+                    , punc "\"\"\""
+                    ]
 
 
 data TypeParensRequired
