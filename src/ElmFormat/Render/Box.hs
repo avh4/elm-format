@@ -994,7 +994,13 @@ formatUnit left right comments =
       surround left right $ prefix space $ stack1 $ map formatComment comments
 
     _ ->
-      surround left right $ stack1 $ map formatComment comments
+      surround left right $
+        case allSingles $ map formatComment comments of
+          Right comments' ->
+            line $ row $ List.intersperse space comments'
+
+          Left comments' ->
+            stack1 comments'
 
 
 formatCommented_ :: Bool -> (a -> Box) -> Commented a -> Box
