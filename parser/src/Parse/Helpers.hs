@@ -2,13 +2,10 @@
 module Parse.Helpers where
 
 import Prelude hiding (until)
-import Control.Monad (guard, join)
+import Control.Monad (guard)
 import Control.Monad.State (State)
 import qualified Data.Char as Char
 import qualified Data.List as List
-import qualified Data.Map as Map
-import qualified Language.GLSL.Parser as GLP
-import qualified Language.GLSL.Syntax as GLS
 import Text.Parsec hiding (newline, spaces, State)
 import Text.Parsec.Indent (indented, runIndent)
 import qualified Text.Parsec.Token as T
@@ -17,7 +14,6 @@ import AST.V0_16
 import qualified AST.Expression
 import qualified AST.Helpers as Help
 import qualified AST.Variable
-import qualified AST.GLShader as L
 import qualified Parse.State as State
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
@@ -548,13 +544,11 @@ anyUntil end =
 
 -- BASIC LANGUAGE LITERALS
 
-shader :: IParser (String, L.GLShaderTipe)
+shader :: IParser String
 shader =
   do  try (string "[glsl|")
       rawSrc <- closeShader id
-      case glSource rawSrc of
-        Left err -> parserFail . show $ err
-        Right tipe -> return (rawSrc, tipe)
+      return rawSrc
 
 
 closeShader :: (String -> a) -> IParser a
@@ -565,58 +559,6 @@ closeShader builder =
     , do  c <- anyChar
           closeShader (builder . (c:))
     ]
-
-
-glSource :: String -> Either ParseError L.GLShaderTipe
-glSource src =
-  case GLP.parse src of
-    Left e -> Left e
-    Right (GLS.TranslationUnit decls) ->
-      map extractGLinputs decls
-        |> join
-        |> foldr addGLinput emptyDecls
-        |> Right
-  where
-    (|>) = flip ($)
-
-    emptyDecls = L.GLShaderTipe Map.empty Map.empty Map.empty
-
-    addGLinput (qual,tipe,name) glDecls =
-      case qual of
-        GLS.Attribute ->
-            glDecls { L.attribute = Map.insert name tipe $ L.attribute glDecls }
-
-        GLS.Uniform ->
-            glDecls { L.uniform = Map.insert name tipe $ L.uniform glDecls }
-
-        GLS.Varying ->
-            glDecls { L.varying = Map.insert name tipe $ L.varying glDecls }
-
-        _ -> error "Should never happen due to below filter"
-
-    extractGLinputs decl =
-      case decl of
-        GLS.Declaration
-          (GLS.InitDeclaration
-             (GLS.TypeDeclarator
-                (GLS.FullType
-                   (Just (GLS.TypeQualSto qual))
-                   (GLS.TypeSpec _prec (GLS.TypeSpecNoPrecision tipe _mexpr1))))
-             [GLS.InitDecl name _mexpr2 _mexpr3]
-          ) ->
-            case elem qual [GLS.Attribute, GLS.Varying, GLS.Uniform] of
-              False -> []
-              True ->
-                  case tipe of
-                    GLS.Int -> return (qual, L.Int,name)
-                    GLS.Float -> return (qual, L.Float,name)
-                    GLS.Vec2 -> return (qual, L.V2,name)
-                    GLS.Vec3 -> return (qual, L.V3,name)
-                    GLS.Vec4 -> return (qual, L.V4,name)
-                    GLS.Mat4 -> return (qual, L.M4,name)
-                    GLS.Sampler2D -> return (qual, L.Texture,name)
-                    _ -> []
-        _ -> []
 
 
 str :: IParser (String, Bool)

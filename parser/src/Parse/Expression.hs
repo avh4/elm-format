@@ -69,9 +69,8 @@ listTerm =
 
     shader' =
       do  pos <- getPosition
-          let uid = show (sourceLine pos) ++ ":" ++ show (sourceColumn pos)
-          (rawSrc, tipe) <- Help.shader
-          return $ E.GLShader uid (filter (/='\r') rawSrc) tipe
+          rawSrc <- Help.shader
+          return $ E.GLShader (filter (/='\r') rawSrc)
 
     commaSeparated =
       do
