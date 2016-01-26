@@ -5,7 +5,6 @@ module AST.Expression where
 import AST.V0_16
 import qualified AST.Pattern as Pattern
 import qualified AST.Variable as Var
-import qualified AST.GLShader as L
 import qualified Reporting.Annotation as A
 
 
@@ -60,7 +59,7 @@ data Expr'
     | Case (Commented Expr, Bool) [(Commented Pattern.Pattern, (Comments, Expr))]
 
     -- for type checking and code gen only
-    | GLShader String String L.GLShaderTipe
+    | GLShader String
     deriving (Eq, Show)
 
 

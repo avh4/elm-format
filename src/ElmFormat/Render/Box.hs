@@ -976,8 +976,12 @@ formatExpression aexpr =
         AST.Expression.Unit comments ->
             formatUnit '(' ')' comments
 
-        AST.Expression.GLShader _ _ _ ->
-            pleaseReport "TODO" "glshader"
+        AST.Expression.GLShader src ->
+          line $ row
+            [ punc "[glsl|"
+            , literal $ src
+            , punc "|]"
+            ]
 
 
 formatUnit :: Char -> Char -> Comments -> Box
