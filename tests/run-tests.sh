@@ -182,6 +182,7 @@ checkGood rtfeldman/dreamwriter/WordGraph.elm
 checkGood avh4/elm-fifo/Fifo.elm
 
 checkTransformation Examples.elm
+checkTransformation QuickCheck-4562ebccb71ea9f622fb99cdf32b2923f6f9d34f-2529668492575674138.elm
 
 echo
 echo "# GREAT SUCCESS!"
