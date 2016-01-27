@@ -78,28 +78,29 @@ import' =
   expecting "an import" $
   addLocation $
   do  try (reserved "import")
-      whitespace -- TODO: use comments
+      (_, preName) <- whitespace
       names <- dotSep1 capVar
-      (,) names <$> method (ModuleName.toString names)
+      method' <- method (ModuleName.toString names)
+      return ((,) preName names, method')
   )
   where
     method :: String -> IParser Module.ImportMethod
     method originalName =
       Module.ImportMethod
-          <$> option Nothing (Just <$> as' originalName)
-          <*> option Var.closedListing exposing
+        <$> option Nothing (Just <$> as' originalName)
+        <*> option ([], ([], Var.closedListing)) exposing
 
-    as' :: String -> IParser String
+    as' :: String -> IParser (Comments, PreCommented String)
     as' moduleName =
-      do  try (whitespace >> reserved "as") -- TODO: use comments
-          whitespace -- TODO: use comments
-          capVar <?> ("an alias for module `" ++ moduleName ++ "`")
+      do  (_, preAs) <- try (whitespace <* reserved "as")
+          (_, postAs) <- whitespace
+          (,) preAs <$> (,) postAs <$> capVar <?> ("an alias for module `" ++ moduleName ++ "`")
 
-    exposing :: IParser (Var.Listing Var.Value)
+    exposing :: IParser (Comments, PreCommented (Var.Listing Var.Value))
     exposing =
-      do  try (whitespace >> reserved "exposing") -- TODO: use comments
-          whitespace -- TODO: use comments
-          listing value
+      do  (_, preExposing) <- try (whitespace <* reserved "exposing")
+          (_, postExposing) <- whitespace
+          (,) preExposing <$> (,) postExposing <$> listing value
 
 
 listing :: IParser a -> IParser (Var.Listing a)

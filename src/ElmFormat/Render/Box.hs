@@ -12,6 +12,7 @@ import qualified AST.Module
 import qualified AST.Module.Name as MN
 import qualified AST.Pattern
 import qualified AST.Variable
+import qualified Control.Monad as Monad
 import qualified Data.Char as Char
 import qualified Data.List as List
 import qualified Paths_elm_format as This
@@ -266,37 +267,130 @@ formatImport aimport =
                 (name,method) ->
                     let
                         as =
-                            case AST.Module.alias method of
-                                Nothing ->
-                                    formatName name
-                                Just alias ->
-                                    row
-                                        [ formatName name
-                                        , space
-                                        , keyword "as"
-                                        , space
-                                        , identifier alias
-                                        ]
+                          (AST.Module.alias method)
+                            |> fmap (formatImportClause
+                            (Just . line . identifier)
+                            "as")
+                            |> Monad.join
+
+                        exposing =
+                          formatImportClause
+                            formatListing
+                            "exposing"
+                            (AST.Module.exposedVars method)
+
+                        formatImportClause :: (a -> Maybe Box) -> String -> (Comments, (Comments, a)) -> Maybe Box
+                        formatImportClause format keyw input =
+                          case
+                            fmap (fmap format) $ input
+                          of
+                            ([], ([], Nothing)) ->
+                              Nothing
+
+                            (preKeyword, (postKeyword, Just listing')) ->
+                              case
+                                ( formatHeadCommented (line . keyword) (preKeyword, keyw)
+                                , formatHeadCommented id (postKeyword, listing')
+                                )
+                              of
+                                (SingleLine keyword', SingleLine listing'') ->
+                                  Just $ line $ row
+                                    [ keyword'
+                                    , space
+                                    , listing''
+                                    ]
+
+                                (keyword', listing'') ->
+                                  Just $ stack1
+                                    [ keyword'
+                                    , indent listing''
+                                    ]
+
+                            _ ->
+                              Just $ pleaseReport "UNEXPECTED IMPORT" "import clause comments with no clause"
                     in
-                        case formatListing $ AST.Module.exposedVars method of
-                            Just (SingleLine listing) ->
-                              line $ row
+                        case
+                          ( formatHeadCommented (line . formatName) name
+                          , as
+                          , exposing
+                          )
+                        of
+                          ( SingleLine name', Just (SingleLine as'), Just (SingleLine exposing') ) ->
+                            line $ row
+                              [ keyword "import"
+                              , space
+                              , name'
+                              , space
+                              , as'
+                              , space
+                              , exposing'
+                              ]
+
+                          (SingleLine name', Just (SingleLine as'), Nothing) ->
+                            line $ row
+                              [ keyword "import"
+                              , space
+                              , name'
+                              , space
+                              , as'
+                              ]
+
+                          (SingleLine name', Nothing, Just (SingleLine exposing')) ->
+                            line $ row
+                              [ keyword "import"
+                              , space
+                              , name'
+                              , space
+                              , exposing'
+                              ]
+
+                          (SingleLine name', Nothing, Nothing) ->
+                            line $ row
+                              [ keyword "import"
+                              , space
+                              , name'
+                              ]
+
+                          ( SingleLine name', Just (SingleLine as'), Just exposing' ) ->
+                            stack1
+                              [ line $ row
                                 [ keyword "import"
                                 , space
-                                , as
+                                , name'
                                 , space
-                                , keyword "exposing"
-                                , space
-                                , listing
+                                , as'
                                 ]
-                            Just _ ->
-                              pleaseReport "TODO" "multiline exposing"
-                            Nothing ->
-                                line $ row
-                                    [ keyword "import"
-                                    , space
-                                    , as
-                                    ]
+                              , indent exposing'
+                              ]
+
+                          ( name', Just as', Just exposing' ) ->
+                            stack1
+                              [ line $ keyword "import"
+                              , indent name'
+                              , indent $ indent as'
+                              , indent $ indent exposing'
+                              ]
+
+                          ( name', Nothing, Just exposing' ) ->
+                            stack1
+                              [ line $ keyword "import"
+                              , indent name'
+                              , indent $ indent exposing'
+                              ]
+
+                          ( name', Just as', Nothing ) ->
+                            stack1
+                              [ line $ keyword "import"
+                              , indent name'
+                              , indent $ indent as'
+                              ]
+
+                          ( name', Nothing, Nothing ) ->
+                            stack1
+                              [ line $ keyword "import"
+                              , indent name'
+                              ]
+
 
         AST.Module.ImportComment c ->
             formatComment c
