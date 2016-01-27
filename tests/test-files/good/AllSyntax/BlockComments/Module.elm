@@ -2,13 +2,13 @@ module {- A -} AllSyntax.BlockComments.Module {- B -} ({- C -} a {- D -}, {- E -
 
 {- J -}
 
-import String
+import {- L -} String
 
 
 {- K -}
 
-import Maybe exposing (Maybe(Just, Nothing), map)
-import Json.Decode as Json
+import {- M -} Maybe {- N -} exposing {- O -} (Maybe(Just, Nothing), map)
+import {- P -} Json.Decode {- Q -} as {- R -} Json
 
 
 a =

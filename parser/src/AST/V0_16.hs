@@ -18,6 +18,9 @@ data Commented a =
     deriving (Eq, Show)
 
 
+type PreCommented a = (Comments, a)
+
+
 instance Functor Commented where
   fmap f (Commented pre a post) =
     Commented pre (f a) post

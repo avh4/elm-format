@@ -51,13 +51,13 @@ data Header = Header
 -- IMPORTs
 
 data UserImport
-    = UserImport (A.Located (Name.Raw, ImportMethod))
+    = UserImport (A.Located (PreCommented Name.Raw, ImportMethod))
     | ImportComment Comment
     deriving (Eq, Show)
 
 
 data ImportMethod = ImportMethod
-    { alias :: Maybe String
-    , exposedVars :: !(Var.Listing Var.Value)
+    { alias :: Maybe (Comments, PreCommented String)
+    , exposedVars :: (Comments, PreCommented (Var.Listing Var.Value))
     }
     deriving (Eq, Show)
