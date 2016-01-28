@@ -21,6 +21,9 @@ data Commented a =
 type PreCommented a = (Comments, a)
 
 
+type PostCommented a = (a, Comments)
+
+
 instance Functor Commented where
   fmap f (Commented pre a post) =
     Commented pre (f a) post

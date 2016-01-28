@@ -428,16 +428,30 @@ formatVarValue aval =
             line $ identifier name
 
         AST.Variable.Union name listing ->
-            case formatStringListing listing of
-                Just (SingleLine listing') ->
+            case
+              ( formatStringListing listing
+              , formatTailCommented (line . identifier) name
+              , snd name
+              )
+            of
+                (Just (SingleLine listing'), SingleLine name', []) ->
                     line $ row
-                        [ identifier name
+                        [ name'
                         , listing'
                         ]
-                Just listing' ->
-                    pleaseReport "TODO" "multiline var in string union type listing"
-                Nothing ->
-                    line $ identifier name
+                (Just (SingleLine listing'), SingleLine name', _) ->
+                    line $ row
+                        [ name'
+                        , space
+                        , listing'
+                        ]
+                (Just listing', name', _) ->
+                  stack1
+                    [ name'
+                    , indent $ listing'
+                    ]
+                (Nothing, name', _) ->
+                    name'
 
 
 formatDeclaration :: AST.Declaration.Decl -> Box
