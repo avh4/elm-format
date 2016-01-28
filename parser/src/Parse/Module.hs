@@ -43,7 +43,7 @@ header =
   do  option [] freshLine -- TODO: use comments
       ((names, exports, postExports), preDocsComments) <-
           option
-            ((Commented [] ["Main"] [], Var.openListing, []), [])
+            ((Commented [] ["Main"] [], Var.OpenListing (Commented [] () []), []), [])
             ((,) <$> moduleDecl <*> freshLine)
       (docs, postDocsComments) <-
         choice
@@ -61,7 +61,7 @@ moduleDecl =
       (_, preName) <- whitespace
       names <- dotSep1 capVar <?> "the name of this module"
       (_, postName1) <- whitespace
-      (postName2, exports) <- option ([], Var.openListing) (listing value)
+      (postName2, exports) <- option ([], Var.OpenListing (Commented [] () [])) (listing value)
       (_, preWhere) <- whitespace
       reserved "where"
       return (Commented preName names (postName1 ++ postName2), exports, preWhere)
@@ -88,7 +88,7 @@ import' =
     method originalName =
       Module.ImportMethod
         <$> option Nothing (Just <$> as' originalName)
-        <*> option ([], ([], Var.closedListing)) exposing
+        <*> option ([], ([], Var.ClosedListing)) exposing
 
     as' :: String -> IParser (Comments, PreCommented String)
     as' moduleName =
@@ -111,8 +111,8 @@ listing item =
       (_, pre) <- whitespace
       listing <-
           choice
-            [ const . const . const Var.openListing <$> string ".." -- TODO: use comments
-            , (\x pre post -> Var.Listing (x pre post) False) <$> commaSep1' item
+            [ (\_ pre post -> Var.OpenListing (Commented pre () post)) <$> string ".."
+            , (\x pre post -> Var.ExplicitListing (x pre post)) <$> commaSep1' item
             ]
       (_, post) <- whitespace
       char ')'

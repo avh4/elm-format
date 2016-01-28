@@ -135,7 +135,7 @@ formatModuleHeader :: AST.Module.Header -> Box
 formatModuleHeader header =
   let
       formatExports =
-        case formatListing $ AST.Module.exports header of
+        case formatListing formatVarValue $ AST.Module.exports header of
             Just listing ->
               listing
             _ ->
@@ -275,7 +275,7 @@ formatImport aimport =
 
                         exposing =
                           formatImportClause
-                            formatListing
+                            (formatListing formatVarValue)
                             "exposing"
                             (AST.Module.exposedVars method)
 
@@ -396,26 +396,17 @@ formatImport aimport =
             formatComment c
 
 
-formatListing :: AST.Variable.Listing AST.Variable.Value-> Maybe Box
-formatListing listing =
+formatListing :: (a -> Box) -> AST.Variable.Listing a -> Maybe Box
+formatListing format listing =
     case listing of
-        AST.Variable.Listing [] False ->
+        AST.Variable.ClosedListing ->
             Nothing
-        AST.Variable.Listing _ True -> -- Not possible for first arg to be non-empty
-            Just $ line $ keyword "(..)"
-        AST.Variable.Listing vars False ->
-            Just $ elmGroup False "(" "," ")" False $ map (formatCommented formatVarValue) vars
 
+        AST.Variable.OpenListing comments ->
+            Just $ parens $ formatCommented (line . keyword) $ fmap (const "..") comments
 
-formatStringListing :: AST.Variable.Listing String -> Maybe Box
-formatStringListing listing =
-    case listing of
-        AST.Variable.Listing [] False ->
-            Nothing
-        AST.Variable.Listing _ True -> -- Not possible for first arg to be non-empty
-            Just $ line $ keyword "(..)"
-        AST.Variable.Listing vars False ->
-            Just $ elmGroup False "(" "," ")" False $ map (formatCommented (line . identifier)) vars
+        AST.Variable.ExplicitListing vars ->
+            Just $ elmGroup False "(" "," ")" False $ map (formatCommented format) vars
 
 
 formatVarValue :: AST.Variable.Value -> Box
@@ -429,7 +420,7 @@ formatVarValue aval =
 
         AST.Variable.Union name listing ->
             case
-              ( formatStringListing listing
+              ( formatListing (line . identifier) listing
               , formatTailCommented (line . identifier) name
               , snd name
               )
