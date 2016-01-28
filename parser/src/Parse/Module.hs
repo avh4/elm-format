@@ -60,11 +60,11 @@ moduleDecl =
   do  try (reserved "module")
       (_, preName) <- whitespace
       names <- dotSep1 capVar <?> "the name of this module"
-      (_, postName) <- whitespace
-      exports <- option Var.openListing (listing value)
+      (_, postName1) <- whitespace
+      (postName2, exports) <- option ([], Var.openListing) (listing value)
       (_, preWhere) <- whitespace
       reserved "where"
-      return (Commented preName names postName, exports, preWhere)
+      return (Commented preName names (postName1 ++ postName2), exports, preWhere)
 
 
 imports :: IParser [Module.UserImport]
@@ -100,13 +100,14 @@ import' =
     exposing =
       do  (_, preExposing) <- try (whitespace <* reserved "exposing")
           (_, postExposing) <- whitespace
-          (,) preExposing <$> (,) postExposing <$> listing value
+          (postExposing2, listing') <- listing value
+          return (preExposing, (postExposing ++ postExposing2, listing'))
 
 
-listing :: IParser a -> IParser (Var.Listing a)
+listing :: IParser a -> IParser (Comments, Var.Listing a)
 listing item =
   expecting "a listing of values and types to expose, like (..)" $
-  do  try (whitespace >> char '(') -- TODO: use comments
+  do  (_, preParen) <- try (whitespace <* char '(')
       (_, pre) <- whitespace
       listing <-
           choice
@@ -115,7 +116,7 @@ listing item =
             ]
       (_, post) <- whitespace
       char ')'
-      return $ listing pre post
+      return $ (preParen, listing pre post)
 
 
 value :: IParser Var.Value
@@ -130,4 +131,4 @@ value =
           maybeCtors <- optionMaybe (listing capVar)
           case maybeCtors of
             Nothing -> return (Var.Alias name)
-            Just ctors -> return (Var.Union name ctors)
+            Just (pre, ctors) -> return (Var.Union (name, pre) ctors)

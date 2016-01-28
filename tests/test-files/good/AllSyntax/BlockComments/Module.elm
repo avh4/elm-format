@@ -7,7 +7,7 @@ import {- L -} String
 
 {- K -}
 
-import {- M -} Maybe {- N -} exposing {- O -} ({- S -} Maybe(Just, Nothing) {- T -}, {- U -} map {- V -})
+import {- M -} Maybe {- N -} exposing {- O -} ({- S -} Maybe {- W -} ({- X -} Just {- Y -}, {- Z -} Nothing {- AA -}) {- T -}, {- U -} map {- V -})
 import {- P -} Json.Decode {- Q -} as {- R -} Json
 
 
