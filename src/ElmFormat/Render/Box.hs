@@ -223,9 +223,19 @@ formatModule modu =
         body =
             intersperseMap spacer formatDeclaration $
                 AST.Module.body modu
+
+
+        initialComments' =
+          case AST.Module.initialComments modu of
+            [] ->
+              []
+            comments ->
+              (map formatComment comments)
+                ++ [ blankLine, blankLine ]
     in
       stack1 $
-        (formatModuleHeader $ AST.Module.header modu)
+        initialComments'
+          ++ (formatModuleHeader $ AST.Module.header modu)
           : body
 
 

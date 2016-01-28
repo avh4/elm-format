@@ -95,6 +95,7 @@ instance Arbitrary AST.Module.Module where
             name <- listOf1 $ capIdentifier
             listing <- arbitrary
             return $ AST.Module.Module
+                []
                 (AST.Module.Header
                   (Commented [] name [])
                   (located Nothing)
