@@ -13,26 +13,11 @@ data Ref
 -- LISTINGS
 
 -- | A listing of values. Something like (a,b,c) or (..) or (a,b,..)
-data Listing a = Listing
-    { _explicits :: [Commented a]
-    , _open :: Bool
-    }
-    deriving (Eq, Show)
-
-
-openListing :: Listing a
-openListing =
-    Listing [] True
-
-
-closedListing :: Listing a
-closedListing =
-    Listing [] False
-
-
-listing :: [Commented a] -> Listing a
-listing xs =
-    Listing xs False
+data Listing a
+  = ExplicitListing [Commented a]
+  | OpenListing (Commented ())
+  | ClosedListing
+  deriving (Eq, Show)
 
 
 -- | A value that can be imported or exported

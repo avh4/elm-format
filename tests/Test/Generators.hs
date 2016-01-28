@@ -85,8 +85,8 @@ instance (Arbitrary a) => Arbitrary (AST.Variable.Listing a) where
         do
             vars <- listOf arbitrary
             case vars of
-                [] -> return $ AST.Variable.Listing [] True
-                _ -> return $ AST.Variable.Listing (map (\x -> Commented [] x []) vars) False
+                [] -> return $ AST.Variable.OpenListing (Commented [] () [])
+                _ -> return $ AST.Variable.ExplicitListing (map (\x -> Commented [] x []) vars)
 
 
 instance Arbitrary AST.Module.Module where
