@@ -56,11 +56,11 @@ Use the [elm-light](https://github.com/rundis/elm-light) plugin.
 
 #### Integration with Vim
 
-Add the following to your vim config:
+Use [elm-vim](https://github.com/ElmCast/elm-vim).
 
-```vim
-autocmd BufWritePost *.elm silent execute "!elm-format --yes %" | edit! | set filetype=elm
-```
+1. Make sure elm-format is in your PATH.
+1. Run the :ElmFormat command to manually format the current file.
+1. To enable automatic formatting on save, add `let g:elm_format_autosave = 1` to your .vimrc file.
 
 #### Integration with Emacs
 
