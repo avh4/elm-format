@@ -1,3 +1,6 @@
+{- AD -}
+
+
 module {- A -} AllSyntax.BlockComments.Module {- B -} ({- C -} a {- D -}, {- E -} b {- F -}, {- G -} c {- H -}) {- I -} where
 
 {- J -}

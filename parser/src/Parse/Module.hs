@@ -13,7 +13,8 @@ import AST.V0_16
 
 elmModule :: IParser Module.Module
 elmModule =
-  do  h <- header
+  do  preModule <- option [] freshLine
+      h <- header
       decls <- declarations
       trailingComments <-
           (++)
@@ -21,7 +22,7 @@ elmModule =
               <*> option [] spaces
       eof
 
-      return $ Module.Module h (decls ++ (map AST.Declaration.BodyComment trailingComments))
+      return $ Module.Module preModule h (decls ++ (map AST.Declaration.BodyComment trailingComments))
 
 
 declarations :: IParser [AST.Declaration.Decl]
@@ -40,8 +41,7 @@ freshDef =
 
 header :: IParser Module.Header
 header =
-  do  option [] freshLine -- TODO: use comments
-      ((names, exports, postExports), preDocsComments) <-
+  do  ((names, exports, postExports), preDocsComments) <-
           option
             ((Commented [] ["Main"] [], Var.OpenListing (Commented [] () []), []), [])
             ((,) <$> moduleDecl <*> freshLine)

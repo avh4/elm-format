@@ -14,7 +14,8 @@ import AST.V0_16
 
 
 data Module = Module
-    { header :: Header
+    { initialComments :: Comments
+    , header :: Header
     , body :: [Declaration.Decl]
     }
     deriving (Eq, Show)
@@ -23,7 +24,8 @@ data Module = Module
 instance A.Strippable Module where
   stripRegion m =
     Module
-    { header =
+    { initialComments = initialComments m
+    , header =
         Header
           { name = name $ header m
           , docs = A.stripRegion $ docs $ header m
