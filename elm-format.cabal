@@ -1,5 +1,5 @@
 Name: elm-format
-Version: 0.1-alpha3-dev
+Version: 0.2.0-alpha
 
 Synopsis:
     A source code formatter for Elm
@@ -14,8 +14,8 @@ License: BSD3
 License-file: LICENSE
 
 Author:     Aaron VonderHaar
-Maintainer: info@elm-lang.org
-Copyright:  Copyright (c) 2015 Aaron VonderHaar
+Maintainer: gruen0aermel@gmail.com
+Copyright:  See https://github.com/avh4/elm-format/blob/master/LICENSE
 
 Category: Build Tool
 
