@@ -12,6 +12,7 @@ import Control.Applicative ((<|>))
 import Control.Monad.Writer (Writer, execWriter, tell)
 import Data.Aeson ((.=))
 import qualified Data.Aeson.Types as Json
+import qualified Data.List.Split as Split
 import System.Console.ANSI
 import System.IO (hPutStr, stderr)
 
@@ -145,7 +146,8 @@ grabRegion renderer maybeSubRegion region@(R.Region start end) source =
     (|>) = flip ($)
 
     relevantLines =
-        lines source
+        -- Using `lines` here will strip the last line.
+        Split.splitOn "\n" source
           |> drop (startLine - 1)
           |> take (endLine - startLine + 1)
   in
