@@ -59,6 +59,7 @@ Executable elm-format
         pretty >= 1.0 && < 2.0,
         process,
         regex-applicative >= 0.3.3 && < 0.4,
+        split >= 0.2.2 && < 0.3,
         text
 
 Test-Suite elm-format-tests

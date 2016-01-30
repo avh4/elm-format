@@ -63,13 +63,12 @@ exitOnInputDirAndOutput = do
     exitFailure
 
 
-showErrors :: [RA.Located Syntax.Error] -> IO ()
-showErrors errs = do
+showErrors :: String -> [RA.Located Syntax.Error] ->  IO ()
+showErrors source errs = do
     putStrLn (r ErrorsHeading)
-    mapM_ printError errs
+    mapM_ (printError source) errs
 
 
-printError :: RA.Located Syntax.Error -> IO ()
-printError (RA.A range err) =
-    Report.printError (r ErrorFileLocation) range (Syntax.toReport err) ""
-
+printError :: String -> RA.Located Syntax.Error -> IO ()
+printError source (RA.A range err) =
+    Report.printError (r ErrorFileLocation) range (Syntax.toReport err) source

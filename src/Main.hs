@@ -28,9 +28,10 @@ import qualified System.Directory as Dir
 -- file. Otherwise, display errors and exit
 writeResult
     :: Maybe FilePath
+    -> Text.Text
     -> Result.Result () Syntax.Error AST.Module.Module
     -> IO ()
-writeResult outputFile result =
+writeResult outputFile inputText result =
     case result of
         Result.Result _ (Result.Ok modu) ->
             let rendered =
@@ -46,14 +47,14 @@ writeResult outputFile result =
 
         Result.Result _ (Result.Err errs) ->
             do
-                showErrors errs
+                showErrors (Text.unpack inputText) errs
                 exitFailure
 
 
 processTextInput :: Maybe FilePath -> Text.Text -> IO ()
 processTextInput outputFile inputText  =
     Parse.parse inputText
-        |> writeResult outputFile
+        |> writeResult outputFile inputText
 
 
 processFileInput :: FilePath -> Maybe FilePath -> IO ()
