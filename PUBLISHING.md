@@ -36,5 +36,5 @@
 
 ## Clean up
 
-1. Edit `elm-format.cabal` to increment the patch version number and add `-dev`.
+1. Edit `elm-format.cabal` with the next planned version number and add `-dev`.
 1. Commit the change to `elm-format.cabal`.
