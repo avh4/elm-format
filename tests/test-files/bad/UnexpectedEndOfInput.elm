@@ -1,0 +1,4 @@
+module UnexpectedEndOfInput (..) where
+
+abcdef =
+    """
