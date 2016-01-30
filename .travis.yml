@@ -1,24 +1,30 @@
 sudo: false
+language: sh
 
-addons:
-  apt:
-    sources:
-    - hvr-ghc
-    packages:
-    - cabal-install-1.22
-    - ghc-7.10.1
+
+env:
+ - HALCYON_GHC_VERSION=7.10.1 HALCYON_CABAL_VERSION=1.22.6.0 HALCYON_CACHE=$HOME/.halcyon-cache
+
+
+cache:
+  directories:
+   - $HOME/.halcyon-cache
 
 
 before_install:
- - export PATH=/opt/ghc/7.10.1/bin:/opt/cabal/1.22/bin:$PATH
+ - git clone https://github.com/mietek/halcyon.git "$HOME/.halcyon"
+ - export HALCYON_BASE="$HOME/.halcyon"
 
 
 install:
- - travis_retry cabal update
- - cabal sandbox init --sandbox="`pwd`"/.cabal-sandbox
+ - $HOME/.halcyon/halcyon build
+ - $HOME/.halcyon/halcyon paths > halcyon-env
+ - ln -sf $HOME/.halcyon/sandbox/cabal.sandbox.config cabal.sandbox.config
+ - source halcyon-env
  - cabal install --only-dependencies --enable-tests
 
 
 script:
+ - source halcyon-env
  - cabal configure --enable-tests
  - ./tests/run-tests.sh
