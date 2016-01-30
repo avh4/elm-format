@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
 ![experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
-[![latest version: 0.1-alpha2](https://img.shields.io/badge/version-0.1--alpha2-blue.svg)](https://github.com/avh4/elm-format/releases/tag/0.1-alpha2)
+[![latest version: 0.2.0-alpha](https://img.shields.io/badge/version-0.2.0--alpha-blue.svg)](https://github.com/avh4/elm-format/releases/tag/0.2.0-alpha)
 
 # elm-format
 
@@ -26,17 +26,17 @@ elm-format --stdin --output Main.elm  # Format input from stdin and write to fil
 elm-format --help  # See other command line options
 ```
 
-## Installation [![(latest version: 0.1-alpha2)](https://img.shields.io/badge/version-0.1--alpha2-blue.svg)](https://github.com/avh4/elm-format/releases/tag/0.1-alpha2)
+## Installation [![(latest version: 0.2.0-alpha)](https://img.shields.io/badge/version-0.2.0--alpha-blue.svg)](https://github.com/avh4/elm-format/releases/tag/0.2.0-alpha)
 
 `elm-format` is still in alpha.  You will need to download the version appropriate for your OS, unzip it, and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.
 
- - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.1-alpha2/elm-format-0.1-alpha2-mac-x64.tgz)
- - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.1-alpha2/elm-format-0.1-alpha2-linux-x64.tgz)
- - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.1-alpha2/elm-format-0.1-alpha2-win-x64.zip)
+ - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.2.0-alpha/elm-format-0.2.0-alpha-mac-x64.tgz)
+ - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.2.0-alpha/elm-format-0.2.0-alpha-linux-x64.tgz)
+ - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.2.0-alpha/elm-format-0.2.0-alpha-win-x64.zip)
 
 If the binary does not work for you, please [report details about your OS](https://github.com/avh4/elm-format/issues/new), or try [building from source](#building-from-source).
 
-If you need PGP signatures, see the [release page](https://github.com/avh4/elm-format/releases/tag/0.1-alpha2).
+If you need PGP signatures, see the [releases page](https://github.com/avh4/elm-format/releases).
 
 ### Editor integration
 
