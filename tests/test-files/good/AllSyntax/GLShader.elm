@@ -1,4 +1,4 @@
-module Main (..) where
+module AllSyntax.GLShader (..) where
 
 
 vertexShader : Shader { position : Vec3, coord : Vec3 } { u | view : Mat4 } { vcoord : Vec2 }
