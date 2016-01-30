@@ -91,9 +91,9 @@ function checkWaysToRun() {
 	compareFiles "$INPUT" "$OUTPUT" 1>/dev/null
 
 	echo "## cat INPUT | elm-format --stdin"
-	STDOUT=$(cat "$INPUT" | "$ELM_FORMAT" --stdin 2>&1)
+	cat "$INPUT" | "$ELM_FORMAT" --stdin > "$OUTPUT"
 	returnCodeShouldEqual 0
-	cat "$INPUT" | shouldOutputTheSame "$STDOUT" 1>/dev/null
+	compareFiles "$INPUT" "$OUTPUT"
 
 	echo "## cat INPUT | elm-format --stdin INPUT"
 	STDOUT=$(cat "$INPUT" | "$ELM_FORMAT" --stdin "$INPUT" 2>&1)
