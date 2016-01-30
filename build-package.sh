@@ -21,7 +21,6 @@ cabal install
 BUILD="elm-format-${VERSION}-mac-x64"
 
 tar zcvf "$BUILD".tgz -C .cabal-sandbox/bin elm-format
-keybase pgp sign --detached --infile "$BUILD".tgz --outfile "$BUILD".tgz.asc
 
 
 ## Build Windows x64 binary
@@ -64,4 +63,6 @@ keybase pgp sign --detached --infile "$BUILD".tgz --outfile "$BUILD".tgz.asc
 
 # for i in elm-format-${VERSION}-{mac-x64.tgz,win-x64.zip,linux-x64.tgz} do
 #   keybase pgp sign --detached --infile "$i" --outfile "$i".asc
+#   github-release upload --user avh4 --repo elm-format --tag "$VERSION" --file "$BUILD".tgz
+#   github-release upload --user avh4 --repo elm-format --tag "$VERSION" --file "$BUILD".tgz.asc
 # end

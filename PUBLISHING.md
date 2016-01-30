@@ -1,6 +1,20 @@
 # How to publish releases of elm-format
 
 
+## Workstation setup
+
+### Mac
+
+```bash
+brew update
+brew install keybase
+brew install github-release
+brew install caskroom/cask/brew-cask
+brew cask install vagrant
+brew cask install virtualbox
+```
+
+
 ## Preparation
 
 1. Create a github issue to draft the release notes.
