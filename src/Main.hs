@@ -40,7 +40,7 @@ writeResult outputFile inputText result =
             in
                 case outputFile of
                     Nothing ->
-                        Char8.putStrLn rendered
+                        Char8.putStr rendered
 
                     Just path -> do
                         ByteString.writeFile path rendered
