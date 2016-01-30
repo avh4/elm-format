@@ -1,7 +1,6 @@
 sudo: false
 language: sh
 
-
 env:
  - HALCYON_GHC_VERSION=7.10.1 HALCYON_CABAL_VERSION=1.22.6.0 HALCYON_CACHE=$HOME/.halcyon-cache
 
@@ -9,6 +8,14 @@ env:
 cache:
   directories:
    - $HOME/.halcyon-cache
+
+
+addons:
+  apt:
+    sources:
+    - debian-sid
+    packages:
+    - shellcheck
 
 
 before_install:
