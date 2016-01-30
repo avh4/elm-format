@@ -18,6 +18,14 @@ function shouldOutputTheSame() {
 	diff <(echo "$1") <(echo "$2") || exit 1
 }
 
+function outputShouldRoughlyMatchPatterns() {
+	PATTERNS_FILE="$1"
+	OUTPUT="$2"
+
+	MATCHES=$(echo "$OUTPUT" | grep -F -f "$PATTERNS_FILE")
+	[[ "$(echo "$MATCHES" | wc -l)" == "$(wc -l < "$PATTERNS_FILE")" ]] || exit 1
+}
+
 function compareFiles() {
 	EXPECTED="$1"
 	ACTUAL="$2"
@@ -144,6 +152,16 @@ function checkGoodAllSyntax() {
 	checkGood "AllSyntax/LineComments/$1.elm"
 }
 
+function checkBad() {
+	INPUT="tests/test-files/bad/$1"
+	EXPECTED="tests/test-files/bad/${1%.*}.output.txt"
+
+	echo "## bad/$1"
+	STDOUT=$(cat "$INPUT" | "$ELM_FORMAT" --stdin 2>&1)
+	returnCodeShouldEqual 1
+	outputShouldRoughlyMatchPatterns "$EXPECTED" "$STDOUT"
+}
+
 function checkTransformation() {
 	INPUT="tests/test-files/transform/$1"
 	OUTPUT="formatted.elm"
@@ -180,6 +198,10 @@ checkGood rtfeldman/dreamwriter/LeftSidebar.elm
 checkGood rtfeldman/dreamwriter/RightSidebar.elm
 checkGood rtfeldman/dreamwriter/WordGraph.elm
 checkGood avh4/elm-fifo/Fifo.elm
+
+checkBad Empty.elm
+checkBad UnexpectedComma.elm
+checkBad UnexpectedEndOfInput.elm
 
 checkTransformation Examples.elm
 checkTransformation QuickCheck-4562ebccb71ea9f622fb99cdf32b2923f6f9d34f-2529668492575674138.elm
