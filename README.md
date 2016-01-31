@@ -44,40 +44,51 @@ If you can simplify or improve the installation instructions or add instructions
 
 <!-- Open-source editors will be listed before closed-source editors. -->
 
+
 #### Integration with [Atom](https://atom.io/)
 
 [atom-beautify](https://atom.io/packages/atom-beautify) 0.28.20 and above supports `elm-format`.  You can install `atom-beautify` using `apm` or the Atom package manager in Atom's settings.
 
+
 #### Integration with [Light Table](http://lighttable.com/)
 
-Use the [elm-light](https://github.com/rundis/elm-light) plugin.
+1. Makes sure `elm-format` is in your PATH
+1. Install the [elm-light plugin](https://github.com/rundis/elm-light) using the Light Table plugin manager
+1. Add the following to your user keymap:
 
-1. Makes sure elm-format is in your PATH
-1. Install the elm-light plugin using the Light Table plugin manager
-1. Select the appropriate `Elm: Format..` command for your usage
-
-You may format an entire buffer or a top level expression. If you like you can format on save. Check out the elm-format chapter in the plugin [README](https://github.com/rundis/elm-light) for details.
+  ```clojure
+  [:editor.elm "ctrl-s" :save :elm-format :elm.lint]
+  ```
 
 
 #### Integration with Vim
 
-Use [elm-vim](https://github.com/ElmCast/elm-vim).
+1. Make sure `elm-format` is in your PATH.
+1. Install [elm-vim](https://github.com/ElmCast/elm-vim) ([instructions](https://github.com/ElmCast/elm-vim#install))
+1. Add the following to your `.vimrc` file:
 
-1. Make sure elm-format is in your PATH.
-1. Run the :ElmFormat command to manually format the current file.
-1. To enable automatic formatting on save, add `let g:elm_format_autosave = 1` to your .vimrc file.
+  ```
+  let g:elm_format_autosave = 1
+  ```
+
 
 #### Integration with Emacs
 
 Use [elm-mode](https://github.com/jcollard/elm-mode#elm-format).
+
+> If you can add more specific instructions for installing and configuring elm-mode to work with `elm-format`, please [make a pull request](https://github.com/avh4/elm-format/edit/master/README.md).
+
 
 #### Integration with Sublime Text
 
 Use the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language%20Support) package.
 
 1. Make sure elm-format is in your PATH
-1. Run the “Elm Language Support: Run elm-format” command from the Command Palette to run elm-format on the current file
-1. To enable automatic formatting on every save, Go to Preferences -> Package Settings -> Elm Language Support -> User and add this setting: `"elm_format_on_save": true`
+1. Go to Preferences -> Package Settings -> Elm Language Support -> User and add the following setting:
+
+  ```
+  "elm_format_on_save": true
+  ```
 
 
 ## Development info
