@@ -52,7 +52,12 @@ If you can simplify or improve the installation instructions or add instructions
 
 Use the [elm-light](https://github.com/rundis/elm-light) plugin.
 
-> If you can add more specific instructions for installing and configuring the elm-light plugin to work with `elm-format`, please [make a pull request](https://github.com/avh4/elm-format/edit/master/README.md).
+1. Makes sure elm-format is in your PATH
+1. Install the elm-light plugin using the Light Table plugin manager
+1. Select the appropriate `Elm: Format..` command for your usage
+
+You may format an entire buffer or a top level expression. If you like you can format on save. Check out the elm-format chapter in the plugin [README](https://github.com/rundis/elm-light) for details.
+
 
 #### Integration with Vim
 
