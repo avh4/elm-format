@@ -30,7 +30,12 @@ elm-format --help  # See other command line options
 
 `elm-format` is still in alpha.  You will need to download the version appropriate for your OS, unzip it, and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.
 
- - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.2.0-alpha/elm-format-0.2.0-alpha-mac-x64.tgz)
+ - Mac: Install via Homebrew
+
+ ```
+ brew tap homebrew/devel-only
+ brew install --devel elm-format
+ ```
  - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.2.0-alpha/elm-format-0.2.0-alpha-linux-x64.tgz)
  - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.2.0-alpha/elm-format-0.2.0-alpha-win-x64.zip)
 
