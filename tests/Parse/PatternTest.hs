@@ -32,7 +32,7 @@ tests =
     testGroup "Parse.Pattern"
     [ example "wildcard" "_" $ at 1 1 1 2 Anything
 
-    , example "literal" "1" $ at 1 1 1 2 (Literal (IntNum 1))
+    , example "literal" "1" $ at 1 1 1 2 (Literal (IntNum 1 DecimalInt))
 
     , example "variable" "a" $ at 1 1 1 2 (Var (VarRef "a"))
 

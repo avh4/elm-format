@@ -1213,8 +1213,18 @@ formatComment comment =
 formatLiteral :: Literal -> Box
 formatLiteral lit =
     case lit of
-        IntNum i ->
+        IntNum i DecimalInt ->
             line $ literal $ show i
+        IntNum i HexadecimalInt ->
+            line $ literal $
+              if i <= 0xFF then
+                printf "0x%02X" i
+              else if i <= 0xFFFF then
+                printf "0x%04X" i
+              else if i <= 0xFFFFFFFF then
+                printf "0x%08X" i
+              else
+                printf "0x%016X" i
         FloatNum f ->
             line $ literal $ show f
         Chr c ->

@@ -9,6 +9,15 @@ int =
   1
 
 
+hexadecimalInt =
+  ( 0x00
+  , 0xFF
+  , 0x07FF
+  , 0x00010000
+  , 0x0000000100000000
+  )
+
+
 float =
   2.0
 
