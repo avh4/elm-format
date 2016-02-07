@@ -130,11 +130,14 @@ escapedString =
     controls3 =
       "\x7F"
 
+    windowsWorkarounds =
+      " "
+
     otherNonPrint =
       "\x06DD\xFFFB\x110BD\xE007F"
 
     whitespace =
-      "\xA0\x2000\x205F"
+      " \x2000\x205F"
   in
     ()
 
@@ -154,7 +157,7 @@ escapedChar =
       [ '\x06DD', '\xFFFB', '\x110BD', '\xE007F' ]
 
     whitespace =
-      [ '\xA0', '\x2000', '\x205F' ]
+      [ ' ', '\x2000', '\x205F' ]
   in
     ()
 
@@ -171,7 +174,7 @@ multiString =
 \x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F
 \x7F
 \x06DD\xFFFB\x110BD\xE007F
-\xA0\x2000\x205F
+ \x2000\x205F
 """
   in
     ()

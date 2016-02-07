@@ -1242,6 +1242,8 @@ formatString style s =
                 hex c
             else if c == ' ' then
                 [c]
+            else if c == '\xA0' then
+                [c] -- Workaround for https://github.com/elm-lang/elm-compiler/issues/1279
             else if Char.isSpace c then
                 hex c
             else
