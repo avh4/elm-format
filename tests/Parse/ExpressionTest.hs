@@ -30,23 +30,23 @@ example name input expected =
 
 
 commentedIntExpr (a,b,c,d) preComment postComment i =
-    Commented [BlockComment [preComment]] (at a b c d  $ Literal $ IntNum i) [BlockComment [postComment]]
+    Commented [BlockComment [preComment]] (at a b c d  $ Literal $ IntNum i DecimalInt) [BlockComment [postComment]]
 
 commentedIntExpr' (a,b,c,d) preComment i =
-    Commented [BlockComment [preComment]] (at a b c d  $ Literal $ IntNum i) []
+    Commented [BlockComment [preComment]] (at a b c d  $ Literal $ IntNum i DecimalInt) []
 
 
 commentedIntExpr'' (a,b,c,d) preComment i =
-    (,) [BlockComment [preComment]] $ at a b c d  $ Literal $ IntNum i
+    (,) [BlockComment [preComment]] $ at a b c d  $ Literal $ IntNum i DecimalInt
 
 
-intExpr (a,b,c,d) i = at a b c d $ Literal $ IntNum i
+intExpr (a,b,c,d) i = at a b c d $ Literal $ IntNum i DecimalInt
 
 intExpr' (a,b,c,d) i =
-    Commented [] (at a b c d  $ Literal $ IntNum i) []
+    Commented [] (at a b c d  $ Literal $ IntNum i DecimalInt) []
 
 intExpr'' (a,b,c,d) i =
-    (,) [] $ at a b c d  $ Literal $ IntNum i
+    (,) [] $ at a b c d  $ Literal $ IntNum i DecimalInt
 
 
 tests :: Test
@@ -60,7 +60,7 @@ tests =
         ]
 
     , testGroup "Literal"
-        [ example "" "1" $ at 1 1 1 2 (Literal (IntNum 1))
+        [ example "" "1" $ at 1 1 1 2 (Literal (IntNum 1 DecimalInt))
 
         , testGroup "Boolean"
             [ example "True" "True" $ at 1 1 1 5 $ Literal $ Boolean True
@@ -175,11 +175,11 @@ tests =
         ]
 
     , testGroup "Record update"
-        [ example "" "{a|x=7,y=8}" $ at 1 1 1 12 (RecordUpdate (Commented [] (at 1 2 1 3 (Var (VarRef "a"))) []) [(Commented [] "x" [],Commented [] (at 1 6 1 7 (Literal (IntNum 7))) [],False),(Commented [] "y" [], Commented [] (at 1 10 1 11 (Literal (IntNum 8))) [],False)] False)
-        , example "single field" "{a|x=7}" $ at 1 1 1 8 (RecordUpdate (Commented [] (at 1 2 1 3 (Var (VarRef "a"))) []) [(Commented [] "x" [], Commented [] (at 1 6 1 7 (Literal (IntNum 7))) [],False)] False)
-        , example "whitespace" "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 (RecordUpdate (Commented [] (at 1 3 1 4 (Var (VarRef "a"))) []) [(Commented [] "x" [], Commented [] (at 1 11 1 12 (Literal (IntNum 7))) [],False),(Commented [] "y" [], Commented [] (at 1 19 1 20 (Literal (IntNum 8))) [],False)] False)
-        , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}" $ at 1 1 1 62 (RecordUpdate (Commented [BlockComment ["A"]] (at 1 7 1 8 (Var (VarRef "a"))) [BlockComment ["B"]]) [(Commented [BlockComment ["C"]] "x" [BlockComment ["D"]],Commented [BlockComment ["E"]] (at 1 31 1 32 (Literal (IntNum 7))) [BlockComment ["F"]],False),(Commented [BlockComment ["G"]] "y" [BlockComment ["H"]],Commented [BlockComment ["I"]] (at 1 55 1 56 (Literal (IntNum 8))) [BlockComment ["J"]],False)] False)
-        , example "newlines" "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 (RecordUpdate (Commented [] (at 2 2 2 3 (Var (VarRef "a"))) []) [(Commented [] "x" [], Commented [] (at 6 2 6 3 (Literal (IntNum 7))) [],True),(Commented [] "y" [], Commented [] (at 10 2 10 3 (Literal (IntNum 8))) [],True)] True)
+        [ example "" "{a|x=7,y=8}" $ at 1 1 1 12 (RecordUpdate (Commented [] (at 1 2 1 3 (Var (VarRef "a"))) []) [(Commented [] "x" [],Commented [] (at 1 6 1 7 (Literal (IntNum 7 DecimalInt))) [],False),(Commented [] "y" [], Commented [] (at 1 10 1 11 (Literal (IntNum 8 DecimalInt))) [],False)] False)
+        , example "single field" "{a|x=7}" $ at 1 1 1 8 (RecordUpdate (Commented [] (at 1 2 1 3 (Var (VarRef "a"))) []) [(Commented [] "x" [], Commented [] (at 1 6 1 7 (Literal (IntNum 7 DecimalInt))) [],False)] False)
+        , example "whitespace" "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 (RecordUpdate (Commented [] (at 1 3 1 4 (Var (VarRef "a"))) []) [(Commented [] "x" [], Commented [] (at 1 11 1 12 (Literal (IntNum 7 DecimalInt))) [],False),(Commented [] "y" [], Commented [] (at 1 19 1 20 (Literal (IntNum 8 DecimalInt))) [],False)] False)
+        , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}" $ at 1 1 1 62 (RecordUpdate (Commented [BlockComment ["A"]] (at 1 7 1 8 (Var (VarRef "a"))) [BlockComment ["B"]]) [(Commented [BlockComment ["C"]] "x" [BlockComment ["D"]],Commented [BlockComment ["E"]] (at 1 31 1 32 (Literal (IntNum 7 DecimalInt))) [BlockComment ["F"]],False),(Commented [BlockComment ["G"]] "y" [BlockComment ["H"]],Commented [BlockComment ["I"]] (at 1 55 1 56 (Literal (IntNum 8 DecimalInt))) [BlockComment ["J"]],False)] False)
+        , example "newlines" "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 (RecordUpdate (Commented [] (at 2 2 2 3 (Var (VarRef "a"))) []) [(Commented [] "x" [], Commented [] (at 6 2 6 3 (Literal (IntNum 7 DecimalInt))) [],True),(Commented [] "y" [], Commented [] (at 10 2 10 3 (Literal (IntNum 8 DecimalInt))) [],True)] True)
         , testCase "only allows simple base" $
             assertFailure expr "{9|x=7}"
         , testCase "only allows simple base" $
@@ -235,11 +235,11 @@ tests =
         ]
 
     , testGroup "case statement"
-        [ example "" "case 9 of\n 1->10\n _->20" $ at 1 1 3 7 (Case (Commented [] (at 1 6 1 7 (Literal (IntNum 9))) [],False) [(Commented [] (at 2 2 2 3 (P.Literal (IntNum 1))) [],([],at 2 5 2 7 (Literal (IntNum 10)))),(Commented [] (at 3 2 3 3 Anything) [],([],at 3 5 3 7 (Literal (IntNum 20))))])
-        , example "no newline after 'of'" "case 9 of 1->10\n          _->20" $ at 1 1 2 16 (Case (Commented [] (at 1 6 1 7 (Literal (IntNum 9))) [],False) [(Commented [] (at 1 11 1 12 (P.Literal (IntNum 1))) [],([],at 1 14 1 16 (Literal (IntNum 10)))),(Commented [] (at 2 11 2 12 Anything) [],([],at 2 14 2 16 (Literal (IntNum 20))))])
-        , example "whitespace" "case 9 of\n 1 -> 10\n _ -> 20" $ at 1 1 3 9 (Case (Commented [] (at 1 6 1 7 (Literal (IntNum 9))) [],False) [(Commented [] (at 2 2 2 3 (P.Literal (IntNum 1))) [],([],at 2 7 2 9 (Literal (IntNum 10)))),(Commented [] (at 3 2 3 3 Anything) [],([],at 3 7 3 9 (Literal (IntNum 20))))])
-        , example "comments" "case{-A-}9{-B-}of{-C-}\n{-D-}1{-E-}->{-F-}10{-G-}\n{-H-}_{-I-}->{-J-}20" $ at 1 1 3 21 (Case (Commented [BlockComment ["A"]] (at 1 10 1 11 (Literal (IntNum 9))) [BlockComment ["B"]],False) [(Commented [BlockComment ["C"],BlockComment ["D"]] (at 2 6 2 7 (P.Literal (IntNum 1))) [BlockComment ["E"]],([BlockComment ["F"]],at 2 19 2 21 (Literal (IntNum 10)))),(Commented [BlockComment ["G"],BlockComment ["H"]] (at 3 6 3 7 Anything) [BlockComment ["I"]],([BlockComment ["J"]],at 3 19 3 21 (Literal (IntNum 20))))])
-        , example "newlines" "case\n 9\n of\n 1\n ->\n 10\n _\n ->\n 20" $ at 1 1 9 4 (Case (Commented [] (at 2 2 2 3 (Literal (IntNum 9))) [],True) [(Commented [] (at 4 2 4 3 (P.Literal (IntNum 1))) [],([],at 6 2 6 4 (Literal (IntNum 10)))),(Commented [] (at 7 2 7 3 Anything) [],([],at 9 2 9 4 (Literal (IntNum 20))))])
+        [ example "" "case 9 of\n 1->10\n _->20" $ at 1 1 3 7 (Case (Commented [] (at 1 6 1 7 (Literal (IntNum 9 DecimalInt))) [],False) [(Commented [] (at 2 2 2 3 (P.Literal (IntNum 1 DecimalInt))) [],([],at 2 5 2 7 (Literal (IntNum 10 DecimalInt)))),(Commented [] (at 3 2 3 3 Anything) [],([],at 3 5 3 7 (Literal (IntNum 20 DecimalInt))))])
+        , example "no newline after 'of'" "case 9 of 1->10\n          _->20" $ at 1 1 2 16 (Case (Commented [] (at 1 6 1 7 (Literal (IntNum 9 DecimalInt))) [],False) [(Commented [] (at 1 11 1 12 (P.Literal (IntNum 1 DecimalInt))) [],([],at 1 14 1 16 (Literal (IntNum 10 DecimalInt)))),(Commented [] (at 2 11 2 12 Anything) [],([],at 2 14 2 16 (Literal (IntNum 20 DecimalInt))))])
+        , example "whitespace" "case 9 of\n 1 -> 10\n _ -> 20" $ at 1 1 3 9 (Case (Commented [] (at 1 6 1 7 (Literal (IntNum 9 DecimalInt))) [],False) [(Commented [] (at 2 2 2 3 (P.Literal (IntNum 1 DecimalInt))) [],([],at 2 7 2 9 (Literal (IntNum 10 DecimalInt)))),(Commented [] (at 3 2 3 3 Anything) [],([],at 3 7 3 9 (Literal (IntNum 20 DecimalInt))))])
+        , example "comments" "case{-A-}9{-B-}of{-C-}\n{-D-}1{-E-}->{-F-}10{-G-}\n{-H-}_{-I-}->{-J-}20" $ at 1 1 3 21 (Case (Commented [BlockComment ["A"]] (at 1 10 1 11 (Literal (IntNum 9 DecimalInt))) [BlockComment ["B"]],False) [(Commented [BlockComment ["C"],BlockComment ["D"]] (at 2 6 2 7 (P.Literal (IntNum 1 DecimalInt))) [BlockComment ["E"]],([BlockComment ["F"]],at 2 19 2 21 (Literal (IntNum 10 DecimalInt)))),(Commented [BlockComment ["G"],BlockComment ["H"]] (at 3 6 3 7 Anything) [BlockComment ["I"]],([BlockComment ["J"]],at 3 19 3 21 (Literal (IntNum 20 DecimalInt))))])
+        , example "newlines" "case\n 9\n of\n 1\n ->\n 10\n _\n ->\n 20" $ at 1 1 9 4 (Case (Commented [] (at 2 2 2 3 (Literal (IntNum 9 DecimalInt))) [],True) [(Commented [] (at 4 2 4 3 (P.Literal (IntNum 1 DecimalInt))) [],([],at 6 2 6 4 (Literal (IntNum 10 DecimalInt)))),(Commented [] (at 7 2 7 3 Anything) [],([],at 9 2 9 4 (Literal (IntNum 20 DecimalInt))))])
         , testCase "should not consume trailing whitespace" $
             assertParse (expr >> string "\nX") "case 9 of\n 1->10\n _->20\nX" $ "\nX"
         , testGroup "clauses must start at the same column"

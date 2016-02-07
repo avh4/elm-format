@@ -15,7 +15,7 @@ import Reporting.Region
 import Parse.TestHelpers
 
 
-pending = at 0 0 0 0 $ IntNum 0
+pending = at 0 0 0 0 $ IntNum 0 DecimalInt
 
 
 example name input expected =
@@ -27,9 +27,9 @@ tests :: Test
 tests =
     testGroup "Parse.Literal"
     [ testGroup "Int"
-        [ example "" "99" $ IntNum 99
-        , example "negative" "-99" $ IntNum (-99)
-        , example "hexadecimal" "0xfF" $ IntNum 255
+        [ example "" "99" $ IntNum 99 DecimalInt
+        , example "negative" "-99" $ IntNum (-99) DecimalInt
+        , example "hexadecimal" "0xfF" $ IntNum 255 HexadecimalInt
         , testCase "hexadecimal must start with 0" $
             assertFailure literal "xFF"
         , testCase "hexadecimal, must contain digits" $

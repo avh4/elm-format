@@ -19,9 +19,9 @@ num =
 
 toLiteral :: String -> Literal
 toLiteral n
-  | 'x' `elem` n         = IntNum (read n)
+  | 'x' `elem` n         = IntNum (read n) HexadecimalInt
   | any (`elem` ".eE") n = FloatNum (read n)
-  | otherwise            = IntNum (read n)
+  | otherwise            = IntNum (read n) DecimalInt
 
 
 rawNumber :: IParser String

@@ -29,13 +29,19 @@ type PreCommented a = (Comments, a)
 type PostCommented a = (a, Comments)
 
 
+data IntRepresentation
+  = DecimalInt
+  | HexadecimalInt
+  deriving (Eq, Show)
+
+
 data Literal
-    = IntNum Int
+    = IntNum Int IntRepresentation
     | FloatNum Double
     | Chr Char
     | Str String Bool
     | Boolean Bool
-    deriving (Eq, Ord, Show)
+    deriving (Eq, Show)
 
 
 data TypeConstructor
