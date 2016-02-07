@@ -5,6 +5,12 @@ unit =
   ()
 
 
+boolean =
+  ( True
+  , False
+  )
+
+
 int =
   1
 

@@ -1234,7 +1234,7 @@ formatLiteral lit =
         Boolean True ->
             line $ literal "True"
         Boolean False ->
-            line $ literal "False" -- TODO: not tested
+            line $ literal "False"
 
 
 data StringStyle
