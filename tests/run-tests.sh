@@ -194,6 +194,7 @@ checkGoodAllSyntax Types
 checkGoodAllSyntax Expressions
 checkGood Comments.elm
 checkGood AllSyntax/GLShader.elm
+checkGood AllSyntax/Literals.elm
 
 checkGood evancz/start-app/StartApp.elm
 checkGood TheSeamau5/elm-check/Check.elm
