@@ -675,3 +675,11 @@ infixr 9 ==/==
 
 (@) =
   always
+
+
+port portFollowedByAnnotation : Signal Int
+
+
+somethingAfterIncomingPort : ()
+somethingAfterIncomingPort =
+  ()

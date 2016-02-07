@@ -107,28 +107,48 @@ splitWhere predicate list =
           |> reverse
 
 
-isDeclaration :: AST.Declaration.Decl -> Bool
-isDeclaration decl =
-    case decl of
-        AST.Declaration.Decl adecl ->
-            case RA.drop adecl of
-                AST.Declaration.Definition _ _ _ _ ->
-                    True
+data DeclarationType
+  = DComment
+  | DDefinition (Maybe AST.Variable.Ref)
+  deriving (Show)
 
-                AST.Declaration.Datatype _ _ _ ->
-                    True
 
-                AST.Declaration.TypeAlias _ _ _ ->
-                    True
+declarationType :: AST.Declaration.Decl -> DeclarationType
+declarationType decl =
+  case decl of
+    AST.Declaration.Decl adecl ->
+      case RA.drop adecl of
+        AST.Declaration.Definition pat _ _ _ ->
+          case RA.drop pat of
+            AST.Pattern.Var name ->
+              DDefinition $ Just name
 
-                AST.Declaration.PortDefinition _ _ _ ->
-                    True
+            _ ->
+              DDefinition Nothing
 
-                _ ->
-                    False
+        AST.Declaration.Datatype (Commented _ (name, _) _) _ _ ->
+          DDefinition $ Just $ AST.Variable.VarRef name
 
-        _ ->
-            False
+        AST.Declaration.TypeAlias _ (Commented _ (name, _) _) _ ->
+          DDefinition $ Just $ AST.Variable.VarRef name
+
+        AST.Declaration.PortDefinition (Commented _ name _) _ _ ->
+          DDefinition $ Just $ AST.Variable.VarRef name
+
+        AST.Declaration.TypeAnnotation (name, _) _ ->
+          DDefinition $ Just name
+
+        AST.Declaration.PortAnnotation (Commented _ name _) _ _ ->
+          DDefinition $ Just $ AST.Variable.VarRef name
+
+        AST.Declaration.Fixity _ _ _ _ name ->
+          DDefinition $ Just name
+
+    AST.Declaration.DocComment _ ->
+      DDefinition Nothing
+
+    AST.Declaration.BodyComment _ ->
+      DComment
 
 
 formatModuleHeader :: AST.Module.Header -> Box
@@ -202,23 +222,21 @@ formatModuleHeader header =
 formatModule :: AST.Module.Module -> Box
 formatModule modu =
     let
-        isComment d =
-            case d of
-                AST.Declaration.BodyComment _ ->
-                    True
-                _ ->
-                    False
-
         spacer first second =
-            case (isDeclaration first, isComment first, isComment second) of
-                (_, False, True) ->
-                    List.replicate 3 blankLine
-                (True, _, _) ->
-                    List.replicate 2 blankLine
-                (False, True, False) ->
-                    List.replicate 2 blankLine
-                _ ->
-                    []
+          case (declarationType first, declarationType second) of
+            (DComment, DComment) ->
+              []
+            (_, DComment) ->
+              List.replicate 3 blankLine
+            (DComment, _) ->
+              List.replicate 2 blankLine
+            (DDefinition Nothing, DDefinition (Just _)) ->
+              []
+            (DDefinition a, DDefinition b) ->
+              if a == b then
+                []
+              else
+                List.replicate 2 blankLine
 
         body =
             intersperseMap spacer formatDeclaration $
