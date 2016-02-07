@@ -72,7 +72,7 @@ viewEditorHeader channels currentDoc fullscreen =
         , viewFontControl
             channels.execCommand
             "toggle-strikethrough"
-            "\xA0S\xA0"
+            " S "
             "strikethrough"
         ]
     , lazy2 viewFullscreenButton channels.fullscreen fullscreen
