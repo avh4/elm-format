@@ -1196,14 +1196,11 @@ formatComment comment =
                         , space
                         , punc "-}"
                         ]
-                (l1:ls) -> -- TODO: not tested
+                (ls) ->
                     stack1
-                        [ line $ row
-                            [ punc "{-"
-                            , space
-                            , literal l1
-                            ]
-                        , stack1 $ map (line . literal) ls
+                        [ prefix
+                            (row [ punc "{-", space ])
+                            (stack1 $ map (line . literal) ls)
                         , line $ punc "-}"
                         ]
         LineComment c ->

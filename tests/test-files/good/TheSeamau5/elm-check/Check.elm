@@ -163,30 +163,30 @@ type alias FailureOptions =
 
 
 {- }
-encode_failureOptions : FailureOptions -> Value
-encode_failureOptions options =
-  Encode.object
-    [ ("name", Encode.string options.name)
-    , ("counterExample", Encode.string options.counterExample)
-    , ("actual", Encode.string options.actual)
-    , ("expected", Encode.string options.expected)
-    , ("original",
-          Encode.object
-            [ ("counterExample", Encode.string options.original.counterExample)
-            , ("actual", Encode.string options.original.actual)
-            , ("expected", Encode.string options.original.expected)
-            ]
+   encode_failureOptions : FailureOptions -> Value
+   encode_failureOptions options =
+     Encode.object
+       [ ("name", Encode.string options.name)
+       , ("counterExample", Encode.string options.counterExample)
+       , ("actual", Encode.string options.actual)
+       , ("expected", Encode.string options.expected)
+       , ("original",
+             Encode.object
+               [ ("counterExample", Encode.string options.original.counterExample)
+               , ("actual", Encode.string options.original.actual)
+               , ("expected", Encode.string options.original.expected)
+               ]
 
-      )
-    , ("seed",
-        let (s0, s1) = case options.seed.state of
-              State s0 s1 -> (s0, s1)
-        in
-            Encode.list [Encode.int s0, Encode.int s1]
-      )
-    , ("numberOfChecks", Encode.int options.numberOfChecks)
-    , ("numberOfShrinks", Encode.int options.numberOfShrinks)
-    ]
+         )
+       , ("seed",
+           let (s0, s1) = case options.seed.state of
+                 State s0 s1 -> (s0, s1)
+           in
+               Encode.list [Encode.int s0, Encode.int s1]
+         )
+       , ("numberOfChecks", Encode.int options.numberOfChecks)
+       , ("numberOfShrinks", Encode.int options.numberOfShrinks)
+       ]
 -}
 ------------------
 -- MAKE A CLAIM --

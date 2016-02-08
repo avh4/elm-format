@@ -73,8 +73,8 @@ graph yOffset days =
           [ y <| toString yOffset
           ]
           {- SVG uses a painter algorithm, so we need axis at the end of
-          the list to keep bars from overlapping the axis, which gets
-          pretty ugly.
+             the list to keep bars from overlapping the axis, which gets
+             pretty ugly.
           -}
           (List.append
             (List.map (\day -> bar day yOffset) days)
