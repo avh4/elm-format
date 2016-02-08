@@ -28,10 +28,11 @@ import qualified System.Directory as Dir
 -- file. Otherwise, display errors and exit
 writeResult
     :: Maybe FilePath
+    -> String
     -> Text.Text
     -> Result.Result () Syntax.Error AST.Module.Module
     -> IO ()
-writeResult outputFile inputText result =
+writeResult outputFile inputFilename inputText result =
     case result of
         Result.Result _ (Result.Ok modu) ->
             let rendered =
@@ -47,14 +48,14 @@ writeResult outputFile inputText result =
 
         Result.Result _ (Result.Err errs) ->
             do
-                showErrors (Text.unpack inputText) errs
+                showErrors inputFilename (Text.unpack inputText) errs
                 exitFailure
 
 
-processTextInput :: Maybe FilePath -> Text.Text -> IO ()
-processTextInput outputFile inputText  =
+processTextInput :: Maybe FilePath -> String -> Text.Text -> IO ()
+processTextInput outputFile inputFilename inputText  =
     Parse.parse inputText
-        |> writeResult outputFile inputText
+        |> writeResult outputFile inputFilename inputText
 
 
 processFileInput :: FilePath -> Maybe FilePath -> IO ()
@@ -62,7 +63,7 @@ processFileInput inputFile outputFile =
     do
         putStrLn $ (r $ ProcessingFile inputFile)
         inputText <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
-        processTextInput outputFile inputText
+        processTextInput outputFile inputFile inputText
 
 
 isEitherFileOrDirectory :: FilePath -> IO Bool
@@ -80,7 +81,7 @@ handleStdinInput outputFile = do
 
     Lazy.toStrict input
         |> Text.decodeUtf8
-        |> processTextInput outputFile
+        |> processTextInput outputFile "<STDIN>"
 
 
 handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> IO ()

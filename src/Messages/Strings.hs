@@ -10,7 +10,6 @@ showFiles = unlines . map ((++) "    ")
 renderMessage :: Message -> String
 
 renderMessage ErrorsHeading = "ERRORS"
-renderMessage ErrorFileLocation = "<location>"
 
 renderMessage (FilesWillBeOverwritten filePaths) =
   unlines
