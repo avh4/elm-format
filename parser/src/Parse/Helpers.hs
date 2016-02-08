@@ -504,7 +504,7 @@ multiComment =
       trimIndent [] = []
       trimIndent (l1:ls) =
           let
-              depth = minimum $ map (length . takeWhile Char.isSpace) $ ls
+              depth = minimum $ map fst $ filter (\(a,b) -> a /= b) $ map (\l -> (length $ takeWhile Char.isSpace $ l, length l)) $ ls
           in
               l1 : (map (drop depth) ls)
 
