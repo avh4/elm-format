@@ -6,7 +6,6 @@ module Messages.Types where
 
 data Message
   = ErrorsHeading
-  | ErrorFileLocation
 
   | FilesWillBeOverwritten [FilePath]
   | NoElmFilesFound [FilePath]
