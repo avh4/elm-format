@@ -37,17 +37,17 @@ tests =
         ]
 
     , testGroup "Float"
-        [ example "" "0.1" $ FloatNum 0.1
-        , example "negative" "-0.1" $ FloatNum (-0.1)
-        , example "exponent" "9e3" $ FloatNum 9000.0
-        , example "positive exponent" "9e+3" $ FloatNum 9000.0
-        , example "negative exponent" "9e-3" $ FloatNum 0.009
-        , example "capital exponent" "9E3" $ FloatNum 9000.0
+        [ example "" "0.1" $ FloatNum 0.1 DecimalFloat
+        , example "negative" "-0.1" $ FloatNum (-0.1) DecimalFloat
+        , example "exponent" "9e3" $ FloatNum 9000.0 ExponentFloat
+        , example "positive exponent" "9e+3" $ FloatNum 9000.0 ExponentFloat
+        , example "negative exponent" "9e-3" $ FloatNum 0.009 ExponentFloat
+        , example "capital exponent" "9E3" $ FloatNum 9000.0 ExponentFloat
         , testCase "exponent must have exponent digits" $
             assertFailure literal "9E"
         , testCase "exponent must have digits" $
             assertFailure literal "e3"
-        , example "exponent and decimal" "9.1e3" $ FloatNum 9100.0
+        , example "exponent and decimal" "9.1e3" $ FloatNum 9100.0 ExponentFloat
         , testCase "exponent and decimal, must have decimal digits" $
             assertFailure literal "9.e3"
         , testCase "must have digits" $

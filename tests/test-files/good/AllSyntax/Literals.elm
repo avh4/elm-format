@@ -25,7 +25,15 @@ hexadecimalInt =
 
 
 float =
-  2.0
+  ( 2.0
+  , 0.01
+  )
+
+
+scientificNotationFloat =
+  ( 1.0e-2
+  , 9.11e23
+  )
 
 
 string =
