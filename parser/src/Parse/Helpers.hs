@@ -482,7 +482,7 @@ popNewlineContext =
 lineComment :: IParser Comment
 lineComment =
   do  try (string "--")
-      comment <- anyUntil $ (simpleNewline >> return ()) <|> eof
+      (comment, ()) <- anyUntil $ (simpleNewline >> return ()) <|> eof
       return $ LineComment comment
 
 
@@ -490,7 +490,7 @@ docComment :: IParser String
 docComment =
   do  try (string "{-|")
       many (string " ")
-      contents <- closeComment
+      contents <- closeComment False
       return contents
 
 
@@ -498,7 +498,7 @@ multiComment :: IParser Comment
 multiComment =
   do  try (string "{-" <* notFollowedBy (string "|") )
       many (string " ")
-      b <- closeComment
+      b <- closeComment False
       return $ BlockComment $ trimIndent $ lines b
   where
       trimIndent [] = []
@@ -509,13 +509,14 @@ multiComment =
               l1 : (map (drop depth) ls)
 
 
-closeComment :: IParser String
-closeComment =
-    anyUntil $
+closeComment :: Bool -> IParser String
+closeComment keepClosingPunc =
+  (\(a,b) -> a ++ b) <$>
+    (anyUntil $
       choice $
-        [ try (many (string " ") >> string "-}") <?> "the end of a comment -}"
-        , concat <$> sequence [ try (string "{-"), closeComment, closeComment ]
-        ]
+        [ try ((\a b -> if keepClosingPunc then concat (a ++ [b]) else "") <$> many (string " ") <*> string "-}") <?> "the end of a comment -}"
+        , concat <$> sequence [ try (string "{-"), closeComment True, closeComment keepClosingPunc]
+        ])
 
 
 -- ODD COMBINATORS
@@ -534,12 +535,17 @@ until p end =
     go = end <|> (p >> go)
 
 
-anyUntil :: IParser a -> IParser String
+anyUntil :: IParser a -> IParser (String, a)
 anyUntil end =
-    go
+    go ""
   where
-    go =
-      (end >> return "") <|> (:) <$> anyChar <*> go
+    next pre =
+      do
+        nextChar <- anyChar
+        go (nextChar : pre)
+
+    go pre =
+      ((,) (reverse pre) <$> end) <|> next pre
 
 
 -- BASIC LANGUAGE LITERALS
