@@ -35,9 +35,15 @@ data IntRepresentation
   deriving (Eq, Show)
 
 
+data FloatRepresentation
+  = DecimalFloat
+  | ExponentFloat
+  deriving (Eq, Show)
+
+
 data Literal
     = IntNum Int IntRepresentation
-    | FloatNum Double
+    | FloatNum Double FloatRepresentation
     | Chr Char
     | Str String Bool
     | Boolean Bool

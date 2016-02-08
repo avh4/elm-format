@@ -1225,8 +1225,10 @@ formatLiteral lit =
                 printf "0x%08X" i
               else
                 printf "0x%016X" i
-        FloatNum f ->
-            line $ literal $ show f
+        FloatNum f DecimalFloat ->
+            line $ literal $ printf "%f" f
+        FloatNum f ExponentFloat ->
+            line $ literal $ printf "%e" f
         Chr c ->
             formatString SChar [c]
         Str s multi ->
