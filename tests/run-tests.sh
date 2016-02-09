@@ -196,6 +196,7 @@ checkGood Comments.elm
 checkGood AllSyntax/GLShader.elm
 checkGood AllSyntax/Literals.elm
 checkGood AllSyntax/Comments.elm
+checkGood ApiSketch.elm
 
 checkGood evancz/start-app/StartApp.elm
 checkGood TheSeamau5/elm-check/Check.elm
