@@ -40,7 +40,7 @@ If you need PGP signatures, see the [releases page](https://github.com/avh4/elm-
 
 ### Editor integration
 
-If you can simplify or improve the installation instructions or add instructions for another editor, please [make a pull request](https://github.com/avh4/elm-format/edit/master/README.md).
+If you can simplify or improve the installation instructions or add instructions for another editor, please [make a pull request](https://github.com/avh4/elm-format/edit/master/README.md).  The default behavior of `elm-format`-approved plugins is to format Elm files on save.
 
 <!-- Open-source editors will be listed before closed-source editors. -->
 
