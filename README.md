@@ -81,14 +81,7 @@ Use [elm-mode](https://github.com/jcollard/elm-mode#elm-format).
 
 #### Integration with Sublime Text
 
-Use the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language%20Support) package.
-
-1. Make sure elm-format is in your PATH
-1. Go to Preferences -> Package Settings -> Elm Language Support -> User and add the following setting:
-
-  ```
-  "elm_format_on_save": true
-  ```
+Use the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language%20Support) package. Make sure elm-format is in your PATH.
 
 
 ## Development info
