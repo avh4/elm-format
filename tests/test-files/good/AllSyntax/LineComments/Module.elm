@@ -63,6 +63,24 @@ import
        --AC
       )
 
+import Task
+  exposing 
+    ( succeed -- AD
+    , fail -- AE
+    , map
+    , map2
+    , map3
+    , map4
+    , map5
+    , andMap
+    , andThen
+    , onError
+    , mapError
+    , toMaybe
+    , fromMaybe
+    , toResult
+    , fromResult
+    ) -- AF
 
 a =
   1
