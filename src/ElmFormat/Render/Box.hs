@@ -301,11 +301,14 @@ formatImport aimport =
                             "as")
                             |> Monad.join
 
+                        (exposingPreKeyword, exposingPostKeywordAndListing, multiline) 
+                          = AST.Module.exposedVars method
+
                         exposing =
                           formatImportClause
                             (formatListing formatVarValue)
                             "exposing"
-                            (AST.Module.exposedVars method)
+                            (exposingPreKeyword, exposingPostKeywordAndListing)
 
                         formatImportClause :: (a -> Maybe Box) -> String -> (Comments, (Comments, a)) -> Maybe Box
                         formatImportClause format keyw input =
