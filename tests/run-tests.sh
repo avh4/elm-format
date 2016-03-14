@@ -19,6 +19,7 @@ function returnCodeShouldEqual() {
 }
 
 function shouldOutputTheSame() {
+	echo "$1" "$2"
 	diff <(echo "$1") <(echo "$2") || exit 1
 }
 
@@ -42,7 +43,10 @@ function compareFiles() {
 
 function checkWaysToRun() {
 	cp "tests/test-files/good/$1" "_input.elm"
+	cp "tests/test-files/good/$1" "_input2.elm"
+
 	INPUT="_input.elm"
+	INPUT_2="_input2.elm"
 	OUTPUT="formatted.elm"
 	DIRECTORY="tests/test-files/directory"
 	RECURSIVE_DIRECTORY="tests/test-files/recursive-directory"
@@ -68,6 +72,11 @@ function checkWaysToRun() {
 	NOARGS=$("$ELM_FORMAT" 2>&1)
 	returnCodeShouldEqual 0
 	shouldOutputTheSame "$HELP" "$NOARGS"
+
+	echo "## elm-format INPUT --dry does not change things"
+	"$ELM_FORMAT" "$INPUT_2" --dry 1>/dev/null
+	compareFiles "$INPUT" "$INPUT_2"
+	returnCodeShouldEqual 0
 
 	echo "## elm-format INPUT (answer = y)"
 	echo "y" | "$ELM_FORMAT" "$INPUT" 1>/dev/null
@@ -134,6 +143,15 @@ function checkWaysToRun() {
 	echo "## elm-format EMPTY_DIRECTORY"
 	"$ELM_FORMAT" "$EMPTY_DIR" 1>/dev/null
 	returnCodeShouldEqual 1
+
+	echo "## elm-format INPUT --dry"
+	"$ELM_FORMAT" "$INPUT" --dry 1>/dev/null
+	returnCodeShouldEqual 0
+
+	echo "## elm-format INPUT --dry --yes"
+	"$ELM_FORMAT" "$INPUT" --dry --yes 1>/dev/null
+	returnCodeShouldEqual 0
+
 
 	echo "# OK!"
 	echo "------------------------------"
