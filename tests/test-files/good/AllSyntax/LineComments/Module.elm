@@ -55,18 +55,18 @@ import
     as
       --R
       Json
-import
-  Signal
-    exposing
-      (--AB
-       ..
-       --AC
-      )
-
+import Signal
+  exposing
+    (--AB
+     ..
+     --AC
+    )
 import Task
-  exposing 
-    ( succeed -- AD
-    , fail -- AE
+  exposing
+    ( succeed
+      -- AD
+    , fail
+      -- AE
     , map
     , map2
     , map3
@@ -80,7 +80,11 @@ import Task
     , fromMaybe
     , toResult
     , fromResult
-    ) -- AF
+    )
+
+
+-- AF
+
 
 a =
   1
