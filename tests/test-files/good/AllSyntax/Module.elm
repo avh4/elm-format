@@ -5,7 +5,7 @@ import Maybe exposing (Maybe(Just, Nothing), map)
 import Json.Decode as Json
 import Signal exposing (..)
 import Task
-  exposing 
+  exposing
     ( succeed
     , fail
     , map
@@ -22,6 +22,7 @@ import Task
     , toResult
     , fromResult
     )
+
 
 a =
   1
