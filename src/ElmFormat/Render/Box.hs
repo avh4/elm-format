@@ -155,7 +155,7 @@ formatModuleHeader :: AST.Module.Header -> Box
 formatModuleHeader header =
   let
       formatExports =
-        case formatListing formatVarValue $ AST.Module.exports header of
+        case formatListing False formatVarValue $ AST.Module.exports header of
             Just listing ->
               listing
             _ ->
@@ -306,7 +306,7 @@ formatImport aimport =
 
                         exposing =
                           formatImportClause
-                            (formatListing formatVarValue)
+                            (formatListing multiline formatVarValue)
                             "exposing"
                             (exposingPreKeyword, exposingPostKeywordAndListing)
 
@@ -384,12 +384,32 @@ formatImport aimport =
 
                           ( SingleLine name', Just (SingleLine as'), Just exposing' ) ->
                             stack1
+                              [ line (keyword "import")
+                              , line $ row
+                                [ name'
+                                , space
+                                , as'
+                                ]
+                              , indent exposing'
+                              ]
+
+                          ( SingleLine name', Just as', Just exposing' ) ->
+                            stack1
                               [ line $ row
                                 [ keyword "import"
                                 , space
                                 , name'
+                                ]
+                              , indent $ as'
+                              , indent $ exposing'
+                              ]
+
+                          ( SingleLine name', Nothing, Just exposing' ) ->
+                            stack1
+                              [ line $ row
+                                [ keyword "import"
                                 , space
-                                , as'
+                                , name'
                                 ]
                               , indent exposing'
                               ]
@@ -397,15 +417,15 @@ formatImport aimport =
                           ( name', Just as', Just exposing' ) ->
                             stack1
                               [ line $ keyword "import"
-                              , indent name'
-                              , indent $ indent as'
-                              , indent $ indent exposing'
+                              , indent $ name'
+                              , indent $ indent $ as'
+                              , indent $ indent $ exposing'
                               ]
 
                           ( name', Nothing, Just exposing' ) ->
                             stack1
                               [ line $ keyword "import"
-                              , indent name'
+                              , indent $ name'
                               , indent $ indent exposing'
                               ]
 
@@ -427,8 +447,8 @@ formatImport aimport =
             formatComment c
 
 
-formatListing :: (a -> Box) -> AST.Variable.Listing a -> Maybe Box
-formatListing format listing =
+formatListing :: Bool -> (a -> Box) -> AST.Variable.Listing a -> Maybe Box
+formatListing multiline format listing =
     case listing of
         AST.Variable.ClosedListing ->
             Nothing
@@ -437,7 +457,7 @@ formatListing format listing =
             Just $ parens $ formatCommented (line . keyword) $ fmap (const "..") comments
 
         AST.Variable.ExplicitListing vars ->
-            Just $ elmGroup False "(" "," ")" False $ map (formatCommented format) vars
+            Just $ elmGroup False "(" "," ")" multiline $ map (formatCommented format) vars
 
 
 formatVarValue :: AST.Variable.Value -> Box
@@ -451,7 +471,7 @@ formatVarValue aval =
 
         AST.Variable.Union name listing ->
             case
-              ( formatListing (line . identifier) listing
+              ( formatListing False (line . identifier) listing
               , formatTailCommented (line . identifier) name
               , snd name
               )
