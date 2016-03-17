@@ -1230,10 +1230,8 @@ formatLiteral lit =
             formatString SChar [c]
         Str s multi ->
             formatString (if multi then SMulti else SString) s
-        Boolean True ->
-            line $ literal "True"
-        Boolean False ->
-            line $ literal "False"
+        Boolean b ->
+            line $ literal $ show b
 
 
 data StringStyle
@@ -1245,69 +1243,66 @@ data StringStyle
 
 formatString :: StringStyle -> String -> Box
 formatString style s =
-    let
-        hex c =
-            if Char.ord c <= 0xFF then
-                "\\x" ++ (printf "%02X" $ Char.ord c)
-            else
-                "\\x" ++ (printf "%04X" $ Char.ord c)
+  case style of
+      SChar ->
+        stringBox "\'" id
+      SString ->
+        stringBox "\"" id
+      SMulti ->
+        stringBox "\"\"\"" escapeMultiQuote
+  where
+    stringBox quotes escaper =
+      line $ row
+          [ punc quotes
+          , literal $ escaper $ concatMap fix s
+          , punc quotes
+          ]
 
-        fix c =
-            if (style == SMulti) && c == '\n' then
-                [c]
-            else if c == '\n' then
-                "\\n"
-            else if c == '\t' then
-                "\\t"
-            else if c == '\\' then
-                "\\\\"
-            else if (style == SString) && c == '\"' then
-                "\\\""
-            else if (style == SChar) && c == '\'' then
-                "\\\'"
-            else if not $ Char.isPrint c then
-                hex c
-            else if c == ' ' then
-                [c]
-            else if c == '\xA0' then
-                [c] -- Workaround for https://github.com/elm-lang/elm-compiler/issues/1279
-            else if Char.isSpace c then
-                hex c
-            else
-                [c]
+    fix c =
+        if (style == SMulti) && c == '\n' then
+            [c]
+        else if c == '\n' then
+            "\\n"
+        else if c == '\t' then
+            "\\t"
+        else if c == '\\' then
+            "\\\\"
+        else if (style == SString) && c == '\"' then
+            "\\\""
+        else if (style == SChar) && c == '\'' then
+            "\\\'"
+        else if not $ Char.isPrint c then
+            hex c
+        else if c == ' ' then
+            [c]
+        else if c == '\xA0' then
+            [c] -- Workaround for https://github.com/elm-lang/elm-compiler/issues/1279
+        else if Char.isSpace c then
+            hex c
+        else
+            [c]
 
-        escapeMultiQuote =
-            let
-                quote =
-                    Regex.sym '"'
+    hex char =
+        "\\x" ++ (printf fmt $ Char.ord char)
+      where
+        fmt =
+          if Char.ord char <= 0xFF then
+            "%02X"
+          else
+            "%04X"
 
-                oneOrMoreQuotes =
-                    Regex.some quote
+    escapeMultiQuote =
+        let
+            quote =
+                Regex.sym '"'
 
-                escape =
-                    ("\\\"\\\"\\" ++) . (List.intersperse '\\')
-            in
-                Regex.replace $ escape <$> oneOrMoreQuotes <* quote <* quote
-    in
-        case style of
-            SChar ->
-                line $ row
-                    [ punc "\'"
-                    , literal $ concatMap fix s
-                    , punc "\'"
-                    ]
-            SString ->
-                line $ row
-                    [ punc "\""
-                    , literal $ concatMap fix s
-                    , punc "\""
-                    ]
-            SMulti ->
-                line $ row
-                    [ punc "\"\"\""
-                    , literal $ escapeMultiQuote $ concatMap fix s
-                    , punc "\"\"\""
-                    ]
+            oneOrMoreQuotes =
+                Regex.some quote
+
+            escape =
+                ("\\\"\\\"\\" ++) . (List.intersperse '\\')
+        in
+            Regex.replace $ escape <$> oneOrMoreQuotes <* quote <* quote
 
 
 data TypeParensRequired
