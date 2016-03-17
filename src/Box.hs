@@ -99,22 +99,13 @@ mustBreak l =
 stack' :: Box -> Box -> Box
 stack' b1 b2 =
     let
-        split b =
-            case b of
-                SingleLine l1 ->
-                    (l1, [])
-                Stack l1 l2 ln ->
-                    (l1, l2:ln)
-                MustBreak l1 ->
-                    (l1, [])
-        (l11, l1n) = split b1
-        (l21, l2n) = split b2
-    in
-      case (l1n ++ (l21:l2n)) of
+        (line1first, line1rest) = destructure b1
+        (line2first, line2rest) = destructure b2
+    in case line1rest ++ line2first:line2rest of
         [] ->
-          error "the list will contain at least l21"
-        l2 : ln ->
-          Stack l11 l2 ln
+            error "the list will contain at least line2first"
+        first : rest ->
+            Stack line1first first rest
 
 
 andThen :: [Box] -> Box -> Box
@@ -127,10 +118,10 @@ stack1 children =
     case children of
         [] ->
             error "stack1: empty structure"
-        (first:[]) ->
+        [first] ->
             first
-        (first:rest) ->
-            foldl1 stack' (first:rest)
+        boxes ->
+            foldl1 stack' boxes
 
 
 mapLines :: (Line -> Line) -> Box -> Box
@@ -209,15 +200,13 @@ myPrefix abcde
 -}
 prefix :: Line -> Box -> Box
 prefix pref =
-    mapFirstLine
-        addPrefixToLine
-        padLineWithSpaces
-    where
-        addPrefixToLine l = row [ pref, l ]
-        padLineWithSpaces l = row [ row paddingSpaces, l ]
-
+    let
         prefixLength = lineLength 0 pref
         paddingSpaces = replicate prefixLength space
+        padLineWithSpaces l = row [ row paddingSpaces, l ]
+        addPrefixToLine l = row [ pref, l ]
+    in
+      mapFirstLine addPrefixToLine padLineWithSpaces
 
 
 addSuffix :: Line -> Box -> Box
@@ -286,23 +275,27 @@ elmExtensionGroup multiline base first rest =
 
 
 renderLine :: Int -> Line -> T.Text
-renderLine _ (Text text) =
-    text
-renderLine _ Space =
-    T.singleton ' '
-renderLine startColumn Tab =
-    T.pack $ replicate (tabLength startColumn) ' '
-renderLine startColumn (Row lines') =
-    renderRow startColumn lines'
+renderLine startColumn line' =
+    case line' of
+        Text text ->
+            text
+        Space ->
+            T.singleton ' '
+        Tab ->
+            T.pack $ replicate (tabLength startColumn) ' '
+        Row lines' ->
+            renderRow startColumn lines'
 
 
 render :: Box -> T.Text
-render (SingleLine l1) =
-    T.snoc (renderLine 0 l1) '\n'
-render (Stack l1 l2 rest) =
-    T.unlines $ map (renderLine 0) (l1 : l2 : rest)
-render (MustBreak line') =
-    T.snoc (renderLine 0 line') '\n'
+render box' =
+    case box' of
+        SingleLine line' ->
+            T.snoc (renderLine 0 line') '\n'
+        Stack l1 l2 rest ->
+            T.unlines $ map (renderLine 0) (l1 : l2 : rest)
+        MustBreak line' ->
+            T.snoc (renderLine 0 line') '\n'
 
 
 -- TODO couldn't we just run renderLine and get the length of the resulting string?
@@ -314,9 +307,6 @@ lineLength startColumn line' =
          Space -> 1
          Tab -> tabLength startColumn
          Row lines' -> rowLength startColumn lines'
-
-
-
 
 
 initRow :: Int -> (T.Text, Int)
