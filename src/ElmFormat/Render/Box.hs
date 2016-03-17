@@ -490,7 +490,7 @@ formatDeclaration decl =
                 AST.Declaration.TypeAnnotation name typ ->
                     formatTypeAnnotation name typ
 
-                AST.Declaration.Datatype nameWithArgs rest last ->
+                AST.Declaration.Datatype nameWithArgs middle final ->
                     let
                         ctor (tag,args') =
                             case allSingles $ map (formatHeadCommented $ formatType' ForCtor) args' of
@@ -506,9 +506,10 @@ formatDeclaration decl =
                                         ]
                     in
                         case
-                          (map (formatCommented ctor) rest) ++ [formatHeadCommented ctor last]
+                          (map (formatCommented ctor) middle) ++ [formatHeadCommented ctor final]
                         of
-                          (first:rest) ->
+                          [] -> error "List can't be empty"
+                          first:rest ->
                               case formatCommented formatNameWithArgs nameWithArgs of
                                 SingleLine nameWithArgs' ->
                                   stack1
@@ -624,6 +625,7 @@ formatDeclaration decl =
                             pleaseReport "TODO" "multiline fixity declaration"
 
 
+formatNameWithArgs :: (String, [(Comments, String)]) -> Box
 formatNameWithArgs (name, args) =
   case allSingles $ map (formatHeadCommented (line . identifier)) args of
     Right args' ->
@@ -1188,7 +1190,7 @@ formatComment comment =
             case c of
                 [] ->
                     line $ punc "{- -}"
-                (l:[]) ->
+                [l] ->
                     line $ row
                         [ punc "{-"
                         , space
@@ -1196,7 +1198,7 @@ formatComment comment =
                         , space
                         , punc "-}"
                         ]
-                (ls) ->
+                ls ->
                     stack1
                         [ prefix
                             (row [ punc "{-", space ])
