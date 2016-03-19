@@ -400,8 +400,8 @@ formatImport aimport =
                                 , space
                                 , name'
                                 ]
-                              , indent $ as'
-                              , indent $ exposing'
+                              , indent as'
+                              , indent exposing'
                               ]
 
                           ( SingleLine name', Nothing, Just exposing' ) ->
@@ -417,15 +417,15 @@ formatImport aimport =
                           ( name', Just as', Just exposing' ) ->
                             stack1
                               [ line $ keyword "import"
-                              , indent $ name'
-                              , indent $ indent $ as'
-                              , indent $ indent $ exposing'
+                              , indent name'
+                              , indent $ indent as'
+                              , indent $ indent exposing'
                               ]
 
                           ( name', Nothing, Just exposing' ) ->
                             stack1
                               [ line $ keyword "import"
-                              , indent $ name'
+                              , indent name'
                               , indent $ indent exposing'
                               ]
 
