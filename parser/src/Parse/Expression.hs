@@ -328,7 +328,7 @@ defStart :: IParser (P.Pattern, [(Comments, P.Pattern)])
 defStart =
     choice
       [ do  pattern <- try Pattern.term
-            infics pattern <|> func pattern
+            func pattern
       , do  opPattern <- addLocation (P.Var <$> parens' symOp)
             func opPattern
       ]
@@ -341,8 +341,3 @@ defStart =
 
           _ ->
               return (pattern, [])
-
-    infics p1 =
-      do  (c1, (start, op, end)) <- try ((,) <$> (snd <$> whitespace) <*> located anyOp)
-          p2 <- (,) <$> (snd <$> whitespace) <*> Pattern.term
-          return (A.at start end (P.Var op), [(c1, p1), p2 ])

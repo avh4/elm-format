@@ -239,6 +239,7 @@ checkBad UnexpectedEndOfInput.elm
 
 checkTransformation Examples.elm
 checkTransformation QuickCheck-4562ebccb71ea9f622fb99cdf32b2923f6f9d34f-2529668492575674138.elm
+checkTransformation QuickCheck-94f37da84c1310f03dcfa1059ce870b73c94a825--6449652945938213463.elm
 
 echo
 echo "# GREAT SUCCESS!"
