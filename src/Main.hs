@@ -30,13 +30,17 @@ writeResult
     :: Maybe FilePath
     -> String
     -> Text.Text
+    -> Bool
     -> Result.Result () Syntax.Error AST.Module.Module
     -> IO ()
-writeResult outputFile inputFilename inputText result =
+writeResult outputFile inputFilename inputText isDry result =
     case result of
         Result.Result _ (Result.Ok modu) ->
-            let rendered =
+            let
+                renderedText =
                     Render.render modu
+                rendered =
+                    renderedText
                         |> Text.encodeUtf8
             in
                 case outputFile of
@@ -44,7 +48,13 @@ writeResult outputFile inputFilename inputText result =
                         Char8.putStr rendered
 
                     Just path -> do
-                        ByteString.writeFile path rendered
+                        if isDry then
+                            if inputText /= renderedText then
+                                putStrLn $ r $ FileWouldChange inputFilename
+                            else
+                                return ()
+                            else
+                                ByteString.writeFile path rendered
 
         Result.Result _ (Result.Err errs) ->
             do
@@ -52,18 +62,18 @@ writeResult outputFile inputFilename inputText result =
                 exitFailure
 
 
-processTextInput :: Maybe FilePath -> String -> Text.Text -> IO ()
-processTextInput outputFile inputFilename inputText  =
+processTextInput :: Maybe FilePath -> String -> Text.Text -> Bool -> IO ()
+processTextInput outputFile inputFilename inputText isDry =
     Parse.parse inputText
-        |> writeResult outputFile inputFilename inputText
+        |> writeResult outputFile inputFilename inputText isDry
 
 
-processFileInput :: FilePath -> Maybe FilePath -> IO ()
-processFileInput inputFile outputFile =
+processFileInput :: FilePath -> Maybe FilePath -> Bool -> IO ()
+processFileInput inputFile outputFile isDry =
     do
         putStrLn $ (r $ ProcessingFile inputFile)
         inputText <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
-        processTextInput outputFile inputFile inputText
+        processTextInput outputFile inputFile inputText isDry
 
 
 isEitherFileOrDirectory :: FilePath -> IO Bool
@@ -81,11 +91,11 @@ handleStdinInput outputFile = do
 
     Lazy.toStrict input
         |> Text.decodeUtf8
-        |> processTextInput outputFile "<STDIN>"
+        |> (\input -> processTextInput outputFile "<STDIN>" input False)
 
 
-handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> IO ()
-handleFilesInput inputFiles outputFile autoYes =
+handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> IO ()
+handleFilesInput inputFiles outputFile autoYes isDry =
     do
         filesExist <-
             all (id) <$> mapM isEitherFileOrDirectory inputFiles
@@ -101,14 +111,14 @@ handleFilesInput inputFiles outputFile autoYes =
         case elmFiles of
             inputFile:[] -> do
                 realOutputFile <- decideOutputFile autoYes inputFile outputFile
-                processFileInput inputFile (Just realOutputFile)
+                processFileInput inputFile (Just realOutputFile) isDry
             _ -> do
                 when (isJust outputFile)
                     exitOnInputDirAndOutput
 
                 canOverwriteFiles <- getApproval autoYes elmFiles
                 when canOverwriteFiles $
-                    mapM_ (\file -> processFileInput file (Just file)) elmFiles
+                    mapM_ (\file -> processFileInput file (Just file) isDry) elmFiles
 
 main :: IO ()
 main =
@@ -117,7 +127,8 @@ main =
         let inputFiles = (Flags._input config)
         let isStdin = (Flags._stdin config)
         let outputFile = (Flags._output config)
-        let autoYes = (Flags._yes config)
+        let isDry = (Flags._dry config)
+        let autoYes = isDry || (Flags._yes config)
 
         let noInputSource = null inputFiles && not isStdin
         let twoInputSources = (not $ null inputFiles) && isStdin
@@ -134,4 +145,4 @@ main =
             handleStdinInput outputFile
             exitSuccess
 
-        handleFilesInput inputFiles outputFile autoYes
+        handleFilesInput inputFiles outputFile autoYes isDry

@@ -12,3 +12,4 @@ data Message
   | TooManyInputSources
   | CantWriteToOutputBecauseInputIsDirectory
   | ProcessingFile FilePath
+  | FileWouldChange FilePath
