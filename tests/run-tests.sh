@@ -42,8 +42,8 @@ function compareFiles() {
 }
 
 function checkWaysToRun() {
-	cp "tests/test-files/good/$1" "_input.elm"
-	cp "tests/test-files/good/$1" "_input2.elm"
+	cp "tests/test-files/good/Simple.elm" "_input.elm"
+	cp "tests/test-files/transform/Examples.elm" "_input2.elm"
 
 	INPUT="_input.elm"
 	INPUT_2="_input2.elm"
@@ -73,9 +73,18 @@ function checkWaysToRun() {
 	returnCodeShouldEqual 0
 	shouldOutputTheSame "$HELP" "$NOARGS"
 
-	echo "## elm-format INPUT --dry does not change things"
-	"$ELM_FORMAT" "$INPUT_2" --dry 1>/dev/null
-	compareFiles "$INPUT" "$INPUT_2"
+	echo "## elm-format INPUT --validate does not change things"
+	"$ELM_FORMAT" "$INPUT_2" --validate 1>/dev/null
+	compareFiles "tests/test-files/transform/Examples.elm" "$INPUT_2"
+	returnCodeShouldEqual 0
+
+	echo "## elm-format INPUT --validate with unformatted file exits 1"
+	"$ELM_FORMAT" "$INPUT_2" --validate 1>/dev/null
+	returnCodeShouldEqual 1
+
+	echo "## elm-format INPUT --validate with formatted file exits 1"
+	"$ELM_FORMAT" "$INPUT_2" --yes 1>/dev/null
+	"$ELM_FORMAT" "$INPUT_2" --validate 1>/dev/null
 	returnCodeShouldEqual 0
 
 	echo "## elm-format INPUT (answer = y)"
@@ -144,12 +153,12 @@ function checkWaysToRun() {
 	"$ELM_FORMAT" "$EMPTY_DIR" 1>/dev/null
 	returnCodeShouldEqual 1
 
-	echo "## elm-format INPUT --dry"
-	"$ELM_FORMAT" "$INPUT" --dry 1>/dev/null
+	echo "## elm-format INPUT --validate"
+	"$ELM_FORMAT" "$INPUT" --validate 1>/dev/null
 	returnCodeShouldEqual 0
 
-	echo "## elm-format INPUT --dry --yes"
-	"$ELM_FORMAT" "$INPUT" --dry --yes 1>/dev/null
+	echo "## elm-format INPUT --validate --yes"
+	"$ELM_FORMAT" "$INPUT" --validate --yes 1>/dev/null
 	returnCodeShouldEqual 0
 
 
@@ -201,7 +210,7 @@ echo
 echo
 echo "# elm-format test suite"
 
-checkWaysToRun Simple.elm
+checkWaysToRun
 
 checkGood Simple.elm
 checkGood AllSyntax/AllSyntax.elm
