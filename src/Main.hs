@@ -32,8 +32,8 @@ writeResult
     -> Text.Text
     -> Bool
     -> Result.Result () Syntax.Error AST.Module.Module
-    -> IO ()
-writeResult outputFile inputFilename inputText isDry result =
+    -> IO (Maybe Bool)
+writeResult outputFile inputFilename inputText validateOnly result =
     case result of
         Result.Result _ (Result.Ok modu) ->
             let
@@ -45,16 +45,20 @@ writeResult outputFile inputFilename inputText isDry result =
             in
                 case outputFile of
                     Nothing ->
-                        Char8.putStr rendered
+                        (Char8.putStr rendered)
+                        >> (return Nothing)
 
                     Just path -> do
-                        if isDry then
-                            if inputText /= renderedText then
-                                putStrLn $ r $ FileWouldChange inputFilename
-                            else
-                                return ()
-                            else
-                                ByteString.writeFile path rendered
+                        case validateOnly of
+                            True ->
+                                if inputText /= renderedText then
+                                    (putStrLn $ r $ FileWouldChange inputFilename)
+                                    >> (return $ Just False)
+                                else
+                                    return $ Just True
+                            False ->
+                                (ByteString.writeFile path rendered)
+                                >> (return Nothing)
 
         Result.Result _ (Result.Err errs) ->
             do
@@ -62,18 +66,18 @@ writeResult outputFile inputFilename inputText isDry result =
                 exitFailure
 
 
-processTextInput :: Maybe FilePath -> String -> Text.Text -> Bool -> IO ()
-processTextInput outputFile inputFilename inputText isDry =
+processTextInput :: Maybe FilePath -> String -> Text.Text -> Bool -> IO (Maybe Bool)
+processTextInput outputFile inputFilename inputText validateOnly =
     Parse.parse inputText
-        |> writeResult outputFile inputFilename inputText isDry
+        |> writeResult outputFile inputFilename inputText validateOnly
 
 
-processFileInput :: FilePath -> Maybe FilePath -> Bool -> IO ()
-processFileInput inputFile outputFile isDry =
+processFileInput :: FilePath -> Maybe FilePath -> Bool -> IO (Maybe Bool)
+processFileInput inputFile outputFile validateOnly =
     do
         putStrLn $ (r $ ProcessingFile inputFile)
         inputText <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
-        processTextInput outputFile inputFile inputText isDry
+        processTextInput outputFile inputFile inputText validateOnly
 
 
 isEitherFileOrDirectory :: FilePath -> IO Bool
@@ -85,7 +89,7 @@ isEitherFileOrDirectory path = do
 -- read input from stdin
 -- if given an output file, then write there
 -- otherwise, stdout
-handleStdinInput :: Maybe FilePath -> IO ()
+handleStdinInput :: Maybe FilePath -> IO (Maybe Bool)
 handleStdinInput outputFile = do
     input <- Lazy.getContents
 
@@ -94,8 +98,8 @@ handleStdinInput outputFile = do
         |> (\input -> processTextInput outputFile "<STDIN>" input False)
 
 
-handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> IO ()
-handleFilesInput inputFiles outputFile autoYes isDry =
+handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> IO (Maybe Bool)
+handleFilesInput inputFiles outputFile autoYes validateOnly =
     do
         filesExist <-
             all (id) <$> mapM isEitherFileOrDirectory inputFiles
@@ -111,14 +115,28 @@ handleFilesInput inputFiles outputFile autoYes isDry =
         case elmFiles of
             inputFile:[] -> do
                 realOutputFile <- decideOutputFile autoYes inputFile outputFile
-                processFileInput inputFile (Just realOutputFile) isDry
+                processFileInput inputFile (Just realOutputFile) validateOnly
             _ -> do
                 when (isJust outputFile)
                     exitOnInputDirAndOutput
 
                 canOverwriteFiles <- getApproval autoYes elmFiles
-                when canOverwriteFiles $
-                    mapM_ (\file -> processFileInput file (Just file) isDry) elmFiles
+
+                if canOverwriteFiles
+                    then
+                        let
+                            merge prev next =
+                                case (prev, next) of
+                                    (Nothing, Just b) -> Just b
+                                    (Just b, Nothing) -> Just b
+                                    (Just a, Just b) -> Just $ a && b
+                                    (Nothing, Nothing) -> Nothing
+                        in
+                            do
+                                validationResults <- mapM (\file -> processFileInput file (Just file) validateOnly) elmFiles
+                                return $ foldl merge Nothing validationResults
+                    else
+                        return Nothing
 
 main :: IO ()
 main =
@@ -127,8 +145,8 @@ main =
         let inputFiles = (Flags._input config)
         let isStdin = (Flags._stdin config)
         let outputFile = (Flags._output config)
-        let isDry = (Flags._dry config)
-        let autoYes = isDry || (Flags._yes config)
+        let validateOnly = (Flags._validate config)
+        let autoYes = validateOnly || (Flags._yes config)
 
         let noInputSource = null inputFiles && not isStdin
         let twoInputSources = (not $ null inputFiles) && isStdin
@@ -145,4 +163,14 @@ main =
             handleStdinInput outputFile
             exitSuccess
 
-        handleFilesInput inputFiles outputFile autoYes isDry
+        validationResult <- handleFilesInput inputFiles outputFile autoYes validateOnly
+
+        case validationResult of
+            Nothing ->
+                exitSuccess
+
+            Just True ->
+                exitSuccess
+
+            Just False ->
+                exitFailure

@@ -13,7 +13,7 @@ data Config = Config
     { _input :: [FilePath]
     , _output :: Maybe FilePath
     , _yes :: Bool
-    , _dry :: Bool
+    , _validate :: Bool
     , _stdin :: Bool
     }
 
@@ -45,7 +45,7 @@ flags =
       <$> Opt.many input
       <*> output
       <*> yes
-      <*> dry
+      <*> validate
       <*> stdin
 
 
@@ -86,12 +86,12 @@ yes =
         , Opt.help "Reply 'yes' to all automated prompts."
         ]
 
-dry :: Opt.Parser Bool
-dry =
+validate :: Opt.Parser Bool
+validate =
     Opt.switch $
         mconcat
-        [ Opt.long "dry"
-        , Opt.help "Only print what would change, don't actually run it"
+        [ Opt.long "validate"
+        , Opt.help "Check if files are formatted without changing them."
         ]
 
 dependencies :: Opt.Parser Bool
