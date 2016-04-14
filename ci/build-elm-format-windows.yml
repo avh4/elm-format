@@ -1,0 +1,5 @@
+platform: windows
+inputs:
+- name: elm-format
+run:
+  path: elm-format/ci/win.bat
