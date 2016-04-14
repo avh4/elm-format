@@ -1,8 +1,8 @@
 #!/bin/bash
 
-shellcheck -e SC2002 "./tests/run-tests.sh" || exit 1
-shellcheck "./build-package.sh" || exit 1
-shellcheck "./package/linux/build-package.sh" || exit 1
+#shellcheck -e SC2002 "./tests/run-tests.sh" || exit 1
+#shellcheck "./build-package.sh" || exit 1
+#shellcheck "./package/linux/build-package.sh" || exit 1
 
 cabal test || exit 1
 cabal build || exit 1
