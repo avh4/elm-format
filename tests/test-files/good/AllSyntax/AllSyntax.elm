@@ -1,4 +1,4 @@
-module AllSyntax (fn,tuple,Type, Data(A, B, C), MultilineData(..)) where
+module AllSyntax (fn, tuple, Type, Data(A, B, C), MultilineData(..)) where
 
 {-| An example of all valid Elm syntax.
 
