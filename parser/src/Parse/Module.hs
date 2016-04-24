@@ -108,15 +108,15 @@ listing :: IParser a -> IParser (Comments, Var.Listing a, Bool)
 listing item =
   expecting "a listing of values and types to expose, like (..)" $
   do  (_, preParen) <- try (whitespace <* char '(')
-      (_, pre) <- whitespace
       pushNewlineContext
+      (_, pre) <- whitespace
       listing <-
           choice
             [ (\_ pre post -> (Var.OpenListing (Commented pre () post))) <$> string ".."
             , (\x pre post -> (Var.ExplicitListing (x pre post))) <$> commaSep1' item
             ]
-      sawNewline <- popNewlineContext
       (_, post) <- whitespace
+      sawNewline <- popNewlineContext
       char ')'
       return $ (preParen, listing pre post, sawNewline)
 
