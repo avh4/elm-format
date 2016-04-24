@@ -3,6 +3,7 @@ module Main where
 import Test.Framework
 
 import qualified Test.Property
+import qualified Test.Integration
 import qualified BoxTest
 import qualified Parse.ExpressionTest
 import qualified Parse.HelpersTest
@@ -25,4 +26,5 @@ main =
     , Parse.TypeTest.tests
     , Parse.TestHelpersTest.tests
     , Util.ListTest.tests
+    , Test.Integration.tests
     ]

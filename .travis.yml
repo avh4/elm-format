@@ -34,4 +34,4 @@ install:
 script:
  - source halcyon-env
  - cabal configure --enable-tests
- - ./tests/run-tests.sh
+ - cabal test --show-details=always

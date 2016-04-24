@@ -108,5 +108,5 @@ cabal build
 
 ```bash
 cabal configure --enable-tests
-./tests/run-tests.sh
+cabal test --show-details=always
 ```

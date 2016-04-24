@@ -1,0 +1,18 @@
+[36m-- SYNTAX PROBLEM --------------------------------------------------- _input.elm
+
+[0mI ran into something unexpected when parsing your code!
+
+1│ [31m
+   ^[0m
+I am looking for one of the following things:
+
+    "{-|"
+    a module declaration
+    a port declaration
+    a type declaration
+    a value definition
+    an import
+    an infix declaration
+    whitespace
+
+

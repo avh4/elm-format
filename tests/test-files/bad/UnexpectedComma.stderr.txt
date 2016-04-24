@@ -1,0 +1,16 @@
+[36m-- SYNTAX PROBLEM --------------------------------------------------- _input.elm
+
+[0mI ran into something unexpected when parsing your code!
+
+4│ abc,def =[31m
+      ^[0m
+I am looking for one of the following things:
+
+    =
+    a pattern
+    an infix operator like +
+    an infix operator like `andThen`
+    more letters in this name
+    whitespace
+
+
