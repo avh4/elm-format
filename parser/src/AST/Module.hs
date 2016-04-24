@@ -60,6 +60,6 @@ data UserImport
 
 data ImportMethod = ImportMethod
     { alias :: Maybe (Comments, PreCommented String)
-    , exposedVars :: (Comments, PreCommented (Var.Listing Var.Value))
+    , exposedVars :: (Comments, PreCommented (Var.Listing Var.Value), Bool)
     }
     deriving (Eq, Show)

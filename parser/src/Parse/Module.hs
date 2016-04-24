@@ -61,7 +61,7 @@ moduleDecl =
       (_, preName) <- whitespace
       names <- dotSep1 capVar <?> "the name of this module"
       (_, postName1) <- whitespace
-      (postName2, exports) <- option ([], Var.OpenListing (Commented [] () [])) (listing value)
+      (postName2, exports, _) <- option ([], Var.OpenListing (Commented [] () []), False) (listing value)
       (_, preWhere) <- whitespace
       reserved "where"
       return (Commented preName names (postName1 ++ postName2), exports, preWhere)
@@ -88,7 +88,7 @@ import' =
     method originalName =
       Module.ImportMethod
         <$> option Nothing (Just <$> as' originalName)
-        <*> option ([], ([], Var.ClosedListing)) exposing
+        <*> option ([], ([], Var.ClosedListing), False) exposing
 
     as' :: String -> IParser (Comments, PreCommented String)
     as' moduleName =
@@ -96,27 +96,29 @@ import' =
           (_, postAs) <- whitespace
           (,) preAs <$> (,) postAs <$> capVar <?> ("an alias for module `" ++ moduleName ++ "`")
 
-    exposing :: IParser (Comments, PreCommented (Var.Listing Var.Value))
+    exposing :: IParser (Comments, PreCommented (Var.Listing Var.Value), Bool)
     exposing =
       do  (_, preExposing) <- try (whitespace <* reserved "exposing")
           (_, postExposing) <- whitespace
-          (postExposing2, listing') <- listing value
-          return (preExposing, (postExposing ++ postExposing2, listing'))
+          (postExposing2, listing', multiline) <- listing value
+          return (preExposing, (postExposing ++ postExposing2, listing'), multiline)
 
 
-listing :: IParser a -> IParser (Comments, Var.Listing a)
+listing :: IParser a -> IParser (Comments, Var.Listing a, Bool)
 listing item =
   expecting "a listing of values and types to expose, like (..)" $
   do  (_, preParen) <- try (whitespace <* char '(')
       (_, pre) <- whitespace
+      pushNewlineContext
       listing <-
           choice
-            [ (\_ pre post -> Var.OpenListing (Commented pre () post)) <$> string ".."
-            , (\x pre post -> Var.ExplicitListing (x pre post)) <$> commaSep1' item
+            [ (\_ pre post -> (Var.OpenListing (Commented pre () post))) <$> string ".."
+            , (\x pre post -> (Var.ExplicitListing (x pre post))) <$> commaSep1' item
             ]
+      sawNewline <- popNewlineContext
       (_, post) <- whitespace
       char ')'
-      return $ (preParen, listing pre post)
+      return $ (preParen, listing pre post, sawNewline)
 
 
 value :: IParser Var.Value
@@ -131,4 +133,4 @@ value =
           maybeCtors <- optionMaybe (listing capVar)
           case maybeCtors of
             Nothing -> return (Var.Alias name)
-            Just (pre, ctors) -> return (Var.Union (name, pre) ctors)
+            Just (pre, ctors, _) -> return (Var.Union (name, pre) ctors)
