@@ -19,6 +19,7 @@ import qualified Data.Text as Text
 import qualified Data.Maybe as Maybe
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
+import qualified ElmVersion
 import qualified Test.Generators
 import qualified Test.ElmSourceGenerators
 
@@ -31,7 +32,7 @@ assertStringToString source =
         result =
             Parse.parse source'
                 |> Parse.toEither
-                |> fmap Render.render
+                |> fmap (Render.render ElmVersion.Elm_0_16)
     in
         assertEqual "" (Right source') result
 
@@ -41,7 +42,7 @@ astToAst ast =
     let
         result =
             ast
-                |> Render.render
+                |> Render.render ElmVersion.Elm_0_16
                 |> Parse.parse
                 |> Parse.toEither
     in
@@ -57,9 +58,9 @@ simpleAst =
 
 reportFailedAst ast =
     let
-        rendering = Render.render ast |> Text.unpack
+        rendering = Render.render ElmVersion.Elm_0_16 ast |> Text.unpack
         result =
-            Render.render ast
+            Render.render ElmVersion.Elm_0_16 ast
                 |> Parse.parse
                 |> fmap stripRegion
                 |> show

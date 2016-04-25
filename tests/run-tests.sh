@@ -167,20 +167,26 @@ function checkWaysToRun() {
 }
 
 function checkGood() {
-	INPUT="tests/test-files/good/$1"
+	ELM_VERSION="$1"
+	INPUT="tests/test-files/good/$2"
 	OUTPUT="formatted.elm"
 
+	if [ ! -e "$INPUT" ]; then
+		echo "ERROR: $INPUT does not exist"
+		exit 1
+	fi
+
 	echo
-	echo "## good/$1"
-	time "$ELM_FORMAT" "$INPUT" --output "$OUTPUT" 1>/dev/null
+	echo "## good/$2"
+	time "$ELM_FORMAT" "$INPUT" --output "$OUTPUT" --elm-version "$1" 1>/dev/null
 	returnCodeShouldEqual 0
 	compareFiles "$INPUT" "$OUTPUT"
 }
 
 function checkGoodAllSyntax() {
-	checkGood "AllSyntax/$1/$2.elm"
-	checkGood "AllSyntax/$1/BlockComments/$2.elm"
-	checkGood "AllSyntax/$1/LineComments/$2.elm"
+	checkGood "$1" "AllSyntax/$1/$2.elm"
+	checkGood "$1" "AllSyntax/$1/BlockComments/$2.elm"
+	checkGood "$1" "AllSyntax/$1/LineComments/$2.elm"
 }
 
 function checkBad() {
@@ -212,26 +218,28 @@ echo "# elm-format test suite"
 
 checkWaysToRun
 
-checkGood Simple.elm
-checkGood AllSyntax/0.16/AllSyntax.elm
+checkGood 0.16 Simple.elm
+checkGood 0.16 AllSyntax/0.16/AllSyntax.elm
 checkGoodAllSyntax 0.16 Module
 checkGoodAllSyntax 0.16 Declarations
 checkGoodAllSyntax 0.16 Patterns
 checkGoodAllSyntax 0.16 Types
 checkGoodAllSyntax 0.16 Expressions
-checkGood Comments.elm
-checkGood AllSyntax/0.16/GLShader.elm
-checkGood AllSyntax/0.16/Literals.elm
-checkGood AllSyntax/0.16/Comments.elm
-checkGood ApiSketch.elm
+checkGood 0.16 Comments.elm
+checkGood 0.16 AllSyntax/0.16/GLShader.elm
+checkGood 0.16 AllSyntax/0.16/Literals.elm
+checkGood 0.16 AllSyntax/0.16/Comments.elm
+checkGood 0.16 ApiSketch.elm
 
-checkGood evancz/start-app/StartApp.elm
-checkGood TheSeamau5/elm-check/Check.elm
-checkGood rtfeldman/dreamwriter/Editor.elm
-checkGood rtfeldman/dreamwriter/LeftSidebar.elm
-checkGood rtfeldman/dreamwriter/RightSidebar.elm
-checkGood rtfeldman/dreamwriter/WordGraph.elm
-checkGood avh4/elm-fifo/Fifo.elm
+checkGoodAllSyntax 0.17 Module
+
+checkGood 0.16 evancz/start-app/StartApp.elm
+checkGood 0.16 TheSeamau5/elm-check/Check.elm
+checkGood 0.16 rtfeldman/dreamwriter/Editor.elm
+checkGood 0.16 rtfeldman/dreamwriter/LeftSidebar.elm
+checkGood 0.16 rtfeldman/dreamwriter/RightSidebar.elm
+checkGood 0.16 rtfeldman/dreamwriter/WordGraph.elm
+checkGood 0.16 avh4/elm-fifo/Fifo.elm
 
 checkBad Empty.elm
 checkBad UnexpectedComma.elm

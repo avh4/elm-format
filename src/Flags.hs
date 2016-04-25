@@ -3,7 +3,10 @@ module Flags where
 
 import Data.Monoid ((<>))
 import Data.Version (showVersion)
+import ElmVersion (ElmVersion(..))
 
+import qualified Data.Maybe as Maybe
+import qualified ElmVersion
 import qualified Options.Applicative as Opt
 import qualified Paths_elm_format as This
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
@@ -15,7 +18,9 @@ data Config = Config
     , _yes :: Bool
     , _validate :: Bool
     , _stdin :: Bool
+    , _elmVersion :: ElmVersion
     }
+
 
 -- PARSE ARGUMENTS
 
@@ -47,6 +52,7 @@ flags =
       <*> yes
       <*> validate
       <*> stdin
+      <*> elmVersion
 
 
 
@@ -123,3 +129,15 @@ stdin =
         [ Opt.long "stdin"
         , Opt.help "Read from stdin, output to stdout."
         ]
+
+
+elmVersion :: Opt.Parser ElmVersion
+elmVersion =
+  fmap (Maybe.fromMaybe Elm_0_16)$
+  Opt.optional $
+  Opt.option (Opt.eitherReader ElmVersion.parse) $
+    mconcat
+      [ Opt.long "elm-version"
+      , Opt.metavar "VERSION"
+      , Opt.help "The Elm version of the source files being formatted.  Valid values: 0.16, 0.17.  Default: 0.16"
+      ]

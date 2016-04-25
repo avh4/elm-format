@@ -56,6 +56,14 @@ header =
 
 moduleDecl :: IParser (Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
 moduleDecl =
+  choice
+    [ try moduleDecl_0_16
+    , moduleDecl_0_17
+    ]
+
+
+moduleDecl_0_16 :: IParser (Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
+moduleDecl_0_16 =
   expecting "a module declaration" $
   do  try (reserved "module")
       (_, preName) <- whitespace
@@ -65,6 +73,18 @@ moduleDecl =
       (_, preWhere) <- whitespace
       reserved "where"
       return (Commented preName names (postName1 ++ postName2), exports, preWhere)
+
+
+moduleDecl_0_17 :: IParser (Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
+moduleDecl_0_17 =
+  expecting "a module declaration" $
+  do  try (reserved "module")
+      (_, preName) <- whitespace
+      names <- dotSep1 capVar <?> "the name of this module"
+      (_, postName1) <- whitespace
+      reserved "exposing"
+      (postName2, exports, _) <- option ([], Var.OpenListing (Commented [] () []), False) (listing value)
+      return (Commented preName names postName1, exports, postName2)
 
 
 imports :: IParser [Module.UserImport]
