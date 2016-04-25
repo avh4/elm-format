@@ -4,6 +4,7 @@ module ElmFormat.Render.Box where
 import Elm.Utils ((|>))
 import Box
 import Data.Version (showVersion)
+import ElmVersion (ElmVersion(..))
 
 import AST.V0_16
 import qualified AST.Declaration
@@ -151,42 +152,16 @@ declarationType decl =
       DComment
 
 
-formatModuleHeader :: AST.Module.Header -> Box
-formatModuleHeader header =
+formatModuleHeader :: ElmVersion -> AST.Module.Header -> Box
+formatModuleHeader elmVersion header =
   let
-      formatExports =
-        case formatListing False formatVarValue $ AST.Module.exports header of
-            Just listing ->
-              listing
-            _ ->
-                line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
-
-      whereClause =
-        formatHeadCommented (line . keyword) (AST.Module.postExportComments header, "where")
-
       moduleLine =
-        case
-          ( formatCommented (line . formatName) $ AST.Module.name header
-          , formatExports
-          , whereClause
-          )
-        of
-          (SingleLine name', SingleLine exports', SingleLine where') ->
-            line $ row
-              [ keyword "module"
-              , space
-              , name'
-              , row [ space, exports' ]
-              , space
-              , where'
-              ]
-          (name', exports', _) ->
-            stack1
-              [ line $ keyword "module"
-              , indent $ name'
-              , indent $ exports'
-              , indent $ whereClause
-              ]
+        case elmVersion of
+          Elm_0_16 ->
+            formatModuleLine_0_16 header
+
+          Elm_0_17 ->
+            formatModuleLine_0_17 header
 
       docs =
           formatModuleDocs (AST.Module.docs header)
@@ -219,8 +194,83 @@ formatModuleHeader header =
           |> andThen [ blankLine, blankLine ]
 
 
-formatModule :: AST.Module.Module -> Box
-formatModule modu =
+formatModuleLine_0_16 :: AST.Module.Header -> Box
+formatModuleLine_0_16 header =
+  let
+    formatExports =
+      case formatListing False formatVarValue $ AST.Module.exports header of
+          Just listing ->
+            listing
+          _ ->
+              line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
+
+    whereClause =
+      formatHeadCommented (line . keyword) (AST.Module.postExportComments header, "where")
+  in
+    case
+      ( formatCommented (line . formatName) $ AST.Module.name header
+      , formatExports
+      , whereClause
+      )
+    of
+      (SingleLine name', SingleLine exports', SingleLine where') ->
+        line $ row
+          [ keyword "module"
+          , space
+          , name'
+          , row [ space, exports' ]
+          , space
+          , where'
+          ]
+      (name', exports', _) ->
+        stack1
+          [ line $ keyword "module"
+          , indent $ name'
+          , indent $ exports'
+          , indent $ whereClause
+          ]
+
+
+formatModuleLine_0_17 :: AST.Module.Header -> Box
+formatModuleLine_0_17 header =
+  let
+    formatExports =
+      case formatListing False formatVarValue $ AST.Module.exports header of
+          Just listing ->
+            listing
+          _ ->
+              line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
+
+    exposingPhrase =
+      formatTailCommented (line . keyword) ("exposing", AST.Module.postExportComments header)
+  in
+    case
+      ( formatCommented (line . formatName) $ AST.Module.name header
+      , formatExports
+      , exposingPhrase
+      )
+    of
+      (SingleLine name', SingleLine exports', SingleLine exposing') ->
+        line $ row
+          [ keyword "module"
+          , space
+          , name'
+          , space
+          , exposing'
+          , space
+          , exports'
+          ]
+      (name', exports', _) ->
+        stack1
+          [ line $ keyword "module"
+          , indent $ name'
+          , indent $ exposingPhrase
+          , indent $ exports'
+          ]
+
+
+formatModule :: ElmVersion -> AST.Module.Module -> Box
+formatModule elmVersion modu =
     let
         spacer first second =
           case (declarationType first, declarationType second) of
@@ -253,7 +303,7 @@ formatModule modu =
     in
       stack1 $
         initialComments'
-          ++ (formatModuleHeader $ AST.Module.header modu)
+          ++ (formatModuleHeader elmVersion $ AST.Module.header modu)
           : body
 
 
@@ -301,7 +351,7 @@ formatImport aimport =
                             "as")
                             |> Monad.join
 
-                        (exposingPreKeyword, exposingPostKeywordAndListing, multiline) 
+                        (exposingPreKeyword, exposingPostKeywordAndListing, multiline)
                           = AST.Module.exposedVars method
 
                         exposing =

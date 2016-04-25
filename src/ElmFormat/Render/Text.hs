@@ -2,6 +2,7 @@
 module ElmFormat.Render.Text where
 
 import Elm.Utils ((|>))
+import ElmVersion (ElmVersion)
 
 import qualified AST.Module
 import qualified Box
@@ -9,8 +10,8 @@ import qualified Data.Text as Text
 import qualified ElmFormat.Render.Box as Render
 
 
-render :: AST.Module.Module -> Text.Text
-render modu =
+render :: ElmVersion -> AST.Module.Module -> Text.Text
+render elmVersion modu =
     let
         trimSpaces text =
             text
@@ -18,6 +19,6 @@ render modu =
                 |> map Text.stripEnd
                 |> Text.unlines
     in
-        Render.formatModule modu
+        Render.formatModule elmVersion modu
             |> Box.render
             |> trimSpaces

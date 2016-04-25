@@ -7,6 +7,7 @@ import Messages.Types (Message(..))
 import Control.Monad (when)
 import Data.Maybe (isJust)
 import CommandLine.Helpers
+import ElmVersion (ElmVersion)
 
 
 import qualified AST.Module
@@ -31,14 +32,15 @@ writeResult
     -> String
     -> Text.Text
     -> Bool
+    -> ElmVersion
     -> Result.Result () Syntax.Error AST.Module.Module
     -> IO (Maybe Bool)
-writeResult outputFile inputFilename inputText validateOnly result =
+writeResult outputFile inputFilename inputText validateOnly elmVersion result =
     case result of
         Result.Result _ (Result.Ok modu) ->
             let
                 renderedText =
-                    Render.render modu
+                    Render.render elmVersion modu
                 rendered =
                     renderedText
                         |> Text.encodeUtf8
@@ -66,18 +68,18 @@ writeResult outputFile inputFilename inputText validateOnly result =
                 exitFailure
 
 
-processTextInput :: Maybe FilePath -> String -> Text.Text -> Bool -> IO (Maybe Bool)
-processTextInput outputFile inputFilename inputText validateOnly =
+processTextInput :: Maybe FilePath -> String -> Text.Text -> Bool -> ElmVersion -> IO (Maybe Bool)
+processTextInput outputFile inputFilename inputText validateOnly elmVersion =
     Parse.parse inputText
-        |> writeResult outputFile inputFilename inputText validateOnly
+        |> writeResult outputFile inputFilename inputText validateOnly elmVersion
 
 
-processFileInput :: FilePath -> Maybe FilePath -> Bool -> IO (Maybe Bool)
-processFileInput inputFile outputFile validateOnly =
+processFileInput :: FilePath -> Maybe FilePath -> Bool -> ElmVersion -> IO (Maybe Bool)
+processFileInput inputFile outputFile validateOnly elmVersion =
     do
         putStrLn $ (r $ ProcessingFile inputFile)
         inputText <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
-        processTextInput outputFile inputFile inputText validateOnly
+        processTextInput outputFile inputFile inputText validateOnly elmVersion
 
 
 isEitherFileOrDirectory :: FilePath -> IO Bool
@@ -89,17 +91,17 @@ isEitherFileOrDirectory path = do
 -- read input from stdin
 -- if given an output file, then write there
 -- otherwise, stdout
-handleStdinInput :: Maybe FilePath -> IO (Maybe Bool)
-handleStdinInput outputFile = do
+handleStdinInput :: Maybe FilePath -> ElmVersion -> IO (Maybe Bool)
+handleStdinInput outputFile elmVersion = do
     input <- Lazy.getContents
 
     Lazy.toStrict input
         |> Text.decodeUtf8
-        |> (\input -> processTextInput outputFile "<STDIN>" input False)
+        |> (\input -> processTextInput outputFile "<STDIN>" input False elmVersion)
 
 
-handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> IO (Maybe Bool)
-handleFilesInput inputFiles outputFile autoYes validateOnly =
+handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> ElmVersion -> IO (Maybe Bool)
+handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion =
     do
         filesExist <-
             all (id) <$> mapM isEitherFileOrDirectory inputFiles
@@ -115,7 +117,7 @@ handleFilesInput inputFiles outputFile autoYes validateOnly =
         case elmFiles of
             inputFile:[] -> do
                 realOutputFile <- decideOutputFile autoYes inputFile outputFile
-                processFileInput inputFile (Just realOutputFile) validateOnly
+                processFileInput inputFile (Just realOutputFile) validateOnly elmVersion
             _ -> do
                 when (isJust outputFile)
                     exitOnInputDirAndOutput
@@ -133,7 +135,7 @@ handleFilesInput inputFiles outputFile autoYes validateOnly =
                                     (Nothing, Nothing) -> Nothing
                         in
                             do
-                                validationResults <- mapM (\file -> processFileInput file (Just file) validateOnly) elmFiles
+                                validationResults <- mapM (\file -> processFileInput file (Just file) validateOnly elmVersion) elmFiles
                                 return $ foldl merge Nothing validationResults
                     else
                         return Nothing
@@ -147,6 +149,7 @@ main =
         let outputFile = (Flags._output config)
         let validateOnly = (Flags._validate config)
         let autoYes = validateOnly || (Flags._yes config)
+        let elmVersion = Flags._elmVersion config
 
         let noInputSource = null inputFiles && not isStdin
         let twoInputSources = (not $ null inputFiles) && isStdin
@@ -160,10 +163,10 @@ main =
             exitTooManyInputSources
 
         when (isStdin) $ do
-            handleStdinInput outputFile
+            handleStdinInput outputFile elmVersion
             exitSuccess
 
-        validationResult <- handleFilesInput inputFiles outputFile autoYes validateOnly
+        validationResult <- handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion
 
         case validationResult of
             Nothing ->
