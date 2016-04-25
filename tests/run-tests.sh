@@ -178,9 +178,9 @@ function checkGood() {
 }
 
 function checkGoodAllSyntax() {
-	checkGood "AllSyntax/$1.elm"
-	checkGood "AllSyntax/BlockComments/$1.elm"
-	checkGood "AllSyntax/LineComments/$1.elm"
+	checkGood "AllSyntax/$1/$2.elm"
+	checkGood "AllSyntax/$1/BlockComments/$2.elm"
+	checkGood "AllSyntax/$1/LineComments/$2.elm"
 }
 
 function checkBad() {
@@ -213,16 +213,16 @@ echo "# elm-format test suite"
 checkWaysToRun
 
 checkGood Simple.elm
-checkGood AllSyntax/AllSyntax.elm
-checkGoodAllSyntax Module
-checkGoodAllSyntax Declarations
-checkGoodAllSyntax Patterns
-checkGoodAllSyntax Types
-checkGoodAllSyntax Expressions
+checkGood AllSyntax/0.16/AllSyntax.elm
+checkGoodAllSyntax 0.16 Module
+checkGoodAllSyntax 0.16 Declarations
+checkGoodAllSyntax 0.16 Patterns
+checkGoodAllSyntax 0.16 Types
+checkGoodAllSyntax 0.16 Expressions
 checkGood Comments.elm
-checkGood AllSyntax/GLShader.elm
-checkGood AllSyntax/Literals.elm
-checkGood AllSyntax/Comments.elm
+checkGood AllSyntax/0.16/GLShader.elm
+checkGood AllSyntax/0.16/Literals.elm
+checkGood AllSyntax/0.16/Comments.elm
 checkGood ApiSketch.elm
 
 checkGood evancz/start-app/StartApp.elm
