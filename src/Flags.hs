@@ -133,11 +133,11 @@ stdin =
 
 elmVersion :: Opt.Parser ElmVersion
 elmVersion =
-  fmap (Maybe.fromMaybe Elm_0_16)$
+  fmap (Maybe.fromMaybe Elm_0_17)$
   Opt.optional $
   Opt.option (Opt.eitherReader ElmVersion.parse) $
     mconcat
       [ Opt.long "elm-version"
       , Opt.metavar "VERSION"
-      , Opt.help "The Elm version of the source files being formatted.  Valid values: 0.16, 0.17.  Default: 0.16"
+      , Opt.help "The Elm version of the source files being formatted.  Valid values: 0.16, 0.17.  Default: 0.17"
       ]

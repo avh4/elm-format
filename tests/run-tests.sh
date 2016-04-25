@@ -206,7 +206,7 @@ function checkTransformation() {
 
 	echo
 	echo "## transform/$1"
-	time "$ELM_FORMAT" "$INPUT" --output "$OUTPUT" 1>/dev/null
+	time "$ELM_FORMAT" "$INPUT" --output "$OUTPUT" --elm-version 0.16 1>/dev/null
 	returnCodeShouldEqual 0
 	compareFiles "$EXPECTED" "$OUTPUT"
 }
