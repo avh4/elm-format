@@ -11,7 +11,7 @@
 The benefits of `elm-format`:
  - It makes code **easier to write**, because you never have to worry about minor formatting concerns while powering out new code.
  - It makes code **easier to read**, because there are no longer distracting minor stylistic differences between different code bases. As such, your brain can map more efficiently from source to mental model.
- - It makes code **easier to maintain**, because you can no longer have diffs related only to formatting; every diff necessary involves a material change.
+ - It makes code **easier to maintain**, because you can no longer have diffs related only to formatting; every diff necessarily involves a material change.
  - It **saves your team time** debating how to format things, because there is a standard tool that formats everything the same way.
 
 
