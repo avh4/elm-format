@@ -241,6 +241,11 @@ checkGood 0.16 rtfeldman/dreamwriter/RightSidebar.elm
 checkGood 0.16 rtfeldman/dreamwriter/WordGraph.elm
 checkGood 0.16 avh4/elm-fifo/Fifo.elm
 
+checkGood 0.17 elm-lang/examples/random.elm
+checkGood 0.17 elm-lang/examples/http.elm
+checkGood 0.17 elm-lang/examples/time.elm
+checkGood 0.17 elm-lang/examples/websockets.elm
+
 checkBad Empty.elm
 checkBad UnexpectedComma.elm
 checkBad UnexpectedEndOfInput.elm

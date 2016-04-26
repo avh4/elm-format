@@ -1,8 +1,9 @@
+module Main exposing (..)
+
 import Html exposing (..)
 import Html.App as Html
 import Html.Events exposing (..)
 import Random
-
 
 
 main =
@@ -23,9 +24,9 @@ type alias Model =
   }
 
 
-init : (Model, Cmd Msg)
+init : ( Model, Cmd Msg )
 init =
-  (Model 1, Cmd.none)
+  ( Model 1, Cmd.none )
 
 
 
@@ -37,14 +38,14 @@ type Msg
   | NewFace Int
 
 
-update : Msg -> Model -> (Model, Cmd Msg)
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
     Roll ->
-      (model, Random.generate NewFace (Random.int 1 6))
+      ( model, Random.generate NewFace (Random.int 1 6) )
 
     NewFace newFace ->
-      (Model newFace, Cmd.none)
+      ( Model newFace, Cmd.none )
 
 
 
@@ -62,7 +63,8 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-  div []
+  div
+    []
     [ h1 [] [ text (toString model.dieFace) ]
     , button [ onClick Roll ] [ text "Roll" ]
     ]

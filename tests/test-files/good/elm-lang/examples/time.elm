@@ -1,9 +1,10 @@
+module Main exposing (..)
+
 import Html exposing (Html)
 import Html.App as Html
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Time exposing (Time, second)
-
 
 
 main =
@@ -19,12 +20,13 @@ main =
 -- MODEL
 
 
-type alias Model = Time
+type alias Model =
+  Time
 
 
-init : (Model, Cmd Msg)
+init : ( Model, Cmd Msg )
 init =
-  (0, Cmd.none)
+  ( 0, Cmd.none )
 
 
 
@@ -35,11 +37,11 @@ type Msg
   = Tick Time
 
 
-update : Msg -> Model -> (Model, Cmd Msg)
+update : Msg -> Model -> ( Model, Cmd Msg )
 update action model =
   case action of
     Tick newTime ->
-      (newTime, Cmd.none)
+      ( newTime, Cmd.none )
 
 
 
@@ -67,7 +69,8 @@ view model =
     handY =
       toString (50 + 40 * sin angle)
   in
-    svg [ viewBox "0 0 100 100", width "300px" ]
+    svg
+      [ viewBox "0 0 100 100", width "300px" ]
       [ circle [ cx "50", cy "50", r "45", fill "#0B79CE" ] []
       , line [ x1 "50", y1 "50", x2 handX, y2 handY, stroke "#023963" ] []
       ]
