@@ -18,16 +18,35 @@ choco install poshgit
 
 # Restart shell
 
+
+## Build Windows x64 binary
+
+# cd package/win
+# see setup.txt
+# vagrant up
+## open VirtualBox and show the screen
+## Start PowerShell
+#># cd Desktop
+#># git fetch
+#># git checkout ${VERSION}
+#># cabal update
+#>#
+
 cd Desktop
 git clone https://github.com/avh4/elm-format.git
 cd elm-format
 cabal update
-cabal sandbox init --sandbox=.cabal-sandbox
+cabal install --only-dependencies
 cabal clean
-cabal test
+cabal configure
+# cabal test
 cabal build
-cabal install
+# cabal install
 
-cp .cabal-sandbox\bin\elm-format.exe \vagrant
+cp .\dist\build\elm-format\elm-format.exe \vagrant
+
+## back to host computer
+# cd ./package/win/
+# vagrant halt
 
 # on mac:  zip elm-format-0.1-alpha-2-win-x64.zip elm-format.exe
