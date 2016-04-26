@@ -5,6 +5,7 @@ set -ex
 VERSION="$(sed -ne "s/^Version: //p" elm-format.cabal)"
 
 cabal update
+cabal sandbox init
 cabal install --only-dependencies --enable-tests
 
 ## Run tests
@@ -19,9 +20,9 @@ cabal configure --enable-tests
 cabal clean
 cabal configure
 cabal build
-cabal install
+# cabal install
 
 BUILD="elm-format-${VERSION}-linux-x64"
 
-tar zcvf "$BUILD".tgz -C .cabal-sandbox/bin elm-format
+tar zcvf "$BUILD".tgz -C dist/build/elm-format elm-format
 mv "$BUILD".tgz /vagrant/
