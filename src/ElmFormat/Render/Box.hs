@@ -827,6 +827,7 @@ formatPattern parensRequired apattern =
 
         AST.Pattern.Data ctor patterns ->
             ElmStructure.application
+                False
                 (line $ identifier ctor)
                 (map (formatHeadCommented $ formatPattern True) patterns)
             |> if parensRequired then parens else id
@@ -991,18 +992,10 @@ formatExpression aexpr =
             prefix (punc "-") $ formatExpression e
 
         AST.Expression.App left args multiline ->
-            case
-                ( multiline
-                , formatExpression left
-                , allSingles $ map (\(x,y) -> formatCommented' x formatExpression y) args
-                )
-            of
-                (False, SingleLine left', Right args') ->
-                  line $ row
-                      $ List.intersperse space $ (left':args')
-                (_, left', _) ->
-                    left'
-                        |> andThen (map (\(x,y) -> indent $ formatCommented' x formatExpression y) args)
+          ElmStructure.application
+            multiline
+            (formatExpression left)
+            (map (\(x,y) -> formatCommented' x formatExpression y) args)
 
         AST.Expression.If if' elseifs (elsComments, els) ->
             let
@@ -1448,6 +1441,7 @@ formatType' requireParens atype =
 
         TypeConstruction ctor args ->
             ElmStructure.application
+                False
                 (formatTypeConstructor ctor)
                 (map (formatHeadCommented $ formatType' ForCtor) args)
                 |> (if requireParens == ForCtor then parens else id)
