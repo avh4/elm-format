@@ -63,8 +63,7 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-  div
-    []
+  div []
     [ h1 [] [ text (toString model.dieFace) ]
     , button [ onClick Roll ] [ text "Roll" ]
     ]

@@ -169,6 +169,7 @@ nestedMultilineLists =
 functionCallInMultilineList =
   [ [ [ toString "a" ] ]
   , [ [ toString
+          -- A
           "a"
       ]
     ]
@@ -217,8 +218,7 @@ commentedFunctionApplication =
 
 
 multilineFunctionApplication =
-  List.map
-    toString
+  List.map toString
     [ 1, 2, 3 ]
 
 
@@ -342,6 +342,7 @@ multilineRecordAccess2 r f =
 
 chainedRecordAccess r =
   ((r.f1.f2).f3.f4
+    -- A
     ()
   ).f5.f6
 
@@ -448,7 +449,7 @@ multilineExpressionsInsideTuple a foo =
       |> Maybe.withDefault 8
   , \a ->
       9
-  , foo
+  , foo 17
       10
   , ( 11
     , 12

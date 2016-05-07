@@ -14,27 +14,43 @@ Formats as:
 
     first rest0 rest1 rest2
 
+    first rest0
+      rest1
+      rest2
+
     first
       rest0
       rest1
       rest2
 -}
 application :: Bool -> Box -> [Box] -> Box
-application forceMultiline first rest =
-  case
-    ( forceMultiline
-    , allSingles (first:rest)
-    )
-  of
-    ( False, Right ls ) ->
-      ls
-        |> List.intersperse space
-        |> row
-        |> line
+application forceMultiline first args =
+  case args of
+    [] ->
+      first
 
-    _ ->
-      stack1
-        $ first : (map indent rest)
+    arg0 : rest ->
+      case
+        ( forceMultiline
+        , first
+        , arg0
+        , allSingles rest
+        )
+      of
+        ( False, SingleLine first', SingleLine arg0', Right rest' ) ->
+          (first' : arg0' : rest' )
+            |> List.intersperse space
+            |> row
+            |> line
+
+        ( _, SingleLine first', SingleLine arg0', _) ->
+          stack1
+            $ (line $ row [ first', space, arg0' ])
+              : (map indent rest)
+
+        _ ->
+          stack1
+            $ first : (map indent $ arg0 : rest)
 
 {-|
 `group True '<' ',' '>'` formats as:

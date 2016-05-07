@@ -25,6 +25,11 @@ functionApplication =
   max 1 2
 
 
+functionApplicationMultiline =
+  max 1
+    2
+
+
 unary x =
   -x
 
