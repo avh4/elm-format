@@ -19,10 +19,14 @@ Formats as:
       rest1
       rest2
 -}
-application :: Box -> [Box] -> Box
-application first rest =
-  case allSingles (first:rest) of
-    Right ls ->
+application :: Bool -> Box -> [Box] -> Box
+application forceMultiline first rest =
+  case
+    ( forceMultiline
+    , allSingles (first:rest)
+    )
+  of
+    ( False, Right ls ) ->
       ls
         |> List.intersperse space
         |> row

@@ -53,7 +53,7 @@ tests =
     testGroup "ElmFormat.Render.ElmStructure"
     [ testCase "application (single line)" $
         assertOutput "a b c\n" $
-            application (word "a" )
+            application False (word "a" )
                 $ map word [ "b", "c" ]
     , testCase "application (multiline)" $
         assertOutput
@@ -65,7 +65,7 @@ tests =
                 , "  c"
                 ]
             ) $
-            application
+            application False
                 ( block "a" )
                 [ block "b"
                 , line $ identifier "c"
