@@ -32,7 +32,7 @@ assertStringToString source =
         result =
             Parse.parse source'
                 |> Parse.toEither
-                |> fmap (Render.render ElmVersion.Elm_0_16)
+                |> fmap (Render.render ElmVersion.Elm_0_17)
     in
         assertEqual "" (Right source') result
 
@@ -42,7 +42,7 @@ astToAst ast =
     let
         result =
             ast
-                |> Render.render ElmVersion.Elm_0_16
+                |> Render.render ElmVersion.Elm_0_17
                 |> Parse.parse
                 |> Parse.toEither
     in
@@ -52,15 +52,15 @@ astToAst ast =
 
 
 simpleAst =
-    case Parse.toEither $ Parse.parse $ Text.pack "module Main (..) where\n\n\nfoo =\n  8\n" of
+    case Parse.toEither $ Parse.parse $ Text.pack "module Main exposing (..)\n\n\nfoo =\n  8\n" of
         Right ast -> ast
 
 
 reportFailedAst ast =
     let
-        rendering = Render.render ElmVersion.Elm_0_16 ast |> Text.unpack
+        rendering = Render.render ElmVersion.Elm_0_17 ast |> Text.unpack
         result =
-            Render.render ElmVersion.Elm_0_16 ast
+            Render.render ElmVersion.Elm_0_17 ast
                 |> Parse.parse
                 |> fmap stripRegion
                 |> show
@@ -99,9 +99,9 @@ propertyTests =
         ]
 
     , testCase "simple round trip" $
-        assertStringToString "module Main (..) where\n\n\nfoo =\n  8\n"
+        assertStringToString "module Main exposing (..)\n\n\nfoo =\n  8\n"
     , testCase "simple round trip with comments" $
-        assertStringToString "module Main (..) where\n\n\nfoo =\n  ( {- A -} 3 {- B -}, {- C -} 4 {- D -} )\n"
+        assertStringToString "module Main exposing (..)\n\n\nfoo =\n  ( {- A -} 3 {- B -}, {- C -} 4 {- D -} )\n"
     , testCase "simple round trip with comments" $
-        assertStringToString "module Main (..) where\n\n\ncommentedLiterals =\n  ( {- int -} 1, {- float -} 0.1, {- char -} \'c\', {- string -} \"str\", {- boolean -} True )\n"
+        assertStringToString "module Main exposing (..)\n\n\ncommentedLiterals =\n  ( {- int -} 1, {- float -} 0.1, {- char -} \'c\', {- string -} \"str\", {- boolean -} True )\n"
     ]
