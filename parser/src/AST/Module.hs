@@ -32,6 +32,7 @@ instance A.Strippable Module where
           , exports = exports $ header m
           , postExportComments = postExportComments $ header m
           , imports = imports $ header m
+          , isPortModule = isPortModule $ header m
           }
     , body = map A.stripRegion $ body m
     }
@@ -46,6 +47,7 @@ data Header = Header
     , exports :: Var.Listing Var.Value
     , postExportComments :: Comments
     , imports :: [UserImport]
+    , isPortModule :: Bool
     }
     deriving (Eq, Show)
 
