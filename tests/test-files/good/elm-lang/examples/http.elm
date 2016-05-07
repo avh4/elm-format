@@ -64,8 +64,7 @@ update action model =
 
 view : Model -> Html Msg
 view model =
-  div
-    []
+  div []
     [ h2 [] [ text model.topic ]
     , button [ onClick MorePlease ] [ text "More Please!" ]
     , br [] []

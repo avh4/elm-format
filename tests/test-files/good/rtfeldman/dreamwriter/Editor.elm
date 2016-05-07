@@ -41,10 +41,8 @@ view channels model =
 
 viewEditor : Addresses a -> Doc -> FullscreenState -> Html
 viewEditor channels currentDoc fullscreen =
-  div
-    [ id "editor-container" ]
-    [ div
-        [ id "editor-frame" ]
+  div [ id "editor-container" ]
+    [ div [ id "editor-frame" ]
         [ viewEditorHeader channels currentDoc fullscreen
         , viewOutline channels currentDoc fullscreen
         , viewEditorFooter channels currentDoc fullscreen
@@ -54,23 +52,18 @@ viewEditor channels currentDoc fullscreen =
 
 viewEditorHeader : Addresses a -> Doc -> FullscreenState -> Html
 viewEditorHeader channels currentDoc fullscreen =
-  div
-    [ id "editor-header" ]
+  div [ id "editor-header" ]
     [ div [ class "toolbar-section toolbar-button flaticon-zoom19" ] []
-    , div
-        [ class "toolbar-section" ]
-        [ viewFontControl
-            channels.execCommand
+    , div [ class "toolbar-section" ]
+        [ viewFontControl channels.execCommand
             "toggle-bold"
             "B"
             "bold"
-        , viewFontControl
-            channels.execCommand
+        , viewFontControl channels.execCommand
             "toggle-italics"
             "I"
             "italic"
-        , viewFontControl
-            channels.execCommand
+        , viewFontControl channels.execCommand
             "toggle-strikethrough"
             " S "
             "strikethrough"
@@ -98,23 +91,19 @@ viewEditorFooter channels currentDoc fullscreen =
     wordCountLabel =
       (pluralize "word" wordCount) ++ " saved "
   in
-    div
-      [ id "editor-footer" ]
-      [ div
-          [ id "doc-word-count" ]
+    div [ id "editor-footer" ]
+      [ div [ id "doc-word-count" ]
           [ text wordCountLabel
           , WordGraph.viewWordGraph currentDoc.dailyWords
           ]
-      , div
-          [ id "dropbox-sync" ]
+      , div [ id "dropbox-sync" ]
           [ input
               [ id "toggle-dropbox-sync"
               , property "type" (string "checkbox")
               , onClick channels.remoteSync ()
               ]
               []
-          , label
-              [ for "toggle-dropbox-sync" ]
+          , label [ for "toggle-dropbox-sync" ]
               [ text " sync to Dropbox" ]
           ]
       ]
@@ -129,12 +118,10 @@ viewOutline channels currentDoc fullscreen =
       ]
 
     outlineChapterNodes =
-      List.concatMap
-        (.id >> lazyViewChapter)
+      List.concatMap (.id >> lazyViewChapter)
         currentDoc.chapters
   in
-    div
-      [ id "document-page" ]
+    div [ id "document-page" ]
       (outlineHeadingNodes ++ outlineChapterNodes)
 
 

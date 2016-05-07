@@ -76,8 +76,7 @@ graph yOffset days =
              the list to keep bars from overlapping the axis, which gets
              pretty ugly.
           -}
-          (List.append
-            (List.map (\day -> bar day yOffset) days)
+          (List.append (List.map (\day -> bar day yOffset) days)
             [ axis ]
           )
       ]

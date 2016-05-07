@@ -38,8 +38,7 @@ view addresses model =
       case model.currentNote of
         Nothing ->
           { sidebarBody =
-              lazy2
-                viewNoteListings
+              lazy2 viewNoteListings
                 addresses.openNoteId
                 model.notes
           , sidebarFooter =
@@ -50,16 +49,13 @@ view addresses model =
           { sidebarBody =
               lazy viewCurrentNoteBody currentNote
           , sidebarFooter =
-              lazy2
-                viewCurrentNoteFooter
+              lazy2 viewCurrentNoteFooter
                 addresses
                 currentNote
           }
   in
-    div
-      [ id "right-sidebar-container", class "sidebar" ]
-      [ div
-          [ id "right-sidebar-body", class "sidebar-body" ]
+    div [ id "right-sidebar-container", class "sidebar" ]
+      [ div [ id "right-sidebar-body", class "sidebar-body" ]
           [ sidebarBody ]
       , sidebarFooter
       ]
@@ -67,8 +63,7 @@ view addresses model =
 
 viewHeader : Addresses a -> Model -> Html
 viewHeader addresses model =
-  div
-    [ id "right-sidebar-header", class "sidebar-header" ]
+  div [ id "right-sidebar-header", class "sidebar-header" ]
     [ input
         [ id "notes-search-text"
         , class "sidebar-header-control"
@@ -86,8 +81,7 @@ viewHeader addresses model =
 
 
 viewNoteListings openNoteIdChannel notes =
-  div
-    [ id "note-listings" ]
+  div [ id "note-listings" ]
     (List.map (viewNoteListing openNoteIdChannel) notes)
 
 
@@ -105,10 +99,8 @@ viewNoteListing openNoteId note =
 
 viewCurrentNoteBody : Note -> Html
 viewCurrentNoteBody note =
-  div
-    [ key ("current-note-" ++ note.id), id "current-note" ]
-    [ div
-        [ id "current-note-title-container" ]
+  div [ key ("current-note-" ++ note.id), id "current-note" ]
+    [ div [ id "current-note-title-container" ]
         [ div [ id "current-note-title" ] [] ]
     , div [ id "current-note-body" ] []
     ]

@@ -75,8 +75,7 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-  div
-    []
+  div []
     [ input [ onInput Change ] []
     , button [ onClick Check ] [ text "Check" ]
     , div [] [ text (String.join ", " model.suggestions) ]

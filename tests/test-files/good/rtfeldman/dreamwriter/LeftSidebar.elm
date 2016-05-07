@@ -95,12 +95,10 @@ view addresses model =
       case model.viewMode of
         OpenMenuMode ->
           { sidebarHeader =
-              lazy
-                viewOpenMenuHeader
+              lazy viewOpenMenuHeader
                 addresses.update
           , sidebarBody =
-              lazy2
-                (OpenMenu.view addresses.openFromFile openDoc)
+              lazy2 (OpenMenu.view addresses.openFromFile openDoc)
                 model.docs
                 model.currentDoc
           , sidebarFooter =
@@ -109,46 +107,38 @@ view addresses model =
 
         CurrentDocMode ->
           { sidebarHeader =
-              lazy2
-                viewCurrentDocHeader
+              lazy2 viewCurrentDocHeader
                 model.currentDoc
                 addresses
           , sidebarBody =
-              lazy3
-                CurrentDoc.view
+              lazy3 CurrentDoc.view
                 addresses.navigateToTitle
                 addresses.navigateToChapterId
                 model.currentDoc
           , sidebarFooter =
-              lazy
-                viewCurrentDocFooter
+              lazy viewCurrentDocFooter
                 addresses
           }
 
         SettingsMode ->
           -- TODO make this different than CurrentDocMode
           { sidebarHeader =
-              lazy2
-                viewCurrentDocHeader
+              lazy2 viewCurrentDocHeader
                 model.currentDoc
                 addresses
           , sidebarBody =
-              lazy3
-                CurrentDoc.view
+              lazy3 CurrentDoc.view
                 addresses.navigateToTitle
                 addresses.navigateToChapterId
                 model.currentDoc
           , sidebarFooter =
-              lazy
-                viewCurrentDocFooter
+              lazy viewCurrentDocFooter
                 addresses
           }
   in
-    div
-      [ id "left-sidebar-container", class "sidebar" ]
+    div [ id "left-sidebar-container", class "sidebar" ]
       [ sidebarHeader
-      , div
-          [ id "left-sidebar-body", class "sidebar-body" ]
+      , div [ id "left-sidebar-body", class "sidebar-body" ]
           [ sidebarBody ]
       , sidebarFooter
       ]
@@ -169,8 +159,7 @@ viewOpenMenuFooter =
 
 viewCurrentDocFooter : Addresses a -> Html
 viewCurrentDocFooter addresses =
-  div
-    [ id "left-sidebar-footer", class "sidebar-footer" ]
+  div [ id "left-sidebar-footer", class "sidebar-footer" ]
     [ span
         [ id "add-chapter"
         , title "Add Chapter"
@@ -203,8 +192,7 @@ viewCurrentDocHeader currentDoc addresses =
       , contentType = downloadContentType
       }
   in
-    menu
-      [ id sidebarHeaderId, class sidebarHeaderClass ]
+    menu [ id sidebarHeaderId, class sidebarHeaderClass ]
       [ menuitem
           [ title "New"
           , class "sidebar-header-control flaticon-add26"
