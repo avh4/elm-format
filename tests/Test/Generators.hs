@@ -94,6 +94,7 @@ instance Arbitrary AST.Module.Module where
         do
             name <- listOf1 $ capIdentifier
             listing <- arbitrary
+            isPortModule <- arbitrary
             return $ AST.Module.Module
                 []
                 (AST.Module.Header
@@ -102,5 +103,6 @@ instance Arbitrary AST.Module.Module where
                   listing
                   []
                   []
+                  isPortModule
                 )
                 [ AST.Declaration.Decl $ located $ AST.Declaration.Definition (located $ AST.Pattern.Anything) [] [] (located $ AST.Expression.TupleFunction 2)]

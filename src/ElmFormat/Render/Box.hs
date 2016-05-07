@@ -234,6 +234,13 @@ formatModuleLine_0_16 header =
 formatModuleLine_0_17 :: AST.Module.Header -> Box
 formatModuleLine_0_17 header =
   let
+    moduleKeyword =
+      case AST.Module.isPortModule header of
+        True ->
+          row [ keyword "port", space, keyword "module" ]
+        False ->
+          keyword "module"
+
     formatExports =
       case formatListing False formatVarValue $ AST.Module.exports header of
           Just listing ->
@@ -252,7 +259,7 @@ formatModuleLine_0_17 header =
     of
       (SingleLine name', SingleLine exports', SingleLine exposing') ->
         line $ row
-          [ keyword "module"
+          [ moduleKeyword
           , space
           , name'
           , space
@@ -262,7 +269,7 @@ formatModuleLine_0_17 header =
           ]
       (name', exports', _) ->
         stack1
-          [ line $ keyword "module"
+          [ line $ moduleKeyword
           , indent $ name'
           , indent $ exposingPhrase
           , indent $ exports'

@@ -41,9 +41,9 @@ freshDef =
 
 header :: IParser Module.Header
 header =
-  do  ((names, exports, postExports), preDocsComments) <-
+  do  ((isPortModule, names, exports, postExports), preDocsComments) <-
           option
-            ((Commented [] ["Main"] [], Var.OpenListing (Commented [] () []), []), [])
+            ((False, Commented [] ["Main"] [], Var.OpenListing (Commented [] () []), []), [])
             ((,) <$> moduleDecl <*> freshLine)
       (docs, postDocsComments) <-
         choice
@@ -51,10 +51,10 @@ header =
           , (,) <$> addLocation (return Nothing) <*> return []
           ]
       imports' <- imports
-      return (Module.Header names docs exports postExports ((fmap Module.ImportComment (preDocsComments ++ postDocsComments)) ++ imports'))
+      return (Module.Header names docs exports postExports ((fmap Module.ImportComment (preDocsComments ++ postDocsComments)) ++ imports') isPortModule)
 
 
-moduleDecl :: IParser (Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
+moduleDecl :: IParser (Bool, Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
 moduleDecl =
   choice
     [ try moduleDecl_0_16
@@ -62,7 +62,7 @@ moduleDecl =
     ]
 
 
-moduleDecl_0_16 :: IParser (Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
+moduleDecl_0_16 :: IParser (Bool, Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
 moduleDecl_0_16 =
   expecting "a module declaration" $
   do  try (reserved "module")
@@ -72,19 +72,21 @@ moduleDecl_0_16 =
       (postName2, exports, _) <- option ([], Var.OpenListing (Commented [] () []), False) (listing value)
       (_, preWhere) <- whitespace
       reserved "where"
-      return (Commented preName names (postName1 ++ postName2), exports, preWhere)
+      return (False, Commented preName names (postName1 ++ postName2), exports, preWhere)
 
 
-moduleDecl_0_17 :: IParser (Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
+moduleDecl_0_17 :: IParser (Bool, Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
 moduleDecl_0_17 =
   expecting "a module declaration" $
-  do  try (reserved "module")
+  do
+      (isPortModule, postPortComments) <- option (False, []) ((,) True <$> (reserved "port" *> (snd <$> whitespace)))
+      try (reserved "module")
       (_, preName) <- whitespace
       names <- dotSep1 capVar <?> "the name of this module"
       (_, postName1) <- whitespace
       reserved "exposing"
       (postName2, exports, _) <- option ([], Var.OpenListing (Commented [] () []), False) (listing value)
-      return (Commented preName names postName1, exports, postName2)
+      return (isPortModule, Commented (postPortComments ++ preName) names postName1, exports, postName2)
 
 
 imports :: IParser [Module.UserImport]
