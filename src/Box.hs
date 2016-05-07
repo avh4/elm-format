@@ -2,15 +2,13 @@
 module Box
   ( Line, identifier, keyword, punc, literal, row, space
   , Box(SingleLine), blankLine, line, mustBreak, stack1, andThen
-  , allSingles
+  , isLine, allSingles
   , indent, prefix, addSuffix
-  , elmApplication, elmGroup, elmExtensionGroup
   , render
   ) where
 
 import Elm.Utils ((|>))
 
-import qualified Data.List as List
 import qualified Data.Text as T
 
 
@@ -174,19 +172,6 @@ allSingles boxes =
             Left boxes
 
 
-elmApplication :: Box -> [Box] -> Box
-elmApplication first rest =
-    case allSingles (first:rest) of
-        Right ls ->
-            ls
-                |> List.intersperse space
-                |> row
-                |> line
-        _ ->
-            stack1
-                $ first : (map indent rest)
-
-
 {-
 Add the prefix to the first line,
 pad the other lines with spaces of the same length
@@ -218,60 +203,6 @@ addSuffix suffix b =
             line l1
                 |> andThen (map line $ init ls)
                 |> andThen [ line $ row [ last ls, suffix ] ]
-
-
-elmGroup :: Bool -> String -> String -> String -> Bool -> [Box] -> Box
-elmGroup innerSpaces left sep right forceMultiline children =
-    case (forceMultiline, allSingles children) of
-        (_, Right []) ->
-            line $ row [punc left, punc right]
-        (False, Right ls) ->
-            line $ row $ concat
-                [ if innerSpaces then [punc left, space] else [punc left]
-                , List.intersperse (row [punc sep, space]) ls
-                , if innerSpaces then [space, punc right] else [punc right]
-                ]
-        _ ->
-            case children of
-                [] ->
-                    line $ row [ punc left, punc right]
-                (first:rest) ->
-                    stack1 $
-                        (prefix (row [punc left, space]) first)
-                        : (map (prefix $ row [punc sep, space]) rest)
-                        ++ [ line $ punc right ]
-
-
-elmExtensionGroup :: Bool -> Box -> Box -> [Box] -> Box
-elmExtensionGroup multiline base first rest =
-  case
-      ( multiline
-      , isLine base
-      , allSingles $ (first:rest)
-      )
-  of
-      (False, Right base', Right fields') ->
-          line $ row
-              [ punc "{"
-              , space
-              , base'
-              , space
-              , punc "|"
-              , space
-              , row (List.intersperse (row [punc ",", space]) fields')
-              , space
-              , punc "}"
-              ]
-
-      _ ->
-          stack1
-              [ prefix (row [punc "{", space]) base
-              , stack1
-                  ([ prefix (row [punc "|", space]) first ]
-                  ++ (map (prefix (row [punc ",", space])) rest))
-                  |> indent
-              , line $ punc "}"
-              ]
 
 
 renderLine :: Int -> Line -> T.Text

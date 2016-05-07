@@ -16,6 +16,7 @@ import qualified AST.Variable
 import qualified Control.Monad as Monad
 import qualified Data.Char as Char
 import qualified Data.List as List
+import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified Paths_elm_format as This
 import qualified Reporting.Annotation as RA
 import qualified Text.Regex.Applicative as Regex
@@ -514,7 +515,7 @@ formatListing multiline format listing =
             Just $ parens $ formatCommented (line . keyword) $ fmap (const "..") comments
 
         AST.Variable.ExplicitListing vars ->
-            Just $ elmGroup False "(" "," ")" multiline $ map (formatCommented format) vars
+            Just $ ElmStructure.group False "(" "," ")" multiline $ map (formatCommented format) vars
 
 
 formatVarValue :: AST.Variable.Value -> Box
@@ -825,7 +826,7 @@ formatPattern parensRequired apattern =
                 line $ identifier ctor
 
         AST.Pattern.Data ctor patterns ->
-            elmApplication
+            ElmStructure.application
                 (line $ identifier ctor)
                 (map (formatHeadCommented $ formatPattern True) patterns)
             |> if parensRequired then parens else id
@@ -835,16 +836,16 @@ formatPattern parensRequired apattern =
               |> parens
 
         AST.Pattern.Tuple patterns ->
-            elmGroup True "(" "," ")" False $ map (formatCommented $ formatPattern False) patterns
+            ElmStructure.group True "(" "," ")" False $ map (formatCommented $ formatPattern False) patterns
 
         AST.Pattern.EmptyListPattern comments ->
             formatUnit '[' ']' comments
 
         AST.Pattern.List patterns ->
-            elmGroup True "[" "," "]" False $ map (formatCommented $ formatPattern False) patterns
+            ElmStructure.group True "[" "," "]" False $ map (formatCommented $ formatPattern False) patterns
 
         AST.Pattern.Record fields ->
-            elmGroup True "{" "," "}" False $ map (formatCommented $ line . identifier) fields
+            ElmStructure.group True "{" "," "}" False $ map (formatCommented $ line . identifier) fields
 
         AST.Pattern.Alias pattern name ->
           case
@@ -940,7 +941,7 @@ formatExpression aexpr =
           formatUnit '[' ']' comments
 
         AST.Expression.ExplicitList exprs multiline ->
-            elmGroup True "[" "," "]" multiline $ map (formatCommented formatExpression) exprs
+            ElmStructure.group True "[" "," "]" multiline $ map (formatCommented formatExpression) exprs
 
         AST.Expression.Binops left ops multiline ->
             let
@@ -1143,7 +1144,7 @@ formatExpression aexpr =
                         )
 
         AST.Expression.Tuple exprs multiline ->
-            elmGroup True "(" "," ")" multiline $ map (formatCommented formatExpression) exprs
+            ElmStructure.group True "(" "," ")" multiline $ map (formatCommented formatExpression) exprs
 
         AST.Expression.TupleFunction n ->
             line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
@@ -1159,14 +1160,14 @@ formatExpression aexpr =
           pleaseReport "INVALID RECORD UPDATE" "no fields"
 
         AST.Expression.RecordUpdate base (first:rest) multiline ->
-          elmExtensionGroup
+          ElmStructure.extensionGroup
             multiline
             (formatCommented formatExpression base)
             (formatRecordPair '=' formatExpression first)
             (map (formatRecordPair '=' formatExpression) rest)
 
         AST.Expression.Record pairs' multiline ->
-          elmGroup True "{" "," "}" multiline $ map (formatRecordPair '=' formatExpression) pairs'
+          ElmStructure.group True "{" "," "}" multiline $ map (formatRecordPair '=' formatExpression) pairs'
 
         AST.Expression.EmptyRecord [] ->
             line $ punc "{}"
@@ -1446,7 +1447,7 @@ formatType' requireParens atype =
             line $ identifier var
 
         TypeConstruction ctor args ->
-            elmApplication
+            ElmStructure.application
                 (formatTypeConstructor ctor)
                 (map (formatHeadCommented $ formatType' ForCtor) args)
                 |> (if requireParens == ForCtor then parens else id)
@@ -1455,19 +1456,19 @@ formatType' requireParens atype =
           parens $ formatCommented formatType type'
 
         TupleType types ->
-          elmGroup True "(" "," ")" False (map (formatCommented formatType) types)
+          ElmStructure.group True "(" "," ")" False (map (formatCommented formatType) types)
 
         EmptyRecordType comments ->
           formatUnit '{' '}' comments
 
         RecordType fields multiline ->
-          elmGroup True "{" "," "}" multiline (map (formatRecordPair ':' formatType) fields)
+          ElmStructure.group True "{" "," "}" multiline (map (formatRecordPair ':' formatType) fields)
 
         RecordExtensionType _ [] _ ->
           pleaseReport "INVALID RECORD TYPE EXTENSION" "no fields"
 
         RecordExtensionType ext (first:rest) multiline ->
-          elmExtensionGroup
+          ElmStructure.extensionGroup
             multiline
             (formatCommented (line . identifier) ext)
             (formatRecordPair ':' formatType first)

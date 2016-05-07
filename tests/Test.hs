@@ -4,6 +4,7 @@ import Test.Framework
 
 import qualified Test.Property
 import qualified BoxTest
+import qualified ElmFormat.Render.ElmStructureTest
 import qualified Parse.ExpressionTest
 import qualified Parse.HelpersTest
 import qualified Parse.LiteralTest
@@ -18,6 +19,7 @@ main =
   defaultMain
     [ Test.Property.propertyTests
     , BoxTest.tests
+    , ElmFormat.Render.ElmStructureTest.tests
     , Parse.ExpressionTest.tests
     , Parse.HelpersTest.tests
     , Parse.LiteralTest.tests

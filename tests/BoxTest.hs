@@ -76,42 +76,4 @@ tests =
     , testCase "indent (with leading spaces)" $
         assertOutput "  a\n" $
             prefix space $ indent $ line $ identifier "a"
-
-    , testCase "elmApplication (single line)" $
-        assertOutput "a b c\n" $
-            elmApplication (word "a" )
-                $ map word [ "b", "c" ]
-    , testCase "elmApplication (multiline)" $
-        assertOutput
-            ( unlines
-                [ "aa"
-                , "aa"
-                , "  bb"
-                , "  bb"
-                , "  c"
-                ]
-            ) $
-            elmApplication
-                ( block "a" )
-                [ block "b"
-                , line $ identifier "c"
-                ]
-    , testCase "elmGroup (empty)" $
-        assertOutput "()\n" $
-            elmGroup True "(" "," ")" False []
-    , testCase "elmGroup (single item, single line)" $
-        assertOutput "( foo )\n" $
-            elmGroup True "(" "," ")" False [ word "foo" ]
-    , testCase "elmGroup (single line)" $
-        assertOutput "( foo, bar )\n" $
-            elmGroup True "(" "," ")" False [ word "foo", word "bar" ]
-    , testCase "elmGroup (single line, no spaces)" $
-        assertOutput "(foo, bar)\n" $
-            elmGroup False "(" "," ")" False [ word "foo", word "bar" ]
-    , testCase "elmGroup (multiline)" $
-        assertOutput "( aa\n  aa\n, b\n, cc\n  cc\n)\n" $
-            elmGroup True "(" "," ")" False [ block "a", word "b", block "c" ]
-    , testCase "elmGroup (forced multiline)" $
-        assertOutput "( a\n, b\n, c\n)\n" $
-            elmGroup True "(" "," ")" True [ word "a", word "b", word "c" ]
     ]
