@@ -8,6 +8,7 @@ import qualified AST.Declaration
 import qualified AST.Module as Module
 import qualified AST.Module.Name as ModuleName
 import qualified AST.Variable as Var
+import qualified Reporting.Annotation as A
 import AST.V0_16
 
 
@@ -41,10 +42,14 @@ freshDef =
 
 header :: IParser Module.Header
 header =
-  do  ((isPortModule, names, exports, postExports), preDocsComments) <-
-          option
-            ((False, Commented [] ["Main"] [], Var.OpenListing (Commented [] () []), []), [])
-            ((,) <$> moduleDecl <*> freshLine)
+  do  (h, preDocsComments) <-
+        option
+          (Module.Header
+            False
+            (Commented [] ["Main"] [])
+            (Var.OpenListing (Commented [] () []))
+            [], [])
+          ((,) <$> moduleDecl <*> freshLine)
       (docs, postDocsComments) <-
         choice
           [ (,) <$> addLocation (Just <$> docComment) <*> freshLine
@@ -52,16 +57,12 @@ header =
           ]
       imports' <- imports
       return $
-        Module.Header
-          isPortModule
-          names
-          exports
-          postExports
+        h
           docs
           ((fmap Module.ImportComment (preDocsComments ++ postDocsComments)) ++ imports')
 
 
-moduleDecl :: IParser (Bool, Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
+moduleDecl :: IParser (A.Located (Maybe String) -> [Module.UserImport] -> Module.Header)
 moduleDecl =
   choice
     [ try moduleDecl_0_16
@@ -69,7 +70,7 @@ moduleDecl =
     ]
 
 
-moduleDecl_0_16 :: IParser (Bool, Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
+moduleDecl_0_16 :: IParser (A.Located (Maybe String) -> [Module.UserImport] -> Module.Header)
 moduleDecl_0_16 =
   expecting "a module declaration" $
   do  try (reserved "module")
@@ -79,10 +80,15 @@ moduleDecl_0_16 =
       (postName2, exports) <- option ([], Var.OpenListing (Commented [] () [])) (listing value)
       (_, preWhere) <- whitespace
       reserved "where"
-      return (False, Commented preName names (postName1 ++ postName2), exports, preWhere)
+      return $
+        Module.Header
+          False
+          (Commented preName names (postName1 ++ postName2))
+          exports
+          preWhere
 
 
-moduleDecl_0_17 :: IParser (Bool, Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
+moduleDecl_0_17 :: IParser (A.Located (Maybe String) -> [Module.UserImport] -> Module.Header)
 moduleDecl_0_17 =
   expecting "a module declaration" $
   do
@@ -93,7 +99,12 @@ moduleDecl_0_17 =
       (_, postName1) <- whitespace
       reserved "exposing"
       (postName2, exports) <- option ([], Var.OpenListing (Commented [] () [])) (listing value)
-      return (isPortModule, Commented (postPortComments ++ preName) names postName1, exports, postName2)
+      return $
+        Module.Header
+          isPortModule
+          (Commented (postPortComments ++ preName) names postName1)
+          exports
+          postName2
 
 
 imports :: IParser [Module.UserImport]
