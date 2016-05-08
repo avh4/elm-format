@@ -30,9 +30,9 @@ binops term last anyOp =
     nextOps =
       choice
         [ commitIf (whitespace >> anyOp) $
-            do  (_, preOpComments) <- whitespace
+            do  preOpComments <- whitespace
                 op <- anyOp
-                (_, preExpressionComments) <- whitespace
+                preExpressionComments <- whitespace
                 expr <- Left <$> try term <|> Right <$> last
                 case expr of
                   Left t -> (:) (preOpComments, op, preExpressionComments, t) <$> nextOps

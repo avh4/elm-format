@@ -83,20 +83,20 @@ port :: IParser AST.Declaration.Declaration
 port =
   expecting "a port declaration" $
   do  try (reserved "port")
-      (_, preNameComments) <- whitespace
+      preNameComments <- whitespace
       name <- lowVar
-      (_, postNameComments) <- whitespace
+      postNameComments <- whitespace
       let name' = Commented preNameComments name postNameComments
       choice [ portAnnotation name', portDefinition name' ]
   where
     portAnnotation name =
       do  try hasType
-          (_, typeComments) <- whitespace
+          typeComments <- whitespace
           tipe <- Type.expr <?> "a type"
           return (AST.Declaration.PortAnnotation name typeComments tipe)
 
     portDefinition name =
       do  try equals
-          (_, bodyComments) <- whitespace
+          bodyComments <- whitespace
           expr <- Expr.expr
           return (AST.Declaration.PortDefinition name bodyComments expr)
