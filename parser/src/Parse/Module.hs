@@ -89,6 +89,7 @@ moduleDecl_0_17 =
   expecting "a module declaration" $
   do
       (moduleType, postPortComments) <-
+        try $
         option
           (Module.UserModule, [])
           ((,) Module.PortModule <$> (reserved "port" *> whitespace))
