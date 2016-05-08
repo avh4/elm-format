@@ -1483,8 +1483,6 @@ formatVar var =
             identifier name
         AST.Variable.OpRef name ->
             identifier $ "(" ++ name ++ ")"
-        AST.Variable.WildcardRef ->
-            keyword "_" -- TODO: not tested
 
 
 formatInfixVar :: AST.Variable.Ref -> Line
@@ -1494,5 +1492,3 @@ formatInfixVar var =
             identifier $ "`" ++ name ++ "`" -- TODO: not tested
         AST.Variable.OpRef name ->
             identifier name
-        AST.Variable.WildcardRef ->
-            pleaseReport' "INVALID INFIX OPERATOR" "wildcard used as infix"

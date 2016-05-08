@@ -6,7 +6,6 @@ import AST.V0_16
 data Ref
     = VarRef String
     | OpRef String
-    | WildcardRef
     deriving (Eq, Ord, Show)
 
 
