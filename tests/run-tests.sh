@@ -246,6 +246,7 @@ checkGood 0.17 elm-lang/examples/http.elm
 checkGood 0.17 elm-lang/examples/time.elm
 checkGood 0.17 elm-lang/examples/websockets.elm
 checkGood 0.17 elm-lang/examples/Spelling.elm
+checkGood 0.17 elm-lang/websocket/WebSocket.elm
 
 checkBad Empty.elm
 checkBad UnexpectedComma.elm

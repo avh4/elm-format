@@ -218,6 +218,19 @@ pipeSep1 =
   spaceySepBy1 verticalBar
 
 
+keyValue :: IParser sep -> IParser key -> IParser val -> IParser (Comments -> Comments -> (Commented key, Commented val) )
+keyValue parseSep parseKey parseVal =
+  do
+    key <- parseKey
+    preSep <- whitespace <* parseSep
+    postSep <- whitespace
+    val <- parseVal
+    return $ \pre post ->
+      ( Commented pre key preSep
+      , Commented postSep val post
+      )
+
+
 separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (e,Comments), [Commented e], (Comments,e), Bool))
 separated sep expr' =
   do  start <- getMyPosition

@@ -101,6 +101,7 @@ instance Arbitrary AST.Module.Module where
                 (AST.Module.Header
                   moduleType
                   (Commented [] name [])
+                  Nothing
                   []
                   listing
                 )

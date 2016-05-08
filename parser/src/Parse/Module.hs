@@ -61,6 +61,7 @@ moduleDecl =
         Module.Header
           Module.UserModule
           (Commented [] ["Main"] [])
+          Nothing
           []
           (Var.OpenListing (Commented [] () []))
     ]
@@ -80,6 +81,7 @@ moduleDecl_0_16 =
         Module.Header
           Module.UserModule
           (Commented preName names (postName1 ++ postName2))
+          Nothing
           preWhere
           exports
 
@@ -90,12 +92,21 @@ moduleDecl_0_17 =
   do
       (moduleType, postPortComments) <-
         try $
-        option
-          (Module.UserModule, [])
-          ((,) Module.PortModule <$> (reserved "port" *> whitespace))
-      try (reserved "module")
+        choice
+          [ (,) Module.PortModule <$> (reserved "port" *> whitespace)
+          , (,) Module.EffectModule <$> (reserved "effect" *> whitespace)
+          , return (Module.UserModule, [])
+          ]
+        <* reserved "module"
       preName <- whitespace
       names <- dotSep1 capVar <?> "the name of this module"
+      whereClause <-
+        optionMaybe $
+          do
+            try (whitespace <* reserved "where")
+            whitespace
+            brackets $ (\f pre post _ -> f pre post) <$> commaSep (keyValue equals lowVar capVar)
+
       postName1 <- whitespace
       reserved "exposing"
       (preExports, exports) <- option ([], Var.OpenListing (Commented [] () [])) (listing value)
@@ -103,6 +114,7 @@ moduleDecl_0_17 =
         Module.Header
           moduleType
           (Commented (postPortComments ++ preName) names postName1)
+          whereClause
           preExports
           exports
 
