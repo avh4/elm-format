@@ -59,7 +59,7 @@ moduleDecl =
     , moduleDecl_0_17
     , return $
         Module.Header
-          False
+          Module.UserModule
           (Commented [] ["Main"] [])
           []
           (Var.OpenListing (Commented [] () []))
@@ -78,7 +78,7 @@ moduleDecl_0_16 =
       reserved "where"
       return $
         Module.Header
-          False
+          Module.UserModule
           (Commented preName names (postName1 ++ postName2))
           preWhere
           exports
@@ -88,7 +88,10 @@ moduleDecl_0_17 :: IParser Module.Header
 moduleDecl_0_17 =
   expecting "a module declaration" $
   do
-      (isPortModule, postPortComments) <- option (False, []) ((,) True <$> (reserved "port" *> (snd <$> whitespace)))
+      (moduleType, postPortComments) <-
+        option
+          (Module.UserModule, [])
+          ((,) Module.PortModule <$> (reserved "port" *> (snd <$> whitespace)))
       try (reserved "module")
       (_, preName) <- whitespace
       names <- dotSep1 capVar <?> "the name of this module"
@@ -97,7 +100,7 @@ moduleDecl_0_17 =
       (preExports, exports) <- option ([], Var.OpenListing (Commented [] () [])) (listing value)
       return $
         Module.Header
-          isPortModule
+          moduleType
           (Commented (postPortComments ++ preName) names postName1)
           preExports
           exports

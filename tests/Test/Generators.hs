@@ -95,11 +95,11 @@ instance Arbitrary AST.Module.Module where
         do
             name <- listOf1 $ capIdentifier
             listing <- arbitrary
-            isPortModule <- arbitrary
+            moduleType <- fmap (\x -> if x then AST.Module.PortModule else AST.Module.UserModule) arbitrary
             return $ AST.Module.Module
                 []
                 (AST.Module.Header
-                  isPortModule
+                  moduleType
                   (Commented [] name [])
                   []
                   listing
