@@ -13,7 +13,7 @@ data Ref
 
 -- | A listing of values. Something like (a,b,c) or (..) or (a,b,..)
 data Listing a
-  = ExplicitListing [Commented a]
+  = ExplicitListing [Commented a] Bool
   | OpenListing (Commented ())
   | ClosedListing
   deriving (Eq, Show)

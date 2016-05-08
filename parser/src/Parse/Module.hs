@@ -69,7 +69,7 @@ moduleDecl_0_16 =
       (_, preName) <- whitespace
       names <- dotSep1 capVar <?> "the name of this module"
       (_, postName1) <- whitespace
-      (postName2, exports, _) <- option ([], Var.OpenListing (Commented [] () []), False) (listing value)
+      (postName2, exports) <- option ([], Var.OpenListing (Commented [] () [])) (listing value)
       (_, preWhere) <- whitespace
       reserved "where"
       return (False, Commented preName names (postName1 ++ postName2), exports, preWhere)
@@ -85,7 +85,7 @@ moduleDecl_0_17 =
       names <- dotSep1 capVar <?> "the name of this module"
       (_, postName1) <- whitespace
       reserved "exposing"
-      (postName2, exports, _) <- option ([], Var.OpenListing (Commented [] () []), False) (listing value)
+      (postName2, exports) <- option ([], Var.OpenListing (Commented [] () [])) (listing value)
       return (isPortModule, Commented (postPortComments ++ preName) names postName1, exports, postName2)
 
 
@@ -110,7 +110,7 @@ import' =
     method originalName =
       Module.ImportMethod
         <$> option Nothing (Just <$> as' originalName)
-        <*> option ([], ([], Var.ClosedListing), False) exposing
+        <*> option ([], ([], Var.ClosedListing)) exposing
 
     as' :: String -> IParser (Comments, PreCommented String)
     as' moduleName =
@@ -118,15 +118,15 @@ import' =
           (_, postAs) <- whitespace
           (,) preAs <$> (,) postAs <$> capVar <?> ("an alias for module `" ++ moduleName ++ "`")
 
-    exposing :: IParser (Comments, PreCommented (Var.Listing Var.Value), Bool)
+    exposing :: IParser (Comments, PreCommented (Var.Listing Var.Value))
     exposing =
       do  (_, preExposing) <- try (whitespace <* reserved "exposing")
           (_, postExposing) <- whitespace
-          (postExposing2, listing', multiline) <- listing value
-          return (preExposing, (postExposing ++ postExposing2, listing'), multiline)
+          (postExposing2, listing') <- listing value
+          return (preExposing, (postExposing ++ postExposing2, listing'))
 
 
-listing :: IParser a -> IParser (Comments, Var.Listing a, Bool)
+listing :: IParser a -> IParser (Comments, Var.Listing a)
 listing item =
   expecting "a listing of values and types to expose, like (..)" $
   do  (_, preParen) <- try (whitespace <* char '(')
@@ -134,13 +134,15 @@ listing item =
       (_, pre) <- whitespace
       listing <-
           choice
-            [ (\_ pre post -> (Var.OpenListing (Commented pre () post))) <$> string ".."
-            , (\x pre post -> (Var.ExplicitListing (x pre post))) <$> commaSep1' item
+            [ (\_ pre post _ -> (Var.OpenListing (Commented pre () post))) <$> string ".."
+            , (\x pre post sawNewline ->
+                (Var.ExplicitListing (x pre post) sawNewline))
+                  <$> commaSep1' item
             ]
       (_, post) <- whitespace
       sawNewline <- popNewlineContext
       char ')'
-      return $ (preParen, listing pre post, sawNewline)
+      return $ (preParen, listing pre post sawNewline)
 
 
 value :: IParser Var.Value
@@ -155,4 +157,4 @@ value =
           maybeCtors <- optionMaybe (listing capVar)
           case maybeCtors of
             Nothing -> return (Var.Alias name)
-            Just (pre, ctors, _) -> return (Var.Union (name, pre) ctors)
+            Just (pre, ctors) -> return (Var.Union (name, pre) ctors)
