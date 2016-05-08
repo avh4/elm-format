@@ -42,12 +42,12 @@ instance A.Strippable Module where
 
 {-| Basic info needed to identify modules and determine dependencies. -}
 data Header = Header
-    { name :: Commented Name.Raw
-    , docs :: A.Located (Maybe String)
+    { isPortModule :: Bool
+    , name :: Commented Name.Raw
     , exports :: Var.Listing Var.Value
     , postExportComments :: Comments
+    , docs :: A.Located (Maybe String)
     , imports :: [UserImport]
-    , isPortModule :: Bool
     }
     deriving (Eq, Show)
 

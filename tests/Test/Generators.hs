@@ -99,11 +99,11 @@ instance Arbitrary AST.Module.Module where
             return $ AST.Module.Module
                 []
                 (AST.Module.Header
+                  isPortModule
                   (Commented [] name [])
-                  (located Nothing)
                   listing
                   []
+                  (located Nothing)
                   []
-                  isPortModule
                 )
                 [ AST.Declaration.Decl $ located $ AST.Declaration.Definition (located $ AST.Pattern.Anything) [] [] (located $ AST.Expression.TupleFunction 2)]
