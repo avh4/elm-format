@@ -46,7 +46,6 @@ toReport err =
             case op of
               Var.VarRef name -> "`" ++ name ++ "`"
               Var.OpRef name -> "(" ++ name ++ ")"
-              Var.WildcardRef -> "_"
 
     TypeWithoutDefinition valueName ->
         Report.simple
