@@ -32,6 +32,7 @@ instance A.Strippable Module where
           { moduleType = moduleType $ header m
           , name = name $ header m
           , preExportsComments = preExportsComments $ header m
+          , moduleSettings = moduleSettings $ header m
           , exports = exports $ header m
           }
     , docs = A.stripRegion $ docs m
@@ -45,6 +46,7 @@ instance A.Strippable Module where
 data ModuleType
   = UserModule
   | PortModule
+  | EffectModule
   deriving (Eq, Show)
 
 
@@ -52,6 +54,7 @@ data ModuleType
 data Header = Header
     { moduleType :: ModuleType
     , name :: Commented Name.Raw
+    , moduleSettings :: Maybe [(Commented String, Commented String)]
     , preExportsComments :: Comments
     , exports :: Var.Listing Var.Value
     }

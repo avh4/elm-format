@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 module ElmFormat.Render.ElmStructure
-  ( application, group, extensionGroup )
+  ( spaceSepOrIndented, equalsPair
+  , application, group, extensionGroup )
   where
 
 
@@ -8,6 +9,66 @@ import Elm.Utils ((|>))
 import Box
 
 import qualified Data.List as List
+
+
+{-|
+Formats as:
+
+    first rest0 rest1 rest2
+
+    first
+      rest0
+      rest1
+      rest2
+-}
+spaceSepOrIndented :: Box -> [Box] -> Box
+spaceSepOrIndented first rest =
+  case
+    ( first
+    , allSingles rest
+    )
+  of
+    ( SingleLine first', Right rest' ) ->
+      line $ row $ List.intersperse space (first' : rest')
+
+    _ ->
+      stack1
+        ( first : map indent rest)
+
+
+{-|
+Formats as:
+
+    left = right
+
+    left =
+      right
+-}
+equalsPair :: Box -> Box -> Box
+equalsPair left right =
+  case (left, right) of
+    ( SingleLine left', SingleLine right' ) ->
+      line $ row
+        [ left'
+        , space
+        , punc "="
+        , space
+        , right'
+        ]
+
+    ( SingleLine left', right' ) ->
+      stack1
+        [ line $ row [ left', space, punc "=" ]
+        , indent right'
+        ]
+
+    ( left', right' ) ->
+      stack1
+        [ left'
+        , indent $ line $ punc "="
+        , indent right'
+        ]
+
 
 {-|
 Formats as:

@@ -16,6 +16,7 @@ import qualified AST.Variable
 import qualified Control.Monad as Monad
 import qualified Data.Char as Char
 import qualified Data.List as List
+import qualified Data.Maybe as Maybe
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified Paths_elm_format as This
 import qualified Reporting.Annotation as RA
@@ -244,6 +245,8 @@ formatModuleLine_0_17 header =
           keyword "module"
         AST.Module.PortModule ->
           row [ keyword "port", space, keyword "module" ]
+        AST.Module.EffectModule ->
+          row [ keyword "effect", space, keyword "module" ]
 
     exports =
       case formatListing formatVarValue $ AST.Module.exports header of
@@ -251,6 +254,15 @@ formatModuleLine_0_17 header =
             listing
           _ ->
               line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
+
+    whereClause =
+      AST.Module.moduleSettings header
+        |> fmap (map (\(k, v) -> ElmStructure.equalsPair (formatCommented (line . identifier) k) (formatCommented (line . identifier) v)))
+        |> fmap (ElmStructure.group True "{" "," "}" False)
+        |> fmap (\x -> [x])
+        |> fmap (ElmStructure.spaceSepOrIndented (line $ keyword "where"))
+        |> fmap (\x -> [x])
+        |> Maybe.fromMaybe []
 
     exposingClause =
       case
@@ -267,26 +279,27 @@ formatModuleLine_0_17 header =
             , indent exports'
             ]
 
+    nameClause =
+      case
+        ( formatCommented (line . formatName) $ AST.Module.name header
+        )
+      of
+        SingleLine name' ->
+          line $ row
+            [ moduleKeyword
+            , space
+            , name'
+            ]
+
+        name' ->
+          stack1
+            [ line $ moduleKeyword
+            , indent $ name'
+            ]
   in
-    case
-      ( formatCommented (line . formatName) $ AST.Module.name header
-      , exposingClause
-      )
-    of
-      (SingleLine name', SingleLine exposingClause') ->
-        line $ row
-          [ moduleKeyword
-          , space
-          , name'
-          , space
-          , exposingClause'
-          ]
-      (name', exposingClause') ->
-        stack1
-          [ line $ moduleKeyword
-          , indent $ name'
-          , indent $ exposingClause'
-          ]
+    ElmStructure.spaceSepOrIndented
+      nameClause
+      (whereClause ++ [exposingClause])
 
 
 formatModule :: ElmVersion -> AST.Module.Module -> Box
