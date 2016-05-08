@@ -39,3 +39,11 @@ expressionDefinitionsInLet =
 expressionTypeAnnotation : ()
 expressionTypeAnnotation =
   ()
+
+
+expressionTypeAnnotationForcedMultiline :
+  Int
+  -> Result String Bool
+  -> List (Maybe ())
+expressionTypeAnnotationForcedMultiline _ _ =
+  []

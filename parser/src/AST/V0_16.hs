@@ -65,7 +65,7 @@ data Type'
     | EmptyRecordType Comments
     | RecordType [(Commented String, Commented Type, Bool)] Bool
     | RecordExtensionType (Commented String) [(Commented String, Commented Type, Bool)] Bool
-    | FunctionType (Type, Comments) [Commented Type] (Comments, Type)
+    | FunctionType (Type, Comments) [Commented Type] (Comments, Type) Bool
     deriving (Eq, Show)
 
 
