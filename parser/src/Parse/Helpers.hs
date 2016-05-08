@@ -122,24 +122,39 @@ symOp =
 
 -- COMMON SYMBOLS
 
-equals :: IParser String
+equals :: IParser ()
 equals =
-  string "=" <?> "="
+  const () <$> char '=' <?> "="
 
 
-rightArrow :: IParser String
+rightArrow :: IParser ()
 rightArrow =
-  string "->" <|> string "\8594" <?> "->"
+  const () <$> (string "->" <|> string "\8594") <?> "->"
 
 
-cons :: IParser String
+cons :: IParser ()
 cons =
-  string "::" <?> "a cons operator '::'"
+  const () <$> string "::" <?> "a cons operator '::'"
 
 
-hasType :: IParser String
+hasType :: IParser ()
 hasType =
-  string ":" <?> "the \"has type\" symbol ':'"
+  const () <$> char ':' <?> "the \"has type\" symbol ':'"
+
+
+comma :: IParser ()
+comma =
+  const () <$> char ',' <?> "a comma ','"
+
+
+semicolon :: IParser ()
+semicolon =
+  const () <$> char ';' <?> "a semicolon ';'"
+
+
+verticalBar :: IParser ()
+verticalBar =
+  const () <$> char '|' <?> "a vertical bar '|'"
 
 
 commitIf check p =
@@ -178,11 +193,6 @@ spaceySepBy1' sep parser =
     parseWhile1 (padded sep) ((\x pre post -> Commented pre x post) <$> parser)
 
 
-comma :: IParser Char
-comma =
-  char ',' <?> "a comma ','"
-
-
 commaSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 commaSep1 =
   spaceySepBy1 comma
@@ -200,12 +210,12 @@ commaSep =
 
 semiSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 semiSep1 =
-  spaceySepBy1 (char ';' <?> "a semicolon ';'")
+  spaceySepBy1 semicolon
 
 
 pipeSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 pipeSep1 =
-  spaceySepBy1 (char '|' <?> "a vertical bar '|'")
+  spaceySepBy1 verticalBar
 
 
 separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (e,Comments), [Commented e], (Comments,e), Bool))
