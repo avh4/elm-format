@@ -245,38 +245,47 @@ formatModuleLine_0_17 header =
         AST.Module.PortModule ->
           row [ keyword "port", space, keyword "module" ]
 
-    formatExports =
+    exports =
       case formatListing formatVarValue $ AST.Module.exports header of
           Just listing ->
             listing
           _ ->
               line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
 
-    exposingPhrase =
-      formatTailCommented (line . keyword) ("exposing", AST.Module.preExportsComments header)
+    exposingClause =
+      case
+        ( formatTailCommented (line . keyword) ("exposing", AST.Module.preExportsComments header)
+        , exports
+        )
+      of
+        (SingleLine exposing, SingleLine exports') ->
+          line $ row [ exposing, space, exports' ]
+
+        (exposing, exports') ->
+          stack1
+            [ exposing
+            , indent exports'
+            ]
+
   in
     case
       ( formatCommented (line . formatName) $ AST.Module.name header
-      , formatExports
-      , exposingPhrase
+      , exposingClause
       )
     of
-      (SingleLine name', SingleLine exports', SingleLine exposing') ->
+      (SingleLine name', SingleLine exposingClause') ->
         line $ row
           [ moduleKeyword
           , space
           , name'
           , space
-          , exposing'
-          , space
-          , exports'
+          , exposingClause'
           ]
-      (name', exports', _) ->
+      (name', exposingClause') ->
         stack1
           [ line $ moduleKeyword
           , indent $ name'
-          , indent $ exposingPhrase
-          , indent $ exports'
+          , indent $ exposingClause'
           ]
 
 

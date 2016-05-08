@@ -7,16 +7,16 @@ module
   --C
   exposing
   --D
-  ( --E
-    a
-    --F
-  , --G
-    b
-    --H
-  , --I
-    c
-    --J
-  )
+    ( --E
+      a
+      --F
+    , --G
+      b
+      --H
+    , --I
+      c
+      --J
+    )
 
 
 a =
