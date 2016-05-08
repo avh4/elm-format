@@ -21,6 +21,10 @@ operator =
   (+)
 
 
+infixApplication =
+  1 `operator` 2
+
+
 functionApplication =
   max 1 2
 

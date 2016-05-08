@@ -1489,6 +1489,6 @@ formatInfixVar :: AST.Variable.Ref -> Line
 formatInfixVar var =
     case var of
         AST.Variable.VarRef name ->
-            identifier $ "`" ++ name ++ "`" -- TODO: not tested
+            identifier $ "`" ++ name ++ "`"
         AST.Variable.OpRef name ->
             identifier name
