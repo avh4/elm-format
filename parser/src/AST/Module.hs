@@ -31,8 +31,8 @@ instance A.Strippable Module where
         Header
           { isPortModule = isPortModule $ header m
           , name = name $ header m
+          , preExportsComments = preExportsComments $ header m
           , exports = exports $ header m
-          , postExportComments = postExportComments $ header m
           }
     , docs = A.stripRegion $ docs m
     , imports = imports m
@@ -46,8 +46,8 @@ instance A.Strippable Module where
 data Header = Header
     { isPortModule :: Bool
     , name :: Commented Name.Raw
+    , preExportsComments :: Comments
     , exports :: Var.Listing Var.Value
-    , postExportComments :: Comments
     }
     deriving (Eq, Show)
 

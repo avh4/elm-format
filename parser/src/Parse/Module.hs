@@ -61,8 +61,8 @@ moduleDecl =
         Module.Header
           False
           (Commented [] ["Main"] [])
-          (Var.OpenListing (Commented [] () []))
           []
+          (Var.OpenListing (Commented [] () []))
     ]
 
 
@@ -80,8 +80,8 @@ moduleDecl_0_16 =
         Module.Header
           False
           (Commented preName names (postName1 ++ postName2))
-          exports
           preWhere
+          exports
 
 
 moduleDecl_0_17 :: IParser Module.Header
@@ -94,13 +94,13 @@ moduleDecl_0_17 =
       names <- dotSep1 capVar <?> "the name of this module"
       (_, postName1) <- whitespace
       reserved "exposing"
-      (postName2, exports) <- option ([], Var.OpenListing (Commented [] () [])) (listing value)
+      (preExports, exports) <- option ([], Var.OpenListing (Commented [] () [])) (listing value)
       return $
         Module.Header
           isPortModule
           (Commented (postPortComments ++ preName) names postName1)
+          preExports
           exports
-          postName2
 
 
 imports :: IParser [Module.UserImport]

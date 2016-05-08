@@ -101,8 +101,8 @@ instance Arbitrary AST.Module.Module where
                 (AST.Module.Header
                   isPortModule
                   (Commented [] name [])
-                  listing
                   []
+                  listing
                 )
                 (located Nothing)
                 []

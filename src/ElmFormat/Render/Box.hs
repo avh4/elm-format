@@ -209,7 +209,7 @@ formatModuleLine_0_16 header =
               line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
 
     whereClause =
-      formatHeadCommented (line . keyword) (AST.Module.postExportComments header, "where")
+      formatHeadCommented (line . keyword) (AST.Module.preExportsComments header, "where")
   in
     case
       ( formatCommented (line . formatName) $ AST.Module.name header
@@ -253,7 +253,7 @@ formatModuleLine_0_17 header =
               line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
 
     exposingPhrase =
-      formatTailCommented (line . keyword) ("exposing", AST.Module.postExportComments header)
+      formatTailCommented (line . keyword) ("exposing", AST.Module.preExportsComments header)
   in
     case
       ( formatCommented (line . formatName) $ AST.Module.name header
