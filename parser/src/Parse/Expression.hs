@@ -255,7 +255,7 @@ caseExpr =
       multilineSubject <- popNewlineContext
       (_, firstPatternComments) <- whitespace
       updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
-      result <- without firstPatternComments -- <|> with
+      result <- cases firstPatternComments
       return $ E.Case (e, multilineSubject) result
   where
     case_ preComments =
@@ -272,12 +272,7 @@ caseExpr =
             , (bodyComments, result)
             )
 
-
-    -- bracketed case statements are removed in 0.16
-    -- with =
-    --   brackets (fmap (const . const . const) $ semiSep1 (case_ <?> "cases { x -> ... }")) -- TODO: use comments
-
-    without preComments =
+    cases preComments =
         withPos $
             do
                 r1 <- case_ preComments
