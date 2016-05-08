@@ -1,5 +1,5 @@
 module AST.Module
-    ( Module(..), Header(..), ModuleType(..)
+    ( Module(..), Header(..), SourceTag(..)
     , UserImport(..), ImportMethod(..)
     ) where
 
@@ -29,9 +29,8 @@ instance A.Strippable Module where
     { initialComments = initialComments m
     , header =
         Header
-          { moduleType = moduleType $ header m
+          { srcTag = srcTag $ header m
           , name = name $ header m
-          , preExportsComments = preExportsComments $ header m
           , moduleSettings = moduleSettings $ header m
           , exports = exports $ header m
           }
@@ -43,23 +42,25 @@ instance A.Strippable Module where
 
 -- HEADERS
 
-data ModuleType
-  = UserModule
-  | PortModule
-  | EffectModule
+data SourceTag
+  = Normal
+  | Effect Comments
+  | Port Comments
   deriving (Eq, Show)
 
 
 {-| Basic info needed to identify modules and determine dependencies. -}
 data Header = Header
-    { moduleType :: ModuleType
+    { srcTag :: SourceTag
     , name :: Commented Name.Raw
-    , moduleSettings :: Maybe [(Commented String, Commented String)]
-    , preExportsComments :: Comments
-    , exports :: Var.Listing Var.Value
+    , moduleSettings :: Maybe (KeywordCommented SourceSettings)
+    , exports :: KeywordCommented (Var.Listing Var.Value)
     }
     deriving (Eq, Show)
 
+
+type SourceSettings =
+  [(Commented String, Commented String)]
 
 -- IMPORTs
 

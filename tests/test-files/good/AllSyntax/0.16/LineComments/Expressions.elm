@@ -64,7 +64,19 @@ emptyRecord =
 
 
 record =
-  { x = 1, y = 2 }
+  { --M
+    x
+    --N
+      = --O
+        1
+        --P
+  , --Q
+    y
+    --R
+      = --S
+        2
+        --T
+  }
 
 
 recordUpdate a =

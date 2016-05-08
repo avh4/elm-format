@@ -23,6 +23,11 @@ instance Functor Commented where
     Commented pre (f a) post
 
 
+data KeywordCommented a =
+  KeywordCommented Comments Comments a
+  deriving (Eq, Show)
+
+
 type PreCommented a = (Comments, a)
 
 
