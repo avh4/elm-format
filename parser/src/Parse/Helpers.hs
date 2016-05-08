@@ -95,12 +95,12 @@ makeVar firstChar =
         else return variable
 
 
-reserved :: String -> IParser String
+reserved :: String -> IParser ()
 reserved word =
   expecting ("reserved word `" ++ word ++ "`") $
     do  string word
         notFollowedBy innerVarChar
-        return word
+        return ()
 
 
 -- INFIX OPERATORS
@@ -518,6 +518,15 @@ lineComment =
   do  try (string "--")
       (comment, ()) <- anyUntil $ (simpleNewline >> return ()) <|> eof
       return $ LineComment comment
+
+
+commentedKeyword :: String -> IParser a -> IParser (KeywordCommented a)
+commentedKeyword word parser =
+  do
+    pre <- try (whitespace <* reserved word)
+    post <- whitespace
+    value <- parser
+    return $ KeywordCommented pre post value
 
 
 docComment :: IParser String

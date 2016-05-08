@@ -44,7 +44,7 @@ moduleHeader :: Gen String
 moduleHeader =
   do
     exports <- exportListing
-    withWhitespace wsRequired [ "module", "Main", exports, "where" ]
+    withWhitespace wsRequired [ "module", "Main", "exposing", exports ]
 
 
 exportListing :: Gen String
@@ -52,7 +52,6 @@ exportListing =
   oneof
     [ return "(..)"
     , withWhitespace wsOptional $ words "( a , b , c )"
-    , return ""
     ]
 
 

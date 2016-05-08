@@ -59,11 +59,10 @@ moduleDecl =
     , moduleDecl_0_17
     , return $
         Module.Header
-          Module.UserModule
+          Module.Normal
           (Commented [] ["Main"] [])
           Nothing
-          []
-          (Var.OpenListing (Commented [] () []))
+          (KeywordCommented [] [] $ Var.OpenListing $ Commented [] () [])
     ]
 
 
@@ -79,43 +78,40 @@ moduleDecl_0_16 =
       reserved "where"
       return $
         Module.Header
-          Module.UserModule
+          Module.Normal
           (Commented preName names (postName1 ++ postName2))
           Nothing
-          preWhere
-          exports
+          (KeywordCommented preWhere [] exports)
 
 
 moduleDecl_0_17 :: IParser Module.Header
 moduleDecl_0_17 =
   expecting "a module declaration" $
   do
-      (moduleType, postPortComments) <-
+      srcTag <-
         try $
         choice
-          [ (,) Module.PortModule <$> (reserved "port" *> whitespace)
-          , (,) Module.EffectModule <$> (reserved "effect" *> whitespace)
-          , return (Module.UserModule, [])
+          [ Module.Port <$> (reserved "port" *> whitespace)
+          , Module.Effect <$> (reserved "effect" *> whitespace)
+          , return Module.Normal
           ]
         <* reserved "module"
       preName <- whitespace
       names <- dotSep1 capVar <?> "the name of this module"
       whereClause <-
         optionMaybe $
-          do
-            try (whitespace <* reserved "where")
-            whitespace
+          commentedKeyword "where" $
             brackets $ (\f pre post _ -> f pre post) <$> commaSep (keyValue equals lowVar capVar)
 
-      postName1 <- whitespace
-      reserved "exposing"
-      (preExports, exports) <- option ([], Var.OpenListing (Commented [] () [])) (listing value)
+      exports <-
+        commentedKeyword "exposing" $
+          listing' value
+
       return $
         Module.Header
-          moduleType
-          (Commented (postPortComments ++ preName) names postName1)
+          srcTag
+          (Commented preName names [])
           whereClause
-          preExports
           exports
 
 
@@ -173,6 +169,25 @@ listing item =
       sawNewline <- popNewlineContext
       char ')'
       return $ (preParen, listing pre post sawNewline)
+
+
+listing' :: IParser a -> IParser (Var.Listing a)
+listing' item =
+  expecting "a listing of values and types to expose, like (..)" $
+  do  _ <- try (char '(')
+      pushNewlineContext
+      pre <- whitespace
+      listing <-
+          choice
+            [ (\_ pre post _ -> (Var.OpenListing (Commented pre () post))) <$> string ".."
+            , (\x pre post sawNewline ->
+                (Var.ExplicitListing (x pre post) sawNewline))
+                  <$> commaSep1' item
+            ]
+      post <- whitespace
+      sawNewline <- popNewlineContext
+      char ')'
+      return $ listing pre post sawNewline
 
 
 value :: IParser Var.Value

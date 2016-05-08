@@ -232,6 +232,7 @@ checkGood 0.16 AllSyntax/0.16/Comments.elm
 checkGood 0.16 ApiSketch.elm
 
 checkGoodAllSyntax 0.17 Module
+checkGoodAllSyntax 0.17 ModuleEffect
 
 checkGood 0.16 evancz/start-app/StartApp.elm
 checkGood 0.16 TheSeamau5/elm-check/Check.elm

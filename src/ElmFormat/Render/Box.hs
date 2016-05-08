@@ -203,14 +203,18 @@ formatModuleLine_0_16 :: AST.Module.Header -> Box
 formatModuleLine_0_16 header =
   let
     formatExports =
-      case formatListing formatVarValue $ AST.Module.exports header of
-          Just listing ->
-            listing
-          _ ->
-              line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
+      case AST.Module.exports header of
+        KeywordCommented _ _ value ->
+          case formatListing formatVarValue value of
+            Just listing ->
+              listing
+            _ ->
+                line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
 
     whereClause =
-      formatHeadCommented (line . keyword) (AST.Module.preExportsComments header, "where")
+      case AST.Module.exports header of
+        KeywordCommented pre post _ ->
+          formatCommented (line . keyword) (Commented pre "where" post)
   in
     case
       ( formatCommented (line . formatName) $ AST.Module.name header
@@ -239,61 +243,60 @@ formatModuleLine_0_16 header =
 formatModuleLine_0_17 :: AST.Module.Header -> Box
 formatModuleLine_0_17 header =
   let
-    moduleKeyword =
-      case AST.Module.moduleType header of
-        AST.Module.UserModule ->
-          keyword "module"
-        AST.Module.PortModule ->
-          row [ keyword "port", space, keyword "module" ]
-        AST.Module.EffectModule ->
-          row [ keyword "effect", space, keyword "module" ]
+    tag =
+      case AST.Module.srcTag header of
+        AST.Module.Normal ->
+          line $ keyword "module"
 
-    exports =
-      case formatListing formatVarValue $ AST.Module.exports header of
+        AST.Module.Port comments ->
+          ElmStructure.spaceSepOrIndented
+            (formatTailCommented (line . keyword) ("port", comments))
+            [ line $ keyword "module" ]
+
+        AST.Module.Effect comments ->
+          ElmStructure.spaceSepOrIndented
+            (formatTailCommented (line . keyword) ("effect", comments))
+            [ line $ keyword "module" ]
+
+    exports list =
+      case formatListing formatVarValue $ list of
           Just listing ->
             listing
           _ ->
               line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
 
+    formatSetting (k, v) =
+      formatRecordPair '=' (line . identifier) (k, v, False)
+
+    formatSettings settings =
+      map formatSetting settings
+        |> ElmStructure.group True "{" "," "}" False
+
     whereClause =
       AST.Module.moduleSettings header
-        |> fmap (map (\(k, v) -> ElmStructure.equalsPair (formatCommented (line . identifier) k) (formatCommented (line . identifier) v)))
-        |> fmap (ElmStructure.group True "{" "," "}" False)
-        |> fmap (\x -> [x])
-        |> fmap (ElmStructure.spaceSepOrIndented (line $ keyword "where"))
+        |> fmap (formatKeywordCommented "where" formatSettings)
         |> fmap (\x -> [x])
         |> Maybe.fromMaybe []
 
     exposingClause =
-      case
-        ( formatTailCommented (line . keyword) ("exposing", AST.Module.preExportsComments header)
-        , exports
-        )
-      of
-        (SingleLine exposing, SingleLine exports') ->
-          line $ row [ exposing, space, exports' ]
-
-        (exposing, exports') ->
-          stack1
-            [ exposing
-            , indent exports'
-            ]
+      formatKeywordCommented "exposing" exports $ AST.Module.exports header
 
     nameClause =
       case
-        ( formatCommented (line . formatName) $ AST.Module.name header
+        ( tag
+        , formatCommented (line . formatName) $ AST.Module.name header
         )
       of
-        SingleLine name' ->
+        (SingleLine tag', SingleLine name') ->
           line $ row
-            [ moduleKeyword
+            [ tag'
             , space
             , name'
             ]
 
-        name' ->
+        (tag', name') ->
           stack1
-            [ line $ moduleKeyword
+            [ tag'
             , indent $ name'
             ]
   in
@@ -1280,6 +1283,13 @@ formatCommentedStack format (Commented pre inner post) =
 formatHeadCommentedStack :: (a -> Box) -> (Comments, a) -> Box
 formatHeadCommentedStack format (pre, inner) =
   formatCommentedStack format (Commented pre inner [])
+
+
+formatKeywordCommented :: String -> (a -> Box) -> KeywordCommented a -> Box
+formatKeywordCommented word format (KeywordCommented pre post value) =
+  ElmStructure.spaceSepOrIndented
+    (formatCommented (line . keyword) (Commented pre word post))
+    [ format value ]
 
 
 formatComment :: Comment -> Box
