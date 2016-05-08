@@ -51,7 +51,14 @@ header =
           , (,) <$> addLocation (return Nothing) <*> return []
           ]
       imports' <- imports
-      return (Module.Header names docs exports postExports ((fmap Module.ImportComment (preDocsComments ++ postDocsComments)) ++ imports') isPortModule)
+      return $
+        Module.Header
+          isPortModule
+          names
+          exports
+          postExports
+          docs
+          ((fmap Module.ImportComment (preDocsComments ++ postDocsComments)) ++ imports')
 
 
 moduleDecl :: IParser (Bool, Commented ModuleName.Raw, Var.Listing Var.Value, Comments)
