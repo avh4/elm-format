@@ -1417,20 +1417,27 @@ formatType' requireParens atype =
         UnitType comments ->
           formatUnit '(' ')' comments
 
-        FunctionType first rest final ->
+        FunctionType first rest final forceMultiline ->
             case
-              allSingles $
-                concat
-                  [ [formatTailCommented (formatType' ForLambda) first]
-                  , map (formatCommented $ formatType' ForLambda) rest
-                  , [formatHeadCommented (formatType' ForLambda) final]
-                  ]
+              ( forceMultiline
+              , allSingles $
+                  concat
+                    [ [formatTailCommented (formatType' ForLambda) first]
+                    , map (formatCommented $ formatType' ForLambda) rest
+                    , [formatHeadCommented (formatType' ForLambda) final]
+                    ]
+              )
             of
-                Right typs ->
+                (False, Right typs) ->
                   line $ row $ List.intersperse (row [ space, keyword "->", space]) typs
-                Left [] ->
+                (True, Right []) ->
                   pleaseReport "INVALID FUNCTION TYPE" "no terms"
-                Left (first':rest') ->
+                (True, Right (first':rest')) ->
+                  (line first')
+                    |> andThen (rest' |> map line |> map (prefix $ row [keyword "->", space]))
+                (_, Left []) ->
+                  pleaseReport "INVALID FUNCTION TYPE" "no terms"
+                (_, Left (first':rest')) ->
                   first'
                     |> andThen (rest' |> map (prefix $ row [keyword "->", space]))
 

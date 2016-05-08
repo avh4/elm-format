@@ -92,11 +92,11 @@ tests =
         ]
 
     , testGroup "function type"
-      [ example "" "a->b->c" $ at 1 1 1 8 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[]) [Commented [] (at 1 4 1 5 (TypeVariable "b")) []] ([],at 1 7 1 8 (TypeVariable "c")))
-      , example "single argument" "a->b" $ at 1 1 1 5 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[]) [] ([],at 1 4 1 5 (TypeVariable "b")))
-      , example "whitespace" "a->b->c" $ at 1 1 1 8 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[]) [Commented [] (at 1 4 1 5 (TypeVariable "b")) []] ([],at 1 7 1 8 (TypeVariable "c")))
-      , example "comments" "a{-A-}->{-B-}b{-C-}->{-D-}c" $ at 1 1 1 28 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[BlockComment ["A"]]) [Commented [BlockComment ["B"]] (at 1 14 1 15 (TypeVariable "b")) [BlockComment ["C"]]] ([BlockComment ["D"]],at 1 27 1 28 (TypeVariable "c")))
-      , example "newlines" "a\n ->\n b\n ->\n c" $ at 1 1 5 3 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[]) [Commented [] (at 3 2 3 3 (TypeVariable "b")) []] ([],at 5 2 5 3 (TypeVariable "c")))
+      [ example "" "a->b->c" $ at 1 1 1 8 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[]) [Commented [] (at 1 4 1 5 (TypeVariable "b")) []] ([],at 1 7 1 8 (TypeVariable "c")) False)
+      , example "single argument" "a->b" $ at 1 1 1 5 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[]) [] ([],at 1 4 1 5 (TypeVariable "b")) False)
+      , example "whitespace" "a->b->c" $ at 1 1 1 8 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[]) [Commented [] (at 1 4 1 5 (TypeVariable "b")) []] ([],at 1 7 1 8 (TypeVariable "c")) False)
+      , example "comments" "a{-A-}->{-B-}b{-C-}->{-D-}c" $ at 1 1 1 28 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[BlockComment ["A"]]) [Commented [BlockComment ["B"]] (at 1 14 1 15 (TypeVariable "b")) [BlockComment ["C"]]] ([BlockComment ["D"]],at 1 27 1 28 (TypeVariable "c")) False)
+      , example "newlines" "a\n ->\n b\n ->\n c" $ at 1 1 5 3 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[]) [Commented [] (at 3 2 3 3 (TypeVariable "b")) []] ([],at 5 2 5 3 (TypeVariable "c")) True)
       , testCase "does not allow space in the arrow" $
           assertFailure expr "a - > b"
       ]

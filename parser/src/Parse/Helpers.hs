@@ -208,28 +208,36 @@ pipeSep1 =
   spaceySepBy1 (char '|' <?> "a vertical bar '|'")
 
 
-separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (e,Comments), [Commented e], (Comments,e)))
+separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (e,Comments), [Commented e], (Comments,e), Bool))
 separated sep expr' =
   do  start <- getMyPosition
+      _ <- pushNewlineContext
       t1 <- expr'
       arrow <- optionMaybe $ try (whitespace <* sep)
       case arrow of
         Nothing ->
-            return $ Left t1
+            do  _ <- popNewlineContext
+                return $ Left t1
         Just (_, preArrow) ->
             do  (_, postArrow) <- whitespace
-                t2 <- (separated sep expr')
+                t2 <- separated sep expr'
                 end <- getMyPosition
+                multiline <- popNewlineContext
                 return $ Right $
                   case t2 of
-                    Right (_, (t2',postT2), ts, tlast) ->
+                    Right (_, (t2',postT2), ts, tlast, _) ->
                       ( R.Region start end
                       , (t1, preArrow)
                       , ((Commented postArrow t2' postT2):ts)
                       , tlast
+                      , multiline
                       )
                     Left t2' ->
-                      (R.Region start end, (t1, preArrow), [], (postArrow, t2'))
+                      ( R.Region start end
+                      , (t1, preArrow)
+                      , []
+                      , (postArrow, t2')
+                      , multiline)
 
 
 dotSep1 :: IParser a -> IParser [a]
