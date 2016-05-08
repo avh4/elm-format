@@ -4,7 +4,6 @@
 #shellcheck "./build-package.sh" || exit 1
 #shellcheck "./package/linux/build-package.sh" || exit 1
 
-cabal test || exit 1
 cabal build || exit 1
 
 ELM_FORMAT="./dist/build/elm-format/elm-format"
@@ -263,3 +262,5 @@ checkTransformation QuickCheck-94f37da84c1310f03dcfa1059ce870b73c94a825--6449652
 
 echo
 echo "# GREAT SUCCESS!"
+
+cabal test || exit 1
