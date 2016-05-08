@@ -17,6 +17,15 @@ type alias TypeAlias a b =
   { x : Int, y : Int, z : ( a, b ) }
 
 
+type alias
+  TypeAliasMultiline
+    -- A
+    a
+    b
+  =
+  ()
+
+
 expressionDefinition _ _ =
   ()
 
