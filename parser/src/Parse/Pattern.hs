@@ -51,8 +51,8 @@ asPattern patternParser =
             return pattern
   where
     asAlias =
-      do  (_, preAs) <- try (whitespace <* reserved "as")
-          (_, postAs) <- whitespace
+      do  preAs <- try (whitespace <* reserved "as")
+          postAs <- whitespace
           var <- lowVar
           return (preAs, (postAs, var))
 

@@ -120,7 +120,7 @@ recordTerm :: IParser E.Expr
 recordTerm =
   addLocation $ brackets $ choice
     [ do  starter <- try (addLocation rLabel)
-          (_, postStarter) <- whitespace
+          postStarter <- whitespace
           choice
             [ update starter postStarter
             , literal starter postStarter
@@ -130,20 +130,20 @@ recordTerm =
   where
     update (A.A ann starter) postStarter =
       do  try (string "|")
-          (_, postBar) <- whitespace
+          postBar <- whitespace
           fields <- commaSep1 field
           return $ \pre post multiline -> (E.RecordUpdate (Commented pre (A.A ann $ E.Var $ Var.VarRef starter) postStarter) (fields postBar post) multiline)
 
     literal (A.A _ starter) postStarter =
       do  pushNewlineContext
           try equals -- TODO: can the try break newline tracking?
-          (_, preExpr) <- whitespace
+          preExpr <- whitespace
           value <- expr
           multiline' <- popNewlineContext
-          (_, postExpr) <- whitespace
+          postExpr <- whitespace
           choice
             [ do  try comma
-                  (_, preNext) <- whitespace
+                  preNext <- whitespace
                   fields <- commaSep field
                   return $ \pre post multiline -> (E.Record ((Commented pre starter postStarter, Commented preExpr value postExpr, multiline') : (fields preNext post)) multiline)
             , return $ \pre post multiline -> (E.Record [(Commented pre starter postStarter, Commented preExpr value (postExpr ++ post), multiline')] multiline)
@@ -209,7 +209,7 @@ ifExpr =
   let
     elseKeyword =
       (reserved "else" <?> "an 'else' branch")
-        >> (snd <$> whitespace)
+        >> whitespace
   in
     do
       first <- ifClause
@@ -223,11 +223,11 @@ ifClause :: IParser E.IfClause
 ifClause =
   do
     try (reserved "if")
-    (_ , preCondition) <- whitespace
+    preCondition <- whitespace
     condition <- expr
     (postCondition, _, bodyComments) <- padded (reserved "then")
     thenBranch <- expr
-    (_, preElse) <- whitespace <?> "an 'else' branch"
+    preElse <- whitespace <?> "an 'else' branch"
     return
       ( Commented preCondition condition postCondition
       , Commented bodyComments thenBranch preElse
@@ -253,14 +253,14 @@ caseExpr =
       e <- (\(pre, e, post) -> Commented pre e post) <$> padded expr
       reserved "of"
       multilineSubject <- popNewlineContext
-      (_, firstPatternComments) <- whitespace
+      firstPatternComments <- whitespace
       updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
       result <- cases firstPatternComments
       return $ E.Case (e, multilineSubject) result
   where
     case_ preComments =
       do
-          ((_, patternComments), p, (preArrowComments, _, bodyComments)) <-
+          (patternComments, p, (preArrowComments, _, bodyComments)) <-
               try ((,,)
                   <$> whitespace
                   <*> (checkIndent >> Pattern.expr)
@@ -285,11 +285,11 @@ caseExpr =
 letExpr :: IParser E.Expr'
 letExpr =
   do  try (reserved "let")
-      commentsAfterLet <- map E.LetComment <$> snd <$> whitespace
+      commentsAfterLet <- map E.LetComment <$> whitespace
       defs <-
         block $
           do  def <- typeAnnotation E.LetAnnotation <|> definition E.LetDefinition
-              (_, commentsAfterDef) <- whitespace
+              commentsAfterDef <- whitespace
               return $ def : (map E.LetComment commentsAfterDef)
       (_, _, bodyComments) <- padded (reserved "in") -- TODO: pre comments are always empty because any whitespace was consumed before padded?
       E.Let (commentsAfterLet ++ concat defs) bodyComments <$> expr

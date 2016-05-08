@@ -37,7 +37,7 @@ record =
   addLocation $
   do  char '{'
       pushNewlineContext
-      (_, pre) <- whitespace
+      pre <- whitespace
       body <- extended <|> normal
       post <- dumbWhitespace
       char '}'
@@ -60,10 +60,10 @@ record =
             try $
               do
                 ext <- lowVar
-                (_, postBase) <- whitespace
+                postBase <- whitespace
                 _ <- string "|"
                 return (ext, postBase)
-          (_, preFields) <- whitespace
+          preFields <- whitespace
           fields <- commaSep1 field
           return $ \pre post sawNewline ->
             RecordExtensionType
@@ -74,9 +74,9 @@ record =
     field =
       do  pushNewlineContext
           lbl <- rLabel
-          (_, postLbl) <- whitespace
+          postLbl <- whitespace
           _ <- hasType
-          (_, preExpr) <- whitespace
+          preExpr <- whitespace
           val <- expr
           sawNewline <- popNewlineContext
           return $ \preLbl postExpr ->

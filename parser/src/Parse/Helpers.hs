@@ -218,8 +218,8 @@ separated sep expr' =
         Nothing ->
             do  _ <- popNewlineContext
                 return $ Left t1
-        Just (_, preArrow) ->
-            do  (_, postArrow) <- whitespace
+        Just preArrow ->
+            do  postArrow <- whitespace
                 t2 <- separated sep expr'
                 end <- getMyPosition
                 multiline <- popNewlineContext
@@ -267,7 +267,7 @@ constrainedSpacePrefix' parser constraint =
       comment pre value = (pre, value)
 
       spacing = do
-        (n, comments) <- whitespace
+        (n, comments) <- whitespace'
         _ <- constraint (not n) <?> Syntax.whitespace
         indented
         return comments
@@ -338,15 +338,14 @@ braces'' = surround'' '[' ']'
 surround'' :: Char -> Char -> IParser a -> IParser (Either Comments [Commented a])
 surround'' leftDelim rightDelim inner =
   let
-    whitespace' = (\(_,w) -> w) <$> whitespace
     sep''' =
       do
-        v <- Commented <$> whitespace' <*> inner <*> whitespace'
+        v <- Commented <$> whitespace <*> inner <*> whitespace
         option [v] ((\x -> v : x) <$> (char ',' >> sep'''))
     sep'' =
       do
-          pre <- whitespace'
-          v <- optionMaybe (Commented pre <$> inner <*> whitespace')
+          pre <- whitespace
+          v <- optionMaybe (Commented pre <$> inner <*> whitespace)
           case v of
               Nothing ->
                   return $ Left pre
@@ -416,9 +415,9 @@ dot =
 
 padded :: IParser a -> IParser (Comments, a, Comments)
 padded p =
-  do  (_, pre) <- whitespace
+  do  pre <- whitespace
       out <- p
-      (_, post) <- whitespace
+      post <- whitespace
       return (pre, out, post)
 
 
@@ -449,9 +448,14 @@ dumbWhitespace =
   concat <$> many (spaces <|> newline)
 
 
-whitespace :: IParser (Bool, Comments)
-whitespace =
+whitespace' :: IParser (Bool, Comments)
+whitespace' =
   option (False, []) ((,) True <$> forcedWS)
+
+
+whitespace :: IParser Comments
+whitespace =
+  snd <$> whitespace'
 
 
 freshLine :: IParser Comments
