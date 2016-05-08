@@ -8,14 +8,20 @@ import qualified AST.Declaration
 import qualified AST.Module as Module
 import qualified AST.Module.Name as ModuleName
 import qualified AST.Variable as Var
-import qualified Reporting.Annotation as A
 import AST.V0_16
 
 
 elmModule :: IParser Module.Module
 elmModule =
   do  preModule <- option [] freshLine
-      h <- header
+      h <- moduleDecl
+      preDocsComments <- option [] freshLine
+      (docs, postDocsComments) <-
+        choice
+          [ (,) <$> addLocation (Just <$> docComment) <*> freshLine
+          , (,) <$> addLocation (return Nothing) <*> return []
+          ]
+      imports' <- imports
       decls <- declarations
       trailingComments <-
           (++)
@@ -23,7 +29,13 @@ elmModule =
               <*> option [] spaces
       eof
 
-      return $ Module.Module preModule h (decls ++ (map AST.Declaration.BodyComment trailingComments))
+      return $
+        Module.Module
+          preModule
+          h
+          docs
+          ((fmap Module.ImportComment (preDocsComments ++ postDocsComments)) ++ imports')
+          (decls ++ (map AST.Declaration.BodyComment trailingComments))
 
 
 declarations :: IParser [AST.Declaration.Decl]
@@ -40,37 +52,21 @@ freshDef =
           return $ (map AST.Declaration.BodyComment comments) ++ [decl]
 
 
-header :: IParser Module.Header
-header =
-  do  (h, preDocsComments) <-
-        option
-          (Module.Header
-            False
-            (Commented [] ["Main"] [])
-            (Var.OpenListing (Commented [] () []))
-            [], [])
-          ((,) <$> moduleDecl <*> freshLine)
-      (docs, postDocsComments) <-
-        choice
-          [ (,) <$> addLocation (Just <$> docComment) <*> freshLine
-          , (,) <$> addLocation (return Nothing) <*> return []
-          ]
-      imports' <- imports
-      return $
-        h
-          docs
-          ((fmap Module.ImportComment (preDocsComments ++ postDocsComments)) ++ imports')
-
-
-moduleDecl :: IParser (A.Located (Maybe String) -> [Module.UserImport] -> Module.Header)
+moduleDecl :: IParser Module.Header
 moduleDecl =
   choice
     [ try moduleDecl_0_16
     , moduleDecl_0_17
+    , return $
+        Module.Header
+          False
+          (Commented [] ["Main"] [])
+          (Var.OpenListing (Commented [] () []))
+          []
     ]
 
 
-moduleDecl_0_16 :: IParser (A.Located (Maybe String) -> [Module.UserImport] -> Module.Header)
+moduleDecl_0_16 :: IParser Module.Header
 moduleDecl_0_16 =
   expecting "a module declaration" $
   do  try (reserved "module")
@@ -88,7 +84,7 @@ moduleDecl_0_16 =
           preWhere
 
 
-moduleDecl_0_17 :: IParser (A.Located (Maybe String) -> [Module.UserImport] -> Module.Header)
+moduleDecl_0_17 :: IParser Module.Header
 moduleDecl_0_17 =
   expecting "a module declaration" $
   do

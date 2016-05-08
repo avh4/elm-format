@@ -16,6 +16,8 @@ import AST.V0_16
 data Module = Module
     { initialComments :: Comments
     , header :: Header
+    , docs :: A.Located (Maybe String)
+    , imports :: [UserImport]
     , body :: [Declaration.Decl]
     }
     deriving (Eq, Show)
@@ -27,13 +29,13 @@ instance A.Strippable Module where
     { initialComments = initialComments m
     , header =
         Header
-          { name = name $ header m
-          , docs = A.stripRegion $ docs $ header m
+          { isPortModule = isPortModule $ header m
+          , name = name $ header m
           , exports = exports $ header m
           , postExportComments = postExportComments $ header m
-          , imports = imports $ header m
-          , isPortModule = isPortModule $ header m
           }
+    , docs = A.stripRegion $ docs m
+    , imports = imports m
     , body = map A.stripRegion $ body m
     }
 
@@ -46,8 +48,6 @@ data Header = Header
     , name :: Commented Name.Raw
     , exports :: Var.Listing Var.Value
     , postExportComments :: Comments
-    , docs :: A.Located (Maybe String)
-    , imports :: [UserImport]
     }
     deriving (Eq, Show)
 

@@ -153,9 +153,12 @@ declarationType decl =
       DComment
 
 
-formatModuleHeader :: ElmVersion -> AST.Module.Header -> Box
-formatModuleHeader elmVersion header =
+formatModuleHeader :: ElmVersion -> AST.Module.Module -> Box
+formatModuleHeader elmVersion modu =
   let
+      header =
+        AST.Module.header modu
+
       moduleLine =
         case elmVersion of
           Elm_0_16 ->
@@ -165,7 +168,7 @@ formatModuleHeader elmVersion header =
             formatModuleLine_0_17 header
 
       docs =
-          formatModuleDocs (AST.Module.docs header)
+          formatModuleDocs (AST.Module.docs modu)
 
       importSpacer first second =
             case (first, second) of
@@ -179,7 +182,7 @@ formatModuleHeader elmVersion header =
                     []
 
       imports =
-            AST.Module.imports header
+            AST.Module.imports modu
                 |> intersperseMap importSpacer formatImport
 
       mapIf fn m a =
@@ -311,7 +314,7 @@ formatModule elmVersion modu =
     in
       stack1 $
         initialComments'
-          ++ (formatModuleHeader elmVersion $ AST.Module.header modu)
+          ++ (formatModuleHeader elmVersion modu)
           : body
 
 
