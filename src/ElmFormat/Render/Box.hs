@@ -631,7 +631,7 @@ formatDeclaration decl =
                           , space
                           , punc "="
                           ]
-                      (SingleLine alias, nameWithArgs') -> -- TODO: not tested
+                      (SingleLine alias, nameWithArgs') ->
                         stack1
                           [ line $ row [keyword "type", space, alias]
                           , indent $ nameWithArgs'
