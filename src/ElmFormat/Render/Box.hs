@@ -199,7 +199,7 @@ formatModuleLine_0_16 :: AST.Module.Header -> Box
 formatModuleLine_0_16 header =
   let
     formatExports =
-      case formatListing False formatVarValue $ AST.Module.exports header of
+      case formatListing formatVarValue $ AST.Module.exports header of
           Just listing ->
             listing
           _ ->
@@ -243,7 +243,7 @@ formatModuleLine_0_17 header =
           keyword "module"
 
     formatExports =
-      case formatListing False formatVarValue $ AST.Module.exports header of
+      case formatListing formatVarValue $ AST.Module.exports header of
           Just listing ->
             listing
           _ ->
@@ -359,12 +359,12 @@ formatImport aimport =
                             "as")
                             |> Monad.join
 
-                        (exposingPreKeyword, exposingPostKeywordAndListing, multiline)
+                        (exposingPreKeyword, exposingPostKeywordAndListing)
                           = AST.Module.exposedVars method
 
                         exposing =
                           formatImportClause
-                            (formatListing multiline formatVarValue)
+                            (formatListing formatVarValue)
                             "exposing"
                             (exposingPreKeyword, exposingPostKeywordAndListing)
 
@@ -505,8 +505,8 @@ formatImport aimport =
             formatComment c
 
 
-formatListing :: Bool -> (a -> Box) -> AST.Variable.Listing a -> Maybe Box
-formatListing multiline format listing =
+formatListing :: (a -> Box) -> AST.Variable.Listing a -> Maybe Box
+formatListing format listing =
     case listing of
         AST.Variable.ClosedListing ->
             Nothing
@@ -514,7 +514,7 @@ formatListing multiline format listing =
         AST.Variable.OpenListing comments ->
             Just $ parens $ formatCommented (line . keyword) $ fmap (const "..") comments
 
-        AST.Variable.ExplicitListing vars ->
+        AST.Variable.ExplicitListing vars multiline ->
             Just $ ElmStructure.group False "(" "," ")" multiline $ map (formatCommented format) vars
 
 
@@ -529,7 +529,7 @@ formatVarValue aval =
 
         AST.Variable.Union name listing ->
             case
-              ( formatListing False (line . identifier) listing
+              ( formatListing (line . identifier) listing
               , formatTailCommented (line . identifier) name
               , snd name
               )

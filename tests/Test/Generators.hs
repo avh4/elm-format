@@ -84,9 +84,10 @@ instance (Arbitrary a) => Arbitrary (AST.Variable.Listing a) where
     arbitrary =
         do
             vars <- listOf arbitrary
+            multiline <- arbitrary
             case vars of
                 [] -> return $ AST.Variable.OpenListing (Commented [] () [])
-                _ -> return $ AST.Variable.ExplicitListing (map (\x -> Commented [] x []) vars)
+                _ -> return $ AST.Variable.ExplicitListing (map (\x -> Commented [] x []) vars) multiline
 
 
 instance Arbitrary AST.Module.Module where
