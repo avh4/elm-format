@@ -1,5 +1,5 @@
 module AST.Module
-    ( Module(..), Header(..)
+    ( Module(..), Header(..), ModuleType(..)
     , UserImport(..), ImportMethod(..)
     ) where
 
@@ -29,7 +29,7 @@ instance A.Strippable Module where
     { initialComments = initialComments m
     , header =
         Header
-          { isPortModule = isPortModule $ header m
+          { moduleType = moduleType $ header m
           , name = name $ header m
           , preExportsComments = preExportsComments $ header m
           , exports = exports $ header m
@@ -42,9 +42,15 @@ instance A.Strippable Module where
 
 -- HEADERS
 
+data ModuleType
+  = UserModule
+  | PortModule
+  deriving (Eq, Show)
+
+
 {-| Basic info needed to identify modules and determine dependencies. -}
 data Header = Header
-    { isPortModule :: Bool
+    { moduleType :: ModuleType
     , name :: Commented Name.Raw
     , preExportsComments :: Comments
     , exports :: Var.Listing Var.Value

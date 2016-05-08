@@ -239,11 +239,11 @@ formatModuleLine_0_17 :: AST.Module.Header -> Box
 formatModuleLine_0_17 header =
   let
     moduleKeyword =
-      case AST.Module.isPortModule header of
-        True ->
-          row [ keyword "port", space, keyword "module" ]
-        False ->
+      case AST.Module.moduleType header of
+        AST.Module.UserModule ->
           keyword "module"
+        AST.Module.PortModule ->
+          row [ keyword "port", space, keyword "module" ]
 
     formatExports =
       case formatListing formatVarValue $ AST.Module.exports header of
