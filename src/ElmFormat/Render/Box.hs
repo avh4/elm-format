@@ -568,9 +568,6 @@ formatVarValue aval =
         AST.Variable.Value val ->
             line $ formatVar val
 
-        AST.Variable.Alias name ->
-            line $ identifier name
-
         AST.Variable.Union name listing ->
             case
               ( formatListing (line . identifier) listing

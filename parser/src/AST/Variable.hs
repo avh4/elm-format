@@ -22,6 +22,5 @@ data Listing a
 -- | A value that can be imported or exported
 data Value
     = Value !Ref
-    | Alias !String -- TODO: what is this?
     | Union (PostCommented String) (Listing String)
     deriving (Eq, Show)
