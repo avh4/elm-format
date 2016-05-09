@@ -40,7 +40,7 @@ elmModule =
 
 declarations :: IParser [AST.Declaration.Decl]
 declarations =
-  (++) <$> ((\x -> [x]) <$> Decl.declaration) -- TODO: can there be comments before this?
+  (++) <$> ((\x -> [x]) <$> Decl.declaration)
       <*> (concat <$> many freshDef)
 
 
