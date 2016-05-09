@@ -68,8 +68,7 @@ listTerm =
                   multiline
 
     shader' =
-      do  pos <- getPosition
-          rawSrc <- Help.shader
+      do  rawSrc <- Help.shader
           return $ E.GLShader (filter (/='\r') rawSrc)
 
     commaSeparated =
