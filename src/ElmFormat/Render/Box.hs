@@ -1340,6 +1340,9 @@ formatComment comment =
         CommentTrickCloser ->
             mustBreak $ punc "--}"
 
+        CommentTrickBlock c ->
+            mustBreak $ row [ punc "{--", literal c, punc "-}" ]
+
 
 formatLiteral :: Literal -> Box
 formatLiteral lit =

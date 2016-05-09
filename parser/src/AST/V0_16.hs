@@ -9,6 +9,7 @@ data Comment
     | LineComment String
     | CommentTrickOpener
     | CommentTrickCloser
+    | CommentTrickBlock String
     deriving (Eq, Show)
 
 
