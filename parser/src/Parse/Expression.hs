@@ -279,7 +279,9 @@ caseExpr =
                 return $ r1:r
 
 
+
 -- LET
+
 
 letExpr :: IParser E.Expr'
 letExpr =
@@ -290,8 +292,10 @@ letExpr =
           do  def <- typeAnnotation E.LetAnnotation <|> definition E.LetDefinition
               commentsAfterDef <- whitespace
               return $ def : (map E.LetComment commentsAfterDef)
-      (_, _, bodyComments) <- padded (reserved "in") -- TODO: pre comments are always empty because any whitespace was consumed before padded?
+      _ <- reserved "in"
+      bodyComments <- whitespace
       E.Let (commentsAfterLet ++ concat defs) bodyComments <$> expr
+
 
 
 -- TYPE ANNOTATION
