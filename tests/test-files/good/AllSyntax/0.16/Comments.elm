@@ -23,3 +23,10 @@ indentedMultilineBlockComment =
 multilineCommentTrickDisabled =
   ()
 --}
+
+
+
+{--
+multilineCommentTrickEnabled =
+  ()
+--}

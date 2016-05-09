@@ -550,9 +550,18 @@ docComment =
 multiComment :: IParser Comment
 multiComment =
   do  try (string "{-" <* notFollowedBy (string "|") )
+      isCommentTrick <-
+        choice
+          [ char '-' >> return True
+          , return False
+          ]
       many (string " ")
       b <- closeComment False
-      return $ BlockComment $ trimIndent $ lines b
+      return $
+        if isCommentTrick then
+          CommentTrickBlock b
+        else
+          BlockComment $ trimIndent $ lines b
   where
       trimIndent [] = []
       trimIndent (l1:ls) =
