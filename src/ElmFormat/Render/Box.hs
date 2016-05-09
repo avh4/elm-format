@@ -112,6 +112,8 @@ splitWhere predicate list =
 
 data DeclarationType
   = DComment
+  | DStarter
+  | DCloser
   | DDefinition (Maybe AST.Variable.Ref)
   deriving (Show)
 
@@ -149,6 +151,12 @@ declarationType decl =
 
     AST.Declaration.DocComment _ ->
       DDefinition Nothing
+
+    AST.Declaration.BodyComment CommentTrickOpener ->
+      DStarter
+
+    AST.Declaration.BodyComment CommentTrickCloser ->
+      DCloser
 
     AST.Declaration.BodyComment _ ->
       DComment
@@ -310,6 +318,10 @@ formatModule elmVersion modu =
     let
         spacer first second =
           case (declarationType first, declarationType second) of
+            (DStarter, _) ->
+              []
+            (_, DCloser) ->
+              []
             (DComment, DComment) ->
               []
             (_, DComment) ->
@@ -318,11 +330,15 @@ formatModule elmVersion modu =
               List.replicate 2 blankLine
             (DDefinition Nothing, DDefinition (Just _)) ->
               []
+            (DDefinition _, DStarter) ->
+              List.replicate 2 blankLine
             (DDefinition a, DDefinition b) ->
               if a == b then
                 []
               else
                 List.replicate 2 blankLine
+            (DCloser, _) ->
+              List.replicate 2 blankLine
 
         body =
             intersperseMap spacer formatDeclaration $
@@ -1314,8 +1330,15 @@ formatComment comment =
                             (stack1 $ map (line . literal) ls)
                         , line $ punc "-}"
                         ]
+
         LineComment c ->
             mustBreak $ row [ punc "--", literal c ]
+
+        CommentTrickOpener ->
+            mustBreak $ punc "{--}"
+
+        CommentTrickCloser ->
+            mustBreak $ punc "--}"
 
 
 formatLiteral :: Literal -> Box
