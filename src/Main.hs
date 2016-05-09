@@ -155,16 +155,16 @@ main =
         let twoInputSources = (not $ null inputFiles) && isStdin
 
         -- when we don't have any input, stdin or otherwise
-        when (noInputSource) $ do
+        when (noInputSource) $
             Flags.showHelpText
-            exitFailure
+            >> exitFailure
 
-        when (twoInputSources) $ do
+        when (twoInputSources) $
             exitTooManyInputSources
 
-        when (isStdin) $ do
+        when (isStdin) $
             handleStdinInput outputFile elmVersion
-            exitSuccess
+            >> exitSuccess
 
         validationResult <- handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion
 
