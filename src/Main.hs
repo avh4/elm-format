@@ -68,8 +68,8 @@ writeResult outputFile inputFilename inputText validateOnly elmVersion result =
                 exitFailure
 
 
-processTextInput :: Maybe FilePath -> String -> Text.Text -> Bool -> ElmVersion -> IO (Maybe Bool)
-processTextInput outputFile inputFilename inputText validateOnly elmVersion =
+processTextInput :: ElmVersion -> Maybe FilePath -> String -> Bool -> Text.Text -> IO (Maybe Bool)
+processTextInput elmVersion outputFile inputFilename validateOnly inputText =
     Parse.parse inputText
         |> writeResult outputFile inputFilename inputText validateOnly elmVersion
 
@@ -79,7 +79,7 @@ processFileInput inputFile outputFile validateOnly elmVersion =
     do
         putStrLn $ (r $ ProcessingFile inputFile)
         inputText <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
-        processTextInput outputFile inputFile inputText validateOnly elmVersion
+        processTextInput elmVersion outputFile inputFile validateOnly inputText
 
 
 isEitherFileOrDirectory :: FilePath -> IO Bool
@@ -97,7 +97,7 @@ handleStdinInput outputFile elmVersion = do
 
     Lazy.toStrict input
         |> Text.decodeUtf8
-        |> (\input -> processTextInput outputFile "<STDIN>" input False elmVersion)
+        |> processTextInput elmVersion outputFile "<STDIN>" False
 
 
 handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> ElmVersion -> IO (Maybe Bool)
