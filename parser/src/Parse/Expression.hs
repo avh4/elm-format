@@ -134,8 +134,9 @@ recordTerm =
           return $ \pre post multiline -> (E.RecordUpdate (Commented pre (A.A ann $ E.Var $ Var.VarRef starter) postStarter) (fields postBar post) multiline)
 
     literal (A.A _ starter) postStarter =
-      do  pushNewlineContext
-          try equals -- TODO: can the try break newline tracking?
+      do
+          try equals
+          pushNewlineContext
           preExpr <- whitespace
           value <- expr
           multiline' <- popNewlineContext
