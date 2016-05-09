@@ -7,6 +7,8 @@ import qualified Reporting.Annotation as A
 data Comment
     = BlockComment [String]
     | LineComment String
+    | CommentTrickOpener
+    | CommentTrickCloser
     deriving (Eq, Show)
 
 

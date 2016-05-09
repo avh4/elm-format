@@ -17,3 +17,9 @@ indentedMultilineBlockComment =
      C
   -}
   ()
+
+
+{--}
+multilineCommentTrickDisabled =
+  ()
+--}

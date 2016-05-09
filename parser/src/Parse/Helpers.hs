@@ -449,7 +449,11 @@ spaces =
   let
       blank = string " " >> return []
       comment = ((\x -> [x]) <$> multiComment)
-      space = blank <|> comment <?> Syntax.whitespace
+      space =
+        blank
+        <|> (const [CommentTrickOpener] <$> (try $ string "{--}"))
+        <|> comment
+        <?> Syntax.whitespace
   in
       concat <$> many1 space
 
@@ -516,8 +520,14 @@ popNewlineContext =
 lineComment :: IParser Comment
 lineComment =
   do  try (string "--")
-      (comment, ()) <- anyUntil $ (simpleNewline >> return ()) <|> eof
-      return $ LineComment comment
+      choice
+        [ const CommentTrickCloser
+            <$> try (char '}' >> many (char ' ') >> (simpleNewline <|> eof))
+        , do
+            (comment, ()) <-
+              anyUntil $ simpleNewline <|> eof
+            return $ LineComment comment
+        ]
 
 
 commentedKeyword :: String -> IParser a -> IParser (KeywordCommented a)
