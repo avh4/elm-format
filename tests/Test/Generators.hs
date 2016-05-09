@@ -77,7 +77,7 @@ instance Arbitrary AST.Variable.Value where
     arbitrary =
         do
             name <- capIdentifier
-            return $ AST.Variable.Alias name
+            return $ AST.Variable.Value $ AST.Variable.VarRef name
 
 
 instance (Arbitrary a) => Arbitrary (AST.Variable.Listing a) where

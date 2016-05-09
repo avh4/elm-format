@@ -201,5 +201,5 @@ value =
       do  name <- capVar
           maybeCtors <- optionMaybe (listing capVar)
           case maybeCtors of
-            Nothing -> return (Var.Alias name)
+            Nothing -> return (Var.Value $ Var.VarRef name)
             Just (pre, ctors) -> return (Var.Union (name, pre) ctors)
