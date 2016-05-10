@@ -43,29 +43,33 @@ Formats as:
 
     left =
       right
+
+    left
+      =
+      right
 -}
-equalsPair :: Box -> Box -> Box
-equalsPair left right =
-  case (left, right) of
-    ( SingleLine left', SingleLine right' ) ->
+equalsPair :: String -> Bool -> Box -> Box -> Box
+equalsPair symbol forceMultiline left right =
+  case (forceMultiline, left, right) of
+    ( False, SingleLine left', SingleLine right' ) ->
       line $ row
         [ left'
         , space
-        , punc "="
+        , punc symbol
         , space
         , right'
         ]
 
-    ( SingleLine left', right' ) ->
+    ( _, SingleLine left', right' ) ->
       stack1
-        [ line $ row [ left', space, punc "=" ]
+        [ line $ row [ left', space, punc symbol ]
         , indent right'
         ]
 
-    ( left', right' ) ->
+    ( _, left', right' ) ->
       stack1
         [ left'
-        , indent $ line $ punc "="
+        , indent $ line $ punc symbol
         , indent right'
         ]
 

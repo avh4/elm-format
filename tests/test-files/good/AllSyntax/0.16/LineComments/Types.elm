@@ -84,17 +84,17 @@ emptyRecord _ =
 
 record :
   { --N
-    x
-    --O
-      : --P
-        Int
-        --Q
+    x :
+      --P
+      Int
+      --Q
   , --R
     y
     --S
-      : --T
-        ()
-        --U
+      :
+      --T
+      ()
+      --U
   }
   -> ()
 record _ =
@@ -108,15 +108,17 @@ recordExtension :
     | --X
       x
       --Y
-        : --Z
-          Int
-          --AA
+        :
+        --Z
+        Int
+        --AA
     , --AB
       y
       --AC
-        : --AD
-          Int
-          --AE
+        :
+        --AD
+        Int
+        --AE
   }
   -> ()
 recordExtension _ =
