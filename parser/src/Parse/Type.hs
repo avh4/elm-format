@@ -75,7 +75,7 @@ record =
       do  pushNewlineContext
           lbl <- rLabel
           postLbl <- whitespace
-          _ <- hasType
+          _ <- lenientHasType
           preExpr <- whitespace
           val <- expr
           sawNewline <- popNewlineContext
