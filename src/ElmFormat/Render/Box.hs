@@ -656,38 +656,13 @@ formatDeclaration decl =
                                     ]
 
                 AST.Declaration.TypeAlias preAlias nameWithArgs typ ->
-                  stack1
-                    [ case
-                        ( formatHeadCommented (line . keyword) (preAlias, "alias")
-                        , formatCommented formatNameWithArgs nameWithArgs
-                        )
-                      of
-                      (SingleLine alias, SingleLine nameWithArgs') ->
-                        line $ row
-                          [ keyword "type"
-                          , space
-                          , alias
-                          , space
-                          , nameWithArgs'
-                          , space
-                          , punc "="
-                          ]
-                      (SingleLine alias, nameWithArgs') ->
-                        stack1
-                          [ line $ row [keyword "type", space, alias]
-                          , indent $ nameWithArgs'
-                          , indent $ line $ punc "="
-                          ]
-                      (alias, nameWithArgs') ->
-                        stack1
-                          [ line $ keyword "type"
-                          , indent $ alias
-                          , indent $ nameWithArgs'
-                          , indent $ line $ punc "="
-                          ]
-                    , formatHeadCommentedStack formatType typ
-                        |> indent
-                    ]
+                  ElmStructure.equalsPair "=" True
+                    (ElmStructure.application False
+                      (line $ keyword "type")
+                      [ formatHeadCommented (line . keyword) (preAlias, "alias")
+                      , formatCommented formatNameWithArgs nameWithArgs]
+                    )
+                    (formatHeadCommentedStack formatType typ)
 
 
                 AST.Declaration.PortAnnotation name typeComments typ ->
