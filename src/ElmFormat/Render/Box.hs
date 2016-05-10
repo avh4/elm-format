@@ -274,7 +274,7 @@ formatModuleLine_0_17 header =
               line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
 
     formatSetting (k, v) =
-      formatRecordPair '=' (line . identifier) (k, v, False)
+      formatRecordPair "=" (line . identifier) (k, v, False)
 
     formatSettings settings =
       map formatSetting settings
@@ -853,11 +853,9 @@ formatPattern parensRequired apattern =
           |> (if parensRequired then parens else id)
 
 
-formatRecordPair :: Char -> (v -> Box) -> (Commented String, Commented v, Bool) -> Box
+formatRecordPair :: String -> (v -> Box) -> (Commented String, Commented v, Bool) -> Box
 formatRecordPair delim formatValue (Commented pre k postK, v, forceMultiline) =
-    ElmStructure.equalsPair
-      (delim : [])
-      forceMultiline
+    ElmStructure.equalsPair delim forceMultiline
       (formatCommented (line . identifier) $ Commented [] k postK)
       (formatCommented formatValue v)
     |> (\x -> Commented pre x []) |> formatCommented id
@@ -1114,11 +1112,11 @@ formatExpression aexpr =
           ElmStructure.extensionGroup
             multiline
             (formatCommented formatExpression base)
-            (formatRecordPair '=' formatExpression first)
-            (map (formatRecordPair '=' formatExpression) rest)
+            (formatRecordPair "=" formatExpression first)
+            (map (formatRecordPair "=" formatExpression) rest)
 
         AST.Expression.Record pairs' multiline ->
-          ElmStructure.group True "{" "," "}" multiline $ map (formatRecordPair '=' formatExpression) pairs'
+          ElmStructure.group True "{" "," "}" multiline $ map (formatRecordPair "=" formatExpression) pairs'
 
         AST.Expression.EmptyRecord [] ->
             line $ punc "{}"
@@ -1438,7 +1436,7 @@ formatType' requireParens atype =
           formatUnit '{' '}' comments
 
         RecordType fields multiline ->
-          ElmStructure.group True "{" "," "}" multiline (map (formatRecordPair ':' formatType) fields)
+          ElmStructure.group True "{" "," "}" multiline (map (formatRecordPair ":" formatType) fields)
 
         RecordExtensionType _ [] _ ->
           pleaseReport "INVALID RECORD TYPE EXTENSION" "no fields"
@@ -1447,8 +1445,8 @@ formatType' requireParens atype =
           ElmStructure.extensionGroup
             multiline
             (formatCommented (line . identifier) ext)
-            (formatRecordPair ':' formatType first)
-            (map (formatRecordPair ':' formatType) rest)
+            (formatRecordPair ":" formatType first)
+            (map (formatRecordPair ":" formatType) rest)
 
 
 formatVar :: AST.Variable.Ref -> Line
