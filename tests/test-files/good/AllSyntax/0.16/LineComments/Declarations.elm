@@ -61,12 +61,19 @@ expressionDefinitionNoPatterns =
 
 expressionDefinitionsInLet =
   let
+    --X
     def1 =
+      --Y
       ()
 
+    --Z
     def2 =
+      --AA
       ()
+
+    --AB
   in
+    --AC
     ()
 
 
