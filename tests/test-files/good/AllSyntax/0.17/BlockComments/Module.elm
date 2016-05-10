@@ -2,4 +2,4 @@ module {- A -} AllSyntax.BlockComments.Module {- B -} exposing {- C -} ({- D -} 
 
 
 a =
-  1
+    1

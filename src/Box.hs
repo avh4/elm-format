@@ -247,7 +247,7 @@ initRow startColumn =
 
 spacesInTab :: Int
 spacesInTab =
-  2
+  4
 
 
 spacesToNextTab :: Int -> Int
