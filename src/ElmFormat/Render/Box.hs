@@ -663,7 +663,6 @@ formatDeclaration decl =
                     ]
                     (formatHeadCommentedStack formatType typ)
 
-
                 AST.Declaration.PortAnnotation name typeComments typ ->
                   ElmStructure.definition ":" False
                     (line $ keyword "port")
@@ -729,33 +728,10 @@ formatDefinition name args comments expr =
 
 formatTypeAnnotation :: (AST.Variable.Ref, Comments) -> (Comments, Type) -> Box
 formatTypeAnnotation name typ =
-  case
-      ( formatTailCommented (line . formatVar) name
-      , formatHeadCommented formatType typ
-      )
-  of
-      (SingleLine name', SingleLine typ') ->
-          line $ row
-              [ name'
-              , space
-              , punc ":"
-              , space
-              , typ'
-              ]
-
-      (SingleLine name', typ') ->
-          stack1
-              [ line $ row [ name', space, punc ":" ]
-              , typ'
-                  |> indent
-              ]
-
-      (name', typ') ->
-        stack1
-          [ name'
-          , indent $ line $ punc ":"
-          , indent $ typ'
-          ]
+  ElmStructure.definition ":" False
+    (formatTailCommented (line . formatVar) name)
+    []
+    (formatHeadCommented formatType typ)
 
 
 formatPattern :: Bool -> AST.Pattern.Pattern -> Box
