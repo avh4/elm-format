@@ -656,12 +656,11 @@ formatDeclaration decl =
                                     ]
 
                 AST.Declaration.TypeAlias preAlias nameWithArgs typ ->
-                  ElmStructure.equalsPair "=" True
-                    (ElmStructure.application False
-                      (line $ keyword "type")
-                      [ formatHeadCommented (line . keyword) (preAlias, "alias")
-                      , formatCommented formatNameWithArgs nameWithArgs]
-                    )
+                  ElmStructure.definition "="
+                    (line $ keyword "type")
+                    [ formatHeadCommented (line . keyword) (preAlias, "alias")
+                    , formatCommented formatNameWithArgs nameWithArgs
+                    ]
                     (formatHeadCommentedStack formatType typ)
 
 
@@ -685,11 +684,9 @@ formatDeclaration decl =
                             pleaseReport "TODO" "multiline type in port annotation"
 
                 AST.Declaration.PortDefinition name bodyComments expr ->
-                  ElmStructure.equalsPair "=" True
-                    (ElmStructure.application False
-                      (line $ keyword "port")
-                      [formatCommented (line . identifier) name]
-                    )
+                  ElmStructure.definition "="
+                    (line $ keyword "port")
+                    [formatCommented (line . identifier) name]
                     (formatCommented' bodyComments formatExpression expr)
 
                 AST.Declaration.Fixity assoc precedenceComments precedence nameComments name ->
@@ -737,11 +734,9 @@ formatDefinition name args comments expr =
         , [ formatExpression expr ]
         ]
   in
-    ElmStructure.equalsPair "=" True
-      (ElmStructure.application False
-        (formatPattern True name)
-        (map (\(x,y) -> formatCommented' x (formatPattern True) y) args)
-      )
+    ElmStructure.definition "="
+      (formatPattern True name)
+      (map (\(x,y) -> formatCommented' x (formatPattern True) y) args)
       body
 
 

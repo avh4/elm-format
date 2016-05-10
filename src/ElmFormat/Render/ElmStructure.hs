@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 module ElmFormat.Render.ElmStructure
-  ( spaceSepOrIndented, equalsPair
+  ( spaceSepOrIndented, equalsPair, definition
   , application, group, extensionGroup )
   where
 
@@ -72,6 +72,16 @@ equalsPair symbol forceMultiline left right =
         , indent $ line $ punc symbol
         , indent right'
         ]
+
+
+{-|
+An equalsPair where the left side is an application
+-}
+definition :: String -> Box -> [Box] -> Box -> Box
+definition symbol first rest body =
+  equalsPair symbol True
+    (application False first rest)
+    body
 
 
 {-|
