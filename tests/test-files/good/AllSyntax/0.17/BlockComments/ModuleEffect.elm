@@ -2,8 +2,8 @@ effect {- T -} module {- A -} AllSyntax.BlockComments.ModuleEffect {- B -} where
 
 
 type MyCmd msg
-  = MyCmd msg
+    = MyCmd msg
 
 
 type MySub msg
-  = MySub msg
+    = MySub msg

@@ -4,122 +4,122 @@ import Dict
 
 
 unit :
-  (-- F
-  )
+    (-- F
+    )
 unit =
-  ()
+    ()
 
 
 lambda :
-  ()
-  --AF
-  -> --AG
-     ()
-     --AH
-  -> --AI
-     ()
+    ()
+    --AF
+    -> --AG
+       ()
+       --AH
+    -> --AI
+       ()
 lambda _ _ =
-  ()
+    ()
 
 
 variable : a -> ()
 variable _ =
-  ()
+    ()
 
 
 constructor :
-  Dict.Dict
-    -- A
-    String
-    -- B
-    Int
-  -> ()
+    Dict.Dict
+        -- A
+        String
+        -- B
+        Int
+    -> ()
 constructor _ =
-  ()
+    ()
 
 
 parens :
-  (--K
-   a
-   --L
-  )
-  -> ()
+    (--K
+     a
+     --L
+    )
+    -> ()
 parens _ =
-  ()
+    ()
 
 
 tupleFn :
-  (,,)
-    -- C
-    Int
-    -- D
-    String
-    --E
-    Bool
-  -> ()
+    (,,)
+        -- C
+        Int
+        -- D
+        String
+        --E
+        Bool
+    -> ()
 tupleFn _ =
-  ()
+    ()
 
 
 tuple :
-  ( --G
-    a
-    --H
-  , --I
-    b
-    --J
-  )
-  -> ()
+    ( --G
+      a
+      --H
+    , --I
+      b
+      --J
+    )
+    -> ()
 tuple _ =
-  ()
+    ()
 
 
 emptyRecord :
-  { --M
-  }
-  -> ()
+    { --M
+    }
+    -> ()
 emptyRecord _ =
-  ()
+    ()
 
 
 record :
-  { --N
-    x :
-      --P
-      Int
-      --Q
-  , --R
-    y
-    --S
-      :
-      --T
-      ()
-      --U
-  }
-  -> ()
+    { --N
+      x :
+        --P
+        Int
+        --Q
+    , --R
+      y
+      --S
+        :
+        --T
+        ()
+        --U
+    }
+    -> ()
 record _ =
-  ()
+    ()
 
 
 recordExtension :
-  { --V
-    a
-    --W
-    | --X
-      x
-      --Y
-        :
-        --Z
-        Int
-        --AA
-    , --AB
-      y
-      --AC
-        :
-        --AD
-        Int
-        --AE
-  }
-  -> ()
+    { --V
+      a
+      --W
+        | --X
+          x
+          --Y
+            :
+            --Z
+            Int
+            --AA
+        , --AB
+          y
+          --AC
+            :
+            --AD
+            Int
+            --AE
+    }
+    -> ()
 recordExtension _ =
-  ()
+    ()

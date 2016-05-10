@@ -8,12 +8,12 @@ import String
 
 
 main =
-  Html.program
-    { init = init
-    , view = view
-    , update = update
-    , subscriptions = subscriptions
-    }
+    Html.program
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
 
 
 
@@ -21,14 +21,14 @@ main =
 
 
 type alias Model =
-  { word : String
-  , suggestions : List String
-  }
+    { word : String
+    , suggestions : List String
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-  ( Model "" [], Cmd.none )
+    ( Model "" [], Cmd.none )
 
 
 
@@ -36,9 +36,9 @@ init =
 
 
 type Msg
-  = Change String
-  | Check
-  | Suggest (List String)
+    = Change String
+    | Check
+    | Suggest (List String)
 
 
 port check : String -> Cmd msg
@@ -46,15 +46,15 @@ port check : String -> Cmd msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update action model =
-  case action of
-    Change newWord ->
-      ( Model newWord [], Cmd.none )
+    case action of
+        Change newWord ->
+            ( Model newWord [], Cmd.none )
 
-    Check ->
-      ( model, check model.word )
+        Check ->
+            ( model, check model.word )
 
-    Suggest newSuggestions ->
-      ( Model model.word newSuggestions, Cmd.none )
+        Suggest newSuggestions ->
+            ( Model model.word newSuggestions, Cmd.none )
 
 
 
@@ -66,7 +66,7 @@ port suggestions : (List String -> msg) -> Sub msg
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  suggestions Suggest
+    suggestions Suggest
 
 
 
@@ -75,8 +75,8 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-  div []
-    [ input [ onInput Change ] []
-    , button [ onClick Check ] [ text "Check" ]
-    , div [] [ text (String.join ", " model.suggestions) ]
-    ]
+    div []
+        [ input [ onInput Change ] []
+        , button [ onClick Check ] [ text "Check" ]
+        , div [] [ text (String.join ", " model.suggestions) ]
+        ]

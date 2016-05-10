@@ -1,16 +1,16 @@
 module
-  --A
-  Main
-  ( a
-  , b
     --A
-  , --A
-    c
-  )
-  {- A -} where
+    Main
+    ( a
+    , b
+      --A
+    , --A
+      c
+    )
+    {- A -} where
 
 
 foo =
-  {- A -}
-  {- B -}
-  "ABC" ({- A -} {- B -}) {- A -} {- B -} "ABC" () 1
+    {- A -}
+    {- B -}
+    "ABC" ({- A -} {- B -}) {- A -} {- B -} "ABC" () 1

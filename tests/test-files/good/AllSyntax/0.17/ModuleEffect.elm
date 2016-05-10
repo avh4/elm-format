@@ -2,8 +2,8 @@ effect module AllSyntax.ModuleEffect where { command = MyCmd, subscription = MyS
 
 
 type MyCmd msg
-  = MyCmd msg
+    = MyCmd msg
 
 
 type MySub msg
-  = MySub msg
+    = MySub msg
