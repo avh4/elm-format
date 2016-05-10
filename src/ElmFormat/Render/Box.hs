@@ -685,21 +685,12 @@ formatDeclaration decl =
                             pleaseReport "TODO" "multiline type in port annotation"
 
                 AST.Declaration.PortDefinition name bodyComments expr ->
-                    case formatCommented (line . identifier) name of
-                        SingleLine name' ->
-                            stack1
-                                [ line $ row
-                                    [ keyword "port"
-                                    , space
-                                    , name'
-                                    , space
-                                    , punc "="
-                                    ]
-                                , formatCommented' bodyComments formatExpression expr
-                                    |> indent
-                                ]
-                        _ ->
-                            pleaseReport "TODO" "multiline name in port definition"
+                  ElmStructure.equalsPair "=" True
+                    (ElmStructure.application False
+                      (line $ keyword "port")
+                      [formatCommented (line . identifier) name]
+                    )
+                    (formatCommented' bodyComments formatExpression expr)
 
                 AST.Declaration.Fixity assoc precedenceComments precedence nameComments name ->
                     case
