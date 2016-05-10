@@ -47,9 +47,9 @@ If you can simplify or improve the installation instructions or add instructions
 
 #### Integration with [Atom](https://atom.io/)
 
-[atom-beautify](https://atom.io/packages/atom-beautify) 0.28.20 and above supports `elm-format`.  You can install `atom-beautify` using `apm` or the Atom package manager in Atom's settings.
-
 [atom-elm-format](https://atom.io/packages/elm-format) supports `elm-format`.  You can install `elm-format` using `apm` or the Atom package manager in Atom's settings.
+
+[atom-beautify](https://atom.io/packages/atom-beautify) 0.28.20 and above supports `elm-format`.  You can install `atom-beautify` using `apm` or the Atom package manager in Atom's settings.
 
 
 #### Integration with [Light Table](http://lighttable.com/)
