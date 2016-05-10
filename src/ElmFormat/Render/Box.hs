@@ -656,7 +656,7 @@ formatDeclaration decl =
                                     ]
 
                 AST.Declaration.TypeAlias preAlias nameWithArgs typ ->
-                  ElmStructure.definition "="
+                  ElmStructure.definition "=" True
                     (line $ keyword "type")
                     [ formatHeadCommented (line . keyword) (preAlias, "alias")
                     , formatCommented formatNameWithArgs nameWithArgs
@@ -665,26 +665,13 @@ formatDeclaration decl =
 
 
                 AST.Declaration.PortAnnotation name typeComments typ ->
-                    case
-                        ( formatCommented' typeComments formatType typ
-                        , formatCommented (line . identifier) name
-                        )
-                    of
-                        (SingleLine typ', SingleLine name') ->
-                            line $ row
-                                [ keyword "port"
-                                , space
-                                , name'
-                                , space
-                                , punc ":"
-                                , space
-                                , typ'
-                                ]
-                        _ ->
-                            pleaseReport "TODO" "multiline type in port annotation"
+                  ElmStructure.definition ":" False
+                    (line $ keyword "port")
+                    [ formatCommented (line . identifier) name ]
+                    (formatCommented' typeComments formatType typ)
 
                 AST.Declaration.PortDefinition name bodyComments expr ->
-                  ElmStructure.definition "="
+                  ElmStructure.definition "=" True
                     (line $ keyword "port")
                     [formatCommented (line . identifier) name]
                     (formatCommented' bodyComments formatExpression expr)
@@ -734,7 +721,7 @@ formatDefinition name args comments expr =
         , [ formatExpression expr ]
         ]
   in
-    ElmStructure.definition "="
+    ElmStructure.definition "=" True
       (formatPattern True name)
       (map (\(x,y) -> formatCommented' x (formatPattern True) y) args)
       body

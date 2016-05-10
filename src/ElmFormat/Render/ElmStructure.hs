@@ -77,9 +77,9 @@ equalsPair symbol forceMultiline left right =
 {-|
 An equalsPair where the left side is an application
 -}
-definition :: String -> Box -> [Box] -> Box -> Box
-definition symbol first rest body =
-  equalsPair symbol True
+definition :: String -> Bool -> Box -> [Box] -> Box -> Box
+definition symbol forceMultiline first rest body =
+  equalsPair symbol forceMultiline
     (application False first rest)
     body
 
