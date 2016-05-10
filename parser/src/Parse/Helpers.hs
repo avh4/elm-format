@@ -127,6 +127,11 @@ equals =
   const () <$> char '=' <?> "="
 
 
+lenientEquals :: IParser ()
+lenientEquals =
+  const () <$> (char '=' <|> char ':') <?> "="
+
+
 rightArrow :: IParser ()
 rightArrow =
   const () <$> (string "->" <|> string "\8594") <?> "->"
@@ -140,6 +145,11 @@ cons =
 hasType :: IParser ()
 hasType =
   const () <$> char ':' <?> "the \"has type\" symbol ':'"
+
+
+lenientHasType :: IParser ()
+lenientHasType =
+  const () <$> (char ':' <|> char '=') <?> "the \"has type\" symbol ':'"
 
 
 comma :: IParser ()

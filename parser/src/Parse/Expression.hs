@@ -135,7 +135,7 @@ recordTerm =
 
     literal (A.A _ starter) postStarter =
       do
-          try equals
+          try lenientEquals
           pushNewlineContext
           preExpr <- whitespace
           value <- expr
@@ -152,7 +152,7 @@ recordTerm =
     field =
       do  pushNewlineContext
           key <- rLabel
-          (postKey, _, preExpr) <- padded equals
+          (postKey, _, preExpr) <- padded lenientEquals
           value <- expr
           multiline <- popNewlineContext
           return $ \pre post -> (Commented pre key postKey, Commented preExpr value post, multiline)
