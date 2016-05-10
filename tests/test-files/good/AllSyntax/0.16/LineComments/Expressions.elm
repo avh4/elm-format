@@ -64,18 +64,19 @@ emptyRecord =
 
 
 record =
-  { --M
-    x
-    --N
-      = --O
-        1
-        --P
+  { x =
+      --M
+      1
+      --N
+  , --O
+    y = 2
   , --Q
-    y
+    z
     --R
-      = --S
-        2
-        --T
+      =
+      --S
+      3
+      --T
   }
 
 

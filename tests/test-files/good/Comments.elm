@@ -43,7 +43,8 @@ records =
     f1 = ()
   , f2
     -- after a field
-      = ()
+      =
+      ()
   , f3 = ()
   }
 

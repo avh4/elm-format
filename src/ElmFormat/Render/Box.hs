@@ -915,35 +915,13 @@ formatPattern parensRequired apattern =
 
 
 formatRecordPair :: Char -> (v -> Box) -> (Commented String, Commented v, Bool) -> Box
-formatRecordPair delim formatValue (Commented pre k postK, v, multiline') =
-    case
-      ( formatCommented (line . identifier) $ Commented [] k postK
-      , multiline'
-      , formatCommented formatValue v
-      )
-    of
-      (SingleLine k', False, SingleLine v') ->
-            line $ row
-                [ k'
-                , space
-                , delim'
-                , space
-                , v'
-                ]
-      (SingleLine k', _, v') ->
-            stack1
-                [ line $ row [ k', space, delim' ]
-                , indent v'
-                ]
-      (k', _, v') ->
-            stack1
-                [ k'
-                , indent $ prefix (row [delim', space]) v'
-                ]
+formatRecordPair delim formatValue (Commented pre k postK, v, forceMultiline) =
+    ElmStructure.equalsPair
+      (delim : [])
+      forceMultiline
+      (formatCommented (line . identifier) $ Commented [] k postK)
+      (formatCommented formatValue v)
     |> (\x -> Commented pre x []) |> formatCommented id
-      where
-        delim' =
-          punc (delim : [])
 
 
 formatExpression :: AST.Expression.Expr -> Box

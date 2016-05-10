@@ -12,15 +12,17 @@ effect
     { --D
       command
       --E
-        = -- F
-          MyCmd
-          -- G
+        =
+        -- F
+        MyCmd
+        -- G
     , -- H
       subscription
       -- I
-        = -- J
-          MySub
-          -- K
+        =
+        -- J
+        MySub
+        -- K
     }
   -- L
   exposing
