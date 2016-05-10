@@ -737,34 +737,12 @@ formatDefinition name args comments expr =
         , [ formatExpression expr ]
         ]
   in
-    case
-      ( formatPattern True name
-      , allSingles $ map (\(x,y) -> formatCommented' x (formatPattern True) y) args
+    ElmStructure.equalsPair "=" True
+      (ElmStructure.application False
+        (formatPattern True name)
+        (map (\(x,y) -> formatCommented' x (formatPattern True) y) args)
       )
-    of
-      (SingleLine name', Right args') ->
-          stack1 $
-              [ line $ row
-                  [ row $ List.intersperse space $ (name':args')
-                  , space
-                  , punc "="
-                  ]
-              , indent $ body
-              ]
-
-      (SingleLine name', Left args') ->
-          stack1
-            [ line $ name'
-            , indent $ stack1 $ concat
-                [ args'
-                , [ line $ punc "="
-                  , body
-                  ]
-                ]
-            ]
-
-      _ ->
-          pleaseReport "TODO" "multiline name in let binding"
+      body
 
 
 formatTypeAnnotation :: (AST.Variable.Ref, Comments) -> (Comments, Type) -> Box

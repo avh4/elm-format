@@ -28,12 +28,19 @@ expressionDefinitionNoPatterns =
 
 expressionDefinitionsInLet =
   let
+    {- X -}
     def1 =
+      {- Z -}
       ()
 
+    {- AA -}
     def2 =
+      {- AC -}
       ()
+
+    {- AD -}
   in
+    {- AE -}
     ()
 
 
