@@ -84,3 +84,10 @@ expressionTypeAnnotation
     ()
 expressionTypeAnnotation =
     ()
+
+
+expressionTypeAnnotation2 :
+    --AD
+    ()
+expressionTypeAnnotation2 =
+    ()
