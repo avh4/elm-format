@@ -36,6 +36,8 @@ If you need PGP signatures, see the [releases page](https://github.com/avh4/elm-
 
 ### For Elm 0.17
 
+(Using this version with Elm 0.16 files will migrate them to Elm 0.17 syntax.)
+
  - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.3.0-alpha/elm-format-0.17-0.3.0-alpha-mac-x64.tgz)
  - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.3.0-alpha/elm-format-0.17-0.3.0-alpha-linux-x64.tgz)
  - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.3.0-alpha/elm-format-0.17-0.3.0-alpha-win-x64.zip)
