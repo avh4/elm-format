@@ -6,7 +6,7 @@
 
 cabal build || exit 1
 
-ELM_FORMAT="./dist/build/elm-format/elm-format"
+ELM_FORMAT="./dist/build/elm-format-0.17/elm-format-0.17"
 if which md5 > /dev/null; then
 	MD5="md5"
 else

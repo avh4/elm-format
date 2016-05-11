@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wall #-}
-module Main where
+module ElmFormat where
 
 import Elm.Utils ((|>))
 import System.Exit (exitFailure, exitSuccess)
@@ -140,10 +140,10 @@ handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion =
                     else
                         return Nothing
 
-main :: IO ()
-main =
+main :: ElmVersion -> IO ()
+main defaultVersion =
     do
-        config <- Flags.parse
+        config <- Flags.parse defaultVersion
         let inputFiles = (Flags._input config)
         let isStdin = (Flags._stdin config)
         let outputFile = (Flags._output config)
@@ -156,7 +156,7 @@ main =
 
         -- when we don't have any input, stdin or otherwise
         when (noInputSource) $
-            Flags.showHelpText
+            Flags.showHelpText defaultVersion
             >> exitFailure
 
         when (twoInputSources) $

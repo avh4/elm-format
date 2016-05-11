@@ -7,6 +7,11 @@ data ElmVersion
   | Elm_0_17
 
 
+instance Show ElmVersion where
+    show Elm_0_16 = "0.16"
+    show Elm_0_17 = "0.17"
+
+
 parse :: String -> Either String ElmVersion
 parse versionString =
   case versionString of

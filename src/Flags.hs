@@ -22,44 +22,55 @@ data Config = Config
     }
 
 
+
 -- PARSE ARGUMENTS
 
-parse :: IO Config
-parse =
-    Opt.customExecParser preferences parser
+
+parse :: ElmVersion -> IO Config
+parse defaultVersion =
+    Opt.customExecParser preferences (parser defaultVersion)
+
 
 preferences :: Opt.ParserPrefs
 preferences =
     Opt.prefs (mempty <> Opt.showHelpOnError)
 
-parser :: Opt.ParserInfo Config
-parser =
-    Opt.info (Opt.helper <*> flags) helpInfo
 
-showHelpText :: IO ()
-showHelpText = Opt.handleParseResult . Opt.Failure $
-  Opt.parserFailure preferences parser Opt.ShowHelpText mempty
+parser :: ElmVersion -> Opt.ParserInfo Config
+parser defaultVersion =
+    Opt.info
+        (Opt.helper <*> flags defaultVersion)
+        (helpInfo defaultVersion)
+
+
+showHelpText :: ElmVersion -> IO ()
+showHelpText defaultVersion = Opt.handleParseResult . Opt.Failure $
+    Opt.parserFailure
+        preferences
+        (parser defaultVersion)
+        Opt.ShowHelpText
+        mempty
 
 
 
 -- COMMANDS
 
-flags :: Opt.Parser Config
-flags =
+flags :: ElmVersion -> Opt.Parser Config
+flags defaultVersion =
     Config
       <$> Opt.many input
       <*> output
       <*> yes
       <*> validate
       <*> stdin
-      <*> elmVersion
+      <*> elmVersion defaultVersion
 
 
 
 -- HELP
 
-helpInfo :: Opt.InfoMod Config
-helpInfo =
+helpInfo :: ElmVersion -> Opt.InfoMod Config
+helpInfo defaultVersion =
     mconcat
         [ Opt.fullDesc
         , Opt.header top
@@ -68,7 +79,10 @@ helpInfo =
         ]
   where
     top =
-        "elm-format " ++ showVersion This.version ++ " \n"
+        concat
+            [ "elm-format-" ++ show defaultVersion ++ " "
+            , showVersion This.version ++ "\n"
+            ]
 
     examples =
         linesToDoc
@@ -131,13 +145,20 @@ stdin =
         ]
 
 
-elmVersion :: Opt.Parser ElmVersion
-elmVersion =
-  fmap (Maybe.fromMaybe Elm_0_17)$
+elmVersion :: ElmVersion -> Opt.Parser ElmVersion
+elmVersion defaultVersion =
+  fmap (Maybe.fromMaybe defaultVersion)$
   Opt.optional $
   Opt.option (Opt.eitherReader ElmVersion.parse) $
     mconcat
       [ Opt.long "elm-version"
       , Opt.metavar "VERSION"
-      , Opt.help "The Elm version of the source files being formatted.  Valid values: 0.16, 0.17.  Default: 0.17"
+      , Opt.help $
+          concat
+            [ "The Elm version of the source files being formatted.  "
+            , "Valid values: "
+            , show ElmVersion.Elm_0_16 ++ ", "
+            , show ElmVersion.Elm_0_17 ++ ".  "
+            , "Default: " ++ show defaultVersion
+            ]
       ]

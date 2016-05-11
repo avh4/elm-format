@@ -1,4 +1,4 @@
-Name: elm-format-0.17
+Name: elm-format
 Version: 0.3.0-alpha
 
 Synopsis:
@@ -28,7 +28,7 @@ source-repository head
     type:     git
     location: git://github.com/avh4/elm-format.git
 
-Executable elm-format
+Executable elm-format-0.17
 
     ghc-options:
         -threaded -O2 -W
@@ -38,7 +38,41 @@ Executable elm-format
         parser/src
 
     Main-is:
-        Main.hs
+        Main0_17.hs
+
+    Build-depends:
+        aeson >= 0.7 && < 0.9,
+        ansi-terminal >= 0.6.2.1 && < 0.7,
+        ansi-wl-pprint,
+        base >= 4.2 && < 5,
+        binary >= 0.7.0.0 && < 0.8,
+        bytestring >= 0.9 && < 0.11,
+        containers >= 0.3 && < 0.6,
+        directory >= 1.0 && < 2.0,
+        edit-distance >= 0.2 && < 0.3,
+        filepath >= 1 && < 2.0,
+        filemanip >= 0.1 && < 1.0,
+        indents >= 0.3 && < 0.4,
+        mtl >= 2.2 && < 3,
+        optparse-applicative >=0.11 && <0.12,
+        parsec >= 3.1.1 && < 3.5,
+        pretty >= 1.0 && < 2.0,
+        process,
+        regex-applicative >= 0.3.3 && < 0.4,
+        split >= 0.2.2 && < 0.3,
+        text
+
+Executable elm-format-0.16
+
+    ghc-options:
+        -threaded -O2 -W
+
+    hs-source-dirs:
+        src
+        parser/src
+
+    Main-is:
+        Main0_16.hs
 
     Build-depends:
         aeson >= 0.7 && < 0.9,
