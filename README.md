@@ -96,7 +96,7 @@ cd elm-format
 cabal sandbox init
 cabal install --only-dependencies --enable-tests
 cabal build
-./dist/build/elm-format/elm-format --help
+./dist/build/elm-format-0.17/elm-format-0.17 --help
 ```
 
 ### Running tests
