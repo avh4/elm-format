@@ -36,8 +36,6 @@ elm-format --help  # See other command line options
 
 You will need to download the version appropriate for your OS, unzip it, and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.  Simpler installation options will be available once there is a stable release of elm-format.
 
-If the binary does not work for you, please [report details about your OS](https://github.com/avh4/elm-format/issues/new), or try [building from source](#building-from-source).
-
 If you need PGP signatures, see the [releases page](https://github.com/avh4/elm-format/releases).
 
 ### For Elm 0.17
