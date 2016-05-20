@@ -22,6 +22,11 @@ import Task
         , toResult
         , fromResult
         )
+import Dict as D
+    exposing
+        ( empty
+        , fromList
+        )
 
 
 a =

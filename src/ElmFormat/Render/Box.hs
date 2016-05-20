@@ -486,9 +486,10 @@ formatImport aimport =
 
                           ( SingleLine name', Just (SingleLine as'), Just exposing' ) ->
                             stack1
-                              [ line (keyword "import")
-                              , line $ row
-                                [ name'
+                              [ line $ row
+                                [ keyword "import"
+                                , space
+                                , name'
                                 , space
                                 , as'
                                 ]
