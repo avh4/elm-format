@@ -20,23 +20,23 @@ brew cask install virtualbox
 1. Create a github issue to draft the release notes.
 1. Edit `elm-format.cabal` to remove `-dev` from the version and make sure the version number is correct.
 1. Commit the change to `elm-format.cabal`.
-1. Create the tag for the new version.
+1. Create a signed tag for the new version.
 1. Push the tag.
 
 
 ## Mac
 
-1. Run `./build-package.sh`
+1. Run `./package/mac/build-package.sh`
 
 
 ## Windows
 
-1. See comments in `./build-package.sh`
+1. See `package/win/setup.md`
 
 
 ## Linux
 
-1. See comments in `./build-package.sh`
+1. See `package/linux/setup.md`
 
 
 ## Publishing
@@ -50,5 +50,5 @@ brew cask install virtualbox
 
 ## Clean up
 
-1. Edit `elm-format.cabal` with the next planned version number and add `-dev`.
+1. Edit `elm-format.cabal` with the next minor version number and add `-dev`.
 1. Commit the change to `elm-format.cabal`.

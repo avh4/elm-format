@@ -3,10 +3,7 @@
 set -ex
 
 VERSION="$(sed -ne "s/^Version: //p" elm-format.cabal)"
-
-cabal update
-cabal sandbox init
-cabal install --only-dependencies --enable-tests
+PLATFORM="linux-x64"
 
 ## Run tests
 
@@ -15,14 +12,20 @@ cabal configure --enable-tests
 ./tests/run-tests.sh
 
 
-## Build linux-x64 binary
+## Build binaries
 
 cabal clean
 cabal configure
 cabal build
-# cabal install
+cabal install
 
-BUILD="elm-format-${VERSION}-linux-x64"
+function build-flavor() {
+    FLAVOR="$1"
+    BUILD="elm-format-${FLAVOR}-${VERSION}-${PLATFORM}"
+    mkdir -p dist/package-scripts
+    cp ".cabal-sandbox/bin/elm-format-${FLAVOR}" dist/package-scripts/elm-format
+    tar zcvf "$BUILD".tgz -C dist/package-scripts elm-format
+}
 
-tar zcvf "$BUILD".tgz -C dist/build/elm-format elm-format
-mv "$BUILD".tgz /vagrant/
+build-flavor 0.17
+build-flavor 0.16
