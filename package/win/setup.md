@@ -1,3 +1,4 @@
+```bash
 brew install caskroom/cask/brew-cask
 brew cask install vagrant
 brew cask install virtualbox
@@ -5,7 +6,7 @@ brew cask install virtualbox
 vagrant up
 vagrant plugin install vagrant-winrm
 vagrant winrm -c "dir"
-
+```
 
 # Open VirtualBox and show the Windows VM
 
@@ -21,29 +22,13 @@ choco install poshgit
 
 ## Build Windows x64 binary
 
-# cd package/win
-# see setup.txt
-# vagrant up
-## open VirtualBox and show the screen
-## Start PowerShell
-#># cd Desktop
-#># git fetch
-#># git checkout ${VERSION}
-#># cabal update
-#>#
+ - Start Git Bash
 
-cd Desktop
-git clone https://github.com/avh4/elm-format.git
-cd elm-format
+```bash
+cd /c/vagrant/elm-format
 cabal update
-cabal install --only-dependencies
-cabal clean
-cabal configure
-# cabal test
-cabal build
-# cabal install
-
-cp .\dist\build\elm-format\elm-format.exe \vagrant
+/c/vagrant/build-package.sh
+```
 
 ## back to host computer
 # cd ./package/win/
