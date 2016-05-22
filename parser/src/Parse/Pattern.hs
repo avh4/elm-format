@@ -1,6 +1,5 @@
 module Parse.Pattern (term, expr) where
 
-import Data.Char (isUpper)
 import qualified Data.List as List
 import Text.Parsec ((<|>), (<?>), char, choice, optionMaybe, try)
 
@@ -17,23 +16,21 @@ basic =
   addLocation $
     choice
       [ char '_' >> return P.Anything
-      , stringToPattern <$> var
+      , P.Var . Var.VarRef <$> lowVar
+      , chunksToPattern <$> dotSep1 capVar
       , P.Literal <$> Literal.literal
       ]
   where
-    stringToPattern str =
-        case str of
+    chunksToPattern chunks =
+        case List.intercalate "." chunks of
           "True" ->
               P.Literal (Boolean True)
 
           "False" ->
               P.Literal (Boolean False)
 
-          c:_ | isUpper c ->
-              P.Data str []
-
-          _ ->
-              P.Var (Var.VarRef str)
+          name ->
+              P.Data name []
 
 
 asPattern :: IParser P.Pattern -> IParser P.Pattern
