@@ -258,6 +258,7 @@ checkTransformation TrickyModule2.elm
 checkTransformation TrickyModule3.elm
 checkTransformation TrickyModule4.elm
 checkTransformation LenientEqualsColon.elm
+checkTransformation github-avh4-elm-format-184.elm
 checkTransformation QuickCheck-4562ebccb71ea9f622fb99cdf32b2923f6f9d34f-2529668492575674138.elm
 checkTransformation QuickCheck-94f37da84c1310f03dcfa1059ce870b73c94a825--6449652945938213463.elm
 
