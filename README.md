@@ -90,9 +90,14 @@ If you can simplify or improve the installation instructions or add instructions
 
 #### Integration with Emacs
 
-Use [elm-mode](https://github.com/jcollard/elm-mode#elm-format).
+1. Install [elm-mode](https://github.com/jcollard/elm-mode) ([instructions](https://github.com/jcollard/elm-mode)).
+1. Make sure `elm-format` is in your PATH.
 
-> If you can add more specific instructions for installing and configuring elm-mode to work with `elm-format`, please [make a pull request](https://github.com/avh4/elm-format/edit/master/README.md).
+That's all.
+
+After the install C-c C-f (in `elm-mode`) runs the command elm-mode-format-buffer which is based on `elm-format`.
+
+See also the respective section about `elm-format` at [elm-mode](https://github.com/jcollard/elm-mode#elm-format)
 
 
 #### Integration with Sublime Text
