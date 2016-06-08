@@ -5,15 +5,13 @@ addons:
   apt:
     sources:
     - hvr-ghc
-    - debian-sid
     packages:
-    - shellcheck
     - cabal-install-1.22
-    - ghc-7.10.1
+    - ghc-7.10.3
 
 
 before_install:
- - export PATH=/opt/ghc/7.10.1/bin:/opt/cabal/1.22/bin:$PATH
+ - export PATH=/opt/ghc/7.10.3/bin:/opt/cabal/1.22/bin:$PATH
 
 
 install:
