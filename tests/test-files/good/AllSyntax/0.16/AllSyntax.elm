@@ -293,16 +293,18 @@ multilineParenthesizedExpressions graphHeight range =
            else
             toFloat range
           )
-        ==/== (if range == 0 then
+        ==/==
+            (if range == 0 then
                 0.2
-               else
+             else
                 toFloat (range - 1)
-              )
-        <<>> (if range == 0 then
+            )
+        <<>>
+            (if range == 0 then
                 -1.0
-              else
+             else
                 0.0
-             )
+            )
 
 
 multilineParenthesizedExpressions2 range =
@@ -569,12 +571,14 @@ indentedMultilineInsideMultilineInfixApplication div id =
         *** { x = 1
             , y = 2
             }
-        <<>> { x = 1
-             , y = 2
-             }
-        ==/== { x = 1
-              , y = 2
-              }
+        <<>>
+            { x = 1
+            , y = 2
+            }
+        ==/==
+            { x = 1
+            , y = 2
+            }
 
 
 port runner : Signal (Task.Task x ())
