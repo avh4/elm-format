@@ -78,17 +78,23 @@ formatBinary multiline left ops =
                 |> row
                 |> line
 
-        (_, _, left', Right ops'', _) ->
-            zip ops'' (map snd ops)
-                |> map (\(op,e) -> prefix (row [op, space]) e)
-                |> stack1
-                |> (\body -> stack1 [left', indent body])
-
         _ ->
-            ops
-                |> map (\(op,e) -> stack1 [ op, indent e ])
-                |> stack1
-                |> (\body -> stack1 [left, indent body])
+            let
+                formatOp (op, e) =
+                  case (op, e) of
+                      (SingleLine op', SingleLine e') ->
+                          line $ row [ op', space, e' ]
+
+                      (SingleLine op', _) | lineLength 0 op' < 4 ->
+                          prefix (row [ op', space ]) e
+
+                      _ ->
+                          stack1 [ op , indent e ]
+            in
+                ops
+                    |> map formatOp
+                    |> stack1
+                    |> (\body -> stack1 [left, indent body])
 
 
 splitWhere :: (a -> Bool) -> [a] -> [[a]]

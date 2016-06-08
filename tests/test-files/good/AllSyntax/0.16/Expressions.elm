@@ -25,6 +25,14 @@ infixApplication =
     1 `operator` 2
 
 
+infixApplicationMultiline =
+    x
+        `infixOperator`
+            [ y
+            , z
+            ]
+
+
 functionApplication =
     max 1 2
 

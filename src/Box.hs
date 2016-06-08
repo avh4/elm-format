@@ -2,7 +2,7 @@
 module Box
   ( Line, identifier, keyword, punc, literal, row, space
   , Box(SingleLine), blankLine, line, mustBreak, stack1, andThen
-  , isLine, allSingles
+  , isLine, allSingles, lineLength
   , indent, prefix, addSuffix
   , render
   ) where
