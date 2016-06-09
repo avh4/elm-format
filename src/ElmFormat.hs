@@ -100,16 +100,32 @@ handleStdinInput outputFile elmVersion = do
         |> processTextInput elmVersion outputFile "<STDIN>" False
 
 
+resolveFile :: FilePath -> IO [FilePath]
+resolveFile path =
+    do
+        isFile <- Dir.doesFileExist path
+        isDirectory <- Dir.doesDirectoryExist path
+
+        case (isFile, isDirectory) of
+            ( True, _ ) ->
+                return [path]
+
+            ( _, True ) ->
+                FS.findAllElmFiles path
+
+            ( False, False ) ->
+                return []
+
+
+resolveFiles :: [FilePath] -> IO [FilePath]
+resolveFiles inputFiles =
+    concat <$> mapM resolveFile inputFiles
+
+
 handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> ElmVersion -> IO (Maybe Bool)
 handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion =
     do
-        filesExist <-
-            all (id) <$> mapM isEitherFileOrDirectory inputFiles
-
-        when (not filesExist) $
-            exitFilesNotFound inputFiles
-
-        elmFiles <- concat <$> mapM FS.findAllElmFiles inputFiles
+        elmFiles <- resolveFiles inputFiles
 
         when (null elmFiles) $
             exitFilesNotFound inputFiles
