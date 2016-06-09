@@ -8,8 +8,13 @@ data Message
   = ErrorsHeading
 
   | FilesWillBeOverwritten [FilePath]
-  | NoElmFilesFound [FilePath]
+  | BadInputFiles [InputFileMessage]
   | TooManyInputSources
   | CantWriteToOutputBecauseInputIsDirectory
   | ProcessingFile FilePath
   | FileWouldChange FilePath
+
+
+data InputFileMessage
+    = FileDoesNotExist FilePath
+    | NoElmFiles FilePath
