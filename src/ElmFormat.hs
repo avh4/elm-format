@@ -202,20 +202,23 @@ main defaultVersion =
         let autoYes = validateOnly || (Flags._yes config)
         let elmVersion = Flags._elmVersion config
 
-        let noInputSource = null inputFiles && not isStdin
-        let twoInputSources = (not $ null inputFiles) && isStdin
+        case (inputFiles, isStdin) of
+            ( [], False ) ->
+                -- when we don't have any input, stdin or otherwise
+                Flags.showHelpText defaultVersion
+                    >> exitFailure
 
-        -- when we don't have any input, stdin or otherwise
-        when (noInputSource) $
-            Flags.showHelpText defaultVersion
-            >> exitFailure
+            ( [], True ) ->
+                handleStdinInput outputFile elmVersion
+                    >> exitSuccess
 
-        when (twoInputSources) $
-            exitTooManyInputSources
+            ( _, True ) ->
+                (putStrLn $ r $ TooManyInputSources)
+                    >> exitFailure
 
-        when (isStdin) $
-            handleStdinInput outputFile elmVersion
-            >> exitSuccess
+
+            ( _, False ) ->
+                return () -- continue
 
         validationResult <- handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion
 
