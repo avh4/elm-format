@@ -45,12 +45,6 @@ getApproval autoYes filePaths =
             yesOrNo
 
 
-exitTooManyInputSources :: IO ()
-exitTooManyInputSources = do
-    putStrLn $ (r $ TooManyInputSources)
-    exitFailure
-
-
 exitOnInputDirAndOutput :: IO ()
 exitOnInputDirAndOutput = do
     putStrLn $ r CantWriteToOutputBecauseInputIsDirectory
