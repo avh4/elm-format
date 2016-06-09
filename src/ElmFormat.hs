@@ -3,7 +3,7 @@ module ElmFormat where
 
 import Elm.Utils ((|>))
 import System.Exit (exitFailure, exitSuccess)
-import Messages.Types (Message(..))
+import Messages.Types
 import Control.Monad (when)
 import Data.Maybe (isJust)
 import CommandLine.Helpers
@@ -100,7 +100,7 @@ handleStdinInput outputFile elmVersion = do
         |> processTextInput elmVersion outputFile "<STDIN>" False
 
 
-resolveFile :: FilePath -> IO [FilePath]
+resolveFile :: FilePath -> IO (Either InputFileMessage [FilePath])
 resolveFile path =
     do
         isFile <- Dir.doesFileExist path
@@ -108,18 +108,49 @@ resolveFile path =
 
         case (isFile, isDirectory) of
             ( True, _ ) ->
-                return [path]
+                return $ Right [path]
 
             ( _, True ) ->
-                FS.findAllElmFiles path
+                do
+                    elmFiles <- FS.findAllElmFiles path
+                    case elmFiles of
+                        [] -> return $ Left $ NoElmFiles path
+                        _ -> return $ Right elmFiles
 
             ( False, False ) ->
-                return []
+                return $ Left $ FileDoesNotExist path
 
 
-resolveFiles :: [FilePath] -> IO [FilePath]
+collectErrors :: [Either l r] -> Either [l] [r]
+collectErrors list =
+    let
+        step acc next =
+            case (next, acc) of
+                (Left l, Right _) ->
+                    Left [l]
+
+                (Left l, Left ls) ->
+                    Left (l : ls)
+
+                (Right r, Right rs) ->
+                    Right (r : rs)
+
+                (Right _, Left ls) ->
+                    Left ls
+    in
+        foldl step (Right []) list
+
+
+resolveFiles :: [FilePath] -> IO (Either [InputFileMessage] [FilePath])
 resolveFiles inputFiles =
-    concat <$> mapM resolveFile inputFiles
+    do
+        result <- collectErrors <$> mapM resolveFile inputFiles
+        case result of
+            Left ls ->
+                return $ Left ls
+
+            Right files ->
+                return $ Right $ concat files
 
 
 handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> ElmVersion -> IO (Maybe Bool)
@@ -127,14 +158,17 @@ handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion =
     do
         elmFiles <- resolveFiles inputFiles
 
-        when (null elmFiles) $
-            exitFilesNotFound inputFiles
-
         case elmFiles of
-            inputFile:[] -> do
+            Left errors ->
+                do
+                    putStrLn $ r $ BadInputFiles errors
+                    exitFailure
+
+            Right [inputFile] -> do
                 realOutputFile <- decideOutputFile autoYes inputFile outputFile
                 processFileInput inputFile (Just realOutputFile) validateOnly elmVersion
-            _ -> do
+
+            Right elmFiles -> do
                 when (isJust outputFile)
                     exitOnInputDirAndOutput
 
@@ -155,6 +189,7 @@ handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion =
                                 return $ foldl merge Nothing validationResults
                     else
                         return Nothing
+
 
 main :: ElmVersion -> IO ()
 main defaultVersion =

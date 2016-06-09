@@ -45,12 +45,6 @@ getApproval autoYes filePaths =
             yesOrNo
 
 
-exitFilesNotFound :: [FilePath] -> IO ()
-exitFilesNotFound filePaths = do
-    putStrLn $ (r $ NoElmFilesFound filePaths)
-    exitFailure
-
-
 exitTooManyInputSources :: IO ()
 exitTooManyInputSources = do
     putStrLn $ (r $ TooManyInputSources)

@@ -1,11 +1,12 @@
 {-# OPTIONS_GHC -Wall #-}
 module Messages.Strings where
 
-import Messages.Types (Message(..))
+import Messages.Types
 
 
 showFiles :: [FilePath] -> String
 showFiles = unlines . map ((++) "    ")
+
 
 renderMessage :: Message -> String
 
@@ -22,11 +23,11 @@ renderMessage (FilesWillBeOverwritten filePaths) =
     ]
 
 
-renderMessage (NoElmFilesFound filePaths) =
+renderMessage (BadInputFiles filePaths) =
   unlines
-    [ "Could not find any .elm files on the specified paths:"
+    [ "There was a problem reading one or more of the specified input files:"
     , ""
-    , showFiles filePaths
+    , unlines $ map ((++) "    ") $ map showInputMessage filePaths
     , "Please check the given paths."
     ]
 
@@ -45,3 +46,11 @@ renderMessage (FileWouldChange file) =
 
 renderMessage TooManyInputSources =
     "Too many input sources! Please only provide one of either INPUT or --stdin"
+
+
+showInputMessage :: InputFileMessage -> String
+showInputMessage (FileDoesNotExist path) =
+    path ++ ": File does not exist"
+
+showInputMessage (NoElmFiles path) =
+    path ++ ": Directory does not contain any *.elm files"
