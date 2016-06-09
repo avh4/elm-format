@@ -105,6 +105,13 @@ See also the respective section about `elm-format` at [elm-mode](https://github.
 Use the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language%20Support) package. Make sure elm-format is in your PATH.
 
 
+#### Integration with Visual Studio Code
+
+1. Make sure `elm-format` is in your PATH.
+1. ```ext install elm``` to get the Elm tools for VSCode, which also know about elm-format.
+1. You **don't** need the "elm-format" listed in the VSCode package-available list.
+1. shift-alt-F or similar will call elm-format on the current file.
+
 ## Development info
 
 ### Building from source
