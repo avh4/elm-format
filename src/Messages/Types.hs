@@ -9,8 +9,10 @@ data Message
 
   | FilesWillBeOverwritten [FilePath]
   | BadInputFiles [InputFileMessage]
-  | TooManyInputSources
-  | CantWriteToOutputBecauseInputIsDirectory
+  | Error_NoInputs
+  | Error_SingleOutputWithMultipleInputs
+  | Error_TooManyInputs
+  | Error_OutputAndValidate
   | ProcessingFile FilePath
   | FileWouldChange FilePath
 

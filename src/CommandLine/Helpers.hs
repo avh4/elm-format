@@ -47,7 +47,7 @@ getApproval autoYes filePaths =
 
 exitOnInputDirAndOutput :: IO ()
 exitOnInputDirAndOutput = do
-    putStrLn $ r CantWriteToOutputBecauseInputIsDirectory
+    putStrLn $ r Error_SingleOutputWithMultipleInputs
     exitFailure
 
 
