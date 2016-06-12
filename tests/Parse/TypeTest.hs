@@ -3,8 +3,8 @@ module Parse.TypeTest where
 import Elm.Utils ((|>))
 
 import Test.HUnit (Assertion, assertEqual)
-import Test.Framework
-import Test.Framework.Providers.HUnit
+import Test.Tasty
+import Test.Tasty.HUnit
 
 import Parse.Type
 import Text.ParserCombinators.Parsec.Combinator (eof)
@@ -23,7 +23,7 @@ example name input expected =
         assertParse expr input expected
 
 
-tests :: Test
+tests :: TestTree
 tests =
     testGroup "Parse.Type"
     [ testGroup "unit"
@@ -84,11 +84,11 @@ tests =
         , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}:{-E-}m{-F-},{-G-}y{-H-}:{-I-}n{-J-}}" $ at 1 1 1 62 (RecordExtensionType (Commented [BlockComment ["A"]] "a" [BlockComment ["B"]]) [(Commented [BlockComment ["C"]] "x" [BlockComment ["D"]],Commented [BlockComment ["E"]] (at 1 31 1 32 (TypeVariable "m")) [BlockComment ["F"]],False),(Commented [BlockComment ["G"]] "y" [BlockComment ["H"]],Commented [BlockComment ["I"]] (at 1 55 1 56 (TypeVariable "n")) [BlockComment ["J"]],False)] False)
         , example "newlines" "{\n a\n |\n x\n :\n m\n ,\n y\n :\n n\n }" $ at 1 1 11 3 (RecordExtensionType (Commented [] "a" []) [(Commented [] "x" [],Commented [] (at 6 2 6 3 (TypeVariable "m")) [],True),(Commented [] "y" [],Commented [] (at 10 2 10 3 (TypeVariable "n")) [],True)] True)
         , testCase "only allows simple base" $
-            assertFailure expr "{()|x:m}"
+            assertParseFailure expr "{()|x:m}"
         , testCase "only allows simple base" $
-            assertFailure expr "{{}|x:m}"
+            assertParseFailure expr "{{}|x:m}"
         , testCase "must have fields" $
-            assertFailure expr "{a|}"
+            assertParseFailure expr "{a|}"
         ]
 
     , testGroup "function type"
@@ -98,6 +98,6 @@ tests =
       , example "comments" "a{-A-}->{-B-}b{-C-}->{-D-}c" $ at 1 1 1 28 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[BlockComment ["A"]]) [Commented [BlockComment ["B"]] (at 1 14 1 15 (TypeVariable "b")) [BlockComment ["C"]]] ([BlockComment ["D"]],at 1 27 1 28 (TypeVariable "c")) False)
       , example "newlines" "a\n ->\n b\n ->\n c" $ at 1 1 5 3 (FunctionType (at 1 1 1 2 (TypeVariable "a"),[]) [Commented [] (at 3 2 3 3 (TypeVariable "b")) []] ([],at 5 2 5 3 (TypeVariable "c")) True)
       , testCase "does not allow space in the arrow" $
-          assertFailure expr "a - > b"
+          assertParseFailure expr "a - > b"
       ]
     ]

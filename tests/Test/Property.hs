@@ -4,10 +4,9 @@ import Prelude hiding ((>>))
 import Elm.Utils ((|>), (>>))
 
 import Data.Char
-import Test.HUnit (Assertion, assertEqual, assertBool, assertFailure)
-import Test.Framework
-import Test.Framework.Providers.HUnit
-import Test.Framework.Providers.QuickCheck2
+import Test.Tasty
+import Test.Tasty.HUnit
+import Test.Tasty.QuickCheck
 import Test.QuickCheck
 import Test.QuickCheck.IO ()
 
@@ -78,7 +77,7 @@ withCounterexample fn prop =
   (\s -> counterexample (fn s) $ prop s)
 
 
-propertyTests :: Test
+propertyTests :: TestTree
 propertyTests =
     testGroup "example test group"
     [ testCase "simple AST round trip" $

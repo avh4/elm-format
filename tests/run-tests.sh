@@ -265,4 +265,4 @@ checkTransformation QuickCheck-94f37da84c1310f03dcfa1059ce870b73c94a825--6449652
 echo
 echo "# GREAT SUCCESS!"
 
-cabal test || exit 1
+cabal test --test-options="--hide-successes" || exit 1

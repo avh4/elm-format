@@ -2,9 +2,8 @@ module Parse.TestHelpers where
 
 import Elm.Utils ((|>))
 
-import Test.HUnit (Assertion, assertEqual)
-import Test.Framework
-import Test.Framework.Providers.HUnit
+import Test.Tasty
+import Test.Tasty.HUnit
 
 import Parse.Helpers (IParser, iParse)
 import Reporting.Annotation hiding (map, at)
@@ -31,8 +30,8 @@ assertParse parser input expected =
                 assertEqual input expected result
 
 
-assertFailure :: (Show a, Eq a) => IParser a -> String -> Assertion
-assertFailure parser input =
+assertParseFailure :: (Show a, Eq a) => IParser a -> String -> Assertion
+assertParseFailure parser input =
     let
         output = iParse (parseFullInput parser) input
     in
@@ -56,7 +55,7 @@ the given parser will fail if that "\n " is replaced by "\n".
 mustBeIndented parser input =
     input
         |> generateReplacements "\n " "\n"
-        |> List.map (testCase "" . assertFailure parser)
+        |> List.map (testCase "" . assertParseFailure parser)
         |> testGroup "must be indented"
 
 
