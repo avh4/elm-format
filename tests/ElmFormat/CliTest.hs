@@ -12,11 +12,11 @@ import qualified ElmFormat.Cli as Cli
 
 
 fakeParse :: String -> Either String ()
-fakeParse "fake input" = Right ()
+fakeParse "good input" = Right ()
 fakeParse input = Left $ "Bad input: " ++ input
 
 fakeRender :: () -> String
-fakeRender () = "fake output"
+fakeRender () = "good output"
 
 
 elmFormat :: [String] -> TestWorldState -> TestWorldState
@@ -26,12 +26,17 @@ elmFormat args input =
         input
 
 
+world :: TestWorldState
+world =
+    testWorld
+        [ ("good.elm", "good input") ]
+
+
 tests :: TestTree
 tests =
     testGroup "ElmFormat.Cli"
-    [ testWorld [ ("file.elm", "fake input") ]
-        |> elmFormat [ "file.elm" ]
+    [ elmFormat [ "good.elm" ] world
         |> assertOutput
-            [ ("file.elm", "fake output") ]
+            [ ("good.elm", "good output") ]
         |> testCase "format a single file in place"
     ]
