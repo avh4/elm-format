@@ -1,9 +1,11 @@
 module ElmFormat.CliTest where
 
 import Elm.Utils ((|>))
+import ElmVersion (ElmVersion(..))
 
 import Test.Tasty
 import Test.Tasty.HUnit
+import Test.Tasty.Golden
 
 import ElmFormat.World
 import ElmFormat.TestWorld
@@ -22,7 +24,7 @@ fakeRender () = "good output"
 elmFormat :: [String] -> TestWorldState -> TestWorldState
 elmFormat args input =
     exec
-        (Cli.main fakeParse fakeRender args)
+        (Cli.main Elm_0_17 fakeParse fakeRender args)
         input
 
 
@@ -39,4 +41,7 @@ tests =
         |> assertOutput
             [ ("good.elm", "good output") ]
         |> testCase "format a single file in place"
+    , elmFormat [] world
+        |> goldenStdout "usage instructions"
+            "tests/ElmFormat/CliTest/Usage.stdout"
     ]

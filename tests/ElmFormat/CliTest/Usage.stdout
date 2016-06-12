@@ -1,0 +1,21 @@
+elm-format-0.17 0.3.2-alpha-dev
+
+Usage: elm-format [INPUT] [--output FILE] [--yes] [--validate] [--stdin]
+                  [--elm-version VERSION]
+  Format an Elm source file.
+
+Available options:
+  -h,--help                Show this help text
+  --output FILE            Write output to FILE instead of overwriting the given
+                           source file.
+  --yes                    Reply 'yes' to all automated prompts.
+  --validate               Check if files are formatted without changing them.
+  --stdin                  Read from stdin, output to stdout.
+  --elm-version VERSION    The Elm version of the source files being formatted.
+                           Valid values: 0.16, 0.17. Default: 0.17
+
+Examples:
+  elm-format Main.elm                     # formats Main.elm
+  elm-format Main.elm --output Main2.elm  # formats Main.elm as Main2.elm
+
+Full guide to using elm-format at <https://github.com/avh4/elm-format>
