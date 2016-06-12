@@ -3,8 +3,8 @@ module Parse.HelpersTest where
 import Elm.Utils ((|>))
 
 import Test.HUnit (Assertion, assertEqual)
-import Test.Framework
-import Test.Framework.Providers.HUnit
+import Test.Tasty
+import Test.Tasty.HUnit
 
 import AST.V0_16
 import Parse.Helpers (IParser, parens'')
@@ -24,7 +24,7 @@ x :: IParser String
 x = (\x -> [x]) <$> lower
 
 
-tests :: Test
+tests :: TestTree
 tests =
     testGroup "Parse.Helpers"
     [ testGroup "parens''"

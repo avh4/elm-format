@@ -2,9 +2,8 @@ module ElmFormat.Render.ElmStructureTest where
 
 import Elm.Utils ((|>))
 
-import Test.HUnit (Assertion, assertEqual)
-import Test.Framework
-import Test.Framework.Providers.HUnit
+import Test.Tasty
+import Test.Tasty.HUnit
 import qualified Data.Text.Lazy as LazyText
 import qualified Data.Text as Text
 
@@ -48,7 +47,7 @@ block text =
         w = identifier text
 
 
-tests :: Test
+tests :: TestTree
 tests =
     testGroup "ElmFormat.Render.ElmStructure"
     [ testCase "application (single line)" $

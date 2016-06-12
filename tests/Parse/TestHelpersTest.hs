@@ -2,16 +2,14 @@ module Parse.TestHelpersTest where
 
 import Elm.Utils ((|>))
 
-import Test.HUnit (Assertion, assertEqual)
-import Test.Framework
-import Test.Framework.Providers.HUnit
-
+import Test.Tasty
+import Test.Tasty.HUnit
 
 import Parse.TestHelpers
 
 
 
-tests :: Test
+tests :: TestTree
 tests =
     testGroup "TestHelpers"
     [ testGroup "generateReplacements"

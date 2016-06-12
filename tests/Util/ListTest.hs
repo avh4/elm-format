@@ -1,13 +1,12 @@
 module Util.ListTest where
 
-import Test.HUnit (Assertion, assertEqual)
-import Test.Framework
-import Test.Framework.Providers.HUnit
+import Test.Tasty
+import Test.Tasty.HUnit
 
 import Util.List
 
 
-tests :: Test
+tests :: TestTree
 tests =
     testGroup "Util.List"
     [ testGroup "pairs"

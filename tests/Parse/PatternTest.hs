@@ -3,8 +3,8 @@ module Parse.PatternTest where
 import Elm.Utils ((|>))
 
 import Test.HUnit (Assertion, assertEqual)
-import Test.Framework
-import Test.Framework.Providers.HUnit
+import Test.Tasty
+import Test.Tasty.HUnit
 import qualified Data.Text.Lazy as LazyText
 
 import Parse.Pattern
@@ -27,7 +27,7 @@ example name input expected =
         assertParse expr input expected
 
 
-tests :: Test
+tests :: TestTree
 tests =
     testGroup "Parse.Pattern"
     [ example "wildcard" "_" $ at 1 1 1 2 Anything
@@ -94,7 +94,7 @@ tests =
         , example "comments" "{{-A-}a{-B-},{-C-}b{-D-}}" $ at 1 1 1 26 (Record [Commented [BlockComment ["A"]] "a" [BlockComment ["B"]],Commented [BlockComment ["C"]] "b" [BlockComment ["D"]]])
         , example "newlines" "{\n a\n ,\n b\n }" $ at 1 1 5 3 (Record [Commented [] "a" [],Commented [] "b" []])
         , testCase "must have at least one field" $
-            assertFailure expr "{}"
+            assertParseFailure expr "{}"
         ]
 
     , testGroup "alias"
@@ -106,6 +106,6 @@ tests =
         , example "nested" "(_ as x)as y" $ at 1 1 1 13 (Alias (at 1 2 1 8 (Alias (at 1 2 1 3 Anything,[]) ([],"x")),[]) ([],"y"))
         , example "nested (whitespace)" "(_ as x) as y" $ at 1 1 1 14 (Alias (at 1 2 1 8 (Alias (at 1 2 1 3 Anything,[]) ([],"x")),[]) ([],"y"))
         , testCase "nesting required parentheses" $
-            assertFailure expr "_ as x as y"
+            assertParseFailure expr "_ as x as y"
         ]
     ]

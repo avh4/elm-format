@@ -3,8 +3,8 @@ module Parse.LiteralTest where
 import Elm.Utils ((|>))
 
 import Test.HUnit (Assertion, assertEqual)
-import Test.Framework
-import Test.Framework.Providers.HUnit
+import Test.Tasty
+import Test.Tasty.HUnit
 
 import Parse.Literal
 import Text.ParserCombinators.Parsec.Combinator (eof)
@@ -23,7 +23,7 @@ example name input expected =
         assertParse literal input expected
 
 
-tests :: Test
+tests :: TestTree
 tests =
     testGroup "Parse.Literal"
     [ testGroup "Int"
@@ -31,9 +31,9 @@ tests =
         , example "negative" "-99" $ IntNum (-99) DecimalInt
         , example "hexadecimal" "0xfF" $ IntNum 255 HexadecimalInt
         , testCase "hexadecimal must start with 0" $
-            assertFailure literal "xFF"
+            assertParseFailure literal "xFF"
         , testCase "hexadecimal, must contain digits" $
-            assertFailure literal "0x"
+            assertParseFailure literal "0x"
         ]
 
     , testGroup "Float"
@@ -44,18 +44,18 @@ tests =
         , example "negative exponent" "9e-3" $ FloatNum 0.009 ExponentFloat
         , example "capital exponent" "9E3" $ FloatNum 9000.0 ExponentFloat
         , testCase "exponent must have exponent digits" $
-            assertFailure literal "9E"
+            assertParseFailure literal "9E"
         , testCase "exponent must have digits" $
-            assertFailure literal "e3"
+            assertParseFailure literal "e3"
         , example "exponent and decimal" "9.1e3" $ FloatNum 9100.0 ExponentFloat
         , testCase "exponent and decimal, must have decimal digits" $
-            assertFailure literal "9.e3"
+            assertParseFailure literal "9.e3"
         , testCase "must have digits" $
-            assertFailure literal "."
+            assertParseFailure literal "."
         , testCase "must start with a digit" $
-            assertFailure literal ".1"
+            assertParseFailure literal ".1"
         , testCase "decimal, must have decimal digits" $
-            assertFailure literal "99."
+            assertParseFailure literal "99."
         ]
 
     , testGroup "String"
@@ -72,8 +72,8 @@ tests =
         [ example "" "\'a\'" $ Chr 'a'
         , example "escaped single quote" "\'\\\'\'" $ Chr '\''
         , testCase "Char (must have one character)" $
-            assertFailure literal "\'\'"
+            assertParseFailure literal "\'\'"
         , testCase "Char (must have only one character)" $
-            assertFailure literal "\'ab\'"
+            assertParseFailure literal "\'ab\'"
         ]
     ]

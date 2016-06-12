@@ -1,6 +1,7 @@
 module Main where
 
-import Test.Framework
+import Test.Tasty
+import Test.Tasty.HUnit
 
 import qualified Test.Property
 import qualified BoxTest
@@ -16,7 +17,7 @@ import qualified Util.ListTest
 
 main :: IO ()
 main =
-  defaultMain
+  defaultMain $ testGroup "elm-format" $
     [ Test.Property.propertyTests
     , BoxTest.tests
     , ElmFormat.Render.ElmStructureTest.tests
