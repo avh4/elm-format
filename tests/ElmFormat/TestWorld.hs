@@ -31,8 +31,13 @@ instance World (State.State TestWorldState) where
     readFile path =
         do
             state <- State.get
-            -- TODO: what does IO do when the file doesn't exist?
-            return $ Dict.findWithDefault "<file did not exist>" path (filesystem state)
+            case Dict.lookup path (filesystem state) of
+                Nothing ->
+                    error $ path ++ ": does not exist"
+
+                Just content ->
+                    return content
+
     writeFile path content =
         do
             state <- State.get
