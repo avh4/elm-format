@@ -7,11 +7,12 @@ import qualified ElmFormat.World as World
 main :: World m => (String -> Either String a) -> (a -> String) -> [String] -> m ()
 main parse render args =
     do
-        input <- World.readFile "file.elm"
+        -- TODO: read filename from args
+        input <- World.readFile "good.elm"
 
         case parse input of
             Left message ->
                 error $ show message
 
             Right ast ->
-                World.writeFile "file.elm" (render ast)
+                World.writeFile "good.elm" (render ast)
