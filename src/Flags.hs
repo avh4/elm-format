@@ -31,6 +31,27 @@ parse defaultVersion =
     Opt.customExecParser preferences (parser defaultVersion)
 
 
+parse' :: ElmVersion -> [String] -> Either (Opt.ParserResult never) Config
+parse' defaultVersion args =
+    case Opt.execParserPure preferences (parser defaultVersion) args of
+        Opt.Success config ->
+            Right config
+
+        Opt.Failure failure ->
+            Left $ Opt.Failure failure
+
+        Opt.CompletionInvoked completion ->
+            Left $ Opt.CompletionInvoked completion
+
+
+usage :: ElmVersion -> String -> String
+usage defaultVersion progName =
+    fst $
+    Opt.renderFailure
+        (Opt.parserFailure preferences (parser defaultVersion) Opt.ShowHelpText mempty)
+        progName
+
+
 preferences :: Opt.ParserPrefs
 preferences =
     Opt.prefs (mempty <> Opt.showHelpOnError)
