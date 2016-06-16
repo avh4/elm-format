@@ -37,12 +37,12 @@ bar : Day -> Float -> Svg
 bar day yOffset =
     rect
         [ x <| toString <| (day.xOffset * (barWidth + barMargin))
-        , y
-            <| toString
-            <| if day.amount <= 0 then
-                yOffset
-               else
-                yOffset - day.amount
+        , y <|
+            toString <|
+                if day.amount <= 0 then
+                    yOffset
+                else
+                    yOffset - day.amount
         , height <| toString <| abs day.amount
         , width <| toString barWidth
         ]

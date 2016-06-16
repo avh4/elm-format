@@ -56,35 +56,48 @@ parens :: Box -> Box
 parens = surround '(' ')'
 
 
-formatBinary :: Bool -> Box -> [ ( Box, Box ) ] -> Box
+formatBinary :: Bool -> Box -> [ ( Bool, Box, Box ) ] -> Box
 formatBinary multiline left ops =
     case ops of
         [] ->
             left
 
-        ( op, next ) : rest ->
+        ( isLeftPipe, op, next ) : rest ->
             case
-                ( multiline, left, op, next )
+                ( isLeftPipe, multiline, left, op, next )
             of
-                ( False, SingleLine left', SingleLine op', SingleLine next' ) ->
+                ( _, False, SingleLine left', SingleLine op', SingleLine next' ) ->
                     formatBinary
                         multiline
                         (line $ row [ left', space, op', space, next' ])
                         rest
 
-                ( _, _, SingleLine op', SingleLine _ ) ->
+                ( True, _, SingleLine left', SingleLine op', _ ) ->
+                    stack1
+                        [ line $ row [ left', space, op' ]
+                        , indent $ formatBinary multiline next rest
+                        ]
+
+                ( True, _, _, _, _ ) ->
+                    stack1
+                        [ left
+                        , op
+                        , indent $ formatBinary multiline next rest
+                        ]
+
+                ( False, _, _, SingleLine op', SingleLine _ ) ->
                     formatBinary
                         multiline
                         (stack1 [ left, indent $ prefix (row [ op', space ]) next])
                         rest
 
-                ( _, _, SingleLine op', _ ) | lineLength 0 op' < 4 ->
+                ( False, _, _, SingleLine op', _ ) | lineLength 0 op' < 4 ->
                     formatBinary
                         multiline
                         (stack1 [left, indent $ prefix (row [ op', space ]) next])
                         rest
 
-                _ ->
+                ( False, _, _, _, _ ) ->
                     formatBinary
                         multiline
                         (stack1 [ left, indent op, indent $ indent next ])
@@ -759,7 +772,7 @@ formatPattern parensRequired apattern =
               formatBinary
                   False
                   first'
-                  (map ((,) (line $ punc "::")) (rest'++[final']))
+                  (map ((,,) False (line $ punc "::")) (rest'++[final']))
               |> if parensRequired then parens else id
 
         AST.Pattern.Data ctor [] ->
@@ -867,7 +880,8 @@ formatExpression aexpr =
         AST.Expression.Binops left ops multiline ->
             let
                 formatPair ( po, o, pe, e ) =
-                    ( formatCommented' po (line . formatInfixVar) o
+                    ( o == AST.Variable.OpRef "<|"
+                    , formatCommented' po (line . formatInfixVar) o
                     , formatCommented' pe formatExpression e
                     )
             in
