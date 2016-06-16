@@ -231,184 +231,184 @@ claim name actualStatement expectedStatement investigator =
     -- 4. Return a failure.
     -------------------------------------------------------------------
     Claim name
-        -- A Claim is just a function that takes a number of checks
-        -- and a random seed and returns an `Evidence` object
-        <|
-            \numberOfChecks seed ->
-                -- `numberOfChecks` is the given number of checks which is usually
-                -- passed in by the `check` function. This sets an upper bound on
-                -- the number of checks performed in order to find a counter example
+    -- A Claim is just a function that takes a number of checks
+    -- and a random seed and returns an `Evidence` object
+    <|
+        \numberOfChecks seed ->
+            -- `numberOfChecks` is the given number of checks which is usually
+            -- passed in by the `check` function. This sets an upper bound on
+            -- the number of checks performed in order to find a counter example
+            --
+            -- `seed` is the random seed which is usually passed in by the `check`
+            -- function. Explictly passing random seeds allow the user to reproduce
+            -- checks in order to re-run old checks on newer, presumably less buggy,
+            -- code.
+            let
+                -- Find the original counter example. The original counter example
+                -- is the first counter example found that disproves the claim.
+                -- This counter example, if found, will later be shrunk into a more
+                -- minimal version, hence "original".
                 --
-                -- `seed` is the random seed which is usually passed in by the `check`
-                -- function. Explictly passing random seeds allow the user to reproduce
-                -- checks in order to re-run old checks on newer, presumably less buggy,
-                -- code.
-                let
-                    -- Find the original counter example. The original counter example
-                    -- is the first counter example found that disproves the claim.
-                    -- This counter example, if found, will later be shrunk into a more
-                    -- minimal version, hence "original".
-                    --
-                    -- Note that since finding a counter example is a recursive process,
-                    -- trampolines are used. `originalCounterExample'` returns a
-                    -- trampoline.
-                    --
-                    -- originalCounterExample' : Seed -> Int -> Trampoline (Result (a, b, b, Seed, Int) Int)
-                    originalCounterExample' seed currentNumberOfChecks =
-                        if currentNumberOfChecks >= numberOfChecks then
+                -- Note that since finding a counter example is a recursive process,
+                -- trampolines are used. `originalCounterExample'` returns a
+                -- trampoline.
+                --
+                -- originalCounterExample' : Seed -> Int -> Trampoline (Result (a, b, b, Seed, Int) Int)
+                originalCounterExample' seed currentNumberOfChecks =
+                    if currentNumberOfChecks >= numberOfChecks then
+                        ------------------------------------------------------------------
+                        -- Stopping Condition:
+                        -- If we have checked the claim at least `numberOfChecks` times
+                        -- Then we simple return `Ok` with the number of checks signifying
+                        -- that we have failed to find a counter example.
+                        ------------------------------------------------------------------
+                        Done (Ok numberOfChecks)
+                    else
+                        let
+                            --------------------------------------------------------------
+                            -- Body of loop:
+                            -- 1. We generate a new random value and the next seed using
+                            --    the investigator's random generator and the previous seed.
+                            -- 2. We calculate the actual outcome and the expected
+                            --    outcome from the given `actualStatement` and
+                            --    `expectedStatement` respectively
+                            -- 3. We compare the actual and the expected
+                            -- 4. If actual equals expected, we continue the loop with
+                            --    the next seed and incrementing the current number of
+                            --    checks
+                            -- 5. Else, we have found our counter example.
+                            --------------------------------------------------------------
+                            ( value, nextSeed ) =
+                                Random.generate investigator.generator seed
+
+                            actual =
+                                actualStatement value
+
+                            expected =
+                                expectedStatement value
+                        in
+                            if actual == expected then
+                                Continue (\() -> originalCounterExample' nextSeed (currentNumberOfChecks + 1))
+                            else
+                                Done (Err ( value, actual, expected, nextSeed, currentNumberOfChecks + 1 ))
+
+                -- originalCounterExample : Result (a, b, b, Seed, Int) Int
+                originalCounterExample =
+                    trampoline (originalCounterExample' seed 0)
+            in
+                case originalCounterExample of
+                    ------------------------------------------------------------
+                    -- Case: No counter examples were found
+                    -- We simply return the name of the claim, the seed, and the
+                    -- number of checks performed.
+                    ------------------------------------------------------------
+                    Ok numberOfChecks ->
+                        Unit <|
+                            Ok
+                                { name = name
+                                , seed = seed
+                                , numberOfChecks = max 0 numberOfChecks
+                                }
+
+                    ------------------------------------------------------------
+                    -- Case : A counter example was found
+                    -- We proceed to shrink the counter example to a more minimal
+                    -- representation which still disproves the claim.
+                    ------------------------------------------------------------
+                    Err ( originalCounterExample, originalActual, originalExpected, seed, numberOfChecks ) ->
+                        let
                             ------------------------------------------------------------------
-                            -- Stopping Condition:
-                            -- If we have checked the claim at least `numberOfChecks` times
-                            -- Then we simple return `Ok` with the number of checks signifying
-                            -- that we have failed to find a counter example.
+                            -- Find the minimal counter example:
+                            -- 1. Given a counter example, we produce a list of values
+                            --    considered more minimal (i.e. we shrink the counter example)
+                            -- 2. We keep only the shrunken values that disprove the claim.
+                            -- 3. If there are no such shrunken value, then we consider the
+                            --    given counter example to be minimal and report the number
+                            --    of shrinking operations performed.
+                            -- 4. Else, we recurse, passing in the new shrunken value
+                            --    and incrementing the current number of shrinks counter.
                             ------------------------------------------------------------------
-                            Done (Ok numberOfChecks)
-                        else
-                            let
-                                --------------------------------------------------------------
-                                -- Body of loop:
-                                -- 1. We generate a new random value and the next seed using
-                                --    the investigator's random generator and the previous seed.
-                                -- 2. We calculate the actual outcome and the expected
-                                --    outcome from the given `actualStatement` and
-                                --    `expectedStatement` respectively
-                                -- 3. We compare the actual and the expected
-                                -- 4. If actual equals expected, we continue the loop with
-                                --    the next seed and incrementing the current number of
-                                --    checks
-                                -- 5. Else, we have found our counter example.
-                                --------------------------------------------------------------
-                                ( value, nextSeed ) =
-                                    Random.generate investigator.generator seed
+                            --
+                            -- Note that since finding the minimal counter example is a
+                            -- recursive process, trampolines are used. `shrink` returns
+                            -- a trampoline.
+                            --
+                            -- shrink : a -> Int -> Trampoline (a, Int)
+                            shrink counterExample currentNumberOfShrinks =
+                                let
+                                    -- Produce a list of values considered more minimal that
+                                    -- the given `counterExample`.
+                                    --
+                                    -- shrunkenCounterExamples : List a
+                                    shrunkenCounterExamples =
+                                        investigator.shrinker counterExample
 
-                                actual =
-                                    actualStatement value
+                                    -- Keep only the counter examples that disprove the claim.
+                                    -- (i.e. they violate `actual == expected`)
+                                    --
+                                    -- failingShrunkenCounterExamples : List a
+                                    failingShrunkenCounterExamples =
+                                        List.filter
+                                            (\shrunk ->
+                                                not (actualStatement shrunk == expectedStatement shrunk)
+                                            )
+                                            shrunkenCounterExamples
+                                in
+                                    case List.head failingShrunkenCounterExamples of
+                                        Nothing ->
+                                            --------------------------------------------------------
+                                            -- Stopping Condition :
+                                            -- If there are no further shrunken counter examples
+                                            -- we simply return the given counter example and report
+                                            -- the number of shrinking operations performed.
+                                            --------------------------------------------------------
+                                            Done ( counterExample, currentNumberOfShrinks )
 
-                                expected =
-                                    expectedStatement value
-                            in
-                                if actual == expected then
-                                    Continue (\() -> originalCounterExample' nextSeed (currentNumberOfChecks + 1))
-                                else
-                                    Done (Err ( value, actual, expected, nextSeed, currentNumberOfChecks + 1 ))
+                                        Just failing ->
+                                            --------------------------------------------------------
+                                            -- Body of Loop :
+                                            -- We simply recurse with the first shrunken counter
+                                            -- example we can get our hands on and incrementing the
+                                            -- current number of shrinking operations counter
+                                            --------------------------------------------------------
+                                            Continue (\() -> shrink failing (currentNumberOfShrinks + 1))
 
-                    -- originalCounterExample : Result (a, b, b, Seed, Int) Int
-                    originalCounterExample =
-                        trampoline (originalCounterExample' seed 0)
-                in
-                    case originalCounterExample of
-                        ------------------------------------------------------------
-                        -- Case: No counter examples were found
-                        -- We simply return the name of the claim, the seed, and the
-                        -- number of checks performed.
-                        ------------------------------------------------------------
-                        Ok numberOfChecks ->
-                            Unit
-                                <| Ok
+                            -- minimal : a
+                            -- numberOfShrinks : Int
+                            ( minimal, numberOfShrinks ) =
+                                trampoline (shrink originalCounterExample 0)
+
+                            -- actual : b
+                            actual =
+                                actualStatement minimal
+
+                            -- expected : b
+                            expected =
+                                expectedStatement minimal
+                        in
+                            -- Here, we return an `Err` signifying that a counter example was
+                            -- found. The returned record contains a number of fields and
+                            -- values useful for diagnostics, such as the counter example,
+                            -- the expected and the actual values, as well the original
+                            -- unshrunk versions, the name of the claim, the seed used to
+                            -- find the counter example, the number of checks performed to find
+                            -- the counter example, and the number of shrinking operations
+                            -- performed.
+                            Unit <|
+                                Err
                                     { name = name
                                     , seed = seed
-                                    , numberOfChecks = max 0 numberOfChecks
-                                    }
-
-                        ------------------------------------------------------------
-                        -- Case : A counter example was found
-                        -- We proceed to shrink the counter example to a more minimal
-                        -- representation which still disproves the claim.
-                        ------------------------------------------------------------
-                        Err ( originalCounterExample, originalActual, originalExpected, seed, numberOfChecks ) ->
-                            let
-                                ------------------------------------------------------------------
-                                -- Find the minimal counter example:
-                                -- 1. Given a counter example, we produce a list of values
-                                --    considered more minimal (i.e. we shrink the counter example)
-                                -- 2. We keep only the shrunken values that disprove the claim.
-                                -- 3. If there are no such shrunken value, then we consider the
-                                --    given counter example to be minimal and report the number
-                                --    of shrinking operations performed.
-                                -- 4. Else, we recurse, passing in the new shrunken value
-                                --    and incrementing the current number of shrinks counter.
-                                ------------------------------------------------------------------
-                                --
-                                -- Note that since finding the minimal counter example is a
-                                -- recursive process, trampolines are used. `shrink` returns
-                                -- a trampoline.
-                                --
-                                -- shrink : a -> Int -> Trampoline (a, Int)
-                                shrink counterExample currentNumberOfShrinks =
-                                    let
-                                        -- Produce a list of values considered more minimal that
-                                        -- the given `counterExample`.
-                                        --
-                                        -- shrunkenCounterExamples : List a
-                                        shrunkenCounterExamples =
-                                            investigator.shrinker counterExample
-
-                                        -- Keep only the counter examples that disprove the claim.
-                                        -- (i.e. they violate `actual == expected`)
-                                        --
-                                        -- failingShrunkenCounterExamples : List a
-                                        failingShrunkenCounterExamples =
-                                            List.filter
-                                                (\shrunk ->
-                                                    not (actualStatement shrunk == expectedStatement shrunk)
-                                                )
-                                                shrunkenCounterExamples
-                                    in
-                                        case List.head failingShrunkenCounterExamples of
-                                            Nothing ->
-                                                --------------------------------------------------------
-                                                -- Stopping Condition :
-                                                -- If there are no further shrunken counter examples
-                                                -- we simply return the given counter example and report
-                                                -- the number of shrinking operations performed.
-                                                --------------------------------------------------------
-                                                Done ( counterExample, currentNumberOfShrinks )
-
-                                            Just failing ->
-                                                --------------------------------------------------------
-                                                -- Body of Loop :
-                                                -- We simply recurse with the first shrunken counter
-                                                -- example we can get our hands on and incrementing the
-                                                -- current number of shrinking operations counter
-                                                --------------------------------------------------------
-                                                Continue (\() -> shrink failing (currentNumberOfShrinks + 1))
-
-                                -- minimal : a
-                                -- numberOfShrinks : Int
-                                ( minimal, numberOfShrinks ) =
-                                    trampoline (shrink originalCounterExample 0)
-
-                                -- actual : b
-                                actual =
-                                    actualStatement minimal
-
-                                -- expected : b
-                                expected =
-                                    expectedStatement minimal
-                            in
-                                -- Here, we return an `Err` signifying that a counter example was
-                                -- found. The returned record contains a number of fields and
-                                -- values useful for diagnostics, such as the counter example,
-                                -- the expected and the actual values, as well the original
-                                -- unshrunk versions, the name of the claim, the seed used to
-                                -- find the counter example, the number of checks performed to find
-                                -- the counter example, and the number of shrinking operations
-                                -- performed.
-                                Unit
-                                    <| Err
-                                        { name = name
-                                        , seed = seed
-                                        , counterExample = toString minimal
-                                        , expected = toString expected
-                                        , actual = toString actual
-                                        , original =
-                                            { counterExample = toString originalCounterExample
-                                            , actual = toString originalActual
-                                            , expected = toString originalExpected
-                                            }
-                                        , numberOfChecks = numberOfChecks
-                                        , numberOfShrinks = numberOfShrinks
+                                    , counterExample = toString minimal
+                                    , expected = toString expected
+                                    , actual = toString actual
+                                    , original =
+                                        { counterExample = toString originalCounterExample
+                                        , actual = toString originalActual
+                                        , expected = toString originalExpected
                                         }
+                                    , numberOfChecks = numberOfChecks
+                                    , numberOfShrinks = numberOfShrinks
+                                    }
 
 
 {-| Make a claim of truth about a system.
