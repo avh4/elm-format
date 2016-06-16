@@ -58,43 +58,37 @@ parens = surround '(' ')'
 
 formatBinary :: Bool -> Box -> [ ( Box, Box ) ] -> Box
 formatBinary multiline left ops =
-    case
-        ( ops
-        , multiline
-        , left
-        , allSingles $ map fst ops
-        , allSingles $ map snd ops
-        )
-    of
-        ([], _, _, _, _) ->
-            pleaseReport "INVALID BINARY EXPRESSION" "no operators"
+    case ops of
+        [] ->
+            left
 
-        (_, False, SingleLine left', Right ops'', Right exprs') ->
-            zip ops'' exprs'
-                |> map (\(op,e) -> row [op, space, e])
-                |> List.intersperse space
-                |> (:) space
-                |> (:) left'
-                |> row
-                |> line
+        ( op, next ) : rest ->
+            case
+                ( multiline, left, op, next )
+            of
+                ( False, SingleLine left', SingleLine op', SingleLine next' ) ->
+                    formatBinary
+                        multiline
+                        (line $ row [ left', space, op', space, next' ])
+                        rest
 
-        _ ->
-            let
-                formatOp (op, e) =
-                  case (op, e) of
-                      (SingleLine op', SingleLine e') ->
-                          line $ row [ op', space, e' ]
+                ( _, _, SingleLine op', SingleLine _ ) ->
+                    formatBinary
+                        multiline
+                        (stack1 [ left, indent $ prefix (row [ op', space ]) next])
+                        rest
 
-                      (SingleLine op', _) | lineLength 0 op' < 4 ->
-                          prefix (row [ op', space ]) e
+                ( _, _, SingleLine op', _ ) | lineLength 0 op' < 4 ->
+                    formatBinary
+                        multiline
+                        (stack1 [left, indent $ prefix (row [ op', space ]) next])
+                        rest
 
-                      _ ->
-                          stack1 [ op , indent e ]
-            in
-                ops
-                    |> map formatOp
-                    |> stack1
-                    |> (\body -> stack1 [left, indent body])
+                _ ->
+                    formatBinary
+                        multiline
+                        (stack1 [ left, indent op, indent $ indent next ])
+                        rest
 
 
 splitWhere :: (a -> Bool) -> [a] -> [[a]]
