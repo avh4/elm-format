@@ -25,16 +25,17 @@ import qualified Reporting.Result as Result
 import qualified System.Directory as Dir
 
 
--- If elm-format was successful, writes the results to the output
--- file. Otherwise, display errors and exit
+-- If elm-format was successful and formatted result differ
+-- from original content, writes the results to the output file.
+-- Otherwise, display errors and exit
 writeResult
     :: ElmVersion
     -> Destination
-    -> String
+    -> FilePath
     -> Text.Text
     -> Result.Result () Syntax.Error AST.Module.Module
     -> IO (Maybe Bool)
-writeResult elmVersion destination inputFilename inputText result =
+writeResult elmVersion destination inputFile inputText result =
     case result of
         Result.Result _ (Result.Ok modu) ->
             let
@@ -51,25 +52,32 @@ writeResult elmVersion destination inputFilename inputText result =
 
                     ValidateOnly ->
                         if inputText /= renderedText then
-                            (putStrLn $ r $ FileWouldChange inputFilename)
+                            (putStrLn $ r $ FileWouldChange inputFile)
                             >> (return $ Just False)
                         else
                             return $ Just True
 
-                    ToFile path -> do
-                        (ByteString.writeFile path rendered)
-                        >> (return Nothing)
+                    ToFile path ->
+                        let
+                            shouldWriteToFile =
+                                inputFile /= path || inputText /= renderedText
+                        in
+                            if shouldWriteToFile then
+                                (ByteString.writeFile path rendered)
+                                >> (return Nothing)
+                            else
+                                return Nothing
 
         Result.Result _ (Result.Err errs) ->
             do
-                showErrors inputFilename (Text.unpack inputText) errs
+                showErrors inputFile (Text.unpack inputText) errs
                 exitFailure
 
 
-processTextInput :: ElmVersion -> Destination -> String -> Text.Text -> IO (Maybe Bool)
-processTextInput elmVersion destination inputFilename inputText =
+processTextInput :: ElmVersion -> Destination -> FilePath -> Text.Text -> IO (Maybe Bool)
+processTextInput elmVersion destination inputFile inputText =
     Parse.parse inputText
-        |> writeResult elmVersion destination inputFilename inputText
+        |> writeResult elmVersion destination inputFile inputText
 
 
 processFileInput :: ElmVersion -> FilePath -> Destination -> IO (Maybe Bool)
