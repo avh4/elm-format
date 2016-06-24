@@ -38,8 +38,12 @@ renderMessage Error_SingleOutputWithMultipleInputs =
     , "Please remove the --output argument. The .elm files in INPUT will be formatted in place."
     ]
 
-renderMessage (ProcessingFile file) =
-    "Processing file " ++ file
+renderMessage (ProcessingFiles files) =
+    case files of
+        file:[] ->
+            "Processing file " ++ file
+        _ ->
+            "Processing multiple files..."
 
 renderMessage (FileWouldChange file) =
     "File would be changed " ++ file
