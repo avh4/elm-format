@@ -83,7 +83,6 @@ processTextInput elmVersion destination inputFile inputText =
 processFileInput :: ElmVersion -> FilePath -> Destination -> IO (Maybe Bool)
 processFileInput elmVersion inputFile destination =
     do
-        putStrLn $ (r $ ProcessingFile inputFile)
         inputText <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
         processTextInput elmVersion destination inputFile inputText
 
@@ -162,6 +161,7 @@ handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion =
             Right [inputFile] -> do
                 realOutputFile <- decideOutputFile autoYes inputFile outputFile
                 let destination = if validateOnly then ValidateOnly else ToFile realOutputFile
+                putStrLn $ (r $ ProcessingFiles $ [inputFile])
                 processFileInput elmVersion inputFile destination
 
             Right elmFiles -> do
@@ -187,6 +187,7 @@ handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion =
                                     ToFile file
                         in
                             do
+                                putStrLn $ (r $ ProcessingFiles elmFiles)
                                 validationResults <- mapM (\file -> processFileInput elmVersion file (dst file)) elmFiles
                                 return $ foldl merge Nothing validationResults
                     else

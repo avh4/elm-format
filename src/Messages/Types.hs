@@ -13,7 +13,7 @@ data Message
   | Error_SingleOutputWithMultipleInputs
   | Error_TooManyInputs
   | Error_OutputAndValidate
-  | ProcessingFile FilePath
+  | ProcessingFiles [FilePath]
   | FileWouldChange FilePath
 
 
