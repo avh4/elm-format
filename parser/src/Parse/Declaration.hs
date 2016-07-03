@@ -31,7 +31,7 @@ definition =
 typeDecl :: IParser AST.Declaration.Declaration
 typeDecl =
   do  try (reserved "type") <?> "a type declaration"
-      postType <- forcedWS
+      postType <- newlineCommented () <$> forcedWS
       isAlias <- optionMaybe (string "alias" >> forcedWS)
 
       name <- capVar

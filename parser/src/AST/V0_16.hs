@@ -37,6 +37,14 @@ type PreCommented a = (Comments, a)
 type PostCommented a = (a, Comments)
 
 
+type NewlineCommented a = (a, Maybe Comment, Comments)
+
+
+newlineCommented :: a -> (Maybe Comment, Comments) -> NewlineCommented a
+newlineCommented a (eol, rest) =
+  (a, eol, rest)
+
+
 data IntRepresentation
   = DecimalInt
   | HexadecimalInt

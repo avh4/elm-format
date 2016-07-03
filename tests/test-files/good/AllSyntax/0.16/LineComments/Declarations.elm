@@ -1,7 +1,7 @@
 module AllSyntax.LineComments.Declarations (..) where
 
 
-type
+type --AE
     --A
     DataType
     --B
@@ -38,7 +38,7 @@ type
 
 type
     --P
-    alias
+    alias --AF
     --Q
     TypeAlias
         --R

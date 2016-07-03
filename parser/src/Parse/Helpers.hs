@@ -468,26 +468,32 @@ spaces =
       concat <$> many1 space
 
 
-forcedWS :: IParser Comments
+forcedWS :: IParser (Maybe Comment, Comments)
 forcedWS =
   choice
-    [ (++) <$> spaces <*> (concat <$> many nl_space)
-    , concat <$> many1 nl_space
+    [ (\x y -> wsJoin $ x : y)
+        <$> ((,) Nothing <$> spaces)
+        <*> (many nl_space)
+    , wsJoin <$> many1 nl_space
     ]
   where
+    nl_space :: IParser (Maybe Comment, Comments)
     nl_space =
-      try ((++) <$> (concat <$> many1 newline) <*> option [] spaces)
+      try $
+        (\x y -> wsJoin [x, y])
+          <$> (wsJoin <$> many1 ((\x -> (x, [])) <$> newline))
+          <*> ((,) Nothing <$> option [] spaces)
 
 
 -- Just eats whitespace until the next meaningful character.
 dumbWhitespace :: IParser Comments
-dumbWhitespace =
-  concat <$> many (spaces <|> newline)
+dumbWhitespace = --TODO: handle eol comments (don't maybeToList)
+  concat <$> many (spaces <|> (maybeToList <$> newline))
 
 
 whitespace' :: IParser (Bool, Comments)
-whitespace' =
-  option (False, []) ((,) True <$> forcedWS)
+whitespace' = -- TODO: handle eol comments (don't flatten)
+  option (False, []) ((,) True <$> wsFlatten <$> forcedWS)
 
 
 whitespace :: IParser Comments
@@ -495,16 +501,58 @@ whitespace =
   snd <$> whitespace'
 
 
-freshLine :: IParser Comments
+wsJoin :: [(Maybe Comment, Comments)] -> (Maybe Comment, Comments)
+wsJoin list =
+  case list of
+    [] ->
+      (Nothing, [])
+
+    [single] ->
+      single
+
+    (Nothing, []) : rest ->
+      wsJoin rest
+
+    (first,more) : rest ->
+      (first, more ++ (concat $ fmap wsFlatten rest))
+
+
+wsFlatten :: (Maybe Comment, Comments) -> Comments
+wsFlatten (first, rest) =
+  maybeToList first ++ rest
+
+
+maybeToList m =
+  case m of
+    Just x ->
+      [x]
+    Nothing ->
+      []
+
+freshLine :: IParser (Maybe Comment, Comments)
 freshLine =
-      concat <$> (try ((++) <$> many1 newline <*> many space_nl) <|> try (many1 space_nl)) <?> Syntax.freshLine
+      wsJoin <$> (try ((++) <$> many1 newline' <*> many space_nl) <|> try (many1 space_nl)) <?> Syntax.freshLine
   where
-    space_nl = try $ (++) <$> spaces <*> (concat <$> many1 newline)
+    newline' =
+      (\x -> (x, [])) <$> newline
+
+    space_nl :: IParser (Maybe Comment, Comments)
+    space_nl =
+      try $
+      do
+        pre_nl <- spaces
+        first_nl <- newline
+        rest_nl <- many newline
+        case pre_nl of
+          [] ->
+            return (first_nl, concat $ fmap maybeToList rest_nl)
+          _ ->
+            return (Nothing, concat $ pre_nl : fmap maybeToList (first_nl : rest_nl))
 
 
-newline :: IParser Comments
+newline :: IParser (Maybe Comment)
 newline =
-  do  result <- (simpleNewline >> return []) <|> ((\x -> [x]) <$> lineComment) <?> Syntax.newline
+  do  result <- (simpleNewline >> return Nothing) <|> (Just <$> lineComment) <?> Syntax.newline
       updateState $ State.setNewline
       return result
 

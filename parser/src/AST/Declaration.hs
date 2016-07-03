@@ -17,7 +17,8 @@ data Declaration
         (Commented (String, [(Comments, String)]))
         [Commented (String, [(Comments, Type)])]
         (Comments, (String, [(Comments, Type)]))
-    | TypeAlias Comments
+    | TypeAlias
+        (NewlineCommented ())
         (Commented (String, [(Comments, String)]))
         (Comments, Type)
     | PortAnnotation (Commented String) Comments Type
