@@ -15,10 +15,10 @@ BINEXT=".exe"
 
 ## Build binaries
 
-# cabal clean
-# cabal configure
-# cabal build
-# cabal install
+cabal clean
+cabal configure
+cabal build
+cabal install
 
 function build-flavor() {
     FLAVOR="$1"

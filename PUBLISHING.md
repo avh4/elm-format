@@ -20,7 +20,7 @@ brew cask install virtualbox
 1. Create a github issue to draft the release notes.
 1. Edit `elm-format.cabal` to remove `-dev` from the version and make sure the version number is correct.
 1. Commit the change to `elm-format.cabal`.
-1. Create a signed tag for the new version.
+1. Create a signed tag for the new version. `git tag -s <version> -m <version>`
 1. Push the tag.
 
 
@@ -41,6 +41,7 @@ brew cask install virtualbox
 
 ## Publishing
 
+1. Run `package/collect_files.sh`
 1. Go to the release page for the new tag on github.
 1. Upload the zip, tgz and asc files.
 1. Write the release notes.
