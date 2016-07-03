@@ -53,8 +53,14 @@ functionApplication =
     max 1 2
 
 
-functionApplicationMultiline =
+functionApplicationMultilineWithFirstArg =
     max 1
+        2
+
+
+functionApplicationMultiline =
+    max
+        1
         2
 
 

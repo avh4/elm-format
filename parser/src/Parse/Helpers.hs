@@ -280,19 +280,20 @@ dotSep1 p =
 
 spacePrefix :: IParser a -> IParser [(Comments, a)]
 spacePrefix p =
-  constrainedSpacePrefix' p (\_ -> return ())
+  fmap fst <$>
+      constrainedSpacePrefix' p (\_ -> return ())
 
 
-constrainedSpacePrefix :: IParser a -> IParser [(Comments, a)]
+constrainedSpacePrefix :: IParser a -> IParser [((Comments, a), Multiline)]
 constrainedSpacePrefix parser =
   constrainedSpacePrefix' parser constraint
   where
     constraint empty = if empty then notFollowedBy (char '-') else return ()
 
 
-constrainedSpacePrefix' :: IParser a -> (Bool -> IParser b) -> IParser [(Comments, a)]
+constrainedSpacePrefix' :: IParser a -> (Bool -> IParser b) -> IParser [((Comments, a), Multiline)]
 constrainedSpacePrefix' parser constraint =
-    many $ choice
+    many $ trackNewline $ choice
       [ comment <$> try (const <$> spacing <*> lookAhead (oneOf "[({")) <*> parser
       , try (comment <$> spacing <*> parser)
       ]
@@ -525,6 +526,16 @@ popNewlineContext =
   do  state <- getState
       updateState State.popNewlineContext
       return $ State.sawNewline state
+
+
+trackNewline :: IParser a -> IParser (a, Multiline)
+trackNewline parser =
+    do
+        updateState State.pushNewlineContext
+        a <- parser
+        state <- getState
+        updateState State.popNewlineContext
+        return (a, if State.sawNewline state then SplitAll else JoinAll)
 
 
 lineComment :: IParser Comment

@@ -784,7 +784,7 @@ formatPattern parensRequired apattern =
 
         AST.Pattern.Data ctor patterns ->
             ElmStructure.application
-                False
+                (FAJoinFirst JoinAll)
                 (line $ identifier ctor)
                 (map (formatHeadCommented $ formatPattern True) patterns)
             |> if parensRequired then parens else id
@@ -1399,7 +1399,7 @@ formatType' requireParens atype =
 
         TypeConstruction ctor args ->
             ElmStructure.application
-                False
+                (FAJoinFirst JoinAll)
                 (formatTypeConstructor ctor)
                 (map (formatHeadCommented $ formatType' ForCtor) args)
                 |> (if requireParens == ForCtor then parens else id)

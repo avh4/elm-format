@@ -37,6 +37,23 @@ type PreCommented a = (Comments, a)
 type PostCommented a = (a, Comments)
 
 
+data Multiline
+    = JoinAll
+    | SplitAll
+    deriving (Eq, Show)
+
+
+isMultiline :: Multiline -> Bool
+isMultiline JoinAll = False
+isMultiline SplitAll = True
+
+
+data FunctionApplicationMultiline
+    = FASplitFirst
+    | FAJoinFirst Multiline
+    deriving (Eq, Show)
+
+
 data IntRepresentation
   = DecimalInt
   | HexadecimalInt

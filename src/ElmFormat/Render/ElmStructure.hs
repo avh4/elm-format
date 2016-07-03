@@ -7,6 +7,7 @@ module ElmFormat.Render.ElmStructure
 
 import Elm.Utils ((|>))
 import Box
+import AST.V0_16 (FunctionApplicationMultiline(..), Multiline(..))
 
 import qualified Data.List as List
 
@@ -80,7 +81,7 @@ An equalsPair where the left side is an application
 definition :: String -> Bool -> Box -> [Box] -> Box -> Box
 definition symbol forceMultiline first rest body =
   equalsPair symbol forceMultiline
-    (application False first rest)
+    (application (FAJoinFirst JoinAll) first rest)
     body
 
 
@@ -98,7 +99,7 @@ Formats as:
       rest1
       rest2
 -}
-application :: Bool -> Box -> [Box] -> Box
+application :: FunctionApplicationMultiline -> Box -> [Box] -> Box
 application forceMultiline first args =
   case args of
     [] ->
@@ -112,13 +113,13 @@ application forceMultiline first args =
         , allSingles rest
         )
       of
-        ( False, SingleLine first', SingleLine arg0', Right rest' ) ->
+        ( FAJoinFirst JoinAll, SingleLine first', SingleLine arg0', Right rest' ) ->
           (first' : arg0' : rest' )
             |> List.intersperse space
             |> row
             |> line
 
-        ( _, SingleLine first', SingleLine arg0', _) ->
+        ( FAJoinFirst _, SingleLine first', SingleLine arg0', _) ->
           stack1
             $ (line $ row [ first', space, arg0' ])
               : (map indent rest)

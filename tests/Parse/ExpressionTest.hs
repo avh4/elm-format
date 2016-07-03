@@ -83,11 +83,12 @@ tests =
         ]
 
     , testGroup "function application"
-        [ example "" "f 7 8" $ at 1 1 1 6 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr'' (1,3,1,4) 7, intExpr'' (1,5,1,6) 8] False
-        , example "argument starts with minus" "f -9 -x" $ at 1 1 1 8 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr'' (1,3,1,5) (-9), (,) [] $ at 1 6 1 8 $ Unary Negative $ at 1 7 1 8 $ Var $ VarRef "x"] False
-        , example "comments" "f{-A-}7{-B-}8" $ at 1 1 1 14 $ App (at 1 1 1 2 $ Var $ VarRef "f") [commentedIntExpr'' (1,7,1,8) "A" 7, commentedIntExpr'' (1,13,1,14) "B" 8] False
-        , example "newlines" "f\n 7\n 8" $ at 1 1 3 3 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr'' (2,2,2,3) 7, intExpr'' (3,2,3,3) 8] True
-        , example "newlines and comments" "f\n {-A-}7\n {-B-}8" $ at 1 1 3 8 $ App (at 1 1 1 2 $ Var $ VarRef "f") [commentedIntExpr'' (2,7,2,8) "A" 7, commentedIntExpr'' (3,7,3,8) "B" 8] True
+        [ example "" "f 7 8" $ at 1 1 1 6 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr'' (1,3,1,4) 7, intExpr'' (1,5,1,6) 8] (FAJoinFirst JoinAll)
+        , example "argument starts with minus" "f -9 -x" $ at 1 1 1 8 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr'' (1,3,1,5) (-9), (,) [] $ at 1 6 1 8 $ Unary Negative $ at 1 7 1 8 $ Var $ VarRef "x"] (FAJoinFirst JoinAll)
+        , example "comments" "f{-A-}7{-B-}8" $ at 1 1 1 14 $ App (at 1 1 1 2 $ Var $ VarRef "f") [commentedIntExpr'' (1,7,1,8) "A" 7, commentedIntExpr'' (1,13,1,14) "B" 8] (FAJoinFirst JoinAll)
+        , example "newlines (1)" "f 7\n 8" $ at 1 1 2 3 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr'' (1,3,1,4) 7, intExpr'' (2,2,2,3) 8] (FAJoinFirst SplitAll)
+        , example "newlines (2)" "f\n 7\n 8" $ at 1 1 3 3 $ App (at 1 1 1 2 $ Var $ VarRef "f") [intExpr'' (2,2,2,3) 7, intExpr'' (3,2,3,3) 8] FASplitFirst
+        , example "newlines and comments" "f\n {-A-}7\n {-B-}8" $ at 1 1 3 8 $ App (at 1 1 1 2 $ Var $ VarRef "f") [commentedIntExpr'' (2,7,2,8) "A" 7, commentedIntExpr'' (3,7,3,8) "B" 8] FASplitFirst
         ]
 
     , testGroup "unary operators"
