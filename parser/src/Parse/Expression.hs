@@ -1,5 +1,6 @@
 module Parse.Expression (term, typeAnnotation, definition, expr) where
 
+import Data.Maybe (fromMaybe)
 import Text.Parsec hiding (newline, spaces)
 import Text.Parsec.Indent (block, withPos, checkIndent)
 
@@ -167,21 +168,39 @@ term =
 
 --------  Applications  --------
 
+head' :: [a] -> Maybe a
+head' [] = Nothing
+head' (a:_) = Just a
+
+
 appExpr :: IParser E.Expr
 appExpr =
   expecting "an expression" $
   do  pushNewlineContext
       start <- getMyPosition
       t <- term
+      sawNewlineInInitialTerm <- popNewlineContext
       ts <- constrainedSpacePrefix term
       end <- getMyPosition
-      sawNewline <- popNewlineContext
       return $
           case ts of
             [] ->
               t
             _  ->
-              A.at start end $ E.App t ts sawNewline
+                let
+                    multiline =
+                        case
+                            ( sawNewlineInInitialTerm
+                            , fromMaybe (JoinAll) $ fmap snd $ head' ts
+                            , any (isMultiline . snd) $ tail ts
+                            )
+                        of
+                            (True, _, _ ) -> FASplitFirst
+                            (False, JoinAll, True) -> FAJoinFirst SplitAll
+                            (False, JoinAll, False) -> FAJoinFirst JoinAll
+                            (False, SplitAll, _) -> FASplitFirst
+                in
+                    A.at start end $ E.App t (fmap fst ts) multiline
 
 
 --------  Normal Expressions  --------

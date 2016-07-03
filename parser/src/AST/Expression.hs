@@ -35,7 +35,7 @@ data Expr'
     | Literal Literal
     | Var Var.Ref
 
-    | App Expr [(Comments, Expr)] Bool
+    | App Expr [(Comments, Expr)] FunctionApplicationMultiline
     | Unary UnaryOperator Expr
     | Binops Expr [(Comments, Var.Ref, Comments, Expr)] Bool
     | Parens (Commented Expr)
