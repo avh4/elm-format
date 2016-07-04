@@ -52,35 +52,180 @@ If you need PGP signatures, see the [releases page](https://github.com/avh4/elm-
  - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.4.0-alpha/elm-format-0.16-0.4.0-alpha-linux-x64.tgz)
  - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.4.0-alpha/elm-format-0.16-0.4.0-alpha-win-x64.zip)
 
-### Editor integration
 
-If you can simplify or improve the installation instructions or add instructions for another editor, please [make a pull request](https://github.com/avh4/elm-format/edit/master/README.md).  The default behavior of `elm-format`-approved plugins is to format Elm files on save.
+## Editor integration
 
 <!-- Open-source editors will be listed before closed-source editors. -->
 
+Find your editor in the table below.  The recommended plugin for each editor is indicated with 🏆 (trophy emoji).
 
-#### Integration with [Atom](https://atom.io/)
+<table>
+  <tr>
+    <th>Editor</th>
+    <th>Plugin</th>
+    <th>Installation</th>
+    <th><a href="https://github.com/avh4/elm-format/issues/104">Formatting</a></th>
+    <th><a href="https://github.com/avh4/elm-format/issues/104">Format on save</a></th>
+    <th><a href="https://github.com/avh4/elm-format/issues/104">Configuration</a></th>
+    <th><a href="https://github.com/avh4/elm-format/issues/104">Error handling</a></th>
+  </tr>
+  <tr>
+    <td rowspan=2><a href="https://atom.io/">Atom</a></td>
+    <td>🏆<a href="https://atom.io/packages/elm-format">atom-elm-format</a></td>
+    <td>✅ <a href="#atom-elm-format-installation">2 steps</a></td>
+    <td>❔ TBD</td>
+    <td>✅ </td>
+    <td>❔ TBD</td>
+    <td>❔ TBD</td>
+  </tr>
+  <tr>
+    <!-- Atom -->
+    <td><a href="https://atom.io/packages/atom-beautify">atom-beautify</a></td>
+    <td>⚠ <a href="#atom-beautify-installation">3 steps</a></td>
+    <td>❔ TBD</td>
+    <td>⚠️ requires configuration</td>
+    <td>❔ TBD</td>
+    <td>❔ TBD</td>
+  </tr>
+  <tr>
+    <td rowspan=1><a href="http://lighttable.com/">Light Table</a></td>
+    <td>🏆<a href="https://github.com/rundis/elm-light">elm-light</a></td>
+    <td>⚠ <a href="#elm-light-installation">3 steps</a></td>
+    <td>❔ TBD</td>
+    <td>⚠️ requires configuration</td>
+    <td>❔ TBD</td>
+    <td>❔ TBD</td>
+  </tr>
+  <tr>
+    <td rowspan=1>Vim</td>
+    <td>🏆<a href="https://github.com/ElmCast/elm-vim">elm-vim</a></td>
+    <td>❌ <a href="#elm-vim-installation">4 steps</a></td>
+    <td>❔ TBD</td>
+    <td>⚠️ requires configuration</td>
+    <td>❔ TBD</td>
+    <td>❔ TBD</td>
+  </tr>
+  <tr>
+    <td rowspan=1>Emacs</td>
+    <td>🏆<a href="https://github.com/jcollard/elm-mode">elm-mode</a></td>
+    <td>⚠ <a href="#elm-mode-installation">3 steps</a></td>
+    <td>❔ TBD</td>
+    <td>⚠️ requires configuration</td>
+    <td>❔ TBD</td>
+    <td>❔ TBD</td>
+  </tr>
+  <tr>
+    <td rowspan=2>Visual Studio Code</td>
+    <td>🏆<a href="https://marketplace.visualstudio.com/items?itemName=sbrink.elm">Elm Language Support</a></td>
+    <td>⚠ <a href="#visual-studio-code-installation">3 steps</a></td>
+    <td>❔ TBD</td>
+    <td>❌</td>
+    <td>❔ TBD</td>
+    <td>❔ TBD</td>
+  </tr>
+  <tr>
+    <!-- Visual Studio Code -->
+    <td><a href="https://marketplace.visualstudio.com/items?itemName=abadi199.elm-format">VSCode Elm Format</a></td>
+    <td>⚠ <a href="#vscode-elm-format-installation">3 steps</a></td>
+    <td>❔ TBD</td>
+    <td>⚠️ requires configuration</td>
+    <td>❔ TBD</td>
+    <td>❔ TBD</td>
+  </tr>
+  <tr>
+    <td rowspan=1>Sublime Text</td>
+    <td>🏆<a href="https://packagecontrol.io/packages/Elm%20Language%20Support">Elm Language Support</a></td>
+    <td>⚠ <a href="#sublime-text-installation">3 steps</a></td>
+    <td>❔ TBD</td>
+    <td>⚠️ requires configuration</td>
+    <td>❔ TBD</td>
+    <td>❔ TBD</td>
+  </tr>
+</table>
 
-[atom-elm-format](https://atom.io/packages/elm-format) supports `elm-format`.  You can install `elm-format` using `apm` or the Atom package manager in Atom's settings.
 
-[atom-beautify](https://atom.io/packages/atom-beautify) 0.28.20 and above supports `elm-format`.  You can install `atom-beautify` using `apm` or the Atom package manager in Atom's settings.
+## Detailed instructions
+
+If you can simplify or improve the installation instructions or add instructions for another editor, please [make a pull request](https://github.com/avh4/elm-format/edit/master/README.md).
+The default behavior of `elm-format`-approved plugins is to format Elm files on save.
 
 
-#### Integration with [Light Table](http://lighttable.com/)
+### atom-elm-format installation
 
-1. Makes sure `elm-format` is in your PATH
+1. Install elm-format
+1. Install atom-elm-format
+
+    ```
+    apm install atom-elm-format
+    ```
+    
+  or use the Atom package manager in Atom's settings
+
+
+### atom-beautify installation
+
+1. Install elm-format
+1. Install atom-beautify
+
+    ```
+    apm install atom-beautify
+    ```
+    
+  or use the Atom package manager in Atom's settings
+
+1. Use `^⌥B` (`CTRL-ALT-B`) to format a file
+
+
+### elm-light installation
+
+1. Install elm-format
 1. Install the [elm-light plugin](https://github.com/rundis/elm-light) using the Light Table plugin manager
 1. Add the following to your user keymap:
 
   ```clojure
   [:editor.elm "ctrl-s" :save :elm-format :elm.lint]
   ```
+  
+  > This step needs improvement to be understandable by novice Light Table users:
+  > how does one edit the user keymap?
 
 
-#### Integration with Vim
+### elm-mode installation
 
-1. Make sure `elm-format` is in your PATH.
-1. Install [elm-vim](https://github.com/ElmCast/elm-vim) ([instructions](https://github.com/ElmCast/elm-vim#install))
+1. Install elm-format
+1. Install elm-mode ([official instructions](https://github.com/jcollard/elm-mode#installation))
+
+    If your Emacs has `package.el` (which is automatically the case for Emacs >= 24), you can install `elm-mode` from the package in [MELPA](http://melpa.milkbox.net/).
+  
+    > This step needs improvement to be understandable by novice Emacs users:
+    > how does one install a package from MELPA?
+  
+1. Use `C-c C-f` to format buffers (when in `elm-mode`)
+1. Set or customize `elm-format-on-save` to `t` to apply elm-format on the current buffer on every save
+
+    > This step needs improvement to be understandable by novice Emacs users:
+    > how does one customize the `elm-format-on-save` setting?
+
+See also the respective section about `elm-format` at [elm-mode](https://github.com/jcollard/elm-mode#elm-format)
+
+
+### elm-vim installation
+
+1. Install elm-format
+1. Install [vim-plug](https://github.com/junegunn/vim-plug) ([official instructions](https://github.com/junegunn/vim-plug#installation))
+
+    ```bash
+    curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    ```
+
+1. Install elm-vim ([official instructions](https://github.com/ElmCast/elm-vim#install))
+
+   Add `Plug 'elmcast/elm-vim` to your plugin section
+   
+   > This step needs improvement to be understandable by novice Vim users:
+   > where is the plugin section?
+
 1. Add the following to your `.vimrc` file:
 
   ```
@@ -88,29 +233,40 @@ If you can simplify or improve the installation instructions or add instructions
   ```
 
 
-#### Integration with Emacs
+### Visual Studio Code installation
 
-1. Install [elm-mode](https://github.com/jcollard/elm-mode) ([instructions](https://github.com/jcollard/elm-mode)).
-1. Make sure `elm-format` is in your PATH.
+1. Install elm-format
+1. Install Elm tools for VSCode
 
-That's all.
+    ```bash
+    ext install elm
+    ```
 
-After the install C-c C-f (in `elm-mode`) runs the command elm-mode-format-buffer which is based on `elm-format`.
-
-See also the respective section about `elm-format` at [elm-mode](https://github.com/jcollard/elm-mode#elm-format)
-
-
-#### Integration with Sublime Text
-
-Use the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language%20Support) package. Make sure elm-format is in your PATH.
+1. SHIFT-ALT-F will format the current file
 
 
-#### Integration with Visual Studio Code
+### VSCode Elm Format installation
 
-1. Make sure `elm-format` is in your PATH.
-1. ```ext install elm``` to get the Elm tools for VSCode, which also know about elm-format.
-1. You **don't** need the "elm-format" listed in the VSCode package-available list.
-1. shift-alt-F or similar will call elm-format on the current file.
+1. Install elm-format
+1. Install VSCode Elm Format
+
+    ```bash
+    ext install elm-format
+    ```
+
+1. You can run elm-format by using the `Elm: Format` command
+1. You can also run elm-format whenever you save the file by enabling the `formatOnSave' option
+
+    > This step needs improvement to be understandable by novice Visual Studio Code users:
+    > how does one enable the `formatOnSave` option?
+
+
+### Sublime Text installation
+
+1. Install elm-format
+1. Install the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language%20Support) package.
+1. Go to Preferences -> Package Settings -> Elm Language Support -> User and add this setting: `"elm_format_on_save": true`
+
 
 ## Development info
 
