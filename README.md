@@ -57,7 +57,7 @@ If you need PGP signatures, see the [releases page](https://github.com/avh4/elm-
 
 <!-- Open-source editors will be listed before closed-source editors. -->
 
-Find your editor in the table below.  The recommended plugin for each editor is indicated with 🏆 (trophy emoji).
+Find your editor in the table below.  The recommended plugin for each editor is indicated with :trophy: (trophy emoji).
 
 <table>
   <tr>
@@ -71,35 +71,35 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   </tr>
   <tr>
     <td rowspan=2><a href="https://atom.io/">Atom</a></td>
-    <td>🏆<a href="https://atom.io/packages/elm-format">atom-elm-format</a></td>
-    <td>✅ <a href="#atom-elm-format-installation">2 steps</a></td>
+    <td>:trophy: <a href="https://atom.io/packages/elm-format">atom-elm-format</a></td>
+    <td>:white_check_mark: <a href="#atom-elm-format-installation">2 steps</a></td>
     <td>❔ TBD</td>
-    <td>✅ </td>
+    <td>:white_check_mark:</td>
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
   <tr>
     <!-- Atom -->
     <td><a href="https://atom.io/packages/atom-beautify">atom-beautify</a></td>
-    <td>⚠ <a href="#atom-beautify-installation">3 steps</a></td>
+    <td>:warning: <a href="#atom-beautify-installation">3 steps</a></td>
     <td>❔ TBD</td>
-    <td>⚠️ requires configuration</td>
+    <td>:warning: requires configuration</td>
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
   <tr>
     <td rowspan=1><a href="http://lighttable.com/">Light Table</a></td>
-    <td>🏆<a href="https://github.com/rundis/elm-light">elm-light</a></td>
-    <td>⚠ <a href="#elm-light-installation">3 steps</a></td>
+    <td>:trophy: <a href="https://github.com/rundis/elm-light">elm-light</a></td>
+    <td>:warning: <a href="#elm-light-installation">3 steps</a></td>
     <td>❔ TBD</td>
-    <td>⚠️ requires configuration</td>
+    <td>:warning: requires configuration</td>
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
   <tr>
     <td rowspan=1>Vim</td>
-    <td>🏆<a href="https://github.com/ElmCast/elm-vim">elm-vim</a></td>
-    <td>❌ <a href="#elm-vim-installation">4 steps</a></td>
+    <td>:trophy: <a href="https://github.com/ElmCast/elm-vim">elm-vim</a></td>
+    <td>:x: <a href="#elm-vim-installation">4 steps</a></td>
     <td>❔ TBD</td>
     <td>⚠️ requires configuration</td>
     <td>❔ TBD</td>
@@ -107,37 +107,37 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   </tr>
   <tr>
     <td rowspan=1>Emacs</td>
-    <td>🏆<a href="https://github.com/jcollard/elm-mode">elm-mode</a></td>
-    <td>⚠ <a href="#elm-mode-installation">3 steps</a></td>
+    <td>:trophy: <a href="https://github.com/jcollard/elm-mode">elm-mode</a></td>
+    <td>:warning: <a href="#elm-mode-installation">3 steps</a></td>
     <td>❔ TBD</td>
-    <td>⚠️ requires configuration</td>
+    <td>:warning: requires configuration</td>
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
   <tr>
     <td rowspan=2>Visual Studio Code</td>
-    <td>🏆<a href="https://marketplace.visualstudio.com/items?itemName=sbrink.elm">Elm Language Support</a></td>
-    <td>⚠ <a href="#visual-studio-code-installation">3 steps</a></td>
+    <td>:trophy: <a href="https://marketplace.visualstudio.com/items?itemName=sbrink.elm">Elm Language Support</a></td>
+    <td>:warning: <a href="#visual-studio-code-installation">3 steps</a></td>
     <td>❔ TBD</td>
-    <td>❌</td>
+    <td>:x:</td>
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
   <tr>
     <!-- Visual Studio Code -->
     <td><a href="https://marketplace.visualstudio.com/items?itemName=abadi199.elm-format">VSCode Elm Format</a></td>
-    <td>⚠ <a href="#vscode-elm-format-installation">3 steps</a></td>
+    <td>:warning: <a href="#vscode-elm-format-installation">3 steps</a></td>
     <td>❔ TBD</td>
-    <td>⚠️ requires configuration</td>
+    <td>:warning: requires configuration</td>
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
   <tr>
     <td rowspan=1>Sublime Text</td>
-    <td>🏆<a href="https://packagecontrol.io/packages/Elm%20Language%20Support">Elm Language Support</a></td>
-    <td>⚠ <a href="#sublime-text-installation">3 steps</a></td>
+    <td>:trophy: <a href="https://packagecontrol.io/packages/Elm%20Language%20Support">Elm Language Support</a></td>
+    <td>:warning: <a href="#sublime-text-installation">3 steps</a></td>
     <td>❔ TBD</td>
-    <td>⚠️ requires configuration</td>
+    <td>:warning: requires configuration</td>
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
