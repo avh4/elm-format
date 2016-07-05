@@ -135,7 +135,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   <tr>
     <td rowspan=1>Sublime Text</td>
     <td>:trophy: <a href="https://packagecontrol.io/packages/Elm%20Language%20Support">Elm Language Support</a></td>
-    <td>:warning: <a href="#sublime-text-installation">3 steps</a></td>
+    <td>:white_check_mark: <a href="#sublime-text-installation">2 steps</a></td>
     <td>❔ TBD</td>
     <td>:white_check_mark:</td>
     <td>❔ TBD</td>
@@ -265,7 +265,6 @@ See also the respective section about `elm-format` at [elm-mode](https://github.
 
 1. Install elm-format
 1. Install the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language%20Support) package.
-1. Go to Preferences -> Package Settings -> Elm Language Support -> User and add this setting: `"elm_format_on_save": true`
 
 
 ## Development info
