@@ -137,7 +137,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td>:trophy: <a href="https://packagecontrol.io/packages/Elm%20Language%20Support">Elm Language Support</a></td>
     <td>:warning: <a href="#sublime-text-installation">3 steps</a></td>
     <td>❔ TBD</td>
-    <td>:warning: requires configuration</td>
+    <td>:white_check_mark:</td>
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
