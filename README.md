@@ -99,11 +99,11 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   <tr>
     <td rowspan=1>Vim</td>
     <td>:trophy: <a href="https://github.com/ElmCast/elm-vim">elm-vim</a></td>
-    <td>:x: <a href="#elm-vim-installation">4 steps</a></td>
-    <td>❔ TBD</td>
+    <td>:x: <a href="#elm-vim-installation">6 steps</a></td>
+    <td>:white_check_mark:</td>
     <td>⚠️ requires configuration</td>
-    <td>❔ TBD</td>
-    <td>❔ TBD</td>
+    <td>:white_check_mark:</td>
+    <td>:x: no error message</td>
   </tr>
   <tr>
     <td rowspan=1>Emacs</td>
@@ -213,20 +213,30 @@ See also the respective section about `elm-format` at [elm-mode](https://github.
 
 1. Install elm-format
 1. Install [vim-plug](https://github.com/junegunn/vim-plug) ([official instructions](https://github.com/junegunn/vim-plug#installation))
-
-    ```bash
-    curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    ```
+   
+    1. Download vim-plug:
+    
+        ```bash
+        curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+            https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        ```
+ 
+   1. Make sure there is a section like this in your `~/.vimrc`:
+   
+        ```vim
+        call plug#begin('~/.vim/plugged')
+        " ... any active plugins
+        call plug#end()
+        ```
+   
+ 
 
 1. Install elm-vim ([official instructions](https://github.com/ElmCast/elm-vim#install))
 
-   Add `Plug 'elmcast/elm-vim` to your plugin section
-   
-   > This step needs improvement to be understandable by novice Vim users:
-   > where is the plugin section?
+    1. Add `Plug 'elmcast/elm-vim'` to the `plug#begin` plugin section in your `~/.vimrc`
+    1. Start `vim` and run `:PlugInstall`
 
-1. Add the following to your `.vimrc` file:
+1. Add the following to your `~/.vimrc`:
 
   ```
   let g:elm_format_autosave = 1
