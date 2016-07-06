@@ -108,11 +108,11 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   <tr>
     <td rowspan=1>Emacs</td>
     <td>:trophy: <a href="https://github.com/jcollard/elm-mode">elm-mode</a></td>
-    <td>:warning: <a href="#elm-mode-installation">3 steps</a></td>
-    <td>❔ TBD</td>
+    <td>:x: <a href="#elm-mode-installation">5 steps</a></td>
+    <td>:white_check_mark:</td>
     <td>:warning: requires configuration</td>
-    <td>❔ TBD</td>
-    <td>❔ TBD</td>
+    <td>:white_check_mark:</td>
+    <td>:warning: no installation instructions</td>
   </tr>
   <tr>
     <td rowspan=2>Visual Studio Code</td>
@@ -193,13 +193,17 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 ### elm-mode installation
 
 1. Install elm-format
-1. Install elm-mode ([official instructions](https://github.com/jcollard/elm-mode#installation))
+1. If your Emacs has `package.el` (which is automatically the case for Emacs >= 24), you can install `elm-mode` from the package in [MELPA](http://melpa.milkbox.net/):
 
-    If your Emacs has `package.el` (which is automatically the case for Emacs >= 24), you can install `elm-mode` from the package in [MELPA](http://melpa.milkbox.net/).
-  
-    > This step needs improvement to be understandable by novice Emacs users:
-    > how does one install a package from MELPA?
-  
+    1. Ensure that you have added the MELPA source in your `~/.emacs.d/init.el`:
+
+        ```lisp
+        (require 'package)
+        (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+        ```
+        
+    1. Install elm-mode ([official instructions](https://github.com/jcollard/elm-mode#installation)): Use `M-x list-packages` and choose `elm-mode`.
+
 1. Use `C-c C-f` to format buffers (when in `elm-mode`)
 1. Set or customize `elm-format-on-save` to `t` to apply elm-format on the current buffer on every save
 
