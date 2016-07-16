@@ -108,7 +108,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   <tr>
     <td rowspan=1>Emacs</td>
     <td>:trophy: <a href="https://github.com/jcollard/elm-mode">elm-mode</a></td>
-    <td>:x: <a href="#elm-mode-installation">5 steps</a></td>
+    <td>:x: <a href="#elm-mode-installation">4 steps</a></td>
     <td>:white_check_mark:</td>
     <td>:warning: requires configuration</td>
     <td>:white_check_mark:</td>
@@ -204,9 +204,7 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
         
     1. Install elm-mode ([official instructions](https://github.com/jcollard/elm-mode#installation)): Use `M-x list-packages` and choose `elm-mode`.
 
-1. Optional: Set `elm-format-on-save` to `t` to apply elm-format on the current buffer on every save. (The setting can be changed via `M-x customize-variable elm-format-on-save`. Click button `Toggle` to change the setting and button `State` to activate the setting.) 
-
-`C-c C-f` applies elm-format to the buffer (when in `elm-mode`.) See also the section about `elm-format` at [elm-mode](https://github.com/jcollard/elm-mode#elm-format)
+1. Set `elm-format-on-save` to `t` to apply elm-format on the current buffer on every save. (The setting can be changed via `M-x customize-variable elm-format-on-save`. Click button `Toggle` to change the setting and button `State` to activate the setting.) 
 
 
 ### elm-vim installation
