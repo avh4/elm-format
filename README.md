@@ -204,13 +204,9 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
         
     1. Install elm-mode ([official instructions](https://github.com/jcollard/elm-mode#installation)): Use `M-x list-packages` and choose `elm-mode`.
 
-1. Use `C-c C-f` to format buffers (when in `elm-mode`)
-1. Set or customize `elm-format-on-save` to `t` to apply elm-format on the current buffer on every save
+1. Optional: Set `elm-format-on-save` to `t` to apply elm-format on the current buffer on every save. (The setting can be changed via `M-x customize-variable elm-format-on-save`. Click button `Toggle` to change the setting and button `State` to activate the setting.) 
 
-    > This step needs improvement to be understandable by novice Emacs users:
-    > how does one customize the `elm-format-on-save` setting?
-
-See also the respective section about `elm-format` at [elm-mode](https://github.com/jcollard/elm-mode#elm-format)
+`C-c C-f` applies elm-format to the buffer (when in `elm-mode`.) See also the section about `elm-format` at [elm-mode](https://github.com/jcollard/elm-mode#elm-format)
 
 
 ### elm-vim installation
