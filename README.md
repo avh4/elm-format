@@ -156,7 +156,7 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 1. Install atom-elm-format
 
     ```
-    apm install atom-elm-format
+    apm install elm-format
     ```
     
   or use the Atom package manager in Atom's settings
