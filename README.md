@@ -290,7 +290,7 @@ This is for WebStorm and other JetBrains IDEs.
 
 1. Install elm-format
 1. Install the [Elm Language Plugin](https://durkiewicz.github.io/elm-plugin/) package.
-1. Add a file watcher for .elm files with the settings as [shown here](https://shrtm.nu/SonI).
+1. Add a file watcher for .elm files with the settings as [shown here](img/JetBrains%20setup.png).
 
 
 ## Development info
