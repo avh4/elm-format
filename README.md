@@ -142,7 +142,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td>❔ TBD</td>
   </tr>
   <tr>
-    <td rowspan=1>WebStorm</td>
+    <td rowspan=1>JetBrains (WebStorm, etc)</td>
     <td>:trophy: <a href="https://durkiewicz.github.io/elm-plugin/">Elm Language Plugin</a></td>
     <td>:warning: <a href="#webstorm-installation">3 steps</a></td>
     <td>❔ TBD</td>
@@ -284,7 +284,9 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 1. Install the [Elm Language Support](https://packagecontrol.io/packages/Elm%20Language%20Support) package.
 
 
-### WebStorm installation
+### JetBrains installation
+
+This is for WebStorm and other JetBrains IDEs.
 
 1. Install elm-format
 1. Install the [Elm Language Plugin](https://durkiewicz.github.io/elm-plugin/) package.
