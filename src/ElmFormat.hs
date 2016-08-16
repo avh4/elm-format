@@ -150,8 +150,8 @@ resolveFiles inputFiles =
                 return $ Right $ concat files
 
 
-handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> ElmVersion -> InfoFormatter -> IO (Maybe Bool)
-handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion formatter =
+handleFilesInput :: ElmVersion -> InfoFormatter -> [FilePath] -> Maybe FilePath -> Bool -> Bool -> IO (Maybe Bool)
+handleFilesInput elmVersion formatter inputFiles outputFile autoYes validateOnly =
     do
         elmFiles <- resolveFiles inputFiles
 
@@ -267,7 +267,7 @@ validate elmVersion formatter source =
                             |> processTextInput elmVersion formatter ValidateOnly "<STDIN>"
 
                 FromFiles first rest ->
-                    handleFilesInput (first:rest) Nothing True True elmVersion formatter
+                    handleFilesInput elmVersion formatter (first:rest) Nothing True True
 
         case result of
             Nothing ->
@@ -323,7 +323,7 @@ main defaultVersion =
 
             (Right elmVersion, Right (FormatInPlace first rest)) ->
                 do
-                    result <- handleFilesInput (first:rest) Nothing autoYes False elmVersion infoFormatter
+                    result <- handleFilesInput elmVersion infoFormatter (first:rest) Nothing autoYes False
                     case result of
                         Nothing ->
                             exitSuccess
@@ -333,7 +333,7 @@ main defaultVersion =
 
             (Right elmVersion, Right (FormatToFile input output)) ->
                 do
-                    result <- handleFilesInput [input] (Just output) autoYes False elmVersion infoFormatter
+                    result <- handleFilesInput elmVersion infoFormatter [input] (Just output) autoYes False
                     case result of
                         Nothing ->
                             exitSuccess
