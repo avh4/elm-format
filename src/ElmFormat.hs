@@ -23,7 +23,6 @@ import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.Filesystem as FS
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Result as Result
-import qualified Messages.Formatter.HumanReadable
 import qualified System.Directory as Dir
 
 
@@ -292,7 +291,7 @@ main defaultVersion =
         config <- Flags.parse defaultVersion
         let autoYes = Flags._yes config
         let elmVersion = Flags._elmVersion config
-        let infoFormatter = Messages.Formatter.HumanReadable.format
+        let infoFormatter = Flags._infoFormatter config
 
         case determineWhatToDoFromConfig config of
             Left NoInputs ->
