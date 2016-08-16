@@ -2,16 +2,16 @@ module CommandLine.Helpers where
 
 import System.IO
 import System.Exit (exitFailure, exitSuccess)
-import Messages.Types (Message(..))
-import Messages.Strings (renderMessage)
+import Messages.Types (ErrorMessage(..))
+import Messages.Strings (renderErrorMessage)
 
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Report as Report
 import qualified Reporting.Error.Syntax as Syntax
 
 
-r :: Message -> String
-r = renderMessage
+r :: ErrorMessage -> String
+r = renderErrorMessage
 
 yesOrNo :: IO Bool
 yesOrNo =
@@ -47,7 +47,7 @@ getApproval autoYes filePaths =
 
 exitOnInputDirAndOutput :: IO ()
 exitOnInputDirAndOutput = do
-    putStrLn $ r Error_SingleOutputWithMultipleInputs
+    putStrLn $ r SingleOutputWithMultipleInputs
     exitFailure
 
 
