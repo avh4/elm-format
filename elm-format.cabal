@@ -70,6 +70,8 @@ library
         ElmFormat.Filesystem
         ElmFormat.Render.Box
         Flags
+        Messages.Formatter.Format
+        Messages.Formatter.HumanReadable
         Messages.Strings
         Messages.Types
         Paths_elm_format
