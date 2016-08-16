@@ -4,17 +4,20 @@ module Messages.Types where
 -- inspired by:
 -- https://wiki.haskell.org/Internationalization_of_Haskell_programs_using_Haskell_data_types
 
-data Message
+data InfoMessage
+  = ProcessingFiles [FilePath]
+  | FileWouldChange FilePath
+
+
+data ErrorMessage
   = ErrorsHeading
 
   | FilesWillBeOverwritten [FilePath]
   | BadInputFiles [InputFileMessage]
-  | Error_NoInputs
-  | Error_SingleOutputWithMultipleInputs
-  | Error_TooManyInputs
-  | Error_OutputAndValidate
-  | ProcessingFiles [FilePath]
-  | FileWouldChange FilePath
+  | NoInputs
+  | SingleOutputWithMultipleInputs
+  | TooManyInputs
+  | OutputAndValidate
 
 
 data InputFileMessage

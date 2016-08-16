@@ -4,6 +4,7 @@ module ElmFormat where
 import Elm.Utils ((|>))
 import System.Exit (exitFailure, exitSuccess)
 import Messages.Types
+import Messages.Formatter.Format
 import Control.Monad (when)
 import Data.Maybe (isJust)
 import CommandLine.Helpers
@@ -22,6 +23,7 @@ import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.Filesystem as FS
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Result as Result
+import qualified Messages.Formatter.HumanReadable
 import qualified System.Directory as Dir
 
 
@@ -30,12 +32,13 @@ import qualified System.Directory as Dir
 -- Otherwise, display errors and exit
 writeResult
     :: ElmVersion
+    -> InfoFormatter
     -> Destination
     -> FilePath
     -> Text.Text
     -> Result.Result () Syntax.Error AST.Module.Module
     -> IO (Maybe Bool)
-writeResult elmVersion destination inputFile inputText result =
+writeResult elmVersion formatter destination inputFile inputText result =
     case result of
         Result.Result _ (Result.Ok modu) ->
             let
@@ -52,7 +55,7 @@ writeResult elmVersion destination inputFile inputText result =
 
                     ValidateOnly ->
                         if inputText /= renderedText then
-                            (putStrLn $ r $ FileWouldChange inputFile)
+                            (onInfo formatter $ FileWouldChange inputFile)
                             >> (return $ Just False)
                         else
                             return $ Just True
@@ -74,17 +77,17 @@ writeResult elmVersion destination inputFile inputText result =
                 exitFailure
 
 
-processTextInput :: ElmVersion -> Destination -> FilePath -> Text.Text -> IO (Maybe Bool)
-processTextInput elmVersion destination inputFile inputText =
+processTextInput :: ElmVersion -> InfoFormatter -> Destination -> FilePath -> Text.Text -> IO (Maybe Bool)
+processTextInput elmVersion formatter destination inputFile inputText =
     Parse.parse inputText
-        |> writeResult elmVersion destination inputFile inputText
+        |> writeResult elmVersion formatter destination inputFile inputText
 
 
-processFileInput :: ElmVersion -> FilePath -> Destination -> IO (Maybe Bool)
-processFileInput elmVersion inputFile destination =
+processFileInput :: ElmVersion -> InfoFormatter -> FilePath -> Destination -> IO (Maybe Bool)
+processFileInput elmVersion formatter inputFile destination =
     do
         inputText <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
-        processTextInput elmVersion destination inputFile inputText
+        processTextInput elmVersion formatter destination inputFile inputText
 
 
 isEitherFileOrDirectory :: FilePath -> IO Bool
@@ -147,8 +150,8 @@ resolveFiles inputFiles =
                 return $ Right $ concat files
 
 
-handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> ElmVersion -> IO (Maybe Bool)
-handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion =
+handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> ElmVersion -> InfoFormatter -> IO (Maybe Bool)
+handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion formatter =
     do
         elmFiles <- resolveFiles inputFiles
 
@@ -161,8 +164,8 @@ handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion =
             Right [inputFile] -> do
                 realOutputFile <- decideOutputFile autoYes inputFile outputFile
                 let destination = if validateOnly then ValidateOnly else ToFile realOutputFile
-                putStrLn $ (r $ ProcessingFiles $ [inputFile])
-                processFileInput elmVersion inputFile destination
+                onInfo formatter $ ProcessingFiles $ [inputFile]
+                processFileInput elmVersion formatter inputFile destination
 
             Right elmFiles -> do
                 when (isJust outputFile)
@@ -187,8 +190,8 @@ handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion =
                                     ToFile file
                         in
                             do
-                                putStrLn $ (r $ ProcessingFiles elmFiles)
-                                validationResults <- mapM (\file -> processFileInput elmVersion file (dst file)) elmFiles
+                                onInfo formatter $ ProcessingFiles $ elmFiles
+                                validationResults <- mapM (\file -> processFileInput elmVersion formatter file (dst file)) elmFiles
                                 return $ foldl merge Nothing validationResults
                     else
                         return Nothing
@@ -213,25 +216,25 @@ data Destination
     | ToFile FilePath
 
 
-determineSource :: Bool -> [FilePath] -> Either Message Source
+determineSource :: Bool -> [FilePath] -> Either ErrorMessage Source
 determineSource stdin inputFiles =
     case ( stdin, inputFiles ) of
         ( True, [] ) -> Right Stdin
-        ( False, [] ) -> Left Error_NoInputs
+        ( False, [] ) -> Left NoInputs
         ( False, first:rest ) -> Right $ FromFiles first rest
-        ( True, _:_ ) -> Left Error_TooManyInputs
+        ( True, _:_ ) -> Left TooManyInputs
 
 
-determineDestination :: Maybe FilePath -> Bool -> Either Message Destination
+determineDestination :: Maybe FilePath -> Bool -> Either ErrorMessage Destination
 determineDestination output validate =
     case ( output, validate ) of
         ( Nothing, True ) -> Right ValidateOnly
         ( Nothing, False ) -> Right UpdateInPlace
         ( Just path, False ) -> Right $ ToFile path
-        ( Just _, True ) -> Left Error_OutputAndValidate
+        ( Just _, True ) -> Left OutputAndValidate
 
 
-determineWhatToDo :: Source -> Destination -> Either Message WhatToDo
+determineWhatToDo :: Source -> Destination -> Either ErrorMessage WhatToDo
 determineWhatToDo source destination =
     case ( source, destination ) of
         ( _, ValidateOnly ) -> Right $ Validate source
@@ -239,10 +242,10 @@ determineWhatToDo source destination =
         ( Stdin, ToFile output ) -> Right $ StdinToFile output
         ( FromFiles first [], ToFile output ) -> Right $ FormatToFile first output
         ( FromFiles first rest, UpdateInPlace ) -> Right $ FormatInPlace first rest
-        ( FromFiles _ _, ToFile _ ) -> Left Error_SingleOutputWithMultipleInputs
+        ( FromFiles _ _, ToFile _ ) -> Left SingleOutputWithMultipleInputs
 
 
-determineWhatToDoFromConfig :: Flags.Config -> Either Message WhatToDo
+determineWhatToDoFromConfig :: Flags.Config -> Either ErrorMessage WhatToDo
 determineWhatToDoFromConfig config =
     do
         source <- determineSource (Flags._stdin config) (Flags._input config)
@@ -250,8 +253,8 @@ determineWhatToDoFromConfig config =
         determineWhatToDo source destination
 
 
-validate :: ElmVersion -> Source -> IO ()
-validate elmVersion source =
+validate :: ElmVersion -> InfoFormatter -> Source -> IO ()
+validate elmVersion formatter source =
     do
         result <-
             case source of
@@ -261,10 +264,10 @@ validate elmVersion source =
 
                         Lazy.toStrict input
                             |> Text.decodeUtf8
-                            |> processTextInput elmVersion ValidateOnly "<STDIN>"
+                            |> processTextInput elmVersion formatter ValidateOnly "<STDIN>"
 
                 FromFiles first rest ->
-                    handleFilesInput (first:rest) Nothing True True elmVersion
+                    handleFilesInput (first:rest) Nothing True True elmVersion formatter
 
         case result of
             Nothing ->
@@ -277,7 +280,7 @@ validate elmVersion source =
                 exitFailure
 
 
-exitWithError :: Message -> IO ()
+exitWithError :: ErrorMessage -> IO ()
 exitWithError message =
     (putStrLn $ r $ message)
         >> exitFailure
@@ -289,9 +292,10 @@ main defaultVersion =
         config <- Flags.parse defaultVersion
         let autoYes = Flags._yes config
         let elmVersion = Flags._elmVersion config
+        let infoFormatter = Messages.Formatter.HumanReadable.format
 
         case determineWhatToDoFromConfig config of
-            Left Error_NoInputs ->
+            Left NoInputs ->
                 Flags.showHelpText defaultVersion
                     >> exitFailure
 
@@ -299,11 +303,11 @@ main defaultVersion =
                 exitWithError message
 
             Right (Validate source) ->
-                validate elmVersion source
+                validate elmVersion infoFormatter source
 
             Right (FormatInPlace first rest) ->
                 do
-                    result <- handleFilesInput (first:rest) Nothing autoYes False elmVersion
+                    result <- handleFilesInput (first:rest) Nothing autoYes False elmVersion infoFormatter
                     case result of
                         Nothing ->
                             exitSuccess
@@ -313,7 +317,7 @@ main defaultVersion =
 
             Right (FormatToFile input output) ->
                 do
-                    result <- handleFilesInput [input] (Just output) autoYes False elmVersion
+                    result <- handleFilesInput [input] (Just output) autoYes False elmVersion infoFormatter
                     case result of
                         Nothing ->
                             exitSuccess
@@ -328,7 +332,7 @@ main defaultVersion =
                     result <-
                         Lazy.toStrict input
                             |> Text.decodeUtf8
-                            |> processTextInput elmVersion UpdateInPlace "<STDIN>"
+                            |> processTextInput elmVersion infoFormatter UpdateInPlace "<STDIN>"
                     case result of
                         Nothing ->
                             exitSuccess
@@ -343,7 +347,7 @@ main defaultVersion =
                     result <-
                         Lazy.toStrict input
                             |> Text.decodeUtf8
-                            |> processTextInput elmVersion (ToFile output) "<STDIN>"
+                            |> processTextInput elmVersion infoFormatter (ToFile output) "<STDIN>"
                     case result of
                         Nothing ->
                             exitSuccess
