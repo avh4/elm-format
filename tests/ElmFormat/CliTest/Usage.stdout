@@ -13,8 +13,8 @@ Available options:
   --stdin                  Read from stdin, output to stdout.
   --elm-version VERSION    The Elm version of the source files being formatted.
                            Valid values: 0.16, 0.17. Default: 0.17
-  --format FORMAT          Output format. Valid values: human-readable. Default:
-                           human-readable
+  --format FORMAT          Output format. Valid values: human-readable, json.
+                           Default: human-readable
 
 Examples:
   elm-format Main.elm                     # formats Main.elm
