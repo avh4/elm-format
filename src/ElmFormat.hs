@@ -23,7 +23,6 @@ import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.Filesystem as FS
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Result as Result
-import qualified Messages.Formatter.HumanReadable
 import qualified System.Directory as Dir
 
 
@@ -305,7 +304,7 @@ main defaultVersion =
         config <- Flags.parse defaultVersion
         let autoYes = Flags._yes config
         let elmVersionResult = determineVersion (Flags._elmVersion config) (Flags._upgrade config)
-        let infoFormatter = Messages.Formatter.HumanReadable.format
+        let infoFormatter = Flags._infoFormatter config
 
         case (elmVersionResult, determineWhatToDoFromConfig config) of
             (_, Left NoInputs) ->

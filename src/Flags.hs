@@ -4,9 +4,12 @@ module Flags where
 import Data.Monoid ((<>))
 import Data.Version (showVersion)
 import ElmVersion (ElmVersion(..))
+import Messages.Formatter.Format (InfoFormatter)
 
+import qualified Data.List as List
 import qualified Data.Maybe as Maybe
 import qualified ElmVersion
+import qualified Messages.Formatter as Formatter
 import qualified Options.Applicative as Opt
 import qualified Paths_elm_format as This
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
@@ -20,6 +23,7 @@ data Config = Config
     , _stdin :: Bool
     , _elmVersion :: ElmVersion
     , _upgrade :: Bool
+    , _infoFormatter :: InfoFormatter
     }
 
 
@@ -87,6 +91,7 @@ flags defaultVersion =
       <*> stdin
       <*> elmVersion defaultVersion
       <*> upgrade
+      <*> infoFormatter
 
 
 
@@ -188,6 +193,7 @@ elmVersion defaultVersion =
             ]
       ]
 
+
 upgrade :: Opt.Parser Bool
 upgrade =
     Opt.switch $
@@ -195,3 +201,22 @@ upgrade =
         [ Opt.long "upgrade"
         , Opt.help "Upgrade older Elm files to Elm 0.18 syntax"
         ]
+
+
+infoFormatter :: Opt.Parser InfoFormatter
+infoFormatter =
+  fmap (Maybe.fromMaybe Formatter.defaultFormatter) $
+  Opt.optional $
+  Opt.option (Opt.eitherReader Formatter.readFormatter) $
+    mconcat
+      [ Opt.long "format"
+      , Opt.metavar "FORMAT"
+      , Opt.help $
+          concat
+            [ "Output format.  "
+            , "Valid values: "
+            , (List.intercalate ", " Formatter.orderedFormatterNames)
+            , ".  "
+            , "Default: " ++ Formatter.defaultFormatterName
+            ]
+      ]
