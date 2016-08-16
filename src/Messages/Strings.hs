@@ -8,11 +8,11 @@ showFiles :: [FilePath] -> String
 showFiles = unlines . map ((++) "    ")
 
 
-renderErrorMessage :: ErrorMessage -> String
+showErrorMessage :: ErrorMessage -> String
 
-renderErrorMessage ErrorsHeading = "ERRORS"
+showErrorMessage ErrorsHeading = "ERRORS"
 
-renderErrorMessage (FilesWillBeOverwritten filePaths) =
+showErrorMessage (FilesWillBeOverwritten filePaths) =
   unlines
     [ "This will overwrite the following files to use Elm's preferred style:"
     , ""
@@ -23,7 +23,7 @@ renderErrorMessage (FilesWillBeOverwritten filePaths) =
     ]
 
 
-renderErrorMessage (BadInputFiles filePaths) =
+showErrorMessage (BadInputFiles filePaths) =
   unlines
     [ "There was a problem reading one or more of the specified input files:"
     , ""
@@ -31,17 +31,17 @@ renderErrorMessage (BadInputFiles filePaths) =
     , "Please check the given paths."
     ]
 
-renderErrorMessage SingleOutputWithMultipleInputs =
+showErrorMessage SingleOutputWithMultipleInputs =
   unlines
     [ "Can't write to the OUTPUT path, because multiple .elm files have been specified."
     , ""
     , "Please remove the --output argument. The .elm files in INPUT will be formatted in place."
     ]
 
-renderErrorMessage TooManyInputs =
+showErrorMessage TooManyInputs =
     "Too many input sources! Please only provide one of either INPUT or --stdin"
 
-renderErrorMessage OutputAndValidate =
+showErrorMessage OutputAndValidate =
     "Cannot use --output and --validate together"
 
 
