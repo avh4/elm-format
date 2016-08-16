@@ -3,7 +3,7 @@ module CommandLine.Helpers where
 import System.IO
 import System.Exit (exitFailure, exitSuccess)
 import Messages.Types (ErrorMessage(..))
-import Messages.Strings (renderErrorMessage)
+import Messages.Strings (showErrorMessage)
 
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Report as Report
@@ -11,7 +11,7 @@ import qualified Reporting.Error.Syntax as Syntax
 
 
 r :: ErrorMessage -> String
-r = renderErrorMessage
+r = showErrorMessage
 
 yesOrNo :: IO Bool
 yesOrNo =
