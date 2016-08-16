@@ -95,9 +95,17 @@ function checkWaysToRun() {
 	"$ELM_FORMAT" "$INPUT_2" --validate 1>/dev/null
 	returnCodeShouldEqual 1
 
+	echo "## elm-format INPUT --validate with unformatted file with output in json exits 1"
+	"$ELM_FORMAT" "$INPUT_2" --validate --format json 1>/dev/null
+	returnCodeShouldEqual 1
+
 	echo "## elm-format INPUT --validate with formatted file exits 0"
 	"$ELM_FORMAT" "$INPUT_2" --yes 1>/dev/null
 	"$ELM_FORMAT" "$INPUT_2" --validate 1>/dev/null
+	returnCodeShouldEqual 0
+
+	echo "## elm-format INPUT --validate with formatted file with output in json exits 0"
+	"$ELM_FORMAT" "$INPUT_2" --validate --format json 1>/dev/null
 	returnCodeShouldEqual 0
 
 	echo "## elm-format INPUT (answer = y)"
@@ -174,6 +182,13 @@ function checkWaysToRun() {
 	"$ELM_FORMAT" "$INPUT" --validate --yes 1>/dev/null
 	returnCodeShouldEqual 0
 
+	echo "## elm-format INPUT --validate --yes --format human-readable"
+	"$ELM_FORMAT" "$INPUT" --validate --yes --format human-readable 1>/dev/null
+	returnCodeShouldEqual 0
+
+	echo "## elm-format INPUT --validate --yes --format json"
+	"$ELM_FORMAT" "$INPUT" --validate --yes --format json 1>/dev/null
+	returnCodeShouldEqual 0
 
 	echo "# OK!"
 	echo "------------------------------"
@@ -236,6 +251,35 @@ function checkUpgrade() {
 	time "$ELM_FORMAT" "$INPUT" --output "$OUTPUT" --upgrade --elm-version "$ELM_VERSION" 1>/dev/null
 	returnCodeShouldEqual 0
 	compareFiles "$EXPECTED" "$OUTPUT"
+}
+
+function checkValidationOutputFormat() {
+	cp "tests/test-files/transform/Examples.elm" "_input.elm"
+	cp "tests/test-files/transform/Examples.elm" "_input2.elm"
+
+	INPUT="_input.elm"
+	INPUT_2="_input2.elm"
+	STDOUT="_stdout.txt"
+
+	echo
+	echo "------------------------------"
+	echo "# VALIDATION OUTPUT IN JSON"
+	echo
+
+	echo "## with unformatted files outputs in expected json format line by line"
+	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate --format json | \
+	while read -r line; do
+		tee "$line" "$STDOUT"; ajv test -s tests/json-format-schema.json -d "$STDOUT" --valid
+	done <&0
+	returnCodeShouldEqual 0
+
+	echo "## with formatted file with output in json outputs nothing"
+	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --yes 1>/dev/null
+	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate --format json 1>"$STDOUT"
+	[ ! -s "$STDOUT" ] || exit 1
+
+	echo "# OK!"
+	echo "------------------------------"
 }
 
 
@@ -309,6 +353,8 @@ checkUpgrade 0.18 Elm-0.18/RangesBecomeListRange.elm
 checkUpgrade 0.18 Elm-0.18/BackticksBecomeFunctionCalls.elm
 checkUpgrade 0.18 Elm-0.18/SpecialBackticksBecomePipelines.elm
 checkUpgrade 0.18 Elm-0.18/RenameTupleFunctions.elm
+
+checkValidationOutputFormat
 
 echo
 echo "# GREAT SUCCESS!"
