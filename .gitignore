@@ -3,6 +3,7 @@
 /formatted.elm
 /_input.elm
 /_input2.elm
+/_stdout.txt
 /.cabal-sandbox/
 *.tix
 /.stack-work/
