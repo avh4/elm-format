@@ -73,7 +73,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td rowspan=2><a href="https://atom.io/">Atom</a></td>
     <td>:trophy: <a href="https://atom.io/packages/elm-format">atom-elm-format</a></td>
     <td>:white_check_mark: <a href="#atom-elm-format-installation">2 steps</a></td>
-    <td>:white_check_mark:</td>
+    <td>:warning: must use format-on-save or save file before formatting</td>
     <td>:white_check_mark:</td>
     <td>:white_check_mark:</td>
     <td>:warning: no installation instructions</td>
