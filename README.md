@@ -118,18 +118,18 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td rowspan=2>Visual Studio Code</td>
     <td>:trophy: <a href="https://marketplace.visualstudio.com/items?itemName=sbrink.elm">Elm Language Support</a></td>
     <td>:warning: <a href="#visual-studio-code-installation">3 steps</a></td>
-    <td>❔ TBD</td>
-    <td>:x:</td>
-    <td>❔ TBD</td>
-    <td>❔ TBD</td>
+    <td>:white_check_mark:</td>
+    <td>:warning: requires configuration</td>
+    <td>:white_check_mark:</td>
+    <td>:white_check_mark:</td>
   </tr>
   <tr>
     <!-- Visual Studio Code -->
-    <td><a href="https://marketplace.visualstudio.com/items?itemName=abadi199.elm-format">VSCode Elm Format</a></td>
+    <td><a href="https://marketplace.visualstudio.com/items?itemName=sbrink.elm">VSCode Elm Format</a></td>
     <td>:warning: <a href="#vscode-elm-format-installation">3 steps</a></td>
-    <td>❔ TBD</td>
+    <td>:white_check_mark:</td>
     <td>:warning: requires configuration</td>
-    <td>❔ TBD</td>
+    <td>:white_check_mark:</td>
     <td>❔ TBD</td>
   </tr>
   <tr>
@@ -253,30 +253,20 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 ### Visual Studio Code installation
 
 1. Install elm-format
-1. Install Elm tools for VSCode
+1. Install [Elm tools for VSCode](https://marketplace.visualstudio.com/items?itemName=sbrink.elm)
 
     ```bash
     ext install elm
     ```
 
-1. SHIFT-ALT-F will format the current file
-
-
-### VSCode Elm Format installation
-
-1. Install elm-format
-1. Install VSCode Elm Format
-
-    ```bash
-    ext install elm-format
-    ```
-
-1. You can run elm-format by using the `Elm: Format` command
-1. You can also run elm-format whenever you save the file by enabling the `formatOnSave' option
-
-    > This step needs improvement to be understandable by novice Visual Studio Code users:
-    > how does one enable the `formatOnSave` option?
-
+1. Run on current file with SHIFT+ALT+F or `Elm: Format` in the command palette
+1. Run elm-format on file saves by adding the `"elm.formatOnSave": true' option to your settings.json (press `CTRL/CMD+,`, or go to `Code > Preferences > User Settings`)
+```
+{
+  "editor.tabSize": 2,
+  "elm.formatOnSave": true
+}
+```
 
 ### Sublime Text installation
 
