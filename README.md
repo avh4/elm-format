@@ -144,7 +144,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   <tr>
     <td rowspan=1>JetBrains (WebStorm, etc)</td>
     <td>:trophy: <a href="https://durkiewicz.github.io/elm-plugin/">Elm Language Plugin</a></td>
-    <td>:warning: <a href="#webstorm-installation">3 steps</a></td>
+    <td>:warning: <a href="#jetbrains-installation">3 steps</a></td>
     <td>❔ TBD</td>
     <td>:white_check_mark:</td>
     <td>❔ TBD</td>
