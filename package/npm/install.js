@@ -119,16 +119,6 @@ function downloadAndUnpack(downloadObject) {
         );
       }
 
-      if (!fs.statSync(distDir).isDirectory()) {
-        reject(
-          'Error extracting executables: extraction finished, but' +
-          distDir + 'ended up being a file, not a directory. ' +
-          'This can happen when the .tar.gz file contained the ' +
-          'binaries directly, instead of containing a directory with ' +
-          'the files inside.'
-        );
-      }
-
       resolve('Successfully downloaded and processed ' + downloadObject.filename);
     }
   });
