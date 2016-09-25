@@ -8,9 +8,11 @@ module.exports = function(executable) {
 
   const os = process.platform;
 
-  const extension = os === 'win32' ? '.exe' : '';
-  const filename = `${executable}${extension}`;
+  // Unzipping the Windows .zip puts the .exe inside the directory,
+  // while the .tgz will produce just the right binary files with
+  // the same name as the executable. path.join will ignore empty strings.
+  const binaryFile = os === 'win32' ? 'elm-format.exe' : '';
 
-  spawn(path.join(distDir, filename), input, { stdio: 'inherit' })
+  spawn(path.join(distDir, executable, binaryFile), input, { stdio: 'inherit' })
     .on('exit', process.exit);
 };
