@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 
-const path = require("path");
+const path = require('path');
 
 require(path.join('..', 'binwrap.js'))('elm-format-0.16');
