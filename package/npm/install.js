@@ -1,13 +1,13 @@
 const fs = require('fs');
-const path = require('path');
 const zlib = require('zlib');
 const request = require('request');
 const tar = require('tar');
 const unzip = require('unzip');
 const mkdirp = require('mkdirp');
 
+const distDir = require('./config').distDir;
+
 const ELM_FORMAT_VERSION = '0.4.0-alpha';
-const distDir = path.join(__dirname, 'bin');
 
 getDownloadUrls()
   .then(downloadAndUnpackBinaries)
@@ -66,6 +66,7 @@ function getDownloadUrls() {
 }
 
 function downloadAndUnpackBinaries(downloadObjects) {
+  console.log('Downloading binaries...');
   return Promise.all(downloadObjects.map(downloadAndUnpack));
 }
 
