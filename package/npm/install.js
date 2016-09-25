@@ -7,7 +7,7 @@ const mkdirp = require('mkdirp');
 
 const distDir = require('./config').distDir;
 
-const ELM_FORMAT_VERSION = '0.4.0-alpha';
+const elmFormatVersion = require('./config').elmFormatVersion;
 
 getDownloadUrls()
   .then(downloadAndUnpackBinaries)
@@ -56,11 +56,11 @@ function getDownloadUrls() {
     );
 
     function versionToFilename(version) {
-      return `elm-format-${version}-${ELM_FORMAT_VERSION}-${os}-${arch}.${extension}`;
+      return `elm-format-${version}-${elmFormatVersion}-${os}-${arch}.${extension}`;
     }
 
     function filenameToDownloadUrl(filename) {
-      return `https://github.com/avh4/elm-format/releases/download/${ELM_FORMAT_VERSION}/${filename}`
+      return `https://github.com/avh4/elm-format/releases/download/${elmFormatVersion}/${filename}`
     }
   })
 }
