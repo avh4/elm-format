@@ -21,5 +21,14 @@
   "bugs": {
     "url": "https://github.com/avh4/elm-format/issues"
   },
-  "homepage": "https://github.com/avh4/elm-format#readme"
+  "homepage": "https://github.com/avh4/elm-format#readme",
+  "dependencies": {
+    "mkdirp": "^0.5.1",
+    "request": "^2.75.0",
+    "tar": "^2.2.1",
+    "unzip": "^0.1.11"
+  },
+  "devDependencies": {
+    "eslint": "^3.6.0"
+  }
 }
