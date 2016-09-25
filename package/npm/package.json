@@ -2,9 +2,13 @@
   "name": "elm-format",
   "version": "0.4.0-alpha",
   "description": "elm-format formats Elm source code according to a standard set of rules based on the official Elm Style Guide",
-  "main": "index.js",
+  "preferGlobal": true,
+  "bin": {
+    "elm-format": "binwrappers/elm-format-0.17",
+    "elm-format-0.16": "binwrappers/elm-format-0.16"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "install": "node install.js"
   },
   "repository": {
     "type": "git",
