@@ -189,14 +189,13 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 
 1. Install elm-format
 1. Install the [elm-light plugin](https://github.com/rundis/elm-light) using the Light Table plugin manager
-1. Add the following to your user keymap:
+1. Use the command pallete to run "Settings: User behaviors" and add the following:
 
   ```clojure
-  [:editor.elm "ctrl-s" :save :elm-format :elm.lint]
+  ;; Elm behaviors on save
+  [:editor.elm :lt.objs.editor.file/on-save :elm-format]
+  [:editor.elm :lt.objs.editor.file/on-save :elm.lint]
   ```
-  
-  > This step needs improvement to be understandable by novice Light Table users:
-  > how does one edit the user keymap?
 
 
 ### elm-mode installation
