@@ -87,7 +87,7 @@ function checkWaysToRun() {
 	"$ELM_FORMAT" "$INPUT_2" --validate 1>/dev/null
 	returnCodeShouldEqual 1
 
-	echo "## elm-format INPUT --validate with formatted file exits 1"
+	echo "## elm-format INPUT --validate with formatted file exits 0"
 	"$ELM_FORMAT" "$INPUT_2" --yes 1>/dev/null
 	"$ELM_FORMAT" "$INPUT_2" --validate 1>/dev/null
 	returnCodeShouldEqual 0
