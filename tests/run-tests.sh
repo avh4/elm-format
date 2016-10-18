@@ -4,9 +4,15 @@
 #shellcheck "./build-package.sh" || exit 1
 #shellcheck "./package/linux/build-package.sh" || exit 1
 
-cabal build || exit 1
+stack build || exit 1
 
-ELM_FORMAT="./dist/build/elm-format-0.17/elm-format-0.17"
+ELM_FORMAT="`ls ./.stack-work/install/*/lts-7.4/8.0.1/bin/elm-format-0.17 | head -n1`"
+if [ ! -e "$ELM_FORMAT" ]; then
+	echo "$0: ERROR: $ELM_FORMAT not found" >&2
+	exit 1
+fi
+echo "Testing $ELM_FORMAT"
+
 if which md5 > /dev/null; then
 	MD5="md5"
 else
@@ -265,4 +271,4 @@ checkTransformation QuickCheck-94f37da84c1310f03dcfa1059ce870b73c94a825--6449652
 echo
 echo "# GREAT SUCCESS!"
 
-cabal test --test-options="--hide-successes --color auto" || exit 1
+stack test --test-arguments="--hide-successes --color auto" || exit 1
