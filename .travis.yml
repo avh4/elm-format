@@ -1,25 +1,31 @@
 sudo: false
 
 
+language: c
+
+
+cache:
+  directories:
+  - $HOME/.stack
+
+
 addons:
   apt:
-    sources:
-    - hvr-ghc
     packages:
-    - cabal-install-1.22
-    - ghc-7.10.3
+    - libgmp3-dev
 
 
 before_install:
- - export PATH=/opt/ghc/7.10.3/bin:/opt/cabal/1.22/bin:$PATH
+- mkdir -p ~/.local/bin
+- export PATH=$HOME/.local/bin:$PATH
+- travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 
 
 install:
- - travis_retry cabal update
- - cabal sandbox init --sandbox="`pwd`"/.cabal-sandbox
- - cabal install --only-dependencies --enable-tests
+- stack setup
+- stack build --only-dependencies
 
 
 script:
- - cabal configure --enable-tests
- - ./tests/run-tests.sh
+- stack build
+- ./tests/run-tests.sh

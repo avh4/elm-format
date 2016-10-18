@@ -167,7 +167,7 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
     ```
     apm install elm-format
     ```
-    
+
   or use the Atom package manager in Atom's settings
 
 
@@ -179,7 +179,7 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
     ```
     apm install atom-beautify
     ```
-    
+
   or use the Atom package manager in Atom's settings
 
 1. Use `^⌥B` (`CTRL-ALT-B`) to format a file
@@ -209,33 +209,33 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
         (require 'package)
         (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
         ```
-        
+
     1. Install elm-mode ([official instructions](https://github.com/jcollard/elm-mode#installation)): Use `M-x list-packages` and choose `elm-mode`.
 
-1. Set `elm-format-on-save` to `t` to apply elm-format on the current buffer on every save. (The setting can be changed via `M-x customize-variable elm-format-on-save`. Click button `Toggle` to change the setting and button `State` to activate the setting.) 
+1. Set `elm-format-on-save` to `t` to apply elm-format on the current buffer on every save. (The setting can be changed via `M-x customize-variable elm-format-on-save`. Click button `Toggle` to change the setting and button `State` to activate the setting.)
 
 
 ### elm-vim installation
 
 1. Install elm-format
 1. Install [vim-plug](https://github.com/junegunn/vim-plug) ([official instructions](https://github.com/junegunn/vim-plug#installation))
-   
+
     1. Download vim-plug:
-    
+
         ```bash
         curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
             https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
         ```
- 
+
    1. Make sure there is a section like this in your `~/.vimrc`:
-   
+
         ```vim
         call plug#begin('~/.vim/plugged')
         " ... any active plugins
         call plug#end()
         ```
-   
- 
+
+
 
 1. Install elm-vim ([official instructions](https://github.com/ElmCast/elm-vim#install))
 
@@ -296,11 +296,11 @@ This is for WebStorm and other JetBrains IDEs.
 ### Building from source
 
 ```bash
+brew install haskell-stack
 git clone https://github.com/avh4/elm-format.git
 cd elm-format
-cabal sandbox init
-cabal install --only-dependencies --enable-tests
-cabal build
+stack setup
+stack build
 ./dist/build/elm-format-0.17/elm-format-0.17 --help
 ```
 
@@ -308,6 +308,5 @@ cabal build
 
 ```bash
 brew install shellcheck
-cabal configure --enable-tests
 ./tests/run-tests.sh
 ```
