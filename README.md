@@ -144,7 +144,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   <tr>
     <td rowspan=1>JetBrains (WebStorm, etc)</td>
     <td>:trophy: <a href="https://durkiewicz.github.io/elm-plugin/">Elm Language Plugin</a></td>
-    <td>:warning: <a href="#jetbrains-installation">3 steps</a></td>
+    <td>:warning: <a href="#jetbrains-installation">4 steps</a></td>
     <td>❔ TBD</td>
     <td>:white_check_mark:</td>
     <td>❔ TBD</td>
@@ -288,6 +288,7 @@ This is for WebStorm and other JetBrains IDEs.
 
 1. Install elm-format
 1. Install the [Elm Language Plugin](https://durkiewicz.github.io/elm-plugin/) package.
+1. Install the File Watchers plugin (available in the plugin repository)
 1. Add a file watcher for .elm files with the settings as [shown here](img/JetBrains%20setup.png).
 
 
