@@ -195,7 +195,7 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
   ```clojure
   [:editor.elm "ctrl-s" :save :elm-format :elm.lint]
   ```
-  * Search for "App: Reload keymaps" in the Commands Window to effect the changes. Alternatively, restart LigthTable.
+  * Search for "App: Reload keymaps" in the Commands Window to apply the changes (or restart LightTable).
 
 
 ### elm-mode installation
