@@ -40,6 +40,46 @@ Executable elm-format-0.17
     Main-is:
         Main0_17.hs
 
+    other-modules:
+        AST.Declaration
+        AST.Expression
+        AST.Helpers
+        AST.Module
+        AST.Module.Name
+        AST.Pattern
+        AST.V0_16
+        AST.Variable
+        Box
+        CommandLine.Helpers
+        Elm.Utils
+        ElmFormat
+        ElmFormat.Filesystem
+        ElmFormat.Parse
+        ElmFormat.Render.Box
+        ElmFormat.Render.ElmStructure
+        ElmFormat.Render.Text
+        ElmVersion
+        Flags
+        Messages.Strings
+        Messages.Types
+        Parse.Binop
+        Parse.Declaration
+        Parse.Expression
+        Parse.Helpers
+        Parse.Literal
+        Parse.Module
+        Parse.Parse
+        Parse.Pattern
+        Parse.State
+        Parse.Type
+        Reporting.Annotation
+        Reporting.Error.Syntax
+        Reporting.PrettyPrint
+        Reporting.Region
+        Reporting.Report
+        Reporting.Result
+        Util.List
+
     Build-depends:
         aeson >= 0.11.2.1 && < 0.12,
         ansi-terminal >= 0.6.2.3 && < 0.7,
@@ -73,6 +113,46 @@ Executable elm-format-0.16
 
     Main-is:
         Main0_16.hs
+
+    other-modules:
+        AST.Declaration
+        AST.Expression
+        AST.Helpers
+        AST.Module
+        AST.Module.Name
+        AST.Pattern
+        AST.V0_16
+        AST.Variable
+        Box
+        CommandLine.Helpers
+        Elm.Utils
+        ElmFormat
+        ElmFormat.Filesystem
+        ElmFormat.Parse
+        ElmFormat.Render.Box
+        ElmFormat.Render.ElmStructure
+        ElmFormat.Render.Text
+        ElmVersion
+        Flags
+        Messages.Strings
+        Messages.Types
+        Parse.Binop
+        Parse.Declaration
+        Parse.Expression
+        Parse.Helpers
+        Parse.Literal
+        Parse.Module
+        Parse.Parse
+        Parse.Pattern
+        Parse.State
+        Parse.Type
+        Reporting.Annotation
+        Reporting.Error.Syntax
+        Reporting.PrettyPrint
+        Reporting.Region
+        Reporting.Report
+        Reporting.Result
+        Util.List
 
     Build-depends:
         aeson >= 0.11.2.1 && < 0.12,
@@ -109,7 +189,56 @@ Test-Suite elm-format-tests
         Test.hs
 
     other-modules:
+        AST.Declaration
+        AST.Expression
+        AST.Helpers
+        AST.Module
+        AST.Module.Name
+        AST.Pattern
+        AST.V0_16
+        AST.Variable
+        Box
+        BoxTest
+        Elm.Utils
+        ElmFormat.Cli
+        ElmFormat.CliTest
+        ElmFormat.Parse
+        ElmFormat.Render.Box
+        ElmFormat.Render.ElmStructure
+        ElmFormat.Render.ElmStructureTest
+        ElmFormat.Render.Text
+        ElmFormat.TestWorld
+        ElmFormat.World
+        ElmVersion
+        Flags
+        Parse.Binop
+        Parse.Declaration
+        Parse.Expression
+        Parse.ExpressionTest
+        Parse.Helpers
+        Parse.HelpersTest
+        Parse.Literal
+        Parse.LiteralTest
+        Parse.Module
+        Parse.Parse
+        Parse.Pattern
+        Parse.PatternTest
+        Parse.State
+        Parse.TestHelpers
+        Parse.TestHelpersTest
+        Parse.Type
+        Parse.TypeTest
+        Reporting.Annotation
+        Reporting.Error.Syntax
+        Reporting.PrettyPrint
+        Reporting.Region
+        Reporting.Report
+        Reporting.Result
+        Test.ElmSourceGenerators
+        Test.Generators
         Test.Property
+        Util.List
+        Util.ListTest
 
     build-depends:
         tasty >= 0.11.0.4 && < 0.12,
