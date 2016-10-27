@@ -12,6 +12,8 @@ if [ ! -e "$ELM_FORMAT" ]; then
 	exit 1
 fi
 echo "Testing $ELM_FORMAT"
+cp "$ELM_FORMAT" tests/elm-format
+ELM_FORMAT="tests/elm-format"
 
 if which md5 > /dev/null; then
 	MD5="md5"
@@ -25,7 +27,7 @@ function returnCodeShouldEqual() {
 
 function shouldOutputTheSame() {
 	echo "$1" "$2"
-	diff <(echo "$1") <(echo "$2") || exit 1
+	diff -u <(echo "$1") <(echo "$2") || exit 1
 }
 
 function outputShouldRoughlyMatchPatterns() {
@@ -64,9 +66,12 @@ function checkWaysToRun() {
 	echo "# WAYS TO RUN"
 	echo
 
+	HELP=$(cat tests/ElmFormat/CliTest/Usage.stdout)
+
 	echo "## elm-format --help"
-	HELP=$("$ELM_FORMAT" --help 2>&1)
+	LONGHELP=$("$ELM_FORMAT" --help 2>&1)
 	returnCodeShouldEqual 0
+	shouldOutputTheSame "$HELP" "$LONGHELP"
 
 	echo "## elm-format -h"
 	SHORTHELP=$("$ELM_FORMAT" -h 2>&1)
