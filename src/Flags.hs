@@ -17,6 +17,7 @@ data Config = Config
     , _stdin :: Bool
     , _elmVersion :: ElmVersion
     , _upgrade :: Bool
+    , _json :: Bool
     }
 
 
@@ -71,7 +72,7 @@ flags defaultVersion =
       <*> stdin
       <*> elmVersion defaultVersion
       <*> upgrade
-
+      <*> json
 
 
 -- HELP
@@ -190,3 +191,12 @@ upgrade =
         [ Opt.long "upgrade"
         , Opt.help "Upgrade older Elm files to Elm 0.18 syntax"
         ]
+
+
+json :: Opt.Parser Bool
+json =
+    Opt.switch $
+        mconcat
+            [ Opt.long "json"
+            , Opt.help "Instead of formatting, write the AST to stdout."
+            ]

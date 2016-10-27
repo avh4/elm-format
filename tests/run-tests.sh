@@ -298,6 +298,17 @@ function checkValidationOutputFormat() {
 	echo "------------------------------"
 }
 
+function checkJson() {
+	INPUT="tests/test-files/$1"
+	OUTPUT="formatted.json"
+	EXPECTED="tests/test-files/${1%.*}.json"
+
+	echo
+	echo "## ${1%.*}.json"
+	time cat "$INPUT" | "$ELM_FORMAT" --stdin --json | python -mjson.tool > "$OUTPUT"
+	returnCodeShouldEqual 0
+	compareFiles "$EXPECTED" "$OUTPUT"
+}
 
 echo
 echo
@@ -382,6 +393,8 @@ checkUpgrade 0.18 Elm-0.18/SpecialBackticksBecomePipelines.elm
 checkUpgrade 0.18 Elm-0.18/RenameTupleFunctions.elm
 
 checkValidationOutputFormat
+
+checkJson good/AllSyntax/0.18/Expressions.elm
 
 echo
 echo "# GREAT SUCCESS!"
