@@ -17,6 +17,10 @@ var x =
     x
 
 
+qualifiedVar =
+    Bar.Baz.foo
+
+
 operator =
     (+)
 

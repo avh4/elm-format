@@ -1,7 +1,7 @@
 elm-format-0.17 0.4.1-alpha-dev
 
 Usage: elm-format [INPUT] [--output FILE] [--yes] [--validate] [--stdin]
-                  [--elm-version VERSION]
+                  [--elm-version VERSION] [--json]
   Format an Elm source file.
 
 Available options:
@@ -13,6 +13,7 @@ Available options:
   --stdin                  Read from stdin, output to stdout.
   --elm-version VERSION    The Elm version of the source files being formatted.
                            Valid values: 0.16, 0.17. Default: 0.17
+  --json                   Instead of formatting, write the AST to stdout.
 
 Examples:
   elm-format Main.elm                     # formats Main.elm

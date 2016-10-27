@@ -8,10 +8,12 @@ import Control.Monad (when)
 import Data.Maybe (isJust)
 import CommandLine.Helpers
 import ElmVersion (ElmVersion)
+import AST.Json
 
 
 import qualified AST.Module
 import qualified Flags
+import qualified Data.Aeson
 import qualified Data.ByteString as ByteString
 import qualified Data.ByteString.Char8 as Char8
 import qualified Data.ByteString.Lazy as Lazy
@@ -67,6 +69,9 @@ writeResult elmVersion destination inputFile inputText result =
                                 >> (return Nothing)
                             else
                                 return Nothing
+
+                    ToJson ->
+                        error "Internal error: ToJson should not get passed to writeResult"
 
         Result.Result _ (Result.Err errs) ->
             do
@@ -200,6 +205,8 @@ data WhatToDo
     | FormatInPlace FilePath [FilePath]
     | StdinToStdout
     | Validate Source
+    | FileToJson FilePath
+    | StdinToJson
 
 
 data Source
@@ -211,6 +218,7 @@ data Destination
     = ValidateOnly
     | UpdateInPlace
     | ToFile FilePath
+    | ToJson
 
 
 determineSource :: Bool -> [FilePath] -> Either Message Source
@@ -222,13 +230,15 @@ determineSource stdin inputFiles =
         ( True, _:_ ) -> Left Error_TooManyInputs
 
 
-determineDestination :: Maybe FilePath -> Bool -> Either Message Destination
-determineDestination output validate =
-    case ( output, validate ) of
-        ( Nothing, True ) -> Right ValidateOnly
-        ( Nothing, False ) -> Right UpdateInPlace
-        ( Just path, False ) -> Right $ ToFile path
-        ( Just _, True ) -> Left Error_OutputAndValidate
+determineDestination :: Maybe FilePath -> Bool -> Bool -> Either Message Destination
+determineDestination output validate json =
+    case ( output, validate, json ) of
+        ( _, True, True ) -> Left Error_OutputAndValidate
+        ( Nothing, True, False ) -> Right ValidateOnly
+        ( Nothing, False, False ) -> Right UpdateInPlace
+        ( Just path, False, False ) -> Right $ ToFile path
+        ( Just _, True, _ ) -> Left Error_OutputAndValidate
+        ( _, False, True ) -> Right ToJson
 
 
 determineWhatToDo :: Source -> Destination -> Either Message WhatToDo
@@ -236,17 +246,20 @@ determineWhatToDo source destination =
     case ( source, destination ) of
         ( _, ValidateOnly ) -> Right $ Validate source
         ( Stdin, UpdateInPlace ) -> Right StdinToStdout
+        ( Stdin, ToJson ) -> Right StdinToJson
         ( Stdin, ToFile output ) -> Right $ StdinToFile output
         ( FromFiles first [], ToFile output ) -> Right $ FormatToFile first output
         ( FromFiles first rest, UpdateInPlace ) -> Right $ FormatInPlace first rest
         ( FromFiles _ _, ToFile _ ) -> Left Error_SingleOutputWithMultipleInputs
+        ( FromFiles first [], ToJson ) -> Right $ FileToJson first
+        ( FromFiles _ _, ToJson ) -> Left Error_SingleOutputWithMultipleInputs
 
 
 determineWhatToDoFromConfig :: Flags.Config -> Either Message WhatToDo
 determineWhatToDoFromConfig config =
     do
         source <- determineSource (Flags._stdin config) (Flags._input config)
-        destination <- determineDestination (Flags._output config) (Flags._validate config)
+        destination <- determineDestination (Flags._output config) (Flags._validate config) (Flags._json config)
         determineWhatToDo source destination
 
 
@@ -350,3 +363,34 @@ main defaultVersion =
 
                         Just _ ->
                             error "There shouldn't be a validation result when formatting"
+
+            Right (StdinToJson) ->
+                do
+                    input <- Lazy.getContents
+
+                    let result = Lazy.toStrict input
+                            |> Text.decodeUtf8
+                            |> Parse.parse
+
+                    case result of
+                        Result.Result _ (Result.Ok ast) ->
+                            (Lazy.putStr $ Data.Aeson.encode ast)
+                            >> (return ())
+
+                        Result.Result _ (Result.Err _) ->
+                            error "TODO: handle errors in JSON output"
+
+            Right (FileToJson path) ->
+                do
+                    input <- fmap Text.decodeUtf8 $ ByteString.readFile path
+
+                    let result = input
+                            |> Parse.parse
+
+                    case result of
+                        Result.Result _ (Result.Ok ast) ->
+                            (Lazy.putStr $ Data.Aeson.encode ast)
+                            >> (return ())
+
+                        Result.Result _ (Result.Err _) ->
+                            error "TODO: handle errors in JSON output"

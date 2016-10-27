@@ -1,0 +1,155 @@
+{
+    "body": [
+        {
+            "expression": "TODO: Expr",
+            "name": "unit",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "literal",
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "name": "x",
+                "type": "VariableReference"
+            },
+            "name": "var",
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "name": "Bar.Baz.foo",
+                "type": "VariableReference"
+            },
+            "name": "qualifiedVar",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "operator",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "infixApplication",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "infixApplicationMultiline",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "infixPipeLeft",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "infixPipeLeft2",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "functionApplication",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "functionApplicationMultilineWithFirstArg",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "functionApplicationMultiline",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "unary",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "binary",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "parens",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "emptyList",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "list",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "range",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "tuple",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "tupleFunction",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "emptyRecord",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "record",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "recordUpdate",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "recordAccess",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "recordAccessfunction",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "lambda",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "ifStatement",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "letStatement",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "caseStatement",
+            "type": "Definition"
+        }
+    ]
+}
