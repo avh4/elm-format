@@ -16,7 +16,7 @@ basic =
   addLocation $
     choice
       [ char '_' >> return P.Anything
-      , P.Var . Var.VarRef <$> lowVar
+      , P.VarPattern . Var.VarRef <$> lowVar
       , chunksToPattern <$> dotSep1 capVar
       , P.Literal <$> Literal.literal
       ]

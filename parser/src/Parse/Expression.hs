@@ -23,7 +23,7 @@ import qualified Reporting.Annotation as A
 
 varTerm :: IParser E.Expr'
 varTerm =
-  boolean <|> ((\x -> E.Var $ Var.VarRef x) <$> var)
+  boolean <|> ((\x -> E.VarExpr $ Var.VarRef x) <$> var)
 
 
 boolean :: IParser E.Expr'
@@ -96,7 +96,7 @@ parensTerm =
     ]
   where
     opFn =
-      E.Var <$> anyOp
+      E.VarExpr <$> anyOp
 
     tupleFn =
       do  commas <- many1 comma
@@ -132,7 +132,7 @@ recordTerm =
       do  try (string "|")
           postBar <- whitespace
           fields <- commaSep1 field
-          return $ \pre post multiline -> (E.RecordUpdate (Commented pre (A.A ann $ E.Var $ Var.VarRef starter) postStarter) (fields postBar post) multiline)
+          return $ \pre post multiline -> (E.RecordUpdate (Commented pre (A.A ann $ E.VarExpr $ Var.VarRef starter) postStarter) (fields postBar post) multiline)
 
     literal (A.A _ starter) postStarter =
       do
@@ -347,14 +347,14 @@ defStart =
     choice
       [ do  pattern <- try Pattern.term
             func pattern
-      , do  opPattern <- addLocation (P.Var <$> parens' symOp)
+      , do  opPattern <- addLocation (P.VarPattern <$> parens' symOp)
             func opPattern
       ]
       <?> "the definition of a variable (x = ...)"
   where
     func pattern =
         case pattern of
-          A.A _ (P.Var _) ->
+          A.A _ (P.VarPattern _) ->
               ((,) pattern) <$> spacePrefix Pattern.term
 
           _ ->
