@@ -432,9 +432,9 @@ accessible exprParser =
                 end <- getMyPosition
                 return . A.at start end $
                     case rootExpr of
-                      AST.Expression.Var (AST.Variable.VarRef name@(c:_))
+                      AST.Expression.VarExpr (AST.Variable.VarRef name@(c:_))
                         | Char.isUpper c ->
-                            AST.Expression.Var $ AST.Variable.VarRef (name ++ '.' : v)
+                            AST.Expression.VarExpr $ AST.Variable.VarRef (name ++ '.' : v)
                       _ ->
                         AST.Expression.Access annotatedRootExpr v
 

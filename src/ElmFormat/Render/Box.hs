@@ -138,7 +138,7 @@ declarationType decl =
       case RA.drop adecl of
         AST.Declaration.Definition pat _ _ _ ->
           case RA.drop pat of
-            AST.Pattern.Var name ->
+            AST.Pattern.VarPattern name ->
               DDefinition $ Just name
 
             _ ->
@@ -760,7 +760,7 @@ formatPattern parensRequired apattern =
         AST.Pattern.Literal lit ->
             formatLiteral lit
 
-        AST.Pattern.Var var ->
+        AST.Pattern.VarPattern var ->
             line $ formatVar var
 
         AST.Pattern.ConsPattern first rest final ->
@@ -844,7 +844,7 @@ formatExpression aexpr =
         AST.Expression.Literal lit ->
             formatLiteral lit
 
-        AST.Expression.Var v ->
+        AST.Expression.VarExpr v ->
             line $ formatVar v
 
         AST.Expression.Range left right multiline ->

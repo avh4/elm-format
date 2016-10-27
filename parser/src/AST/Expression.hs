@@ -33,7 +33,7 @@ type IfClause =
 data Expr'
     = Unit Comments
     | Literal Literal
-    | Var Var.Ref
+    | VarExpr Var.Ref
 
     | App Expr [(Comments, Expr)] FunctionApplicationMultiline
     | Unary UnaryOperator Expr

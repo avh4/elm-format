@@ -14,7 +14,7 @@ data Pattern'
     = Anything
     | UnitPattern Comments
     | Literal Literal
-    | Var Var.Ref
+    | VarPattern Var.Ref
     | Data String [(Comments, Pattern)]
     | PatternParens (Commented Pattern)
     | Tuple [Commented Pattern]
