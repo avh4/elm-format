@@ -1,6 +1,7 @@
 /dist/
 /cabal.sandbox.config
 /formatted.elm
+/formatted.json
 /_input.elm
 /_input2.elm
 /.cabal-sandbox/

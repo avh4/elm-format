@@ -19,6 +19,7 @@ data Config = Config
     , _validate :: Bool
     , _stdin :: Bool
     , _elmVersion :: ElmVersion
+    , _json :: Bool
     }
 
 
@@ -85,6 +86,7 @@ flags defaultVersion =
       <*> validate
       <*> stdin
       <*> elmVersion defaultVersion
+      <*> json
 
 
 
@@ -183,3 +185,11 @@ elmVersion defaultVersion =
             , "Default: " ++ show defaultVersion
             ]
       ]
+
+json :: Opt.Parser Bool
+json =
+    Opt.switch $
+        mconcat
+            [ Opt.long "json"
+            , Opt.help "Instead of formatting, write the AST to stdout."
+            ]
