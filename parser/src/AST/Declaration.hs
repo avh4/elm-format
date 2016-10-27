@@ -11,15 +11,15 @@ import qualified Reporting.Annotation as A
 -- DECLARATIONS
 
 data Declaration
-    = Definition Pattern.Pattern [(Comments, Pattern.Pattern)] Comments Expression.Expr
-    | TypeAnnotation (Var.Ref, Comments) (Comments, Type)
+    = Definition Pattern.Pattern [PreCommented Pattern.Pattern] Comments Expression.Expr
+    | TypeAnnotation (PostCommented Var.Ref) (PreCommented Type)
     | Datatype
-        (Commented (String, [(Comments, String)]))
-        [Commented (String, [(Comments, Type)])]
-        (Comments, (String, [(Comments, Type)]))
+        (Commented (String, [PreCommented String]))
+        [Commented (String, [PreCommented Type])]
+        (PreCommented (String, [PreCommented Type]))
     | TypeAlias Comments
-        (Commented (String, [(Comments, String)]))
-        (Comments, Type)
+        (Commented (String, [PreCommented String]))
+        (PreCommented Type)
     | PortAnnotation (Commented String) Comments Type
     | PortDefinition (Commented String) Comments Expression.Expr
     | Fixity Assoc Comments Int Comments Var.Ref
