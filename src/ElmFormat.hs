@@ -16,6 +16,8 @@ import ElmFormat.InputConsole (InputConsole)
 import ElmFormat.OutputConsole (OutputConsole)
 import ElmFormat.World
 
+import qualified AST.Json
+import qualified AST.Module
 import qualified Flags
 import qualified Data.Text as Text
 import qualified ElmFormat.Execute as Execute
@@ -29,6 +31,74 @@ import qualified ElmFormat.OutputConsole as OutputConsole
 import qualified ElmFormat.Version
 import qualified Options.Applicative as Opt
 import qualified Reporting.Result as Result
+import qualified Text.JSON
+
+
+-- If elm-format was successful and formatted result differ
+-- from original content, writes the results to the output file.
+-- Otherwise, display errors and exit
+writeResult
+    :: Operation f =>
+    ElmVersion
+    -> Destination
+    -> FilePath
+    -> Text.Text
+    -> Result.Result () Syntax.Error AST.Module.Module
+    -> Free f (Maybe Bool)
+writeResult elmVersion destination inputFile inputText result =
+    case result of
+        Result.Result _ (Result.Ok modu) ->
+            let
+                renderedText =
+                    Render.render elmVersion modu
+                rendered =
+                    renderedText
+                        |> Text.encodeUtf8
+            in
+                case destination of
+                    UpdateInPlace ->
+                        Operation.deprecatedIO $
+                        Char8.putStr rendered
+                        >> return Nothing
+
+                    ValidateOnly ->
+                        if inputText /= renderedText then
+                            onInfo (FileWouldChange inputFile)
+                            >> return (Just False)
+                        else
+                            return $ Just True
+
+                    ToFile path ->
+                        let
+                            shouldWriteToFile =
+                                inputFile /= path || inputText /= renderedText
+                        in
+                            if shouldWriteToFile then
+                                Operation.deprecatedIO $
+                                ByteString.writeFile path rendered
+                                >> return Nothing
+                            else
+                                return Nothing
+
+                    ToJson ->
+                        error "Internal error: ToJson should not get passed to writeResult"
+
+        Result.Result _ (Result.Err errs) ->
+            onInfo (ParseError inputFile (Text.unpack inputText) errs)
+            >> return (Just False)
+
+
+processTextInput :: Operation f => ElmVersion -> Destination -> FilePath -> Text.Text -> Free f (Maybe Bool)
+processTextInput elmVersion destination inputFile inputText =
+    Parse.parse inputText
+        |> writeResult elmVersion destination inputFile inputText
+
+
+processFileInput :: Operation f => ElmVersion -> FilePath -> Destination -> Free f (Maybe Bool)
+processFileInput elmVersion inputFile destination =
+    do
+        inputText <- Operation.deprecatedIO $ fmap Text.decodeUtf8 $ ByteString.readFile inputFile
+        processTextInput elmVersion destination inputFile inputText
 
 
 resolveFile :: FileStore f => FilePath -> Free f (Either InputFileMessage [FilePath])
@@ -90,6 +160,8 @@ data WhatToDo
     | StdinToStdout
     | ValidateStdin
     | ValidateFiles FilePath [FilePath]
+    | FileToJson FilePath
+    | StdinToJson
 
 
 data Source
@@ -101,6 +173,7 @@ data Destination
     = ValidateOnly
     | UpdateInPlace
     | ToFile FilePath
+    | ToJson
 
 
 determineSource :: Bool -> Either [InputFileMessage] [FilePath] -> Either ErrorMessage Source
@@ -113,13 +186,15 @@ determineSource stdin inputFiles =
         ( True, Right (_:_) ) -> Left TooManyInputs
 
 
-determineDestination :: Maybe FilePath -> Bool -> Either ErrorMessage Destination
-determineDestination output doValidate =
-    case ( output, doValidate ) of
-        ( Nothing, True ) -> Right ValidateOnly
-        ( Nothing, False ) -> Right UpdateInPlace
-        ( Just path, False ) -> Right $ ToFile path
-        ( Just _, True ) -> Left OutputAndValidate
+determineDestination :: Maybe FilePath -> Bool -> Bool -> Either ErrorMessage Destination
+determineDestination output doValidate json =
+    case ( output, doValidate, json ) of
+        ( _, True, True ) -> Left OutputAndValidate
+        ( Nothing, True, False ) -> Right ValidateOnly
+        ( Nothing, False, False ) -> Right UpdateInPlace
+        ( Just path, False, False ) -> Right $ ToFile path
+        ( Just _, True, _ ) -> Left OutputAndValidate
+        ( _, False, True ) -> Right ToJson
 
 
 determineWhatToDo :: Source -> Destination -> Either ErrorMessage WhatToDo
@@ -128,17 +203,20 @@ determineWhatToDo source destination =
         ( Stdin, ValidateOnly ) -> Right $ ValidateStdin
         ( FromFiles first rest, ValidateOnly) -> Right $ ValidateFiles first rest
         ( Stdin, UpdateInPlace ) -> Right StdinToStdout
+        ( Stdin, ToJson ) -> Right StdinToJson
         ( Stdin, ToFile output ) -> Right $ StdinToFile output
         ( FromFiles first [], ToFile output ) -> Right $ FormatToFile first output
         ( FromFiles first rest, UpdateInPlace ) -> Right $ FormatInPlace first rest
         ( FromFiles _ _, ToFile _ ) -> Left SingleOutputWithMultipleInputs
+        ( FromFiles first [], ToJson ) -> Right $ FileToJson first
+        ( FromFiles _ _, ToJson ) -> Left SingleOutputWithMultipleInputs
 
 
 determineWhatToDoFromConfig :: Flags.Config -> Either [InputFileMessage] [FilePath] -> Either ErrorMessage WhatToDo
 determineWhatToDoFromConfig config resolvedInputFiles =
     do
         source <- determineSource (Flags._stdin config) resolvedInputFiles
-        destination <- determineDestination (Flags._output config) (Flags._validate config)
+        destination <- determineDestination (Flags._output config) (Flags._validate config) (Flags._json config)
         determineWhatToDo source destination
 
 

@@ -1,7 +1,7 @@
 elm-format-0.18 x.x.x
 
 Usage: elm-format [INPUT] [--output FILE] [--yes] [--validate] [--stdin]
-                  [--elm-version VERSION] [--upgrade]
+                  [--elm-version VERSION] [--upgrade] [--json]
   Format Elm source files.
 
 Available options:
@@ -14,6 +14,7 @@ Available options:
   --elm-version VERSION    The Elm version of the source files being formatted.
                            Valid values: 0.17, 0.18. Default: 0.18
   --upgrade                Upgrade older Elm files to Elm 0.18 syntax
+  --json                   Instead of formatting, write the AST to stdout.
 
 Examples:
   elm-format Main.elm                     # formats Main.elm
