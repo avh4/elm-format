@@ -1437,32 +1437,85 @@ formatType' elmVersion requireParens atype =
         RecordExtensionType ext (first:rest) multiline ->
           ElmStructure.extensionGroup
             multiline
-            (formatCommented (line . identifier) ext)
-            (formatRecordPair ":" (formatType elmVersion) first)
-            (map (formatRecordPair ":" (formatType elmVersion)) rest)
+            (formatCommented (line . formatLowercaseIdentifier elmVersion []) ext)
+            (formatRecordPair elmVersion ":" (formatType elmVersion) first)
+            (map (formatRecordPair elmVersion ":" (formatType elmVersion)) rest)
 
 
 formatVar :: ElmVersion -> AST.Variable.Ref -> Line
 formatVar elmVersion var =
     case var of
-        AST.Variable.VarRef name ->
-            identifier $ formatVarName elmVersion name
-        AST.Variable.OpRef name ->
+        AST.Variable.VarRef namespace name ->
+            formatLowercaseIdentifier elmVersion namespace name
+        AST.Variable.TagRef namespace name ->
+            case namespace of
+                [] -> identifier $ formatVarName'' elmVersion name
+                _ ->
+                    row
+                        [ formatQualifiedUppercaseIdentifier elmVersion namespace
+                        , punc "."
+                        , identifier $ formatVarName'' elmVersion name
+                        ]
+        AST.Variable.OpRef (SymbolIdentifier name) ->
             identifier $ "(" ++ name ++ ")"
 
 
 formatInfixVar :: ElmVersion -> AST.Variable.Ref -> Line
 formatInfixVar elmVersion var =
     case var of
-        AST.Variable.VarRef name ->
-            identifier $ "`" ++ formatVarName elmVersion name ++ "`"
-        AST.Variable.OpRef name ->
+        AST.Variable.VarRef _ _ ->
+            row [ punc "`"
+                , formatVar elmVersion var
+                , punc "`"
+                ]
+        AST.Variable.TagRef _ _ ->
+            row [ punc "`"
+                , formatVar elmVersion var
+                , punc "`"
+                ]
+        AST.Variable.OpRef (SymbolIdentifier name) ->
             identifier name
 
 
-formatVarName :: ElmVersion -> String -> String
-formatVarName elmVersion name =
+formatLowercaseIdentifier :: ElmVersion -> [UppercaseIdentifier] -> LowercaseIdentifier -> Line
+formatLowercaseIdentifier elmVersion namespace (LowercaseIdentifier name) =
+    case namespace of
+        [] -> identifier $ formatVarName' elmVersion name
+        _ ->
+            row
+                [ formatQualifiedUppercaseIdentifier elmVersion namespace
+                , punc "."
+                , identifier $ formatVarName' elmVersion name
+                ]
+
+
+formatUppercaseIdentifier :: ElmVersion -> UppercaseIdentifier -> Line
+formatUppercaseIdentifier elmVersion (UppercaseIdentifier name) =
+    identifier $ formatVarName' elmVersion name
+
+
+formatQualifiedUppercaseIdentifier :: ElmVersion -> [UppercaseIdentifier] -> Line
+formatQualifiedUppercaseIdentifier elmVersion names =
+  identifier $ List.intercalate "." $
+      map (\(UppercaseIdentifier name) -> formatVarName' elmVersion name) names
+
+
+formatVarName :: ElmVersion -> LowercaseIdentifier -> String
+formatVarName elmVersion (LowercaseIdentifier name) =
     case elmVersion of
         Elm_0_18 -> map (\x -> if x == '\'' then '_' else x) name
         Elm_0_17 -> name
         Elm_0_16 -> name
+
+
+formatVarName' :: ElmVersion -> String -> String
+formatVarName' elmVersion name =
+    case elmVersion of
+        Elm_0_18 -> map (\x -> if x == '\'' then '_' else x) name
+        Elm_0_17 -> name
+        Elm_0_16 -> name
+
+
+formatVarName'' :: ElmVersion -> UppercaseIdentifier -> String
+formatVarName'' elmVersion (UppercaseIdentifier name) =
+    formatVarName' elmVersion name

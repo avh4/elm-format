@@ -63,7 +63,8 @@ var =
 
 lowVar :: IParser LowercaseIdentifier
 lowVar =
-  makeVar lower <?> "a lower case name"
+  LowercaseIdentifier <$> makeVar lower <?> "a lower case name"
+  -- TODO: allow it to start with '_' ?
 
 
 capVar :: IParser UppercaseIdentifier
@@ -435,14 +436,14 @@ accessible exprParser =
 
         Just _ ->
           accessible $
-            do  v <- var
+            do  v <- lowVar
                 end <- getMyPosition
                 return . A.at start end $
-                    case rootExpr of
-                      AST.Expression.VarExpr (AST.Variable.VarRef name@(c:_))
-                        | Char.isUpper c ->
-                            AST.Expression.VarExpr $ AST.Variable.VarRef (name ++ '.' : v)
-                      _ ->
+                    -- case rootExpr of
+                    --   AST.Expression.VarExpr (AST.Variable.VarRef name@(c:_))
+                    --     | Char.isUpper c ->
+                    --         AST.Expression.VarExpr $ AST.Variable.VarRef (name ++ '.' : v)
+                    --   _ ->
                         AST.Expression.Access annotatedRootExpr v
 
 
