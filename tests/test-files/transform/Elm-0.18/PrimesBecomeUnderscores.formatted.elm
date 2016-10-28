@@ -6,7 +6,7 @@ declaration_ =
     ()
 
 
-typeVariable : number -> number' -> number'' -> number'
+typeVariable : number -> number_ -> number__ -> number_
 typeVariable _ x _ =
     x
 
