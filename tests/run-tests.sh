@@ -210,13 +210,14 @@ function checkBad() {
 }
 
 function checkTransformation() {
-	INPUT="tests/test-files/transform/$1"
+	ELM_VERSION="$1"
+	INPUT="tests/test-files/transform/$2"
 	OUTPUT="formatted.elm"
-	EXPECTED="tests/test-files/transform/${1%.*}.formatted.elm"
+	EXPECTED="tests/test-files/transform/${2%.*}.formatted.elm"
 
 	echo
-	echo "## transform/$1"
-	time "$ELM_FORMAT" "$INPUT" --output "$OUTPUT" --elm-version 0.16 1>/dev/null
+	echo "## transform/$2"
+	time "$ELM_FORMAT" "$INPUT" --output "$OUTPUT" --elm-version "$ELM_VERSION" 1>/dev/null
 	returnCodeShouldEqual 0
 	compareFiles "$EXPECTED" "$OUTPUT"
 }
@@ -274,15 +275,16 @@ checkBad Empty.elm
 checkBad UnexpectedComma.elm
 checkBad UnexpectedEndOfInput.elm
 
-checkTransformation Examples.elm
-checkTransformation TrickyModule1.elm
-checkTransformation TrickyModule2.elm
-checkTransformation TrickyModule3.elm
-checkTransformation TrickyModule4.elm
-checkTransformation LenientEqualsColon.elm
-checkTransformation github-avh4-elm-format-184.elm
-checkTransformation QuickCheck-4562ebccb71ea9f622fb99cdf32b2923f6f9d34f-2529668492575674138.elm
-checkTransformation QuickCheck-94f37da84c1310f03dcfa1059ce870b73c94a825--6449652945938213463.elm
+checkTransformation 0.16 Examples.elm
+checkTransformation 0.16 TrickyModule1.elm
+checkTransformation 0.16 TrickyModule2.elm
+checkTransformation 0.16 TrickyModule3.elm
+checkTransformation 0.16 TrickyModule4.elm
+checkTransformation 0.16 LenientEqualsColon.elm
+checkTransformation 0.16 github-avh4-elm-format-184.elm
+checkTransformation 0.16 QuickCheck-4562ebccb71ea9f622fb99cdf32b2923f6f9d34f-2529668492575674138.elm
+checkTransformation 0.16 QuickCheck-94f37da84c1310f03dcfa1059ce870b73c94a825--6449652945938213463.elm
+checkTransformation 0.18 Elm-0.18/PrimesBecomeUnderscores.elm
 
 checkJson good/AllSyntax/0.16/Expressions.elm
 
