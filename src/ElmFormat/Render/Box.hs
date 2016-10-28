@@ -634,7 +634,7 @@ formatDeclaration elmVersion decl =
                 AST.Declaration.Datatype nameWithArgs middle final ->
                     let
                         ctor (tag,args') =
-                            case allSingles $ map (formatHeadCommented $ formatType' ForCtor) args' of
+                            case allSingles $ map (formatHeadCommented $ formatType' elmVersion ForCtor) args' of
                                 Right args'' ->
                                     line $ row $ List.intersperse space $ (identifier tag):args''
                                 Left [] ->
@@ -680,13 +680,13 @@ formatDeclaration elmVersion decl =
                     [ formatHeadCommented (line . keyword) (preAlias, "alias")
                     , formatCommented formatNameWithArgs nameWithArgs
                     ]
-                    (formatHeadCommentedStack formatType typ)
+                    (formatHeadCommentedStack (formatType elmVersion) typ)
 
                 AST.Declaration.PortAnnotation name typeComments typ ->
                   ElmStructure.definition ":" False
                     (line $ keyword "port")
                     [ formatCommented (line . identifier) name ]
-                    (formatCommented' typeComments formatType typ)
+                    (formatCommented' typeComments (formatType elmVersion) typ)
 
                 AST.Declaration.PortDefinition name bodyComments expr ->
                   ElmStructure.definition "=" True
@@ -750,7 +750,7 @@ formatTypeAnnotation elmVersion name typ =
   ElmStructure.definition ":" False
     (formatTailCommented (line . formatVar elmVersion) name)
     []
-    (formatHeadCommented formatType typ)
+    (formatHeadCommented (formatType elmVersion) typ)
 
 
 formatPattern :: ElmVersion -> Bool -> AST.Pattern.Pattern -> Box
@@ -1344,9 +1344,9 @@ data TypeParensRequired
     deriving (Eq)
 
 
-formatType :: Type -> Box
-formatType =
-    formatType' NotRequired
+formatType :: ElmVersion -> Type -> Box
+formatType elmVersion =
+    formatType' elmVersion NotRequired
 
 
 commaSpace :: Line
@@ -1367,8 +1367,8 @@ formatTypeConstructor ctor =
             line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
 
 
-formatType' :: TypeParensRequired -> Type -> Box
-formatType' requireParens atype =
+formatType' :: ElmVersion -> TypeParensRequired -> Type -> Box
+formatType' elmVersion requireParens atype =
     case RA.drop atype of
         UnitType comments ->
           formatUnit '(' ')' comments
@@ -1378,9 +1378,9 @@ formatType' requireParens atype =
               ( forceMultiline
               , allSingles $
                   concat
-                    [ [formatTailCommented (formatType' ForLambda) first]
-                    , map (formatCommented $ formatType' ForLambda) rest
-                    , [formatHeadCommented (formatType' ForLambda) final]
+                    [ [formatTailCommented (formatType' elmVersion ForLambda) first]
+                    , map (formatCommented $ formatType' elmVersion ForLambda) rest
+                    , [formatHeadCommented (formatType' elmVersion ForLambda) final]
                     ]
               )
             of
@@ -1400,26 +1400,26 @@ formatType' requireParens atype =
             |> (if requireParens /= NotRequired then parens else id)
 
         TypeVariable var ->
-            line $ identifier var
+            line $ identifier $ formatVarName elmVersion var
 
         TypeConstruction ctor args ->
             ElmStructure.application
                 (FAJoinFirst JoinAll)
                 (formatTypeConstructor ctor)
-                (map (formatHeadCommented $ formatType' ForCtor) args)
+                (map (formatHeadCommented $ formatType' elmVersion ForCtor) args)
                 |> (if requireParens == ForCtor then parens else id)
 
         TypeParens type' ->
-          parens $ formatCommented formatType type'
+          parens $ formatCommented (formatType elmVersion) type'
 
         TupleType types ->
-          ElmStructure.group True "(" "," ")" False (map (formatCommented formatType) types)
+          ElmStructure.group True "(" "," ")" False (map (formatCommented (formatType elmVersion)) types)
 
         EmptyRecordType comments ->
           formatUnit '{' '}' comments
 
         RecordType fields multiline ->
-          ElmStructure.group True "{" "," "}" multiline (map (formatRecordPair ":" formatType) fields)
+          ElmStructure.group True "{" "," "}" multiline (map (formatRecordPair ":" (formatType elmVersion)) fields)
 
         RecordExtensionType _ [] _ ->
           pleaseReport "INVALID RECORD TYPE EXTENSION" "no fields"
@@ -1428,8 +1428,8 @@ formatType' requireParens atype =
           ElmStructure.extensionGroup
             multiline
             (formatCommented (line . identifier) ext)
-            (formatRecordPair ":" formatType first)
-            (map (formatRecordPair ":" formatType) rest)
+            (formatRecordPair ":" (formatType elmVersion) first)
+            (map (formatRecordPair ":" (formatType elmVersion)) rest)
 
 
 formatVar :: ElmVersion -> AST.Variable.Ref -> Line
