@@ -1357,11 +1357,11 @@ commaSpace =
         ]
 
 
-formatTypeConstructor :: TypeConstructor -> Box
-formatTypeConstructor ctor =
+formatTypeConstructor :: ElmVersion -> TypeConstructor -> Box
+formatTypeConstructor elmVersion ctor =
     case ctor of
         NamedConstructor name ->
-            line $ identifier name
+            line $ identifier $ formatVarName elmVersion name
 
         TupleConstructor n ->
             line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
@@ -1405,7 +1405,7 @@ formatType' elmVersion requireParens atype =
         TypeConstruction ctor args ->
             ElmStructure.application
                 (FAJoinFirst JoinAll)
-                (formatTypeConstructor ctor)
+                (formatTypeConstructor elmVersion ctor)
                 (map (formatHeadCommented $ formatType' elmVersion ForCtor) args)
                 |> (if requireParens == ForCtor then parens else id)
 
