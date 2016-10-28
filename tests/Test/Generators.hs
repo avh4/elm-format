@@ -6,7 +6,6 @@ import AST.V0_16
 import qualified AST.Declaration
 import qualified AST.Expression
 import qualified AST.Module
-import qualified AST.Module.Name
 import qualified AST.Pattern
 import qualified AST.Variable
 import qualified Reporting.Annotation
@@ -34,20 +33,20 @@ number =
     elements "0123456789"
 
 
-capIdentifier :: Gen String
+capIdentifier :: Gen UppercaseIdentifier
 capIdentifier =
     do
         first <- capitalLetter
         rest <- listOf $ oneof [ capitalLetter, lowerLetter, number ]
-        return $ first:rest
+        return $ UppercaseIdentifier $ first:rest
 
 
-lowerIdentifier :: Gen String
+lowerIdentifier :: Gen LowercaseIdentifier
 lowerIdentifier =
     do
         first <- lowerLetter
         rest <- listOf $ oneof [ capitalLetter, lowerLetter, number ]
-        return $ first:rest
+        return $ LowercaseIdentifier $ first:rest
 
 
 nowhere :: Reporting.Region.Position
@@ -77,7 +76,7 @@ instance Arbitrary AST.Variable.Value where
     arbitrary =
         do
             name <- capIdentifier
-            return $ AST.Variable.Value $ AST.Variable.VarRef name
+            return $ AST.Variable.Union (name, []) AST.Variable.ClosedListing
 
 
 instance (Arbitrary a) => Arbitrary (AST.Variable.Listing a) where

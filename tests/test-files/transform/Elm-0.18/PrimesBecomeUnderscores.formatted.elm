@@ -14,3 +14,8 @@ typeVariable _ x _ =
 parameter : () -> () -> () -> ()
 parameter x x_ x__ =
     ()
+
+
+namedTypeConstructor : Foo_ a b -> Bar__ x -> ()
+namedTypeConstructor _ _ =
+    ()

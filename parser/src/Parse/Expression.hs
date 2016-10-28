@@ -23,7 +23,7 @@ import qualified Reporting.Annotation as A
 
 varTerm :: IParser E.Expr'
 varTerm =
-  boolean <|> ((\x -> E.VarExpr $ Var.VarRef x) <$> var)
+  boolean <|> (E.VarExpr <$> var)
 
 
 boolean :: IParser E.Expr'
@@ -132,7 +132,7 @@ recordTerm =
       do  try (string "|")
           postBar <- whitespace
           fields <- commaSep1 field
-          return $ \pre post multiline -> (E.RecordUpdate (Commented pre (A.A ann $ E.VarExpr $ Var.VarRef starter) postStarter) (fields postBar post) multiline)
+          return $ \pre post multiline -> (E.RecordUpdate (Commented pre (A.A ann $ E.VarExpr $ Var.VarRef [] starter) postStarter) (fields postBar post) multiline)
 
     literal (A.A _ starter) postStarter =
       do
@@ -325,7 +325,7 @@ typeAnnotation fn =
     (\(v, pre, post) e -> fn (v, pre) (post, e)) <$> try start <*> Type.expr
   where
     start =
-      do  v <- (Var.VarRef <$> lowVar) <|> parens' symOp
+      do  v <- (Var.VarRef [] <$> lowVar) <|> parens' (Var.OpRef <$> symOp)
           (preColon, _, postColon) <- padded hasType
           return (v, preColon, postColon)
 
@@ -347,7 +347,7 @@ defStart =
     choice
       [ do  pattern <- try Pattern.term
             func pattern
-      , do  opPattern <- addLocation (P.VarPattern <$> parens' symOp)
+      , do  opPattern <- addLocation (P.OpPattern <$> parens' symOp)
             func opPattern
       ]
       <?> "the definition of a variable (x = ...)"
@@ -355,6 +355,9 @@ defStart =
     func pattern =
         case pattern of
           A.A _ (P.VarPattern _) ->
+              ((,) pattern) <$> spacePrefix Pattern.term
+
+          A.A _ (P.OpPattern _) ->
               ((,) pattern) <$> spacePrefix Pattern.term
 
           _ ->

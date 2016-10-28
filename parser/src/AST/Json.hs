@@ -9,7 +9,9 @@ import AST.Variable
 import AST.V0_16
 import Data.Aeson
 import Data.Monoid ((<>))
-import Reporting.Annotation
+import Reporting.Annotation hiding (map)
+
+import qualified Data.List as List
 
 
 instance ToJSON Module where
@@ -20,7 +22,7 @@ instance ToJSON Module where
 
 
 instance ToJSON Decl where
-  toJSON (Decl (A _ (Definition (A _ (VarPattern (VarRef var))) params _ (A _ expr)))) =
+  toJSON (Decl (A _ (Definition (A _ (VarPattern (LowercaseIdentifier var))) params _ (A _ expr)))) =
     object
       [ "type" .= ("Definition" :: String)
       , "name" .= var
@@ -30,9 +32,14 @@ instance ToJSON Decl where
 
 
 instance ToJSON Expr' where
-  toJSON (VarExpr (VarRef var)) =
+  toJSON (VarExpr (VarRef [] (LowercaseIdentifier var))) =
     object
       [ "type" .= ("VariableReference" :: String)
       , "name" .= var
+      ]
+  toJSON (VarExpr (VarRef namespace (LowercaseIdentifier var))) =
+    object
+      [ "type" .= ("VariableReference" :: String)
+      , "name" .= ((List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) namespace) ++ "." ++ var)
       ]
   toJSON _ = String "TODO: Expr"

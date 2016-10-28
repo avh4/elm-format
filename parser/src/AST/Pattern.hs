@@ -2,7 +2,6 @@
 module AST.Pattern where
 
 import AST.V0_16
-import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
 
 
@@ -14,13 +13,14 @@ data Pattern'
     = Anything
     | UnitPattern Comments
     | Literal Literal
-    | VarPattern Var.Ref
-    | Data String [(Comments, Pattern)]
+    | VarPattern LowercaseIdentifier
+    | OpPattern SymbolIdentifier
+    | Data [UppercaseIdentifier] [(Comments, Pattern)]
     | PatternParens (Commented Pattern)
     | Tuple [Commented Pattern]
     | EmptyListPattern Comments
     | List [Commented Pattern]
     | ConsPattern (Pattern, Comments) [Commented Pattern] (Comments, Pattern)
-    | Record [Commented String]
-    | Alias (Pattern, Comments) (Comments, String)
+    | Record [Commented LowercaseIdentifier]
+    | Alias (Pattern, Comments) (Comments, LowercaseIdentifier)
     deriving (Eq, Show)

@@ -45,7 +45,6 @@ Executable elm-format-0.17
         AST.Expression
         AST.Helpers
         AST.Module
-        AST.Module.Name
         AST.Pattern
         AST.V0_16
         AST.Variable
@@ -119,7 +118,6 @@ Executable elm-format-0.16
         AST.Expression
         AST.Helpers
         AST.Module
-        AST.Module.Name
         AST.Pattern
         AST.V0_16
         AST.Variable
@@ -193,7 +191,6 @@ Test-Suite elm-format-tests
         AST.Expression
         AST.Helpers
         AST.Module
-        AST.Module.Name
         AST.Pattern
         AST.V0_16
         AST.Variable
