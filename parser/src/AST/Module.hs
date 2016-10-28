@@ -4,7 +4,6 @@ module AST.Module
     ) where
 
 import qualified AST.Declaration as Declaration
-import qualified AST.Module.Name as Name
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
 import AST.V0_16
@@ -52,7 +51,7 @@ data SourceTag
 {-| Basic info needed to identify modules and determine dependencies. -}
 data Header = Header
     { srcTag :: SourceTag
-    , name :: Commented Name.Raw
+    , name :: Commented [UppercaseIdentifier]
     , moduleSettings :: Maybe (KeywordCommented SourceSettings)
     , exports :: KeywordCommented (Var.Listing Var.Value)
     }
@@ -60,18 +59,18 @@ data Header = Header
 
 
 type SourceSettings =
-  [(Commented String, Commented String)]
+  [(Commented LowercaseIdentifier, Commented UppercaseIdentifier)]
 
 -- IMPORTs
 
 data UserImport
-    = UserImport (A.Located (PreCommented Name.Raw, ImportMethod))
+    = UserImport (A.Located (PreCommented [UppercaseIdentifier], ImportMethod))
     | ImportComment Comment
     deriving (Eq, Show)
 
 
 data ImportMethod = ImportMethod
-    { alias :: Maybe (Comments, PreCommented String)
+    { alias :: Maybe (Comments, PreCommented UppercaseIdentifier)
     , exposedVars :: (Comments, PreCommented (Var.Listing Var.Value))
     }
     deriving (Eq, Show)

@@ -1,7 +1,6 @@
 {-# OPTIONS_GHC -Wall -fno-warn-unused-do-bind #-}
 module Parse.Type where
 
-import Data.List (intercalate)
 import Text.Parsec ((<|>), (<?>), char, many1, string, try)
 
 import Parse.Helpers
@@ -86,9 +85,9 @@ record =
             )
 
 
-capTypeVar :: IParser String
+capTypeVar :: IParser [UppercaseIdentifier]
 capTypeVar =
-  intercalate "." <$> dotSep1 capVar
+    dotSep1 capVar
 
 
 constructor0 :: IParser TypeConstructor
@@ -100,8 +99,8 @@ constructor0 =
 constructor0' :: IParser Type
 constructor0' =
     addLocation $
-    do  ctor <- capTypeVar
-        return (TypeVariable ctor)
+    do  ctor <- constructor0
+        return (TypeConstruction ctor [])
 
 
 term :: IParser Type
@@ -135,7 +134,13 @@ expr =
           A.A region $ FunctionType first rest final multiline
 
 
-constructor :: IParser (String, [(Comments, Type)])
+constructor :: IParser ([UppercaseIdentifier], [(Comments, Type)])
 constructor =
   (,) <$> (capTypeVar <?> "another type constructor")
+      <*> spacePrefix term
+
+
+tag :: IParser (UppercaseIdentifier, [(Comments, Type)])
+tag =
+  (,) <$> (capVar <?> "another type constructor")
       <*> spacePrefix term

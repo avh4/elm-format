@@ -4,8 +4,9 @@ import AST.V0_16
 
 
 data Ref
-    = VarRef String
-    | OpRef String
+    = VarRef [UppercaseIdentifier] LowercaseIdentifier
+    | TagRef [UppercaseIdentifier] UppercaseIdentifier
+    | OpRef SymbolIdentifier
     deriving (Eq, Ord, Show)
 
 
@@ -21,6 +22,7 @@ data Listing a
 
 -- | A value that can be imported or exported
 data Value
-    = Value !Ref
-    | Union (PostCommented String) (Listing String)
+    = Value !LowercaseIdentifier
+    | OpValue SymbolIdentifier
+    | Union (PostCommented UppercaseIdentifier) (Listing UppercaseIdentifier)
     deriving (Eq, Show)
