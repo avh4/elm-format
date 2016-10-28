@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 module Reporting.Error.Syntax where
 
+import AST.V0_16
 import qualified Data.List as List
 import qualified Data.Set as Set
 import qualified Text.Parsec.Error as Parsec

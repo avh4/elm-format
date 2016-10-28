@@ -6,7 +6,6 @@ import Parse.Helpers
 import Parse.Declaration as Decl
 import qualified AST.Declaration
 import qualified AST.Module as Module
-import qualified AST.Module.Name as ModuleName
 import qualified AST.Variable as Var
 import AST.V0_16
 
@@ -60,7 +59,7 @@ moduleDecl =
     , return $
         Module.Header
           Module.Normal
-          (Commented [] ["Main"] [])
+          (Commented [] [UppercaseIdentifier "Main"] [])
           Nothing
           (KeywordCommented [] [] $ Var.OpenListing $ Commented [] () [])
     ]
@@ -128,21 +127,21 @@ import' =
   do  try (reserved "import")
       preName <- whitespace
       names <- dotSep1 capVar
-      method' <- method (ModuleName.toString names)
+      method' <- method names
       return ((,) preName names, method')
   )
   where
-    method :: String -> IParser Module.ImportMethod
+    method :: [UppercaseIdentifier] -> IParser Module.ImportMethod
     method originalName =
       Module.ImportMethod
         <$> option Nothing (Just <$> as' originalName)
         <*> option ([], ([], Var.ClosedListing)) exposing
 
-    as' :: String -> IParser (Comments, PreCommented String)
+    as' :: [UppercaseIdentifier] -> IParser (Comments, PreCommented UppercaseIdentifier)
     as' moduleName =
       do  preAs <- try (whitespace <* reserved "as")
           postAs <- whitespace
-          (,) preAs <$> (,) postAs <$> capVar <?> ("an alias for module `" ++ moduleName ++ "`")
+          (,) preAs <$> (,) postAs <$> capVar <?> ("an alias for module `" ++ show moduleName ++ "`") -- TODO: do something correct instead of show
 
     exposing :: IParser (Comments, PreCommented (Var.Listing Var.Value))
     exposing =
@@ -195,11 +194,11 @@ value =
     val <|> tipe <?> "a value or type to expose"
   where
     val =
-      Var.Value <$> ((Var.VarRef <$> lowVar) <|> parens' symOp)
+      (Var.Value <$> lowVar) <|> (Var.OpValue <$> parens' symOp)
 
     tipe =
       do  name <- capVar
           maybeCtors <- optionMaybe (listing capVar)
           case maybeCtors of
-            Nothing -> return (Var.Value $ Var.VarRef name)
+            Nothing -> return $ Var.Union (name, []) Var.ClosedListing
             Just (pre, ctors) -> return (Var.Union (name, pre) ctors)

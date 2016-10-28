@@ -48,7 +48,7 @@ typeDecl =
                     (postEquals, tipe)
 
         Nothing ->
-            do  tcs <- pipeSep1 ((\x pre post -> Commented pre x post) <$> Type.constructor) <?> "a constructor for a union type"
+            do  tcs <- pipeSep1 ((\x pre post -> Commented pre x post) <$> Type.tag) <?> "a constructor for a union type"
                 let tcs' = tcs postEquals []
                 return $
                   case (init tcs', last tcs') of

@@ -16,17 +16,17 @@ basic =
   addLocation $
     choice
       [ char '_' >> return P.Anything
-      , P.VarPattern . Var.VarRef <$> lowVar
+      , P.VarPattern <$> lowVar
       , chunksToPattern <$> dotSep1 capVar
       , P.Literal <$> Literal.literal
       ]
   where
     chunksToPattern chunks =
-        case List.intercalate "." chunks of
-          "True" ->
+        case chunks of
+          [UppercaseIdentifier "True"] ->
               P.Literal (Boolean True)
 
-          "False" ->
+          [UppercaseIdentifier "False"] ->
               P.Literal (Boolean False)
 
           name ->
@@ -106,10 +106,10 @@ term =
 patternConstructor :: IParser P.Pattern
 patternConstructor =
   addLocation $
-    do  v <- List.intercalate "." <$> dotSep1 capVar
+    do  v <- dotSep1 capVar
         case v of
-          "True"  -> return $ P.Literal (Boolean True)
-          "False" -> return $ P.Literal (Boolean False)
+          [UppercaseIdentifier "True"]  -> return $ P.Literal (Boolean True)
+          [UppercaseIdentifier "False"] -> return $ P.Literal (Boolean False)
           _       -> P.Data v <$> spacePrefix term
 
 

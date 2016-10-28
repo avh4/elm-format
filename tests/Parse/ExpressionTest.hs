@@ -69,12 +69,12 @@ tests =
         ]
 
     , testGroup "variable"
-        [ example "lowercase" "foo" $ at 1 1 1 4 $ VarExpr $ VarRef "foo"
-        , example "uppercase" "Bar" $ at 1 1 1 4 $ VarExpr $ VarRef "Bar"
-        , example "qualified" "Bar.Baz.foo" $ at 1 1 1 12 $ VarExpr $ VarRef "Bar.Baz.foo"
+        [ example "lowercase" "foo" $ at 1 1 1 4 $ VarExpr $ VarRef [] $ LowercaseIdentifier "foo"
+        , example "uppercase" "Bar" $ at 1 1 1 4 $ VarExpr $ TagRef [] $ UppercaseIdentifier "Bar"
+        , example "qualified" "Bar.Baz.foo" $ at 1 1 1 12 $ VarExpr $ VarRef [UppercaseIdentifier "Bar", UppercaseIdentifier "Baz"] $ LowercaseIdentifier "foo"
 
         , testGroup "symbolic operator"
-            [ example "" "(+)" $ at 1 1 1 4 $ VarExpr $ OpRef "+"
+            [ example "" "(+)" $ at 1 1 1 4 $ VarExpr $ (OpRef $ SymbolIdentifier "+")
             , testCase "does not allow whitespace" $
                 assertParseFailure expr "( + )"
             , testCase "doew not allow comments" $
@@ -83,12 +83,12 @@ tests =
         ]
 
     , testGroup "function application"
-        [ example "" "f 7 8" $ at 1 1 1 6 $ App (at 1 1 1 2 $ VarExpr $ VarRef "f") [intExpr'' (1,3,1,4) 7, intExpr'' (1,5,1,6) 8] (FAJoinFirst JoinAll)
-        , example "argument starts with minus" "f -9 -x" $ at 1 1 1 8 $ App (at 1 1 1 2 $ VarExpr $ VarRef "f") [intExpr'' (1,3,1,5) (-9), (,) [] $ at 1 6 1 8 $ Unary Negative $ at 1 7 1 8 $ VarExpr $ VarRef "x"] (FAJoinFirst JoinAll)
-        , example "comments" "f{-A-}7{-B-}8" $ at 1 1 1 14 $ App (at 1 1 1 2 $ VarExpr $ VarRef "f") [commentedIntExpr'' (1,7,1,8) "A" 7, commentedIntExpr'' (1,13,1,14) "B" 8] (FAJoinFirst JoinAll)
-        , example "newlines (1)" "f 7\n 8" $ at 1 1 2 3 $ App (at 1 1 1 2 $ VarExpr $ VarRef "f") [intExpr'' (1,3,1,4) 7, intExpr'' (2,2,2,3) 8] (FAJoinFirst SplitAll)
-        , example "newlines (2)" "f\n 7\n 8" $ at 1 1 3 3 $ App (at 1 1 1 2 $ VarExpr $ VarRef "f") [intExpr'' (2,2,2,3) 7, intExpr'' (3,2,3,3) 8] FASplitFirst
-        , example "newlines and comments" "f\n {-A-}7\n {-B-}8" $ at 1 1 3 8 $ App (at 1 1 1 2 $ VarExpr $ VarRef "f") [commentedIntExpr'' (2,7,2,8) "A" 7, commentedIntExpr'' (3,7,3,8) "B" 8] FASplitFirst
+        [ example "" "f 7 8" $ at 1 1 1 6 $ App (at 1 1 1 2 $ VarExpr $ VarRef [] $ LowercaseIdentifier "f") [intExpr'' (1,3,1,4) 7, intExpr'' (1,5,1,6) 8] (FAJoinFirst JoinAll)
+        , example "argument starts with minus" "f -9 -x" $ at 1 1 1 8 $ App (at 1 1 1 2 $ VarExpr $ VarRef [] $ LowercaseIdentifier "f") [intExpr'' (1,3,1,5) (-9), (,) [] $ at 1 6 1 8 $ Unary Negative $ at 1 7 1 8 $ VarExpr $ VarRef [] $ LowercaseIdentifier "x"] (FAJoinFirst JoinAll)
+        , example "comments" "f{-A-}7{-B-}8" $ at 1 1 1 14 $ App (at 1 1 1 2 $ VarExpr $ VarRef [] $ LowercaseIdentifier "f") [commentedIntExpr'' (1,7,1,8) "A" 7, commentedIntExpr'' (1,13,1,14) "B" 8] (FAJoinFirst JoinAll)
+        , example "newlines (1)" "f 7\n 8" $ at 1 1 2 3 $ App (at 1 1 1 2 $ VarExpr $ VarRef [] $ LowercaseIdentifier "f") [intExpr'' (1,3,1,4) 7, intExpr'' (2,2,2,3) 8] (FAJoinFirst SplitAll)
+        , example "newlines (2)" "f\n 7\n 8" $ at 1 1 3 3 $ App (at 1 1 1 2 $ VarExpr $ VarRef [] $ LowercaseIdentifier "f") [intExpr'' (2,2,2,3) 7, intExpr'' (3,2,3,3) 8] FASplitFirst
+        , example "newlines and comments" "f\n {-A-}7\n {-B-}8" $ at 1 1 3 8 $ App (at 1 1 1 2 $ VarExpr $ VarRef [] $ LowercaseIdentifier "f") [commentedIntExpr'' (2,7,2,8) "A" 7, commentedIntExpr'' (3,7,3,8) "B" 8] FASplitFirst
         ]
 
     , testGroup "unary operators"
@@ -106,12 +106,12 @@ tests =
         ]
 
     , testGroup "binary operators"
-        [ example "" "7+8<<>>9" $ at 1 1 1 9 $ Binops (intExpr (1,1,1,2) 7) [([], OpRef "+", [], intExpr (1,3,1,4) 8), ([], OpRef "<<>>", [], intExpr (1,8,1,9) 9)] False
-        , example "minus with no whitespace" "9-1" $ at 1 1 1 4 $ Binops (intExpr (1,1,1,2) 9) [([], OpRef "-", [], intExpr (1,3,1,4) 1)] False
-        , example "backticks" "7`plus`8`shift`9" $ at 1 1 1 17 $ Binops (intExpr (1,1,1,2) 7) [([], VarRef "plus", [], intExpr (1,8,1,9) 8), ([], VarRef "shift", [], intExpr (1,16,1,17) 9)] False
-        , example "whitespace" "7 + 8 <<>> 9" $ at 1 1 1 13 $ Binops (intExpr (1,1,1,2) 7) [([], OpRef "+", [], intExpr (1,5,1,6) 8), ([], OpRef "<<>>", [], intExpr (1,12,1,13) 9)] False
-        , example "comments" "7{-A-}+{-B-}8{-C-}<<>>{-D-}9" $ at 1 1 1 29 $ Binops (intExpr (1,1,1,2) 7) [([BlockComment ["A"]], OpRef "+", [BlockComment ["B"]], intExpr (1,13,1,14) 8), ([BlockComment ["C"]], OpRef "<<>>", [BlockComment ["D"]], intExpr (1,28,1,29) 9)] False
-        , example "newlines" "7\n +\n 8\n <<>>\n 9" $ at 1 1 5 3 $ Binops (intExpr (1,1,1,2) 7) [([], OpRef "+", [], intExpr (3,2,3,3) 8), ([], OpRef "<<>>", [], intExpr (5,2,5,3) 9)] True
+        [ example "" "7+8<<>>9" $ at 1 1 1 9 $ Binops (intExpr (1,1,1,2) 7) [([], (OpRef $ SymbolIdentifier "+"), [], intExpr (1,3,1,4) 8), ([], (OpRef $ SymbolIdentifier "<<>>"), [], intExpr (1,8,1,9) 9)] False
+        , example "minus with no whitespace" "9-1" $ at 1 1 1 4 $ Binops (intExpr (1,1,1,2) 9) [([], (OpRef $ SymbolIdentifier "-"), [], intExpr (1,3,1,4) 1)] False
+        , example "backticks" "7`plus`8`shift`9" $ at 1 1 1 17 $ Binops (intExpr (1,1,1,2) 7) [([], VarRef [] $ LowercaseIdentifier "plus", [], intExpr (1,8,1,9) 8), ([], VarRef [] $ LowercaseIdentifier "shift", [], intExpr (1,16,1,17) 9)] False
+        , example "whitespace" "7 + 8 <<>> 9" $ at 1 1 1 13 $ Binops (intExpr (1,1,1,2) 7) [([], (OpRef $ SymbolIdentifier "+"), [], intExpr (1,5,1,6) 8), ([], (OpRef $ SymbolIdentifier "<<>>"), [], intExpr (1,12,1,13) 9)] False
+        , example "comments" "7{-A-}+{-B-}8{-C-}<<>>{-D-}9" $ at 1 1 1 29 $ Binops (intExpr (1,1,1,2) 7) [([BlockComment ["A"]], (OpRef $ SymbolIdentifier "+"), [BlockComment ["B"]], intExpr (1,13,1,14) 8), ([BlockComment ["C"]], (OpRef $ SymbolIdentifier "<<>>"), [BlockComment ["D"]], intExpr (1,28,1,29) 9)] False
+        , example "newlines" "7\n +\n 8\n <<>>\n 9" $ at 1 1 5 3 $ Binops (intExpr (1,1,1,2) 7) [([], (OpRef $ SymbolIdentifier "+"), [], intExpr (3,2,3,3) 8), ([], (OpRef $ SymbolIdentifier "<<>>"), [], intExpr (5,2,5,3) 9)] True
         ]
 
     , testGroup "parentheses"
@@ -167,20 +167,20 @@ tests =
             , example "comments" "{{-A-}}" $ at 1 1 1 8 $ EmptyRecord [BlockComment ["A"]]
             ]
 
-        , example "" "{x=7,y=8}" $ at 1 1 1 10 $ Record [(Commented [] "x" [], intExpr' (1,4,1,5) 7, False), (Commented [] "y" [], intExpr' (1,8,1,9) 8, False)] False
-        , example "single field" "{x=7}" $ at 1 1 1 6 $ Record [(Commented [] "x" [], intExpr' (1,4,1,5) 7, False)] False
-        , example "whitespace" "{ x = 7 , y = 8 }" $ at 1 1 1 18 $ Record [(Commented [] "x" [], intExpr' (1,7,1,8) 7, False), (Commented [] "y" [], intExpr' (1,15,1,16) 8, False)] False
-        , example "comments" "{{-A-}x{-B-}={-C-}7{-D-},{-E-}y{-F-}={-G-}8{-H-}}" $ at 1 1 1 50 $ Record [(Commented [BlockComment ["A"]] "x" [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False), (Commented [BlockComment ["E"]] "y" [BlockComment ["F"]], commentedIntExpr (1,43,1,44) "G" "H" 8, False)] False
-        , example "single field with comments" "{{-A-}x{-B-}={-C-}7{-D-}}" $ at 1 1 1 26 $ Record [(Commented [BlockComment ["A"]] "x" [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False)] False
-        , example "newlines" "{\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 9 3 $ Record [(Commented [] "x" [], intExpr' (4,2,4,3) 7, True), (Commented [] "y" [], intExpr' (8,2,8,3) 8, True)] True
+        , example "" "{x=7,y=8}" $ at 1 1 1 10 $ Record [(Commented [] (LowercaseIdentifier "x") [], intExpr' (1,4,1,5) 7, False), (Commented [] (LowercaseIdentifier "y") [], intExpr' (1,8,1,9) 8, False)] False
+        , example "single field" "{x=7}" $ at 1 1 1 6 $ Record [(Commented [] (LowercaseIdentifier "x") [], intExpr' (1,4,1,5) 7, False)] False
+        , example "whitespace" "{ x = 7 , y = 8 }" $ at 1 1 1 18 $ Record [(Commented [] (LowercaseIdentifier "x") [], intExpr' (1,7,1,8) 7, False), (Commented [] (LowercaseIdentifier "y") [], intExpr' (1,15,1,16) 8, False)] False
+        , example "comments" "{{-A-}x{-B-}={-C-}7{-D-},{-E-}y{-F-}={-G-}8{-H-}}" $ at 1 1 1 50 $ Record [(Commented [BlockComment ["A"]] (LowercaseIdentifier "x") [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False), (Commented [BlockComment ["E"]] (LowercaseIdentifier "y") [BlockComment ["F"]], commentedIntExpr (1,43,1,44) "G" "H" 8, False)] False
+        , example "single field with comments" "{{-A-}x{-B-}={-C-}7{-D-}}" $ at 1 1 1 26 $ Record [(Commented [BlockComment ["A"]] (LowercaseIdentifier "x") [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False)] False
+        , example "newlines" "{\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 9 3 $ Record [(Commented [] (LowercaseIdentifier "x") [], intExpr' (4,2,4,3) 7, True), (Commented [] (LowercaseIdentifier "y") [], intExpr' (8,2,8,3) 8, True)] True
         ]
 
     , testGroup "Record update"
-        [ example "" "{a|x=7,y=8}" $ at 1 1 1 12 (RecordUpdate (Commented [] (at 1 2 1 3 (VarExpr (VarRef "a"))) []) [(Commented [] "x" [],Commented [] (at 1 6 1 7 (Literal (IntNum 7 DecimalInt))) [],False),(Commented [] "y" [], Commented [] (at 1 10 1 11 (Literal (IntNum 8 DecimalInt))) [],False)] False)
-        , example "single field" "{a|x=7}" $ at 1 1 1 8 (RecordUpdate (Commented [] (at 1 2 1 3 (VarExpr (VarRef "a"))) []) [(Commented [] "x" [], Commented [] (at 1 6 1 7 (Literal (IntNum 7 DecimalInt))) [],False)] False)
-        , example "whitespace" "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 (RecordUpdate (Commented [] (at 1 3 1 4 (VarExpr (VarRef "a"))) []) [(Commented [] "x" [], Commented [] (at 1 11 1 12 (Literal (IntNum 7 DecimalInt))) [],False),(Commented [] "y" [], Commented [] (at 1 19 1 20 (Literal (IntNum 8 DecimalInt))) [],False)] False)
-        , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}" $ at 1 1 1 62 (RecordUpdate (Commented [BlockComment ["A"]] (at 1 7 1 8 (VarExpr (VarRef "a"))) [BlockComment ["B"]]) [(Commented [BlockComment ["C"]] "x" [BlockComment ["D"]],Commented [BlockComment ["E"]] (at 1 31 1 32 (Literal (IntNum 7 DecimalInt))) [BlockComment ["F"]],False),(Commented [BlockComment ["G"]] "y" [BlockComment ["H"]],Commented [BlockComment ["I"]] (at 1 55 1 56 (Literal (IntNum 8 DecimalInt))) [BlockComment ["J"]],False)] False)
-        , example "newlines" "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 (RecordUpdate (Commented [] (at 2 2 2 3 (VarExpr (VarRef "a"))) []) [(Commented [] "x" [], Commented [] (at 6 2 6 3 (Literal (IntNum 7 DecimalInt))) [],True),(Commented [] "y" [], Commented [] (at 10 2 10 3 (Literal (IntNum 8 DecimalInt))) [],True)] True)
+        [ example "" "{a|x=7,y=8}" $ at 1 1 1 12 (RecordUpdate (Commented [] (at 1 2 1 3 (VarExpr (VarRef [] $ LowercaseIdentifier "a"))) []) [(Commented [] (LowercaseIdentifier "x") [],Commented [] (at 1 6 1 7 (Literal (IntNum 7 DecimalInt))) [],False),(Commented [] (LowercaseIdentifier "y") [], Commented [] (at 1 10 1 11 (Literal (IntNum 8 DecimalInt))) [],False)] False)
+        , example "single field" "{a|x=7}" $ at 1 1 1 8 (RecordUpdate (Commented [] (at 1 2 1 3 (VarExpr (VarRef [] $ LowercaseIdentifier "a"))) []) [(Commented [] (LowercaseIdentifier "x") [], Commented [] (at 1 6 1 7 (Literal (IntNum 7 DecimalInt))) [],False)] False)
+        , example "whitespace" "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 (RecordUpdate (Commented [] (at 1 3 1 4 (VarExpr (VarRef [] $ LowercaseIdentifier "a"))) []) [(Commented [] (LowercaseIdentifier "x") [], Commented [] (at 1 11 1 12 (Literal (IntNum 7 DecimalInt))) [],False),(Commented [] (LowercaseIdentifier "y") [], Commented [] (at 1 19 1 20 (Literal (IntNum 8 DecimalInt))) [],False)] False)
+        , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}" $ at 1 1 1 62 (RecordUpdate (Commented [BlockComment ["A"]] (at 1 7 1 8 (VarExpr (VarRef [] $ LowercaseIdentifier "a"))) [BlockComment ["B"]]) [(Commented [BlockComment ["C"]] (LowercaseIdentifier "x") [BlockComment ["D"]],Commented [BlockComment ["E"]] (at 1 31 1 32 (Literal (IntNum 7 DecimalInt))) [BlockComment ["F"]],False),(Commented [BlockComment ["G"]] (LowercaseIdentifier "y") [BlockComment ["H"]],Commented [BlockComment ["I"]] (at 1 55 1 56 (Literal (IntNum 8 DecimalInt))) [BlockComment ["J"]],False)] False)
+        , example "newlines" "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 (RecordUpdate (Commented [] (at 2 2 2 3 (VarExpr (VarRef [] $ LowercaseIdentifier "a"))) []) [(Commented [] (LowercaseIdentifier "x") [], Commented [] (at 6 2 6 3 (Literal (IntNum 7 DecimalInt))) [],True),(Commented [] (LowercaseIdentifier "y") [], Commented [] (at 10 2 10 3 (Literal (IntNum 8 DecimalInt))) [],True)] True)
         , testCase "only allows simple base" $
             assertParseFailure expr "{9|x=7}"
         , testCase "only allows simple base" $
@@ -190,8 +190,8 @@ tests =
         ]
 
     , testGroup "record access"
-        [ example "" "x.f1" $ at 1 1 1 5 (Access (at 1 1 1 2 (VarExpr (VarRef "x"))) "f1")
-        , example "nested" "x.f1.f2" $ at 1 1 1 8 (Access (at 1 1 1 5 (Access (at 1 1 1 2 (VarExpr (VarRef "x"))) "f1")) "f2")
+        [ example "" "x.f1" $ at 1 1 1 5 (Access (at 1 1 1 2 (VarExpr (VarRef [] $ LowercaseIdentifier "x"))) (LowercaseIdentifier "f1"))
+        , example "nested" "x.f1.f2" $ at 1 1 1 8 (Access (at 1 1 1 5 (Access (at 1 1 1 2 (VarExpr (VarRef [] $ LowercaseIdentifier "x"))) (LowercaseIdentifier "f1"))) (LowercaseIdentifier "f2"))
         , testCase "does not allow symbolic field names" $
             assertParseFailure expr "x.+"
         , testCase "does not allow symbolic field names" $
@@ -199,33 +199,33 @@ tests =
         ]
 
     , testGroup "record access fuction"
-        [ example "" ".f1" $ at 1 1 1 4 $ AccessFunction "f1"
+        [ example "" ".f1" $ at 1 1 1 4 $ AccessFunction (LowercaseIdentifier "f1")
         ]
 
     , testGroup "lambda"
-        [ example "" "\\x y->9" $ at 1 1 1 8 $ Lambda [([], at 1 2 1 3 $ P.VarPattern $ VarRef "x"), ([], at 1 4 1 5 $ P.VarPattern $ VarRef "y")] [] (intExpr (1,7,1,8) 9) False
-        , example "single parameter" "\\x->9" $ at 1 1 1 6 $ Lambda [([], at 1 2 1 3 $ P.VarPattern $ VarRef "x")] [] (intExpr (1,5,1,6) 9) False
-        , example "whitespace" "\\ x y -> 9" $ at 1 1 1 11 $ Lambda [([], at 1 3 1 4 $ P.VarPattern $ VarRef "x"), ([], at 1 5 1 6 $ P.VarPattern $ VarRef "y")] [] (intExpr (1,10,1,11) 9) False
-        , example "comments" "\\{-A-}x{-B-}y{-C-}->{-D-}9" $ at 1 1 1 27 $ Lambda [([BlockComment ["A"]], at 1 7 1 8 $ P.VarPattern $ VarRef "x"), ([BlockComment ["B"]], at 1 13 1 14 $ P.VarPattern $ VarRef "y")] [BlockComment ["C"], BlockComment ["D"]] (intExpr (1,26,1,27) 9) False
-        , example "newlines" "\\\n x\n y\n ->\n 9" $ at 1 1 5 3 $ Lambda [([], at 2 2 2 3 $ P.VarPattern $ VarRef "x"), ([], at 3 2 3 3 $ P.VarPattern $ VarRef "y")] [] (intExpr (5,2,5,3) 9) True
+        [ example "" "\\x y->9" $ at 1 1 1 8 $ Lambda [([], at 1 2 1 3 $ P.VarPattern $ LowercaseIdentifier "x"), ([], at 1 4 1 5 $ P.VarPattern $ LowercaseIdentifier "y")] [] (intExpr (1,7,1,8) 9) False
+        , example "single parameter" "\\x->9" $ at 1 1 1 6 $ Lambda [([], at 1 2 1 3 $ P.VarPattern $ LowercaseIdentifier "x")] [] (intExpr (1,5,1,6) 9) False
+        , example "whitespace" "\\ x y -> 9" $ at 1 1 1 11 $ Lambda [([], at 1 3 1 4 $ P.VarPattern $ LowercaseIdentifier "x"), ([], at 1 5 1 6 $ P.VarPattern $ LowercaseIdentifier "y")] [] (intExpr (1,10,1,11) 9) False
+        , example "comments" "\\{-A-}x{-B-}y{-C-}->{-D-}9" $ at 1 1 1 27 $ Lambda [([BlockComment ["A"]], at 1 7 1 8 $ P.VarPattern $ LowercaseIdentifier "x"), ([BlockComment ["B"]], at 1 13 1 14 $ P.VarPattern $ LowercaseIdentifier "y")] [BlockComment ["C"], BlockComment ["D"]] (intExpr (1,26,1,27) 9) False
+        , example "newlines" "\\\n x\n y\n ->\n 9" $ at 1 1 5 3 $ Lambda [([], at 2 2 2 3 $ P.VarPattern $ LowercaseIdentifier "x"), ([], at 3 2 3 3 $ P.VarPattern $ LowercaseIdentifier "y")] [] (intExpr (5,2,5,3) 9) True
         , testCase "arrow must not contain whitespace" $
             assertParseFailure expr "\\x y - > 9"
         ]
 
     , testGroup "if statement"
-        [ example "" "if x then y else z" $ at 1 1 1 19 (If (Commented [] (at 1 4 1 5 (VarExpr (VarRef "x"))) [],Commented [] (at 1 11 1 12 (VarExpr (VarRef "y"))) []) [] ([],at 1 18 1 19 (VarExpr (VarRef "z"))))
-        , example "comments" "if{-A-}x{-B-}then{-C-}y{-D-}else{-E-}if{-F-}x'{-G-}then{-H-}y'{-I-}else{-J-}z" $ at 1 1 1 78 (If (Commented [BlockComment ["A"]] (at 1 8 1 9 (VarExpr (VarRef "x"))) [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 23 1 24 (VarExpr (VarRef "y"))) [BlockComment ["D"]]) [([BlockComment ["E"]],(Commented [BlockComment ["F"]] (at 1 45 1 47 (VarExpr (VarRef "x'"))) [BlockComment ["G"]],Commented [BlockComment ["H"]] (at 1 61 1 63 (VarExpr (VarRef "y'"))) [BlockComment ["I"]]))] ([BlockComment ["J"]],at 1 77 1 78 (VarExpr (VarRef "z"))))
-        , example "else if" "if x then y else if x' then y' else if x'' then y'' else z" $ at 1 1 1 59 (If (Commented [] (at 1 4 1 5 (VarExpr (VarRef "x"))) [],Commented [] (at 1 11 1 12 (VarExpr (VarRef "y"))) []) [([],(Commented [] (at 1 21 1 23 (VarExpr (VarRef "x'"))) [],Commented [] (at 1 29 1 31 (VarExpr (VarRef "y'"))) [])),([],(Commented [] (at 1 40 1 43 (VarExpr (VarRef "x''"))) [],Commented [] (at 1 49 1 52 (VarExpr (VarRef "y''"))) []))] ([],at 1 58 1 59 (VarExpr (VarRef "z"))))
-        , example "newlines" "if\n x\n then\n y\n else\n z" $ at 1 1 6 3 (If (Commented [] (at 2 2 2 3 (VarExpr (VarRef "x"))) [],Commented [] (at 4 2 4 3 (VarExpr (VarRef "y"))) []) [] ([],at 6 2 6 3 (VarExpr (VarRef "z"))))
+        [ example "" "if x then y else z" $ at 1 1 1 19 (If (Commented [] (at 1 4 1 5 (VarExpr (VarRef [] $ LowercaseIdentifier "x"))) [],Commented [] (at 1 11 1 12 (VarExpr (VarRef [] $ LowercaseIdentifier "y"))) []) [] ([],at 1 18 1 19 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "comments" "if{-A-}x{-B-}then{-C-}y{-D-}else{-E-}if{-F-}x'{-G-}then{-H-}y'{-I-}else{-J-}z" $ at 1 1 1 78 (If (Commented [BlockComment ["A"]] (at 1 8 1 9 (VarExpr (VarRef [] $ LowercaseIdentifier "x"))) [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 23 1 24 (VarExpr (VarRef [] $ LowercaseIdentifier "y"))) [BlockComment ["D"]]) [([BlockComment ["E"]],(Commented [BlockComment ["F"]] (at 1 45 1 47 (VarExpr (VarRef [] $ LowercaseIdentifier "x'"))) [BlockComment ["G"]],Commented [BlockComment ["H"]] (at 1 61 1 63 (VarExpr (VarRef [] $ LowercaseIdentifier "y'"))) [BlockComment ["I"]]))] ([BlockComment ["J"]],at 1 77 1 78 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "else if" "if x then y else if x' then y' else if x'' then y'' else z" $ at 1 1 1 59 (If (Commented [] (at 1 4 1 5 (VarExpr (VarRef [] $ LowercaseIdentifier "x"))) [],Commented [] (at 1 11 1 12 (VarExpr (VarRef [] $ LowercaseIdentifier "y"))) []) [([],(Commented [] (at 1 21 1 23 (VarExpr (VarRef [] $ LowercaseIdentifier "x'"))) [],Commented [] (at 1 29 1 31 (VarExpr (VarRef [] $ LowercaseIdentifier "y'"))) [])),([],(Commented [] (at 1 40 1 43 (VarExpr (VarRef [] $ LowercaseIdentifier "x''"))) [],Commented [] (at 1 49 1 52 (VarExpr (VarRef [] $ LowercaseIdentifier "y''"))) []))] ([],at 1 58 1 59 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "newlines" "if\n x\n then\n y\n else\n z" $ at 1 1 6 3 (If (Commented [] (at 2 2 2 3 (VarExpr (VarRef [] $ LowercaseIdentifier "x"))) [],Commented [] (at 4 2 4 3 (VarExpr (VarRef [] $ LowercaseIdentifier "y"))) []) [] ([],at 6 2 6 3 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
         ]
 
     , testGroup "let statement"
-        [ example "" "let a=b in z" $ at 1 1 1 13 (Let [LetDefinition (at 1 5 1 6 (P.VarPattern (VarRef "a"))) [] [] (at 1 7 1 8 (VarExpr (VarRef "b")))] [] (at 1 12 1 13 (VarExpr (VarRef "z"))))
-        , example "multiple declarations" "let a=b\n    c=d\nin z" $ at 1 1 3 5 (Let [LetDefinition (at 1 5 1 6 (P.VarPattern (VarRef "a"))) [] [] (at 1 7 1 8 (VarExpr (VarRef "b"))),LetDefinition (at 2 5 2 6 (P.VarPattern (VarRef "c"))) [] [] (at 2 7 2 8 (VarExpr (VarRef "d")))] [] (at 3 4 3 5 (VarExpr (VarRef "z"))))
-        , example "multiple declarations" "let\n a=b\n c=d\nin z" $ at 1 1 4 5 (Let [LetDefinition (at 2 2 2 3 (P.VarPattern (VarRef "a"))) [] [] (at 2 4 2 5 (VarExpr (VarRef "b"))),LetDefinition (at 3 2 3 3 (P.VarPattern (VarRef "c"))) [] [] (at 3 4 3 5 (VarExpr (VarRef "d")))] [] (at 4 4 4 5 (VarExpr (VarRef "z"))))
-        , example "whitespace" "let a = b in z" $ at 1 1 1 15 (Let [LetDefinition (at 1 5 1 6 (P.VarPattern (VarRef "a"))) [] [] (at 1 9 1 10 (VarExpr (VarRef "b")))] [] (at 1 14 1 15 (VarExpr (VarRef "z"))))
-        , example "comments" "let{-A-}a{-B-}={-C-}b{-D-}in{-E-}z" $ at 1 1 1 35 (Let [LetComment (BlockComment ["A"]),LetDefinition (at 1 9 1 10 (P.VarPattern (VarRef "a"))) [] [BlockComment ["B"],BlockComment ["C"]] (at 1 21 1 22 (VarExpr (VarRef "b"))),LetComment (BlockComment ["D"])] [BlockComment ["E"]] (at 1 34 1 35 (VarExpr (VarRef "z"))))
-        , example "newlines" "let\n a\n =\n b\nin\n z" $ at 1 1 6 3 (Let [LetDefinition (at 2 2 2 3 (P.VarPattern (VarRef "a"))) [] [] (at 4 2 4 3 (VarExpr (VarRef "b")))] [] (at 6 2 6 3 (VarExpr (VarRef "z"))))
+        [ example "" "let a=b in z" $ at 1 1 1 13 (Let [LetDefinition (at 1 5 1 6 (P.VarPattern (LowercaseIdentifier "a"))) [] [] (at 1 7 1 8 (VarExpr (VarRef [] $ LowercaseIdentifier "b")))] [] (at 1 12 1 13 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "multiple declarations" "let a=b\n    c=d\nin z" $ at 1 1 3 5 (Let [LetDefinition (at 1 5 1 6 (P.VarPattern (LowercaseIdentifier "a"))) [] [] (at 1 7 1 8 (VarExpr (VarRef [] $ LowercaseIdentifier "b"))),LetDefinition (at 2 5 2 6 (P.VarPattern (LowercaseIdentifier "c"))) [] [] (at 2 7 2 8 (VarExpr (VarRef [] $ LowercaseIdentifier "d")))] [] (at 3 4 3 5 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "multiple declarations" "let\n a=b\n c=d\nin z" $ at 1 1 4 5 (Let [LetDefinition (at 2 2 2 3 (P.VarPattern (LowercaseIdentifier "a"))) [] [] (at 2 4 2 5 (VarExpr (VarRef [] $ LowercaseIdentifier "b"))),LetDefinition (at 3 2 3 3 (P.VarPattern (LowercaseIdentifier "c"))) [] [] (at 3 4 3 5 (VarExpr (VarRef [] $ LowercaseIdentifier "d")))] [] (at 4 4 4 5 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "whitespace" "let a = b in z" $ at 1 1 1 15 (Let [LetDefinition (at 1 5 1 6 (P.VarPattern (LowercaseIdentifier "a"))) [] [] (at 1 9 1 10 (VarExpr (VarRef [] $ LowercaseIdentifier "b")))] [] (at 1 14 1 15 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "comments" "let{-A-}a{-B-}={-C-}b{-D-}in{-E-}z" $ at 1 1 1 35 (Let [LetComment (BlockComment ["A"]),LetDefinition (at 1 9 1 10 (P.VarPattern (LowercaseIdentifier "a"))) [] [BlockComment ["B"],BlockComment ["C"]] (at 1 21 1 22 (VarExpr (VarRef [] $ LowercaseIdentifier "b"))),LetComment (BlockComment ["D"])] [BlockComment ["E"]] (at 1 34 1 35 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "newlines" "let\n a\n =\n b\nin\n z" $ at 1 1 6 3 (Let [LetDefinition (at 2 2 2 3 (P.VarPattern (LowercaseIdentifier "a"))) [] [] (at 4 2 4 3 (VarExpr (VarRef [] $ LowercaseIdentifier "b")))] [] (at 6 2 6 3 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
         , testCase "must have at least one definition" $
             assertParseFailure expr "let in z"
         , testGroup "declarations must start at the same column" $
