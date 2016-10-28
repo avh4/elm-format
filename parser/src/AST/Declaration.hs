@@ -14,14 +14,14 @@ data Declaration
     = Definition Pattern.Pattern [PreCommented Pattern.Pattern] Comments Expression.Expr
     | TypeAnnotation (PostCommented Var.Ref) (PreCommented Type)
     | Datatype
-        (Commented (String, [PreCommented String]))
-        [Commented (String, [PreCommented Type])]
-        (PreCommented (String, [PreCommented Type]))
+        (Commented (UppercaseIdentifier, [PreCommented LowercaseIdentifier]))
+        [Commented (UppercaseIdentifier, [PreCommented Type])]
+        (PreCommented (UppercaseIdentifier, [PreCommented Type]))
     | TypeAlias Comments
-        (Commented (String, [PreCommented String]))
+        (Commented (UppercaseIdentifier, [PreCommented LowercaseIdentifier]))
         (PreCommented Type)
-    | PortAnnotation (Commented String) Comments Type
-    | PortDefinition (Commented String) Comments Expression.Expr
+    | PortAnnotation (Commented LowercaseIdentifier) Comments Type
+    | PortDefinition (Commented LowercaseIdentifier) Comments Expression.Expr
     | Fixity Assoc Comments Int Comments Var.Ref
     deriving (Eq, Show)
 

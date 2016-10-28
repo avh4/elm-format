@@ -56,29 +56,37 @@ iParseWithState sourceName state aParser input =
 
 -- VARIABLES
 
-var :: IParser String
+var :: IParser AST.Variable.Ref
 var =
-  makeVar (letter <|> char '_') <?> "a name"
+  try qualifiedVar <|> qualifiedTag <?> "a name"
 
 
-lowVar :: IParser String
+lowVar :: IParser LowercaseIdentifier
 lowVar =
-  makeVar lower <?> "a lower case name"
+  LowercaseIdentifier <$> makeVar lower <?> "a lower case name"
+  -- TODO: allow it to start with '_' ?
 
 
-capVar :: IParser String
+capVar :: IParser UppercaseIdentifier
 capVar =
-  makeVar upper <?> "an upper case name"
+  UppercaseIdentifier <$> makeVar upper <?> "an upper case name"
 
 
 qualifiedVar :: IParser AST.Variable.Ref
 qualifiedVar =
-  do  vars <- many ((++) <$> capVar <*> string ".")
-      var <- (++) (concat vars) <$> lowVar
-      return $ AST.Variable.VarRef var
+    AST.Variable.VarRef
+        <$> many (const <$> capVar <*> string ".")
+        <*> lowVar
 
 
-rLabel :: IParser String
+qualifiedTag :: IParser AST.Variable.Ref
+qualifiedTag =
+    AST.Variable.TagRef
+        <$> many (try $ const <$> capVar <*> string ".")
+        <*> capVar
+
+
+rLabel :: IParser LowercaseIdentifier
 rLabel = lowVar
 
 
@@ -108,16 +116,16 @@ reserved word =
 anyOp :: IParser AST.Variable.Ref
 anyOp =
   (betwixt '`' '`' qualifiedVar <?> "an infix operator like `andThen`")
-  <|> symOp
+  <|> (AST.Variable.OpRef <$> symOp)
 
 
-symOp :: IParser AST.Variable.Ref
+symOp :: IParser SymbolIdentifier
 symOp =
   do  op <- many1 (satisfy Help.isSymbol) <?> "an infix operator like +"
       guard (op `notElem` [ "=", "..", "->", "--", "|", "\8594", ":" ])
       case op of
-        "." -> notFollowedBy lower >> (return $ AST.Variable.OpRef op)
-        _   -> return $ AST.Variable.OpRef op
+        "." -> notFollowedBy lower >> (return $ SymbolIdentifier op)
+        _   -> return $ SymbolIdentifier op
 
 
 -- COMMON SYMBOLS
@@ -428,14 +436,14 @@ accessible exprParser =
 
         Just _ ->
           accessible $
-            do  v <- var
+            do  v <- lowVar
                 end <- getMyPosition
                 return . A.at start end $
-                    case rootExpr of
-                      AST.Expression.VarExpr (AST.Variable.VarRef name@(c:_))
-                        | Char.isUpper c ->
-                            AST.Expression.VarExpr $ AST.Variable.VarRef (name ++ '.' : v)
-                      _ ->
+                    -- case rootExpr of
+                    --   AST.Expression.VarExpr (AST.Variable.VarRef name@(c:_))
+                    --     | Char.isUpper c ->
+                    --         AST.Expression.VarExpr $ AST.Variable.VarRef (name ++ '.' : v)
+                    --   _ ->
                         AST.Expression.Access annotatedRootExpr v
 
 

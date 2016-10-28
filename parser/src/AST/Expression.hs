@@ -48,10 +48,10 @@ data Expr'
     | TupleFunction Int -- will be 2 or greater, indicating the number of elements in the tuple
 
     | EmptyRecord Comments
-    | Record [(Commented String, Commented Expr, Bool)] Bool
-    | RecordUpdate (Commented Expr) [(Commented String, Commented Expr, Bool)] Bool
-    | Access Expr String
-    | AccessFunction String
+    | Record [(Commented LowercaseIdentifier, Commented Expr, Bool)] Bool
+    | RecordUpdate (Commented Expr) [(Commented LowercaseIdentifier, Commented Expr, Bool)] Bool
+    | Access Expr LowercaseIdentifier
+    | AccessFunction LowercaseIdentifier
 
     | Lambda [(Comments, Pattern.Pattern)] Comments Expr Bool
     | If IfClause [(Comments, IfClause)] (Comments, Expr)

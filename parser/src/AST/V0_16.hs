@@ -3,6 +3,20 @@ module AST.V0_16 where
 
 import qualified Reporting.Annotation as A
 
+data LowercaseIdentifier =
+    LowercaseIdentifier String
+    deriving (Eq, Ord, Show)
+
+
+data UppercaseIdentifier =
+    UppercaseIdentifier String
+    deriving (Eq, Ord, Show)
+
+
+data SymbolIdentifier =
+    SymbolIdentifier String
+    deriving (Eq, Ord, Show)
+
 
 data Comment
     = BlockComment [String]
@@ -76,20 +90,20 @@ data Literal
 
 
 data TypeConstructor
-    = NamedConstructor String
+    = NamedConstructor [UppercaseIdentifier]
     | TupleConstructor Int -- will be 2 or greater, indicating the number of elements in the tuple
     deriving (Eq, Show)
 
 
 data Type'
     = UnitType Comments
-    | TypeVariable String
+    | TypeVariable LowercaseIdentifier
     | TypeConstruction TypeConstructor [(Comments, Type)]
     | TypeParens (Commented Type)
     | TupleType [Commented Type]
     | EmptyRecordType Comments
-    | RecordType [(Commented String, Commented Type, Bool)] Bool
-    | RecordExtensionType (Commented String) [(Commented String, Commented Type, Bool)] Bool
+    | RecordType [(Commented LowercaseIdentifier, Commented Type, Bool)] Bool
+    | RecordExtensionType (Commented LowercaseIdentifier) [(Commented LowercaseIdentifier, Commented Type, Bool)] Bool
     | FunctionType (Type, Comments) [Commented Type] (Comments, Type) Bool
     deriving (Eq, Show)
 
