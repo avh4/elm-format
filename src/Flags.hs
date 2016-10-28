@@ -180,7 +180,8 @@ elmVersion defaultVersion =
             [ "The Elm version of the source files being formatted.  "
             , "Valid values: "
             , show ElmVersion.Elm_0_16 ++ ", "
-            , show ElmVersion.Elm_0_17 ++ ".  "
+            , show ElmVersion.Elm_0_17 ++ ", "
+            , show ElmVersion.Elm_0_18 ++ ".  "
             , "Default: " ++ show defaultVersion
             ]
       ]
