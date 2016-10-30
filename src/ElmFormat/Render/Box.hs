@@ -19,6 +19,7 @@ import qualified Data.Maybe as Maybe
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified Paths_elm_format as This
 import qualified Reporting.Annotation as RA
+import qualified Reporting.Region as Region
 import qualified Text.Regex.Applicative as Regex
 import Text.Printf (printf)
 import Util.List
@@ -858,28 +859,10 @@ formatExpression elmVersion aexpr =
             line $ formatVar elmVersion v
 
         AST.Expression.Range left right multiline ->
-            case
-                ( multiline
-                , formatCommented (formatExpression elmVersion) left
-                , formatCommented (formatExpression elmVersion) right
-                )
-            of
-                (False, SingleLine left', SingleLine right') ->
-                    line $ row
-                        [ punc "["
-                        , left'
-                        , punc ".."
-                        , right'
-                        , punc "]"
-                        ]
-                (_, left', right') ->
-                    stack1
-                        [ line $ punc "["
-                        , indent left'
-                        , line $ punc ".."
-                        , indent right'
-                        , line $ punc "]"
-                        ]
+            case elmVersion of
+                Elm_0_16 -> formatRange_0_17 elmVersion left right multiline
+                Elm_0_17 -> formatRange_0_17 elmVersion left right multiline
+                Elm_0_18 -> formatRange_0_18 elmVersion left right
 
         AST.Expression.EmptyList comments ->
           formatUnit '[' ']' comments
@@ -1130,6 +1113,69 @@ formatExpression elmVersion aexpr =
             , punc "|]"
             ]
 
+formatRange_0_17 :: ElmVersion -> Commented AST.Expression.Expr -> Commented AST.Expression.Expr -> Bool -> Box
+formatRange_0_17 elmVersion left right multiline =
+    case
+        ( multiline
+        , formatCommented (formatExpression elmVersion) left
+        , formatCommented (formatExpression elmVersion) right
+        )
+    of
+        (False, SingleLine left', SingleLine right') ->
+            line $ row
+                [ punc "["
+                , left'
+                , punc ".."
+                , right'
+                , punc "]"
+                ]
+        (_, left', right') ->
+            stack1
+                [ line $ punc "["
+                , indent left'
+                , line $ punc ".."
+                , indent right'
+                , line $ punc "]"
+                ]
+
+nowhere :: Region.Position
+nowhere =
+    Region.Position 0 0
+
+
+noRegion :: a -> RA.Located a
+noRegion =
+    RA.at nowhere nowhere
+
+formatRange_0_18 :: ElmVersion -> Commented AST.Expression.Expr -> Commented AST.Expression.Expr -> Box
+formatRange_0_18 elmVersion left right =
+    case (left, right) of
+        (Commented preLeft left' [], Commented preRight right' []) ->
+            AST.Expression.App
+                (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
+                [ if needsParensInSpaces left' then
+                      ([], noRegion $ AST.Expression.Parens left)
+                  else
+                      (preLeft, left')
+                , if needsParensInSpaces right' then
+                      ([], noRegion $ AST.Expression.Parens right)
+                  else
+                      (preRight, right')
+                ]
+                (FAJoinFirst JoinAll)
+                |> noRegion
+                |> formatExpression elmVersion
+
+        _ ->
+            AST.Expression.App
+                (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
+                [ ([], noRegion $ AST.Expression.Parens left)
+                , ([], noRegion $ AST.Expression.Parens right)
+                ]
+                (FAJoinFirst JoinAll)
+                |> noRegion
+                |> formatExpression elmVersion
+
 
 formatUnit :: Char -> Char -> Comments -> Box
 formatUnit left right comments =
@@ -1347,6 +1393,39 @@ data TypeParensRequired
     | ForCtor
     | NotRequired
     deriving (Eq)
+
+
+needsParensInSpaces :: AST.Expression.Expr -> Bool
+needsParensInSpaces (RA.A _ expr) =
+    case expr of
+      AST.Expression.Unit _ -> False
+      AST.Expression.Literal _ -> False
+      AST.Expression.VarExpr _-> False
+
+      AST.Expression.App _ _ _ -> True
+      AST.Expression.Unary _ _ -> False
+      AST.Expression.Binops _ _ _ -> True
+      AST.Expression.Parens _ -> False
+
+      AST.Expression.EmptyList _ -> False
+      AST.Expression.ExplicitList _ _ -> False
+      AST.Expression.Range _ _ _ -> False
+
+      AST.Expression.Tuple _ _ -> False
+      AST.Expression.TupleFunction _ -> False
+
+      AST.Expression.EmptyRecord _ -> False
+      AST.Expression.Record _ _ -> False
+      AST.Expression.RecordUpdate _ _ _ -> False
+      AST.Expression.Access _ _ -> False
+      AST.Expression.AccessFunction _ -> False
+
+      AST.Expression.Lambda _ _ _ _ -> True -- Maybe should be False?
+      AST.Expression.If _ _ _ -> True
+      AST.Expression.Let _ _ _ -> True
+      AST.Expression.Case _ _ -> True
+
+      AST.Expression.GLShader _ -> True -- Maybe can be False?
 
 
 formatType :: ElmVersion -> Type -> Box
