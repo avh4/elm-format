@@ -1,11 +1,17 @@
+module Main' exposing (declaration', NewType'(Foo', Foo'', Foo'oo))
+
+import String' as S'S exposing (x', x'')
+
 declaration' : ()
 declaration' = ()
+
+namespaceReference = (String'.x'', String'.Extra''.x'x)
 
 typeVariable : number -> number' -> number'' -> number'
 typeVariable _ x _ = x
 
 parameter : () -> () -> () -> ()
-parameter x x' x'' x''x = ()
+parameter x x' x'' x''x = x''
 
 namedTypeConstructor : Foo' a b -> Bar'' x -> ()
 namedTypeConstructor _ _ = ()

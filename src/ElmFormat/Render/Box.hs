@@ -245,7 +245,7 @@ formatModuleLine_0_16 header =
           formatCommented (line . keyword) (Commented pre "where" post)
   in
     case
-      ( formatCommented (line . formatName) $ AST.Module.name header
+      ( formatCommented (line . formatQualifiedUppercaseIdentifier elmVersion) $ AST.Module.name header
       , formatExports
       , whereClause
       )
@@ -312,7 +312,7 @@ formatModuleLine elmVersion header =
     nameClause =
       case
         ( tag
-        , formatCommented (line . formatName) $ AST.Module.name header
+        , formatCommented (line . formatQualifiedUppercaseIdentifier elmVersion) $ AST.Module.name header
         )
       of
         (SingleLine tag', SingleLine name') ->
@@ -404,11 +404,6 @@ formatDocComment docs =
                 |> andThen [ line $ punc "-}" ]
 
 
-formatName :: [UppercaseIdentifier] -> Line
-formatName name =
-    identifier $ List.intercalate "." $ map (\(UppercaseIdentifier x) -> x) name
-
-
 formatImport :: ElmVersion -> AST.Module.UserImport -> Box
 formatImport elmVersion aimport =
     case aimport of
@@ -463,7 +458,7 @@ formatImport elmVersion aimport =
                               Just $ pleaseReport "UNEXPECTED IMPORT" "import clause comments with no clause"
                     in
                         case
-                          ( formatHeadCommented (line . formatName) name
+                          ( formatHeadCommented (line . formatQualifiedUppercaseIdentifier elmVersion) name
                           , as
                           , exposing
                           )
