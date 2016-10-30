@@ -301,7 +301,8 @@ git clone https://github.com/avh4/elm-format.git
 cd elm-format
 stack setup
 stack build
-./dist/build/elm-format-0.17/elm-format-0.17 --help
+stack install
+~/.local/bin/elm-format-0.18 --help
 ```
 
 ### Running tests
