@@ -1,11 +1,9 @@
 module Parse.Pattern (term, expr) where
 
-import qualified Data.List as List
 import Text.Parsec ((<|>), (<?>), char, choice, optionMaybe, try)
 
 import AST.V0_16
 import qualified AST.Pattern as P
-import qualified AST.Variable as Var
 import Parse.Helpers
 import qualified Parse.Literal as Literal
 import qualified Reporting.Annotation as A
