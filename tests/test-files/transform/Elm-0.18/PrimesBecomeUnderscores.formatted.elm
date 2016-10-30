@@ -1,9 +1,15 @@
-module Main exposing (..)
+module Main_ exposing (declaration_, NewType_(Foo_, Foo__, Foo_oo))
+
+import String_ as S_S exposing (x_, x__)
 
 
 declaration_ : ()
 declaration_ =
     ()
+
+
+namespaceReference =
+    ( String_.x__, String_.Extra__.x_x )
 
 
 typeVariable : number -> number_ -> number__ -> number_
@@ -13,7 +19,7 @@ typeVariable _ x _ =
 
 parameter : () -> () -> () -> ()
 parameter x x_ x__ x__x =
-    ()
+    x__
 
 
 namedTypeConstructor : Foo_ a b -> Bar__ x -> ()
