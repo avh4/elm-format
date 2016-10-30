@@ -1158,7 +1158,11 @@ removeBackticks left ops =
             let
                 e' = noRegion $ AST.Expression.App
                     (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef v' v)
-                    [(post, e)]
+                    [ if needsParensInSpaces e then
+                          (post, noRegion $ AST.Expression.Parens (Commented [] e []))
+                      else
+                          (post, e)
+                    ]
                     (FAJoinFirst JoinAll)
 
                 (e'', rest') = removeBackticks e' rest
