@@ -19,7 +19,7 @@ withComments =
 
 andThenIn17 =
     String.toInt "1234"
-        |> Result.andThen \year -> isValidYear year
+        |> Result.andThen (\year -> isValidYear year)
 
 
 tasksIn17 =
