@@ -1,4 +1,4 @@
-elm-format-0.17 0.4.1-alpha-dev
+elm-format-0.18 0.4.1-alpha-dev
 
 Usage: elm-format [INPUT] [--output FILE] [--yes] [--validate] [--stdin]
                   [--elm-version VERSION]
@@ -12,7 +12,7 @@ Available options:
   --validate               Check if files are formatted without changing them.
   --stdin                  Read from stdin, output to stdout.
   --elm-version VERSION    The Elm version of the source files being formatted.
-                           Valid values: 0.16, 0.17, 0.18. Default: 0.17
+                           Valid values: 0.16, 0.17, 0.18. Default: 0.18
 
 Examples:
   elm-format Main.elm                     # formats Main.elm
