@@ -871,17 +871,10 @@ formatExpression elmVersion aexpr =
             ElmStructure.group True "[" "," "]" multiline $ map (formatCommented (formatExpression elmVersion)) exprs
 
         AST.Expression.Binops left ops multiline ->
-            let
-                formatPair ( po, o, pe, e ) =
-                    ( o == AST.Variable.OpRef (SymbolIdentifier "<|")
-                    , formatCommented' po (line . formatInfixVar elmVersion) o
-                    , formatCommented' pe (formatExpression elmVersion) e
-                    )
-            in
-                formatBinary
-                    multiline
-                    (formatExpression elmVersion left)
-                    (map formatPair ops)
+            case elmVersion of
+                Elm_0_16 -> formatBinops_0_17 elmVersion left ops multiline
+                Elm_0_17 -> formatBinops_0_17 elmVersion left ops multiline
+                Elm_0_18 -> formatBinops_0_18 elmVersion left ops multiline
 
         AST.Expression.Lambda patterns bodyComments expr multiline ->
             case
@@ -1112,6 +1105,71 @@ formatExpression elmVersion aexpr =
             , literal $ src
             , punc "|]"
             ]
+
+
+formatBinops_0_17 :: ElmVersion -> AST.Expression.Expr -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)] -> Bool -> Box
+formatBinops_0_17 elmVersion left ops multiline =
+    let
+        formatPair ( po, o, pe, e ) =
+            ( o == AST.Variable.OpRef (SymbolIdentifier "<|")
+            , formatCommented' po (line . formatInfixVar elmVersion) o
+            , formatCommented' pe (formatExpression elmVersion) e
+            )
+    in
+        formatBinary
+            multiline
+            (formatExpression elmVersion left)
+            (map formatPair ops)
+
+
+formatBinops_0_18 ::
+    ElmVersion
+    -> AST.Expression.Expr
+    -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)]
+    -> Bool
+    -> Box
+formatBinops_0_18 elmVersion left ops multiline =
+    let
+        (left', ops') = removeBackticks left ops
+
+        formatPair ( po, o, pe, e ) =
+            ( o == AST.Variable.OpRef (SymbolIdentifier "<|")
+            , formatCommented' po (line . formatInfixVar elmVersion) o
+            , formatCommented' pe (formatExpression elmVersion) e
+            )
+    in
+        formatBinary
+            multiline
+            (formatExpression elmVersion left')
+            (map formatPair ops')
+
+
+removeBackticks ::
+    AST.Expression.Expr
+    -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)]
+    -> (AST.Expression.Expr, [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)])
+removeBackticks left ops =
+    case ops of
+        [] -> (left, ops)
+        (pre, AST.Variable.VarRef v' v, post, e):rest ->
+            removeBackticks
+                (noRegion $ AST.Expression.App
+                    (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef v' v)
+                    [ if needsParensInSpaces left then
+                          (pre, noRegion $ AST.Expression.Parens (Commented [] left []))
+                      else
+                          (pre, left)
+                    , (post, e)
+                    ]
+                    (FAJoinFirst JoinAll)
+                )
+                rest
+        (pre, op, post, e):rest ->
+            let
+                (e', rest') = removeBackticks e rest
+            in
+                (left, (pre, op, post, e'):rest')
+
 
 formatRange_0_17 :: ElmVersion -> Commented AST.Expression.Expr -> Commented AST.Expression.Expr -> Bool -> Box
 formatRange_0_17 elmVersion left right multiline =
