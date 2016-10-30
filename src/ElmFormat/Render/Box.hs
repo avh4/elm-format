@@ -1151,7 +1151,22 @@ removeBackticks ::
 removeBackticks left ops =
     case ops of
         [] -> (left, ops)
+        (pre, AST.Variable.VarRef v' v, post, e):rest
+          | v == LowercaseIdentifier "andThen" || v == LowercaseIdentifier "onError"
+          ->
+            -- Convert `andThen` to |> andThen
+            let
+                e' = noRegion $ AST.Expression.App
+                    (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef v' v)
+                    [(post, e)]
+                    (FAJoinFirst JoinAll)
+
+                (e'', rest') = removeBackticks e' rest
+            in
+                (left, (pre, AST.Variable.OpRef $ SymbolIdentifier "|>", [], e''):rest')
+
         (pre, AST.Variable.VarRef v' v, post, e):rest ->
+            -- Convert other backtick operators to normal function application
             removeBackticks
                 (noRegion $ AST.Expression.App
                     (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef v' v)
@@ -1164,7 +1179,9 @@ removeBackticks left ops =
                     (FAJoinFirst JoinAll)
                 )
                 rest
+
         (pre, op, post, e):rest ->
+            -- Preserve symbolic infix operators
             let
                 (e', rest') = removeBackticks e rest
             in

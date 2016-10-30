@@ -287,6 +287,7 @@ checkTransformation 0.16 QuickCheck-94f37da84c1310f03dcfa1059ce870b73c94a825--64
 checkTransformation 0.18 Elm-0.18/PrimesBecomeUnderscores.elm
 checkTransformation 0.18 Elm-0.18/RangesBecomeListRange.elm
 checkTransformation 0.18 Elm-0.18/BackticksBecomeFunctionCalls.elm
+checkTransformation 0.18 Elm-0.18/SpecialBackticksBecomePipelines.elm
 
 checkJson good/AllSyntax/0.16/Expressions.elm
 
