@@ -95,7 +95,7 @@ helpInfo defaultVersion =
     mconcat
         [ Opt.fullDesc
         , Opt.header top
-        , Opt.progDesc "Format an Elm source file."
+        , Opt.progDesc "Format Elm source files."
         , Opt.footerDoc (Just examples)
         ]
   where
@@ -110,6 +110,7 @@ helpInfo defaultVersion =
         [ "Examples:"
         , "  elm-format Main.elm                     # formats Main.elm"
         , "  elm-format Main.elm --output Main2.elm  # formats Main.elm as Main2.elm"
+        , "  elm-format src/                         # format all *.elm files in the src directory"
         , ""
         , "Full guide to using elm-format at <https://github.com/avh4/elm-format>"
         ]
