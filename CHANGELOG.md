@@ -1,3 +1,10 @@
+## 0.5.1-alpha
+
+Bug fixes:
+  - Whne upgrading ranges to `List.range`, parentheses are correctly added if the range is used as a function call argument
+  - Correctly space top-level declarations that use pattern destructuring
+
+
 ## 0.5.0-alpha
 
 Support for Elm 0.18:
