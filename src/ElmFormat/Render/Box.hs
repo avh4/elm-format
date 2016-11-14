@@ -1637,8 +1637,12 @@ formatInfixVar elmVersion var =
 
 formatLowercaseIdentifier :: ElmVersion -> [UppercaseIdentifier] -> LowercaseIdentifier -> Line
 formatLowercaseIdentifier elmVersion namespace (LowercaseIdentifier name) =
-    case namespace of
-        [] -> identifier $ formatVarName' elmVersion name
+    case (elmVersion, namespace, name) of
+        (Elm_0_18_Upgrade, [], "fst") -> identifier "Tuple.first"
+        (Elm_0_18_Upgrade, [UppercaseIdentifier "Basics"], "fst") -> identifier "Tuple.first"
+        (Elm_0_18_Upgrade, [], "snd") -> identifier "Tuple.second"
+        (Elm_0_18_Upgrade, [UppercaseIdentifier "Basics"], "snd") -> identifier "Tuple.second"
+        (_, [], _) -> identifier $ formatVarName' elmVersion name
         _ ->
             row
                 [ formatQualifiedUppercaseIdentifier elmVersion namespace
@@ -1660,9 +1664,7 @@ formatQualifiedUppercaseIdentifier elmVersion names =
 
 formatVarName :: ElmVersion -> LowercaseIdentifier -> String
 formatVarName elmVersion (LowercaseIdentifier name) =
-    case elmVersion of
-        Elm_0_18_Upgrade -> map (\x -> if x == '\'' then '_' else x) name
-        _ -> name
+    formatVarName' elmVersion name
 
 
 formatVarName' :: ElmVersion -> String -> String

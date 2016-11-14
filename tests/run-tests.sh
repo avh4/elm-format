@@ -290,6 +290,7 @@ checkUpgrade 0.18 Elm-0.18/PrimesBecomeUnderscores.elm
 checkUpgrade 0.18 Elm-0.18/RangesBecomeListRange.elm
 checkUpgrade 0.18 Elm-0.18/BackticksBecomeFunctionCalls.elm
 checkUpgrade 0.18 Elm-0.18/SpecialBackticksBecomePipelines.elm
+checkUpgrade 0.18 Elm-0.18/RenameTupleFunctions.elm
 
 echo
 echo "# GREAT SUCCESS!"
