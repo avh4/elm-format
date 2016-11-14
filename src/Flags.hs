@@ -104,7 +104,7 @@ helpInfo defaultVersion =
     top =
         concat
             [ "elm-format-" ++ show defaultVersion ++ " "
-            , showVersion This.version  ++ "-alpha-dev" ++ "\n"
+            , showVersion This.version  ++ "-alpha" ++ "\n"
             ]
 
     examples =
