@@ -1,6 +1,8 @@
 {-# OPTIONS_GHC -Wall #-}
 module Messages.Types where
 
+import ElmVersion
+
 -- inspired by:
 -- https://wiki.haskell.org/Internationalization_of_Haskell_programs_using_Haskell_data_types
 
@@ -15,6 +17,7 @@ data Message
   | Error_OutputAndValidate
   | ProcessingFiles [FilePath]
   | FileWouldChange FilePath
+  | MustSpecifyVersionWithUpgrade ElmVersion
 
 
 data InputFileMessage

@@ -195,6 +195,9 @@ formatModuleHeader elmVersion modu =
           Elm_0_18 ->
             formatModuleLine elmVersion header
 
+          Elm_0_18_Upgrade ->
+              formatModuleLine elmVersion header
+
       docs =
           formatModuleDocs (AST.Module.docs modu)
 
@@ -863,6 +866,7 @@ formatExpression elmVersion aexpr =
                 Elm_0_16 -> formatRange_0_17 elmVersion left right multiline
                 Elm_0_17 -> formatRange_0_17 elmVersion left right multiline
                 Elm_0_18 -> formatRange_0_18 elmVersion left right
+                Elm_0_18_Upgrade -> formatRange_0_18 elmVersion left right
 
         AST.Expression.EmptyList comments ->
           formatUnit '[' ']' comments
@@ -875,6 +879,7 @@ formatExpression elmVersion aexpr =
                 Elm_0_16 -> formatBinops_0_17 elmVersion left ops multiline
                 Elm_0_17 -> formatBinops_0_17 elmVersion left ops multiline
                 Elm_0_18 -> formatBinops_0_18 elmVersion left ops multiline
+                Elm_0_18_Upgrade -> formatBinops_0_18 elmVersion left ops multiline
 
         AST.Expression.Lambda patterns bodyComments expr multiline ->
             case
@@ -1656,17 +1661,15 @@ formatQualifiedUppercaseIdentifier elmVersion names =
 formatVarName :: ElmVersion -> LowercaseIdentifier -> String
 formatVarName elmVersion (LowercaseIdentifier name) =
     case elmVersion of
-        Elm_0_18 -> map (\x -> if x == '\'' then '_' else x) name
-        Elm_0_17 -> name
-        Elm_0_16 -> name
+        Elm_0_18_Upgrade -> map (\x -> if x == '\'' then '_' else x) name
+        _ -> name
 
 
 formatVarName' :: ElmVersion -> String -> String
 formatVarName' elmVersion name =
     case elmVersion of
-        Elm_0_18 -> map (\x -> if x == '\'' then '_' else x) name
-        Elm_0_17 -> name
-        Elm_0_16 -> name
+        Elm_0_18_Upgrade -> map (\x -> if x == '\'' then '_' else x) name
+        _ -> name
 
 
 formatVarName'' :: ElmVersion -> UppercaseIdentifier -> String

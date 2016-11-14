@@ -19,6 +19,7 @@ data Config = Config
     , _validate :: Bool
     , _stdin :: Bool
     , _elmVersion :: ElmVersion
+    , _upgrade :: Bool
     }
 
 
@@ -85,6 +86,7 @@ flags defaultVersion =
       <*> validate
       <*> stdin
       <*> elmVersion defaultVersion
+      <*> upgrade
 
 
 
@@ -185,3 +187,11 @@ elmVersion defaultVersion =
             , "Default: " ++ show defaultVersion
             ]
       ]
+
+upgrade :: Opt.Parser Bool
+upgrade =
+    Opt.switch $
+        mconcat
+        [ Opt.long "upgrade"
+        , Opt.help "Upgrade older Elm files to Elm 0.18 syntax"
+        ]
