@@ -2,7 +2,7 @@ elm-format-0.17 0.4.1-alpha-dev
 
 Usage: elm-format [INPUT] [--output FILE] [--yes] [--validate] [--stdin]
                   [--elm-version VERSION]
-  Format an Elm source file.
+  Format Elm source files.
 
 Available options:
   -h,--help                Show this help text
@@ -17,5 +17,6 @@ Available options:
 Examples:
   elm-format Main.elm                     # formats Main.elm
   elm-format Main.elm --output Main2.elm  # formats Main.elm as Main2.elm
+  elm-format src/                         # format all *.elm files in the src directory
 
 Full guide to using elm-format at <https://github.com/avh4/elm-format>
