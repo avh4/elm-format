@@ -7,7 +7,7 @@ import Messages.Types
 import Control.Monad (when)
 import Data.Maybe (isJust)
 import CommandLine.Helpers
-import ElmVersion (ElmVersion)
+import ElmVersion
 
 
 import qualified AST.Module
@@ -283,25 +283,41 @@ exitWithError message =
         >> exitFailure
 
 
+determineVersion :: ElmVersion -> Bool -> Either Message ElmVersion
+determineVersion elmVersion upgrade =
+    case (elmVersion, upgrade) of
+        (Elm_0_18, True) ->
+            Right Elm_0_18_Upgrade
+
+        (_, True) ->
+            Left $ MustSpecifyVersionWithUpgrade Elm_0_18_Upgrade
+
+        (_, False) ->
+            Right elmVersion
+
+
 main :: ElmVersion -> IO ()
 main defaultVersion =
     do
         config <- Flags.parse defaultVersion
         let autoYes = Flags._yes config
-        let elmVersion = Flags._elmVersion config
+        let elmVersionResult = determineVersion (Flags._elmVersion config) (Flags._upgrade config)
 
-        case determineWhatToDoFromConfig config of
-            Left Error_NoInputs ->
+        case (elmVersionResult, determineWhatToDoFromConfig config) of
+            (_, Left Error_NoInputs) ->
                 Flags.showHelpText defaultVersion
                     >> exitFailure
 
-            Left message ->
+            (_, Left message) ->
                 exitWithError message
 
-            Right (Validate source) ->
+            (Left message, _) ->
+                exitWithError message
+
+            (Right elmVersion, Right (Validate source)) ->
                 validate elmVersion source
 
-            Right (FormatInPlace first rest) ->
+            (Right elmVersion, Right (FormatInPlace first rest)) ->
                 do
                     result <- handleFilesInput (first:rest) Nothing autoYes False elmVersion
                     case result of
@@ -311,7 +327,7 @@ main defaultVersion =
                         Just _ ->
                             error "There shouldn't be a validation result when formatting"
 
-            Right (FormatToFile input output) ->
+            (Right elmVersion, Right (FormatToFile input output)) ->
                 do
                     result <- handleFilesInput [input] (Just output) autoYes False elmVersion
                     case result of
@@ -321,7 +337,7 @@ main defaultVersion =
                         Just _ ->
                             error "There shouldn't be a validation result when formatting"
 
-            Right (StdinToStdout) ->
+            (Right elmVersion, Right (StdinToStdout)) ->
                 do
                     input <- Lazy.getContents
 
@@ -336,7 +352,7 @@ main defaultVersion =
                         Just _ ->
                             error "There shouldn't be a validation result when formatting"
 
-            Right (StdinToFile output) ->
+            (Right elmVersion, Right (StdinToFile output)) ->
                 do
                     input <- Lazy.getContents
 
