@@ -27,7 +27,6 @@ choco install poshgit
 
 ```bash
 cd /c/vagrant/elm-format
-cabal update
 /c/vagrant/build-package.sh
 ```
 
