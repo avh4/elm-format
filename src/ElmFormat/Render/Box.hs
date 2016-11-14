@@ -865,7 +865,7 @@ formatExpression elmVersion aexpr =
             case elmVersion of
                 Elm_0_16 -> formatRange_0_17 elmVersion left right multiline
                 Elm_0_17 -> formatRange_0_17 elmVersion left right multiline
-                Elm_0_18 -> formatRange_0_18 elmVersion left right
+                Elm_0_18 -> formatRange_0_17 elmVersion left right multiline
                 Elm_0_18_Upgrade -> formatRange_0_18 elmVersion left right
 
         AST.Expression.EmptyList comments ->
