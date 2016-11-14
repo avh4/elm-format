@@ -128,6 +128,7 @@ data DeclarationType
   | DStarter
   | DCloser
   | DDefinition (Maybe AST.Variable.Ref)
+  | DDocComment
   deriving (Show)
 
 
@@ -166,7 +167,7 @@ declarationType decl =
           DDefinition $ Just name
 
     AST.Declaration.DocComment _ ->
-      DDefinition Nothing
+      DDocComment
 
     AST.Declaration.BodyComment CommentTrickOpener ->
       DStarter
@@ -352,8 +353,10 @@ formatModule elmVersion modu =
               List.replicate 3 blankLine
             (DComment, _) ->
               List.replicate 2 blankLine
-            (DDefinition Nothing, DDefinition (Just _)) ->
+            (DDocComment, DDefinition _) ->
               []
+            (DDefinition Nothing, DDefinition (Just _)) ->
+              List.replicate 2 blankLine
             (DDefinition _, DStarter) ->
               List.replicate 2 blankLine
             (DDefinition a, DDefinition b) ->
@@ -363,6 +366,10 @@ formatModule elmVersion modu =
                 List.replicate 2 blankLine
             (DCloser, _) ->
               List.replicate 2 blankLine
+            (_, DDocComment) ->
+              List.replicate 2 blankLine
+            (DDocComment, DStarter) ->
+              []
 
         body =
             intersperseMap spacer (formatDeclaration elmVersion) $
