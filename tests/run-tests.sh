@@ -26,8 +26,7 @@ function returnCodeShouldEqual() {
 }
 
 function shouldOutputTheSameIgnoringEol() {
-	echo "$1" "$2"
-	diff -u --ignore-space-change <(echo "$1") <(echo "$2") || exit 1
+	diff -u --ignore-space-change <(echo "$1" | sed -e 's/\.exe//') <(echo "$2" | sed -e 's/\.exe//') || exit 1
 }
 
 function outputShouldRoughlyMatchPatterns() {
