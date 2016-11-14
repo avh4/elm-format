@@ -6,7 +6,7 @@
 
 stack build || exit 1
 
-ELM_FORMAT="`ls ./.stack-work/install/*/lts-7.4/8.0.1*/bin/elm-format-0.18 | head -n1`"
+ELM_FORMAT="`stack path --local-install-root`/bin/elm-format-0.18"
 if [ ! -e "$ELM_FORMAT" ]; then
 	echo "$0: ERROR: $ELM_FORMAT not found" >&2
 	exit 1
