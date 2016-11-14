@@ -1,3 +1,17 @@
+## 0.5.0-alpha
+
+Support for Elm 0.18:
+  - Added the `--upgrade` option to help migration code from Elm 0.17 to Elm 0.18
+    - Infix function calls using backticks become normal functions calls
+    - Infix function calls using backticks with `andThen` and `onError` become pipelines
+    - Ranges become calls to `List.range`
+    - Primes in variable names become underscores
+    - References to `fst` and `snd` become `Tuple.first` and `Tuple.second`
+
+Bug fixes:
+  - Type tags starting with `True` and `False` are now handled correctly
+
+
 ## 0.4.0-alpha
 
 Syntax changes:
