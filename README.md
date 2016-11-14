@@ -44,13 +44,13 @@ If you need PGP signatures, see the [releases page](https://github.com/avh4/elm-
 
  - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.5.0-alpha/elm-format-0.18-0.5.0-alpha-mac-x64.tgz)
  - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.5.0-alpha/elm-format-0.18-0.5.0-alpha-linux-x64.tgz)
- - Windows: (sorry, there was a problem with the packaging script; Windows binaries will be available in the next few hours <!-- [download](https://github.com/avh4/elm-format/releases/download/0.5.0-alpha/elm-format-0.18-0.5.0-alpha-win-x64.zip) -->
+ - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.5.0-alpha/elm-format-0.18-0.5.0-alpha-win-x64.zip)
 
 ### For Elm 0.17
 
  - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.5.0-alpha/elm-format-0.17-0.5.0-alpha-mac-x64.tgz)
  - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.5.0-alpha/elm-format-0.17-0.5.0-alpha-linux-x64.tgz)
- - Windows:  (sorry, there was a problem with the packaging script; Windows binaries will be available in the next few hours <!-- [download](https://github.com/avh4/elm-format/releases/download/0.5.0-alpha/elm-format-0.17-0.5.0-alpha-win-x64.zip) -->
+ - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.5.0-alpha/elm-format-0.17-0.5.0-alpha-win-x64.zip)
 
 
 ## Editor integration
