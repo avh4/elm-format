@@ -9,3 +9,4 @@ precommented2 =
     ]
 commented = [{-A-}1{-B-}..{-C-}2{-D-}]
 needsParens = [f x..f y]
+usedInFunctionCall = f [1..9] [{-A-}1{-B-}..{-C-}2{-D-}]
