@@ -878,7 +878,7 @@ formatExpression elmVersion aexpr =
             case elmVersion of
                 Elm_0_16 -> formatBinops_0_17 elmVersion left ops multiline
                 Elm_0_17 -> formatBinops_0_17 elmVersion left ops multiline
-                Elm_0_18 -> formatBinops_0_18 elmVersion left ops multiline
+                Elm_0_18 -> formatBinops_0_17 elmVersion left ops multiline
                 Elm_0_18_Upgrade -> formatBinops_0_18 elmVersion left ops multiline
 
         AST.Expression.Lambda patterns bodyComments expr multiline ->
