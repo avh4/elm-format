@@ -40,7 +40,7 @@ If you need PGP signatures, see the [releases page](https://github.com/avh4/elm-
 
 ### For Elm 0.18
 
-(To upgrade your Elm 0.17 project to Elm 0.18, see https://github.com/elm-lang/elm-platform/blob/master/upgrade-docs/0.18.md)
+(To upgrade your Elm 0.17 project to Elm 0.18, see the [Elm 0.18 upgrade guide](https://github.com/elm-lang/elm-platform/blob/master/upgrade-docs/0.18.md).)
 
  - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.5.0-alpha/elm-format-0.18-0.5.0-alpha-mac-x64.tgz)
  - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.5.0-alpha/elm-format-0.18-0.5.0-alpha-linux-x64.tgz)
