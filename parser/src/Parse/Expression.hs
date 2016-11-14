@@ -23,15 +23,14 @@ import qualified Reporting.Annotation as A
 
 varTerm :: IParser E.Expr'
 varTerm =
-  boolean <|> (E.VarExpr <$> var)
-
-
-boolean :: IParser E.Expr'
-boolean =
-  let t = const (Boolean True) <$> string "True"
-      f = const (Boolean False) <$> string "False"
-  in
-    E.Literal <$> try (t <|> f)
+    let
+        resolve v =
+            case v of
+                Var.TagRef [] (UppercaseIdentifier "True") -> E.Literal $ Boolean True
+                Var.TagRef [] (UppercaseIdentifier "False") -> E.Literal $ Boolean False
+                _ -> E.VarExpr v
+    in
+        resolve <$> var
 
 
 accessor :: IParser E.Expr'
