@@ -8,7 +8,7 @@ BINEXT=".exe"
 
 # ## Run tests
 #
-# stack clean
+stack clean
 # ./tests/run-tests.sh
 
 
@@ -21,7 +21,7 @@ function build-flavor() {
     BUILD="elm-format-${FLAVOR}-${VERSION}-${PLATFORM}"
     mkdir -p dist/package-scripts
     ELM_FORMAT="`stack path --local-install-root`/bin/elm-format-${FLAVOR}${BINEXT}"
-    cp "$ELM_FORMAT" "dist/package-scripts/elm-format{$BINEXT}"
+    cp "$ELM_FORMAT" "dist/package-scripts/elm-format${BINEXT}"
     tar zcvf "$BUILD".tgz -C dist/package-scripts "elm-format${BINEXT}"
 }
 
