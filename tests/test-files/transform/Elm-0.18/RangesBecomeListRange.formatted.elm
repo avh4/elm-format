@@ -27,3 +27,7 @@ commented =
 
 needsParens =
     List.range (f x) (f y)
+
+
+usedInFunctionCall =
+    f (List.range 1 9) (List.range ({- A -} 1 {- B -}) ({- C -} 2 {- D -}))
