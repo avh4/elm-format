@@ -1,13 +1,15 @@
 
+## First time setup
+
 ```bash
 git clone ../.. elm-format
 vagrant up
 vagrant ssh
-  sudo apt-get install git
-  sudo add-apt-repository -y ppa:hvr/ghc
+  sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 575159689BEFB442
+  echo 'deb http://download.fpcomplete.com/ubuntu xenial main' | sudo tee /etc/apt/sources.list.d/fpco.list
   sudo apt-get update
-  sudo apt-get install ghc-7.10.3
-  sudo apt-get install cabal-install-1.22
+  sudo apt-get install stack
+  stack setup
 ```
 
 
@@ -15,9 +17,7 @@ vagrant ssh
 
 ```bash
 vagrant ssh
-  export PATH=/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:$PATH
   cd /vagrant/elm-format
-  cabal update
   /vagrant/build-package.sh
 vagrant halt
 ```
