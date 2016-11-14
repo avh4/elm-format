@@ -25,9 +25,9 @@ function returnCodeShouldEqual() {
 	[ "$?" -eq "$1" ] || exit 1
 }
 
-function shouldOutputTheSame() {
+function shouldOutputTheSameIgnoringEol() {
 	echo "$1" "$2"
-	diff -u <(echo "$1") <(echo "$2") || exit 1
+	diff -u --ignore-space-change <(echo "$1") <(echo "$2") || exit 1
 }
 
 function outputShouldRoughlyMatchPatterns() {
@@ -71,17 +71,17 @@ function checkWaysToRun() {
 	echo "## elm-format --help"
 	LONGHELP=$("$ELM_FORMAT" --help 2>&1)
 	returnCodeShouldEqual 0
-	shouldOutputTheSame "$HELP" "$LONGHELP"
+	shouldOutputTheSameIgnoringEol "$HELP" "$LONGHELP"
 
 	echo "## elm-format -h"
 	SHORTHELP=$("$ELM_FORMAT" -h 2>&1)
 	returnCodeShouldEqual 0
-	shouldOutputTheSame "$HELP" "$SHORTHELP"
+	shouldOutputTheSameIgnoringEol "$HELP" "$SHORTHELP"
 
 	echo "## elm-format"
 	NOARGS=$("$ELM_FORMAT" 2>&1)
 	returnCodeShouldEqual 0
-	shouldOutputTheSame "$HELP" "$NOARGS"
+	shouldOutputTheSameIgnoringEol "$HELP" "$NOARGS"
 
 	echo "## elm-format INPUT --validate does not change things"
 	"$ELM_FORMAT" "$INPUT_2" --validate 1>/dev/null
