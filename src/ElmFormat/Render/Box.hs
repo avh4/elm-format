@@ -859,6 +859,14 @@ formatRecordPair elmVersion delim formatValue (Commented pre k postK, v, forceMu
     |> (\x -> Commented pre x []) |> formatCommented id
 
 
+negativeCasePatternWorkaround :: Commented AST.Pattern.Pattern -> Box -> Box
+negativeCasePatternWorkaround (Commented _ (RA.A _ pattern) _) =
+    case pattern of
+        AST.Pattern.Literal (IntNum i _) | i < 0 -> parens
+        AST.Pattern.Literal (FloatNum f _) | f < 0 -> parens
+        _ -> id
+
+
 formatExpression :: ElmVersion -> Bool -> AST.Expression.Expr -> Box
 formatExpression elmVersion needsParens aexpr =
     case RA.drop aexpr of
@@ -1037,8 +1045,10 @@ formatExpression elmVersion needsParens aexpr =
                 clause (pat, expr) =
                     case
                       ( pat
-                      , formatPattern elmVersion False $ (\(Commented _ x _) -> x) pat
+                      , (formatPattern elmVersion False $ (\(Commented _ x _) -> x) pat)
+                          |> negativeCasePatternWorkaround pat
                       , formatCommentedStack (formatPattern elmVersion False) pat
+                          |> negativeCasePatternWorkaround pat
                       , formatHeadCommentedStack (formatExpression elmVersion False) expr
                       )
                     of
