@@ -1521,7 +1521,7 @@ needsParensInSpaces (RA.A _ expr) =
       AST.Expression.Let _ _ _ -> True
       AST.Expression.Case _ _ -> True
 
-      AST.Expression.GLShader _ -> True -- Maybe can be False?
+      AST.Expression.GLShader _ -> False
 
 
 formatType :: ElmVersion -> Type -> Box
