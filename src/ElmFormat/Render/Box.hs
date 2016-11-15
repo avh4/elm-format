@@ -1190,7 +1190,10 @@ removeBackticks left ops =
                           (pre, noRegion $ AST.Expression.Parens (Commented [] left []))
                       else
                           (pre, left)
-                    , (post, e)
+                    , if needsParensInSpaces e then
+                          (post, noRegion $ AST.Expression.Parens (Commented [] e []))
+                      else
+                          (post, e)
                     ]
                     (FAJoinFirst JoinAll)
                 )
