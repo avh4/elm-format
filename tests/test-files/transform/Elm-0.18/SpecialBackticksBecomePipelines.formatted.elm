@@ -17,6 +17,10 @@ withComments =
     a {- 1 -} |> andThen {- 2 -} b {- 3 -} |> andThen {- 4 -} c
 
 
+needsParens =
+    a 1 2 |> andThen (b 3 4) |> andThen (c 5 6)
+
+
 andThenIn17 =
     String.toInt "1234"
         |> Result.andThen (\year -> isValidYear year)
