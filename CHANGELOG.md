@@ -1,7 +1,14 @@
+## 0.5.2-alpha
+
+Bug fixes:
+  - When upgrading backticks, parentheses are correctly added if the second argument is a function call
+  - Added a workaround for an elm-compiler bug where patterns with literal negative numbers cannot be used without parentheses in case expressions
+
+
 ## 0.5.1-alpha
 
 Bug fixes:
-  - Whne upgrading ranges to `List.range`, parentheses are correctly added if the range is used as a function call argument
+  - When upgrading ranges to `List.range`, parentheses are correctly added if the range is used as a function call argument
   - Correctly space top-level declarations that use pattern destructuring
 
 
