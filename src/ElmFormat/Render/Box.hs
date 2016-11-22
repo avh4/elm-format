@@ -567,7 +567,7 @@ sortImports imports =
                     case RA.drop uimport of
                         ((_, identifiers), importMethod) ->
                             case AST.Module.alias importMethod of
-                                Just (_, (_, alias)) -> [alias]
+                                Just (_, (_, alias)) -> alias : identifiers
                                 Nothing -> identifiers
                 AST.Module.ImportComment _ -> []
 
