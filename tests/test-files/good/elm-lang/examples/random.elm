@@ -1,8 +1,8 @@
 module Main exposing (..)
 
 import Html exposing (..)
-import Html.App as Html
 import Html.Events exposing (..)
+import Html.App as Html
 import Random
 
 
