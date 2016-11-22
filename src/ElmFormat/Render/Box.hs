@@ -14,6 +14,7 @@ import qualified AST.Pattern
 import qualified AST.Variable
 import qualified Control.Monad as Monad
 import qualified Data.Char as Char
+import qualified Data.Function as Function
 import qualified Data.List as List
 import qualified Data.Maybe as Maybe
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
@@ -189,6 +190,7 @@ formatModuleHeader elmVersion modu =
 
       imports =
             AST.Module.imports modu
+                |> sortImports
                 |> intersperseMap importSpacer (formatImport elmVersion)
 
       mapIf fn m a =
@@ -549,6 +551,44 @@ formatImport elmVersion aimport =
         AST.Module.ImportComment c ->
             formatComment c
 
+sortImports :: [AST.Module.UserImport] -> [AST.Module.UserImport]
+sortImports imports =
+    let
+        importIsComment :: AST.Module.UserImport -> Bool
+        importIsComment aimport =
+            case aimport of
+                AST.Module.UserImport _ -> False
+                AST.Module.ImportComment _ -> True
+
+        aliasOrName :: AST.Module.UserImport -> [UppercaseIdentifier]
+        aliasOrName aimport =
+            case aimport of
+                AST.Module.UserImport uimport ->
+                    case RA.drop uimport of
+                        ((_, identifiers), importMethod) ->
+                            case AST.Module.alias importMethod of
+                                Just (_, (_, alias)) -> [alias]
+                                Nothing -> identifiers
+                AST.Module.ImportComment _ -> []
+
+        onInit :: ([a] -> [a]) -> [a] -> [a]
+        onInit f xs = f (List.init xs) ++ [List.last xs]
+
+        importGroupMap f groups =
+            case groups of
+                [] -> []
+                [x] ->
+                    case last x of
+                        AST.Module.ImportComment _ -> [onInit f x]
+                        AST.Module.UserImport _ -> [f x]
+                (x:xs) -> onInit f x : importGroupMap f xs
+
+        sortImports' = List.sortBy (compare `Function.on` aliasOrName)
+    in
+        imports
+            |> splitWhere importIsComment
+            |> importGroupMap sortImports'
+            |> concat
 
 formatListing :: (a -> Box) -> AST.Variable.Listing a -> Maybe Box
 formatListing format listing =
