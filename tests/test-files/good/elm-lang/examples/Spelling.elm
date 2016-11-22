@@ -1,9 +1,9 @@
 port module Spelling exposing (..)
 
 import Html exposing (..)
-import Html.App as Html
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Html.App as Html
 import String
 
 
