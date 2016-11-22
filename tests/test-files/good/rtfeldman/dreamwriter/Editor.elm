@@ -1,6 +1,5 @@
 module Component.Editor (..) where
 
-import Component.WordGraph as WordGraph
 import Dreamwriter exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -11,6 +10,7 @@ import List exposing (..)
 import Maybe
 import Signal exposing (Address, mailbox)
 import String
+import Component.WordGraph as WordGraph
 
 
 type alias Addresses a =

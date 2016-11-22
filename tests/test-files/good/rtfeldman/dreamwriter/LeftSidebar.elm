@@ -1,13 +1,13 @@
 module Component.LeftSidebar (..) where
 
-import Dreamwriter exposing (..)
-import Component.LeftSidebar.OpenMenuView as OpenMenu
 import Component.LeftSidebar.CurrentDocView as CurrentDoc
+import Dreamwriter exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Lazy exposing (..)
 import Maybe
+import Component.LeftSidebar.OpenMenuView as OpenMenu
 import Regex
 import Signal exposing (Address)
 
