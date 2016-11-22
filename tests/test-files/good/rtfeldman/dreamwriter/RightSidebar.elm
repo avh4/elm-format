@@ -5,9 +5,9 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Lazy exposing (..)
+import List exposing (..)
 import Maybe
 import Signal exposing (Address)
-import List exposing (..)
 
 
 type alias Addresses a =

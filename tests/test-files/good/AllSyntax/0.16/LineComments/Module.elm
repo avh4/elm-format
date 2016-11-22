@@ -28,6 +28,13 @@ import
 --K
 
 import
+    --P
+    Json.Decode
+        --Q
+        as
+            --R
+            Json
+import
     --M
     Maybe
         --N
@@ -47,13 +54,6 @@ import
               map
               --V
             )
-import
-    --P
-    Json.Decode
-        --Q
-        as
-            --R
-            Json
 import Signal
     exposing
         (--AB
