@@ -552,43 +552,30 @@ formatImport elmVersion aimport =
             formatComment c
 
 sortImports :: [AST.Module.UserImport] -> [AST.Module.UserImport]
-sortImports imports =
-    let
-        importIsComment :: AST.Module.UserImport -> Bool
-        importIsComment aimport =
-            case aimport of
-                AST.Module.UserImport _ -> False
-                AST.Module.ImportComment _ -> True
-
-        aliasOrName :: AST.Module.UserImport -> [UppercaseIdentifier]
+sortImports = sortGroupsOn aliasOrName
+    where
+        aliasOrName :: AST.Module.UserImport -> Maybe [UppercaseIdentifier]
         aliasOrName aimport =
             case aimport of
                 AST.Module.UserImport uimport ->
                     case RA.drop uimport of
                         ((_, identifiers), importMethod) ->
                             case AST.Module.alias importMethod of
-                                Just (_, (_, alias)) -> alias : identifiers
-                                Nothing -> identifiers
-                AST.Module.ImportComment _ -> []
+                                Just (_, (_, alias)) ->
+                                    Just $ alias : UppercaseIdentifier "" : identifiers
 
-        onInit :: ([a] -> [a]) -> [a] -> [a]
-        onInit f xs = f (List.init xs) ++ [List.last xs]
+                                Nothing ->
+                                    Just identifiers
 
-        importGroupMap f groups =
-            case groups of
-                [] -> []
-                [x] ->
-                    case last x of
-                        AST.Module.ImportComment _ -> [onInit f x]
-                        AST.Module.UserImport _ -> [f x]
-                (x:xs) -> onInit f x : importGroupMap f xs
+                AST.Module.ImportComment _ -> Nothing
 
-        sortImports' = List.sortBy (compare `Function.on` aliasOrName)
-    in
-        imports
-            |> splitWhere importIsComment
-            |> importGroupMap sortImports'
-            |> concat
+sortGroupsOn :: Ord b => (a -> Maybe b) -> [a] -> [a]
+sortGroupsOn f list =
+    list
+        |> zip (map f list)
+        |> List.groupBy ((==) `Function.on` (Maybe.isJust . fst))
+        |> concatMap (List.sortBy (compare `Function.on` fst))
+        |> map snd
 
 formatListing :: (a -> Box) -> AST.Variable.Listing a -> Maybe Box
 formatListing format listing =
