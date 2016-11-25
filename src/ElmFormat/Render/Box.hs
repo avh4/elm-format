@@ -412,7 +412,9 @@ formatImport elmVersion aimport =
                           formatImportClause
                             (formatListing (formatVarValue elmVersion))
                             "exposing"
-                            (exposingPreKeyword, exposingPostKeywordAndListing)
+                            ( exposingPreKeyword
+                            , fmap sortListing exposingPostKeywordAndListing
+                            )
 
                         formatImportClause :: (a -> Maybe Box) -> String -> (Comments, (Comments, a)) -> Maybe Box
                         formatImportClause format keyw input =
@@ -550,6 +552,20 @@ formatImport elmVersion aimport =
 
         AST.Module.ImportComment c ->
             formatComment c
+
+sortListing :: Ord a => AST.Variable.Listing a -> AST.Variable.Listing a
+sortListing listing =
+    let
+        unComment (Commented _ a _) = a
+    in
+        case listing of
+            AST.Variable.ExplicitListing commentedAs b ->
+                AST.Variable.ExplicitListing
+                    (List.sortBy (compare `Function.on` unComment) commentedAs)
+                    b
+
+            AST.Variable.OpenListing _ -> listing
+            AST.Variable.ClosedListing -> listing
 
 sortImports :: [AST.Module.UserImport] -> [AST.Module.UserImport]
 sortImports = sortGroupsOn aliasOrName

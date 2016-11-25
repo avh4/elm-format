@@ -26,3 +26,12 @@ data Value
     | OpValue SymbolIdentifier
     | Union (PostCommented UppercaseIdentifier) (Listing UppercaseIdentifier)
     deriving (Eq, Show)
+
+instance Ord Value where
+  (Value a)        <= (Value b)        = a <= b
+  (OpValue a)      <= (OpValue b)      = a <= b
+  (Union (a, _) _) <= (Union (b, _) _) = a <= b
+  (Union _ _)      <= _                = True
+  _                <= (Union _ _)      = False
+  (OpValue _)      <= (Value _)        = True
+  (Value _)        <= (OpValue _)      = False

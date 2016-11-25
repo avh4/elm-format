@@ -5,18 +5,18 @@ module
     --A
     AllSyntax.LineComments.Module
     --B
-    ( --C
-      a
-      --D
-    , --E
-      b
-      --F
-    , --G
-      c
-      --H
-    )
     --I
-    where
+    exposing
+        ( --C
+          a
+          --D
+        , --E
+          b
+          --F
+        , --G
+          c
+          --H
+        )
 
 --J
 
@@ -41,7 +41,8 @@ import
         exposing
             --O
             ( --S
-              Maybe --W
+              Maybe
+              --W
                 ( --X
                   Just
                   --Y
@@ -62,21 +63,23 @@ import Signal
         )
 import Task
     exposing
-        ( succeed -- AD
-        , fail -- AE
+        ( andMap
+        , andThen
+        , fail
+          -- AE
+        , fromMaybe
+        , fromResult
         , map
         , map2
         , map3
         , map4
         , map5
-        , andMap
-        , andThen
-        , onError
         , mapError
+        , onError
+        , succeed
+          -- AD
         , toMaybe
-        , fromMaybe
         , toResult
-        , fromResult
         )
 
 
