@@ -15,21 +15,21 @@ import {- M -} Maybe {- N -} exposing {- O -} ({- S -} Maybe {- W -} ({- X -} Ju
 import Signal exposing ({- AB -} .. {- AC -})
 import Task
     exposing
-        ( succeed {- AD -}
+        ( andMap
+        , andThen
         , fail {- AE -}
+        , fromMaybe
+        , fromResult
         , map
         , map2
         , map3
         , map4
         , map5
-        , andMap
-        , andThen
-        , onError
         , mapError
+        , onError
+        , succeed {- AD -}
         , toMaybe
-        , fromMaybe
         , toResult
-        , fromResult
         )
 
 
