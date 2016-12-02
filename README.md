@@ -36,6 +36,10 @@ elm-format --help  # See other command line options
 
 You will need to download the version appropriate for your OS, unzip it, and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.  Simpler installation options will be available once there is a stable release of elm-format.
 
+Users of the [homebrew](http://brew.sh) package manager for macOS can install development / alpha versions of `elm-format` as follows:
+
+    brew install --devel homebrew/devel-only/elm-format
+
 If you need PGP signatures, see the [releases page](https://github.com/avh4/elm-format/releases).
 
 ### For Elm 0.18
