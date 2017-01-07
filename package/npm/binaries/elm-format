@@ -1,0 +1,1 @@
+echo "The npm installation of elm-format did not complete successfully! Please try reinstalling elm-format through npm. If you still see this message even after reinstalling, please file a bug at https://github.com/avh4/elm-format/issues to let us know. You can find manual installers at https://github.com/avh4/elm-format"
