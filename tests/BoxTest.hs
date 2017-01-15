@@ -8,6 +8,7 @@ import qualified Data.Text.Lazy as LazyText
 import qualified Data.Text as Text
 
 import Box
+import Defaults
 
 
 trim :: String -> String
@@ -28,7 +29,7 @@ assertLineOutput expected actual =
 assertOutput :: String -> Box -> Assertion
 assertOutput expected actual =
     assertEqual expected expected $
-        trim $ Text.unpack $ render $ actual
+        trim $ Text.unpack $ render defaultTabSize $ actual
 
 
 word :: String -> Box
@@ -74,5 +75,5 @@ tests =
                 ]
     , testCase "indent (with leading spaces)" $
         assertOutput "    a\n" $
-            prefix space $ indent $ line $ identifier "a"
+            prefix defaultTabSize space $ indent $ line $ identifier "a"
     ]

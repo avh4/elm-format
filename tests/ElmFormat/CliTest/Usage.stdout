@@ -1,7 +1,7 @@
 elm-format-0.18 0.5.2-alpha
 
 Usage: elm-format [INPUT] [--output FILE] [--yes] [--validate] [--stdin]
-                  [--elm-version VERSION] [--upgrade]
+                  [--tabsize SPACES] [--elm-version VERSION] [--upgrade]
   Format Elm source files.
 
 Available options:
@@ -11,6 +11,7 @@ Available options:
   --yes                    Reply 'yes' to all automated prompts.
   --validate               Check if files are formatted without changing them.
   --stdin                  Read from stdin, output to stdout.
+  --tabsize SPACES         Spaces per tab (default: 4)
   --elm-version VERSION    The Elm version of the source files being formatted.
                            Valid values: 0.16, 0.17, 0.18. Default: 0.18
   --upgrade                Upgrade older Elm files to Elm 0.18 syntax

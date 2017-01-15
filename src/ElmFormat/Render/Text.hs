@@ -10,8 +10,8 @@ import qualified Data.Text as Text
 import qualified ElmFormat.Render.Box as Render
 
 
-render :: ElmVersion -> AST.Module.Module -> Text.Text
-render elmVersion modu =
+render :: ElmVersion -> Int -> AST.Module.Module -> Text.Text
+render elmVersion tabSize modu =
     let
         trimSpaces text =
             text
@@ -19,6 +19,6 @@ render elmVersion modu =
                 |> map Text.stripEnd
                 |> Text.unlines
     in
-        Render.formatModule elmVersion modu
-            |> Box.render
+        Render.formatModule elmVersion tabSize modu
+            |> Box.render tabSize
             |> trimSpaces

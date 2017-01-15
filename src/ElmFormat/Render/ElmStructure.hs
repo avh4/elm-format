@@ -142,8 +142,8 @@ application forceMultiline first args =
     ; child2
     >
 -}
-group :: Bool -> String -> String -> String -> Bool -> [Box] -> Box
-group innerSpaces left sep right forceMultiline children =
+group :: Int -> Bool -> String -> String -> String -> Bool -> [Box] -> Box
+group tabsize innerSpaces left sep right forceMultiline children =
   case (forceMultiline, allSingles children) of
     (_, Right []) ->
       line $ row [punc left, punc right]
@@ -162,8 +162,8 @@ group innerSpaces left sep right forceMultiline children =
 
         (first:rest) ->
           stack1 $
-            (prefix (row [punc left, space]) first)
-            : (map (prefix $ row [punc sep, space]) rest)
+            (prefix tabsize (row [punc left, space]) first)
+            : (map (prefix tabsize $ row [punc sep, space]) rest)
             ++ [ line $ punc right ]
 
 {-|
@@ -179,8 +179,8 @@ Formats as:
       , rest1
     }
 -}
-extensionGroup :: Bool -> Box -> Box -> [Box] -> Box
-extensionGroup multiline base first rest =
+extensionGroup :: Int -> Bool -> Box -> Box -> [Box] -> Box
+extensionGroup tabSize multiline base first rest =
   case
     ( multiline
     , isLine base
@@ -202,10 +202,10 @@ extensionGroup multiline base first rest =
 
     _ ->
       stack1
-        [ prefix (row [punc "{", space]) base
+        [ prefix tabSize (row [punc "{", space]) base
         , stack1
-            ([ prefix (row [punc "|", space]) first ]
-            ++ (map (prefix (row [punc ",", space])) rest))
+            ([ prefix tabSize (row [punc "|", space]) first ]
+            ++ (map (prefix tabSize (row [punc ",", space])) rest))
             |> indent
         , line $ punc "}"
         ]

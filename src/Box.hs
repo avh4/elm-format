@@ -16,7 +16,7 @@ import qualified Data.Text as T
 A line is ALWAYS just one line.
 
 Space is self-explanatory,
-  Tab aligns to the nearest multiple of 4 spaces,
+  Tab aligns to the nearest multiple of Config._tabsize spaces,
   Text brings any string into the data structure,
   Row joins more of these elements onto one line.
 -}
@@ -183,10 +183,10 @@ xyz
 myPrefix abcde
          xyz
 -}
-prefix :: Line -> Box -> Box
-prefix pref =
+prefix :: Int -> Line -> Box -> Box
+prefix tabSize pref =
     let
-        prefixLength = lineLength 0 pref
+        prefixLength = lineLength tabSize 0 pref
         paddingSpaces = replicate prefixLength space
         padLineWithSpaces l = row [ row paddingSpaces, l ]
         addPrefixToLine l = row [ pref, l ]
@@ -205,39 +205,39 @@ addSuffix suffix b =
                 |> andThen [ line $ row [ last ls, suffix ] ]
 
 
-renderLine :: Int -> Line -> T.Text
-renderLine startColumn line' =
+renderLine :: Int -> Int -> Line -> T.Text
+renderLine tabSize startColumn line' =
     case line' of
         Text text ->
             text
         Space ->
             T.singleton ' '
         Tab ->
-            T.pack $ replicate (tabLength startColumn) ' '
+            T.pack $ replicate (tabLength tabSize startColumn) ' '
         Row lines' ->
-            renderRow startColumn lines'
+            renderRow tabSize startColumn lines'
 
 
-render :: Box -> T.Text
-render box' =
+render :: Int -> Box -> T.Text
+render tabSize box' =
     case box' of
         SingleLine line' ->
-            T.snoc (renderLine 0 line') '\n'
+            T.snoc (renderLine tabSize 0 line') '\n'
         Stack l1 l2 rest ->
-            T.unlines $ map (renderLine 0) (l1 : l2 : rest)
+            T.unlines $ map (renderLine tabSize 0) (l1 : l2 : rest)
         MustBreak line' ->
-            T.snoc (renderLine 0 line') '\n'
+            T.snoc (renderLine tabSize 0 line') '\n'
 
 
 -- TODO couldn't we just run renderLine and get the length of the resulting string?
-lineLength :: Int -> Line -> Int
-lineLength startColumn line' =
+lineLength :: Int -> Int -> Line -> Int
+lineLength tabSize startColumn line' =
    startColumn +
       case line' of
          Text string -> T.length string
          Space -> 1
-         Tab -> tabLength startColumn
-         Row lines' -> rowLength startColumn lines'
+         Tab -> tabLength tabSize startColumn
+         Row lines' -> rowLength tabSize startColumn lines'
 
 
 initRow :: Int -> (T.Text, Int)
@@ -245,18 +245,13 @@ initRow startColumn =
   (T.empty, startColumn)
 
 
-spacesInTab :: Int
-spacesInTab =
-  4
+spacesToNextTab :: Int -> Int -> Int
+spacesToNextTab tabSize startColumn =
+  startColumn `mod` tabSize
 
-
-spacesToNextTab :: Int -> Int
-spacesToNextTab startColumn =
-  startColumn `mod` spacesInTab
-
-tabLength :: Int -> Int
-tabLength startColumn =
-  spacesInTab - (spacesToNextTab startColumn)
+tabLength :: Int -> Int -> Int
+tabLength tabSize startColumn =
+  tabSize - (spacesToNextTab tabSize startColumn)
 
 {-
 What happens here is we take a row and start building its contents
@@ -283,31 +278,32 @@ The (T.Text, Int) type here means the (string, column) from the table above.
 Then we just need to do one final modification to get from endColumn to resultLength,
   which is what we are after in the function `rowLength`.
 -}
-renderRow' :: Int -> [Line] -> (T.Text, Int)
-renderRow' startColumn lines' =
+renderRow' :: Int -> Int -> [Line] -> (T.Text, Int)
+renderRow' tabSize startColumn lines' =
   (result, resultLength)
   where
-    (result, endColumn) = foldl addLine (initRow startColumn) lines'
+    addLine' = addLine tabSize
+    (result, endColumn) = foldl addLine' (initRow startColumn) lines'
     resultLength = endColumn - startColumn
 
 {-
 A step function for renderRow'.
 
-addLine (" ",1) Tab == ("    ",4)
+addLine ... (" ",1) Tab == ... ("    ",Flags.Config._tabsize)
 -}
-addLine :: (T.Text, Int) -> Line -> (T.Text, Int)
-addLine (string, startColumn') line' =
+addLine :: Int -> (T.Text, Int) -> Line -> (T.Text, Int)
+addLine tabSize (string, startColumn') line' =
   (newString, newStartColumn)
   where
-    newString = T.append string $ renderLine startColumn' line'
-    newStartColumn = lineLength startColumn' line'
+    newString = T.append string $ renderLine tabSize startColumn' line'
+    newStartColumn = lineLength tabSize startColumn' line'
 
 -- Extract the final string from renderRow'
-renderRow :: Int -> [Line] -> T.Text
-renderRow startColumn lines' =
-  fst $ renderRow' startColumn lines'
+renderRow :: Int -> Int -> [Line] -> T.Text
+renderRow tabSize startColumn lines' =
+  fst $ renderRow' tabSize startColumn lines'
 
 -- Extract the final length from renderRow'
-rowLength :: Int -> [Line] -> Int
-rowLength startColumn lines' =
-  snd $ renderRow' startColumn lines'
+rowLength :: Int -> Int -> [Line] -> Int
+rowLength tabSize startColumn lines' =
+  snd $ renderRow' tabSize startColumn lines'

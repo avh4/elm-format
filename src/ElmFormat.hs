@@ -30,17 +30,18 @@ import qualified System.Directory as Dir
 -- Otherwise, display errors and exit
 writeResult
     :: ElmVersion
+    -> Int
     -> Destination
     -> FilePath
     -> Text.Text
     -> Result.Result () Syntax.Error AST.Module.Module
     -> IO (Maybe Bool)
-writeResult elmVersion destination inputFile inputText result =
+writeResult elmVersion tabSize destination inputFile inputText result =
     case result of
         Result.Result _ (Result.Ok modu) ->
             let
                 renderedText =
-                    Render.render elmVersion modu
+                    Render.render elmVersion tabSize modu
                 rendered =
                     renderedText
                         |> Text.encodeUtf8
@@ -74,17 +75,17 @@ writeResult elmVersion destination inputFile inputText result =
                 exitFailure
 
 
-processTextInput :: ElmVersion -> Destination -> FilePath -> Text.Text -> IO (Maybe Bool)
-processTextInput elmVersion destination inputFile inputText =
+processTextInput :: ElmVersion -> Int -> Destination -> FilePath -> Text.Text -> IO (Maybe Bool)
+processTextInput elmVersion tabSize destination inputFile inputText =
     Parse.parse inputText
-        |> writeResult elmVersion destination inputFile inputText
+        |> writeResult elmVersion tabSize destination inputFile inputText
 
 
-processFileInput :: ElmVersion -> FilePath -> Destination -> IO (Maybe Bool)
-processFileInput elmVersion inputFile destination =
+processFileInput :: ElmVersion -> Int -> FilePath -> Destination -> IO (Maybe Bool)
+processFileInput elmVersion tabSize inputFile destination =
     do
         inputText <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
-        processTextInput elmVersion destination inputFile inputText
+        processTextInput elmVersion tabSize destination inputFile inputText
 
 
 isEitherFileOrDirectory :: FilePath -> IO Bool
@@ -147,8 +148,8 @@ resolveFiles inputFiles =
                 return $ Right $ concat files
 
 
-handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> ElmVersion -> IO (Maybe Bool)
-handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion =
+handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> Int ->  ElmVersion -> IO (Maybe Bool)
+handleFilesInput inputFiles outputFile autoYes validateOnly tabSize elmVersion =
     do
         elmFiles <- resolveFiles inputFiles
 
@@ -162,7 +163,7 @@ handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion =
                 realOutputFile <- decideOutputFile autoYes inputFile outputFile
                 let destination = if validateOnly then ValidateOnly else ToFile realOutputFile
                 putStrLn $ (r $ ProcessingFiles $ [inputFile])
-                processFileInput elmVersion inputFile destination
+                processFileInput elmVersion tabSize inputFile destination
 
             Right elmFiles -> do
                 when (isJust outputFile)
@@ -188,7 +189,7 @@ handleFilesInput inputFiles outputFile autoYes validateOnly elmVersion =
                         in
                             do
                                 putStrLn $ (r $ ProcessingFiles elmFiles)
-                                validationResults <- mapM (\file -> processFileInput elmVersion file (dst file)) elmFiles
+                                validationResults <- mapM (\file -> processFileInput elmVersion tabSize file (dst file)) elmFiles
                                 return $ foldl merge Nothing validationResults
                     else
                         return Nothing
@@ -250,8 +251,8 @@ determineWhatToDoFromConfig config =
         determineWhatToDo source destination
 
 
-validate :: ElmVersion -> Source -> IO ()
-validate elmVersion source =
+validate :: ElmVersion -> Int -> Source -> IO ()
+validate elmVersion tabSize source =
     do
         result <-
             case source of
@@ -261,10 +262,10 @@ validate elmVersion source =
 
                         Lazy.toStrict input
                             |> Text.decodeUtf8
-                            |> processTextInput elmVersion ValidateOnly "<STDIN>"
+                            |> processTextInput elmVersion tabSize ValidateOnly "<STDIN>"
 
                 FromFiles first rest ->
-                    handleFilesInput (first:rest) Nothing True True elmVersion
+                    handleFilesInput (first:rest) Nothing True True tabSize elmVersion
 
         case result of
             Nothing ->
@@ -301,6 +302,7 @@ main defaultVersion =
     do
         config <- Flags.parse defaultVersion
         let autoYes = Flags._yes config
+        let tabSize = Flags._tabSize config
         let elmVersionResult = determineVersion (Flags._elmVersion config) (Flags._upgrade config)
 
         case (elmVersionResult, determineWhatToDoFromConfig config) of
@@ -315,11 +317,11 @@ main defaultVersion =
                 exitWithError message
 
             (Right elmVersion, Right (Validate source)) ->
-                validate elmVersion source
+                validate elmVersion tabSize source
 
             (Right elmVersion, Right (FormatInPlace first rest)) ->
                 do
-                    result <- handleFilesInput (first:rest) Nothing autoYes False elmVersion
+                    result <- handleFilesInput (first:rest) Nothing autoYes False tabSize elmVersion
                     case result of
                         Nothing ->
                             exitSuccess
@@ -329,7 +331,7 @@ main defaultVersion =
 
             (Right elmVersion, Right (FormatToFile input output)) ->
                 do
-                    result <- handleFilesInput [input] (Just output) autoYes False elmVersion
+                    result <- handleFilesInput [input] (Just output) autoYes False tabSize elmVersion
                     case result of
                         Nothing ->
                             exitSuccess
@@ -344,7 +346,7 @@ main defaultVersion =
                     result <-
                         Lazy.toStrict input
                             |> Text.decodeUtf8
-                            |> processTextInput elmVersion UpdateInPlace "<STDIN>"
+                            |> processTextInput elmVersion tabSize UpdateInPlace "<STDIN>"
                     case result of
                         Nothing ->
                             exitSuccess
@@ -359,7 +361,7 @@ main defaultVersion =
                     result <-
                         Lazy.toStrict input
                             |> Text.decodeUtf8
-                            |> processTextInput elmVersion (ToFile output) "<STDIN>"
+                            |> processTextInput elmVersion tabSize (ToFile output) "<STDIN>"
                     case result of
                         Nothing ->
                             exitSuccess

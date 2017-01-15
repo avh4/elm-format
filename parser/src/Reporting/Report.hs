@@ -18,6 +18,7 @@ import System.IO (hPutStr, stderr)
 
 import qualified Reporting.Region as R
 
+import Defaults
 
 data Report = Report
     { _title :: String
@@ -121,7 +122,7 @@ ansi tipe =
 messageBar :: Renderer m -> String -> String -> m ()
 messageBar renderer tag location =
   let
-    usedSpace = 4 + length tag + 1 + length location
+    usedSpace = defaultTabSize + length tag + 1 + length location
   in
     header renderer $
       "-- " ++ tag ++ " "
