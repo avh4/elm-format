@@ -254,6 +254,9 @@ checkGood 0.16 AllSyntax/0.16/Literals.elm
 checkGood 0.16 AllSyntax/0.16/Comments.elm
 checkGood 0.16 ApiSketch.elm
 
+checkGood 0.17 Export.elm
+checkGood 0.18 Export.elm
+
 checkGoodAllSyntax 0.17 Module
 checkGoodAllSyntax 0.17 ModuleEffect
 
