@@ -61,7 +61,7 @@ equalsPair symbol forceMultiline left right =
         , right'
         ]
 
-    ( False, SingleLine left', MustBreak right' ) ->
+    ( _, SingleLine left', MustBreak right' ) ->
       mustBreak $ row
         [ left'
         , space
