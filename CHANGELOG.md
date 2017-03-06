@@ -1,3 +1,9 @@
+## master (next release, probably 0.6.0-alpha)
+
+Bug fixes:
+  - Empty records containing multiline comments are now handled correctly
+
+
 ## 0.5.2-alpha
 
 Bug fixes:

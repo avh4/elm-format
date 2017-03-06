@@ -60,7 +60,8 @@ tupleFunction =
 
 
 emptyRecord =
-    {}
+    { --U
+    }
 
 
 record =
