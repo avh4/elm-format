@@ -1,4 +1,4 @@
-module AllSyntax.BlockComments.Declarations (..) where
+module AllSyntax.BlockComments.Declarations exposing (..)
 
 
 type {- A -} DataType {- B -}

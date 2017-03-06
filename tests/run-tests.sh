@@ -244,7 +244,7 @@ checkWaysToRun
 checkGood 0.16 Simple.elm
 checkGood 0.16 AllSyntax/0.16/AllSyntax.elm
 checkGoodAllSyntax 0.16 Module
-checkGoodAllSyntax 0.16 Declarations
+checkGoodAllSyntax 0.18 Declarations
 checkGoodAllSyntax 0.18 Patterns
 checkGoodAllSyntax 0.18 Types
 checkGood 0.18 AllSyntax/0.18/Expressions.elm

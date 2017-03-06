@@ -1,4 +1,4 @@
-module AllSyntax.LineComments.Declarations (..) where
+module AllSyntax.LineComments.Declarations exposing (..)
 
 
 type
