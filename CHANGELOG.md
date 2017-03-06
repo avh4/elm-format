@@ -2,6 +2,7 @@
 
 Bug fixes:
   - Empty records containing multiline comments are now handled correctly
+  - Double quotes at the end of multiline strings are now handled correctly
 
 
 ## 0.5.2-alpha
