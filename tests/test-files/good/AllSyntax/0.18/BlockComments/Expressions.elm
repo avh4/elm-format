@@ -1,20 +1,6 @@
 module AllSyntax.BlockComments.Expressions exposing (..)
 
 
-ifStatement =
-    if {- C -} True {- D -} then
-        {- E -}
-        1
-        {- F -}
-    else {- G -} if {- H -} False {- I -} then
-        {- J -}
-        2
-        {- K -}
-    else
-        {- L -}
-        3
-
-
 caseStatement =
     case {- M -} Just 1 {- N -} of
         {- O -}

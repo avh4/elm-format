@@ -134,12 +134,52 @@ lambda =
 
 
 ifStatement =
-    if True then
-        1
-    else if False then
-        2
-    else
-        3
+    let
+        a =
+            if True then
+                1
+            else if False then
+                2
+            else
+                3
+
+        b =
+            if {- C -} True {- D -} then
+                {- E -}
+                1
+                {- F -}
+            else {- G -} if {- H -} False {- I -} then
+                {- J -}
+                2
+                {- K -}
+            else
+                {- L -}
+                3
+
+        c =
+            if
+                --C
+                True
+                --D
+            then
+                --E
+                1
+                --F
+            else
+            --G
+            if
+                --H
+                False
+                --I
+            then
+                --J
+                2
+                --K
+            else
+                --L
+                3
+    in
+        {}
 
 
 letStatement =
