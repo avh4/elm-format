@@ -1,10 +1,6 @@
 module AllSyntax.BlockComments.Expressions exposing (..)
 
 
-unit =
-    ({- A -})
-
-
 emptyList =
     [{- B -}]
 
