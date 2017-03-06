@@ -33,9 +33,20 @@ tupleFn _ =
     ()
 
 
-tuple : ( a, b ) -> ()
-tuple _ =
-    ()
+type alias Tuple =
+    ( ( a, b )
+    , ( {- A -} a {- B -}, {- C -} b {- D -} )
+    , ( --A
+        a
+        --B
+      , --C
+        b
+        --D
+      )
+    , ( a -- A
+      , b -- B
+      )
+    )
 
 
 emptyRecord : {} -> ()
