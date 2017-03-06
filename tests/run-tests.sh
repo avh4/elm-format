@@ -248,7 +248,6 @@ checkGoodAllSyntax 0.16 Declarations
 checkGoodAllSyntax 0.18 Patterns
 checkGoodAllSyntax 0.16 Types
 checkGood 0.18 AllSyntax/0.18/Expressions.elm
-checkGood 0.18 AllSyntax/0.18/BlockComments/Expressions.elm
 checkGood 0.16 Comments.elm
 checkGood 0.16 AllSyntax/0.16/GLShader.elm
 checkGood 0.16 AllSyntax/0.16/Literals.elm
