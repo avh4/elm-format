@@ -1112,8 +1112,8 @@ formatExpression elmVersion needsParens aexpr =
                 SingleLine comments' ->
                     line $ row [ punc "{", comments', punc "}" ]
 
-                comments' ->
-                    comments'
+                _ ->
+                    formatUnit '{' '}' comments
 
         AST.Expression.Parens expr ->
             parens $ formatCommented (formatExpression elmVersion False) expr
