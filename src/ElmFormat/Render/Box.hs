@@ -796,11 +796,13 @@ formatPattern elmVersion parensRequired apattern =
         AST.Pattern.Data ctor [] ->
             line (formatQualifiedUppercaseIdentifier elmVersion ctor)
                 |>
-                    case ctor of
-                        [_] ->
+                    case (elmVersion, ctor) of
+                        (Elm_0_16, [_]) ->
                             id
-                        _ ->
+                        (Elm_0_16, _) ->
                             if parensRequired then parens else id
+                        _ ->
+                            id
 
         AST.Pattern.Data ctor patterns ->
             ElmStructure.application
