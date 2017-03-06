@@ -20,7 +20,6 @@ import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified Paths_elm_format as This
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Region as Region
-import qualified Text.Regex.Applicative as Regex
 import Text.Printf (printf)
 import Util.List
 
@@ -1482,16 +1481,23 @@ formatString style s =
 
     escapeMultiQuote =
         let
-            quote =
-                Regex.sym '"'
+            step okay quotes remaining =
+                case remaining of
+                    [] ->
+                        reverse $ (concat $ replicate quotes "\"\\") ++ okay
 
-            oneOrMoreQuotes =
-                Regex.some quote
-
-            escape =
-                ("\\\"\\\"\\" ++) . (List.intersperse '\\')
+                    next : rest ->
+                        if next == '"' then
+                            step okay (quotes + 1) rest
+                        else if quotes >= 3 then
+                            step (next : (concat $ replicate quotes "\"\\") ++ okay) 0 rest
+                        else if quotes > 0 then
+                            step (next : (replicate quotes '"') ++ okay) 0 rest
+                        else
+                            step (next : okay) 0 rest
         in
-            Regex.replace $ escape <$> oneOrMoreQuotes <* quote <* quote
+            step "" 0
+
 
 
 data TypeParensRequired

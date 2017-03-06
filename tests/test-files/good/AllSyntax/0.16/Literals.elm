@@ -104,3 +104,16 @@ multilineString =
 \x06DD\xFFFB\x110BD\xE007F
  \x2000\x205F
 """
+
+
+multilineStringQuoteHandling =
+    [ """trailing double quote\""""
+    , """trailing double quote 2\"\""""
+    , """trailing double quote 3\"\"\""""
+    , """trailing double quote 4\"\"\"\""""
+    , """embedded triple double quotes (\"\"\")"""
+    , """embedded triple double quotes (\"\"\") (\"\"\"\")"""
+    , """""leading double quote 2"""
+    , """\"\"\" leading double quote 3"""
+    , """\"\"\"\" leading double quote 4"""
+    ]
