@@ -64,7 +64,6 @@ var =
 lowVar :: IParser LowercaseIdentifier
 lowVar =
   LowercaseIdentifier <$> makeVar lower <?> "a lower case name"
-  -- TODO: allow it to start with '_' ?
 
 
 capVar :: IParser UppercaseIdentifier
