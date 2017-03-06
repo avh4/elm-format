@@ -1084,7 +1084,7 @@ formatExpression elmVersion needsParens aexpr =
             line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
 
         AST.Expression.Access expr field ->
-            formatExpression elmVersion True expr -- TODO: needs to have parens in some cases (does passing True resolve this?)
+            formatExpression elmVersion True expr
                 |> addSuffix (row $ [punc ".", formatLowercaseIdentifier elmVersion [] field])
 
         AST.Expression.AccessFunction (LowercaseIdentifier field) ->
