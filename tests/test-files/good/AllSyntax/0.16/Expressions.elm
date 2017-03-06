@@ -108,8 +108,17 @@ recordUpdate a =
     { a | x = 1, y = 2 }
 
 
-recordAccess =
-    { x = 1 }.x
+recordAccess f a b r =
+    [ ().x
+    , a.x
+    , (a).x
+    , ( 1, 2 ).x
+    , (,,).x
+    , {}.x
+    , { x = 1 }.x
+    , { r | x = 1 }.x
+    , a.x.y
+    ]
 
 
 recordAccessfunction =
