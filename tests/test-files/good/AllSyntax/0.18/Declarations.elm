@@ -1,4 +1,4 @@
-module AllSyntax.Declarations (..) where
+module AllSyntax.Declarations exposing (..)
 
 
 type DataType
