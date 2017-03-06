@@ -1,4 +1,4 @@
-module AllSyntax.Types (..) where
+module AllSyntax.Types exposing (..)
 
 import Dict
 
