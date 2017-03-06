@@ -81,7 +81,11 @@ parens x =
 
 
 emptyList =
-    []
+    [ []
+    , [{- A -}]
+    , [--B
+      ]
+    ]
 
 
 list =

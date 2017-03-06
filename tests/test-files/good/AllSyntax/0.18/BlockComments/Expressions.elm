@@ -1,10 +1,6 @@
 module AllSyntax.BlockComments.Expressions exposing (..)
 
 
-emptyList =
-    [{- B -}]
-
-
 ifStatement =
     if {- C -} True {- D -} then
         {- E -}
