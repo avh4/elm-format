@@ -1,4 +1,4 @@
-module AllSyntax.BlockComments.Types (..) where
+module AllSyntax.BlockComments.Types exposing (..)
 
 import Dict
 
