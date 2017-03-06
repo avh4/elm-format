@@ -1,4 +1,4 @@
-module AllSyntax.LineComments.Patterns (..) where
+module AllSyntax.LineComments.Patterns exposing (..)
 
 
 type Foo

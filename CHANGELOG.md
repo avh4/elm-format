@@ -1,5 +1,8 @@
 ## master (next release, probably 0.6.0-alpha)
 
+Syntax changes:
+  - Removed a workaround for an Elm 0.16 compiler bug that added extra parenthesis to qualified type tags in pattern matches
+
 Bug fixes:
   - Empty records containing multiline comments are now handled correctly
   - Double quotes at the end of multiline strings are now handled correctly

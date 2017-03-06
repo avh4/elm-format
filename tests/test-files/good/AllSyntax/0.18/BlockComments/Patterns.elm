@@ -1,4 +1,4 @@
-module AllSyntax.BlockComments.Patterns (..) where
+module AllSyntax.BlockComments.Patterns exposing (..)
 
 
 type Foo
