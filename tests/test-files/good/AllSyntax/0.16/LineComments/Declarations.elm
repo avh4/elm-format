@@ -77,8 +77,7 @@ expressionDefinitionsInLet =
         ()
 
 
-expressionTypeAnnotation
---V
+expressionTypeAnnotation --V
     :
     --W
     ()

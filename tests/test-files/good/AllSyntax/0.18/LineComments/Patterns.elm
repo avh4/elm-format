@@ -76,8 +76,7 @@ list
 
 
 consList
-    (a
-     --T
+    (a --T
         :: --U
            b
            --V
@@ -101,8 +100,7 @@ record
 
 
 asAlias
-    (()
-     --O
+    (() --O
      as
         --P
         x

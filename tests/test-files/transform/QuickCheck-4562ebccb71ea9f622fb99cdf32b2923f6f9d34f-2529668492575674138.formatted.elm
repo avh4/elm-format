@@ -2,8 +2,7 @@ module
     --A
     Main
     ( a
-    , b
-      --A
+    , b --A
     , --A
       c
     )

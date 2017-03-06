@@ -43,9 +43,12 @@ emptyRecord _ =
     ()
 
 
-record : { x : Int, y : () } -> ()
-record _ =
-    ()
+type alias Record =
+    ( { x : Int, y : () }
+    , { x : Int -- X
+      , y : () -- Y
+      }
+    )
 
 
 recordExtension : { a | x : Int, y : Int } -> ()
