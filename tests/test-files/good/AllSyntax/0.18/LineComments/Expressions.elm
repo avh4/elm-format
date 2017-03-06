@@ -1,11 +1,6 @@
 module AllSyntax.LineComments.Expressions exposing (..)
 
 
-unit =
-    (--A
-    )
-
-
 emptyList =
     [--B
     ]

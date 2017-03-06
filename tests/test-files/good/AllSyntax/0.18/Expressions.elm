@@ -2,7 +2,11 @@ module AllSyntax.Expressions exposing (..)
 
 
 unit =
-    ()
+    [ ()
+    , ({- A -})
+    , (--B
+      )
+    ]
 
 
 literal =
