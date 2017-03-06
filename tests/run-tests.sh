@@ -247,7 +247,7 @@ checkGoodAllSyntax 0.16 Module
 checkGoodAllSyntax 0.16 Declarations
 checkGoodAllSyntax 0.18 Patterns
 checkGoodAllSyntax 0.16 Types
-checkGoodAllSyntax 0.16 Expressions
+checkGoodAllSyntax 0.18 Expressions
 checkGood 0.16 Comments.elm
 checkGood 0.16 AllSyntax/0.16/GLShader.elm
 checkGood 0.16 AllSyntax/0.16/Literals.elm
@@ -255,13 +255,14 @@ checkGood 0.16 AllSyntax/0.16/Comments.elm
 checkGood 0.16 ApiSketch.elm
 
 checkGood 0.16 AllSyntax/0.16/PatternsRequireParens.elm
+checkGood 0.16 AllSyntax/0.16/Range.elm
 
+checkGood 0.17 AllSyntax/0.17/Range.elm
 checkGood 0.17 Export.elm
-checkGood 0.18 Export.elm
-
 checkGoodAllSyntax 0.17 Module
 checkGoodAllSyntax 0.17 ModuleEffect
 
+checkGood 0.18 Export.elm
 checkGood 0.18 TrueFalseInIdentifiers.elm
 checkGood 0.18 TopLevelSpacing.elm
 checkGood 0.18 WorkaroundNegativeCasePatterns.elm

@@ -1,8 +1,9 @@
-module AllSyntax.BlockComments.Expressions (..) where
+module AllSyntax.LineComments.Expressions exposing (..)
 
 
 unit =
-    ({- A -})
+    (--A
+    )
 
 
 literal =
@@ -19,10 +20,6 @@ var x =
 
 operator =
     (+)
-
-
-infixApplication =
-    1 `operator` 2
 
 
 functionApplication =
@@ -42,15 +39,12 @@ parens x =
 
 
 emptyList =
-    [{- B -}]
+    [--B
+    ]
 
 
 list =
     [ (), () ]
-
-
-range =
-    [1..2]
 
 
 tuple =
@@ -62,11 +56,25 @@ tupleFunction =
 
 
 emptyRecord =
-    {}
+    { --U
+    }
 
 
 record =
-    { x = 1, y = 2 }
+    { x =
+        --M
+        1
+        --N
+    , --O
+      y = 2
+    , --Q
+      z
+      --R
+        =
+        --S
+        3
+        --T
+    }
 
 
 recordUpdate a =
@@ -86,16 +94,26 @@ lambda =
 
 
 ifStatement =
-    if {- C -} True {- D -} then
-        {- E -}
+    if
+        --C
+        True
+        --D
+    then
+        --E
         1
-        {- F -}
-    else {- G -} if {- H -} False {- I -} then
-        {- J -}
-        2
-        {- K -}
+        --F
     else
-        {- L -}
+    --G
+    if
+        --H
+        False
+        --I
+    then
+        --J
+        2
+        --K
+    else
+        --L
         3
 
 
@@ -111,17 +129,9 @@ letStatement =
 
 
 caseStatement =
-    case {- M -} Just 1 {- N -} of
-        {- O -}
-        Just x
-        {- P -}
-        ->
-            {- Q -}
+    case Just 1 of
+        Just x ->
             x
 
-        {- R -}
-        _
-        {- S -}
-        ->
-            {- T -}
+        _ ->
             2

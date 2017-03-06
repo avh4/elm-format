@@ -1,4 +1,4 @@
-module AllSyntax.Expressions (..) where
+module AllSyntax.Expressions exposing (..)
 
 
 unit =
@@ -82,10 +82,6 @@ emptyList =
 
 list =
     [ (), () ]
-
-
-range =
-    [1..2]
 
 
 tuple =
