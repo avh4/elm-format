@@ -33,11 +33,6 @@ tupleFn _ =
     ()
 
 
-tuple : ( {- G -} a {- H -}, {- I -} b {- J -} ) -> ()
-tuple _ =
-    ()
-
-
 emptyRecord : {{- M -}} -> ()
 emptyRecord _ =
     ()
