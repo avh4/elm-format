@@ -1,11 +1,6 @@
 module AllSyntax.LineComments.Expressions exposing (..)
 
 
-emptyList =
-    [--B
-    ]
-
-
 emptyRecord =
     { --U
     }
