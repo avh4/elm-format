@@ -100,7 +100,7 @@ moduleDecl_0_17 =
       whereClause <-
         optionMaybe $
           commentedKeyword "where" $
-            brackets $ (\f pre post _ -> f pre post) <$> commaSep (keyValue equals lowVar capVar)
+            brackets $ (\f pre post _ -> f pre post) <$> commaSep1 (keyValue equals lowVar capVar)
 
       exports <-
         commentedKeyword "exposing" $
