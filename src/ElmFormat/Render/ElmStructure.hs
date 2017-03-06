@@ -61,6 +61,15 @@ equalsPair symbol forceMultiline left right =
         , right'
         ]
 
+    ( False, SingleLine left', MustBreak right' ) ->
+      mustBreak $ row
+        [ left'
+        , space
+        , punc symbol
+        , space
+        , right'
+        ]
+
     ( _, SingleLine left', right' ) ->
       stack1
         [ line $ row [ left', space, punc symbol ]

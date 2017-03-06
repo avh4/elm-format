@@ -11,8 +11,7 @@ unit =
 
 
 lambda :
-    ()
-    --AF
+    () --AF
     -> --AG
        ()
        --AH
@@ -89,8 +88,7 @@ record :
         Int
         --Q
     , --R
-      y
-      --S
+      y --S
         :
         --T
         ()
@@ -106,15 +104,13 @@ recordExtension :
       a
       --W
         | --X
-          x
-          --Y
+          x --Y
             :
             --Z
             Int
             --AA
         , --AB
-          y
-          --AC
+          y --AC
             :
             --AD
             Int
