@@ -216,9 +216,49 @@ letStatement =
 
 
 caseStatement =
-    case Just 1 of
-        Just x ->
-            x
+    let
+        a =
+            case Just 1 of
+                Just x ->
+                    x
 
-        _ ->
-            2
+                _ ->
+                    2
+
+        b =
+            case {- M -} Just 1 {- N -} of
+                {- O -}
+                Just x
+                {- P -}
+                ->
+                    {- Q -}
+                    x
+
+                {- R -}
+                _
+                {- S -}
+                ->
+                    {- T -}
+                    2
+
+        c =
+            case
+                --M
+                Just 1
+                --N
+            of
+                --O
+                Just x
+                --P
+                ->
+                    --Q
+                    x
+
+                --R
+                _
+                --S
+                ->
+                    --T
+                    2
+    in
+        {}
