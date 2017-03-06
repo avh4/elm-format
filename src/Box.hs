@@ -229,7 +229,6 @@ render box' =
             T.snoc (renderLine 0 line') '\n'
 
 
--- TODO couldn't we just run renderLine and get the length of the resulting string?
 lineLength :: Int -> Line -> Int
 lineLength startColumn line' =
    startColumn +
