@@ -101,7 +101,11 @@ tupleFunction =
 
 
 emptyRecord =
-    {}
+    [ {}
+    , {{- A -}}
+    , { --B
+      }
+    ]
 
 
 record =
