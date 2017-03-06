@@ -144,7 +144,7 @@ recordTerm =
           choice
             [ do  try comma
                   preNext <- whitespace
-                  fields <- commaSep field
+                  fields <- commaSep1 field
                   return $ \pre post multiline -> (E.Record ((Commented pre starter postStarter, Commented preExpr value postExpr, multiline') : (fields preNext post)) multiline)
             , return $ \pre post multiline -> (E.Record [(Commented pre starter postStarter, Commented preExpr value (postExpr ++ post), multiline')] multiline)
             ]

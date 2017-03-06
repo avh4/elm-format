@@ -47,11 +47,12 @@ record =
       do
           fields <- commaSep field
           return $ \pre post sawNewline ->
-            case fields pre post of
-              [] ->
-                EmptyRecordType (pre ++ post)
-              fields' ->
-                RecordType fields' sawNewline
+              case fields of
+                  Nothing ->
+                      EmptyRecordType (pre ++ post)
+
+                  Just fields' ->
+                      RecordType (fields' pre post) sawNewline
 
     -- extended record types require at least one field
     extended =

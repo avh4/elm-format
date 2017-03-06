@@ -221,9 +221,9 @@ commaSep1' =
   spaceySepBy1' comma
 
 
-commaSep :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
-commaSep =
-  option (\_ _ -> []) . commaSep1 -- TODO: use comments for empty list
+commaSep :: IParser (Comments -> Comments -> a) -> IParser (Maybe (Comments -> Comments -> [a]))
+commaSep term =
+    option Nothing (Just <$> commaSep1 term)
 
 
 semiSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])

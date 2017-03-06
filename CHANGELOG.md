@@ -3,6 +3,8 @@
 Bug fixes:
   - Empty records containing multiline comments are now handled correctly
   - Double quotes at the end of multiline strings are now handled correctly
+  - The `where` clause in `effect module`s are now required to have at least one field (and comments are now handled correctly)
+  - Record expressions with a trailing comma are no longer allowed (and comments are now handled correctly)
 
 
 ## 0.5.2-alpha
