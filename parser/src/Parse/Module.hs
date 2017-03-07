@@ -71,14 +71,14 @@ moduleDecl_0_16 =
   do  try (reserved "module")
       preName <- whitespace
       names <- dotSep1 capVar <?> "the name of this module"
-      postName1 <- whitespace
-      (postName2, exports) <- option ([], Var.OpenListing (Commented [] () [])) (listing value)
+      postName <- whitespace
+      exports <- option (Var.OpenListing (Commented [] () [])) (listing value)
       preWhere <- whitespace
       reserved "where"
       return $
         Module.Header
           Module.Normal
-          (Commented preName names (postName1 ++ postName2))
+          (Commented preName names postName)
           Nothing
           (KeywordCommented preWhere [] exports)
 
@@ -89,12 +89,12 @@ moduleDecl_0_17 =
   do
       srcTag <-
         try $
-        choice
-          [ Module.Port <$> (reserved "port" *> whitespace)
-          , Module.Effect <$> (reserved "effect" *> whitespace)
-          , return Module.Normal
-          ]
-        <* reserved "module"
+            choice
+                [ Module.Port <$> (reserved "port" *> whitespace)
+                , Module.Effect <$> (reserved "effect" *> whitespace)
+                , return Module.Normal
+                ]
+            <* reserved "module"
       preName <- whitespace
       names <- dotSep1 capVar <?> "the name of this module"
       whereClause <-
@@ -104,7 +104,7 @@ moduleDecl_0_17 =
 
       exports <-
         commentedKeyword "exposing" $
-          listing' value
+          listing value
 
       return $
         Module.Header
@@ -147,31 +147,12 @@ import' =
     exposing =
       do  preExposing <- try (whitespace <* reserved "exposing")
           postExposing <- whitespace
-          (postExposing2, listing') <- listing value
-          return (preExposing, (postExposing ++ postExposing2, listing'))
+          imports <- listing value
+          return (preExposing, (postExposing, imports))
 
 
-listing :: IParser a -> IParser (Comments, Var.Listing a)
+listing :: IParser a -> IParser (Var.Listing a)
 listing item =
-  expecting "a listing of values and types to expose, like (..)" $
-  do  preParen <- try (whitespace <* char '(')
-      pushNewlineContext
-      pre <- whitespace
-      listing <-
-          choice
-            [ (\_ pre post _ -> (Var.OpenListing (Commented pre () post))) <$> string ".."
-            , (\x pre post sawNewline ->
-                (Var.ExplicitListing (x pre post) sawNewline))
-                  <$> commaSep1' item
-            ]
-      post <- whitespace
-      sawNewline <- popNewlineContext
-      char ')'
-      return $ (preParen, listing pre post sawNewline)
-
-
-listing' :: IParser a -> IParser (Var.Listing a)
-listing' item =
   expecting "a listing of values and types to expose, like (..)" $
   do  _ <- try (char '(')
       pushNewlineContext
@@ -198,7 +179,7 @@ value =
 
     tipe =
       do  name <- capVar
-          maybeCtors <- optionMaybe (listing capVar)
+          maybeCtors <- optionMaybe (try $ (,) <$> whitespace <*> listing capVar)
           case maybeCtors of
             Nothing -> return $ Var.Union (name, []) Var.ClosedListing
             Just (pre, ctors) -> return (Var.Union (name, pre) ctors)
