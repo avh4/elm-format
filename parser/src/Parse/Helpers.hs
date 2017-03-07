@@ -311,12 +311,6 @@ constrainedSpacePrefix' parser constraint =
 
 -- SURROUNDED BY
 
-followedBy a b =
-  do  x <- a
-      b
-      return x
-
-
 betwixt :: Char -> Char -> IParser a -> IParser a
 betwixt a b c =
   do  char a
