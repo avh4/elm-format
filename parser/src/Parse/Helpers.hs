@@ -225,11 +225,6 @@ commaSep term =
     option Nothing (Just <$> commaSep1 term)
 
 
-semiSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
-semiSep1 =
-  spaceySepBy1 semicolon
-
-
 pipeSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 pipeSep1 =
   spaceySepBy1 verticalBar
