@@ -37,6 +37,16 @@ type
         ()
 
 
+type DataTypeWithEolComments1
+    = Ctor1 --A
+
+
+type DataTypeWithEolComments2
+    = Ctor1 --A
+    | Ctor2 a --B
+    | Ctor3 b c --C
+
+
 
 --
 -- Union type with params

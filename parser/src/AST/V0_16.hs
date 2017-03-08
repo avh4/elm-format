@@ -64,34 +64,42 @@ data ContainedCommentedList a
 
 
 {-| This represents a list of things that have no clear start and end
-delimiters.  If there is more than one item in the list, then comments can
-appear.  Comments can appear after the first item, before the last item, and
+delimiters.
+
+If there is more than one item in the list, then comments can appear.
+Comments can appear after the first item, before the last item, and
 around any other item.
+An end-of-line comment can appear after the last item.
+
+If there is only one item in the list, an end-of-line comment can appear after the item.
 -}
 data ExposedCommentedList a
-    = Single a
-    | Multiple (PostCommented a) [Commented a] (PreCommented a)
+    = Single a (Maybe String)
+    | Multiple (PostCommented a) [Commented a] (PreCommented a) (Maybe String)
+
 
 {-| This represents a list of things that have a clear start delimiter but no
-clear end delimiter.  Comments can appear before the last item, or around any
-other item.
+clear end delimiter.
+There must be at least one item.
+Comments can appear before the last item, or around any other item.
+An end-of-line comment can also appear after the last item.
 
 For example:
   = a
   = a, b, c
 -}
 data OpenCommentedList a
-    = OpenCommentedList [Commented a] (PreCommented a)
+    = OpenCommentedList [Commented a] (PreCommented a) (Maybe String)
     deriving (Eq, Show)
 
 exposedToOpen :: Comments -> ExposedCommentedList a -> OpenCommentedList a
 exposedToOpen pre exposed =
     case exposed of
-        Single item ->
-            OpenCommentedList [] (pre, item)
+        Single item eolComment ->
+            OpenCommentedList [] (pre, item) eolComment
 
-        Multiple (first, postFirst) rest lst ->
-            OpenCommentedList (Commented pre first postFirst : rest) lst
+        Multiple (first, postFirst) rest lst eolComment ->
+            OpenCommentedList (Commented pre first postFirst : rest) lst eolComment
 
 
 data Multiline

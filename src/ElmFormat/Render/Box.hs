@@ -1368,8 +1368,9 @@ formatKeywordCommented word format (KeywordCommented pre post value) =
 
 
 formatOpenCommentedList :: (a -> Box) -> OpenCommentedList a -> [Box]
-formatOpenCommentedList format (OpenCommentedList rest lst) =
-    (fmap (formatCommented format) rest) ++ [formatHeadCommented format lst]
+formatOpenCommentedList format (OpenCommentedList rest (preLst, lst) eol) =
+    (fmap (formatCommented format) rest)
+        ++ [formatCommented format $ Commented preLst lst $ Maybe.maybeToList $ fmap LineComment eol]
 
 
 formatComment :: Comment -> Box

@@ -5,6 +5,7 @@ import Prelude hiding (until)
 import Control.Monad (guard)
 import Control.Monad.State (State)
 import qualified Data.Char as Char
+import qualified Data.Maybe as Maybe
 import Text.Parsec hiding (newline, spaces, State)
 import Text.Parsec.Indent (indented, runIndent)
 import qualified Text.Parsec.Token as T
@@ -193,7 +194,7 @@ spaceySepBy1 sep parser =
                 choice
                     [ try (padded sep)
                         >>= (\(preSep, _, postSep) -> step first (Commented post next preSep : rest) postSep)
-                    , return $ Multiple first (reverse rest) (post, next)
+                    , Multiple first (reverse rest) (post, next) <$> restOfLine
                     ]
 
     in
@@ -202,7 +203,7 @@ spaceySepBy1 sep parser =
             choice
                 [ try (padded sep)
                     >>= (\(preSep, _, postSep) -> step (value, preSep) [] postSep)
-                , return $ Single value
+                , Single value <$> restOfLine
                 ]
 
 
@@ -212,14 +213,15 @@ spaceySepBy1'' sep parser =
     do
         result <- spaceySepBy1 sep parser
         case result of
-            Single item ->
-                return $ \pre post -> [item pre post]
-            Multiple (first, postFirst) rest (preLast, last) ->
+            Single item eol ->
+                return $ \pre post -> [item pre (Maybe.maybeToList (fmap LineComment eol) ++ post)]
+
+            Multiple (first, postFirst) rest (preLast, last) eol ->
                 return $ \preFirst postLast ->
                     concat
                         [ [first preFirst postFirst]
                         , fmap (\(Commented pre item post) -> item pre post) rest
-                        , [last preLast postLast]
+                        , [last preLast (Maybe.maybeToList (fmap LineComment eol) ++ postLast)]
                         ]
 
 
@@ -520,14 +522,13 @@ freshLine =
 
 newline :: IParser Comments
 newline =
-  do  result <- (simpleNewline >> return []) <|> ((\x -> [x]) <$> lineComment) <?> Syntax.newline
-      updateState $ State.setNewline
-      return result
+    (simpleNewline >> return []) <|> ((\x -> [x]) <$> lineComment) <?> Syntax.newline
 
 
 simpleNewline :: IParser ()
 simpleNewline =
   do  try (string "\r\n") <|> string "\n"
+      updateState $ State.setNewline
       return ()
 
 
@@ -564,6 +565,15 @@ lineComment =
               anyUntil $ simpleNewline <|> eof
             return $ LineComment comment
         ]
+
+
+restOfLine :: IParser (Maybe String)
+restOfLine =
+    many (char ' ') *>
+        choice
+            [ Just . fst <$> (try (string "--") *> (anyUntil $ (lookAhead simpleNewline) <|> eof))
+            , return Nothing
+            ]
 
 
 commentedKeyword :: String -> IParser a -> IParser (KeywordCommented a)
