@@ -258,6 +258,7 @@ checkGood 0.16 AllSyntax/0.16/PatternsRequireParens.elm
 checkGood 0.16 AllSyntax/0.16/Range.elm
 
 checkGood 0.17 AllSyntax/0.17/Range.elm
+checkGood 0.17 AllSyntax/0.17/InfixOperators.elm
 checkGood 0.17 Export.elm
 checkGoodAllSyntax 0.17 Module
 checkGoodAllSyntax 0.17 ModuleEffect

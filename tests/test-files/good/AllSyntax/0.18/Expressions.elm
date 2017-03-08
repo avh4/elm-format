@@ -25,18 +25,6 @@ operator =
     (+)
 
 
-infixApplication =
-    1 `operator` 2
-
-
-infixApplicationMultiline =
-    x
-        `infixOperator`
-            [ y
-            , z
-            ]
-
-
 infixPipeLeft =
     x <|
         [ y
