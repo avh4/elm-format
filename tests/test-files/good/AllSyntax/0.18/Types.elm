@@ -18,9 +18,15 @@ variable _ =
     ()
 
 
-constructor : Dict.Dict String Int -> ()
-constructor _ =
-    ()
+type alias Constructor =
+    ( Dict.Dict String Int
+    , Dict.Dict {- A -} String {- B -} Int
+    , Dict.Dict
+        -- A
+        String
+        -- B
+        Int
+    )
 
 
 parens : a -> ()
