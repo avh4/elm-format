@@ -5,7 +5,6 @@ import Prelude hiding (until)
 import Control.Monad (guard)
 import Control.Monad.State (State)
 import qualified Data.Char as Char
-import qualified Data.List as List
 import Text.Parsec hiding (newline, spaces, State)
 import Text.Parsec.Indent (indented, runIndent)
 import qualified Text.Parsec.Token as T
@@ -183,36 +182,56 @@ commitIf check p =
 
 -- SEPARATORS
 
-parseWhile1 :: IParser (b, z, a) -> IParser (a -> b -> x) -> IParser (a -> b -> [x])
-parseWhile1 sep parser =
-    let
-        -- step :: ((b, _, a), xff) -> ([x], (b -> x), b) -> ([x], (b -> x), b)
-        step ((sepPre, _, sepPost), nextXf) (acc, xf, lastPost) =
-            ((xf sepPre):acc, nextXf sepPost, lastPost)
 
-        -- done :: ([x], xf, b) -> [x]
-        done (acc, next, post) =
-            List.reverse $ (next post):acc
+spaceySepBy1 :: IParser sep -> IParser a -> IParser (ExposedCommentedList a)
+spaceySepBy1 sep parser =
+    let
+        -- step :: PostCommented a -> [Commented a] -> Comments -> IParser (ExposedCommentedList a)
+        step first rest post =
+            do
+                next <- parser
+                choice
+                    [ try (padded sep)
+                        >>= (\(preSep, _, postSep) -> step first (Commented post next preSep : rest) postSep)
+                    , return $ Multiple first (reverse rest) (post, next)
+                    ]
+
     in
         do
             value <- parser
-            zips <- many ((,) <$> try sep <*> parser)
-            return $ \pre post -> done $ List.foldr step ([], value pre, post) (List.reverse zips)
+            choice
+                [ try (padded sep)
+                    >>= (\(preSep, _, postSep) -> step (value, preSep) [] postSep)
+                , return $ Single value
+                ]
 
 
-spaceySepBy1 :: IParser sep -> IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
-spaceySepBy1 sep parser =
-    parseWhile1 (padded sep) parser
+-- DEPRECATED: use spaceySepBy1 instead
+spaceySepBy1'' :: IParser sep -> IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
+spaceySepBy1'' sep parser =
+    do
+        result <- spaceySepBy1 sep parser
+        case result of
+            Single item ->
+                return $ \pre post -> [item pre post]
+            Multiple (first, postFirst) rest (preLast, last) ->
+                return $ \preFirst postLast ->
+                    concat
+                        [ [first preFirst postFirst]
+                        , fmap (\(Commented pre item post) -> item pre post) rest
+                        , [last preLast postLast]
+                        ]
 
 
+-- DEPRECATED: use spaceySepBy1 instead
 spaceySepBy1' :: IParser sep -> IParser a -> IParser (Comments -> Comments -> [Commented a])
 spaceySepBy1' sep parser =
-    parseWhile1 (padded sep) ((\x pre post -> Commented pre x post) <$> parser)
+    spaceySepBy1'' sep ((\x pre post -> Commented pre x post) <$> parser)
 
 
 commaSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 commaSep1 =
-  spaceySepBy1 comma
+  spaceySepBy1'' comma
 
 
 commaSep1' :: IParser a -> IParser (Comments -> Comments -> [Commented a])
@@ -225,7 +244,7 @@ commaSep term =
     option Nothing (Just <$> commaSep1 term)
 
 
-pipeSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
+pipeSep1 :: IParser a -> IParser (ExposedCommentedList a)
 pipeSep1 =
   spaceySepBy1 verticalBar
 

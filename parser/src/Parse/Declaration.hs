@@ -48,16 +48,13 @@ typeDecl =
                     (postEquals, tipe)
 
         Nothing ->
-            do  tcs <- pipeSep1 ((\x pre post -> Commented pre x post) <$> Type.tag) <?> "a constructor for a union type"
-                let tcs' = tcs postEquals []
-                return $
-                  case (init tcs', last tcs') of
-                    (rest, (Commented pre lst [])) ->
-                      AST.Declaration.Datatype
-                        (Commented postType (name, args) preEquals)
-                        rest (pre,lst)
-                    (_, (Commented _ _ (_:_))) ->
-                      error "closing comments will never be provided to tcs"
+            do
+                tags <- pipeSep1 Type.tag <?> "a constructor for a union type"
+                return
+                    AST.Declaration.Datatype
+                        { nameWithArgs = Commented postType (name, args) preEquals
+                        , tags = exposedToOpen postEquals tags
+                        }
 
 
 -- INFIX
