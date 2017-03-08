@@ -147,7 +147,7 @@ declarationType decl =
             _ ->
               DDefinition Nothing
 
-        AST.Declaration.Datatype (Commented _ (name, _) _) _ _ ->
+        AST.Declaration.Datatype (Commented _ (name, _) _) _ ->
           DDefinition $ Just $ AST.Variable.TagRef [] name
 
         AST.Declaration.TypeAlias _ (Commented _ (name, _) _) _ ->
@@ -641,7 +641,7 @@ formatDeclaration elmVersion decl =
                 AST.Declaration.TypeAnnotation name typ ->
                     formatTypeAnnotation elmVersion name typ
 
-                AST.Declaration.Datatype nameWithArgs middle final ->
+                AST.Declaration.Datatype nameWithArgs tags ->
                     let
                         ctor (tag,args') =
                             case allSingles $ map (formatHeadCommented $ formatType' elmVersion ForCtor) args' of
@@ -657,7 +657,7 @@ formatDeclaration elmVersion decl =
                                         ]
                     in
                         case
-                          (map (formatCommented ctor) middle) ++ [formatHeadCommented ctor final]
+                            formatOpenCommentedList ctor tags
                         of
                           [] -> error "List can't be empty"
                           first:rest ->
@@ -1365,6 +1365,11 @@ formatKeywordCommented word format (KeywordCommented pre post value) =
   ElmStructure.spaceSepOrIndented
     (formatCommented (line . keyword) (Commented pre word post))
     [ format value ]
+
+
+formatOpenCommentedList :: (a -> Box) -> OpenCommentedList a -> [Box]
+formatOpenCommentedList format (OpenCommentedList rest lst) =
+    (fmap (formatCommented format) rest) ++ [formatHeadCommented format lst]
 
 
 formatComment :: Comment -> Box

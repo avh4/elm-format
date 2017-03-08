@@ -10,13 +10,16 @@ import qualified Reporting.Annotation as A
 
 -- DECLARATIONS
 
+type NameWithArgs name arg =
+    (name, [PreCommented arg])
+
 data Declaration
     = Definition Pattern.Pattern [PreCommented Pattern.Pattern] Comments Expression.Expr
     | TypeAnnotation (PostCommented Var.Ref) (PreCommented Type)
     | Datatype
-        (Commented (UppercaseIdentifier, [PreCommented LowercaseIdentifier]))
-        [Commented (UppercaseIdentifier, [PreCommented Type])]
-        (PreCommented (UppercaseIdentifier, [PreCommented Type]))
+        { nameWithArgs :: Commented (NameWithArgs UppercaseIdentifier LowercaseIdentifier)
+        , tags :: OpenCommentedList (UppercaseIdentifier, [PreCommented Type])
+        }
     | TypeAlias Comments
         (Commented (UppercaseIdentifier, [PreCommented LowercaseIdentifier]))
         (PreCommented Type)
