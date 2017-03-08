@@ -18,11 +18,6 @@ variable _ =
     ()
 
 
-constructor : Dict.Dict {- A -} String {- B -} Int -> ()
-constructor _ =
-    ()
-
-
 parens : ({- K -} a {- L -}) -> ()
 parens _ =
     ()
