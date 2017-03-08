@@ -18,10 +18,10 @@ data Declaration
     | TypeAnnotation (PostCommented Var.Ref) (PreCommented Type)
     | Datatype
         { nameWithArgs :: Commented (NameWithArgs UppercaseIdentifier LowercaseIdentifier)
-        , tags :: OpenCommentedList (UppercaseIdentifier, [PreCommented Type])
+        , tags :: OpenCommentedList (NameWithArgs UppercaseIdentifier Type)
         }
     | TypeAlias Comments
-        (Commented (UppercaseIdentifier, [PreCommented LowercaseIdentifier]))
+        (Commented (NameWithArgs UppercaseIdentifier LowercaseIdentifier))
         (PreCommented Type)
     | PortAnnotation (Commented LowercaseIdentifier) Comments Type
     | PortDefinition (Commented LowercaseIdentifier) Comments Expression.Expr
