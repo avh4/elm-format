@@ -11,11 +11,8 @@ cache:
 
 addons:
   apt:
-    sources:
-    - debian-sid # for shellcheck
     packages:
     - libgmp3-dev
-    - shellcheck
 
 
 before_install:
