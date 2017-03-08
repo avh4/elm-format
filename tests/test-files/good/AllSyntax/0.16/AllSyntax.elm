@@ -180,35 +180,6 @@ commentedLiterals =
     ( {- int -} 1, {- float -} 0.1, {- char -} 'c', {- string -} "str", {- boolean -} True )
 
 
-infixOperator =
-    1 + 2 * 3 / 4 <> 5 |> (+) 0
-
-
-multilineInfixOperators =
-    1
-        + 2
-        * 3
-        / 4
-        <> 5
-        |> (+) 0
-
-
-commentedInfixOperator =
-    1 {- plus -} + 2
-
-
-unaryOperator a =
-    -(1) + -2 + -a
-
-
-multilineUnaryOperator a =
-    -(if a then
-        1
-      else
-        2
-     )
-
-
 functionApplication =
     toString 10
 
