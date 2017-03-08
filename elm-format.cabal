@@ -32,7 +32,7 @@ source-repository head
 Executable elm-format-0.18
 
     ghc-options:
-        -threaded -O2 -W
+        -threaded -O2 -W -Wno-name-shadowing
 
     hs-source-dirs:
         src
@@ -105,7 +105,7 @@ Executable elm-format-0.18
 Executable elm-format-0.17
 
     ghc-options:
-        -threaded -O2 -W
+        -threaded -O2 -W -Wno-name-shadowing
 
     hs-source-dirs:
         src
@@ -177,7 +177,7 @@ Executable elm-format-0.17
 Executable elm-format-0.16
 
     ghc-options:
-        -threaded -O2 -W
+        -threaded -O2 -W -Wno-name-shadowing
 
     hs-source-dirs:
         src
