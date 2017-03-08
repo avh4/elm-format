@@ -16,8 +16,8 @@ tar zxvf "elm-format-0.18-${VERSION}-win-x64.tgz"
 zip "elm-format-0.18-${VERSION}-win-x64.zip" elm-format.exe
 popd
 
-cp -v package/win/elm-format/elm-format-*-${VERSION}-win-x64.zip ./
-cp -v package/linux/elm-format/elm-format-*-${VERSION}-linux-x64.tgz ./
+cp -v package/win/elm-format/elm-format-*-"${VERSION}"-win-x64.zip ./
+cp -v package/linux/elm-format/elm-format-*-"${VERSION}"-linux-x64.tgz ./
 
 for i in elm-format-{0.16,0.17,0.18}-${VERSION}-{mac-x64.tgz,win-x64.zip,linux-x64.tgz}; do
   keybase pgp sign --detached --infile "$i" --outfile "$i".asc

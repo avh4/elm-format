@@ -1,12 +1,16 @@
 #!/bin/bash
+# shellcheck disable=SC2002
 
-#shellcheck -e SC2002 "./tests/run-tests.sh" || exit 1
-#shellcheck "./build-package.sh" || exit 1
-#shellcheck "./package/linux/build-package.sh" || exit 1
+if which shellcheck; then
+	shellcheck "./tests/run-tests.sh" || exit 1
+	shellcheck "./package/collect_files.sh" || exit 1
+	shellcheck "./package/mac/build-package.sh" || exit 1
+	shellcheck "./package/linux/build-package.sh" || exit 1
+fi
 
 stack build || exit 1
 
-ELM_FORMAT="`stack path --local-install-root`/bin/elm-format-0.18"
+ELM_FORMAT="$(stack path --local-install-root)/bin/elm-format-0.18"
 if [ ! -e "$ELM_FORMAT" ]; then
 	echo "$0: ERROR: $ELM_FORMAT not found" >&2
 	exit 1
@@ -26,7 +30,7 @@ function returnCodeShouldEqual() {
 }
 
 function shouldOutputTheSameIgnoringEol() {
-	diff -u --ignore-space-change <(echo "$1" | sed -e 's/\.exe//') <(echo "$2" | sed -e 's/\.exe//') || exit 1
+	diff -u --ignore-space-change <("${1//.exe/}") <("${2//.exe/}") || exit 1
 }
 
 function outputShouldRoughlyMatchPatterns() {
