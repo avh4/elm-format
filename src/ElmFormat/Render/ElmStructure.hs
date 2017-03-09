@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 module ElmFormat.Render.ElmStructure
-  ( spaceSepOrIndented, equalsPair, definition
+  ( spaceSepOrStack, spaceSepOrIndented, forceableSpaceSepOrIndented, spaceSepOrPrefix
+  , equalsPair, definition
   , application, group, extensionGroup )
   where
 
@@ -11,6 +12,25 @@ import AST.V0_16 (FunctionApplicationMultiline(..), Multiline(..))
 
 import qualified Data.List as List
 
+{-|
+Formats as:
+
+    first rest0 rest1
+
+    first
+    rest0
+    rest1
+-}
+spaceSepOrStack :: Box -> [Box] -> Box
+spaceSepOrStack first rest =
+    case
+      ( first, allSingles rest )
+    of
+      ( SingleLine first', Right rest' ) ->
+        line $ row $ List.intersperse space (first' : rest')
+
+      _ ->
+        stack1 (first : rest)
 
 {-|
 Formats as:
@@ -23,18 +43,45 @@ Formats as:
       rest2
 -}
 spaceSepOrIndented :: Box -> [Box] -> Box
-spaceSepOrIndented first rest =
+spaceSepOrIndented =
+    forceableSpaceSepOrIndented False
+
+
+forceableSpaceSepOrIndented :: Bool -> Box -> [Box] -> Box
+forceableSpaceSepOrIndented forceMultiline first rest =
   case
-    ( first
-    , allSingles rest
-    )
+    ( forceMultiline, first, allSingles rest )
   of
-    ( SingleLine first', Right rest' ) ->
+    ( False, SingleLine first', Right rest' ) ->
       line $ row $ List.intersperse space (first' : rest')
 
     _ ->
       stack1
         ( first : map indent rest)
+
+
+{-|
+Formats as:
+
+    op rest
+
+    op rest1
+       rest2
+
+    opLong
+        rest
+-}
+spaceSepOrPrefix :: Box -> Box -> Box
+spaceSepOrPrefix op rest =
+    case ( op, rest) of
+        ( SingleLine op', SingleLine rest' ) ->
+            line $ row [ op', space, rest' ]
+
+        ( SingleLine op', _ ) | lineLength 0 op' < 4 ->
+            prefix (row [ op', space ]) rest
+
+        _ ->
+            stack1 [ op, indent rest ]
 
 
 {-|

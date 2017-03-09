@@ -62,45 +62,15 @@ formatBinary multiline left ops =
             left
 
         ( isLeftPipe, op, next ) : rest ->
-            case
-                ( isLeftPipe, multiline, left, op, next )
-            of
-                ( _, False, SingleLine left', SingleLine op', SingleLine next' ) ->
-                    formatBinary
-                        multiline
-                        (line $ row [ left', space, op', space, next' ])
-                        rest
-
-                ( True, _, SingleLine left', SingleLine op', _ ) ->
-                    stack1
-                        [ line $ row [ left', space, op' ]
-                        , indent $ formatBinary multiline next rest
-                        ]
-
-                ( True, _, _, _, _ ) ->
-                    stack1
-                        [ left
-                        , op
-                        , indent $ formatBinary multiline next rest
-                        ]
-
-                ( False, _, _, SingleLine op', SingleLine _ ) ->
-                    formatBinary
-                        multiline
-                        (stack1 [ left, indent $ prefix (row [ op', space ]) next])
-                        rest
-
-                ( False, _, _, SingleLine op', _ ) | lineLength 0 op' < 4 ->
-                    formatBinary
-                        multiline
-                        (stack1 [left, indent $ prefix (row [ op', space ]) next])
-                        rest
-
-                ( False, _, _, _, _ ) ->
-                    formatBinary
-                        multiline
-                        (stack1 [ left, indent op, indent $ indent next ])
-                        rest
+            if isLeftPipe then
+                ElmStructure.spaceSepOrIndented
+                    (ElmStructure.spaceSepOrStack left [op])
+                    [formatBinary multiline next rest]
+            else
+                formatBinary
+                    multiline
+                    (ElmStructure.forceableSpaceSepOrIndented multiline left [ElmStructure.spaceSepOrPrefix op next])
+                    rest
 
 
 splitWhere :: (a -> Bool) -> [a] -> [[a]]
