@@ -88,10 +88,9 @@ equalsPair symbol forceMultiline left right =
 An equalsPair where the left side is an application
 -}
 definition :: String -> Bool -> Box -> [Box] -> Box -> Box
-definition symbol forceMultiline first rest body =
+definition symbol forceMultiline first rest =
   equalsPair symbol forceMultiline
     (application (FAJoinFirst JoinAll) first rest)
-    body
 
 
 {-|
@@ -130,12 +129,12 @@ application forceMultiline first args =
 
         ( FAJoinFirst _, SingleLine first', SingleLine arg0', _) ->
           stack1
-            $ (line $ row [ first', space, arg0' ])
-              : (map indent rest)
+            $ line ( row [ first', space, arg0' ])
+              : map indent rest
 
         _ ->
           stack1
-            $ first : (map indent $ arg0 : rest)
+            $ first : map indent (arg0 : rest)
 
 {-|
 `group True '<' ',' '>'` formats as:
@@ -171,8 +170,8 @@ group innerSpaces left sep right forceMultiline children =
 
         (first:rest) ->
           stack1 $
-            (prefix (row [punc left, space]) first)
-            : (map (prefix $ row [punc sep, space]) rest)
+            prefix (row [punc left, space]) first
+            : map (prefix $ row [punc sep, space]) rest
             ++ [ line $ punc right ]
 
 {-|
@@ -193,7 +192,7 @@ extensionGroup multiline base first rest =
   case
     ( multiline
     , isLine base
-    , allSingles $ (first:rest)
+    , allSingles (first : rest)
     )
   of
     (False, Right base', Right fields') ->
@@ -213,8 +212,8 @@ extensionGroup multiline base first rest =
       stack1
         [ prefix (row [punc "{", space]) base
         , stack1
-            ([ prefix (row [punc "|", space]) first ]
-            ++ (map (prefix (row [punc ",", space])) rest))
+            ( prefix (row [punc "|", space]) first
+            : map (prefix (row [punc ",", space])) rest)
             |> indent
         , line $ punc "}"
         ]
