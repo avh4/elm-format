@@ -34,8 +34,7 @@ comments2 =
     1
         -- plus
         -- plus
-        +
-            3
+        + 3
 
 
 records =

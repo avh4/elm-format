@@ -16,3 +16,11 @@ multilineInfixOperators =
 
 commentedInfixOperator =
     1 {- plus -} + 2
+
+
+lineComments =
+    ()
+        |> identity
+        |> identity
+        --X
+        |> identity
