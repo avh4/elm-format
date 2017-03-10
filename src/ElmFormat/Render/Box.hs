@@ -1273,28 +1273,24 @@ formatUnit left right comments =
             stack1 comments'
 
 
+formatComments :: Comments -> Maybe Box
+formatComments comments =
+    case fmap formatComment comments of
+        [] ->
+            Nothing
+
+        (first:rest) ->
+            Just $ ElmStructure.spaceSepOrStack first rest
+
+
 formatCommented_ :: Bool -> (a -> Box) -> Commented a -> Box
 formatCommented_ forceMultiline format (Commented pre inner post) =
-    case
-        ( forceMultiline
-        , pre
-        , post
-        , allSingles $ fmap formatComment pre
-        , allSingles $ fmap formatComment post
-        , format inner
-        )
-    of
-        ( False, [], [LineComment eol], _, _, SingleLine inner') ->
-            mustBreak $ row [ inner', space, punc "--", literal eol ]
-
-        ( False, _, _, Right pre', Right post', SingleLine inner' ) ->
-            line $ row $ List.intersperse space $ concat [pre', [inner'], post']
-
-        (_, _, _, _, _, inner') ->
-            stack1 $
-                (map formatComment pre)
-                ++ [ inner' ]
-                ++ ( map formatComment post)
+    ElmStructure.forceableSpaceSepOrStack1 forceMultiline $
+        concat
+            [ Maybe.maybeToList $ formatComments pre
+            , [format inner]
+            , Maybe.maybeToList $ formatComments post
+            ]
 
 
 formatCommented :: (a -> Box) -> Commented a -> Box

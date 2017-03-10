@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 module ElmFormat.Render.ElmStructure
-  ( spaceSepOrStack, spaceSepOrIndented, forceableSpaceSepOrIndented, spaceSepOrPrefix
+  ( spaceSepOrStack, forceableSpaceSepOrStack1
+  , spaceSepOrIndented, forceableSpaceSepOrIndented, spaceSepOrPrefix
   , equalsPair, definition
   , application, group, extensionGroup )
   where
@@ -12,6 +13,14 @@ import AST.V0_16 (FunctionApplicationMultiline(..), Multiline(..))
 
 import qualified Data.List as List
 
+
+{-| Same as `forceableSpaceSepOrStack False`
+-}
+spaceSepOrStack :: Box -> [Box] -> Box
+spaceSepOrStack =
+    forceableSpaceSepOrStack False
+
+
 {-|
 Formats as:
 
@@ -21,16 +30,32 @@ Formats as:
     rest0
     rest1
 -}
-spaceSepOrStack :: Box -> [Box] -> Box
-spaceSepOrStack first rest =
+forceableSpaceSepOrStack :: Bool -> Box -> [Box] -> Box
+forceableSpaceSepOrStack forceMultiline first rest =
     case
-      ( first, allSingles rest )
+      ( forceMultiline, first, allSingles rest, rest )
     of
-      ( SingleLine first', Right rest' ) ->
+      ( False, SingleLine first', Right rest', _ ) ->
         line $ row $ List.intersperse space (first' : rest')
+
+      ( False, SingleLine first', _, [MustBreak rest'] ) ->
+          mustBreak $ row $ List.intersperse space [ first', rest' ]
 
       _ ->
         stack1 (first : rest)
+
+
+{-| Same as `forceableSpaceSepOrStack`
+-}
+forceableSpaceSepOrStack1 :: Bool -> [Box] -> Box
+forceableSpaceSepOrStack1 forceMultiline boxes =
+    case boxes of
+        (first:rest) ->
+            forceableSpaceSepOrStack forceMultiline first rest
+
+        _ ->
+            error "forceableSpaceSepOrStack1 with empty list"
+
 
 {-|
 Formats as:
