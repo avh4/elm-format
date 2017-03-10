@@ -55,21 +55,26 @@ parens :: Box -> Box
 parens = surround '(' ')'
 
 
-formatBinary :: Bool -> Box -> [ ( Bool, Box, Box ) ] -> Box
+formatBinary :: Bool -> Box -> [ ( Bool, Comments, Box, Box ) ] -> Box
 formatBinary multiline left ops =
     case ops of
         [] ->
             left
 
-        ( isLeftPipe, op, next ) : rest ->
+        ( isLeftPipe, comments, op, next ) : rest ->
             if isLeftPipe then
                 ElmStructure.spaceSepOrIndented
-                    (ElmStructure.spaceSepOrStack left [op])
+                    (ElmStructure.spaceSepOrStack left $
+                        concat
+                            [ Maybe.maybeToList $ formatComments comments
+                            , [op]
+                            ]
+                    )
                     [formatBinary multiline next rest]
             else
                 formatBinary
                     multiline
-                    (ElmStructure.forceableSpaceSepOrIndented multiline left [ElmStructure.spaceSepOrPrefix op next])
+                    (ElmStructure.forceableSpaceSepOrIndented multiline left [formatCommented' comments id $ ElmStructure.spaceSepOrPrefix op next])
                     rest
 
 
@@ -760,7 +765,7 @@ formatPattern elmVersion parensRequired apattern =
               formatBinary
                   False
                   first'
-                  (map ((,,) False (line $ punc "::")) (rest'++[final']))
+                  (map ((,,,) False [] (line $ punc "::")) (rest'++[final']))
               |> if parensRequired then parens else id
 
         AST.Pattern.Data ctor [] ->
@@ -1105,7 +1110,8 @@ formatBinops_0_17 elmVersion left ops multiline =
     let
         formatPair ( po, o, pe, e ) =
             ( o == AST.Variable.OpRef (SymbolIdentifier "<|")
-            , formatCommented' po (line . formatInfixVar elmVersion) o
+            , po
+            , (line . formatInfixVar elmVersion) o
             , formatCommented' pe (formatExpression elmVersion False) e
             )
     in
@@ -1127,7 +1133,8 @@ formatBinops_0_18 elmVersion left ops multiline =
 
         formatPair ( po, o, pe, e ) =
             ( o == AST.Variable.OpRef (SymbolIdentifier "<|")
-            , formatCommented' po (line . formatInfixVar elmVersion) o
+            , po
+            , (line . formatInfixVar elmVersion) o
             , formatCommented' pe (formatExpression elmVersion False) e
             )
     in
