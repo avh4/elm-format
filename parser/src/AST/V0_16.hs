@@ -98,8 +98,8 @@ exposedToOpen pre exposed =
         Single item eolComment ->
             OpenCommentedList [] (pre, item) eolComment
 
-        Multiple (first, postFirst) rest lst eolComment ->
-            OpenCommentedList (Commented pre first postFirst : rest) lst eolComment
+        Multiple (first', postFirst) rest' lst eolComment ->
+            OpenCommentedList (Commented pre first' postFirst : rest') lst eolComment
 
 
 data Multiline
@@ -155,7 +155,11 @@ data Type'
     | EmptyRecordType Comments
     | RecordType [(Commented LowercaseIdentifier, Commented Type, Bool)] Bool
     | RecordExtensionType (Commented LowercaseIdentifier) [(Commented LowercaseIdentifier, Commented Type, Bool)] Bool
-    | FunctionType (Type, Comments) [Commented Type] (Comments, Type) Bool
+    | FunctionType
+        { first :: (Type, Maybe String)
+        , rest :: [(Comments, Comments, Type, Maybe String)]
+        , forceMultiline :: Bool
+        }
     deriving (Eq, Show)
 
 

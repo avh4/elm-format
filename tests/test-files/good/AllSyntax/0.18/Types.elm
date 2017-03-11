@@ -1,25 +1,53 @@
 module AllSyntax.Types exposing (..)
 
-import Dict
+import Dict exposing (Dict)
 
 
-unit : ()
-unit =
-    ()
+type alias Unit =
+    ( ()
+    , ({- A -})
+    , (--B
+      )
+    )
 
 
-lambda : () -> () -> ()
-lambda _ _ =
-    ()
+type alias Function =
+    ( () -> () -> ()
+    , ()
+      -> ()
+      -> ()
+    , (--
+      )
+      ->
+        (--
+        )
+      ->
+        (--
+        )
+    , () {- AF -} -> {- AG -} () {- AH -} -> {- AI -} ()
+    , () --A
+      --B
+      ->
+        --C
+        ()
+      --D
+      ->
+        --G
+        ()
+    , () --A
+      -> () --B
+      -> () --C
+    )
 
 
-variable : a -> ()
-variable _ =
-    ()
+type alias Variable a =
+    a
 
 
 type alias Constructor =
-    ( Dict.Dict String Int
+    ( Bool
+    , Dict String Int
+    , Dict.Dict String Int
     , Dict.Dict {- A -} String {- B -} Int
     , Dict.Dict
         -- A
@@ -29,14 +57,27 @@ type alias Constructor =
     )
 
 
-parens : a -> ()
-parens _ =
-    ()
+type alias Parens =
+    ( ({- A -} Int {- B -})
+    , (--A
+       Int
+       --B
+      )
+    )
 
 
-tupleFn : (,,) Int String Bool -> ()
-tupleFn _ =
-    ()
+type alias TupleConstructor =
+    ( (,) Int String
+    , (,,) Int String Bool
+    , (,,) {- C -} Int {- D -} String {- E -} Bool
+    , (,,)
+        -- C
+        Int
+        -- D
+        String
+        --E
+        Bool
+    )
 
 
 type alias Tuple =

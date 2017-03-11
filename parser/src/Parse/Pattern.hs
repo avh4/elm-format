@@ -122,5 +122,5 @@ expr =
           case result of
             Left pattern ->
               pattern
-            Right (region, first, rest, final, _) ->
-              A.A region $ P.ConsPattern first rest final
+            Right (region, first, rest, _) ->
+              A.A region $ P.ConsPattern first rest

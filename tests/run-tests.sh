@@ -259,6 +259,8 @@ checkGood 0.16 AllSyntax/0.16/GLShader.elm
 checkGood 0.16 AllSyntax/0.16/Literals.elm
 checkGood 0.16 AllSyntax/0.16/Comments.elm
 checkGood 0.16 ApiSketch.elm
+checkTransformation 0.18 AllSyntax/0.18/Types.elm
+checkTransformation 0.18 AllSyntax/0.18/Patterns.elm
 
 checkGood 0.16 AllSyntax/0.16/PatternsRequireParens.elm
 checkGood 0.16 AllSyntax/0.16/Range.elm

@@ -264,36 +264,37 @@ keyValue parseSep parseKey parseVal =
       )
 
 
-separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (e,Comments), [Commented e], (Comments,e), Bool))
+separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (e,Maybe String), [(Comments, Comments, e, Maybe String)], Bool))
 separated sep expr' =
   do  start <- getMyPosition
       _ <- pushNewlineContext
       t1 <- expr'
-      arrow <- optionMaybe $ try (whitespace <* sep)
+      arrow <- optionMaybe $ try ((,) <$> restOfLine <*> whitespace <* sep)
       case arrow of
         Nothing ->
             do  _ <- popNewlineContext
                 return $ Left t1
-        Just preArrow ->
+        Just (eolT1, preArrow) ->
             do  postArrow <- whitespace
                 t2 <- separated sep expr'
                 end <- getMyPosition
                 multiline <- popNewlineContext
-                return $ Right $
-                  case t2 of
-                    Right (_, (t2',postT2), ts, tlast, _) ->
-                      ( R.Region start end
-                      , (t1, preArrow)
-                      , ((Commented postArrow t2' postT2):ts)
-                      , tlast
-                      , multiline
-                      )
+                case t2 of
+                    Right (_, (t2',eolT2), ts, _) ->
+                      return $ Right
+                        ( R.Region start end
+                        , (t1, eolT1)
+                        , (preArrow, postArrow, t2', eolT2):ts
+                        , multiline
+                        )
                     Left t2' ->
-                      ( R.Region start end
-                      , (t1, preArrow)
-                      , []
-                      , (postArrow, t2')
-                      , multiline)
+                      do
+                        eol <- restOfLine
+                        return $ Right
+                          ( R.Region start end
+                          , (t1, eolT1)
+                          , [(preArrow, postArrow, t2', eol)]
+                          , multiline)
 
 
 dotSep1 :: IParser a -> IParser [a]

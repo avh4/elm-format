@@ -26,37 +26,7 @@ example name input expected =
 tests :: TestTree
 tests =
     testGroup "Parse.Type"
-    [ testGroup "unit"
-        [ example "" "()" $ at 1 1 1 3 (UnitType [])
-        , example "whitespace" "( )" $ at 1 1 1 4 (UnitType [])
-        , example "comments" "({-A-})" $ at 1 1 1 8 (UnitType [BlockComment ["A"]])
-        , example "newlines" "(\n)" $ at 1 1 2 2 (UnitType [])
-        ]
-
-    , testGroup "type variable"
-        [ example "lowercase" "a" $ at 1 1 1 2 (TypeVariable $ LowercaseIdentifier "a")
-        ]
-
-    , testGroup "constructor"
-        [ example "" "Foo a b" $ at 1 1 1 8 (TypeConstruction (NamedConstructor [UppercaseIdentifier "Foo"]) [([],at 1 5 1 6 (TypeVariable $ LowercaseIdentifier "a")),([],at 1 7 1 8 (TypeVariable $ LowercaseIdentifier "b"))])
-        , example "no arguments" "Foo" $ at 1 1 1 4 (TypeConstruction (NamedConstructor [UppercaseIdentifier "Foo"]) [])
-        , example "comments" "Foo{-A-}a{-B-}b" $ at 1 1 1 16 (TypeConstruction (NamedConstructor [UppercaseIdentifier "Foo"]) [([BlockComment ["A"]],at 1 9 1 10 (TypeVariable $ LowercaseIdentifier "a")),([BlockComment ["B"]],at 1 15 1 16 (TypeVariable $ LowercaseIdentifier "b"))])
-        , example "newlines" "Foo\n a\n b" $ at 1 1 3 3 (TypeConstruction (NamedConstructor [UppercaseIdentifier "Foo"]) [([],at 2 2 2 3 (TypeVariable $ LowercaseIdentifier "a")),([],at 3 2 3 3 (TypeVariable $ LowercaseIdentifier "b"))])
-        ]
-
-    , testGroup "tuple constructor"
-        [ example "single comma" "(,) a b" $ at 1 1 1 8 (TypeConstruction (TupleConstructor 2) [([],at 1 5 1 6 (TypeVariable $ LowercaseIdentifier "a")),([],at 1 7 1 8 (TypeVariable $ LowercaseIdentifier "b"))])
-        , example "multiple commas" "(,,,) a b c d" $ at 1 1 1 14 (TypeConstruction (TupleConstructor 4) [([],at 1 7 1 8 (TypeVariable $ LowercaseIdentifier "a")),([],at 1 9 1 10 (TypeVariable $ LowercaseIdentifier "b")),([],at 1 11 1 12 (TypeVariable $ LowercaseIdentifier "c")),([],at 1 13 1 14 (TypeVariable $ LowercaseIdentifier "d"))])
-        ]
-
-    , testGroup "parens"
-        [ example "" "(a)" $ at 1 1 1 4 (TypeVariable $ LowercaseIdentifier "a")
-        , example "whitespace" "( a )" $ at 1 1 1 6 (TypeVariable $ LowercaseIdentifier "a")
-        , example "comments" "({-A-}a{-B-})" $ at 1 1 1 14 (TypeParens (Commented [BlockComment ["A"]] (at 1 7 1 8 (TypeVariable $ LowercaseIdentifier "a")) [BlockComment ["B"]]))
-        , example "newlines" "(\n a\n )" $ at 1 1 3 3 (TypeVariable $ LowercaseIdentifier "a")
-        ]
-
-    , testGroup "tuple type"
+    [ testGroup "tuple type"
         [ example "" "(a,b)" $ at 1 1 1 6 (TupleType [Commented [] (at 1 2 1 3 (TypeVariable $ LowercaseIdentifier "a")) [],Commented [] (at 1 4 1 5 (TypeVariable $ LowercaseIdentifier "b")) []])
         , example "whitespace" "( a , b )" $ at 1 1 1 10 (TupleType [Commented [] (at 1 3 1 4 (TypeVariable $ LowercaseIdentifier "a")) [],Commented [] (at 1 7 1 8 (TypeVariable $ LowercaseIdentifier "b")) []])
         , example "comments" "({-A-}a{-B-},{-C-}b{-D-})" $ at 1 1 1 26 (TupleType [Commented [BlockComment ["A"]] (at 1 7 1 8 (TypeVariable $ LowercaseIdentifier "a")) [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 19 1 20 (TypeVariable $ LowercaseIdentifier "b")) [BlockComment ["D"]]])
@@ -90,14 +60,4 @@ tests =
         , testCase "must have fields" $
             assertParseFailure expr "{a|}"
         ]
-
-    , testGroup "function type"
-      [ example "" "a->b->c" $ at 1 1 1 8 (FunctionType (at 1 1 1 2 (TypeVariable $ LowercaseIdentifier "a"),[]) [Commented [] (at 1 4 1 5 (TypeVariable $ LowercaseIdentifier "b")) []] ([],at 1 7 1 8 (TypeVariable $ LowercaseIdentifier "c")) False)
-      , example "single argument" "a->b" $ at 1 1 1 5 (FunctionType (at 1 1 1 2 (TypeVariable $ LowercaseIdentifier "a"),[]) [] ([],at 1 4 1 5 (TypeVariable $ LowercaseIdentifier "b")) False)
-      , example "whitespace" "a->b->c" $ at 1 1 1 8 (FunctionType (at 1 1 1 2 (TypeVariable $ LowercaseIdentifier "a"),[]) [Commented [] (at 1 4 1 5 (TypeVariable $ LowercaseIdentifier "b")) []] ([],at 1 7 1 8 (TypeVariable $ LowercaseIdentifier "c")) False)
-      , example "comments" "a{-A-}->{-B-}b{-C-}->{-D-}c" $ at 1 1 1 28 (FunctionType (at 1 1 1 2 (TypeVariable $ LowercaseIdentifier "a"),[BlockComment ["A"]]) [Commented [BlockComment ["B"]] (at 1 14 1 15 (TypeVariable $ LowercaseIdentifier "b")) [BlockComment ["C"]]] ([BlockComment ["D"]],at 1 27 1 28 (TypeVariable $ LowercaseIdentifier "c")) False)
-      , example "newlines" "a\n ->\n b\n ->\n c" $ at 1 1 5 3 (FunctionType (at 1 1 1 2 (TypeVariable $ LowercaseIdentifier "a"),[]) [Commented [] (at 3 2 3 3 (TypeVariable $ LowercaseIdentifier "b")) []] ([],at 5 2 5 3 (TypeVariable $ LowercaseIdentifier "c")) True)
-      , testCase "does not allow space in the arrow" $
-          assertParseFailure expr "a - > b"
-      ]
     ]
