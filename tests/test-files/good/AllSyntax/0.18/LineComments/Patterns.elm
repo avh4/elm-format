@@ -79,7 +79,7 @@ consList
     (a --T
         :: --U
            b
-           --V
+        --V
         :: --W
            c
     )

@@ -1,32 +1,5 @@
 module AllSyntax.BlockComments.Types exposing (..)
 
-import Dict
-
-
-unit : ({- F -})
-unit =
-    ()
-
-
-lambda : () {- AF -} -> {- AG -} () {- AH -} -> {- AI -} ()
-lambda _ _ =
-    ()
-
-
-variable : a -> ()
-variable _ =
-    ()
-
-
-parens : ({- K -} a {- L -}) -> ()
-parens _ =
-    ()
-
-
-tupleFn : (,,) {- C -} Int {- D -} String {- E -} Bool -> ()
-tupleFn _ =
-    ()
-
 
 emptyRecord : {{- M -}} -> ()
 emptyRecord _ =

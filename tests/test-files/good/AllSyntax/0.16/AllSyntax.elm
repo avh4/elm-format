@@ -105,9 +105,10 @@ fn2 :
     , y : String
     }
     -> String
-    -> { a
-        | x : Float
-       }
+    ->
+        { a
+            | x : Float
+        }
     -> Int
 fn2 _ _ _ =
     999

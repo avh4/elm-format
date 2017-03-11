@@ -131,8 +131,8 @@ expr =
       case result of
         Left t ->
           t
-        Right (region, first, rest, final, multiline) ->
-          A.A region $ FunctionType first rest final multiline
+        Right (region, first, rest, multiline) ->
+          A.A region $ FunctionType first rest multiline
 
 
 constructor :: IParser ([UppercaseIdentifier], [(Comments, Type)])

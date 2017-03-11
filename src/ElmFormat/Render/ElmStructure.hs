@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 module ElmFormat.Render.ElmStructure
-  ( spaceSepOrStack, forceableSpaceSepOrStack1
+  ( spaceSepOrStack, forceableSpaceSepOrStack, forceableSpaceSepOrStack1
   , spaceSepOrIndented, forceableSpaceSepOrIndented, spaceSepOrPrefix
   , equalsPair, definition
   , application, group, extensionGroup )
@@ -75,10 +75,13 @@ spaceSepOrIndented =
 forceableSpaceSepOrIndented :: Bool -> Box -> [Box] -> Box
 forceableSpaceSepOrIndented forceMultiline first rest =
   case
-    ( forceMultiline, first, allSingles rest )
+    ( forceMultiline, first, allSingles rest, rest )
   of
-    ( False, SingleLine first', Right rest' ) ->
+    ( False, SingleLine first', Right rest', _ ) ->
       line $ row $ List.intersperse space (first' : rest')
+
+    ( False, SingleLine first', _, [MustBreak rest'] ) ->
+        mustBreak $ row $ List.intersperse space [ first', rest' ]
 
     _ ->
       stack1

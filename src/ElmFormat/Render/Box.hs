@@ -756,17 +756,21 @@ formatPattern elmVersion parensRequired apattern =
         AST.Pattern.OpPattern (SymbolIdentifier name) ->
             line $ identifier $ "(" ++ name ++ ")"
 
-        AST.Pattern.ConsPattern first rest final ->
+        AST.Pattern.ConsPattern first rest ->
             let
-              first' = formatTailCommented (formatPattern elmVersion True) first
-              rest' = map (formatCommented (formatPattern elmVersion True)) rest
-              final' = formatHeadCommented (formatPattern elmVersion True) final
+                formatRight (preOp, postOp, term, eol) =
+                    ( False
+                    , preOp
+                    , line $ punc "::"
+                    , formatCommented
+                        (formatPattern elmVersion True)
+                        (Commented postOp term (fmap LineComment $ Maybe.maybeToList eol))
+                    )
             in
-              formatBinary
-                  False
-                  first'
-                  (map ((,,,) False [] (line $ punc "::")) (rest'++[final']))
-              |> if parensRequired then parens else id
+                formatBinary False
+                    (formatEolCommented (formatPattern elmVersion True) first)
+                    (map formatRight rest)
+                |> if parensRequired then parens else id
 
         AST.Pattern.Data ctor [] ->
             line (formatQualifiedUppercaseIdentifier elmVersion ctor)
@@ -1320,6 +1324,11 @@ formatTailCommented format (inner, post) =
   formatCommented format (Commented [] inner post)
 
 
+formatEolCommented :: (a -> Box) -> (a, Maybe String) -> Box
+formatEolCommented format (inner, post) =
+  formatCommented format (Commented [] inner (Maybe.maybeToList $ fmap LineComment post))
+
+
 formatCommentedStack :: (a -> Box) -> Commented a -> Box
 formatCommentedStack format (Commented pre inner post) =
   stack1 $
@@ -1556,31 +1565,26 @@ formatType' elmVersion requireParens atype =
         UnitType comments ->
           formatUnit '(' ')' comments
 
-        FunctionType first rest final forceMultiline ->
-            case
-              ( forceMultiline
-              , allSingles $
-                  concat
-                    [ [formatTailCommented (formatType' elmVersion ForLambda) first]
-                    , map (formatCommented $ formatType' elmVersion ForLambda) rest
-                    , [formatHeadCommented (formatType' elmVersion ForLambda) final]
-                    ]
-              )
-            of
-                (False, Right typs) ->
-                  line $ row $ List.intersperse (row [ space, keyword "->", space]) typs
-                (True, Right []) ->
-                  pleaseReport "INVALID FUNCTION TYPE" "no terms"
-                (True, Right (first':rest')) ->
-                  (line first')
-                    |> andThen (rest' |> map line |> map (prefix $ row [keyword "->", space]))
-                (_, Left []) ->
-                  pleaseReport "INVALID FUNCTION TYPE" "no terms"
-                (_, Left (first':rest')) ->
-                  first'
-                    |> andThen (rest' |> map (prefix $ row [keyword "->", space]))
-
-            |> (if requireParens /= NotRequired then parens else id)
+        FunctionType first rest forceMultiline ->
+            let
+                formatRight (preOp, postOp, term, eol) =
+                    ElmStructure.forceableSpaceSepOrStack1
+                        False
+                        $ concat
+                            [ Maybe.maybeToList $ formatComments preOp
+                            , [ ElmStructure.spaceSepOrIndented
+                                    (line $ punc "->")
+                                    [formatCommented
+                                        (formatType' elmVersion ForLambda)
+                                        (Commented postOp term (fmap LineComment $ Maybe.maybeToList eol))]
+                              ]
+                            ]
+            in
+                ElmStructure.forceableSpaceSepOrStack
+                    forceMultiline
+                    (formatEolCommented (formatType' elmVersion ForLambda) first)
+                    (map formatRight rest)
+                |> if requireParens /= NotRequired then parens else id
 
         TypeVariable var ->
             line $ identifier $ formatVarName elmVersion var
