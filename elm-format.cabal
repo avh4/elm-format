@@ -32,7 +32,7 @@ source-repository head
 Executable elm-format-0.18
 
     ghc-options:
-        -threaded -O2 -W -Wno-name-shadowing
+        -threaded -O2 -Wall -Wno-name-shadowing
 
     hs-source-dirs:
         src
@@ -105,7 +105,7 @@ Executable elm-format-0.18
 Executable elm-format-0.17
 
     ghc-options:
-        -threaded -O2 -W -Wno-name-shadowing
+        -threaded -O2 -Wall -Wno-name-shadowing
 
     hs-source-dirs:
         src
@@ -174,10 +174,11 @@ Executable elm-format-0.17
         split >= 0.2.3.1 && < 0.3,
         text >= 1.2.2.1 && < 2
 
+
 Executable elm-format-0.16
 
     ghc-options:
-        -threaded -O2 -W -Wno-name-shadowing
+        -threaded -O2 -Wall -Wno-name-shadowing
 
     hs-source-dirs:
         src
@@ -246,9 +247,13 @@ Executable elm-format-0.16
         split >= 0.2.3.1 && < 0.3,
         text >= 1.2.2.1 && < 2
 
+
 Test-Suite elm-format-tests
     Type:
         exitcode-stdio-1.0
+
+    ghc-options:
+        -threaded -Wall -Wno-name-shadowing
 
     hs-source-dirs:
         tests
