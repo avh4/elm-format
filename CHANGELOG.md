@@ -1,4 +1,4 @@
-## master (next release, probably 0.6.0-alpha)
+## master (next release, 0.6.0-alpha)
 
 Syntax changes:
   - Removed a workaround for an Elm 0.16 compiler bug that added extra parenthesis to qualified type tags in pattern matches
