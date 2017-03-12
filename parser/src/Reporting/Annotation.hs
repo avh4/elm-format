@@ -1,7 +1,6 @@
 module Reporting.Annotation where
 
 import Prelude hiding (map)
-import qualified Reporting.PrettyPrint as P
 import qualified Reporting.Region as R
 import qualified Data.String as String
 
@@ -61,10 +60,3 @@ class Strippable a where
 instance Strippable (Located a) where
   stripRegion (A _ value) =
     A (R.Region (R.Position 0 0) (R.Position 0 0)) value
-
-
--- PRETTY PRINT
-
-instance (P.Pretty a) => P.Pretty (Located a) where
-  pretty dealiaser parens (A _ value) =
-      P.pretty dealiaser parens value

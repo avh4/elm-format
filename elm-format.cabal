@@ -93,7 +93,6 @@ Executable elm-format-0.18
         mtl >= 2.2.1 && < 3,
         optparse-applicative >= 0.12.1.0 && < 0.13,
         parsec >= 3.1.11 && < 4,
-        pretty >= 1.1.3.3 && < 2,
         process >= 1.4.2.0 && < 2,
         split >= 0.2.3.1 && < 0.3,
         text >= 1.2.2.1 && < 2
@@ -163,7 +162,6 @@ Executable elm-format-0.17
         mtl >= 2.2.1 && < 3,
         optparse-applicative >= 0.12.1.0 && < 0.13,
         parsec >= 3.1.11 && < 4,
-        pretty >= 1.1.3.3 && < 2,
         process >= 1.4.2.0 && < 2,
         split >= 0.2.3.1 && < 0.3,
         text >= 1.2.2.1 && < 2
@@ -233,7 +231,6 @@ Executable elm-format-0.16
         mtl >= 2.2.1 && < 3,
         optparse-applicative >= 0.12.1.0 && < 0.13,
         parsec >= 3.1.11 && < 4,
-        pretty >= 1.1.3.3 && < 2,
         process >= 1.4.2.0 && < 2,
         split >= 0.2.3.1 && < 0.3,
         text >= 1.2.2.1 && < 2
@@ -325,7 +322,6 @@ Test-Suite elm-format-tests
         mtl >= 2.2.1 && < 3,
         optparse-applicative >= 0.12.1.0 && < 0.13,
         parsec >= 3.1.11 && < 4,
-        pretty >= 1.1.3.3 && < 2,
         process >= 1.4.2.0 && < 2,
         split >= 0.2.3.1 && < 0.3,
         text >= 1.2.2.1 && < 2,

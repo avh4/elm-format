@@ -2,7 +2,6 @@
 module Reporting.PrettyPrint where
 
 import qualified Data.Map as Map
-import Text.PrettyPrint as P
 
 import qualified AST.Helpers as Help
 
@@ -15,13 +14,6 @@ class Pretty a where
 
 type Dealiaser =
   Map.Map String String
-
-
--- INSTANCES
-
-instance Pretty String where
-  pretty _ _ str =
-      P.text str
 
 
 -- HELPERS
