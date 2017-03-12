@@ -124,7 +124,7 @@ symOp =
   do  op <- many1 (satisfy Help.isSymbol) <?> "an infix operator like +"
       guard (op `notElem` [ "=", "..", "->", "--", "|", "\8594", ":" ])
       case op of
-        "." -> notFollowedBy lower >> (return $ SymbolIdentifier op)
+        "." -> notFollowedBy lower >> return (SymbolIdentifier op)
         _   -> return $ SymbolIdentifier op
 
 
@@ -592,8 +592,7 @@ docComment :: IParser String
 docComment =
   do  _ <- try (string "{-|")
       _ <- many (string " ")
-      contents <- closeComment False
-      return contents
+      closeComment False
 
 
 multiComment :: IParser Comment
@@ -623,7 +622,7 @@ multiComment =
 
 closeComment :: Bool -> IParser String
 closeComment keepClosingPunc =
-  (uncurry (++)) <$>
+  uncurry (++) <$>
     anyUntil
       (choice
         [ try ((\a b -> if keepClosingPunc then concat (a ++ [b]) else "") <$> many (string " ") <*> string "-}") <?> "the end of a comment -}"
