@@ -10,6 +10,7 @@ Bug fixes:
   - Double quotes at the end of multiline strings are now handled correctly
   - The `where` clause in `effect module`s are now required to have at least one field (and comments are now handled correctly)
   - Record expressions with a trailing comma are no longer allowed (and comments are now handled correctly)
+  - Block comments containing only multiple lines of whitespace no longer crash elm-format
 
 
 ## 0.5.2-alpha
