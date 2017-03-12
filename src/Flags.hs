@@ -2,16 +2,15 @@
 module Flags where
 
 import Data.Monoid ((<>))
-import Data.Version (showVersion)
 import ElmVersion (ElmVersion(..))
 import Messages.Formatter.Format (InfoFormatter)
 
 import qualified Data.List as List
 import qualified Data.Maybe as Maybe
 import qualified ElmVersion
+import qualified ElmFormat.Version
 import qualified Messages.Formatter as Formatter
 import qualified Options.Applicative as Opt
-import qualified Paths_elm_format as This
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
 
 
@@ -109,7 +108,7 @@ helpInfo defaultVersion =
     top =
         concat
             [ "elm-format-" ++ show defaultVersion ++ " "
-            , showVersion This.version  ++ "-alpha" ++ "\n"
+            , ElmFormat.Version.asString ++ "\n"
             ]
 
     examples =
