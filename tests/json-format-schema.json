@@ -14,5 +14,5 @@
       "type": "string"
     }
   },
-  "required": ["path", "line", "column", "message"]
+  "required": ["path", "message"]
 }
