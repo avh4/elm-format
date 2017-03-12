@@ -35,6 +35,7 @@ reserveds =
 
 -- ERROR HELP
 
+expecting :: String -> IParser a -> IParser a
 expecting = flip (<?>)
 
 
@@ -45,8 +46,8 @@ type IParser a = ParsecT String State.State SourceM a
 
 
 iParse :: IParser a -> String -> Either ParseError a
-iParse parser source =
-  iParseWithState "" State.init parser source
+iParse =
+    iParseWithState "" State.init
 
 
 iParseWithState :: SourceName -> State.State -> IParser a -> String -> Either ParseError a
@@ -105,7 +106,7 @@ makeVar firstChar =
 reserved :: String -> IParser ()
 reserved word =
   expecting ("reserved word `" ++ word ++ "`") $
-    do  string word
+    do  _ <- string word
         notFollowedBy innerVarChar
         return ()
 
@@ -174,6 +175,7 @@ verticalBar =
   const () <$> char '|' <?> "a vertical bar '|'"
 
 
+commitIf :: IParser any -> IParser a -> IParser a
 commitIf check p =
     commit <|> try p
   where
@@ -335,18 +337,18 @@ constrainedSpacePrefix' parser constraint =
 
 betwixt :: Char -> Char -> IParser a -> IParser a
 betwixt a b c =
-  do  char a
+  do  _ <- char a
       out <- c
-      char b <?> "a closing '" ++ [b] ++ "'"
+      _ <- char b <?> "a closing '" ++ [b] ++ "'"
       return out
 
 
 surround :: Char -> Char -> String -> IParser (Comments -> Comments -> Bool -> a) -> IParser a
 surround a z name p = do
   pushNewlineContext
-  char a
+  _ <- char a
   (pre, v, post) <- padded p
-  char z <?> unwords ["a closing", name, show z]
+  _ <- char z <?> unwords ["a closing", name, show z]
   multiline <- popNewlineContext
   return $ v pre post multiline
 
@@ -368,9 +370,9 @@ brackets =
 
 surround' :: Char -> Char -> String -> IParser a -> IParser a
 surround' a z name p = do
-  char a
+  _ <- char a
   v <- p
-  char z <?> unwords ["a closing", name, show z]
+  _ <- char z <?> unwords ["a closing", name, show z]
   return v
 
 
@@ -405,9 +407,9 @@ surround'' leftDelim rightDelim inner =
                   Right <$> option [v'] ((\x -> v' : x) <$> (char ',' >> sep'''))
   in
     do
-      char leftDelim
+      _ <- char leftDelim
       vs <- sep''
-      char rightDelim
+      _ <- char rightDelim
       return vs
 
 
@@ -459,7 +461,7 @@ accessible exprParser =
 
 dot :: IParser ()
 dot =
-  do  char '.'
+  do  _ <- char '.'
       notFollowedBy (char '.')
 
 
@@ -528,8 +530,8 @@ newline =
 
 simpleNewline :: IParser ()
 simpleNewline =
-  do  try (string "\r\n") <|> string "\n"
-      updateState $ State.setNewline
+  do  _ <- try (string "\r\n") <|> string "\n"
+      updateState State.setNewline
       return ()
 
 
@@ -557,7 +559,7 @@ trackNewline parser =
 
 lineComment :: IParser Comment
 lineComment =
-  do  try (string "--")
+  do  _ <- try (string "--")
       choice
         [ const CommentTrickCloser
             <$> try (char '}' >> many (char ' ') >> (simpleNewline <|> eof))
@@ -588,21 +590,21 @@ commentedKeyword word parser =
 
 docComment :: IParser String
 docComment =
-  do  try (string "{-|")
-      many (string " ")
+  do  _ <- try (string "{-|")
+      _ <- many (string " ")
       contents <- closeComment False
       return contents
 
 
 multiComment :: IParser Comment
 multiComment =
-  do  try (string "{-" <* notFollowedBy (string "|") )
+  do  _ <- try (string "{-" <* notFollowedBy (string "|") )
       isCommentTrick <-
         choice
           [ char '-' >> return True
           , return False
           ]
-      many (string " ")
+      _ <- many (string " ")
       b <- closeComment False
       return $
         if isCommentTrick then
@@ -613,16 +615,17 @@ multiComment =
       trimIndent [] = []
       trimIndent (l1:ls) =
           let
-              depth = minimum $ map fst $ filter (\(a,b) -> a /= b) $ map (\l -> (length $ takeWhile Char.isSpace $ l, length l)) $ ls
+              depth = minimum $ map fst $ filter (uncurry (/=))
+                  $ map (\l -> (length $ takeWhile Char.isSpace l, length l)) ls
           in
-              l1 : (map (drop depth) ls)
+              l1 : map (drop depth) ls
 
 
 closeComment :: Bool -> IParser String
 closeComment keepClosingPunc =
-  (\(a,b) -> a ++ b) <$>
-    (anyUntil $
-      choice $
+  (uncurry (++)) <$>
+    anyUntil
+      (choice
         [ try ((\a b -> if keepClosingPunc then concat (a ++ [b]) else "") <$> many (string " ") <*> string "-}") <?> "the end of a comment -}"
         , concat <$> sequence [ try (string "{-"), closeComment True, closeComment keepClosingPunc]
         ])
@@ -630,6 +633,7 @@ closeComment keepClosingPunc =
 
 -- ODD COMBINATORS
 
+failure :: String -> IParser String
 failure msg = do
   inp <- getInput
   setInput ('x':inp)
@@ -661,15 +665,14 @@ anyUntil end =
 
 shader :: IParser String
 shader =
-  do  try (string "[glsl|")
-      rawSrc <- closeShader id
-      return rawSrc
+  do  _ <- try (string "[glsl|")
+      closeShader id
 
 
 closeShader :: (String -> a) -> IParser a
 closeShader builder =
   choice
-    [ do  try (string "|]")
+    [ do  _ <- try (string "|]")
           return (builder "")
     , do  c <- anyChar
           closeShader (builder . (c:))
@@ -718,7 +721,7 @@ sandwich delim s =
 escaped :: Char -> IParser String
 escaped delim =
   try $ do
-    char '\\'
+    _ <- char '\\'
     c <- char '\\' <|> char delim
     return ['\\', c]
 
