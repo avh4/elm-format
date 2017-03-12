@@ -253,7 +253,14 @@ function checkValidationOutputFormat() {
 	echo "## with unformatted files outputs in expected json format line by line"
 	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate | \
 	while read -r line; do
-		tee "$line" "$STDOUT"; ajv test -s tests/json-format-schema.json -d "$STDOUT" --valid
+		echo "$line" | tee "$STDOUT"; ajv test -s tests/json-format-schema.json -d "$STDOUT" --valid
+	done <&0
+	returnCodeShouldEqual 0
+
+	echo "## with invalid files outputs in expected json format line by line"
+	"$ELM_FORMAT" "tests/test-files/bad/Empty.elm" --validate | \
+	while read -r line; do
+		echo "$line" | tee "$STDOUT"; ajv test -s tests/json-format-schema.json -d "$STDOUT" --valid
 	done <&0
 	returnCodeShouldEqual 0
 

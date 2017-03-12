@@ -3,6 +3,7 @@ module Messages.Formatter.HumanReadable (format) where
 
 import Messages.Formatter.Format
 import Messages.Types
+import CommandLine.Helpers (showErrors)
 
 
 format :: InfoFormatter
@@ -21,3 +22,6 @@ renderInfo (ProcessingFiles files) =
 
 renderInfo (FileWouldChange file) =
     putStrLn $ "File would be changed " ++ file
+
+renderInfo (ParseError inputFile inputText errs) =
+    showErrors inputFile inputText errs

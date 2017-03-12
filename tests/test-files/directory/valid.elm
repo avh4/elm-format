@@ -1,4 +1,5 @@
-module X (..) where
+module X exposing (..)
+
 
 a =
     123

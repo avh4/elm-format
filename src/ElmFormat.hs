@@ -51,13 +51,13 @@ writeResult elmVersion formatter destination inputFile inputText result =
             in
                 case destination of
                     UpdateInPlace ->
-                        (Char8.putStr rendered)
-                        >> (return Nothing)
+                        Char8.putStr rendered
+                        >> return Nothing
 
                     ValidateOnly ->
                         if inputText /= renderedText then
-                            (onInfo formatter $ FileWouldChange inputFile)
-                            >> (return $ Just False)
+                            onInfo formatter (FileWouldChange inputFile)
+                            >> return (Just False)
                         else
                             return $ Just True
 
@@ -67,15 +67,14 @@ writeResult elmVersion formatter destination inputFile inputText result =
                                 inputFile /= path || inputText /= renderedText
                         in
                             if shouldWriteToFile then
-                                (ByteString.writeFile path rendered)
-                                >> (return Nothing)
+                                ByteString.writeFile path rendered
+                                >> return Nothing
                             else
                                 return Nothing
 
         Result.Result _ (Result.Err errs) ->
-            do
-                showErrors inputFile (Text.unpack inputText) errs
-                exitFailure
+            onInfo formatter (ParseError inputFile (Text.unpack inputText) errs)
+            >> return (Just False)
 
 
 processTextInput :: ElmVersion -> InfoFormatter -> Destination -> FilePath -> Text.Text -> IO (Maybe Bool)
@@ -325,21 +324,21 @@ main defaultVersion =
                 do
                     result <- handleFilesInput elmVersion HumanReadable.format (first:rest) Nothing autoYes False
                     case result of
-                        Nothing ->
-                            exitSuccess
+                        Just False ->
+                            exitFailure
 
-                        Just _ ->
-                            error "There shouldn't be a validation result when formatting"
+                        _ ->
+                            exitSuccess
 
             (Right elmVersion, Right (FormatToFile input output)) ->
                 do
                     result <- handleFilesInput elmVersion HumanReadable.format [input] (Just output) autoYes False
                     case result of
-                        Nothing ->
-                            exitSuccess
+                        Just False ->
+                            exitFailure
 
-                        Just _ ->
-                            error "There shouldn't be a validation result when formatting"
+                        _ ->
+                            exitSuccess
 
             (Right elmVersion, Right StdinToStdout) ->
                 do
@@ -350,11 +349,11 @@ main defaultVersion =
                             |> Text.decodeUtf8
                             |> processTextInput elmVersion HumanReadable.format UpdateInPlace "<STDIN>"
                     case result of
-                        Nothing ->
-                            exitSuccess
+                        Just False ->
+                            exitFailure
 
-                        Just _ ->
-                            error "There shouldn't be a validation result when formatting"
+                        _ ->
+                            exitSuccess
 
             (Right elmVersion, Right (StdinToFile output)) ->
                 do
@@ -365,8 +364,8 @@ main defaultVersion =
                             |> Text.decodeUtf8
                             |> processTextInput elmVersion HumanReadable.format (ToFile output) "<STDIN>"
                     case result of
-                        Nothing ->
-                            exitSuccess
+                        Just False ->
+                            exitFailure
 
-                        Just _ ->
-                            error "There shouldn't be a validation result when formatting"
+                        _ ->
+                            exitSuccess
