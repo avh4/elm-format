@@ -1,4 +1,4 @@
-FROM fpco/stack-build:lts-7.4
+FROM fpco/stack-build:lts-7.20
 
 COPY stack.yaml elm-format.cabal ./
 RUN stack setup
@@ -15,4 +15,4 @@ RUN stack build
 COPY tests/ ./tests/
 RUN ./tests/run-tests.sh
 
-# binaries are in .stack-work/install/x86_64-linux/lts-7.4/8.0.1/bin
+# binaries are in .stack-work/install/x86_64-linux/lts-7.20/8.0.1/bin
