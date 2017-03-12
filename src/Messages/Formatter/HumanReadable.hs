@@ -14,13 +14,10 @@ renderInfo :: InfoMessage -> IO ()
 
 renderInfo (ProcessingFiles files) =
     case files of
-        file:[] ->
+        [file] ->
             putStrLn $ "Processing file " ++ file
         _ ->
-            putStrLn $ "Processing multiple files..."
+            putStrLn "Processing multiple files..."
 
 renderInfo (FileWouldChange file) =
     putStrLn $ "File would be changed " ++ file
-
-renderInfo _ =
-    return ()
