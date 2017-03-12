@@ -43,7 +43,7 @@ negative :: IParser E.Expr'
 negative =
   do  nTerm <-
           try $
-            do  char '-'
+            do  _ <- char '-'
                 notFollowedBy (char '.' <|> char '-')
                 term
 
@@ -128,7 +128,7 @@ recordTerm =
     ]
   where
     update (A.A ann starter) postStarter =
-      do  try (string "|")
+      do  _ <- try (string "|")
           postBar <- whitespace
           fields <- commaSep1 field
           return $ \pre post multiline -> (E.RecordUpdate (Commented pre (A.A ann $ E.VarExpr $ Var.VarRef [] starter) postStarter) (fields postBar post) multiline)
@@ -256,7 +256,7 @@ lambdaExpr :: IParser E.Expr
 lambdaExpr =
   addLocation $
   do  pushNewlineContext
-      char '\\' <|> char '\x03BB' <?> "an anonymous function"
+      _ <- char '\\' <|> char '\x03BB' <?> "an anonymous function"
       args <- spacePrefix Pattern.term
       (preArrowComments, _, bodyComments) <- padded rightArrow
       body <- expr
