@@ -19,11 +19,17 @@ showInfo _ (ProcessingFiles _) =
     Nothing
 
 showInfo elmVersion (FileWouldChange file) =
-    Just $ Json.encode $ Json.makeObj
+    Just $ json file $
+        "File is not formatted with elm-format-" ++ ElmFormat.Version.asString
+        ++ " --elm-version=" ++ show elmVersion
+
+showInfo _ (ParseError inputFile _ _) =
+    Just $ json inputFile "Error parsing the file"
+
+
+json :: FilePath -> String -> String
+json file message =
+    Json.encode $ Json.makeObj
         [ ( "path", Json.JSString $ Json.toJSString file )
-        , ( "message"
-          , Json.JSString $ Json.toJSString
-              $ "File is not formatted with elm-format-" ++ ElmFormat.Version.asString
-                  ++ " --elm-version=" ++ show elmVersion
-          )
+        , ( "message", Json.JSString $ Json.toJSString message )
         ]
