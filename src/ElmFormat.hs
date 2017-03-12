@@ -21,6 +21,8 @@ import qualified Data.Text.Encoding as Text
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.Filesystem as FS
+import qualified Messages.Formatter.HumanReadable as HumanReadable
+import qualified Messages.Formatter.Json as Json
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Result as Result
 import qualified System.Directory as Dir
@@ -304,7 +306,6 @@ main defaultVersion =
         config <- Flags.parse defaultVersion
         let autoYes = Flags._yes config
         let elmVersionResult = determineVersion (Flags._elmVersion config) (Flags._upgrade config)
-        let infoFormatter = Flags._infoFormatter config
 
         case (elmVersionResult, determineWhatToDoFromConfig config) of
             (_, Left NoInputs) ->
@@ -318,11 +319,11 @@ main defaultVersion =
                 exitWithError message
 
             (Right elmVersion, Right (Validate source)) ->
-                validate elmVersion (infoFormatter elmVersion) source
+                validate elmVersion (Json.format elmVersion) source
 
             (Right elmVersion, Right (FormatInPlace first rest)) ->
                 do
-                    result <- handleFilesInput elmVersion (infoFormatter elmVersion) (first:rest) Nothing autoYes False
+                    result <- handleFilesInput elmVersion HumanReadable.format (first:rest) Nothing autoYes False
                     case result of
                         Nothing ->
                             exitSuccess
@@ -332,7 +333,7 @@ main defaultVersion =
 
             (Right elmVersion, Right (FormatToFile input output)) ->
                 do
-                    result <- handleFilesInput elmVersion (infoFormatter elmVersion) [input] (Just output) autoYes False
+                    result <- handleFilesInput elmVersion HumanReadable.format [input] (Just output) autoYes False
                     case result of
                         Nothing ->
                             exitSuccess
@@ -347,7 +348,7 @@ main defaultVersion =
                     result <-
                         Lazy.toStrict input
                             |> Text.decodeUtf8
-                            |> processTextInput elmVersion (infoFormatter elmVersion) UpdateInPlace "<STDIN>"
+                            |> processTextInput elmVersion HumanReadable.format UpdateInPlace "<STDIN>"
                     case result of
                         Nothing ->
                             exitSuccess
@@ -362,7 +363,7 @@ main defaultVersion =
                     result <-
                         Lazy.toStrict input
                             |> Text.decodeUtf8
-                            |> processTextInput elmVersion (infoFormatter elmVersion) (ToFile output) "<STDIN>"
+                            |> processTextInput elmVersion HumanReadable.format (ToFile output) "<STDIN>"
                     case result of
                         Nothing ->
                             exitSuccess
