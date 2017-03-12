@@ -614,8 +614,14 @@ multiComment =
       trimIndent [] = []
       trimIndent (l1:ls) =
           let
-              depth = minimum $ map fst $ filter (uncurry (/=))
-                  $ map (\l -> (length $ takeWhile Char.isSpace l, length l)) ls
+              leadingIndents =
+                  map fst $ filter (uncurry (/=))
+                      $ map (\l -> (length $ takeWhile Char.isSpace l, length l)) ls
+
+              depth =
+                  case leadingIndents of
+                      [] -> 0
+                      _ -> minimum leadingIndents
           in
               l1 : map (drop depth) ls
 
