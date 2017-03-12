@@ -22,7 +22,7 @@ data Config = Config
     , _stdin :: Bool
     , _elmVersion :: ElmVersion
     , _upgrade :: Bool
-    , _infoFormatter :: InfoFormatter
+    , _infoFormatter :: ElmVersion -> InfoFormatter
     }
 
 
@@ -202,9 +202,9 @@ upgrade =
         ]
 
 
-infoFormatter :: Opt.Parser InfoFormatter
+infoFormatter :: Opt.Parser (ElmVersion -> InfoFormatter)
 infoFormatter =
-  fmap (Maybe.fromMaybe Formatter.defaultFormatter) $
+  fmap (Maybe.fromMaybe $ const Formatter.defaultFormatter) $
   Opt.optional $
   Opt.option (Opt.eitherReader Formatter.readFormatter) $
     mconcat
@@ -214,7 +214,7 @@ infoFormatter =
           concat
             [ "Output format.  "
             , "Valid values: "
-            , (List.intercalate ", " Formatter.orderedFormatterNames)
+            , List.intercalate ", " Formatter.orderedFormatterNames
             , ".  "
             , "Default: " ++ Formatter.defaultFormatterName
             ]

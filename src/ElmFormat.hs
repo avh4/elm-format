@@ -318,11 +318,11 @@ main defaultVersion =
                 exitWithError message
 
             (Right elmVersion, Right (Validate source)) ->
-                validate elmVersion infoFormatter source
+                validate elmVersion (infoFormatter elmVersion) source
 
             (Right elmVersion, Right (FormatInPlace first rest)) ->
                 do
-                    result <- handleFilesInput elmVersion infoFormatter (first:rest) Nothing autoYes False
+                    result <- handleFilesInput elmVersion (infoFormatter elmVersion) (first:rest) Nothing autoYes False
                     case result of
                         Nothing ->
                             exitSuccess
@@ -332,7 +332,7 @@ main defaultVersion =
 
             (Right elmVersion, Right (FormatToFile input output)) ->
                 do
-                    result <- handleFilesInput elmVersion infoFormatter [input] (Just output) autoYes False
+                    result <- handleFilesInput elmVersion (infoFormatter elmVersion) [input] (Just output) autoYes False
                     case result of
                         Nothing ->
                             exitSuccess
@@ -340,14 +340,14 @@ main defaultVersion =
                         Just _ ->
                             error "There shouldn't be a validation result when formatting"
 
-            (Right elmVersion, Right (StdinToStdout)) ->
+            (Right elmVersion, Right StdinToStdout) ->
                 do
                     input <- Lazy.getContents
 
                     result <-
                         Lazy.toStrict input
                             |> Text.decodeUtf8
-                            |> processTextInput elmVersion infoFormatter UpdateInPlace "<STDIN>"
+                            |> processTextInput elmVersion (infoFormatter elmVersion) UpdateInPlace "<STDIN>"
                     case result of
                         Nothing ->
                             exitSuccess
@@ -362,7 +362,7 @@ main defaultVersion =
                     result <-
                         Lazy.toStrict input
                             |> Text.decodeUtf8
-                            |> processTextInput elmVersion infoFormatter (ToFile output) "<STDIN>"
+                            |> processTextInput elmVersion (infoFormatter elmVersion) (ToFile output) "<STDIN>"
                     case result of
                         Nothing ->
                             exitSuccess
