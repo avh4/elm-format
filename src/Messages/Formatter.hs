@@ -8,6 +8,8 @@ import qualified Messages.Formatter.HumanReadable as HumanReadable
 import qualified Data.Map as Map
 import qualified Data.List as List
 
+import ElmVersion (ElmVersion)
+
 
 defaultFormatterName :: String
 defaultFormatterName = "human-readable"
@@ -17,9 +19,9 @@ defaultFormatter :: InfoFormatter
 defaultFormatter = HumanReadable.format
 
 
-formatters :: Map.Map String (InfoFormatter)
+formatters :: Map.Map String (ElmVersion -> InfoFormatter)
 formatters = Map.fromList [
-    (defaultFormatterName, defaultFormatter),
+    (defaultFormatterName, const defaultFormatter),
     ("json", Json.format)
     ]
 
@@ -29,7 +31,7 @@ orderedFormatterNames =
     List.sort . Map.keys $ formatters
 
 
-readFormatter :: String -> Either String InfoFormatter
+readFormatter :: String -> Either String (ElmVersion -> InfoFormatter)
 readFormatter name =
     case Map.lookup name formatters of
         Nothing ->

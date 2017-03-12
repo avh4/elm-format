@@ -5,23 +5,25 @@ import qualified Text.JSON as Json
 
 import Messages.Formatter.Format
 import Messages.Types
+import ElmVersion (ElmVersion)
 
 
-format :: InfoFormatter
-format = InfoFormatter
-    { onInfo = maybe (return ()) putStrLn . showInfo }
+format :: ElmVersion -> InfoFormatter
+format elmVersion = InfoFormatter
+    { onInfo = maybe (return ()) putStrLn . showInfo elmVersion }
 
 
-showInfo :: InfoMessage -> Maybe String
+showInfo :: ElmVersion -> InfoMessage -> Maybe String
 
-showInfo (ProcessingFiles _) =
+showInfo _ (ProcessingFiles _) =
     Nothing
 
-showInfo (FileWouldChange file) =
+showInfo elmVersion (FileWouldChange file) =
     Just $ Json.encode $ Json.makeObj
         [ ( "path", Json.JSString $ Json.toJSString file )
         , ( "message"
           , Json.JSString $ Json.toJSString
               $ "File is not formatted with elm-format-" ++ ElmFormat.Version.asString
+                  ++ " --elm-version=" ++ show elmVersion
           )
         ]
