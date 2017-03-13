@@ -91,7 +91,7 @@ processFileInput elmVersion formatter inputFile destination =
         processTextInput elmVersion formatter destination inputFile inputText
 
 
-resolveFile :: (FileStore f, Functor f) => FilePath -> Free f (Either InputFileMessage [FilePath])
+resolveFile :: FileStore f => FilePath -> Free f (Either InputFileMessage [FilePath])
 resolveFile path =
     do
         fileType <- FileStore.stat path
@@ -131,7 +131,7 @@ collectErrors list =
         foldl step (Right []) list
 
 
-resolveFiles :: (FileStore f, Functor f) => [FilePath] -> Free f (Either [InputFileMessage] [FilePath])
+resolveFiles :: FileStore f => [FilePath] -> Free f (Either [InputFileMessage] [FilePath])
 resolveFiles inputFiles =
     do
         result <- collectErrors <$> mapM resolveFile inputFiles
