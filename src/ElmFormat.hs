@@ -11,6 +11,7 @@ import Data.Maybe (isJust)
 import CommandLine.Helpers
 import ElmVersion
 import ElmFormat.FileStore (FileStore)
+import ElmFormat.Operation (Operation)
 
 import qualified AST.Module
 import qualified Flags
@@ -23,6 +24,7 @@ import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.FileStore as FileStore
 import qualified ElmFormat.Filesystem as FS
+import qualified ElmFormat.Operation as Operation
 import qualified Messages.Formatter.HumanReadable as HumanReadable
 import qualified Messages.Formatter.Json as Json
 import qualified Reporting.Error.Syntax as Syntax
@@ -33,13 +35,14 @@ import qualified Reporting.Result as Result
 -- from original content, writes the results to the output file.
 -- Otherwise, display errors and exit
 writeResult
-    :: ElmVersion
+    :: Operation f =>
+    ElmVersion
     -> InfoFormatter
     -> Destination
     -> FilePath
     -> Text.Text
     -> Result.Result () Syntax.Error AST.Module.Module
-    -> IO (Maybe Bool)
+    -> Free f (Maybe Bool)
 writeResult elmVersion formatter destination inputFile inputText result =
     case result of
         Result.Result _ (Result.Ok modu) ->
@@ -52,11 +55,13 @@ writeResult elmVersion formatter destination inputFile inputText result =
             in
                 case destination of
                     UpdateInPlace ->
+                        Operation.deprecatedIO $
                         Char8.putStr rendered
                         >> return Nothing
 
                     ValidateOnly ->
                         if inputText /= renderedText then
+                            Operation.deprecatedIO $
                             onInfo formatter (FileWouldChange inputFile)
                             >> return (Just False)
                         else
@@ -68,26 +73,28 @@ writeResult elmVersion formatter destination inputFile inputText result =
                                 inputFile /= path || inputText /= renderedText
                         in
                             if shouldWriteToFile then
+                                Operation.deprecatedIO $
                                 ByteString.writeFile path rendered
                                 >> return Nothing
                             else
                                 return Nothing
 
         Result.Result _ (Result.Err errs) ->
+            Operation.deprecatedIO $
             onInfo formatter (ParseError inputFile (Text.unpack inputText) errs)
             >> return (Just False)
 
 
-processTextInput :: ElmVersion -> InfoFormatter -> Destination -> FilePath -> Text.Text -> IO (Maybe Bool)
+processTextInput :: Operation f => ElmVersion -> InfoFormatter -> Destination -> FilePath -> Text.Text -> Free f (Maybe Bool)
 processTextInput elmVersion formatter destination inputFile inputText =
     Parse.parse inputText
         |> writeResult elmVersion formatter destination inputFile inputText
 
 
-processFileInput :: ElmVersion -> InfoFormatter -> FilePath -> Destination -> IO (Maybe Bool)
+processFileInput :: Operation f => ElmVersion -> InfoFormatter -> FilePath -> Destination -> Free f (Maybe Bool)
 processFileInput elmVersion formatter inputFile destination =
     do
-        inputText <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
+        inputText <- Operation.deprecatedIO $ fmap Text.decodeUtf8 $ ByteString.readFile inputFile
         processTextInput elmVersion formatter destination inputFile inputText
 
 
@@ -143,13 +150,14 @@ resolveFiles inputFiles =
                 return $ Right $ concat files
 
 
-handleFilesInput :: ElmVersion -> InfoFormatter -> [FilePath] -> Maybe FilePath -> Bool -> Bool -> IO (Maybe Bool)
+handleFilesInput :: Operation f => ElmVersion -> InfoFormatter -> [FilePath] -> Maybe FilePath -> Bool -> Bool -> Free f (Maybe Bool)
 handleFilesInput elmVersion formatter inputFiles outputFile autoYes validateOnly =
     do
-        elmFiles <- foldFree FileStore.execute $ resolveFiles inputFiles
+        elmFiles <- resolveFiles inputFiles
 
         case elmFiles of
             Left errors ->
+                Operation.deprecatedIO $
                 do
                     putStrLn $ r $ BadInputFiles errors
                     exitFailure
@@ -157,7 +165,7 @@ handleFilesInput elmVersion formatter inputFiles outputFile autoYes validateOnly
             Right [inputFile] -> do
                 realOutputFile <- decideOutputFile autoYes inputFile outputFile
                 let destination = if validateOnly then ValidateOnly else ToFile realOutputFile
-                onInfo formatter $ ProcessingFiles $ [inputFile]
+                Operation.deprecatedIO $ onInfo formatter $ ProcessingFiles $ [inputFile]
                 processFileInput elmVersion formatter inputFile destination
 
             Right elmFiles -> do
@@ -183,7 +191,7 @@ handleFilesInput elmVersion formatter inputFiles outputFile autoYes validateOnly
                                     ToFile file
                         in
                             do
-                                onInfo formatter $ ProcessingFiles $ elmFiles
+                                Operation.deprecatedIO $ onInfo formatter $ ProcessingFiles $ elmFiles
                                 validationResults <- mapM (\file -> processFileInput elmVersion formatter file (dst file)) elmFiles
                                 return $ foldl merge Nothing validationResults
                     else
@@ -246,14 +254,14 @@ determineWhatToDoFromConfig config =
         determineWhatToDo source destination
 
 
-validate :: ElmVersion -> InfoFormatter -> Source -> IO ()
+validate :: Operation f => ElmVersion -> InfoFormatter -> Source -> Free f ()
 validate elmVersion formatter source =
     do
         result <-
             case source of
                 Stdin ->
                     do
-                        input <- Lazy.getContents
+                        input <- Operation.deprecatedIO Lazy.getContents
 
                         Lazy.toStrict input
                             |> Text.decodeUtf8
@@ -267,10 +275,10 @@ validate elmVersion formatter source =
                 error "Validation should always give a result"
 
             Just True ->
-                exitSuccess
+                Operation.deprecatedIO exitSuccess
 
             Just False ->
-                exitFailure
+                Operation.deprecatedIO exitFailure
 
 
 exitWithError :: ErrorMessage -> IO ()
@@ -292,6 +300,11 @@ determineVersion elmVersion upgrade =
             Right elmVersion
 
 
+execute :: Operation.OperationF a -> IO a
+execute (Operation.DeprecatedIO io) = io
+execute (Operation.InFileStore op) = FileStore.execute op
+
+
 main :: ElmVersion -> IO ()
 main defaultVersion =
     do
@@ -311,11 +324,12 @@ main defaultVersion =
                 exitWithError message
 
             (Right elmVersion, Right (Validate source)) ->
+                foldFree execute $
                 validate elmVersion (Json.format elmVersion) source
 
             (Right elmVersion, Right (FormatInPlace first rest)) ->
                 do
-                    result <- handleFilesInput elmVersion HumanReadable.format (first:rest) Nothing autoYes False
+                    result <- foldFree execute $ handleFilesInput elmVersion HumanReadable.format (first:rest) Nothing autoYes False
                     case result of
                         Just False ->
                             exitFailure
@@ -325,7 +339,7 @@ main defaultVersion =
 
             (Right elmVersion, Right (FormatToFile input output)) ->
                 do
-                    result <- handleFilesInput elmVersion HumanReadable.format [input] (Just output) autoYes False
+                    result <- foldFree execute $ handleFilesInput elmVersion HumanReadable.format [input] (Just output) autoYes False
                     case result of
                         Just False ->
                             exitFailure
@@ -341,6 +355,7 @@ main defaultVersion =
                         Lazy.toStrict input
                             |> Text.decodeUtf8
                             |> processTextInput elmVersion HumanReadable.format UpdateInPlace "<STDIN>"
+                            |> foldFree execute
                     case result of
                         Just False ->
                             exitFailure
@@ -356,6 +371,7 @@ main defaultVersion =
                         Lazy.toStrict input
                             |> Text.decodeUtf8
                             |> processTextInput elmVersion HumanReadable.format (ToFile output) "<STDIN>"
+                            |> foldFree execute
                     case result of
                         Just False ->
                             exitFailure
