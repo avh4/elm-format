@@ -13,7 +13,7 @@ data FileType
     | DoesNotExist
 
 
-class FileStore f where
+class Functor f => FileStore f where
     readFile :: FilePath -> f Text
     stat :: FilePath -> f FileType
     listDirectory :: FilePath -> f [FilePath]
@@ -37,7 +37,7 @@ instance FileStore FileStoreF where
     listDirectory path = ListDirectory path id
 
 
-instance (FileStore f, Functor f) => FileStore (Free f) where
+instance FileStore f => FileStore (Free f) where
     readFile path = liftF (readFile path)
     stat path = liftF (stat path)
     listDirectory path = liftF (listDirectory path)

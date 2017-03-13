@@ -14,12 +14,12 @@ collectFiles children root =
         return $ root : concat subChildren
 
 
-listDir :: (FileStore f, Functor f) => FilePath -> Free f [FilePath]
+listDir :: FileStore f => FilePath -> Free f [FilePath]
 listDir path =
     map (path </>) <$> listDirectory path
 
 
-doesDirectoryExist :: (FileStore f, Functor f) => FilePath -> Free f Bool
+doesDirectoryExist :: FileStore f => FilePath -> Free f Bool
 doesDirectoryExist path =
     do
         fileType <- stat path
@@ -28,7 +28,7 @@ doesDirectoryExist path =
             _ -> return False
 
 
-fileList :: (FileStore f, Functor f) => FilePath -> Free f [FilePath]
+fileList :: FileStore f => FilePath -> Free f [FilePath]
 fileList =
   let
       children path =
@@ -47,7 +47,7 @@ hasExtension ext path =
     pack ext `isSuffixOf` pack path
 
 
-findAllElmFiles :: (FileStore f, Functor f) => FilePath -> Free f [FilePath]
+findAllElmFiles :: FileStore f => FilePath -> Free f [FilePath]
 findAllElmFiles inputFile =
     filter (hasExtension ".elm") <$> fileList inputFile
 
