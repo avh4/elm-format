@@ -6,9 +6,12 @@ import Messages.Types
 import CommandLine.Helpers (showErrors)
 
 
-format :: InfoFormatter
-format = InfoFormatter
-    { onInfo = renderInfo }
+format :: InfoFormatterF a -> IO a
+format infoFormatter =
+    case infoFormatter of
+        OnInfo info next ->
+            renderInfo info
+                *> return next
 
 
 renderInfo :: InfoMessage -> IO ()
