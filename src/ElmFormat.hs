@@ -6,10 +6,11 @@ import System.Exit (exitFailure, exitSuccess)
 import Messages.Types
 import Messages.Formatter.Format
 import Control.Monad (when)
+import Control.Monad.Free
 import Data.Maybe (isJust)
 import CommandLine.Helpers
 import ElmVersion
-
+import ElmFormat.FileStore (FileStore)
 
 import qualified AST.Module
 import qualified Flags
@@ -20,12 +21,12 @@ import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
+import qualified ElmFormat.FileStore as FileStore
 import qualified ElmFormat.Filesystem as FS
 import qualified Messages.Formatter.HumanReadable as HumanReadable
 import qualified Messages.Formatter.Json as Json
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Result as Result
-import qualified System.Directory as Dir
 
 
 -- If elm-format was successful and formatted result differ
@@ -90,31 +91,23 @@ processFileInput elmVersion formatter inputFile destination =
         processTextInput elmVersion formatter destination inputFile inputText
 
 
-isEitherFileOrDirectory :: FilePath -> IO Bool
-isEitherFileOrDirectory path = do
-    fileExists <- Dir.doesFileExist path
-    dirExists <- Dir.doesDirectoryExist path
-    return $ fileExists || dirExists
-
-
-resolveFile :: FilePath -> IO (Either InputFileMessage [FilePath])
+resolveFile :: (FileStore f, Functor f) => FilePath -> Free f (Either InputFileMessage [FilePath])
 resolveFile path =
     do
-        isFile <- Dir.doesFileExist path
-        isDirectory <- Dir.doesDirectoryExist path
+        fileType <- FileStore.stat path
 
-        case (isFile, isDirectory) of
-            ( True, _ ) ->
+        case fileType of
+            FileStore.IsFile ->
                 return $ Right [path]
 
-            ( _, True ) ->
+            FileStore.IsDirectory ->
                 do
                     elmFiles <- FS.findAllElmFiles path
                     case elmFiles of
                         [] -> return $ Left $ NoElmFiles path
                         _ -> return $ Right elmFiles
 
-            ( False, False ) ->
+            FileStore.DoesNotExist ->
                 return $ Left $ FileDoesNotExist path
 
 
@@ -138,7 +131,7 @@ collectErrors list =
         foldl step (Right []) list
 
 
-resolveFiles :: [FilePath] -> IO (Either [InputFileMessage] [FilePath])
+resolveFiles :: (FileStore f, Functor f) => [FilePath] -> Free f (Either [InputFileMessage] [FilePath])
 resolveFiles inputFiles =
     do
         result <- collectErrors <$> mapM resolveFile inputFiles
@@ -153,7 +146,7 @@ resolveFiles inputFiles =
 handleFilesInput :: ElmVersion -> InfoFormatter -> [FilePath] -> Maybe FilePath -> Bool -> Bool -> IO (Maybe Bool)
 handleFilesInput elmVersion formatter inputFiles outputFile autoYes validateOnly =
     do
-        elmFiles <- resolveFiles inputFiles
+        elmFiles <- foldFree FileStore.execute $ resolveFiles inputFiles
 
         case elmFiles of
             Left errors ->
