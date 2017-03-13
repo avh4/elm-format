@@ -2,8 +2,8 @@ module CommandLine.Helpers where
 
 import System.IO
 import System.Exit (exitFailure, exitSuccess)
-import Messages.Types (ErrorMessage(..))
-import Messages.Strings (showErrorMessage)
+import Messages.Types (ErrorMessage(..), PromptMessage(..))
+import Messages.Strings (showErrorMessage, showPromptMessage)
 
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Report as Report
@@ -41,7 +41,7 @@ getApproval autoYes filePaths =
         True ->
             return True
         False -> do
-            putStrLn $ (r $ FilesWillBeOverwritten filePaths)
+            putStrLn $ (showPromptMessage $ FilesWillBeOverwritten filePaths)
             yesOrNo
 
 

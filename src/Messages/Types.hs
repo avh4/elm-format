@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wall #-}
 module Messages.Types where
 
 import ElmVersion
@@ -14,10 +13,13 @@ data InfoMessage
   | ParseError FilePath String [A.Located Syntax.Error]
 
 
+data PromptMessage
+    = FilesWillBeOverwritten [FilePath]
+
+
 data ErrorMessage
   = ErrorsHeading
 
-  | FilesWillBeOverwritten [FilePath]
   | BadInputFiles [InputFileMessage]
   | NoInputs
   | SingleOutputWithMultipleInputs
