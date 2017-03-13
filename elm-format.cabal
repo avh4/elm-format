@@ -67,6 +67,7 @@ library
 
     other-modules:
         CommandLine.Helpers
+        ElmFormat.Execute
         ElmFormat.Filesystem
         ElmFormat.FileStore
         ElmFormat.Operation

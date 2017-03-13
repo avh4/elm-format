@@ -20,13 +20,12 @@ import qualified Data.ByteString.Char8 as Char8
 import qualified Data.ByteString.Lazy as Lazy
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
+import qualified ElmFormat.Execute as Execute
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.FileStore as FileStore
 import qualified ElmFormat.Filesystem as FS
 import qualified ElmFormat.Operation as Operation
-import qualified Messages.Formatter.HumanReadable as HumanReadable
-import qualified Messages.Formatter.Json as Json
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Result as Result
 
@@ -297,19 +296,6 @@ determineVersion elmVersion upgrade =
             Right elmVersion
 
 
-executeForHuman :: Operation.OperationF a -> IO a
-executeForHuman (Operation.DeprecatedIO io) = io
-executeForHuman (Operation.InFileStore op) = FileStore.execute op
-executeForHuman (Operation.InInfoFormatter op) = HumanReadable.format op
-
-
-executeForMachine :: ElmVersion -> Operation.OperationF a -> IO a
-executeForMachine _ (Operation.DeprecatedIO io) = io
-executeForMachine _ (Operation.InFileStore op) = FileStore.execute op
-executeForMachine elmVersion (Operation.InInfoFormatter op) =
-    Json.format elmVersion op
-
-
 main :: ElmVersion -> IO ()
 main defaultVersion =
     do
@@ -329,12 +315,12 @@ main defaultVersion =
                 exitWithError message
 
             (Right elmVersion, Right (Validate source)) ->
-                foldFree (executeForMachine elmVersion) $
+                foldFree (Execute.forMachine elmVersion) $
                 validate elmVersion source
 
             (Right elmVersion, Right (FormatInPlace first rest)) ->
                 do
-                    result <- foldFree executeForHuman $ handleFilesInput elmVersion (first:rest) Nothing autoYes False
+                    result <- foldFree Execute.forHuman $ handleFilesInput elmVersion (first:rest) Nothing autoYes False
                     case result of
                         Just False ->
                             exitFailure
@@ -344,7 +330,7 @@ main defaultVersion =
 
             (Right elmVersion, Right (FormatToFile input output)) ->
                 do
-                    result <- foldFree executeForHuman $ handleFilesInput elmVersion [input] (Just output) autoYes False
+                    result <- foldFree Execute.forHuman $ handleFilesInput elmVersion [input] (Just output) autoYes False
                     case result of
                         Just False ->
                             exitFailure
@@ -360,7 +346,7 @@ main defaultVersion =
                         Lazy.toStrict input
                             |> Text.decodeUtf8
                             |> processTextInput elmVersion UpdateInPlace "<STDIN>"
-                            |> foldFree executeForHuman
+                            |> foldFree Execute.forHuman
                     case result of
                         Just False ->
                             exitFailure
@@ -376,7 +362,7 @@ main defaultVersion =
                         Lazy.toStrict input
                             |> Text.decodeUtf8
                             |> processTextInput elmVersion (ToFile output) "<STDIN>"
-                            |> foldFree executeForHuman
+                            |> foldFree Execute.forHuman
                     case result of
                         Just False ->
                             exitFailure
