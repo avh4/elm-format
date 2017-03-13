@@ -3,14 +3,16 @@ module ElmFormat.Operation (Operation, OperationF(..), deprecatedIO) where
 import Prelude hiding (readFile, writeFile)
 import Control.Monad.Free
 import ElmFormat.FileStore
+import Messages.Formatter.Format
 
 
-class FileStore f => Operation f where
+class (FileStore f, InfoFormatter f) => Operation f where
     deprecatedIO :: IO a -> f a
 
 
 data OperationF a
     = InFileStore (FileStoreF a)
+    | InInfoFormatter (InfoFormatterF a)
     | DeprecatedIO (IO a)
 
 
@@ -24,8 +26,13 @@ instance FileStore OperationF where
     listDirectory path = InFileStore $ listDirectory path
 
 
+instance InfoFormatter OperationF where
+    onInfo msg = InInfoFormatter $ onInfo msg
+
+
 instance Functor OperationF where
-    fmap f (InFileStore fileStore) = InFileStore (fmap f fileStore)
+    fmap f (InFileStore op) = InFileStore (fmap f op)
+    fmap f (InInfoFormatter op) = InInfoFormatter (fmap f op)
     fmap f (DeprecatedIO io) = DeprecatedIO (fmap f io)
 
 
