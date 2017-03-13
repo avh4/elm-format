@@ -68,6 +68,7 @@ library
     other-modules:
         CommandLine.Helpers
         ElmFormat.Filesystem
+        ElmFormat.FileStore
         ElmFormat.Render.Box
         ElmFormat.Version
         Flags
@@ -95,6 +96,7 @@ library
         containers >= 0.5.7.1 && < 0.6,
         directory >= 1.2.6.2 && < 2,
         filepath >= 1.4.1.0 && < 2,
+        free >= 4.12.4 && < 5,
         indents >= 0.3.3 && < 0.4,
         json >= 0.9.1 && < 0.10,
         mtl >= 2.2.1 && < 3,

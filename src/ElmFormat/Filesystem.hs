@@ -1,6 +1,7 @@
 module ElmFormat.Filesystem where
 
-import System.Directory (listDirectory, doesDirectoryExist)
+import Control.Monad.Free
+import ElmFormat.FileStore
 import System.FilePath ((</>))
 import Data.Text (pack, isSuffixOf)
 
@@ -13,12 +14,21 @@ collectFiles children root =
         return $ root : concat subChildren
 
 
-listDir :: FilePath -> IO [FilePath]
+listDir :: (FileStore f, Functor f) => FilePath -> Free f [FilePath]
 listDir path =
-    fmap (map (path </>)) $ listDirectory path
+    map (path </>) <$> listDirectory path
 
 
-fileList :: FilePath -> IO [FilePath]
+doesDirectoryExist :: (FileStore f, Functor f) => FilePath -> Free f Bool
+doesDirectoryExist path =
+    do
+        fileType <- stat path
+        case fileType of
+            IsDirectory -> return True
+            _ -> return False
+
+
+fileList :: (FileStore f, Functor f) => FilePath -> Free f [FilePath]
 fileList =
   let
       children path =
@@ -34,14 +44,14 @@ fileList =
 
 hasExtension :: String -> FilePath -> Bool
 hasExtension ext path =
-    isSuffixOf (pack ext) (pack path)
+    pack ext `isSuffixOf` pack path
 
 
-findAllElmFiles :: FilePath -> IO [FilePath]
+findAllElmFiles :: (FileStore f, Functor f) => FilePath -> Free f [FilePath]
 findAllElmFiles inputFile =
     filter (hasExtension ".elm") <$> fileList inputFile
 
 
 hasntFilename :: String -> FilePath -> Bool
 hasntFilename name path =
-      not $ (isSuffixOf (pack $ '/' : name) (pack path) || name == path)
+      not (isSuffixOf (pack $ '/' : name) (pack path) || name == path)
