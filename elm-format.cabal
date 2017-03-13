@@ -69,6 +69,7 @@ library
         CommandLine.Helpers
         ElmFormat.Filesystem
         ElmFormat.FileStore
+        ElmFormat.Operation
         ElmFormat.Render.Box
         ElmFormat.Version
         Flags

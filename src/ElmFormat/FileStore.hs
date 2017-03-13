@@ -1,4 +1,4 @@
-module ElmFormat.FileStore (FileStore, FileType(..), stat, listDirectory, execute) where
+module ElmFormat.FileStore (FileStore, FileStoreF(..), FileType(..), readFile, stat, listDirectory, execute) where
 
 import qualified System.Directory as Dir
 
