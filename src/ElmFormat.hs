@@ -7,6 +7,7 @@ import Messages.Types
 import Messages.Formatter.Format
 import Control.Monad (when)
 import Control.Monad.Free
+import Control.Monad.State (evalStateT)
 import Data.Maybe (isJust)
 import CommandLine.Helpers
 import ElmVersion
@@ -250,7 +251,7 @@ determineWhatToDoFromConfig config =
         determineWhatToDo source destination
 
 
-validate :: Operation f => ElmVersion -> Source -> Free f ()
+validate :: Operation f => ElmVersion -> Source -> Free f Bool
 validate elmVersion source =
     do
         result <-
@@ -270,11 +271,8 @@ validate elmVersion source =
             Nothing ->
                 error "Validation should always give a result"
 
-            Just True ->
-                Operation.deprecatedIO exitSuccess
-
-            Just False ->
-                Operation.deprecatedIO exitFailure
+            Just isSuccess ->
+                return isSuccess
 
 
 exitWithError :: ErrorMessage -> IO ()
@@ -296,6 +294,11 @@ determineVersion elmVersion upgrade =
             Right elmVersion
 
 
+exit :: Bool -> IO ()
+exit True = exitSuccess
+exit False = exitFailure
+
+
 main :: ElmVersion -> IO ()
 main defaultVersion =
     do
@@ -315,8 +318,15 @@ main defaultVersion =
                 exitWithError message
 
             (Right elmVersion, Right (Validate source)) ->
-                foldFree (Execute.forMachine elmVersion) $
-                validate elmVersion source
+                do
+                    let (initIO, initState) = Execute.forMachineInit
+                    initIO
+                    isSuccess <-
+                        validate elmVersion source
+                            |> foldFree (Execute.forMachine elmVersion)
+                            |> flip evalStateT initState
+                    Execute.forMachineDone
+                    exit isSuccess
 
             (Right elmVersion, Right (FormatInPlace first rest)) ->
                 do
