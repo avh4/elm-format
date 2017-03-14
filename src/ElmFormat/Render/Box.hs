@@ -268,7 +268,7 @@ formatModuleLine elmVersion header =
             [ line $ keyword "module" ]
 
     exports list =
-      case formatListing (formatVarValue elmVersion) $ list of
+      case formatListing (formatVarValue elmVersion) . sortListing $ list of
           Just listing ->
             listing
           _ ->

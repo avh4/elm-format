@@ -53,6 +53,7 @@ library
         Elm.Utils
         ElmFormat.Cli
         ElmFormat.Parse
+        ElmFormat.Render.Box
         ElmFormat.Render.ElmStructure
         ElmFormat.Render.Text
         ElmFormat.World
@@ -68,7 +69,6 @@ library
     other-modules:
         CommandLine.Helpers
         ElmFormat.Filesystem
-        ElmFormat.Render.Box
         Flags
         Messages.Strings
         Messages.Types
