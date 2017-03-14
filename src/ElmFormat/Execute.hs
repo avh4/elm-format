@@ -1,9 +1,10 @@
-module ElmFormat.Execute (forHuman, forMachine) where
+module ElmFormat.Execute (forHuman, forMachine, forMachineInit, forMachineDone) where
 
 {-| This module provides executors that can take streams of Operations and
 perform IO.
 -}
 
+import Control.Monad.State
 import ElmFormat.Operation
 import ElmVersion
 
@@ -22,9 +23,19 @@ forHuman operation =
 
 
 {-| Execute Operations in a fashion appropriate for use by automated scripts. -}
-forMachine :: ElmVersion -> OperationF a -> IO a
+forMachine :: ElmVersion -> OperationF a -> StateT Bool IO a
 forMachine elmVersion operation =
     case operation of
-        InFileStore op -> FileStore.execute op
+        InFileStore op -> lift $ FileStore.execute op
         InInfoFormatter op -> Json.format elmVersion op
-        DeprecatedIO io -> io
+        DeprecatedIO io -> lift io
+
+
+forMachineInit :: (IO (), Bool)
+forMachineInit =
+    Json.init
+
+
+forMachineDone :: IO ()
+forMachineDone =
+    Json.done
