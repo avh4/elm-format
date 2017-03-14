@@ -1,9 +1,9 @@
 effect module WebSocket
     where { command = MyCmd, subscription = MySub }
     exposing
-        ( send
+        ( keepAlive
         , listen
-        , keepAlive
+        , send
         )
 
 {-| Web sockets make it cheaper to talk to your servers.

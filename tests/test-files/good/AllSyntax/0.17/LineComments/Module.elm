@@ -7,7 +7,10 @@ module
     --C
     exposing
     --D
-        ( --E
+        ( --K
+          D
+          --L
+        , --E
           a
           --F
         , --G
@@ -16,9 +19,6 @@ module
         , --I
           c
           --J
-        , --K
-          D
-          --L
         )
 
 
