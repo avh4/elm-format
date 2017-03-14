@@ -8,6 +8,7 @@ import qualified AST.Expression
 import qualified AST.Module
 import qualified AST.Pattern
 import qualified AST.Variable
+import qualified ElmFormat.Render.Box
 import qualified Reporting.Annotation
 import qualified Reporting.Region
 
@@ -79,14 +80,16 @@ instance Arbitrary AST.Variable.Value where
             return $ AST.Variable.Union (name, []) AST.Variable.ClosedListing
 
 
-instance (Arbitrary a) => Arbitrary (AST.Variable.Listing a) where
+instance (Arbitrary a, Ord a) => Arbitrary (AST.Variable.Listing a) where
     arbitrary =
         do
             vars <- listOf arbitrary
             multiline <- arbitrary
             case vars of
                 [] -> return $ AST.Variable.OpenListing (Commented [] () [])
-                _ -> return $ AST.Variable.ExplicitListing (map (\x -> Commented [] x []) vars) multiline
+                _ -> return
+                   . ElmFormat.Render.Box.sortListing
+                   $ AST.Variable.ExplicitListing (map (\x -> Commented [] x []) vars) multiline
 
 
 instance Arbitrary AST.Module.Module where
