@@ -7,7 +7,6 @@ import Messages.Types
 import Messages.Formatter.Format
 import Control.Monad (when)
 import Control.Monad.Free
-import Control.Monad.State (evalStateT)
 import Data.Maybe (isJust)
 import CommandLine.Helpers
 import ElmVersion
@@ -319,13 +318,9 @@ main defaultVersion =
 
             (Right elmVersion, Right (Validate source)) ->
                 do
-                    let (initIO, initState) = Execute.forMachineInit
-                    initIO
                     isSuccess <-
                         validate elmVersion source
-                            |> foldFree (Execute.forMachine elmVersion)
-                            |> flip evalStateT initState
-                    Execute.forMachineDone
+                            |> Execute.run (Execute.forMachine elmVersion)
                     exit isSuccess
 
             (Right elmVersion, Right (FormatInPlace first rest)) ->
