@@ -160,9 +160,15 @@ handleFilesInput elmVersion inputFiles outputFile autoYes validateOnly =
 
             Right [inputFile] -> do
                 realOutputFile <- decideOutputFile autoYes inputFile outputFile
-                let destination = if validateOnly then ValidateOnly else ToFile realOutputFile
-                onInfo $ ProcessingFiles [inputFile]
-                processFileInput elmVersion inputFile destination
+                case realOutputFile of
+                    Nothing ->
+                        return Nothing
+
+                    Just realOutputFile' ->
+                        do
+                            let destination = if validateOnly then ValidateOnly else ToFile realOutputFile'
+                            onInfo $ ProcessingFiles [inputFile]
+                            processFileInput elmVersion inputFile destination
 
             Right elmFiles -> do
                 when (isJust outputFile)
