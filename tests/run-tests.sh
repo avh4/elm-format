@@ -250,24 +250,21 @@ function checkValidationOutputFormat() {
 	echo "# VALIDATION OUTPUT IN JSON"
 	echo
 
-	echo "## with unformatted files outputs in expected json format line by line"
-	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate | \
-	while read -r line; do
-		echo "$line" | tee "$STDOUT"; ajv test -s tests/json-format-schema.json -d "$STDOUT" --valid
-	done <&0
+	echo "## with unformatted files outputs in expected json format"
+	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate > "$STDOUT"
+	ajv test -s tests/json-format-schema.json -d "$STDOUT" --valid
 	returnCodeShouldEqual 0
 
-	echo "## with invalid files outputs in expected json format line by line"
-	"$ELM_FORMAT" "tests/test-files/bad/Empty.elm" --validate | \
-	while read -r line; do
-		echo "$line" | tee "$STDOUT"; ajv test -s tests/json-format-schema.json -d "$STDOUT" --valid
-	done <&0
+	echo "## with invalid files outputs in expected json format"
+	"$ELM_FORMAT" "tests/test-files/bad/Empty.elm" --validate > "$STDOUT"
+	ajv test -s tests/json-format-schema.json -d "$STDOUT" --valid
 	returnCodeShouldEqual 0
 
-	echo "## with formatted file with output in json outputs nothing"
+	echo "## with formatted file with output in json outputs empty list"
 	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --yes 1>/dev/null
 	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate 1>"$STDOUT"
-	[ ! -s "$STDOUT" ] || exit 1
+	grep -q "^\[\]$" "$STDOUT"
+	returnCodeShouldEqual 0
 
 	echo "# OK!"
 	echo "------------------------------"
