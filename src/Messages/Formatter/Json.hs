@@ -8,9 +8,12 @@ import Messages.Types
 import ElmVersion (ElmVersion)
 
 
-format :: ElmVersion -> InfoFormatter
-format elmVersion = InfoFormatter
-    { onInfo = maybe (return ()) putStrLn . showInfo elmVersion }
+format :: ElmVersion -> InfoFormatterF a -> IO a
+format elmVersion infoFormatter =
+    case infoFormatter of
+        OnInfo info next ->
+            maybe (return ()) putStrLn (showInfo elmVersion info)
+                *> return next
 
 
 showInfo :: ElmVersion -> InfoMessage -> Maybe String
