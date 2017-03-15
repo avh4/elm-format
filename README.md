@@ -309,5 +309,6 @@ stack install
 
 ```bash
 brew install shellcheck
+node install -g ajv-cli
 ./tests/run-tests.sh
 ```

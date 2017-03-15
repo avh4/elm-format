@@ -2,13 +2,12 @@
 module Flags where
 
 import Data.Monoid ((<>))
-import Data.Version (showVersion)
 import ElmVersion (ElmVersion(..))
 
 import qualified Data.Maybe as Maybe
 import qualified ElmVersion
+import qualified ElmFormat.Version
 import qualified Options.Applicative as Opt
-import qualified Paths_elm_format as This
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
 
 
@@ -104,7 +103,7 @@ helpInfo defaultVersion =
     top =
         concat
             [ "elm-format-" ++ show defaultVersion ++ " "
-            , showVersion This.version  ++ "-alpha" ++ "\n"
+            , ElmFormat.Version.asString ++ "\n"
             ]
 
     examples =
@@ -187,6 +186,7 @@ elmVersion defaultVersion =
             , "Default: " ++ show defaultVersion
             ]
       ]
+
 
 upgrade :: Opt.Parser Bool
 upgrade =

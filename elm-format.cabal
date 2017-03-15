@@ -69,7 +69,11 @@ library
         CommandLine.Helpers
         ElmFormat.Filesystem
         ElmFormat.Render.Box
+        ElmFormat.Version
         Flags
+        Messages.Formatter.Format
+        Messages.Formatter.HumanReadable
+        Messages.Formatter.Json
         Messages.Strings
         Messages.Types
         Paths_elm_format
@@ -92,6 +96,7 @@ library
         directory >= 1.2.6.2 && < 2,
         filepath >= 1.4.1.0 && < 2,
         indents >= 0.3.3 && < 0.4,
+        json >= 0.9.1 && < 0.10,
         mtl >= 2.2.1 && < 3,
         optparse-applicative >= 0.12.1.0 && < 0.13,
         parsec >= 3.1.11 && < 4,
