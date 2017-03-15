@@ -27,15 +27,15 @@ yesOrNo =
                   yesOrNo
 
 
-decideOutputFile :: Operation f => Bool -> FilePath -> Maybe FilePath -> Free f FilePath
+decideOutputFile :: Operation f => Bool -> FilePath -> Maybe FilePath -> Free f (Maybe FilePath)
 decideOutputFile autoYes inputFile outputFile =
     case outputFile of
         Nothing -> do -- we are overwriting the input file
             canOverwrite <- getApproval autoYes [inputFile]
             case canOverwrite of
-                True -> return inputFile
-                False -> Operation.deprecatedIO exitSuccess
-        Just outputFile' -> return outputFile'
+                True -> return $ Just inputFile
+                False -> return Nothing
+        Just outputFile' -> return $ Just outputFile'
 
 
 getApproval :: Operation f => Bool -> [FilePath] -> Free f Bool
