@@ -1,3 +1,5 @@
+build: off
+
 cache:
 - "c:\\sr"
 
