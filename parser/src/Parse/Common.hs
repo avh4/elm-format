@@ -1,6 +1,6 @@
 module Parse.Common
     ( sectionedGroup, pair
-    , commented, preCommented, postCommented
+    , commented, preCommented, postCommented, withEol
     , checkMultiline
     ) where
 
@@ -25,13 +25,12 @@ sectionedGroup term =
         step leading terms =
             do
                 pre <- whitespace
-                first <- term
-                eol <- restOfLine
+                first <- withEol term
                 preSep <- whitespace
                 hasMore <- choice [ comma *> return True, return False ]
                 if hasMore
-                    then step preSep ((leading, (pre, (first, eol))) : terms)
-                    else return (reverse $ (leading, (pre, (first, eol))) : terms, preSep)
+                    then step preSep ((leading, (pre, first)) : terms)
+                    else return (reverse $ (leading, (pre, first)) : terms, preSep)
     in
         choice
             [ try $ step [] []
@@ -59,6 +58,16 @@ preCommented :: IParser a -> IParser (PreCommented a)
 preCommented a =
     (,) <$> whitespace <*> a
 
+
+withEol :: IParser a -> IParser (WithEol a)
+withEol a =
+    do
+        pushNewlineContext
+        result <- a
+        multiline <- popNewlineContext
+        if multiline
+            then return (result, Nothing)
+            else (,) result <$> restOfLine
 
 
 --
