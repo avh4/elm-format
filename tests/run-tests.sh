@@ -1,6 +1,11 @@
 #!/bin/bash
 # shellcheck disable=SC2002
 
+which diff
+which grep
+which wc
+
+
 if which shellcheck; then
 	shellcheck "./tests/run-tests.sh" || exit 1
 	shellcheck "./package/collect_files.sh" || exit 1
