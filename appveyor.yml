@@ -14,7 +14,8 @@ environment:
     STACK_ROOT: "c:\\sr"
 
 test_script:
+- "set PATH=%PATH%;c:\\stack;%APPDATA%\\npm"
+- which ajv
 - stack setup > nil
 - stack build
-- "set PATH=%PATH%;c:\\stack"
 - bash tests/run-tests.sh
