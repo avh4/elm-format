@@ -839,6 +839,13 @@ formatRecordPair elmVersion delim formatValue (Commented pre k postK, v, forceMu
     |> (\x -> Commented pre x []) |> formatCommented id
 
 
+formatPair :: (a -> Line) -> String -> (b -> Box) -> Pair a b -> Box
+formatPair formatA delim formatB (Pair a b (ForceMultiline forceMultiline)) =
+    ElmStructure.equalsPair delim forceMultiline
+        (formatTailCommented (line . formatA) a)
+        (formatHeadCommented formatB b)
+
+
 negativeCasePatternWorkaround :: Commented AST.Pattern.Pattern -> Box -> Box
 negativeCasePatternWorkaround (Commented _ (RA.A _ pattern) _) =
     case pattern of
@@ -1071,29 +1078,43 @@ formatExpression elmVersion needsParens aexpr =
         AST.Expression.AccessFunction (LowercaseIdentifier field) ->
             line $ identifier $ "." ++ (formatVarName' elmVersion field)
 
-        AST.Expression.RecordUpdate _ [] _ ->
-          pleaseReport "INVALID RECORD UPDATE" "no fields"
+        AST.Expression.Record (Just base) [] trailing multiline ->
+            ElmStructure.extensionGroup'
+                ((\(ForceMultiline b) -> b) multiline)
+                (formatCommented (line . formatLowercaseIdentifier elmVersion []) base)
+                (formatSequence '|' ',' Nothing
+                    line
+                    multiline
+                    trailing
+                    [([], ([], (space, Nothing)))])
 
-        AST.Expression.RecordUpdate base (first:rest) multiline ->
-          ElmStructure.extensionGroup
-            multiline
-            (formatCommented (formatExpression elmVersion False) base)
-            (formatRecordPair elmVersion "=" (formatExpression elmVersion False) first)
-            (map (formatRecordPair elmVersion "=" (formatExpression elmVersion False)) rest)
+        AST.Expression.Record (Just base) pairs' trailing multiline ->
+            ElmStructure.extensionGroup'
+                ((\(ForceMultiline b) -> b) multiline)
+                (formatCommented (line . formatLowercaseIdentifier elmVersion []) base)
+                (formatSequence '|' ',' Nothing
+                    (formatPair (formatLowercaseIdentifier elmVersion []) "=" (formatExpression elmVersion False))
+                    multiline
+                    trailing
+                    pairs')
 
-        AST.Expression.Record pairs' multiline ->
-          ElmStructure.group True "{" "," "}" multiline $ map (formatRecordPair elmVersion "=" (formatExpression elmVersion False)) pairs'
-
-        AST.Expression.EmptyRecord [] ->
+        AST.Expression.Record Nothing [] [] _ ->
             line $ punc "{}"
 
-        AST.Expression.EmptyRecord comments ->
+        AST.Expression.Record Nothing [] comments _ ->
             case stack1 $ map formatComment comments of
                 SingleLine comments' ->
                     line $ row [ punc "{", comments', punc "}" ]
 
                 _ ->
                     formatUnit '{' '}' comments
+
+        AST.Expression.Record Nothing pairs' trailing multiline ->
+            formatSequence '{' ',' (Just '}')
+                (formatPair (formatLowercaseIdentifier elmVersion []) "=" (formatExpression elmVersion False))
+                multiline
+                trailing
+                pairs'
 
         AST.Expression.Parens expr ->
             parens $ formatCommented (formatExpression elmVersion False) expr
@@ -1107,6 +1128,22 @@ formatExpression elmVersion needsParens aexpr =
             , literal $ src
             , punc "|]"
             ]
+
+
+formatSequence :: Char -> Char -> Maybe Char -> (a -> Box) -> ForceMultiline -> Comments -> Sequence a -> Box
+formatSequence left delim right formatA (ForceMultiline multiline) trailing (first:rest) =
+    let
+        formatItem delim (pre, item) =
+            maybe id (stack' . stack' blankLine) (formatComments pre) $
+            prefix (row [ punc [delim], space ]) $
+            formatHeadCommented (formatEolCommented formatA) item
+    in
+        ElmStructure.spaceSepOrStack
+            (ElmStructure.forceableRowOrStack multiline
+                (formatItem left first)
+                (map (formatItem delim) rest)
+            )
+            (maybe [] (flip (:) [] . stack' blankLine) (formatComments trailing) ++ (Maybe.maybeToList $ fmap (line . punc . flip (:) []) right))
 
 
 formatBinops_0_17 :: ElmVersion -> AST.Expression.Expr -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)] -> Bool -> Box
@@ -1309,6 +1346,7 @@ formatCommented =
   formatCommented_ False
 
 
+-- TODO: rename to formatPreCommented
 formatHeadCommented :: (a -> Box) -> (Comments, a) -> Box
 formatHeadCommented format (pre, inner) =
     formatCommented' pre format inner
@@ -1522,9 +1560,7 @@ needsParensInSpaces (RA.A _ expr) =
       AST.Expression.Tuple _ _ -> False
       AST.Expression.TupleFunction _ -> False
 
-      AST.Expression.EmptyRecord _ -> False
-      AST.Expression.Record _ _ -> False
-      AST.Expression.RecordUpdate _ _ _ -> False
+      AST.Expression.Record _ _ _ _ -> False
       AST.Expression.Access _ _ -> False
       AST.Expression.AccessFunction _ -> False
 

@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -Wall #-}
-
+{-# LANGUAGE DuplicateRecordFields #-}
 module AST.Expression where
 
 import AST.V0_16
@@ -47,9 +46,12 @@ data Expr'
     | Tuple [Commented Expr] Bool
     | TupleFunction Int -- will be 2 or greater, indicating the number of elements in the tuple
 
-    | EmptyRecord Comments
-    | Record [(Commented LowercaseIdentifier, Commented Expr, Bool)] Bool
-    | RecordUpdate (Commented Expr) [(Commented LowercaseIdentifier, Commented Expr, Bool)] Bool
+    | Record
+        { base :: Maybe (Commented LowercaseIdentifier)
+        , fields :: Sequence (Pair LowercaseIdentifier Expr)
+        , trailingComments :: Comments
+        , forceMultiline :: ForceMultiline
+        }
     | Access Expr LowercaseIdentifier
     | AccessFunction LowercaseIdentifier
 

@@ -30,7 +30,7 @@ assertParse parser input expected =
                 assertEqual input expected result
 
 
-assertParseFailure :: (Show a, Eq a) => IParser a -> String -> Assertion
+assertParseFailure :: (Show a) => IParser a -> String -> Assertion
 assertParseFailure parser input =
     let
         output = iParse (parseFullInput parser) input
