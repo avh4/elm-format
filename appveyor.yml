@@ -1,8 +1,10 @@
-build: off
+cache:
+- "c:\\sr"
 
 before_test:
 - curl -sS -ostack.zip -L --insecure http://www.stackage.org/stack/windows-x86_64
 - 7z x stack.zip stack.exe
+- npm install -g ajv-cli
 
 clone_folder: "c:\\stack"
 environment:
@@ -10,8 +12,7 @@ environment:
     STACK_ROOT: "c:\\sr"
 
 test_script:
-- stack setup > nul
-# The ugly echo "" hack is to avoid complaints about 0 being an invalid file
-# descriptor
+- stack setup
+- stack build
 - "set PATH=%PATH%;c:\\stack"
 - bash tests/run-tests.sh
