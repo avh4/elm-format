@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 module Box
   ( Line, identifier, keyword, punc, literal, row, space
-  , Box(SingleLine, MustBreak), blankLine, line, mustBreak, stack1, andThen
+  , Box(SingleLine, MustBreak), blankLine, line, mustBreak, stack', stack1, andThen
   , isLine, allSingles, lineLength
   , indent, prefix, addSuffix
   , render

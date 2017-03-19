@@ -6,6 +6,7 @@ import Text.Parsec.Indent (block, withPos, checkIndent)
 
 import qualified Parse.Binop as Binop
 import Parse.Helpers
+import Parse.Common
 import qualified Parse.Helpers as Help
 import qualified Parse.Literal as Literal
 import qualified Parse.Pattern as Pattern
@@ -117,45 +118,11 @@ parensTerm =
 
 recordTerm :: IParser E.Expr
 recordTerm =
-  addLocation $ brackets $ choice
-    [ do  starter <- try (addLocation rLabel)
-          postStarter <- whitespace
-          choice
-            [ update starter postStarter
-            , literal starter postStarter
-            ]
-    , return $ \pre post _ -> E.EmptyRecord (pre ++ post)
-    ]
-  where
-    update (A.A ann starter) postStarter =
-      do  _ <- try (string "|")
-          postBar <- whitespace
-          fields <- commaSep1 field
-          return $ \pre post multiline -> (E.RecordUpdate (Commented pre (A.A ann $ E.VarExpr $ Var.VarRef [] starter) postStarter) (fields postBar post) multiline)
-
-    literal (A.A _ starter) postStarter =
-      do
-          try lenientEquals
-          pushNewlineContext
-          preExpr <- whitespace
-          value <- expr
-          multiline' <- popNewlineContext
-          postExpr <- whitespace
-          choice
-            [ do  try comma
-                  preNext <- whitespace
-                  fields <- commaSep1 field
-                  return $ \pre post multiline -> (E.Record ((Commented pre starter postStarter, Commented preExpr value postExpr, multiline') : (fields preNext post)) multiline)
-            , return $ \pre post multiline -> (E.Record [(Commented pre starter postStarter, Commented preExpr value (postExpr ++ post), multiline')] multiline)
-            ]
-
-    field =
-      do  pushNewlineContext
-          key <- rLabel
-          (postKey, _, preExpr) <- padded lenientEquals
-          value <- expr
-          multiline <- popNewlineContext
-          return $ \pre post -> (Commented pre key postKey, Commented preExpr value post, multiline)
+    addLocation $ brackets' $ checkMultiline $
+        do
+            base <- optionMaybe $ try (commented lowVar <* string "|")
+            (fields, trailing) <- sectionedGroup (pair lowVar lenientEquals expr)
+            return $ E.Record base fields trailing
 
 
 term :: IParser E.Expr

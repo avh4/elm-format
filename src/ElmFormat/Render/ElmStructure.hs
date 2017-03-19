@@ -1,9 +1,10 @@
 {-# OPTIONS_GHC -Wall #-}
 module ElmFormat.Render.ElmStructure
   ( spaceSepOrStack, forceableSpaceSepOrStack, forceableSpaceSepOrStack1
+  , forceableRowOrStack
   , spaceSepOrIndented, forceableSpaceSepOrIndented, spaceSepOrPrefix
   , equalsPair, definition
-  , application, group, extensionGroup )
+  , application, group, extensionGroup, extensionGroup' )
   where
 
 
@@ -40,6 +41,21 @@ forceableSpaceSepOrStack forceMultiline first rest =
 
       ( False, SingleLine first', _, [MustBreak rest'] ) ->
           mustBreak $ row $ List.intersperse space [ first', rest' ]
+
+      _ ->
+        stack1 (first : rest)
+
+
+forceableRowOrStack :: Bool -> Box -> [Box] -> Box
+forceableRowOrStack forceMultiline first rest =
+    case
+      ( forceMultiline, first, allSingles rest, rest )
+    of
+      ( False, SingleLine first', Right rest', _ ) ->
+        line $ row (first' : rest')
+
+      ( False, SingleLine first', _, [MustBreak rest'] ) ->
+          mustBreak $ row [ first', rest' ]
 
       _ ->
         stack1 (first : rest)
@@ -212,7 +228,7 @@ application forceMultiline first args =
             $ first : map indent (arg0 : rest)
 
 {-|
-`group True '<' ',' '>'` formats as:
+`group True '<' ';' '>'` formats as:
 
     <>
 
@@ -290,5 +306,29 @@ extensionGroup multiline base first rest =
             ( prefix (row [punc "|", space]) first
             : map (prefix (row [punc ",", space])) rest)
             |> indent
+        , line $ punc "}"
+        ]
+
+
+extensionGroup' :: Bool -> Box -> Box -> Box
+extensionGroup' multiline base fields =
+  case
+    ( multiline
+    , base
+    , fields
+    )
+  of
+    (False, SingleLine base', SingleLine fields') ->
+      line $ row $ List.intersperse space
+        [ punc "{"
+        , base'
+        , fields'
+        , punc "}"
+        ]
+
+    _ ->
+      stack1
+        [ prefix (row [punc "{", space]) base
+        , indent fields
         , line $ punc "}"
         ]

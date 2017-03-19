@@ -53,6 +53,7 @@ library
         Elm.Utils
         ElmFormat.Cli
         ElmFormat.Parse
+        ElmFormat.Render.Box
         ElmFormat.Render.ElmStructure
         ElmFormat.Render.Text
         ElmFormat.World
@@ -71,7 +72,6 @@ library
         ElmFormat.Filesystem
         ElmFormat.FileStore
         ElmFormat.Operation
-        ElmFormat.Render.Box
         ElmFormat.Version
         Flags
         Messages.Formatter.Format
@@ -81,6 +81,7 @@ library
         Messages.Types
         Paths_elm_format
         Parse.Binop
+        Parse.Common
         Parse.Declaration
         Parse.Module
         Parse.Parse

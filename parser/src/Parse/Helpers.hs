@@ -368,6 +368,11 @@ brackets =
   surround '{' '}' "bracket"
 
 
+brackets' :: IParser a -> IParser a
+brackets' =
+    surround' '{' '}' "bracket"
+
+
 surround' :: Char -> Char -> String -> IParser a -> IParser a
 surround' a z name p = do
   _ <- char a
