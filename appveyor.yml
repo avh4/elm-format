@@ -1,5 +1,7 @@
 build: off
 
+platform: x86
+
 cache:
 - "c:\\sr"
 
@@ -17,5 +19,11 @@ test_script:
 - "set PATH=%PATH%;c:\\stack;%APPDATA%\\npm"
 - which ajv
 - stack setup > nil
+- stack path
 - stack build
 - bash tests/run-tests.sh
+- mkdir -p dist
+- stack install --local-bin-dir=dist
+
+artifacts:
+- path: dist
