@@ -24,7 +24,7 @@ test_script:
 - stack build
 - bash tests/run-tests.sh
 - mkdir -p dist
-- stack install --local-bin-dir dist
+- stack install --local-bin-path=dist
 
 artifacts:
 - path: dist
