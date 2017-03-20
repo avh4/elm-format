@@ -1,6 +1,7 @@
 #!/bin/bash
 # shellcheck disable=SC2002
 
+unname -s
 which ajv
 which diff
 which grep
