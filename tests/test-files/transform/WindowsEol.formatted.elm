@@ -2,14 +2,24 @@ module AllSyntax.WindowsEol exposing (..)
 
 {-| elm-format converts all CRLF line-endings to LF.
 
-CRs that are within strings will be escaped.
+Raw CRs that are within strings will be escaped.
+
+Escaped CRs will be retained.
 -}
 
 
 multilineString =
-    """\x0D
+    """
 """
 
 
 string =
-    "\x0D\n"
+    "\n"
+
+
+rawCR =
+    "\x0D"
+
+
+escapedCR =
+    "\x0D"

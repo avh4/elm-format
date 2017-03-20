@@ -719,8 +719,13 @@ str =
 
     newlineChar :: IParser String
     newlineChar =
-        choice [ char '\n' >> return "\\n"
-               , char '\r' >> return "\\r" ]
+        choice
+            [ char '\n' >> return "\\n"
+            , char '\r' >> choice
+                [ char '\n' >> return "\\n"
+                , return "\\r"
+                ]
+            ]
 
 
 sandwich :: Char -> String -> String
