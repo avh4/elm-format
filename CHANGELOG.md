@@ -6,6 +6,7 @@ Syntax changes:
   - `--` comments in the middle of binary operator sequences no longer push the following expression to the next line
   - `--` comments can be use to create sections in record expressions
   - `elm-format --validate` (meant for use in CI scripts) now reports errors as JSON
+  - For Windows, CRLF newlines no longer corrupt literal strings
 
 Bug fixes:
   - Empty records containing multiline comments are now handled correctly
