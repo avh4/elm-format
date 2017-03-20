@@ -27,4 +27,4 @@ test_script:
 - stack install --local-bin-path=dist
 
 artifacts:
-- path: dist
+- path: 'dist\elm-format-0.18.exe'
