@@ -1,6 +1,7 @@
 #!/bin/bash
 # shellcheck disable=SC2002
 
+which ajv
 which diff
 which grep
 which wc
@@ -40,9 +41,13 @@ function shouldOutputTheSameIgnoringEol() {
 
 function outputShouldRoughlyMatchPatterns() {
 	PATTERNS_FILE="$1"
+	echo "DEBUG: PATTERNS_FILE=$PATTERNS_FILE"
 	OUTPUT="$2"
+	echo "DEBUG: OUTPUT=$OUTPUT"
 
 	MATCHES=$(echo "$OUTPUT" | grep -F -f "$PATTERNS_FILE")
+	echo "DEBUG: MATCHES=$MATCHES"
+	echo "DEBUG: $(echo "$MATCHES" | wc -l)"
 	[[ "$(echo "$MATCHES" | wc -l)" == "$(wc -l < "$PATTERNS_FILE")" ]] || exit 1
 }
 
@@ -213,6 +218,7 @@ function checkBad() {
 	echo "## bad/$1"
 	STDOUT=$(cat "$INPUT" | "$ELM_FORMAT" --stdin 2>&1)
 	returnCodeShouldEqual 1
+	echo "DEBUG: return code was 1"
 	outputShouldRoughlyMatchPatterns "$EXPECTED" "$STDOUT"
 }
 
