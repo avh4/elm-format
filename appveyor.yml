@@ -4,6 +4,7 @@ platform: x86
 
 cache:
 - "c:\\sr"
+- 'C:\Users\appveyor\AppData\Local\Programs\stack'
 
 before_test:
 - curl -sS -ostack.zip -L --insecure http://www.stackage.org/stack/windows-x86_64
@@ -23,7 +24,7 @@ test_script:
 - stack build
 - bash tests/run-tests.sh
 - mkdir -p dist
-- stack install --local-bin-dir=dist
+- stack install --local-bin-dir dist
 
 artifacts:
 - path: dist
