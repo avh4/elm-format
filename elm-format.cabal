@@ -33,6 +33,7 @@ custom-setup
     setup-depends:
         base,
         Cabal,
+        directory,
         filepath,
         process
 

@@ -3,6 +3,7 @@ import Distribution.Simple.BuildPaths (autogenModulesDir)
 import Distribution.Simple.LocalBuildInfo (LocalBuildInfo)
 import Distribution.Simple.Setup (BuildFlags)
 import Distribution.PackageDescription (PackageDescription, emptyHookedBuildInfo)
+import System.Directory (createDirectoryIfMissing)
 import System.FilePath ((</>))
 import System.Process (readProcess)
 
@@ -13,6 +14,7 @@ main = defaultMainWithHooks $ simpleUserHooks { buildHook = myBuildHook }
 myBuildHook :: PackageDescription -> LocalBuildInfo -> UserHooks -> BuildFlags -> IO ()
 myBuildHook packageDescription buildInfo userHooks buildFlags =
     do
+        createDirectoryIfMissing True (autogenModulesDir buildInfo)
         writeCustomFile (autogenModulesDir buildInfo </> "Build_elm_format.hs")
         buildHook simpleUserHooks packageDescription buildInfo userHooks buildFlags
 
