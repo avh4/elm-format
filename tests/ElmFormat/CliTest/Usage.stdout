@@ -1,4 +1,4 @@
-elm-format-0.18 0.6.0-alpha
+elm-format-0.18 x.x.x
 
 Usage: elm-format [INPUT] [--output FILE] [--yes] [--validate] [--stdin]
                   [--elm-version VERSION] [--upgrade]
