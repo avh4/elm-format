@@ -152,22 +152,6 @@ executable elm-format-0.17
         elm-format
 
 
-executable elm-format-0.16
-
-    ghc-options:
-        -threaded -O2 -Wall -Wno-name-shadowing
-
-    hs-source-dirs:
-        src-cli
-
-    main-is:
-        Main0_16.hs
-
-    build-depends:
-        base >= 4.9.0.0 && < 5,
-        elm-format
-
-
 test-Suite elm-format-tests
     type:
         exitcode-stdio-1.0
