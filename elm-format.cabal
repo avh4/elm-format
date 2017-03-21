@@ -1,5 +1,5 @@
 Name: elm-format
-Version: 0.6.0-alpha
+version: 0.6.0-alpha-dev
 
 Synopsis:
     A source code formatter for Elm
@@ -19,7 +19,7 @@ Copyright:  See https://github.com/avh4/elm-format/blob/master/LICENSE
 
 Category: Build Tool
 
-Build-type: Simple
+build-type: Custom
 Cabal-version: >=1.9
 
 Extra-source-files: README.md
@@ -27,6 +27,14 @@ Extra-source-files: README.md
 source-repository head
     type:     git
     location: git://github.com/avh4/elm-format.git
+
+
+custom-setup
+    setup-depends:
+        base,
+        Cabal,
+        filepath,
+        process
 
 
 library
@@ -67,6 +75,7 @@ library
         Util.List
 
     other-modules:
+        Build_elm_format
         CommandLine.Helpers
         ElmFormat.Execute
         ElmFormat.Filesystem

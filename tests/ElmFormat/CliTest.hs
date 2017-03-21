@@ -24,7 +24,7 @@ fakeRender () = "good output"
 elmFormat :: [String] -> TestWorldState -> TestWorldState
 elmFormat args input =
     exec
-        (Cli.main Elm_0_18 fakeParse fakeRender args)
+        (Cli.main Elm_0_18 "x.x.x" fakeParse fakeRender args)
         input
 
 

@@ -14,6 +14,7 @@ import ElmFormat.FileStore (FileStore)
 import ElmFormat.Operation (Operation)
 
 import qualified AST.Module
+import qualified Build_elm_format
 import qualified Flags
 import qualified Data.ByteString as ByteString
 import qualified Data.ByteString.Char8 as Char8
@@ -304,16 +305,21 @@ exit True = exitSuccess
 exit False = exitFailure
 
 
+elmFormatVersion :: String
+elmFormatVersion =
+    Build_elm_format.gitDescribe
+
+
 main :: ElmVersion -> IO ()
 main defaultVersion =
     do
-        config <- Flags.parse defaultVersion
+        config <- Flags.parse defaultVersion elmFormatVersion
         let autoYes = Flags._yes config
         let elmVersionResult = determineVersion (Flags._elmVersion config) (Flags._upgrade config)
 
         case (elmVersionResult, determineWhatToDoFromConfig config) of
             (_, Left NoInputs) ->
-                Flags.showHelpText defaultVersion
+                Flags.showHelpText defaultVersion elmFormatVersion
                     >> exitFailure
 
             (_, Left message) ->

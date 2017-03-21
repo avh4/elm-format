@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wall #-}
 module Flags where
 
 import Data.Monoid ((<>))
@@ -26,14 +25,14 @@ data Config = Config
 -- PARSE ARGUMENTS
 
 
-parse :: ElmVersion -> IO Config
-parse defaultVersion =
-    Opt.customExecParser preferences (parser defaultVersion)
+parse :: ElmVersion -> String -> IO Config
+parse defaultElmVersion elmFormatVersion =
+    Opt.customExecParser preferences (parser defaultElmVersion elmFormatVersion)
 
 
-parse' :: ElmVersion -> [String] -> Either (Opt.ParserResult never) Config
-parse' defaultVersion args =
-    case Opt.execParserPure preferences (parser defaultVersion) args of
+parse' :: ElmVersion -> String -> [String] -> Either (Opt.ParserResult never) Config
+parse' defaultElmVersion elmFormatVersion args =
+    case Opt.execParserPure preferences (parser defaultElmVersion elmFormatVersion) args of
         Opt.Success config ->
             Right config
 
@@ -44,11 +43,11 @@ parse' defaultVersion args =
             Left $ Opt.CompletionInvoked completion
 
 
-usage :: ElmVersion -> String -> String
-usage defaultVersion progName =
+usage :: ElmVersion -> String -> String -> String
+usage defaultVersion progName version =
     fst $
     Opt.renderFailure
-        (Opt.parserFailure preferences (parser defaultVersion) Opt.ShowHelpText mempty)
+        (Opt.parserFailure preferences (parser defaultVersion version) Opt.ShowHelpText mempty)
         progName
 
 
@@ -57,18 +56,18 @@ preferences =
     Opt.prefs (mempty <> Opt.showHelpOnError)
 
 
-parser :: ElmVersion -> Opt.ParserInfo Config
-parser defaultVersion =
+parser :: ElmVersion -> String -> Opt.ParserInfo Config
+parser defaultElmVersion elmFormatVersion =
     Opt.info
-        (Opt.helper <*> flags defaultVersion)
-        (helpInfo defaultVersion)
+        (Opt.helper <*> flags defaultElmVersion)
+        (helpInfo defaultElmVersion elmFormatVersion)
 
 
-showHelpText :: ElmVersion -> IO ()
-showHelpText defaultVersion = Opt.handleParseResult . Opt.Failure $
+showHelpText :: ElmVersion -> String -> IO ()
+showHelpText defaultElmVersion elmFormatVersion = Opt.handleParseResult . Opt.Failure $
     Opt.parserFailure
         preferences
-        (parser defaultVersion)
+        (parser defaultElmVersion elmFormatVersion)
         Opt.ShowHelpText
         mempty
 
@@ -91,8 +90,8 @@ flags defaultVersion =
 
 -- HELP
 
-helpInfo :: ElmVersion -> Opt.InfoMod Config
-helpInfo defaultVersion =
+helpInfo :: ElmVersion -> String -> Opt.InfoMod Config
+helpInfo defaultElmVersion elmFormatVersion =
     mconcat
         [ Opt.fullDesc
         , Opt.header top
@@ -102,8 +101,8 @@ helpInfo defaultVersion =
   where
     top =
         concat
-            [ "elm-format-" ++ show defaultVersion ++ " "
-            , ElmFormat.Version.asString ++ "\n"
+            [ "elm-format-" ++ show defaultElmVersion ++ " "
+            , elmFormatVersion ++ "\n"
             ]
 
     examples =
