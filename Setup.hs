@@ -21,7 +21,7 @@ writeCustomFile :: FilePath -> IO ()
 writeCustomFile filepath = do
   putStrLn $ "Generating " ++ filepath ++ "..."
 
-  desc <- readProcess "git" ["describe", "--dirty=-modified"] ""
+  desc <- readProcess "git" ["describe", "--always"] ""
   now <- readProcess "date" ["+%s"] ""
 
   writeFile filepath $ unlines
