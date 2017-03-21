@@ -8,7 +8,6 @@ Syntax changes:
   - End-of-line `--` comments are now kept on their original line when appropriate
   - `--` comments in the middle of binary operator sequences no longer push the following expression to the next line
   - `--` comments can be use to create sections in record expressions
-  - `elm-format --validate` (meant for use in CI scripts) now reports errors as JSON
   - For Windows, CRLF newlines no longer corrupt literal strings
 
 Bug fixes:
@@ -17,6 +16,10 @@ Bug fixes:
   - The `where` clause in `effect module`s are now required to have at least one field (and comments are now handled correctly)
   - Record expressions with a trailing comma are no longer allowed (and comments are now handled correctly)
   - Block comments containing only multiple lines of whitespace no longer crash elm-format
+
+Other changes:
+  - `elm-format --validate` (meant for use in CI scripts) now reports errors as JSON
+  - When recursively searching a directory, `node_modules` folders are ignored
 
 
 ## 0.5.2-alpha

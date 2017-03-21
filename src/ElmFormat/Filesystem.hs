@@ -32,15 +32,23 @@ fileList :: FileStore f => FilePath -> Free f [FilePath]
 fileList =
   let
       children path =
-          if hasntFilename "elm-stuff" path then
+          if isSkippable path then
+              return []
+          else
               do
                   directory <- doesDirectoryExist path
                   if directory then listDir path else return []
-          else
-              return []
   in
       collectFiles children
 
+
+isSkippable :: FilePath -> Bool
+isSkippable path =
+    or
+        [ hasFilename "elm-stuff" path
+        , hasFilename "node_modules" path
+        , hasFilename ".git" path
+        ]
 
 hasExtension :: String -> FilePath -> Bool
 hasExtension ext path =
@@ -52,6 +60,9 @@ findAllElmFiles inputFile =
     filter (hasExtension ".elm") <$> fileList inputFile
 
 
-hasntFilename :: String -> FilePath -> Bool
-hasntFilename name path =
-      not (isSuffixOf (pack $ '/' : name) (pack path) || name == path)
+hasFilename :: String -> FilePath -> Bool
+hasFilename name path =
+    or
+        [ isSuffixOf (pack $ '/' : name) (pack path)
+        , name == path
+        ]
