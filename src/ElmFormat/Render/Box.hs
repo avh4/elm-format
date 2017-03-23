@@ -1138,7 +1138,7 @@ formatSequence left delim right formatA (ForceMultiline multiline) trailing (fir
             prefix (row [ punc [delim], space ]) $
             formatHeadCommented (formatEolCommented formatA) item
     in
-        ElmStructure.spaceSepOrStack
+        ElmStructure.forceableSpaceSepOrStack multiline
             (ElmStructure.forceableRowOrStack multiline
                 (formatItem left first)
                 (map (formatItem delim) rest)
