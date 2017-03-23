@@ -124,6 +124,11 @@ record =
     [ { x = 1 }
     , { x = 1, y = 2 }
     , { x = 1, y = 2, z = 3 }
+    , { x = 1
+      }
+    , { x = 1
+      , y = 2
+      }
     , { {- A -} x {- B -} = {- C -} 1
 
       {- D -}
@@ -164,7 +169,16 @@ record =
 
 
 recordUpdate a =
-    { a | x = 1, y = 2 }
+    ( { a | x = 1 }
+    , { a | x = 1, y = 2 }
+    , { a
+        | x = 1
+      }
+    , { a
+        | x = 1
+        , y = 2
+      }
+    )
 
 
 recordAccess f a b r =
