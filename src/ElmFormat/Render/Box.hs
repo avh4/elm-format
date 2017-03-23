@@ -63,7 +63,7 @@ formatBinary multiline left ops =
 
         ( isLeftPipe, comments, op, next ) : rest ->
             if isLeftPipe then
-                ElmStructure.spaceSepOrIndented
+                ElmStructure.forceableSpaceSepOrIndented multiline
                     (ElmStructure.spaceSepOrStack left $
                         concat
                             [ Maybe.maybeToList $ formatComments comments

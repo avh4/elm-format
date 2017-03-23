@@ -24,3 +24,10 @@ lineComments =
         |> identity
         --X
         |> identity
+
+
+leftPipe a =
+    a <|
+        a <|
+            a <|
+                ()
