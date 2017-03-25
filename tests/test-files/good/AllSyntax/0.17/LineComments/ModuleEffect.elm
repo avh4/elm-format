@@ -1,7 +1,8 @@
 -- U
 
 
-effect --T
+effect
+--T
     module
     -- A
     AllSyntax.BlockComments.ModuleEffect
@@ -9,13 +10,15 @@ effect --T
     where
     -- C
         { --D
-          command --E
+          command
+          --E
             =
             -- F
             MyCmd
             -- G
         , -- H
-          subscription -- I
+          subscription
+          -- I
             =
             -- J
             MySub

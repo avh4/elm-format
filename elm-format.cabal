@@ -68,6 +68,7 @@ library
         ElmFormat.World
         Parse.Expression
         Parse.Helpers
+        Parse.IParser
         Parse.Literal
         Parse.Pattern
         Parse.Type
@@ -94,7 +95,6 @@ library
         Parse.Common
         Parse.Comments
         Parse.Declaration
-        Parse.IParser
         Parse.Module
         Parse.Parse
         Parse.State
