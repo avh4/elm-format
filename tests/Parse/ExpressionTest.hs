@@ -226,7 +226,7 @@ tests =
             assertParseFailure expr "{{}|x=7}"
         , example' "no fields (elm-compiler does not allow this)"
             "{a|}"
-            "{ a |   }\n"
+            "{ a |  }\n"
         ]
 
     , testGroup "record access"
