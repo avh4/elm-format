@@ -29,14 +29,15 @@ brew cask install virtualbox
 1. Run `./package/mac/build-package.sh`
 
 
+## Linux
+
+1. Make sure you have Docker installed and running
+1. Run `./package/linux/build-in-docker.sh`
+
+
 ## Windows
 
 1. See `package/win/setup.md`
-
-
-## Linux
-
-1. See `package/linux/setup.md`
 
 
 ## Publishing

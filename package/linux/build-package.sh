@@ -2,7 +2,7 @@
 
 set -ex
 
-VERSION="$(sed -ne "s/^Version: //p" elm-format.cabal)"
+VERSION="$(git describe)"
 PLATFORM="linux-x64"
 
 ## Run tests
@@ -26,4 +26,3 @@ function build-flavor() {
 
 build-flavor 0.18
 build-flavor 0.17
-build-flavor 0.16
