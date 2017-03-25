@@ -15,6 +15,9 @@ import qualified AST.Expression
 import qualified AST.Helpers as Help
 import qualified AST.Variable
 import qualified Parse.State as State
+import Parse.Comments
+import Parse.IParser
+import Parse.Whitespace
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Region as R
@@ -40,10 +43,6 @@ expecting = flip (<?>)
 
 
 -- SETUP
-
-type SourceM = State SourcePos
-type IParser a = ParsecT String State.State SourceM a
-
 
 iParse :: IParser a -> String -> Either ParseError a
 iParse =
@@ -189,41 +188,45 @@ commitIf check p =
 spaceySepBy1 :: IParser sep -> IParser a -> IParser (ExposedCommentedList a)
 spaceySepBy1 sep parser =
     let
-        -- step :: PostCommented a -> [Commented a] -> Comments -> IParser (ExposedCommentedList a)
+        -- step :: PostCommented (WithEol a) -> [Commented (WithEol a)] -> Comments -> IParser (ExposedCommentedList a)
         step first rest post =
             do
-                next <- parser
+                next <- withEol parser
                 choice
                     [ try (padded sep)
                         >>= (\(preSep, _, postSep) -> step first (Commented post next preSep : rest) postSep)
-                    , Multiple first (reverse rest) (post, next) <$> restOfLine
+                    , return $ Multiple first (reverse rest) (post, next)
                     ]
 
     in
         do
-            value <- parser
+            value <- withEol parser
             choice
                 [ try (padded sep)
                     >>= (\(preSep, _, postSep) -> step (value, preSep) [] postSep)
-                , Single value <$> restOfLine
+                , return $ Single value
                 ]
 
 
 -- DEPRECATED: use spaceySepBy1 instead
 spaceySepBy1'' :: IParser sep -> IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 spaceySepBy1'' sep parser =
+  let
+    combine eol post =
+      Maybe.maybeToList (fmap LineComment eol) ++ post
+  in
     do
         result <- spaceySepBy1 sep parser
         case result of
-            Single item eol ->
-                return $ \pre post -> [item pre (Maybe.maybeToList (fmap LineComment eol) ++ post)]
+            Single (item, eol) ->
+                return $ \pre post -> [item pre (combine eol post)]
 
-            Multiple (first, postFirst) rest (preLast, last) eol ->
+            Multiple ((first, firstEol), postFirst) rest (preLast, (last, eol)) ->
                 return $ \preFirst postLast ->
                     concat
-                        [ [first preFirst postFirst]
-                        , fmap (\(Commented pre item post) -> item pre post) rest
-                        , [last preLast (Maybe.maybeToList (fmap LineComment eol) ++ postLast)]
+                        [ [first preFirst $ combine firstEol postFirst]
+                        , fmap (\(Commented pre (item, eol) post) -> item pre $ combine eol post) rest
+                        , [last preLast $ combine eol postLast ]
                         ]
 
 
@@ -368,6 +371,11 @@ brackets =
   surround '{' '}' "bracket"
 
 
+braces' :: IParser a -> IParser a
+braces' =
+    surround' '[' ']' "brace"
+
+
 brackets' :: IParser a -> IParser a
 brackets' =
     surround' '{' '}' "bracket"
@@ -470,120 +478,6 @@ dot =
       notFollowedBy (char '.')
 
 
--- WHITESPACE
-
-padded :: IParser a -> IParser (Comments, a, Comments)
-padded p =
-  do  pre <- whitespace
-      out <- p
-      post <- whitespace
-      return (pre, out, post)
-
-
-spaces :: IParser Comments
-spaces =
-  let
-      blank = string " " >> return []
-      comment = ((\x -> [x]) <$> multiComment)
-      space =
-        blank
-        <|> (const [CommentTrickOpener] <$> (try $ string "{--}"))
-        <|> comment
-        <?> Syntax.whitespace
-  in
-      concat <$> many1 space
-
-
-forcedWS :: IParser Comments
-forcedWS =
-  choice
-    [ (++) <$> spaces <*> (concat <$> many nl_space)
-    , concat <$> many1 nl_space
-    ]
-  where
-    nl_space =
-      try ((++) <$> (concat <$> many1 newline) <*> option [] spaces)
-
-
--- Just eats whitespace until the next meaningful character.
-dumbWhitespace :: IParser Comments
-dumbWhitespace =
-  concat <$> many (spaces <|> newline)
-
-
-whitespace' :: IParser (Bool, Comments)
-whitespace' =
-  option (False, []) ((,) True <$> forcedWS)
-
-
-whitespace :: IParser Comments
-whitespace =
-  snd <$> whitespace'
-
-
-freshLine :: IParser Comments
-freshLine =
-      concat <$> (try ((++) <$> many1 newline <*> many space_nl) <|> try (many1 space_nl)) <?> Syntax.freshLine
-  where
-    space_nl = try $ (++) <$> spaces <*> (concat <$> many1 newline)
-
-
-newline :: IParser Comments
-newline =
-    (simpleNewline >> return []) <|> ((\x -> [x]) <$> lineComment) <?> Syntax.newline
-
-
-simpleNewline :: IParser ()
-simpleNewline =
-  do  _ <- try (string "\r\n") <|> string "\n"
-      updateState State.setNewline
-      return ()
-
-
-pushNewlineContext :: IParser ()
-pushNewlineContext =
-    updateState State.pushNewlineContext
-
-
-popNewlineContext :: IParser Bool
-popNewlineContext =
-  do  state <- getState
-      updateState State.popNewlineContext
-      return $ State.sawNewline state
-
-
-trackNewline :: IParser a -> IParser (a, Multiline)
-trackNewline parser =
-    do
-        updateState State.pushNewlineContext
-        a <- parser
-        state <- getState
-        updateState State.popNewlineContext
-        return (a, if State.sawNewline state then SplitAll else JoinAll)
-
-
-lineComment :: IParser Comment
-lineComment =
-  do  _ <- try (string "--")
-      choice
-        [ const CommentTrickCloser
-            <$> try (char '}' >> many (char ' ') >> (simpleNewline <|> eof))
-        , do
-            (comment, ()) <-
-              anyUntil $ simpleNewline <|> eof
-            return $ LineComment comment
-        ]
-
-
-restOfLine :: IParser (Maybe String)
-restOfLine =
-    many (char ' ') *>
-        choice
-            [ Just . fst <$> (try (string "--") *> (anyUntil $ (lookAhead simpleNewline) <|> eof))
-            , return Nothing
-            ]
-
-
 commentedKeyword :: String -> IParser a -> IParser (KeywordCommented a)
 commentedKeyword word parser =
   do
@@ -591,54 +485,6 @@ commentedKeyword word parser =
     post <- whitespace
     value <- parser
     return $ KeywordCommented pre post value
-
-
-docComment :: IParser String
-docComment =
-  do  _ <- try (string "{-|")
-      _ <- many (string " ")
-      closeComment False
-
-
-multiComment :: IParser Comment
-multiComment =
-  do  _ <- try (string "{-" <* notFollowedBy (string "|") )
-      isCommentTrick <-
-        choice
-          [ char '-' >> return True
-          , return False
-          ]
-      _ <- many (string " ")
-      b <- closeComment False
-      return $
-        if isCommentTrick then
-          CommentTrickBlock b
-        else
-          BlockComment $ trimIndent $ lines b
-  where
-      trimIndent [] = []
-      trimIndent (l1:ls) =
-          let
-              leadingIndents =
-                  map fst $ filter (uncurry (/=))
-                      $ map (\l -> (length $ takeWhile Char.isSpace l, length l)) ls
-
-              depth =
-                  case leadingIndents of
-                      [] -> 0
-                      _ -> minimum leadingIndents
-          in
-              l1 : map (drop depth) ls
-
-
-closeComment :: Bool -> IParser String
-closeComment keepClosingPunc =
-  uncurry (++) <$>
-    anyUntil
-      (choice
-        [ try ((\a b -> if keepClosingPunc then concat (a ++ [b]) else "") <$> many (string " ") <*> string "-}") <?> "the end of a comment -}"
-        , concat <$> sequence [ try (string "{-"), closeComment True, closeComment keepClosingPunc]
-        ])
 
 
 -- ODD COMBINATORS
@@ -656,19 +502,6 @@ until p end =
     go
   where
     go = end <|> (p >> go)
-
-
-anyUntil :: IParser a -> IParser (String, a)
-anyUntil end =
-    go ""
-  where
-    next pre =
-      do
-        nextChar <- anyChar
-        go (nextChar : pre)
-
-    go pre =
-      ((,) (reverse pre) <$> end) <|> next pre
 
 
 -- BASIC LANGUAGE LITERALS

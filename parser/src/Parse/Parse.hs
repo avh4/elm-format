@@ -9,6 +9,7 @@ import qualified Parse.Module as Module
 import qualified Reporting.Region as R
 import qualified Reporting.Error.Syntax as Error
 import qualified Reporting.Result as Result
+import Parse.IParser
 
 
 parseSource :: String -> Result.Result () Error.Error AST.Module.Module

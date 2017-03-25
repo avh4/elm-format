@@ -7,6 +7,8 @@ import qualified AST.Pattern as P
 import Parse.Helpers
 import qualified Parse.Literal as Literal
 import qualified Reporting.Annotation as A
+import Parse.IParser
+import Parse.Whitespace
 
 
 basic :: IParser P.Pattern

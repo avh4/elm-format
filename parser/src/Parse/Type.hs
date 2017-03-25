@@ -6,6 +6,8 @@ import Text.Parsec ((<|>), (<?>), char, many1, string, try)
 import Parse.Helpers
 import qualified Reporting.Annotation as A
 import AST.V0_16
+import Parse.IParser
+import Parse.Whitespace
 
 
 tvar :: IParser Type

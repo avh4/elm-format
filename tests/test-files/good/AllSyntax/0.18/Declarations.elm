@@ -143,7 +143,8 @@ expressionTypeAnnotation2 =
     ()
 
 
-expressionTypeAnnotation3 --V
+expressionTypeAnnotation3
+--V
     :
     --W
     ()

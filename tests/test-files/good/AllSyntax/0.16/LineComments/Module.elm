@@ -34,7 +34,8 @@ import
         exposing
             --O
             ( --S
-              Maybe --W
+              Maybe
+              --W
                 ( --X
                   Just
                   --Y
@@ -62,8 +63,10 @@ import Signal
         )
 import Task
     exposing
-        ( succeed -- AD
-        , fail -- AE
+        ( succeed
+          -- AD
+        , fail
+          -- AE
         , map
         , map2
         , map3

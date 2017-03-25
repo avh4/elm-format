@@ -100,8 +100,8 @@ If there is only one item in the list, an end-of-line comment can appear after t
 TODO: this should be replaced with (Sequence a)
 -}
 data ExposedCommentedList a
-    = Single a (Maybe String)
-    | Multiple (PostCommented a) [Commented a] (PreCommented a) (Maybe String)
+    = Single (WithEol a)
+    | Multiple (PostCommented (WithEol a)) [Commented (WithEol a)] (PreCommented (WithEol a))
 
 
 {-| This represents a list of things that have a clear start delimiter but no
@@ -117,17 +117,17 @@ For example:
 TODO: this should be replaced with (Sequence a)
 -}
 data OpenCommentedList a
-    = OpenCommentedList [Commented a] (PreCommented a) (Maybe String)
+    = OpenCommentedList [Commented (WithEol a)] (PreCommented (WithEol a))
     deriving (Eq, Show)
 
 exposedToOpen :: Comments -> ExposedCommentedList a -> OpenCommentedList a
 exposedToOpen pre exposed =
     case exposed of
-        Single item eolComment ->
-            OpenCommentedList [] (pre, item) eolComment
+        Single item ->
+            OpenCommentedList [] (pre, item)
 
-        Multiple (first', postFirst) rest' lst eolComment ->
-            OpenCommentedList (Commented pre first' postFirst : rest') lst eolComment
+        Multiple (first', postFirst) rest' lst ->
+            OpenCommentedList (Commented pre first' postFirst : rest') lst
 
 
 {-| Represents a delimiter-separated pair.
@@ -202,7 +202,7 @@ data Type'
     | RecordType [(Commented LowercaseIdentifier, Commented Type, Bool)] Bool
     | RecordExtensionType (Commented LowercaseIdentifier) [(Commented LowercaseIdentifier, Commented Type, Bool)] Bool
     | FunctionType
-        { first :: (Type, Maybe String)
+        { first :: WithEol Type
         , rest :: [(Comments, Comments, Type, Maybe String)]
         , forceMultiline :: Bool
         }

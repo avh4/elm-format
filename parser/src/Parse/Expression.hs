@@ -12,6 +12,8 @@ import qualified Parse.Literal as Literal
 import qualified Parse.Pattern as Pattern
 import qualified Parse.State as State
 import qualified Parse.Type as Type
+import Parse.IParser
+import Parse.Whitespace
 
 import AST.V0_16
 import qualified AST.Expression as E
@@ -73,16 +75,10 @@ listTerm =
           return $ E.GLShader (filter (/='\r') rawSrc)
 
     commaSeparated =
-      do
-        pushNewlineContext
-        result <- braces'' expr
-        sawNewline <- popNewlineContext
-        return $
-          case result of
-            Left comments ->
-              E.EmptyList comments
-            Right terms ->
-              E.ExplicitList terms sawNewline
+        braces' $ checkMultiline $
+        do
+            (terms, trailing) <- sectionedGroup expr
+            return $ E.ExplicitList terms trailing
 
 
 parensTerm :: IParser E.Expr

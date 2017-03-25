@@ -2,7 +2,7 @@
 module ElmFormat.Render.ElmStructure
   ( spaceSepOrStack, forceableSpaceSepOrStack, forceableSpaceSepOrStack1
   , forceableRowOrStack
-  , spaceSepOrIndented, forceableSpaceSepOrIndented, spaceSepOrPrefix
+  , spaceSepOrIndented, forceableSpaceSepOrIndented, spaceSepOrPrefix, prefixOrIndented
   , equalsPair, definition
   , application, group, extensionGroup, extensionGroup' )
   where
@@ -39,8 +39,6 @@ forceableSpaceSepOrStack forceMultiline first rest =
       ( False, SingleLine first', Right rest', _ ) ->
         line $ row $ List.intersperse space (first' : rest')
 
-      ( False, SingleLine first', _, [MustBreak rest'] ) ->
-          mustBreak $ row $ List.intersperse space [ first', rest' ]
 
       _ ->
         stack1 (first : rest)
@@ -54,8 +52,6 @@ forceableRowOrStack forceMultiline first rest =
       ( False, SingleLine first', Right rest', _ ) ->
         line $ row (first' : rest')
 
-      ( False, SingleLine first', _, [MustBreak rest'] ) ->
-          mustBreak $ row [ first', rest' ]
 
       _ ->
         stack1 (first : rest)
@@ -96,8 +92,6 @@ forceableSpaceSepOrIndented forceMultiline first rest =
     ( False, SingleLine first', Right rest', _ ) ->
       line $ row $ List.intersperse space (first' : rest')
 
-    ( False, SingleLine first', _, [MustBreak rest'] ) ->
-        mustBreak $ row $ List.intersperse space [ first', rest' ]
 
     _ ->
       stack1
@@ -126,6 +120,19 @@ spaceSepOrPrefix op rest =
 
         _ ->
             stack1 [ op, indent rest ]
+
+
+prefixOrIndented :: Box -> Box -> Box
+prefixOrIndented a b =
+    case ( a, b ) of
+        ( SingleLine a', SingleLine b' ) ->
+            line $ row [ a', space, b' ]
+
+        ( SingleLine a', MustBreak b' ) ->
+            mustBreak $ row [ a', space, b' ]
+
+        _ ->
+            stack1 [ a, indent b ]
 
 
 {-|
