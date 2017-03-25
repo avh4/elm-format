@@ -118,6 +118,29 @@ type alias Record =
     )
 
 
+type alias RecordWithCommentedOutTerms =
+    { a : Int
+
+    -- , b : Int
+    -- , c : Int
+    , d : Int
+
+    -- , e : Int
+    }
+
+
 recordExtension : { a | x : Int, y : Int } -> ()
 recordExtension _ =
     ()
+
+
+type alias RecordExtensionWithCommentedOutTerms z =
+    { z
+        | a : Int
+
+        -- , b : Int
+        -- , c : Int
+        , d : Int
+
+        -- , e : Int
+    }
