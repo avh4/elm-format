@@ -7,8 +7,8 @@ import Parse.Helpers
 import qualified Reporting.Annotation as A
 import AST.V0_16
 import Parse.IParser
-import Parse.Whitespace
 import Parse.Common
+import Data.Maybe (maybeToList)
 
 
 tvar :: IParser Type
@@ -20,16 +20,16 @@ tvar =
 tuple :: IParser Type
 tuple =
   addLocation $
-  do  types <- parens'' expr
+  do  types <- parens'' (withEol expr)
       case types of
         Left comments ->
             return $ UnitType comments
         Right [] ->
             return $ UnitType []
-        Right [Commented [] t []] ->
+        Right [Commented [] (t, Nothing) []] ->
             return $ A.drop t
-        Right [t] ->
-            return $ TypeParens t
+        Right [Commented pre (t, eol) post] ->
+            return $ TypeParens (Commented pre t (maybeToList (fmap LineComment eol) ++ post))
         Right types' ->
             return $ TupleType types'
 
