@@ -3,7 +3,6 @@ module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
 import Box
-import Data.Version (showVersion)
 import ElmVersion (ElmVersion(..))
 
 import AST.V0_16
@@ -17,7 +16,7 @@ import qualified Data.Char as Char
 import qualified Data.List as List
 import qualified Data.Maybe as Maybe
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
-import qualified Paths_elm_format as This
+import qualified ElmFormat.Version
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Region as Region
 import Text.Printf (printf)
@@ -26,7 +25,7 @@ import Util.List
 
 pleaseReport' :: String -> String -> Line
 pleaseReport' what details =
-    keyword $ "<elm-format-" ++ (showVersion This.version) ++ ": "++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
+    keyword $ "<elm-format-" ++ ElmFormat.Version.asString ++ ": "++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
 
 
 pleaseReport :: String -> String -> Box
@@ -216,7 +215,7 @@ formatModuleLine_0_16 header =
             Just listing ->
               listing
             _ ->
-                line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
+                pleaseReport "UNEXPECTED MODULE DECLARATION" "empty listing"
 
     whereClause =
       case AST.Module.exports header of
@@ -270,7 +269,7 @@ formatModuleLine elmVersion header =
           Just listing ->
             listing
           _ ->
-              line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
+              pleaseReport "UNEXPECTED MODULE DECLARATION" "empty listing"
 
     formatSetting (k, v) =
       formatRecordPair elmVersion "=" (line . formatUppercaseIdentifier elmVersion) (k, v, False)
