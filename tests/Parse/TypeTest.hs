@@ -111,6 +111,6 @@ tests =
             assertParseFailure expr "{{}|x:m}"
         , example "no fields (elm-compiler does not allow this)"
             "{a|}"
-            "{ a |   }\n"
+            "{ a |  }\n"
         ]
     ]

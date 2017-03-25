@@ -1106,18 +1106,8 @@ formatRecordLike ::
     -> Maybe (Commented base) -> Sequence (Pair key value)-> Comments -> ForceMultiline
     -> Box
 formatRecordLike formatBase formatKey fieldSep formatValue base' fields trailing multiline =
-    case (base', fields, trailing) of
-      ( Just base, [], _ ) ->
-          ElmStructure.extensionGroup'
-              ((\(ForceMultiline b) -> b) multiline)
-              (formatCommented formatBase base)
-              (formatSequence '|' ',' Nothing
-                  line
-                  multiline
-                  trailing
-                  [([], ([], (space, Nothing)))])
-
-      ( Just base, pairs', _ ) ->
+    case (base', fields) of
+      ( Just base, pairs' ) ->
           ElmStructure.extensionGroup'
               ((\(ForceMultiline b) -> b) multiline)
               (formatCommented formatBase base)
@@ -1127,18 +1117,7 @@ formatRecordLike formatBase formatKey fieldSep formatValue base' fields trailing
                   trailing
                   pairs')
 
-      ( Nothing, [], [] ) ->
-          line $ punc "{}"
-
-      ( Nothing, [], _ ) ->
-          case stack1 $ map formatComment trailing of
-              SingleLine comments' ->
-                  line $ row [ punc "{", comments', punc "}" ]
-
-              _ ->
-                  formatUnit '{' '}' trailing
-
-      ( Nothing, pairs', _ ) ->
+      ( Nothing, pairs' ) ->
           formatSequence '{' ',' (Just '}')
               (formatPair formatKey fieldSep formatValue)
               multiline
@@ -1163,7 +1142,7 @@ formatSequence left delim right formatA (ForceMultiline multiline) trailing (fir
 formatSequence left _ (Just right) _ _ trailing [] =
     formatUnit left right trailing
 formatSequence left _ Nothing _ _ trailing [] =
-    pleaseReport "UNEXPECTED SEQUENCE" "no terms and no right delimiter"
+    formatUnit left ' ' trailing
 
 
 formatBinops_0_17 :: ElmVersion -> AST.Expression.Expr -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)] -> Bool -> Box
