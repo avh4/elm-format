@@ -1,3 +1,3 @@
-.git
-.stack-work
-package
+*
+!stack.yaml
+!elm-format.cabal
