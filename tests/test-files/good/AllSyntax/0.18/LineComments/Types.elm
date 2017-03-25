@@ -16,13 +16,16 @@ record :
       x :
         --P
         Int
-        --Q
+
+    --Q
     , --R
-      y --S
+      y
+      --S
         :
         --T
         ()
-        --U
+
+    --U
     }
     -> ()
 record _ =
@@ -34,17 +37,21 @@ recordExtension :
       a
       --W
         | --X
-          x --Y
+          x
+          --Y
             :
             --Z
             Int
-            --AA
+
+        --AA
         , --AB
-          y --AC
+          y
+          --AC
             :
             --AD
             Int
-            --AE
+
+        --AE
     }
     -> ()
 recordExtension _ =
