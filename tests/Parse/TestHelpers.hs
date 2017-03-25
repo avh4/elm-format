@@ -5,7 +5,8 @@ import Elm.Utils ((|>))
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import Parse.Helpers (IParser, iParse)
+import Parse.Helpers (iParse)
+import Parse.IParser
 import Reporting.Annotation hiding (map, at)
 import Reporting.Region
 import Text.ParserCombinators.Parsec.Combinator (eof)

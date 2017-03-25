@@ -8,7 +8,8 @@ import Test.Tasty.HUnit
 import qualified Data.Text.Lazy as LazyText
 
 import Parse.Pattern
-import Parse.Helpers (IParser, iParse)
+import Parse.Helpers (iParse)
+import Parse.IParser
 import AST.V0_16
 import AST.Pattern
 import AST.Variable hiding (Alias)
