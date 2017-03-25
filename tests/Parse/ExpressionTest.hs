@@ -224,9 +224,9 @@ tests =
             assertParseFailure expr "{9|x=7}"
         , testCase "only allows simple base" $
             assertParseFailure expr "{{}|x=7}"
-        -- elm-compiler does not allow this, but elm-format does (though for no good reason other than the parsing code is simpler):
-        -- , testCase "must have fields" $
-        --     assertParseFailure expr "{a|}"
+        , example' "no fields (elm-compiler does not allow this)"
+            "{a|}"
+            "{ a |   }\n"
         ]
 
     , testGroup "record access"

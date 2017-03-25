@@ -40,7 +40,8 @@ comments2 =
 records =
     { -- before a field
       f1 = ()
-    , f2 -- after a field
+    , f2
+      -- after a field
         =
         ()
     , f3 = ()
