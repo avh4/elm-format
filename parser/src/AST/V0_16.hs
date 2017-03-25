@@ -198,13 +198,16 @@ data Type'
     | TypeConstruction TypeConstructor [(Comments, Type)]
     | TypeParens (Commented Type)
     | TupleType [Commented Type]
-    | EmptyRecordType Comments
-    | RecordType [(Commented LowercaseIdentifier, Commented Type, Bool)] Bool
-    | RecordExtensionType (Commented LowercaseIdentifier) [(Commented LowercaseIdentifier, Commented Type, Bool)] Bool
+    | RecordType
+        { base :: Maybe (Commented LowercaseIdentifier)
+        , fields :: Sequence (Pair LowercaseIdentifier Type)
+        , trailingComments :: Comments
+        , forceMultiline :: ForceMultiline
+        }
     | FunctionType
         { first :: WithEol Type
         , rest :: [(Comments, Comments, Type, Maybe String)]
-        , forceMultiline :: Bool
+        , forceMultiline :: ForceMultiline
         }
     deriving (Eq, Show)
 
