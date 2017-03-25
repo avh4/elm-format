@@ -201,6 +201,17 @@ record =
     ]
 
 
+recordWithCommentedOutFields =
+    { x = 1
+
+    -- , y = 2
+    -- , z = 3
+    , a = 4
+
+    -- , b = 5
+    }
+
+
 recordUpdate a =
     ( { a | x = 1 }
     , { a | x = 1, y = 2 }
@@ -212,6 +223,18 @@ recordUpdate a =
         , y = 2
       }
     )
+
+
+recordUpdateWithCommentedOutFields =
+    { a
+        | x = 1
+
+        -- , y = 2
+        -- , z = 3
+        , a = 4
+
+        -- , b = 5
+    }
 
 
 recordAccess f a b r =
