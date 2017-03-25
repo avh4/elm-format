@@ -32,10 +32,12 @@ tests :: TestTree
 tests =
     testGroup "Parse.Type"
     [ testGroup "tuple type"
-        [ example "" "(a,b)" $ at 1 1 1 6 (TupleType [Commented [] (at 1 2 1 3 (TypeVariable $ LowercaseIdentifier "a")) [],Commented [] (at 1 4 1 5 (TypeVariable $ LowercaseIdentifier "b")) []])
-        , example "whitespace" "( a , b )" $ at 1 1 1 10 (TupleType [Commented [] (at 1 3 1 4 (TypeVariable $ LowercaseIdentifier "a")) [],Commented [] (at 1 7 1 8 (TypeVariable $ LowercaseIdentifier "b")) []])
-        , example "comments" "({-A-}a{-B-},{-C-}b{-D-})" $ at 1 1 1 26 (TupleType [Commented [BlockComment ["A"]] (at 1 7 1 8 (TypeVariable $ LowercaseIdentifier "a")) [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 19 1 20 (TypeVariable $ LowercaseIdentifier "b")) [BlockComment ["D"]]])
-        , example "newlines" "(\n a\n ,\n b\n )" $ at 1 1 5 3 (TupleType [Commented [] (at 2 2 2 3 (TypeVariable $ LowercaseIdentifier "a")) [],Commented [] (at 4 2 4 3 (TypeVariable $ LowercaseIdentifier "b")) []])
+        [ example "" "(a,b)" "( a, b )\n"
+        , example "whitespace" "( a , b )" "( a, b )\n"
+        , example "comments"
+            "({-A-}a{-B-},{-C-}b{-D-})"
+            "( {- A -} a {- B -}, {- C -} b {- D -} )\n"
+        , example "newlines" "(\n a\n ,\n b\n )" "( a, b )\n"
         ]
 
     , testGroup "record type"

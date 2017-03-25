@@ -197,7 +197,7 @@ data Type'
     | TypeVariable LowercaseIdentifier
     | TypeConstruction TypeConstructor [(Comments, Type)]
     | TypeParens (Commented Type)
-    | TupleType [Commented Type]
+    | TupleType [Commented (WithEol Type)]
     | RecordType
         { base :: Maybe (Commented LowercaseIdentifier)
         , fields :: Sequence (Pair LowercaseIdentifier Type)

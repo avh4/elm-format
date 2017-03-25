@@ -1661,7 +1661,7 @@ formatType' elmVersion requireParens atype =
           parens $ formatCommented (formatType elmVersion) type'
 
         TupleType types ->
-          ElmStructure.group True "(" "," ")" False (map (formatCommented (formatType elmVersion)) types)
+          ElmStructure.group True "(" "," ")" False (map (formatCommented (formatEolCommented $ formatType elmVersion)) types)
 
         RecordType base fields trailing multiline ->
             formatRecordLike
