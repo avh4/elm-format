@@ -96,6 +96,15 @@ type alias Tuple =
     )
 
 
+type alias TupleWithCommentedOutTerms =
+    ( Int
+      -- , Int
+      -- , Int
+    , Int
+      -- , Int
+    )
+
+
 emptyRecord : {} -> ()
 emptyRecord _ =
     ()
