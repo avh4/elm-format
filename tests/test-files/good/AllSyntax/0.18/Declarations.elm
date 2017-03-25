@@ -47,6 +47,14 @@ type DataTypeWithEolComments2
     | Ctor3 b c --C
 
 
+type DataTypeWithCommentedOutConstructors
+    = A
+      -- | B
+      -- | C
+    | D
+    | E
+
+
 
 --
 -- Union type with params
