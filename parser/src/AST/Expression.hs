@@ -39,8 +39,11 @@ data Expr'
     | Binops Expr [(Comments, Var.Ref, Comments, Expr)] Bool
     | Parens (Commented Expr)
 
-    | EmptyList Comments
-    | ExplicitList [Commented Expr] Bool
+    | ExplicitList
+        { terms :: Sequence Expr
+        , trailingComments :: Comments
+        , forceMultiline :: ForceMultiline
+        }
     | Range (Commented Expr) (Commented Expr) Bool
 
     | Tuple [Commented Expr] Bool

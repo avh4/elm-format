@@ -92,10 +92,13 @@ library
         Paths_elm_format
         Parse.Binop
         Parse.Common
+        Parse.Comments
         Parse.Declaration
+        Parse.IParser
         Parse.Module
         Parse.Parse
         Parse.State
+        Parse.Whitespace
         Reporting.Error.Syntax
         Reporting.Report
         Reporting.Result

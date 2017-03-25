@@ -8,12 +8,14 @@ import qualified Parse.Expression as Expr
 import Parse.Helpers as Help
 import qualified Parse.Type as Type
 import AST.V0_16
+import Parse.IParser
+import Parse.Whitespace
 
 
 declaration :: IParser AST.Declaration.Decl
 declaration =
   choice
-    [ AST.Declaration.DocComment <$> Help.docComment
+    [ AST.Declaration.DocComment <$> docComment
     , AST.Declaration.Decl <$> addLocation (typeDecl <|> infixDecl <|> port <|> definition)
     ]
 

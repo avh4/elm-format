@@ -763,8 +763,8 @@ formatPattern elmVersion parensRequired apattern =
                     , preOp
                     , line $ punc "::"
                     , formatCommented
-                        (formatPattern elmVersion True)
-                        (Commented postOp term (fmap LineComment $ Maybe.maybeToList eol))
+                        (formatEolCommented $ formatPattern elmVersion True)
+                        (Commented postOp (term, eol) [])
                     )
             in
                 formatBinary False
@@ -870,11 +870,12 @@ formatExpression elmVersion needsParens aexpr =
                 Elm_0_18 -> formatRange_0_17 elmVersion left right multiline
                 Elm_0_18_Upgrade -> formatRange_0_18 elmVersion needsParens left right
 
-        AST.Expression.EmptyList comments ->
-          formatUnit '[' ']' comments
-
-        AST.Expression.ExplicitList exprs multiline ->
-            ElmStructure.group True "[" "," "]" multiline $ map (formatCommented (formatExpression elmVersion False)) exprs
+        AST.Expression.ExplicitList exprs trailing multiline ->
+            formatSequence '[' ',' (Just ']')
+                (formatExpression elmVersion False)
+                multiline
+                trailing
+                exprs
 
         AST.Expression.Binops left ops multiline ->
             case elmVersion of
@@ -1144,6 +1145,10 @@ formatSequence left delim right formatA (ForceMultiline multiline) trailing (fir
                 (map (formatItem delim) rest)
             )
             (maybe [] (flip (:) [] . stack' blankLine) (formatComments trailing) ++ (Maybe.maybeToList $ fmap (line . punc . flip (:) []) right))
+formatSequence left _ (Just right) _ _ trailing [] =
+    formatUnit left right trailing
+formatSequence left _ Nothing _ _ trailing [] =
+    pleaseReport "UNEXPECTED SEQUENCE" "no terms and no right delimiter"
 
 
 formatBinops_0_17 :: ElmVersion -> AST.Expression.Expr -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)] -> Bool -> Box
@@ -1362,9 +1367,14 @@ formatTailCommented format (inner, post) =
   formatCommented format (Commented [] inner post)
 
 
-formatEolCommented :: (a -> Box) -> (a, Maybe String) -> Box
+formatEolCommented :: (a -> Box) -> WithEol a -> Box
 formatEolCommented format (inner, post) =
-  formatCommented format (Commented [] inner (Maybe.maybeToList $ fmap LineComment post))
+  case (post, format inner) of
+    (Nothing, box) -> box
+    (Just eol, SingleLine result) ->
+      mustBreak $ row [ result, space, punc "--", literal eol ]
+    (Just eol, box) ->
+      stack1 [ box, formatComment $ LineComment eol ]
 
 
 formatCommentedStack :: (a -> Box) -> Commented a -> Box
@@ -1388,9 +1398,9 @@ formatKeywordCommented word format (KeywordCommented pre post value) =
 
 
 formatOpenCommentedList :: (a -> Box) -> OpenCommentedList a -> [Box]
-formatOpenCommentedList format (OpenCommentedList rest (preLst, lst) eol) =
-    (fmap (formatCommented format) rest)
-        ++ [formatCommented format $ Commented preLst lst $ Maybe.maybeToList $ fmap LineComment eol]
+formatOpenCommentedList format (OpenCommentedList rest (preLst, lst)) =
+    (fmap (formatCommented $ formatEolCommented format) rest)
+        ++ [formatCommented (formatEolCommented format) $ Commented preLst lst []]
 
 
 formatComment :: Comment -> Box
@@ -1553,8 +1563,7 @@ needsParensInSpaces (RA.A _ expr) =
       AST.Expression.Binops _ _ _ -> True
       AST.Expression.Parens _ -> False
 
-      AST.Expression.EmptyList _ -> False
-      AST.Expression.ExplicitList _ _ -> False
+      AST.Expression.ExplicitList _ _ _ -> False
       AST.Expression.Range _ _ _ -> False
 
       AST.Expression.Tuple _ _ -> False
@@ -1608,11 +1617,12 @@ formatType' elmVersion requireParens atype =
                         False
                         $ concat
                             [ Maybe.maybeToList $ formatComments preOp
-                            , [ ElmStructure.spaceSepOrIndented
-                                    (line $ punc "->")
-                                    [formatCommented
-                                        (formatType' elmVersion ForLambda)
-                                        (Commented postOp term (fmap LineComment $ Maybe.maybeToList eol))]
+                            , [ ElmStructure.prefixOrIndented
+                                  (line $ punc "->")
+                                  (formatCommented
+                                      (formatEolCommented $ formatType' elmVersion ForLambda)
+                                      (Commented postOp (term, eol) [])
+                                  )
                               ]
                             ]
             in

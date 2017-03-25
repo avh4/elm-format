@@ -8,6 +8,8 @@ import qualified AST.Declaration
 import qualified AST.Module as Module
 import qualified AST.Variable as Var
 import AST.V0_16
+import Parse.IParser
+import Parse.Whitespace
 
 
 elmModule :: IParser Module.Module
