@@ -1,13 +1,14 @@
 {-# OPTIONS_GHC -Wall -fno-warn-unused-do-bind #-}
 module Parse.Type where
 
-import Text.Parsec ((<|>), (<?>), char, many1, string, try)
+import Text.Parsec ((<|>), (<?>), char, many1, string, try, optionMaybe)
 
 import Parse.Helpers
 import qualified Reporting.Annotation as A
 import AST.V0_16
 import Parse.IParser
 import Parse.Whitespace
+import Parse.Common
 
 
 tvar :: IParser Type
@@ -35,57 +36,11 @@ tuple =
 
 record :: IParser Type
 record =
-  addLocation $
-  do  char '{'
-      pushNewlineContext
-      pre <- whitespace
-      body <- extended <|> normal
-      post <- dumbWhitespace
-      char '}'
-      sawNewline <- popNewlineContext
-      return $ body pre post sawNewline
-  where
-    normal =
-      do
-          fields <- commaSep field
-          return $ \pre post sawNewline ->
-              case fields of
-                  Nothing ->
-                      EmptyRecordType (pre ++ post)
-
-                  Just fields' ->
-                      RecordType (fields' pre post) sawNewline
-
-    -- extended record types require at least one field
-    extended =
-      do  (ext, postBase) <-
-            try $
-              do
-                ext <- lowVar
-                postBase <- whitespace
-                _ <- string "|"
-                return (ext, postBase)
-          preFields <- whitespace
-          fields <- commaSep1 field
-          return $ \pre post sawNewline ->
-            RecordExtensionType
-              (Commented pre ext postBase)
-              (fields preFields post)
-              sawNewline
-
-    field =
-      do  pushNewlineContext
-          lbl <- rLabel
-          postLbl <- whitespace
-          _ <- lenientHasType
-          preExpr <- whitespace
-          val <- expr
-          sawNewline <- popNewlineContext
-          return $ \preLbl postExpr ->
-            ( Commented preLbl lbl postLbl
-            , Commented preExpr val postExpr
-            , sawNewline
-            )
+    addLocation $ brackets' $ checkMultiline $
+        do
+            base <- optionMaybe $ try (commented lowVar <* string "|")
+            (fields, trailing) <- sectionedGroup (pair lowVar lenientHasType expr)
+            return $ RecordType base fields trailing
 
 
 capTypeVar :: IParser [UppercaseIdentifier]
@@ -134,7 +89,7 @@ expr =
         Left t ->
           t
         Right (region, first, rest, multiline) ->
-          A.A region $ FunctionType first rest multiline
+          A.A region $ FunctionType first rest (ForceMultiline multiline)
 
 
 constructor :: IParser ([UppercaseIdentifier], [(Comments, Type)])

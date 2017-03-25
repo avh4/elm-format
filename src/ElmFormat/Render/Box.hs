@@ -1079,43 +1079,13 @@ formatExpression elmVersion needsParens aexpr =
         AST.Expression.AccessFunction (LowercaseIdentifier field) ->
             line $ identifier $ "." ++ (formatVarName' elmVersion field)
 
-        AST.Expression.Record (Just base) [] trailing multiline ->
-            ElmStructure.extensionGroup'
-                ((\(ForceMultiline b) -> b) multiline)
-                (formatCommented (line . formatLowercaseIdentifier elmVersion []) base)
-                (formatSequence '|' ',' Nothing
-                    line
-                    multiline
-                    trailing
-                    [([], ([], (space, Nothing)))])
-
-        AST.Expression.Record (Just base) pairs' trailing multiline ->
-            ElmStructure.extensionGroup'
-                ((\(ForceMultiline b) -> b) multiline)
-                (formatCommented (line . formatLowercaseIdentifier elmVersion []) base)
-                (formatSequence '|' ',' Nothing
-                    (formatPair (formatLowercaseIdentifier elmVersion []) "=" (formatExpression elmVersion False))
-                    multiline
-                    trailing
-                    pairs')
-
-        AST.Expression.Record Nothing [] [] _ ->
-            line $ punc "{}"
-
-        AST.Expression.Record Nothing [] comments _ ->
-            case stack1 $ map formatComment comments of
-                SingleLine comments' ->
-                    line $ row [ punc "{", comments', punc "}" ]
-
-                _ ->
-                    formatUnit '{' '}' comments
-
-        AST.Expression.Record Nothing pairs' trailing multiline ->
-            formatSequence '{' ',' (Just '}')
-                (formatPair (formatLowercaseIdentifier elmVersion []) "=" (formatExpression elmVersion False))
-                multiline
-                trailing
-                pairs'
+        AST.Expression.Record base fields trailing multiline ->
+            formatRecordLike
+                (line . formatLowercaseIdentifier elmVersion [])
+                (formatLowercaseIdentifier elmVersion [])
+                "="
+                (formatExpression elmVersion False)
+                base fields trailing multiline
 
         AST.Expression.Parens expr ->
             parens $ formatCommented (formatExpression elmVersion False) expr
@@ -1129,6 +1099,51 @@ formatExpression elmVersion needsParens aexpr =
             , literal $ src
             , punc "|]"
             ]
+
+
+formatRecordLike ::
+    (base -> Box) -> (key -> Line) -> String -> (value -> Box)
+    -> Maybe (Commented base) -> Sequence (Pair key value)-> Comments -> ForceMultiline
+    -> Box
+formatRecordLike formatBase formatKey fieldSep formatValue base' fields trailing multiline =
+    case (base', fields, trailing) of
+      ( Just base, [], _ ) ->
+          ElmStructure.extensionGroup'
+              ((\(ForceMultiline b) -> b) multiline)
+              (formatCommented formatBase base)
+              (formatSequence '|' ',' Nothing
+                  line
+                  multiline
+                  trailing
+                  [([], ([], (space, Nothing)))])
+
+      ( Just base, pairs', _ ) ->
+          ElmStructure.extensionGroup'
+              ((\(ForceMultiline b) -> b) multiline)
+              (formatCommented formatBase base)
+              (formatSequence '|' ',' Nothing
+                  (formatPair formatKey fieldSep formatValue)
+                  multiline
+                  trailing
+                  pairs')
+
+      ( Nothing, [], [] ) ->
+          line $ punc "{}"
+
+      ( Nothing, [], _ ) ->
+          case stack1 $ map formatComment trailing of
+              SingleLine comments' ->
+                  line $ row [ punc "{", comments', punc "}" ]
+
+              _ ->
+                  formatUnit '{' '}' trailing
+
+      ( Nothing, pairs', _ ) ->
+          formatSequence '{' ',' (Just '}')
+              (formatPair formatKey fieldSep formatValue)
+              multiline
+              trailing
+              pairs'
 
 
 formatSequence :: Char -> Char -> Maybe Char -> (a -> Box) -> ForceMultiline -> Comments -> Sequence a -> Box
@@ -1610,7 +1625,7 @@ formatType' elmVersion requireParens atype =
         UnitType comments ->
           formatUnit '(' ')' comments
 
-        FunctionType first rest forceMultiline ->
+        FunctionType first rest (ForceMultiline forceMultiline) ->
             let
                 formatRight (preOp, postOp, term, eol) =
                     ElmStructure.forceableSpaceSepOrStack1
@@ -1648,21 +1663,13 @@ formatType' elmVersion requireParens atype =
         TupleType types ->
           ElmStructure.group True "(" "," ")" False (map (formatCommented (formatType elmVersion)) types)
 
-        EmptyRecordType comments ->
-          formatUnit '{' '}' comments
-
-        RecordType fields multiline ->
-          ElmStructure.group True "{" "," "}" multiline (map (formatRecordPair elmVersion ":" (formatType elmVersion)) fields)
-
-        RecordExtensionType _ [] _ ->
-          pleaseReport "INVALID RECORD TYPE EXTENSION" "no fields"
-
-        RecordExtensionType ext (first:rest) multiline ->
-          ElmStructure.extensionGroup
-            multiline
-            (formatCommented (line . formatLowercaseIdentifier elmVersion []) ext)
-            (formatRecordPair elmVersion ":" (formatType elmVersion) first)
-            (map (formatRecordPair elmVersion ":" (formatType elmVersion)) rest)
+        RecordType base fields trailing multiline ->
+            formatRecordLike
+                (line . formatLowercaseIdentifier elmVersion [])
+                (formatLowercaseIdentifier elmVersion [])
+                ":"
+                (formatType elmVersion)
+                base fields trailing multiline
 
 
 formatVar :: ElmVersion -> AST.Variable.Ref -> Line
