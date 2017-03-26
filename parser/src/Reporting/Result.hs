@@ -1,6 +1,5 @@
 module Reporting.Result where
 
-import Control.Applicative ((<|>))
 import qualified Control.Monad as M
 import Control.Monad.Except (Except, runExcept)
 

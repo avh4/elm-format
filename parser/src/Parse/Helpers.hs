@@ -3,8 +3,6 @@ module Parse.Helpers where
 
 import Prelude hiding (until)
 import Control.Monad (guard)
-import Control.Monad.State (State)
-import qualified Data.Char as Char
 import qualified Data.Maybe as Maybe
 import Text.Parsec hiding (newline, spaces, State)
 import Text.Parsec.Indent (indented, runIndent)
