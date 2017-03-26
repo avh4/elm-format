@@ -1,11 +1,13 @@
 {
   "name": "elm-format",
-  "version": "0.5.2-alpha-dev",
+  "version": "0.5.2",
   "description": "Install elm-format",
   "preferGlobal": true,
   "main": "install.js",
   "scripts": {
-    "install": "node install.js"
+    "install": "node install.js",
+    "prepublish": "npm test",
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -21,6 +23,7 @@
   },
   "files": [
     "install.js",
+    "elmFormatDownload.js",
     "binaries"
   ],
   "homepage": "https://github.com/avh4/elm-format",
@@ -29,5 +32,10 @@
   },
   "dependencies": {
     "binstall": "1.2.0"
+  },
+  "devDependencies": {
+    "mocha": "^3.2.0",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.0"
   }
 }

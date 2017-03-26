@@ -56,7 +56,6 @@ brew cask install virtualbox
 
 ```
 cd package/npm
-# TODO: ensure that the required URLs all exist
 npm publish
 ```
 
