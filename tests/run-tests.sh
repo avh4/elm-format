@@ -269,7 +269,7 @@ function checkValidationOutputFormat() {
 	echo
 
 	echo "## with unformatted files outputs in expected json format"
-	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate | sed -e "s/$(git describe --abbrev=8)/<version>/" | tee "$OUTPUT"
+	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate | sed -e "s/$(git describe --abbrev=8 --always)/<version>/" | tee "$OUTPUT"
 	compareFiles tests/test-files/validate1.json "$OUTPUT"
 
 	echo "## with invalid files outputs in expected json format"
