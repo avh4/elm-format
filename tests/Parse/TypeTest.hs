@@ -1,16 +1,10 @@
 module Parse.TypeTest where
 
-import Elm.Utils ((|>))
-
-import Test.HUnit (Assertion, assertEqual)
 import Test.Tasty
 import Test.Tasty.HUnit
 
 import Parse.Type
-import Text.ParserCombinators.Parsec.Combinator (eof)
 import AST.V0_16
-import Reporting.Annotation hiding (map, at)
-import Reporting.Region
 
 import Parse.TestHelpers
 import ElmVersion

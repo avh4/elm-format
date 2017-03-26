@@ -1,22 +1,11 @@
 module Parse.PatternTest where
 
-import Elm.Utils ((|>))
-
-import Test.HUnit (Assertion, assertEqual)
 import Test.Tasty
 import Test.Tasty.HUnit
-import qualified Data.Text.Lazy as LazyText
 
 import Parse.Pattern
-import Parse.Helpers (iParse)
-import Parse.IParser
 import AST.V0_16
 import AST.Pattern
-import AST.Variable hiding (Alias)
-import Reporting.Annotation hiding (map, at)
-import Reporting.Region
-import Text.Parsec.Char (string)
-import Debug.Trace
 
 import Parse.TestHelpers
 

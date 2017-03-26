@@ -5,9 +5,7 @@ import ElmVersion (ElmVersion(..))
 
 import Test.Tasty
 import Test.Tasty.HUnit
-import Test.Tasty.Golden
 
-import ElmFormat.World
 import ElmFormat.TestWorld
 
 import qualified ElmFormat.Cli as Cli

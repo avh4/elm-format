@@ -1,7 +1,6 @@
 module Main where
 
 import Test.Tasty
-import Test.Tasty.HUnit
 
 import qualified Test.Property
 import qualified BoxTest

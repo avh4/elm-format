@@ -3,7 +3,7 @@ module CommandLine.Helpers where
 import Control.Monad.Free
 import ElmFormat.Operation (Operation)
 import System.IO
-import System.Exit (exitFailure, exitSuccess)
+import System.Exit (exitFailure)
 import Messages.Types (ErrorMessage(..), PromptMessage(..))
 import Messages.Strings (showErrorMessage, showPromptMessage)
 

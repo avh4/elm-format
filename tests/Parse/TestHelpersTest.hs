@@ -1,7 +1,5 @@
 module Parse.TestHelpersTest where
 
-import Elm.Utils ((|>))
-
 import Test.Tasty
 import Test.Tasty.HUnit
 
