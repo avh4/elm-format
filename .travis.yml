@@ -25,7 +25,6 @@ before_install:
 install:
 - stack setup
 - stack build --only-dependencies
-- npm install -g ajv-cli
 
 
 script:

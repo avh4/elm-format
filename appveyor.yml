@@ -11,7 +11,6 @@ before_test:
 - set PATH=%PATH%;C:\Program Files\Git\mingw64\bin
 - curl -sS -ostack.zip -L --insecure http://www.stackage.org/stack/windows-x86_64
 - 7z x stack.zip stack.exe
-- npm install -g ajv-cli
 
 clone_folder: 'c:\stack'
 environment:
@@ -19,8 +18,7 @@ environment:
     STACK_ROOT: 'c:\sr'
 
 test_script:
-- "set PATH=%PATH%;c:\\stack;%APPDATA%\\npm"
-- which ajv
+- "set PATH=%PATH%;c:\\stack"
 - stack setup > nil
 - stack path
 - stack build

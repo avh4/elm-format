@@ -26,14 +26,3 @@ COPY elm-format.cabal ./
 RUN stack build --only-snapshot
 RUN stack build --only-dependencies
 RUN stack build --test --only-dependencies
-
-
-# Install nodejs
-RUN curl -sL https://deb.nodesource.com/setup_7.x | bash -
-RUN apt-get install -qy nodejs && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-
-# Install elm-format dependencies
-RUN npm install -g ajv-cli
