@@ -21,6 +21,7 @@ function build-flavor() {
     mkdir -p dist/package-scripts
     ELM_FORMAT="$(stack path --local-install-root)/bin/elm-format-${FLAVOR}"
     cp "$ELM_FORMAT" dist/package-scripts/elm-format
+    strip dist/package-scripts/elm-format
     tar zcvf "$BUILD".tgz -C dist/package-scripts elm-format
 }
 

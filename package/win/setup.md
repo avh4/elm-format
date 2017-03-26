@@ -21,7 +21,17 @@ choco install poshgit
 # Restart shell
 
 
-## Build Windows x64 binary
+## Build Windows binary
+
+```bash
+cd package/win/elm-format
+git fetch
+git checkout <version tag>
+
+## !! Make sure you are in package/win/elm-format !!
+git clean -dfx
+## !! Make sure you are in package/win/elm-format !!
+```
 
  - Start Git Bash
 
