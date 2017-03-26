@@ -20,7 +20,7 @@ brew cask install virtualbox
 1. Create a github issue to draft the release notes.
 1. Edit `elm-format.cabal` to remove `-dev` from the version and make sure the version number is correct.
 1. Edit `CHANGELOG.md` to set the correct version number.
-1. `(cd package/npm && npm version "$(git describe --abbrev=8)")`
+1. `(cd package/npm && npm version "<new version>")`
 1. Commit the changes.
 1. Create a signed tag for the new version. `git tag -s <version> -m <version>`
 1. Push the tag.

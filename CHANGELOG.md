@@ -1,4 +1,4 @@
-## master (next release, 0.6.0-alpha)
+## 0.6.0-alpha
 
 Notes:
   - Support for Elm 0.16 is deprecated (but is still available with the `--elm-version=0.16` option).
