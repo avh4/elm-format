@@ -12,6 +12,10 @@ exports.url = function(operatingSystem, arch) {
     win32: "win"
   }[operatingSystem] || operatingSystem;
 
+  if (operatingSystem === "win") {
+    arch = "i386";
+  }
+
   var ext = {
     win: "zip"
   }[operatingSystem] || "tgz";
