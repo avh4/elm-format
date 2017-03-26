@@ -3,8 +3,7 @@ var path = require("path");
 var fs = require("fs");
 var packageInfo = require(path.join(__dirname, "package.json"));
 
-// Use major.minor.patch from version string - e.g. "1.2.3" from "1.2.3-alpha"
-var binVersion = packageInfo.version.match(/^(\d+\.\d+\.\d+).*$/)[1];
+var binVersion = packageInfo.version;
 
 
 // 'arm', 'ia32', or 'x64'.
@@ -23,7 +22,7 @@ var binaryExtension = process.platform === "win32" ? ".exe" : "";
 var executablePaths = Object.keys(packageInfo.bin).map(function(executable) {
   return path.join(binariesDir, executable + binaryExtension);
 });
-var errorMessage = "Unfortunately, there are no elm-format " + binVersion + " binaries available on your operating system and architecture.\n\nIf you would like to build Elm from source, there are instructions at https://github.com/elm-lang/elm-platform#build-from-source\n";
+var errorMessage = "Unfortunately, there are no elm-format " + binVersion + " binaries available on your operating system and architecture.\n\nIf you would like to build elm-format from source, there are instructions at https://github.com/avh4/elm-format#building-from-source\n";
 
 binstall(url, {path: binariesDir},
   {verbose: true, verify: executablePaths, errorMessage: errorMessage}

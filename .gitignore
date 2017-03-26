@@ -5,4 +5,4 @@
 *.tix
 /.stack-work/
 /tests/elm-format
-node_modules/
+/node_modules/
