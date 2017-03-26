@@ -7,7 +7,7 @@ Syntax changes:
   - Removed a workaround for an Elm 0.16 compiler bug that added extra parenthesis to qualified type tags in pattern matches
   - End-of-line `--` comments are now kept on their original line when appropriate
   - `--` comments in the middle of binary operator sequences no longer push the following expression to the next line
-  - `--` comments can be use to create sections in record expressions
+  - `--` comments can be use to create sections in records and lists
   - For Windows, CRLF newlines no longer corrupt literal strings
 
 Bug fixes:
