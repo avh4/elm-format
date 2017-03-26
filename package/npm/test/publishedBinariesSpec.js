@@ -1,4 +1,4 @@
-var request = require("request-promise");
+var request = require("then-request");
 var elmFormat = require("../elmFormatDownload");
 
 function showUrl(url) {
@@ -10,13 +10,13 @@ function showUrl(url) {
 function checkBinary(os, arch) {
   return function() {
     var url = elmFormat.url(os, arch);
-    return request.head(url).catch(showUrl(url));
+    return request("HEAD", url).catch(showUrl(url));
   };
 }
 
 describe("published binaries", function() {
   it("(tests should be able to connect to the internet)", function() {
-    return request.head("https://google.com");
+    return request("HEAD", "https://google.com");
   });
 
   it("should include Mac binaries", checkBinary("darwin", "x64"));

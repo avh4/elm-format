@@ -1,6 +1,6 @@
 {
   "name": "elm-format",
-  "version": "0.5.2",
+  "version": "0.5.2-alpha",
   "description": "Install elm-format",
   "preferGlobal": true,
   "main": "install.js",
@@ -35,7 +35,6 @@
   },
   "devDependencies": {
     "mocha": "^3.2.0",
-    "request": "^2.81.0",
-    "request-promise": "^4.2.0"
+    "then-request": "^2.2.0"
   }
 }
