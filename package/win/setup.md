@@ -10,7 +10,7 @@ vagrant winrm -c "dir"
 
 # Open VirtualBox and show the Windows VM
 
-# Download and install Haskell Stack (64-bit)
+# Download and install Haskell Stack (32-bit)
 
 stack setup
 choco install devbox-common

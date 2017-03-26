@@ -2,7 +2,7 @@
 
 set -ex
 
-VERSION="$(git describe)"
+VERSION="$(git describe --abbrev=8)"
 PLATFORM="linux-x64"
 
 ## Run tests
