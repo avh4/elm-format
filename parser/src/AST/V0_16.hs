@@ -2,6 +2,7 @@
 module AST.V0_16 where
 
 import qualified Reporting.Annotation as A
+import Data.Int (Int64)
 
 
 type List a = [a]
@@ -178,7 +179,7 @@ data FloatRepresentation
 
 
 data Literal
-    = IntNum Int IntRepresentation
+    = IntNum Int64 IntRepresentation
     | FloatNum Double FloatRepresentation
     | Chr Char
     | Str String Bool
