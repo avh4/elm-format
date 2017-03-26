@@ -22,4 +22,5 @@ describe("published binaries", function() {
   it("should include Mac binaries", checkBinary("darwin", "x64"));
   it("should include Linux binaries", checkBinary("linux", "x64"));
   it("should include Windows binaries", checkBinary("win32", "x64"));
+  it("should include Windows binaries (32-bit)", checkBinary("win32", "ia32"));
 });
