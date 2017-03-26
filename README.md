@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
 ![experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
-[![latest version: 0.5.2-alpha](https://img.shields.io/badge/version-0.5.2--alpha-blue.svg)](https://github.com/avh4/elm-format/releases/tag/0.5.2-alpha)
+[![latest version: 0.6.0-alpha](https://img.shields.io/badge/version-0.6.0--alpha-blue.svg)](https://github.com/avh4/elm-format/releases/tag/0.6.0-alpha)
 
 # elm-format
 
@@ -28,7 +28,7 @@ elm-format --stdin --output Main.elm  # Format input from stdin and write to fil
 elm-format --help  # See other command line options
 ```
 
-## Installation [![(latest version: 0.5.2-alpha)](https://img.shields.io/badge/version-0.5.2--alpha-blue.svg)](https://github.com/avh4/elm-format/releases/tag/0.5.2-alpha)
+## Installation [![(latest version: 0.6.0-alpha)](https://img.shields.io/badge/version-0.6.0--alpha-blue.svg)](https://github.com/avh4/elm-format/releases/tag/0.6.0-alpha)
 
 > `elm-format` is still in alpha.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
 >
@@ -42,15 +42,15 @@ If you need to verify the downloads, see the [releases page](https://github.com/
 
 (To upgrade your Elm 0.17 project to Elm 0.18, see the [Elm 0.18 upgrade guide](https://github.com/elm-lang/elm-platform/blob/master/upgrade-docs/0.18.md).)
 
- - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.5.2-alpha/elm-format-0.18-0.5.2-alpha-mac-x64.tgz)
- - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.5.2-alpha/elm-format-0.18-0.5.2-alpha-linux-x64.tgz)
- - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.5.2-alpha/elm-format-0.18-0.5.2-alpha-win-x64.zip)
+ - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.6.0-alpha/elm-format-0.18-0.6.0-alpha-mac-x64.tgz)
+ - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.6.0-alpha/elm-format-0.18-0.6.0-alpha-linux-x64.tgz)
+ - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.6.0-alpha/elm-format-0.18-0.6.0-alpha-win-i386.zip)
 
 ### For Elm 0.17
 
- - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.5.2-alpha/elm-format-0.17-0.5.2-alpha-mac-x64.tgz)
- - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.5.2-alpha/elm-format-0.17-0.5.2-alpha-linux-x64.tgz)
- - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.5.2-alpha/elm-format-0.17-0.5.2-alpha-win-x64.zip)
+ - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.6.0-alpha/elm-format-0.17-0.6.0-alpha-mac-x64.tgz)
+ - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.6.0-alpha/elm-format-0.17-0.6.0-alpha-linux-x64.tgz)
+ - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.6.0-alpha/elm-format-0.17-0.6.0-alpha-win-i386.zip)
 
 
 ## Editor integration
