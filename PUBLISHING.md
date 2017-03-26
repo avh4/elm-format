@@ -24,6 +24,7 @@ brew cask install virtualbox
 1. Commit the changes.
 1. Create a signed tag for the new version. `git tag -s <version> -m <version>`
 1. Push the tag.
+1. Wait for CI to successfully build the tag.
 
 
 ## Mac
