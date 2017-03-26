@@ -22,7 +22,12 @@ tests =
     [ testGroup "Int"
         [ example "" "99" "99\n"
         , example "negative" "-99" "-99\n"
-        , example "hexadecimal" "0xfF" "0xFF\n"
+        , testGroup "hexadecimal"
+            [ example "small" "0xfF" "0xFF\n"
+            , example "medium" "0xfF0" "0x0FF0\n"
+            , example "large" "0xfF000" "0x000FF000\n"
+            , example "huge" "0xfF0000000" "0x0000000FF0000000\n"
+            ]
         , testCase "hexadecimal must start with 0" $
             assertParseFailure literal "xFF"
         , testCase "hexadecimal, must contain digits" $
