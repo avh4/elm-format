@@ -2,9 +2,10 @@
 # shellcheck disable=SC2002
 
 uname -s
-which ajv
 which diff
 which grep
+which sed
+which tee
 which wc
 
 
@@ -260,7 +261,7 @@ function checkValidationOutputFormat() {
 
 	INPUT="_input.elm"
 	INPUT_2="_input2.elm"
-	STDOUT="_stdout.txt"
+	OUTPUT="_stdout.txt"
 
 	echo
 	echo "------------------------------"
@@ -268,20 +269,17 @@ function checkValidationOutputFormat() {
 	echo
 
 	echo "## with unformatted files outputs in expected json format"
-	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate > "$STDOUT"
-	ajv test -s tests/json-format-schema.json -d "$STDOUT" --valid
-	returnCodeShouldEqual 0
+	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate | sed -e "s/$(git describe --abbrev=8)/<version>/" | tee "$OUTPUT"
+	compareFiles tests/test-files/validate1.json "$OUTPUT"
 
 	echo "## with invalid files outputs in expected json format"
-	"$ELM_FORMAT" "tests/test-files/bad/Empty.elm" --validate > "$STDOUT"
-	ajv test -s tests/json-format-schema.json -d "$STDOUT" --valid
-	returnCodeShouldEqual 0
+	"$ELM_FORMAT" "tests/test-files/bad/Empty.elm" --validate | tee "$OUTPUT"
+	compareFiles tests/test-files/bad/Empty.validate.json "$OUTPUT"
 
 	echo "## with formatted file with output in json outputs empty list"
-	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --yes 1>/dev/null
-	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate 1>"$STDOUT"
-	grep -q "^\[\]$" "$STDOUT"
-	returnCodeShouldEqual 0
+	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --yes > /dev/null
+	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate | tee "$OUTPUT"
+	compareFiles tests/test-files/validate2.json "$OUTPUT"
 
 	echo "# OK!"
 	echo "------------------------------"
