@@ -5,7 +5,10 @@ import Parse.IParser
 import qualified Parse.State as State
 import qualified Reporting.Error.Syntax as Syntax
 import Text.Parsec hiding (newline, spaces, State)
+import qualified Cheapskate.Types as Markdown
+import qualified Cheapskate.Parse
 import qualified Data.Char as Char
+import qualified Data.Text as Text
 
 
 padded :: IParser a -> IParser (Comments, a, Comments)
@@ -125,6 +128,25 @@ docComment =
   do  _ <- try (string "{-|")
       _ <- many (string " ")
       closeComment False
+
+
+($>) :: Functor f => f a -> (a -> b) -> f b
+($>) = flip (<$>)
+
+
+docCommentAsMarkdown :: IParser Markdown.Blocks
+docCommentAsMarkdown =
+    docComment
+        $> Text.pack
+        $> Cheapskate.Parse.markdown
+            (Markdown.Options
+                { Markdown.sanitize = True
+                , Markdown.allowRawHtml = True
+                , Markdown.preserveHardBreaks = True
+                , Markdown.debug = False
+                }
+            )
+        $> (\(Markdown.Doc _ source) -> source)
 
 
 multiComment :: IParser Comment
