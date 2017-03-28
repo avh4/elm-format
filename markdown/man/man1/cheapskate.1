@@ -1,0 +1,55 @@
+.TH "cheapskate" "1" "January 4, 2014" "cheapskate manual" ""
+.SH NAME
+.PP
+cheapskate \- convert markdown to HTML.
+.SH SYNOPSIS
+.PP
+cheapskate [\f[I]options..\f[]] [\f[I]file..\f[]]
+.SH DESCRIPTION
+.PP
+\f[C]cheapskate\f[] will convert the input text (which may come from
+stdin or from any number of input files) from markdown to HTML.
+Output will be written to stdout.
+.SH OPTIONS
+.TP
+.B \f[C]\-s,\ \-\-sanitize\f[]
+Sanitize raw HTML and link and image attributes to protect from XSS
+attacks.
+.RS
+.RE
+.TP
+.B \f[C]\-e,\ \-\-escape\-raw\-html\f[]
+Escape all raw HTML.
+(Note: for safety, use \f[C]\-\-sanitize\f[].
+This option is for those who want to disallow raw HTML to enforce
+uniformity of formatting.)
+.RS
+.RE
+.TP
+.B \f[C]\-b,\ \-\-hard\-line\-breaks\f[]
+Treat all newlines as hard line breaks (\f[C]<br\ />\f[] tags in HTML).
+.RS
+.RE
+.TP
+.B \f[C]\-\-debug\f[]
+Print the container structure obtained from phase 1 of parsing.
+For debugging only.
+.RS
+.RE
+.TP
+.B \f[C]\-h,\ \-\-help\f[]
+Print usage information.
+.RS
+.RE
+.TP
+.B \f[C]\-V,\ \-\-version\f[]
+Print version.
+.RS
+.RE
+.SH AUTHORS
+.PP
+John MacFarlane.
+.SH SEE ALSO
+.PP
+The \f[C]cheapskate\f[] source code and all documentation may be
+downloaded from <http://github.com/jgm/cheapskate/>.
