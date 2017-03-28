@@ -1,0 +1,79 @@
+name:                cheapskate
+version:             0.1.0.5
+synopsis:            Experimental markdown processor.
+description:         This is an experimental Markdown processor in pure
+                     Haskell.  It aims to process Markdown efficiently and in
+                     the most forgiving possible way.  It is designed to deal
+                     with any input, including garbage, with linear
+                     performance.  Output is sanitized by default for
+                     protection against XSS attacks.
+                     .
+                     Several markdown extensions are implemented, including
+                     fenced code blocks, significant list start numbers, and
+                     autolinked URLs.  See README.markdown for details.
+homepage:            http://github.com/jgm/cheapskate
+license:             BSD3
+license-file:        LICENSE
+author:              John MacFarlane
+maintainer:          jgm@berkeley.edu
+copyright:           (C) 2012-2013 John MacFarlane
+category:            Text
+build-type:          Simple
+extra-source-files:  README.markdown
+                     changelog
+                     man/man1/cheapskate.1
+cabal-version:       >=1.10
+Source-repository head
+  type:              git
+  location:          git://github.com/jgm/cheapskate.git
+
+Flag dingus
+  Description:       Build cheapskate-dingus cgi script.
+  Default:           False
+
+library
+  hs-source-dirs:    .
+  exposed-modules:   Cheapskate
+                     Cheapskate.Parse
+                     Cheapskate.Types
+                     Cheapskate.Html
+  other-modules:     Cheapskate.Util
+                     Cheapskate.Inlines
+                     Cheapskate.ParserCombinators
+                     Paths_cheapskate
+  build-depends:     base >=4.4 && <5,
+                     containers >=0.4 && <0.6,
+                     mtl >=2.1 && <2.3,
+                     text >= 0.9 && < 1.3,
+                     blaze-html >=0.6 && < 0.10,
+                     xss-sanitize >= 0.3 && < 0.4,
+                     data-default >= 0.5 && < 0.7,
+                     syb,
+                     uniplate >= 1.6 && < 1.7
+  default-language:  Haskell2010
+  ghc-options:       -Wall -fno-warn-unused-do-bind
+
+executable cheapskate
+  main-is:           main.hs
+  hs-source-dirs:    bin
+  build-depends:     base >=4.4 && <5,
+                     cheapskate,
+                     bytestring,
+                     blaze-html >=0.6 && < 0.10,
+                     text >= 0.9 && < 1.3
+  default-language:  Haskell2010
+  ghc-options:       -Wall -fno-warn-unused-do-bind
+  ghc-prof-options:  -auto-all -caf-all -rtsopts
+
+executable cheapskate-dingus
+  main-is:           cheapskate-dingus.hs
+  hs-source-dirs:    bin
+  build-depends:     base, aeson, cheapskate, blaze-html,
+                     text, wai-extra, wai >= 0.3, http-types
+  default-language:  Haskell2010
+  if flag(dingus)
+    Buildable:       True
+  else
+    Buildable:       False
+  ghc-options:       -Wall -fno-warn-unused-do-bind
+  ghc-prof-options:  -auto-all -caf-all -rtsopts
