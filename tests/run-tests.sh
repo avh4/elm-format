@@ -357,6 +357,7 @@ checkTransformation 0.16 github-avh4-elm-format-184.elm
 checkTransformation 0.16 QuickCheck-4562ebccb71ea9f622fb99cdf32b2923f6f9d34f-2529668492575674138.elm
 checkTransformation 0.16 QuickCheck-94f37da84c1310f03dcfa1059ce870b73c94a825--6449652945938213463.elm
 checkTransformation 0.18 WindowsEol.elm
+checkTransformation 0.18 DocCommentCodeExample.elm
 checkUpgrade 0.18 Elm-0.18/PrimesBecomeUnderscores.elm
 checkUpgrade 0.18 Elm-0.18/RangesBecomeListRange.elm
 checkUpgrade 0.18 Elm-0.18/BackticksBecomeFunctionCalls.elm

@@ -11,8 +11,8 @@ works!**
 [elm-effects]: http://package.elm-lang.org/packages/evancz/elm-effects/latest
 
 # Start your Application
-@docs start, Config, App
 
+@docs start, Config, App
 -}
 
 import Effects exposing (Effects, Never)

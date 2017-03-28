@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 module Cheapskate.Types where
 import Data.Sequence (Seq)
-import Data.Default
 import Data.Text (Text)
 import qualified Data.Map as M
 import Data.Data
@@ -19,6 +18,7 @@ data Block = Para Inlines
            | CodeBlock CodeAttr Text
            | HtmlBlock Text
            | HRule
+           | ReferencesBlock [(Text, Text, Text)]
            deriving (Show, Data, Typeable)
 
 -- | Attributes for fenced code blocks.  'codeLang' is the
@@ -44,11 +44,18 @@ data Inline = Str Text
             | Emph Inlines
             | Strong Inlines
             | Code Text
-            | Link Inlines Text {- URL -} Text {- title -}
+            | Link Inlines LinkTarget {- URL -} Text {- title -}
             | Image Inlines Text {- URL -} Text {- title -}
             | Entity Text
             | RawHtml Text
             deriving (Show, Data, Typeable)
+
+
+data LinkTarget
+    = Url Text
+    | Ref Text
+    deriving (Show, Data)
+
 
 type Inlines = Seq Inline
 
@@ -62,12 +69,3 @@ data Options = Options{
   , debug              :: Bool  -- ^ Print container structure for debugging
   }
   deriving (Show, Data, Typeable)
-
-instance Default Options where
-  def = Options{
-          sanitize = True
-        , allowRawHtml = True
-        , preserveHardBreaks = False
-        , debug = False
-        }
-

@@ -3,18 +3,23 @@ module Check (..) where
 {-| Property Based Testing module in Elm.
 
 # Make a claim
+
 @docs claim, claimTrue, claimFalse
 
 # Check a claim
+
 @docs quickCheck, check
 
 # Group claims into a suite
+
 @docs suite
 
 # Types
+
 @docs Claim, Evidence, UnitEvidence, SuccessOptions, FailureOptions
 
 # Multi-arity claims
+
 @docs claim2True, claim2False, claim3, claim3True, claim3False, claim4, claim4True, claim4False, claim5, claim5True, claim5False
 
 # DSL
@@ -25,31 +30,24 @@ test code.
 
 With the DSL, claims read as either:
 
-1. claim - (string) - that - (actual) - is - (expected) - for - (investigator)
-2. claim - (string) - true - (predicate) - for - (investigator)
-3. claim - (string) - false - (predicate) - for - (investigator)
-
+1.  claim - (string) - that - (actual) - is - (expected) - for - (investigator)
+2.  claim - (string) - true - (predicate) - for - (investigator)
+3.  claim - (string) - false - (predicate) - for - (investigator)
 
 **Example:**
 
     claim_multiplication_by_one_noop =
-      claim
-        "Multiplying by one does not change a number"
-      `true`
-        (\n -> n * 1 == n)
-      `for`
-        int
+        claim
+            "Multiplying by one does not change a number"
+            `true` (\n -> n * 1 == n)
+            `for` int
 
     claim_reverse_append =
-      claim
-        "Append then reverse is equivalent to reverse then append"
-      `that`
-        (\(l1, l2) -> List.reverse (l1 ++ l2))
-      `is`
-        (\(l1, l2) -> List.reverse l1 ++ List.reverse l2)
-      `for`
-        tuple (list int, list int)
-
+        claim
+            "Append then reverse is equivalent to reverse then append"
+            `that` (\( l1, l2 ) -> List.reverse (l1 ++ l2))
+            `is` (\( l1, l2 ) -> List.reverse l1 ++ List.reverse l2)
+            `for` tuple ( list int, list int )
 
 It is important to note that, if you wish to deal with multi-arity functions
 using this DSL, you must deal explicitly in tuples.
@@ -61,7 +59,6 @@ a uniform way. As a result, the following functions have horrendous type
 signatures and you are better off ignoring them.*
 
 @docs that, is, for, true, false
-
 -}
 
 --------------------------
@@ -120,9 +117,10 @@ type alias UnitEvidence =
 found disproving a Claim.
 
 SuccessOptions contains:
-1. the `name` of the claim
-2. the number of checks performed
-3. the `seed` used in order to reproduce the check.
+
+1.  the `name` of the claim
+2.  the number of checks performed
+3.  the `seed` used in order to reproduce the check.
 -}
 type alias SuccessOptions =
     { name : String
@@ -135,15 +133,16 @@ type alias SuccessOptions =
 disproving a Claim.
 
 FailureOptions contains:
-1. the `name` of the claim
-2. the minimal `counterExample` which serves as evidence that the claim is false
-3. the value `expected` to be returned by the claim
-4. the `actual` value returned by the claim
-5. the `seed` used in order to reproduce the results
-6. the number of checks performed
-7. the number of shrinking operations performed
-8. the original `counterExample`, `actual`, and `expected` values found prior
-to performing the shrinking operations.
+
+1.  the `name` of the claim
+2.  the minimal `counterExample` which serves as evidence that the claim is false
+3.  the value `expected` to be returned by the claim
+4.  the `actual` value returned by the claim
+5.  the `seed` used in order to reproduce the results
+6.  the number of checks performed
+7.  the number of shrinking operations performed
+8.  the original `counterExample`, `actual`, and `expected` values found prior
+    to performing the shrinking operations.
 -}
 type alias FailureOptions =
     { name : String
@@ -197,20 +196,19 @@ type alias FailureOptions =
 
     claim nameOfClaim actualStatement expectedStatement investigator
 
-1. The `nameOfClaim` is a string you pass in order to name your claim.
-This is very useful when trying to debug or reading reports.
-2. The `actualStatement` is a function which states something about your
-system. The result of which will be compared by equality `==` to the
-result of the `expectedStatement`.
-3. The `expectedStatement` is a function which states something which
-the `actualStatement` should conform to or be equivalent to. The result of
-which will be compared by equality `==` to the result of the `actualStatement`.
-4. The `investigator` is an investigator used to generate random values to be passed
-to the `actualStatement` and `expectedStatement` in order to attempt to
-disprove the claim. If a counter example is found, the `investigator` will then
-shrink the counter example until it yields a minimal counter example which
-is then easy to debug.
-
+1.  The `nameOfClaim` is a string you pass in order to name your claim.
+    This is very useful when trying to debug or reading reports.
+2.  The `actualStatement` is a function which states something about your
+    system. The result of which will be compared by equality `==` to the
+    result of the `expectedStatement`.
+3.  The `expectedStatement` is a function which states something which
+    the `actualStatement` should conform to or be equivalent to. The result of
+    which will be compared by equality `==` to the result of the `actualStatement`.
+4.  The `investigator` is an investigator used to generate random values to be passed
+    to the `actualStatement` and `expectedStatement` in order to attempt to
+    disprove the claim. If a counter example is found, the `investigator` will then
+    shrink the counter example until it yields a minimal counter example which
+    is then easy to debug.
 
 Example :
 
@@ -219,7 +217,6 @@ Example :
         (\list -> List.sort (List.sort (list))
         (\list -> List.sort (list))
         (list int)
-
 -}
 claim : String -> (a -> b) -> (a -> b) -> Investigator a -> Claim
 claim name actualStatement expectedStatement investigator =
@@ -419,13 +416,12 @@ predicate to yield `False`, then it will consider that as the counter example.
 
     claimTrue nameOfClaim predicate investigator
 
-
 Example:
 
     claim_length_list_nonnegative =
-      claimTrue "The length of a list is strictly non-negative"
-        (\list -> List.length list >= 0)
-        (list string)
+        claimTrue "The length of a list is strictly non-negative"
+            (\list -> List.length list >= 0)
+            (list string)
 -}
 claimTrue : String -> (a -> Bool) -> Investigator a -> Claim
 claimTrue name predicate =
@@ -441,13 +437,12 @@ example.
 
     claimFalse nameOfClaim predicate investigator
 
-
 Example:
 
     claim_length_list_never_negative =
-      claimFalse "The length of a list is never negative"
-      (\list -> List.length list < 0)
-      (list float)
+        claimFalse "The length of a list is never negative"
+            (\list -> List.length list < 0)
+            (list float)
 -}
 claimFalse : String -> (a -> Bool) -> Investigator a -> Claim
 claimFalse name predicate =
@@ -485,7 +480,7 @@ This function is very useful when checking claims locally. `quickCheck` will
 perform 100 checks and use `Random.initialSeed 1` as the random seed.
 
     quickCheck claim =
-      check claim 100 (Random.initialSeed 1)
+        check claim 100 (Random.initialSeed 1)
 -}
 quickCheck : Claim -> Evidence
 quickCheck claim =

@@ -331,7 +331,25 @@ processElts refmap (C (Container ct cs) : rest) =
 
     -- References have already been taken into account in the reference map,
     -- so we just skip.
-    Reference{} -> processElts refmap rest
+    Reference{} ->
+        processElts' [] (C (Container ct cs) : rest)
+        where
+            refs cs' =
+                fmap (extractRef . extractText) (toList cs')
+
+            extractRef t =
+              case parse pReference (T.strip t) of
+                 Right (lab, lnk, tit) ->
+                    (lab, lnk, tit)
+                 Left _ ->
+                    ("??", "??", "??")
+
+            processElts' :: [[(Text, Text, Text)]] -> [Elt] -> Blocks
+            processElts' acc (C (Container Reference cs) : rest') =
+                processElts' (refs cs : acc) rest'
+            processElts' acc pass =
+                (singleton $ ReferencesBlock $ concat $ reverse acc)
+                    <> processElts refmap pass
 
    where isBlankLine (L _ BlankLine{}) = True
          isBlankLine _ = False
@@ -448,7 +466,7 @@ tryNewContainers lastLineIsText offset t =
 
 textLineOrBlank :: Parser Leaf
 textLineOrBlank = consolidate <$> takeText
-  where consolidate ts | T.all (==' ') ts = BlankLine ts
+  where consolidate ts | T.all isWhitespace ts = BlankLine ts
                        | otherwise        = TextLine  ts
 
 -- Parse a leaf node.

@@ -350,7 +350,7 @@ pInlineLink lab = do
   url <- pLinkUrl
   tit <- option "" $ scanSpnl *> pLinkTitle <* scanSpaces
   char ')'
-  return $ singleton $ Link lab url tit
+  return $ singleton $ Link lab (Url url) tit
 
 lookupLinkReference :: ReferenceMap
                     -> Text                -- reference label
@@ -359,12 +359,10 @@ lookupLinkReference refmap key = M.lookup (normalizeReference key) refmap
 
 -- A reference link: [label], [foo][label], or [label][].
 pReferenceLink :: ReferenceMap -> Text -> Inlines -> Parser Inlines
-pReferenceLink refmap rawlab lab = do
+pReferenceLink _ rawlab lab = do
   ref <- option rawlab $ scanSpnl >> pLinkLabel
-  let ref' = if T.null ref then rawlab else ref
-  case lookupLinkReference refmap ref' of
-       Just (url,tit)  -> return $ singleton $ Link lab url tit
-       Nothing         -> fail "Reference not found"
+  return $ singleton $ Link lab (Ref ref) ""
+
 
 -- An image:  ! followed by a link.
 pImage :: ReferenceMap -> Parser Inlines
@@ -375,7 +373,7 @@ pImage refmap = do
 linkToImage :: Inlines -> Inlines
 linkToImage ils =
   case viewl ils of
-        (Link lab url tit :< x)
+        (Link lab (Url url) tit :< x)
           | Seq.null x -> singleton (Image lab url tit)
         _ -> singleton (Str "!") <> ils
 
@@ -424,7 +422,7 @@ pAutolink = do
          | otherwise   -> fail "Unknown contents of <>"
 
 autoLink :: Text -> Inlines
-autoLink t = singleton $ Link (toInlines t) t (T.empty)
+autoLink t = singleton $ Link (toInlines t) (Url t) (T.empty)
   where toInlines t' = case parse pToInlines t' of
                          Right r   -> r
                          Left e    -> error $ "autolink: " ++ show e
@@ -435,6 +433,4 @@ autoLink t = singleton $ Link (toInlines t) t (T.empty)
 
 emailLink :: Text -> Inlines
 emailLink t = singleton $ Link (singleton $ Str t)
-                               ("mailto:" <> t) (T.empty)
-
-
+                               (Url $ "mailto:" <> t) (T.empty)

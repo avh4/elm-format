@@ -6,6 +6,7 @@ import qualified AST.Expression as Expression
 import qualified AST.Pattern as Pattern
 import qualified AST.Variable as Var
 import qualified Reporting.Annotation as A
+import qualified Cheapskate.Types as Markdown
 
 
 -- DECLARATIONS
@@ -54,10 +55,14 @@ assocToString assoc =
 
 
 data Decl
-    = DocComment String
+    = DocComment Markdown.Blocks
     | BodyComment Comment
     | Decl (A.Located Declaration)
     deriving (Eq, Show)
+
+
+instance Eq Markdown.Block where
+  (==) a b = (==) (show a) (show b)
 
 
 instance A.Strippable Decl where

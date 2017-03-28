@@ -5,6 +5,7 @@ module AST.Module
 
 import qualified AST.Declaration as Declaration
 import qualified AST.Variable as Var
+import qualified Cheapskate.Types as Markdown
 import qualified Reporting.Annotation as A
 import AST.V0_16
 
@@ -15,7 +16,7 @@ import AST.V0_16
 data Module = Module
     { initialComments :: Comments
     , header :: Header
-    , docs :: A.Located (Maybe String)
+    , docs :: A.Located (Maybe Markdown.Blocks)
     , imports :: [UserImport]
     , body :: [Declaration.Decl]
     }

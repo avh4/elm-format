@@ -3,6 +3,7 @@ module AllSyntax (fn, tuple, Type, Data(A, B, C), MultilineData(..)) where
 {-| An example of all valid Elm syntax.
 
 # Section
+
 @docs fn
 -}
 
