@@ -61,10 +61,6 @@ data Decl
     deriving (Eq, Show)
 
 
-instance Eq Markdown.Block where
-  (==) a b = (==) (show a) (show b)
-
-
 instance A.Strippable Decl where
   stripRegion d =
     case d of

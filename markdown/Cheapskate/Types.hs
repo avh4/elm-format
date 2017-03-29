@@ -19,12 +19,12 @@ data Block = Para Inlines
            | HtmlBlock Text
            | HRule
            | ReferencesBlock [(Text, Text, Text)]
-           deriving (Show, Data, Typeable)
+           deriving (Show, Data, Typeable, Eq)
 
 -- | Attributes for fenced code blocks.  'codeLang' is the
 -- first word of the attribute line, 'codeInfo' is the rest.
 data CodeAttr = CodeAttr { codeLang :: Text, codeInfo :: Text }
-              deriving (Show, Data, Typeable)
+              deriving (Show, Data, Typeable, Eq)
 
 data ListType = Bullet Char | Numbered NumWrapper Int deriving (Eq,Show,Data,Typeable)
 data NumWrapper = PeriodFollowing | ParenFollowing deriving (Eq,Show,Data,Typeable)
@@ -48,13 +48,13 @@ data Inline = Str Text
             | Image Inlines Text {- URL -} Text {- title -}
             | Entity Text
             | RawHtml Text
-            deriving (Show, Data, Typeable)
+            deriving (Show, Data, Typeable, Eq)
 
 
 data LinkTarget
     = Url Text
     | Ref Text
-    deriving (Show, Data)
+    deriving (Show, Data, Eq)
 
 
 type Inlines = Seq Inline
