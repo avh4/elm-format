@@ -46,6 +46,7 @@ library
     hs-source-dirs:
         src
         parser/src
+        markdown
 
     exposed-modules:
         ElmFormat
@@ -70,6 +71,7 @@ library
         Parse.Helpers
         Parse.IParser
         Parse.Literal
+        Parse.Markdown
         Parse.Pattern
         Parse.Type
         Reporting.Annotation
@@ -78,11 +80,17 @@ library
 
     other-modules:
         Build_elm_format
+        Cheapskate.Inlines
+        Cheapskate.Parse
+        Cheapskate.ParserCombinators
+        Cheapskate.Types
+        Cheapskate.Util
         CommandLine.Helpers
         ElmFormat.Execute
         ElmFormat.Filesystem
         ElmFormat.FileStore
         ElmFormat.Operation
+        ElmFormat.Render.Markdown
         ElmFormat.Version
         Flags
         Messages.Formatter.Format

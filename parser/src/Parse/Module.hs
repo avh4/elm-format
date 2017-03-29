@@ -19,7 +19,7 @@ elmModule =
       preDocsComments <- option [] freshLine
       (docs, postDocsComments) <-
         choice
-          [ (,) <$> addLocation (Just <$> docComment) <*> freshLine
+          [ (,) <$> addLocation (Just <$> docCommentAsMarkdown) <*> freshLine
           , (,) <$> addLocation (return Nothing) <*> return []
           ]
       imports' <- imports

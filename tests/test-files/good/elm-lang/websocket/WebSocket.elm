@@ -11,17 +11,19 @@ effect module WebSocket
 Connecting to a server takes some time, so with web sockets, you make that
 connection once and then keep using. The major benefits of this are:
 
-  1. It faster to send messages. No need to do a bunch of work for every single
-  message.
+1.  It faster to send messages. No need to do a bunch of work for every single
+    message.
 
-  2. The server can push messages to you. With normal HTTP you would have to
-  keep *asking* for changes, but a web socket, the server can talk to you
-  whenever it wants. This means there is less unnecessary network traffic.
+2.  The server can push messages to you. With normal HTTP you would have to
+    keep *asking* for changes, but a web socket, the server can talk to you
+    whenever it wants. This means there is less unnecessary network traffic.
 
 The API here attempts to cover the typical usage scenarios, but if you need
 many unique connections to the same endpoint, you need a different library.
 
+
 # Web Sockets
+
 @docs listen, keepAlive, send
 
 -}
@@ -47,6 +49,7 @@ type MyCmd msg
 **Note:** It is important that you are also subscribed to this address with
 `listen` or `keepAlive`. If you are not, the web socket will be created to
 send one message and then closed. Not good!
+
 -}
 send : String -> String -> Cmd msg
 send url message =
@@ -78,6 +81,7 @@ like this:
 **Note:** If the connection goes down, the effect manager tries to reconnect
 with an exponential backoff strategy. Any messages you try to `send` while the
 connection is down are queued and will be sent as soon as possible.
+
 -}
 listen : String -> (String -> msg) -> Sub msg
 listen url tagger =
@@ -89,11 +93,12 @@ for keeping a connection open for when you only need to `send` messages. So
 you might say something like this:
 
     subscriptions model =
-      keepAlive "ws://echo.websocket.org"
+        keepAlive "ws://echo.websocket.org"
 
 **Note:** If the connection goes down, the effect manager tries to reconnect
 with an exponential backoff strategy. Any messages you try to `send` while the
 connection is down are queued and will be sent as soon as possible.
+
 -}
 keepAlive : String -> Sub msg
 keepAlive url =

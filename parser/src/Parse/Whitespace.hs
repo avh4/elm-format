@@ -1,11 +1,13 @@
 module Parse.Whitespace where
 
 import AST.V0_16
+import qualified Cheapskate.Types as Markdown
+import qualified Data.Char as Char
 import Parse.IParser
+import qualified Parse.Markdown as Markdown
 import qualified Parse.State as State
 import qualified Reporting.Error.Syntax as Syntax
 import Text.Parsec hiding (newline, spaces, State)
-import qualified Data.Char as Char
 
 
 padded :: IParser a -> IParser (Comments, a, Comments)
@@ -125,6 +127,11 @@ docComment =
   do  _ <- try (string "{-|")
       _ <- many (string " ")
       closeComment False
+
+
+docCommentAsMarkdown :: IParser Markdown.Blocks
+docCommentAsMarkdown =
+    Markdown.parse <$> docComment
 
 
 multiComment :: IParser Comment
