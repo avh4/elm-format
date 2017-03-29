@@ -1,14 +1,13 @@
 module Parse.Whitespace where
 
 import AST.V0_16
+import qualified Cheapskate.Types as Markdown
+import qualified Data.Char as Char
 import Parse.IParser
+import qualified Parse.Markdown as Markdown
 import qualified Parse.State as State
 import qualified Reporting.Error.Syntax as Syntax
 import Text.Parsec hiding (newline, spaces, State)
-import qualified Cheapskate.Types as Markdown
-import qualified Cheapskate.Parse
-import qualified Data.Char as Char
-import qualified Data.Text as Text
 
 
 padded :: IParser a -> IParser (Comments, a, Comments)
@@ -130,23 +129,9 @@ docComment =
       closeComment False
 
 
-($>) :: Functor f => f a -> (a -> b) -> f b
-($>) = flip (<$>)
-
-
 docCommentAsMarkdown :: IParser Markdown.Blocks
 docCommentAsMarkdown =
-    docComment
-        $> Text.pack
-        $> Cheapskate.Parse.markdown
-            (Markdown.Options
-                { Markdown.sanitize = True
-                , Markdown.allowRawHtml = True
-                , Markdown.preserveHardBreaks = True
-                , Markdown.debug = False
-                }
-            )
-        $> (\(Markdown.Doc _ source) -> source)
+    Markdown.parse <$> docComment
 
 
 multiComment :: IParser Comment
