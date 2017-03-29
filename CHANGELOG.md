@@ -1,5 +1,8 @@
-## master (0.6.1-beta)
+## master (0.6.1-alpha)
 
+  - elm-format now formats your documentation comments:
+      - code snippets in your documentation will be elm-formatted
+      - markdown in your documentation will be normalized
 
 
 ## 0.6.0-alpha
