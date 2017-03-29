@@ -1,2 +1,0 @@
-:set -XOverloadedStrings
-:set editor emacsclient -c -nw --alternate-editor=emacs
