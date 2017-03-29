@@ -1,2 +1,0 @@
-#!/bin/sh
-perl -pe 's/ /␣/g'
