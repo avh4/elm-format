@@ -21,6 +21,7 @@ Paragraph with [link], [reference link][reflink],
 Images ![][img],
 ![image loaded from URL](http://example.com/favicon.ico).
 ![alt text](http://example.com/favicon.ico "and title").
+URL as link: <http://elm-lang.org>
 
 [link]: http://example.com#link "with title"
 [reflink]: http://example.com#reflink
