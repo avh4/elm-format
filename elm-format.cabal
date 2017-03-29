@@ -71,6 +71,7 @@ library
         Parse.Helpers
         Parse.IParser
         Parse.Literal
+        Parse.Markdown
         Parse.Pattern
         Parse.Type
         Reporting.Annotation
