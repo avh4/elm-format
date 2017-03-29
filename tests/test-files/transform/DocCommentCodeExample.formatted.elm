@@ -7,6 +7,7 @@ module Main exposing (..)
 
     myValue =
         f 20
+
 -}
 f x =
     x * x
@@ -16,6 +17,7 @@ f x =
 
     myValue =
         g 99
+
 -}
 g y =
     y + (4 * y)

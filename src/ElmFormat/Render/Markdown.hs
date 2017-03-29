@@ -1,32 +1,46 @@
 module ElmFormat.Render.Markdown where
 
 import Cheapskate.Types
-import Data.Foldable (fold)
-import qualified Control.Applicative
+import Data.Foldable (fold, toList)
 import qualified Data.List as List
 import Data.Maybe (fromMaybe)
-import qualified Data.Sequence as Seq
 import qualified Data.Text as Text
 import Data.Text (Text)
-
-
--- TODO: remove this after upgrading to containers-0.5.8
-intersperse :: a -> Seq.Seq a -> Seq.Seq a
-intersperse y xs = case Seq.viewl xs of
-  Seq.EmptyL -> Seq.empty
-  p Seq.:< ps -> p Seq.<| (ps Control.Applicative.<**> (const y Seq.<| Seq.singleton id))
+import Elm.Utils ((|>))
 
 
 formatMarkdown :: (String -> Maybe String) -> Blocks -> String
 formatMarkdown formatCode blocks =
     let
+        blocks' =
+            toList blocks
+
         needsInitialBlanks =
-            case Seq.viewl blocks of
-                (Para _ Seq.:< _) -> False
-                Seq.EmptyL -> False
+            case blocks' of
+                (Para _ : _) -> False
+                [] -> False
+                _ -> True
+
+        needsTrailingBlanks =
+            case blocks' of
+                [] -> False
+                (_ : []) -> False
                 _ -> True
     in
-        (if needsInitialBlanks then "\n\n" else "") ++ (fold $ intersperse "\n" $ fmap (formatMardownBlock formatCode) $ blocks)
+        formatMarkdown' formatCode False needsInitialBlanks needsTrailingBlanks blocks'
+
+
+formatMarkdown' :: (String -> Maybe String) -> Bool -> Bool -> Bool -> [Block] -> String
+formatMarkdown' formatCode isListItem needsInitialBlanks needsTrailingBlanks blocks =
+    let
+        intersperse =
+            case (isListItem, blocks) of
+                (True, [Para _, List _ _ _]) -> id
+                _ -> List.intersperse "\n"
+    in
+    (if needsInitialBlanks then "\n\n" else "")
+        ++ (fold $ intersperse $ fmap (formatMardownBlock formatCode) $ blocks)
+        ++ (if needsTrailingBlanks then "\n" else "")
 
 
 formatMardownBlock :: (String -> Maybe String) -> Block -> String
@@ -34,23 +48,39 @@ formatMardownBlock formatCode block =
     case block of
         Para inlines ->
             (fold $ fmap formatMarkdownInline $ inlines) ++ "\n"
+
         Header level inlines ->
-            replicate level '#' ++ " " ++ (fold $ fmap formatMarkdownInline $ inlines) ++ "\n"
+            "\n" ++ replicate level '#' ++ " " ++ (fold $ fmap formatMarkdownInline $ inlines) ++ "\n"
+
         Blockquote blocks ->
-            "TODO:Markdown.Blockquote"
-        List tight (Bullet b) items ->
+            formatMarkdown' formatCode False False False (toList blocks)
+                |> prefix' "> " "> "
+
+        List tight (Bullet _) items ->
             fold $ (if tight then id else List.intersperse "\n") $
-                fmap (fold . fmap (unlines . prefix ("  * ") "    " . lines . formatMardownBlock formatCode)) items
-        List tight (Numbered _ i) items ->
+                fmap (prefix' "  - " "    " . formatMarkdown' formatCode True False False . toList) items
+        List tight (Numbered _ _) items ->
             fold $ (if tight then id else List.intersperse "\n") $
                 fmap (formatListItem formatCode) $ zip [1..] items
 
-        CodeBlock (CodeAttr lang _) code ->
-            unlines $ fmap ((++) "    ") $ lines $ fromMaybe (Text.unpack code) $ formatCode $ Text.unpack code
+        CodeBlock (CodeAttr lang info) code ->
+            let
+                formatted =
+                    fromMaybe (Text.unpack code) $ formatCode $ Text.unpack code
+
+                lang' =
+                    Text.unpack lang
+            in
+                if lang' == "elm" || lang' == ""
+                    then unlines $ fmap ((++) "    ") $ lines $ formatted
+                    else "```" ++ Text.unpack lang ++ "\n" ++ formatted ++ "\n```\n"
+
         HtmlBlock text ->
-            "TODO:Markdown.HtmlBlock"
+            Text.unpack text
+
         HRule ->
-            "TODO:Markdown.HRule"
+            "---\n"
+
         ReferencesBlock refs ->
             fold $ fmap formatRef refs
 
@@ -62,16 +92,20 @@ formatListItem formatCode (i, item)=
             if i < 10
                 then show i ++ ".  "
                 else show i ++ ". "
-
-        addPrefix =
-            unlines . prefix pref "    " . lines
     in
-        fold $ fmap (addPrefix . formatMardownBlock formatCode) item
+        prefix' pref "    " $ formatMarkdown' formatCode True False False (toList item)
 
 
 formatRef :: (Text, Text, Text) -> String
 formatRef (label, url, title) =
-    "[" ++ Text.unpack label ++ "]: " ++ Text.unpack url ++ "\n"
+    "[" ++ Text.unpack label ++ "]: " ++ Text.unpack url
+      ++ (if Text.unpack title == "" then "" else " \"" ++ Text.unpack title ++ "\"")
+      ++ "\n"
+
+
+prefix' :: String -> String -> String -> String
+prefix' preFirst preRest =
+    unlines . prefix preFirst preRest . lines
 
 
 prefix :: [a] -> [a] -> [[a]] -> [[a]]
@@ -90,20 +124,37 @@ formatMarkdownInline inline =
         SoftBreak ->
             "\n"
         LineBreak ->
-            "TODO:Markdown.LineBreak"
+            "\n"
         Emph inlines ->
             "*" ++ (fold $ fmap formatMarkdownInline $ inlines) ++ "*" -- TODO: escaping
         Strong inlines ->
             "**" ++ (fold $ fmap formatMarkdownInline $ inlines) ++ "**" -- TODO: escaping
         Code text ->
             "`" ++ Text.unpack text ++ "`" -- TODO: escape backticks
-        Link inlines (Url url) text ->
-            "[" ++ (fold $ fmap formatMarkdownInline $ inlines) ++ "](" ++ Text.unpack url ++ ")"
-        Link inlines (Ref ref) text ->
-            "[" ++ (fold $ fmap formatMarkdownInline $ inlines) ++ "][" ++ Text.unpack ref ++ "]"
-        Image inlines url text ->
-            "TODO:Markdown.Image"
+
+        Link inlines (Url url) title ->
+                "[" ++ (fold $ fmap formatMarkdownInline $ inlines)
+                    ++ "](" ++ Text.unpack url
+                    ++ (if Text.unpack title == "" then "" else " \"" ++ Text.unpack title ++ "\"")
+                    ++ ")"
+
+        Link inlines (Ref ref) _ ->
+            let
+                text = fold $ fmap formatMarkdownInline $ inlines
+
+                ref' = Text.unpack ref
+            in
+                if text == ref' || ref' == ""
+                    then "[" ++ text ++ "]"
+                    else "[" ++ text ++ "][" ++ ref' ++ "]"
+
+        Image inlines url title ->
+            "![" ++ (fold $ fmap formatMarkdownInline $ inlines)
+                ++ "](" ++ Text.unpack url
+                ++ (if Text.unpack title == "" then "" else " \"" ++ Text.unpack title ++ "\"")
+                ++ ")"
+
         Entity text ->
             Text.unpack text
         RawHtml text ->
-            "TODO:Markdown.RawHtml"
+            Text.unpack text

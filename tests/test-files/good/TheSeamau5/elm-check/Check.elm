@@ -2,25 +2,31 @@ module Check (..) where
 
 {-| Property Based Testing module in Elm.
 
+
 # Make a claim
 
 @docs claim, claimTrue, claimFalse
+
 
 # Check a claim
 
 @docs quickCheck, check
 
+
 # Group claims into a suite
 
 @docs suite
+
 
 # Types
 
 @docs Claim, Evidence, UnitEvidence, SuccessOptions, FailureOptions
 
+
 # Multi-arity claims
 
 @docs claim2True, claim2False, claim3, claim3True, claim3False, claim4, claim4True, claim4False, claim5, claim5True, claim5False
+
 
 # DSL
 
@@ -59,6 +65,7 @@ a uniform way. As a result, the following functions have horrendous type
 signatures and you are better off ignoring them.*
 
 @docs that, is, for, true, false
+
 -}
 
 --------------------------
@@ -121,6 +128,7 @@ SuccessOptions contains:
 1.  the `name` of the claim
 2.  the number of checks performed
 3.  the `seed` used in order to reproduce the check.
+
 -}
 type alias SuccessOptions =
     { name : String
@@ -143,6 +151,7 @@ FailureOptions contains:
 7.  the number of shrinking operations performed
 8.  the original `counterExample`, `actual`, and `expected` values found prior
     to performing the shrinking operations.
+
 -}
 type alias FailureOptions =
     { name : String
@@ -217,6 +226,7 @@ Example :
         (\list -> List.sort (List.sort (list))
         (\list -> List.sort (list))
         (list int)
+
 -}
 claim : String -> (a -> b) -> (a -> b) -> Investigator a -> Claim
 claim name actualStatement expectedStatement investigator =
@@ -422,6 +432,7 @@ Example:
         claimTrue "The length of a list is strictly non-negative"
             (\list -> List.length list >= 0)
             (list string)
+
 -}
 claimTrue : String -> (a -> Bool) -> Investigator a -> Claim
 claimTrue name predicate =
@@ -443,6 +454,7 @@ Example:
         claimFalse "The length of a list is never negative"
             (\list -> List.length list < 0)
             (list float)
+
 -}
 claimFalse : String -> (a -> Bool) -> Investigator a -> Claim
 claimFalse name predicate =
@@ -463,6 +475,7 @@ perform as well a random seed. Given a random seed and a number of checks,
 when you wish to reproduce checks.
 
     check claim 100 (Random.initialSeed 1)
+
 -}
 check : Claim -> Int -> Seed -> Evidence
 check claim n seed =
@@ -481,6 +494,7 @@ perform 100 checks and use `Random.initialSeed 1` as the random seed.
 
     quickCheck claim =
         check claim 100 (Random.initialSeed 1)
+
 -}
 quickCheck : Claim -> Evidence
 quickCheck claim =
@@ -497,6 +511,7 @@ quickCheck claim =
 group similar claims together.
 
     suite nameOfSuite listOfClaims
+
 -}
 suite : String -> List Claim -> Claim
 suite name claims =

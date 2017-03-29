@@ -306,6 +306,7 @@ checkGoodAllSyntax 0.18 Types
 checkGood 0.18 AllSyntax/0.18/Expressions.elm
 checkGood 0.18 AllSyntax/0.18/Expressions/Unary.elm
 checkGood 0.18 AllSyntax/0.18/Expressions/BinaryOperators.elm
+checkGood 0.18 AllSyntax/0.18/DocComments.elm
 checkGood 0.16 Comments.elm
 checkGood 0.16 AllSyntax/0.16/GLShader.elm
 checkGood 0.16 AllSyntax/0.16/Literals.elm

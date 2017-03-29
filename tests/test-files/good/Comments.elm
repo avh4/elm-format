@@ -2,9 +2,11 @@ module Comments (..) where
 
 {-| An example of all valid Elm syntax.
 
+
 # Section
 
 @docs fn
+
 -}
 
 -- Comments before imports

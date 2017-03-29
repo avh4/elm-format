@@ -181,20 +181,8 @@ formatModuleHeader elmVersion modu =
       docs =
           fmap (formatModuleDocs elmVersion) $ RA.drop $ AST.Module.docs modu
 
-      importSpacer first second =
-            case (first, second) of
-                (AST.Module.ImportComment _, AST.Module.ImportComment _) ->
-                    []
-                (AST.Module.ImportComment _, _) ->
-                    List.replicate 1 blankLine
-                (_, AST.Module.ImportComment _) ->
-                    List.replicate 2 blankLine
-                (_, _) ->
-                    []
-
       imports =
-            AST.Module.imports modu
-                |> intersperseMap importSpacer (formatImport elmVersion)
+          formatImports elmVersion modu
 
       mapIf fn m a =
           case m of
@@ -207,6 +195,24 @@ formatModuleHeader elmVersion modu =
           |> mapIf (\x -> andThen [ blankLine, x ]) docs
           |> (if null imports then id else andThen imports . andThen [blankLine])
           |> andThen [ blankLine, blankLine ]
+
+
+formatImports :: ElmVersion -> AST.Module.Module -> [Box]
+formatImports elmVersion modu =
+    let
+        importSpacer first second =
+              case (first, second) of
+                  (AST.Module.ImportComment _, AST.Module.ImportComment _) ->
+                      []
+                  (AST.Module.ImportComment _, _) ->
+                      List.replicate 1 blankLine
+                  (_, AST.Module.ImportComment _) ->
+                      List.replicate 2 blankLine
+                  (_, _) ->
+                      []
+    in
+        AST.Module.imports modu
+            |> intersperseMap importSpacer (formatImport elmVersion)
 
 
 formatModuleLine_0_16 :: AST.Module.Header -> Box
@@ -381,10 +387,21 @@ formatModuleDocs elmVersion blocks =
     let
         format :: AST.Module.Module -> String
         format modu =
-            modu
-                |> formatModuleBody 1 elmVersion
-                |> fmap (Text.unpack . Box.render)
-                |> fromMaybe ""
+            let
+                box =
+                    case
+                        ( formatImports elmVersion modu
+                        , formatModuleBody 1 elmVersion modu
+                        )
+                    of
+                        ( [], Nothing ) -> Nothing
+                        ( imports, Nothing ) -> Just $ stack1 imports
+                        ( [], Just body) -> Just body
+                        ( imports, Just body ) -> Just $ stack1 (imports ++ [blankLine, body])
+            in
+                box
+                    |> fmap (Text.unpack . Box.render)
+                    |> fromMaybe ""
 
         reformat :: String -> Maybe String
         reformat source =
