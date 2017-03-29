@@ -21,9 +21,11 @@ connection once and then keep using. The major benefits of this are:
 The API here attempts to cover the typical usage scenarios, but if you need
 many unique connections to the same endpoint, you need a different library.
 
+
 # Web Sockets
 
 @docs listen, keepAlive, send
+
 -}
 
 import Dict
@@ -47,6 +49,7 @@ type MyCmd msg
 **Note:** It is important that you are also subscribed to this address with
 `listen` or `keepAlive`. If you are not, the web socket will be created to
 send one message and then closed. Not good!
+
 -}
 send : String -> String -> Cmd msg
 send url message =
@@ -78,6 +81,7 @@ like this:
 **Note:** If the connection goes down, the effect manager tries to reconnect
 with an exponential backoff strategy. Any messages you try to `send` while the
 connection is down are queued and will be sent as soon as possible.
+
 -}
 listen : String -> (String -> msg) -> Sub msg
 listen url tagger =
@@ -94,6 +98,7 @@ you might say something like this:
 **Note:** If the connection goes down, the effect manager tries to reconnect
 with an exponential backoff strategy. Any messages you try to `send` while the
 connection is down are queued and will be sent as soon as possible.
+
 -}
 keepAlive : String -> Sub msg
 keepAlive url =

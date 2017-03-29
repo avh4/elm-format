@@ -2,17 +2,21 @@ module Fifo (Fifo, empty, insert, remove, fromList, toList) where
 
 {-|
 
+
 # Creating FIFOs
 
 @docs Fifo, empty, fromList
+
 
 # Inserting/Removing
 
 @docs insert, remove
 
+
 # To List
 
 @docs toList
+
 -}
 
 
@@ -26,6 +30,7 @@ type Fifo a
 
     Fifo.empty
         -- == Fifo.fromList []
+
 -}
 empty : Fifo a
 empty =
@@ -38,6 +43,7 @@ empty =
     |> Fifo.insert 7
     |> Fifo.insert 8
         -- == Fifo.fromList [7,8]
+
 -}
 insert : a -> Fifo a -> Fifo a
 insert a (Fifo front back) =
@@ -49,6 +55,7 @@ insert a (Fifo front back) =
     Fifo.fromList [3,7]
     |> Fifo.remove
         -- == (Just 3, Fifo.fromList [7])
+
 -}
 remove : Fifo a -> ( Maybe a, Fifo a )
 remove fifo =
@@ -69,6 +76,7 @@ remove fifo =
     |> Fifo.remove
     |> fst
         -- == Just 3
+
 -}
 fromList : List a -> Fifo a
 fromList list =
@@ -82,6 +90,7 @@ fromList list =
     |> Fifo.insert 9
     |> Fifo.toList
         -- == [7,9]
+
 -}
 toList : Fifo a -> List a
 toList (Fifo front back) =

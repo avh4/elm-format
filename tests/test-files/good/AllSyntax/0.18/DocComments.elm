@@ -1,0 +1,113 @@
+module Main exposing (..)
+
+{-| Example of markdown in doc comments.
+
+
+# Section
+
+@docs x
+
+
+# Another section
+
+Simple paragraph.
+
+Paragraph with
+soft breaks in
+the text.
+
+Paragraph with [link], [reference link][reflink],
+[url link](http://example.com). [link](http://example.com "with title")
+Images ![][img],
+![image loaded from URL](http://example.com/favicon.ico).
+![alt text](http://example.com/favicon.ico "and title").
+
+[link]: http://example.com#link "with title"
+[reflink]: http://example.com#reflink
+[img]: http://example.com/favicon.ico
+
+  - List item 1
+  - List item 2
+  - List item 3
+      - Sub item
+      - Sub item
+
+1.  First
+2.  Second
+3.  Third
+
+
+# HTML blocks
+
+<strong>some HTML</strong>
+
+  - <pre>raw HTML block</pre>
+
+
+## Example Elm declarations
+
+    import MyModule
+
+    myResult =
+        x
+
+
+## Example Elm expressions
+
+    x == ()
+
+```bash
+echo "non-Elm code block"
+```
+
+---
+
+> Blockquote
+>
+>     code
+>
+>   - first
+>   - second
+
+1.  Item 1, paragraph.
+
+    Item 2. paragraph. Long paragraph
+    with soft breaks in the
+    middle.
+
+2.  Item 2.
+
+3.  Item 3.
+
+
+## Nested lists
+
+  - One
+      - Two
+          - Three
+
+Another:
+
+1.  First
+2.  Second
+      - AAA
+      - BBB
+      - CCC
+3.  Third
+
+Nested with loose items
+
+1.  First
+
+2.  Second
+      - AAA
+      - BBB
+      - CCC
+
+3.  Third
+
+-}
+
+
+x =
+    ()

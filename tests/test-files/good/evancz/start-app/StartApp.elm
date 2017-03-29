@@ -2,7 +2,7 @@ module StartApp (start, Config, App) where
 
 {-| This module helps you start your application in a typical Elm workflow.
 It assumes you are following [the Elm Architecture][arch] and using
-[elm-effects][]. From there it will wire everything up for you!
+[elm-effects]. From there it will wire everything up for you!
 
 **Be sure to [read the Elm Architecture tutorial][arch] to learn how this all
 works!**
@@ -10,9 +10,11 @@ works!**
 [arch]: https://github.com/evancz/elm-architecture-tutorial
 [elm-effects]: http://package.elm-lang.org/packages/evancz/elm-effects/latest
 
+
 # Start your Application
 
 @docs start, Config, App
+
 -}
 
 import Effects exposing (Effects, Never)
@@ -32,6 +34,7 @@ model.
 The `inputs` field is for any external signals you might need. If you need to
 get values from JavaScript, they will come in through a port as a signal which
 you can pipe into your app as one of the `inputs`.
+
 -}
 type alias Config model action =
     { init : ( model, Effects action )
@@ -43,16 +46,17 @@ type alias Config model action =
 
 {-| An `App` is made up of a couple signals:
 
-  * `html` &mdash; a signal of `Html` representing the current visual
+  - `html` &mdash; a signal of `Html` representing the current visual
     representation of your app. This should be fed into `main`.
 
-  * `model` &mdash; a signal representing the current model. Generally you
+  - `model` &mdash; a signal representing the current model. Generally you
     will not need this one, but it is there just in case. You will know if you
     need this.
 
-  * `tasks` &mdash; a signal of tasks that need to get run. Your app is going
+  - `tasks` &mdash; a signal of tasks that need to get run. Your app is going
     to be producing tasks in response to all sorts of events, so this needs to
     be hooked up to a `port` to ensure they get run.
+
 -}
 type alias App model =
     { html : Signal Html
@@ -76,6 +80,7 @@ type alias App model =
 
 So once we start the `App` we feed the HTML into `main` and feed the resulting
 tasks into a `port` that will run them all.
+
 -}
 start : Config model action -> App model
 start config =
