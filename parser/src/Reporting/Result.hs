@@ -80,6 +80,11 @@ destruct errFunc okFunc rawResult =
         errFunc errors
 
 
+toMaybe :: Result w a r -> Maybe r
+toMaybe (Result _ (Ok a)) = Just a
+toMaybe (Result _ (Err _)) = Nothing
+
+
 -- EXTRA FANCY HELPERS
 
 instance M.Functor (Result w e) where

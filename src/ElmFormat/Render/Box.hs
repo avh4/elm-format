@@ -11,14 +11,20 @@ import qualified AST.Expression
 import qualified AST.Module
 import qualified AST.Pattern
 import qualified AST.Variable
+import qualified Cheapskate.Types as Markdown
 import qualified Control.Monad as Monad
 import qualified Data.Char as Char
 import qualified Data.List as List
 import qualified Data.Maybe as Maybe
+import Data.Maybe (fromMaybe, maybeToList)
+import qualified Data.Text as Text
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
+import qualified ElmFormat.Render.Markdown
 import qualified ElmFormat.Version
+import qualified Parse.Parse as Parse
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Region as Region
+import qualified Reporting.Result as Result
 import Text.Printf (printf)
 import Util.List
 
@@ -173,22 +179,10 @@ formatModuleHeader elmVersion modu =
               formatModuleLine elmVersion header
 
       docs =
-          formatModuleDocs (AST.Module.docs modu)
-
-      importSpacer first second =
-            case (first, second) of
-                (AST.Module.ImportComment _, AST.Module.ImportComment _) ->
-                    []
-                (AST.Module.ImportComment _, _) ->
-                    List.replicate 1 blankLine
-                (_, AST.Module.ImportComment _) ->
-                    List.replicate 2 blankLine
-                (_, _) ->
-                    []
+          fmap (formatModuleDocs elmVersion) $ RA.drop $ AST.Module.docs modu
 
       imports =
-            AST.Module.imports modu
-                |> intersperseMap importSpacer (formatImport elmVersion)
+          formatImports elmVersion modu
 
       mapIf fn m a =
           case m of
@@ -201,6 +195,24 @@ formatModuleHeader elmVersion modu =
           |> mapIf (\x -> andThen [ blankLine, x ]) docs
           |> (if null imports then id else andThen imports . andThen [blankLine])
           |> andThen [ blankLine, blankLine ]
+
+
+formatImports :: ElmVersion -> AST.Module.Module -> [Box]
+formatImports elmVersion modu =
+    let
+        importSpacer first second =
+              case (first, second) of
+                  (AST.Module.ImportComment _, AST.Module.ImportComment _) ->
+                      []
+                  (AST.Module.ImportComment _, _) ->
+                      List.replicate 1 blankLine
+                  (_, AST.Module.ImportComment _) ->
+                      List.replicate 2 blankLine
+                  (_, _) ->
+                      []
+    in
+        AST.Module.imports modu
+            |> intersperseMap importSpacer (formatImport elmVersion)
 
 
 formatModuleLine_0_16 :: AST.Module.Header -> Box
@@ -314,41 +326,6 @@ formatModuleLine elmVersion header =
 formatModule :: ElmVersion -> AST.Module.Module -> Box
 formatModule elmVersion modu =
     let
-        spacer first second =
-          case (declarationType first, declarationType second) of
-            (DStarter, _) ->
-              []
-            (_, DCloser) ->
-              []
-            (DComment, DComment) ->
-              []
-            (_, DComment) ->
-              List.replicate 3 blankLine
-            (DComment, _) ->
-              List.replicate 2 blankLine
-            (DDocComment, DDefinition _) ->
-              []
-            (DDefinition Nothing, DDefinition (Just _)) ->
-              List.replicate 2 blankLine
-            (DDefinition _, DStarter) ->
-              List.replicate 2 blankLine
-            (DDefinition a, DDefinition b) ->
-              if a == b then
-                []
-              else
-                List.replicate 2 blankLine
-            (DCloser, _) ->
-              List.replicate 2 blankLine
-            (_, DDocComment) ->
-              List.replicate 2 blankLine
-            (DDocComment, DStarter) ->
-              []
-
-        body =
-            intersperseMap spacer (formatDeclaration elmVersion) $
-                AST.Module.body modu
-
-
         initialComments' =
           case AST.Module.initialComments modu of
             [] ->
@@ -360,16 +337,84 @@ formatModule elmVersion modu =
       stack1 $
         initialComments'
           ++ (formatModuleHeader elmVersion modu)
-          : body
+          : maybeToList (formatModuleBody 2 elmVersion modu)
 
 
-formatModuleDocs :: RA.Located (Maybe String) -> Maybe Box
-formatModuleDocs adocs =
-    case RA.drop adocs of
-        Nothing ->
-            Nothing
-        Just docs ->
-            Just $ formatDocComment docs
+formatModuleBody :: Int -> ElmVersion -> AST.Module.Module -> Maybe Box
+formatModuleBody linesBetween elmVersion modu =
+    let
+        spacer first second =
+          case (declarationType first, declarationType second) of
+            (DStarter, _) ->
+              []
+            (_, DCloser) ->
+              []
+            (DComment, DComment) ->
+              []
+            (_, DComment) ->
+              List.replicate (linesBetween + 1) blankLine
+            (DComment, _) ->
+              List.replicate linesBetween blankLine
+            (DDocComment, DDefinition _) ->
+              []
+            (DDefinition Nothing, DDefinition (Just _)) ->
+              List.replicate linesBetween blankLine
+            (DDefinition _, DStarter) ->
+              List.replicate linesBetween blankLine
+            (DDefinition a, DDefinition b) ->
+              if a == b then
+                []
+              else
+                List.replicate linesBetween blankLine
+            (DCloser, _) ->
+              List.replicate linesBetween blankLine
+            (_, DDocComment) ->
+              List.replicate linesBetween blankLine
+            (DDocComment, DStarter) ->
+              []
+
+        boxes =
+            intersperseMap spacer (formatDeclaration elmVersion) $
+                AST.Module.body modu
+    in
+        case boxes of
+            [] -> Nothing
+            _ -> Just $ stack1 boxes
+
+
+formatModuleDocs :: ElmVersion -> Markdown.Blocks -> Box
+formatModuleDocs elmVersion blocks =
+    let
+        format :: AST.Module.Module -> String
+        format modu =
+            let
+                box =
+                    case
+                        ( formatImports elmVersion modu
+                        , formatModuleBody 1 elmVersion modu
+                        )
+                    of
+                        ( [], Nothing ) -> Nothing
+                        ( imports, Nothing ) -> Just $ stack1 imports
+                        ( [], Just body) -> Just body
+                        ( imports, Just body ) -> Just $ stack1 (imports ++ [blankLine, body])
+            in
+                box
+                    |> fmap (Text.unpack . Box.render)
+                    |> fromMaybe ""
+
+        reformat :: String -> Maybe String
+        reformat source =
+            source
+                |> Parse.parseSource
+                |> Result.toMaybe
+                |> fmap format
+
+        content :: String
+        content =
+            ElmFormat.Render.Markdown.formatMarkdown reformat blocks
+    in
+        formatDocComment content
 
 
 formatDocComment :: String -> Box
@@ -602,7 +647,7 @@ formatDeclaration :: ElmVersion -> AST.Declaration.Decl -> Box
 formatDeclaration elmVersion decl =
     case decl of
         AST.Declaration.DocComment docs ->
-            formatDocComment docs
+            formatModuleDocs elmVersion docs
 
         AST.Declaration.BodyComment c ->
             formatComment c

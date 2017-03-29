@@ -5,6 +5,7 @@ module AllSyntax.WindowsEol exposing (..)
 Raw CRs that are within strings will be escaped.
 
 Escaped CRs will be retained.
+
 -}
 
 

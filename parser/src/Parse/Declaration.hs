@@ -15,9 +15,10 @@ import Parse.Whitespace
 declaration :: IParser AST.Declaration.Decl
 declaration =
   choice
-    [ AST.Declaration.DocComment <$> docComment
+    [ AST.Declaration.DocComment <$> docCommentAsMarkdown
     , AST.Declaration.Decl <$> addLocation (typeDecl <|> infixDecl <|> port <|> definition)
     ]
+
 
 
 -- TYPE ANNOTATIONS and DEFINITIONS
