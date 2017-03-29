@@ -133,10 +133,20 @@ formatMarkdownInline inline =
             "`" ++ Text.unpack text ++ "`" -- TODO: escape backticks
 
         Link inlines (Url url) title ->
-                "[" ++ (fold $ fmap formatMarkdownInline $ inlines)
-                    ++ "](" ++ Text.unpack url
-                    ++ (if Text.unpack title == "" then "" else " \"" ++ Text.unpack title ++ "\"")
-                    ++ ")"
+            let
+                text = fold $ fmap formatMarkdownInline $ inlines
+
+                title' = Text.unpack title
+                url' = Text.unpack url
+            in
+                if text == url' && title' == ""
+                    then
+                        "<" ++ url' ++ ">"
+                    else
+                        "[" ++ text
+                            ++ "](" ++ Text.unpack url
+                            ++ (if title' == "" then "" else " \"" ++ title' ++ "\"")
+                            ++ ")"
 
         Link inlines (Ref ref) _ ->
             let
