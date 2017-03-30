@@ -24,6 +24,7 @@
   "files": [
     "install.js",
     "elmFormatDownload.js",
+    "binstall/binstall.js",
     "binaries"
   ],
   "homepage": "https://github.com/avh4/elm-format",
