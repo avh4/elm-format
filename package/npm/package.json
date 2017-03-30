@@ -31,7 +31,8 @@
     "elm-format": "binaries/elm-format"
   },
   "dependencies": {
-    "binstall": "1.2.0"
+    "request": "^2.81.0",
+    "tar": "^2.2.1"
   },
   "devDependencies": {
     "eslint": "^3.18.0",
