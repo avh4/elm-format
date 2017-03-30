@@ -21,7 +21,7 @@ exports.url = function(operatingSystem, arch) {
   }[operatingSystem] || "tgz";
 
   var packageInfo = require(path.join(__dirname, "package.json"));
-  var binVersion = packageInfo.version.split("+")[0];
+  var binVersion = packageInfo.version.replace(/\.[0-9]*$/, "");
 
   var url = "https://github.com/avh4/elm-format/releases/download/" +
     binVersion +
