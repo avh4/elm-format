@@ -1,5 +1,5 @@
-var binstall = require("binstall");
 var path = require("path");
+var binstall = require(path.join(__dirname, "binstall/binstall.js"));
 var url = require(path.join(__dirname, "elmFormatDownload.js")).url();
 
 var binariesDir = path.join(__dirname, "binaries");
