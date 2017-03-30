@@ -44,6 +44,10 @@ URL as link: <http://elm-lang.org>
 
   - <pre>raw HTML block</pre>
 
+<table></table>
+
+Followed by a paragraph.
+
 
 ## Example Elm declarations
 
