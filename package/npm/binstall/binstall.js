@@ -83,8 +83,10 @@ function unzipUrl(url, tarArgs, options) {
       .on("entry", function(entry) {
         console.log("Entry: " + entry.path);
       })
-      .on("end", function() {
+      .on("close", function() {
         var successMessage = "Successfully downloaded and processed " + url;
+
+        fs.renameSync("binaries/elm-format.exe", "binaries/elm-format");
 
         if (verify) {
           verifyContents(verify)
