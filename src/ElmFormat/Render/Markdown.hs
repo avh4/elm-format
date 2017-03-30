@@ -76,7 +76,7 @@ formatMardownBlock formatCode block =
                     else "```" ++ Text.unpack lang ++ "\n" ++ formatted ++ "\n```\n"
 
         HtmlBlock text ->
-            Text.unpack text
+            Text.unpack text ++ "\n"
 
         HRule ->
             "---\n"
