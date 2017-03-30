@@ -2,8 +2,17 @@ var fs = require("fs");
 var request = require("request");
 var tar = require("tar");
 var zlib = require("zlib");
+var unzip = require("unzip");
 
 function binstall(url, tarArgs, options) {
+  if (url.endsWith(".zip")) {
+    return unzipUrl(url, tarArgs, options);
+  } else {
+    return untgz(url, tarArgs, options);
+  }
+}
+
+function untgz(url, tarArgs, options) {
   options = options || {};
 
   var verbose = options.verbose;
@@ -56,6 +65,60 @@ function binstall(url, tarArgs, options) {
       })
       .pipe(gunzip)
       .pipe(untar);
+  });
+}
+
+function unzipUrl(url, tarArgs, options) {
+  options = options || {};
+
+  var verbose = options.verbose;
+  var verify = options.verify;
+
+  return new Promise(function(resolve, reject) {
+    var writeStream = unzip
+      .Extract({ path: tarArgs.path })
+      .on("error", function(error) {
+        reject("Error extracting " + url + " - " + error);
+      })
+      .on("entry", function(entry) {
+        console.log("Entry: " + entry.path);
+      })
+      .on("end", function() {
+        var successMessage = "Successfully downloaded and processed " + url;
+
+        if (verify) {
+          verifyContents(verify)
+            .then(function() {
+              resolve(successMessage);
+            })
+            .catch(reject);
+        } else {
+          resolve(successMessage);
+        }
+      });
+
+    request
+      .get(url, function(error, response) {
+        if (error) {
+          reject("Error communicating with URL " + url + " " + error);
+          return;
+        }
+        if (response.statusCode == 404) {
+          var errorMessage = options.errorMessage || "Not Found: " + url;
+
+          reject(errorMessage);
+          return;
+        }
+
+        if (verbose) {
+          console.log("Downloading binaries from " + url);
+        }
+
+        response.on("error", function() {
+          reject("Error receiving " + url);
+        });
+      })
+      .pipe(writeStream);
   });
 }
 
