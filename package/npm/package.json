@@ -1,13 +1,13 @@
 {
   "name": "elm-format",
-  "version": "0.6.0-alpha.3",
+  "version": "0.6.0-alpha.4",
   "description": "Install elm-format",
   "preferGlobal": true,
-  "main": "install.js",
+  "main": "index.js",
   "scripts": {
-    "install": "node install.js",
+    "install": "binwrap-install",
     "prepublish": "npm test",
-    "test": "eslint . && mocha"
+    "test": "eslint . && binwrap-test"
   },
   "repository": {
     "type": "git",
@@ -22,23 +22,17 @@
     "url": "https://github.com/avh4/elm-format/issues"
   },
   "files": [
-    "install.js",
-    "elmFormatDownload.js",
-    "binstall/binstall.js",
-    "binaries"
+    "index.js",
+    "bin"
   ],
   "homepage": "https://github.com/avh4/elm-format",
   "bin": {
-    "elm-format": "binaries/elm-format"
+    "elm-format": "bin/elm-format"
   },
   "dependencies": {
-    "request": "^2.81.0",
-    "tar": "^2.2.1",
-    "unzip": "^0.1.11"
+    "binwrap": "^0.1.2"
   },
   "devDependencies": {
-    "eslint": "^3.18.0",
-    "mocha": "^3.2.0",
-    "then-request": "^2.2.0"
+    "eslint": "^3.18.0"
   }
 }
