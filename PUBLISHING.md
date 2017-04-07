@@ -21,7 +21,7 @@ brew cask install virtualbox
 1. Edit `elm-format.cabal` to remove `-dev` from the version and make sure the version number is correct.
 1. Edit `CHANGELOG.md` to set the correct version number.
 1. `(cd package/npm && npm version "<new version>")`
-1. Commit the changes.
+1. Commit the changes "Bump version to *new version*"
 1. Create a signed tag for the new version. `git tag -s <version> -m <version>`
 1. Push the tag.
 1. Wait for CI to successfully build the tag.
