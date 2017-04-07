@@ -28,6 +28,9 @@ vagrant up
 vagrant ssh
 cd /vagrant/elm-format-0.18-bin
 
+# Ensure you have @avh4's PGP key:
+curl https://keybase.io/avh4/pgp_keys.asc | gpg --import
+
 # Generate checksums:
 makepkg -g
 
