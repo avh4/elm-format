@@ -932,11 +932,11 @@ formatExpression elmVersion needsParens aexpr =
             case
                 ( multiline
                 , allSingles $ map (formatCommented (formatPattern elmVersion True) . (\(c,p) -> Commented c p [])) patterns
-                , bodyComments
+                , bodyComments == []
                 , formatExpression elmVersion False expr
                 )
             of
-                (False, Right patterns', [], SingleLine expr') ->
+                (False, Right patterns', True, SingleLine expr') ->
                     line $ row
                         [ punc "\\"
                         , row $ List.intersperse space $ patterns'
@@ -945,7 +945,7 @@ formatExpression elmVersion needsParens aexpr =
                         , space
                         , expr'
                         ]
-                (_, Right patterns', _, _) ->
+                (_, Right patterns', _, expr') ->
                     stack1
                         [ line $ row
                             [ punc "\\"
@@ -955,7 +955,7 @@ formatExpression elmVersion needsParens aexpr =
                             ]
                         , indent $ stack1 $
                             (map formatComment bodyComments)
-                            ++ [ formatExpression elmVersion False expr ]
+                            ++ [ expr' ]
                         ]
                 _ ->
                     pleaseReport "TODO" "multiline pattern in lambda"
