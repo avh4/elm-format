@@ -25,14 +25,14 @@ operator =
     (+)
 
 
-infixPipeLeft =
+infixPipeLeft x y z =
     x <|
         [ y
         , z
         ]
 
 
-infixPipeLeft2 =
+infixPipeLeft2 x y z =
     [ x
     ]
     <|
@@ -153,7 +153,7 @@ emptyRecord =
 
 
 record =
-    [ { x = 1 }
+    ( { x = 1 }
     , { x = 1, y = 2 }
     , { x = 1, y = 2, z = 3 }
     , { x = 1
@@ -198,7 +198,7 @@ record =
       -- Section 2
       , z = 3
       }
-    ]
+    )
 
 
 recordWithCommentedOutFields =
@@ -225,7 +225,7 @@ recordUpdate a =
     )
 
 
-recordUpdateWithCommentedOutFields =
+recordUpdateWithCommentedOutFields a =
     { a
         | x = 1
 
@@ -238,7 +238,7 @@ recordUpdateWithCommentedOutFields =
 
 
 recordAccess f a b r =
-    [ ().x
+    ( ().x
     , a.x
     , (a).x
     , ( 1, 2 ).x
@@ -247,7 +247,7 @@ recordAccess f a b r =
     , { x = 1 }.x
     , { r | x = 1 }.x
     , a.x.y
-    ]
+    )
 
 
 recordAccessfunction =
