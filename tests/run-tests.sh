@@ -308,6 +308,7 @@ checkGood 0.18 AllSyntax/0.18/Expressions/Unary.elm
 checkGood 0.18 AllSyntax/0.18/Expressions/BinaryOperators.elm
 checkGood 0.18 AllSyntax/0.18/DocComments.elm
 checkGood 0.18 AllSyntax/0.18/DocCommentsStartingWtihAtDocs.elm
+checkGood 0.18 AllSyntax/0.18/DeclaraionSpacing.elm
 checkGood 0.16 Comments.elm
 checkGood 0.16 AllSyntax/0.16/GLShader.elm
 checkGood 0.16 AllSyntax/0.16/Literals.elm
