@@ -17,14 +17,20 @@ formatMarkdown formatCode blocks =
 
         needsInitialBlanks =
             case blocks' of
-                (Para _ : _) -> False
+                (Para inlines : _ ) ->
+                    case toList inlines of
+                        (Str a : Str b : _) ->
+                            if (a == Text.pack "@") && (b == Text.pack "docs")
+                                then True
+                                else False
+                        _ -> False
                 [] -> False
                 _ -> True
 
         needsTrailingBlanks =
             case blocks' of
                 [] -> False
-                (_ : []) -> False
+                (_ : []) -> needsInitialBlanks
                 _ -> True
     in
         formatMarkdown' formatCode False needsInitialBlanks needsTrailingBlanks blocks'
