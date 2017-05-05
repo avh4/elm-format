@@ -258,6 +258,15 @@ lambda =
     \x -> x + 1
 
 
+lambdaWithMultilinePattern =
+    \{ x
+     , --A
+       y
+     }
+    ->
+        ()
+
+
 ifStatement =
     let
         a =

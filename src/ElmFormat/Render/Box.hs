@@ -957,8 +957,16 @@ formatExpression elmVersion needsParens aexpr =
                             (map formatComment bodyComments)
                             ++ [ expr' ]
                         ]
-                _ ->
-                    pleaseReport "TODO" "multiline pattern in lambda"
+                (_, Left [], _, _) ->
+                    pleaseReport "UNEXPECTED LAMBDA" "no patterns"
+                (_, Left patterns', _, expr') ->
+                    stack1
+                        [ prefix (punc "\\") $ stack1 patterns'
+                        , line $ punc "->"
+                        , indent $ stack1 $
+                            (map formatComment bodyComments)
+                            ++ [ expr' ]
+                        ]
 
         AST.Expression.Unary AST.Expression.Negative e ->
             prefix (punc "-") $ formatExpression elmVersion True e
