@@ -116,3 +116,25 @@ Nested with loose items
 
 x =
     ()
+
+
+{-| Code block following a list. In this case we fallback to a fenced code block
+because some markdown implementations parse this differently (notably, marked and
+elm-markdown differ from commonmark). marked will parse an indented code block
+after an indented list as a code block, but commonmark will parse it as a paragraph
+inside of the list item.
+
+Increment a number.
+
+  - The given number will be incremented by 1.
+  - This function is really simple.
+
+```
+increment x =
+    x + 1
+```
+
+-}
+increment : Int -> Int
+increment x =
+    x + 1

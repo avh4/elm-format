@@ -36,6 +36,12 @@ formatMarkdown formatCode blocks =
         formatMarkdown' formatCode False needsInitialBlanks needsTrailingBlanks blocks'
 
 
+mapWithPrev :: (Maybe a -> a -> b) -> [a] -> [b]
+mapWithPrev f [] = []
+mapWithPrev f (first:rest) =
+    f Nothing first : zipWith (\prev next -> f (Just prev) next) (first:rest) rest
+
+
 formatMarkdown' :: (String -> Maybe String) -> Bool -> Bool -> Bool -> [Block] -> String
 formatMarkdown' formatCode isListItem needsInitialBlanks needsTrailingBlanks blocks =
     let
@@ -43,14 +49,24 @@ formatMarkdown' formatCode isListItem needsInitialBlanks needsTrailingBlanks blo
             case (isListItem, blocks) of
                 (True, [Para _, List _ _ _]) -> id
                 _ -> List.intersperse "\n"
+
+        contextFor prev =
+            case prev of
+                Just (List _ _ _) -> AfterIndentedList
+                _ -> Normal
     in
     (if needsInitialBlanks then "\n\n" else "")
-        ++ (fold $ intersperse $ fmap (formatMardownBlock formatCode) $ blocks)
+        ++ (fold $ intersperse $ mapWithPrev (\prev -> formatMardownBlock formatCode (contextFor prev)) $ blocks)
         ++ (if needsTrailingBlanks then "\n" else "")
 
 
-formatMardownBlock :: (String -> Maybe String) -> Block -> String
-formatMardownBlock formatCode block =
+data Context
+    = Normal
+    | AfterIndentedList
+
+
+formatMardownBlock :: (String -> Maybe String) -> Context -> Block -> String
+formatMardownBlock formatCode context block =
     case block of
         Para inlines ->
             (fold $ fmap formatMarkdownInline $ inlines) ++ "\n"
@@ -76,10 +92,18 @@ formatMardownBlock formatCode block =
 
                 lang' =
                     Text.unpack lang
+
+                isElm =
+                    lang' == "elm" || lang' == ""
+
+                canIndent =
+                    case context of
+                        Normal -> True
+                        AfterIndentedList -> False
             in
-                if lang' == "elm" || lang' == ""
+                if isElm && canIndent
                     then unlines $ fmap ((++) "    ") $ lines $ formatted
-                    else "```" ++ Text.unpack lang ++ "\n" ++ formatted ++ "\n```\n"
+                    else "```" ++ Text.unpack lang ++ "\n" ++ formatted ++ "```\n"
 
         HtmlBlock text ->
             Text.unpack text ++ "\n"
