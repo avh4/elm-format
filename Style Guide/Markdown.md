@@ -96,3 +96,46 @@ separate their items with blank lines.
 
 3.  Item 3.
 ```
+
+
+## Code Blocks
+
+Code blocks containing valid Elm code are formatted with `elm-format`.
+
+Valid elm code is one or more top-level declarations,
+possibly preceded by a module header.
+
+FUTURE: code blocks containing valid Elm expressions will be formatted with `elm-format.`
+
+Code blocks with an info string of "elm" or with no info string
+are considered to be "Elm code blocks".
+
+"Elm code blocks" use the indented code block style:
+
+```markdown
+Example:
+
+    main : Program Never Model Msg
+```
+
+Other code blocks use the fenced code block style:
+
+````markdown
+Example:
+
+```sh
+#!/bin/sh
+```
+````
+
+Exception: "Elm code blocks" that follow a list use the fenced code block style.
+This is done because some popular markdown implementations (notably commonmark)
+would parse an indented code block here as a paragraph within the last list item.
+
+````markdown
+  - List Item
+
+```
+main : Program Never Model Msg
+```
+````
