@@ -1353,8 +1353,7 @@ formatRange_0_18 elmVersion context left right =
                 ]
                 (FAJoinFirst JoinAll)
                 |> noRegion
-                |> formatExpression elmVersion SyntaxSeparated
-                |> expressionParens SpaceSeparated context
+                |> formatExpression elmVersion context
 
         _ ->
             AST.Expression.App
@@ -1364,8 +1363,7 @@ formatRange_0_18 elmVersion context left right =
                 ]
                 (FAJoinFirst JoinAll)
                 |> noRegion
-                |> formatExpression elmVersion SyntaxSeparated
-                |> expressionParens SpaceSeparated context
+                |> formatExpression elmVersion context
 
 
 formatUnit :: Char -> Char -> Comments -> Box
