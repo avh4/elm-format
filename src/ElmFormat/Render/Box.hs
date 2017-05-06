@@ -981,6 +981,7 @@ formatExpression elmVersion context aexpr =
                             (map formatComment bodyComments)
                             ++ [ expr' ]
                         ]
+            |> expressionParens SpaceSeparated context
 
         AST.Expression.Unary AST.Expression.Negative e ->
             prefix (punc "-") $ formatExpression elmVersion SpaceSeparated e -- TODO: This might need something stronger than SpaceSeparated?
@@ -1265,10 +1266,7 @@ removeBackticks left ops =
             let
                 e' = noRegion $ AST.Expression.App
                     (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef v' v)
-                    [ if needsParensInSpaces e then
-                          (post, noRegion $ AST.Expression.Parens (Commented [] e []))
-                      else
-                          (post, e)
+                    [ (post, e)
                     ]
                     (FAJoinFirst JoinAll)
 
@@ -1281,14 +1279,8 @@ removeBackticks left ops =
             removeBackticks
                 (noRegion $ AST.Expression.App
                     (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef v' v)
-                    [ if needsParensInSpaces left then
-                          (pre, noRegion $ AST.Expression.Parens (Commented [] left []))
-                      else
-                          (pre, left)
-                    , if needsParensInSpaces e then
-                          (post, noRegion $ AST.Expression.Parens (Commented [] e []))
-                      else
-                          (post, e)
+                    [ (pre, left)
+                    , (post, e)
                     ]
                     (FAJoinFirst JoinAll)
                 )
@@ -1342,14 +1334,8 @@ formatRange_0_18 elmVersion context left right =
         (Commented preLeft left' [], Commented preRight right' []) ->
             AST.Expression.App
                 (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
-                [ if needsParensInSpaces left' then
-                      ([], noRegion $ AST.Expression.Parens left)
-                  else
-                      (preLeft, left')
-                , if needsParensInSpaces right' then
-                      ([], noRegion $ AST.Expression.Parens right)
-                  else
-                      (preRight, right')
+                [ (preLeft, left')
+                , (preRight, right')
                 ]
                 (FAJoinFirst JoinAll)
                 |> noRegion
@@ -1608,36 +1594,6 @@ data TypeParensRequired
     | ForCtor
     | NotRequired
     deriving (Eq)
-
-
-needsParensInSpaces :: AST.Expression.Expr -> Bool
-needsParensInSpaces (RA.A _ expr) =
-    case expr of
-      AST.Expression.Unit _ -> False
-      AST.Expression.Literal _ -> False
-      AST.Expression.VarExpr _-> False
-
-      AST.Expression.App _ _ _ -> True
-      AST.Expression.Unary _ _ -> False
-      AST.Expression.Binops _ _ _ -> True
-      AST.Expression.Parens _ -> False
-
-      AST.Expression.ExplicitList _ _ _ -> False
-      AST.Expression.Range _ _ _ -> False
-
-      AST.Expression.Tuple _ _ -> False
-      AST.Expression.TupleFunction _ -> False
-
-      AST.Expression.Record _ _ _ _ -> False
-      AST.Expression.Access _ _ -> False
-      AST.Expression.AccessFunction _ -> False
-
-      AST.Expression.Lambda _ _ _ _ -> True -- Maybe should be False?
-      AST.Expression.If _ _ _ -> True
-      AST.Expression.Let _ _ _ -> True
-      AST.Expression.Case _ _ -> True
-
-      AST.Expression.GLShader _ -> False
 
 
 formatType :: ElmVersion -> Type -> Box
