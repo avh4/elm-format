@@ -88,7 +88,12 @@ formatMardownBlock formatCode context block =
         CodeBlock (CodeAttr lang info) code ->
             let
                 formatted =
-                    fromMaybe (Text.unpack code) $ formatCode $ Text.unpack code
+                    fromMaybe (Text.unpack $ ensureNewline code) $ formatCode $ Text.unpack code
+
+                ensureNewline text =
+                    if Text.last text == '\n'
+                        then text
+                        else Text.snoc text '\n'
 
                 lang' =
                     Text.unpack lang

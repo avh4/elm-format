@@ -294,7 +294,7 @@ processElts refmap (C (Container ct cs) : rest) =
 
                     isTight = tightListItem xs && all tightListItem items
 
-    FencedCode _ _ info' -> singleton (CodeBlock attr (T.snoc txt '\n')) <>
+    FencedCode _ _ info' -> singleton (CodeBlock attr txt) <>
                                processElts refmap rest
                   where txt = joinLines $ map extractText $ toList cs
                         attr = CodeAttr x (T.strip y)
