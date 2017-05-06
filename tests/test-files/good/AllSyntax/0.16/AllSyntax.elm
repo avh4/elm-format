@@ -210,15 +210,11 @@ patternAlias ({ x, y } as r) ( a, { b } as r' ) =
 
 
 fnAsLambda =
-    (\a -> a)
-
-
-fnAsUnparenthesizedLambda =
-    \arg -> arg
+    \a -> a
 
 
 multiArgLambda =
-    \a b ( t, s, _, ( t', s', _, ( t'', s'' ), { x', y' } ) ) { x, y } _ -> \c -> (\d -> ())
+    \a b ( t, s, _, ( t', s', _, ( t'', s'' ), { x', y' } ) ) { x, y } _ -> \c -> \d -> ()
 
 
 multilineLambda =
@@ -228,7 +224,7 @@ multilineLambda =
 
 
 parenthesizedExpressions =
-    (1 + (2 * 3) / 4) |> ((+) 0)
+    1 + (2 * 3) / 4 |> (+) 0
 
 
 multilineParenthesizedExpressions graphHeight range =
@@ -252,12 +248,13 @@ multilineParenthesizedExpressions graphHeight range =
             )
 
 
-multilineParenthesizedExpressions2 range =
+multilineParenthesizedExpressions2 range arg =
     (if range == 0 then
-        0.1
+        always 0.1
      else
         toFloat range
     )
+        arg
 
 
 recordAccess r =
@@ -288,7 +285,7 @@ multilineRecordAccess2 r f =
 
 
 chainedRecordAccess r =
-    ((r.f1.f2).f3.f4
+    (r.f1.f2.f3.f4
         -- A
         ()
     ).f5.f6
@@ -301,11 +298,11 @@ multilineRecordLiteral =
 
 
 singleLineRecord addStatus =
-    (addStatus { f1 = 50 }.f1)
+    addStatus { f1 = 50 }.f1
 
 
 singleLineRecordUpdate x =
-    (always { x | f1 = 20 }.f1)
+    always { x | f1 = 20 }.f1
 
 
 letExpression =

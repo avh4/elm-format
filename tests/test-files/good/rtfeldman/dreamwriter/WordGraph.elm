@@ -39,10 +39,11 @@ bar day yOffset =
         [ x <| toString <| (day.xOffset * (barWidth + barMargin))
         , y <|
             toString <|
-                if day.amount <= 0 then
+                (if day.amount <= 0 then
                     yOffset
-                else
+                 else
                     yOffset - day.amount
+                )
         , height <| toString <| abs day.amount
         , width <| toString barWidth
         ]
@@ -53,7 +54,7 @@ graph : Float -> List Day -> Svg
 graph yOffset days =
     let
         graphWidth =
-            (List.length days) * (barWidth + barMargin)
+            List.length days * (barWidth + barMargin)
 
         axis =
             line
