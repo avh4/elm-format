@@ -721,7 +721,7 @@ formatDeclaration elmVersion decl =
                   ElmStructure.definition "=" True
                     (line $ keyword "port")
                     [formatCommented (line . formatLowercaseIdentifier elmVersion []) name]
-                    (formatCommented' bodyComments (formatExpression elmVersion False) expr)
+                    (formatCommented' bodyComments (formatExpression elmVersion SyntaxSeparated) expr)
 
                 AST.Declaration.Fixity assoc precedenceComments precedence nameComments name ->
                     case
@@ -765,7 +765,7 @@ formatDefinition elmVersion name args comments expr =
     body =
       stack1 $ concat
         [ map formatComment comments
-        , [ formatExpression elmVersion False expr ]
+        , [ formatExpression elmVersion SyntaxSeparated expr ]
         ]
   in
     ElmStructure.definition "=" True
@@ -898,8 +898,22 @@ negativeCasePatternWorkaround (Commented _ (RA.A _ pattern) _) =
         _ -> id
 
 
-formatExpression :: ElmVersion -> Bool -> AST.Expression.Expr -> Box
-formatExpression elmVersion needsParens aexpr =
+data ExpressionContext
+    = SyntaxSeparated
+    | InfixSeparated
+    | SpaceSeparated
+
+
+expressionParens :: ExpressionContext -> ExpressionContext -> Box -> Box
+expressionParens inner outer =
+    case (inner, outer) of
+        (SpaceSeparated, SpaceSeparated) -> parens
+        (_, SyntaxSeparated) -> id
+        _ -> id
+
+
+formatExpression :: ElmVersion -> ExpressionContext -> AST.Expression.Expr -> Box
+formatExpression elmVersion context aexpr =
     case RA.drop aexpr of
         AST.Expression.Literal lit ->
             formatLiteral lit
@@ -912,11 +926,11 @@ formatExpression elmVersion needsParens aexpr =
                 Elm_0_16 -> formatRange_0_17 elmVersion left right multiline
                 Elm_0_17 -> formatRange_0_17 elmVersion left right multiline
                 Elm_0_18 -> formatRange_0_17 elmVersion left right multiline
-                Elm_0_18_Upgrade -> formatRange_0_18 elmVersion needsParens left right
+                Elm_0_18_Upgrade -> formatRange_0_18 elmVersion context left right
 
         AST.Expression.ExplicitList exprs trailing multiline ->
             formatSequence '[' ',' (Just ']')
-                (formatExpression elmVersion False)
+                (formatExpression elmVersion SyntaxSeparated)
                 multiline
                 trailing
                 exprs
@@ -933,7 +947,7 @@ formatExpression elmVersion needsParens aexpr =
                 ( multiline
                 , allSingles $ map (formatCommented (formatPattern elmVersion True) . (\(c,p) -> Commented c p [])) patterns
                 , bodyComments == []
-                , formatExpression elmVersion False expr
+                , formatExpression elmVersion SyntaxSeparated expr
                 )
             of
                 (False, Right patterns', True, SingleLine expr') ->
@@ -969,13 +983,14 @@ formatExpression elmVersion needsParens aexpr =
                         ]
 
         AST.Expression.Unary AST.Expression.Negative e ->
-            prefix (punc "-") $ formatExpression elmVersion True e
+            prefix (punc "-") $ formatExpression elmVersion SpaceSeparated e -- TODO: This might need something stronger than SpaceSeparated?
 
         AST.Expression.App left args multiline ->
           ElmStructure.application
             multiline
-            (formatExpression elmVersion True left)
-            (map (\(x,y) -> formatCommented' x (formatExpression elmVersion True) y) args)
+            (formatExpression elmVersion SpaceSeparated left)
+            (map (\(x,y) -> formatCommented' x (formatExpression elmVersion SpaceSeparated) y) args)
+            |> expressionParens SpaceSeparated context
 
         AST.Expression.If if' elseifs (elsComments, els) ->
             let
@@ -998,8 +1013,8 @@ formatExpression elmVersion needsParens aexpr =
 
                 formatIf (cond, body) =
                     stack1
-                        [ opening (line $ keyword "if") $ formatCommented (formatExpression elmVersion False) cond
-                        , indent $ formatCommented_ True (formatExpression elmVersion False) body
+                        [ opening (line $ keyword "if") $ formatCommented (formatExpression elmVersion SyntaxSeparated) cond
+                        , indent $ formatCommented_ True (formatExpression elmVersion SyntaxSeparated) body
                         ]
 
                 formatElseIf (ifComments, (cond, body)) =
@@ -1015,15 +1030,15 @@ formatExpression elmVersion needsParens aexpr =
                             ]
                   in
                     stack1
-                      [ opening key $ formatCommented (formatExpression elmVersion False) cond
-                      , indent $ formatCommented_ True (formatExpression elmVersion False) body
+                      [ opening key $ formatCommented (formatExpression elmVersion SyntaxSeparated) cond
+                      , indent $ formatCommented_ True (formatExpression elmVersion SyntaxSeparated) body
                       ]
             in
                 formatIf if'
                     |> andThen (map formatElseIf elseifs)
                     |> andThen
                         [ line $ keyword "else"
-                        , indent $ formatCommented_ True (formatExpression elmVersion False) (Commented elsComments els [])
+                        , indent $ formatCommented_ True (formatExpression elmVersion SyntaxSeparated) (Commented elsComments els [])
                         ]
 
         AST.Expression.Let defs bodyComments expr ->
@@ -1056,7 +1071,7 @@ formatExpression elmVersion needsParens aexpr =
                         [ line $ keyword "in"
                         , stack1 $
                             (map formatComment bodyComments)
-                            ++ [formatExpression elmVersion False expr]
+                            ++ [formatExpression elmVersion SyntaxSeparated expr]
                         ]
 
         AST.Expression.Case (subject,multiline) clauses ->
@@ -1064,7 +1079,7 @@ formatExpression elmVersion needsParens aexpr =
                 opening =
                   case
                     ( multiline
-                    , formatCommented (formatExpression elmVersion False) subject
+                    , formatCommented (formatExpression elmVersion SyntaxSeparated) subject
                     )
                   of
                       (False, SingleLine subject') ->
@@ -1089,7 +1104,7 @@ formatExpression elmVersion needsParens aexpr =
                           |> negativeCasePatternWorkaround pat
                       , formatCommentedStack (formatPattern elmVersion False) pat
                           |> negativeCasePatternWorkaround pat
-                      , formatHeadCommentedStack (formatExpression elmVersion False) expr
+                      , formatHeadCommentedStack (formatExpression elmVersion SyntaxSeparated) expr
                       )
                     of
                         (_, _, SingleLine pat', body') ->
@@ -1119,13 +1134,13 @@ formatExpression elmVersion needsParens aexpr =
                         )
 
         AST.Expression.Tuple exprs multiline ->
-            ElmStructure.group True "(" "," ")" multiline $ map (formatCommented (formatExpression elmVersion False)) exprs
+            ElmStructure.group True "(" "," ")" multiline $ map (formatCommented (formatExpression elmVersion SyntaxSeparated)) exprs
 
         AST.Expression.TupleFunction n ->
             line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
 
         AST.Expression.Access expr field ->
-            formatExpression elmVersion True expr
+            formatExpression elmVersion SpaceSeparated expr -- TODO: does this need a different context than SpaceSeparated?
                 |> addSuffix (row $ [punc ".", formatLowercaseIdentifier elmVersion [] field])
 
         AST.Expression.AccessFunction (LowercaseIdentifier field) ->
@@ -1136,11 +1151,11 @@ formatExpression elmVersion needsParens aexpr =
                 (line . formatLowercaseIdentifier elmVersion [])
                 (formatLowercaseIdentifier elmVersion [])
                 "="
-                (formatExpression elmVersion False)
+                (formatExpression elmVersion SyntaxSeparated)
                 base fields trailing multiline
 
         AST.Expression.Parens expr ->
-            parens $ formatCommented (formatExpression elmVersion False) expr
+            parens $ formatCommented (formatExpression elmVersion SyntaxSeparated) expr
 
         AST.Expression.Unit comments ->
             formatUnit '(' ')' comments
@@ -1204,12 +1219,12 @@ formatBinops_0_17 elmVersion left ops multiline =
             ( o == AST.Variable.OpRef (SymbolIdentifier "<|")
             , po
             , (line . formatInfixVar elmVersion) o
-            , formatCommented' pe (formatExpression elmVersion False) e
+            , formatCommented' pe (formatExpression elmVersion InfixSeparated) e
             )
     in
         formatBinary
             multiline
-            (formatExpression elmVersion False left)
+            (formatExpression elmVersion InfixSeparated left)
             (map formatPair ops)
 
 
@@ -1227,12 +1242,12 @@ formatBinops_0_18 elmVersion left ops multiline =
             ( o == AST.Variable.OpRef (SymbolIdentifier "<|")
             , po
             , (line . formatInfixVar elmVersion) o
-            , formatCommented' pe (formatExpression elmVersion False) e
+            , formatCommented' pe (formatExpression elmVersion InfixSeparated) e
             )
     in
         formatBinary
             multiline
-            (formatExpression elmVersion False left')
+            (formatExpression elmVersion InfixSeparated left')
             (map formatPair ops')
 
 
@@ -1291,8 +1306,8 @@ formatRange_0_17 :: ElmVersion -> Commented AST.Expression.Expr -> Commented AST
 formatRange_0_17 elmVersion left right multiline =
     case
         ( multiline
-        , formatCommented (formatExpression elmVersion False) left
-        , formatCommented (formatExpression elmVersion False) right
+        , formatCommented (formatExpression elmVersion SyntaxSeparated) left
+        , formatCommented (formatExpression elmVersion SyntaxSeparated) right
         )
     of
         (False, SingleLine left', SingleLine right') ->
@@ -1321,8 +1336,8 @@ noRegion :: a -> RA.Located a
 noRegion =
     RA.at nowhere nowhere
 
-formatRange_0_18 :: ElmVersion -> Bool -> Commented AST.Expression.Expr -> Commented AST.Expression.Expr -> Box
-formatRange_0_18 elmVersion needsParens left right =
+formatRange_0_18 :: ElmVersion -> ExpressionContext -> Commented AST.Expression.Expr -> Commented AST.Expression.Expr -> Box
+formatRange_0_18 elmVersion context left right =
     case (left, right) of
         (Commented preLeft left' [], Commented preRight right' []) ->
             AST.Expression.App
@@ -1338,8 +1353,8 @@ formatRange_0_18 elmVersion needsParens left right =
                 ]
                 (FAJoinFirst JoinAll)
                 |> noRegion
-                |> formatExpression elmVersion False
-                |> if needsParens then parens else id
+                |> formatExpression elmVersion SyntaxSeparated
+                |> expressionParens SpaceSeparated context
 
         _ ->
             AST.Expression.App
@@ -1349,8 +1364,8 @@ formatRange_0_18 elmVersion needsParens left right =
                 ]
                 (FAJoinFirst JoinAll)
                 |> noRegion
-                |> formatExpression elmVersion False
-                |> if needsParens then parens else id
+                |> formatExpression elmVersion SyntaxSeparated
+                |> expressionParens SpaceSeparated context
 
 
 formatUnit :: Char -> Char -> Comments -> Box

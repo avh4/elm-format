@@ -11,7 +11,7 @@ import qualified AST.Pattern as P
 import AST.Variable
 import Text.Parsec.Char (string)
 import ElmVersion
-import ElmFormat.Render.Box (formatExpression)
+import ElmFormat.Render.Box (formatExpression, ExpressionContext(..))
 import qualified Box
 import qualified Data.Text as Text
 import Parse.TestHelpers
@@ -30,7 +30,7 @@ example name input expected =
 example' :: String -> String -> String -> TestTree
 example' name input expected =
     testCase name $
-        assertParse (fmap (Text.unpack . Box.render . formatExpression Elm_0_18 False) expr) input expected
+        assertParse (fmap (Text.unpack . Box.render . formatExpression Elm_0_18 SyntaxSeparated) expr) input expected
 
 
 commentedIntExpr (a,b,c,d) preComment postComment i =
