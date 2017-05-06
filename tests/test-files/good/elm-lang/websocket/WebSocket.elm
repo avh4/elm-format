@@ -178,11 +178,13 @@ onEffects router cmds subs state =
                 leftStep name _ getNewSockets =
                     getNewSockets
                         `Task.andThen`
-                            \newSockets ->
+                            (\newSockets ->
                                 attemptOpen router 0 name
                                     `Task.andThen`
-                                        \pid ->
+                                        (\pid ->
                                             Task.succeed (Dict.insert name (Opening 0 pid) newSockets)
+                                        )
+                            )
 
                 bothStep name _ connection getNewSockets =
                     Task.map (Dict.insert name connection) getNewSockets
@@ -192,8 +194,9 @@ onEffects router cmds subs state =
             in
             Dict.merge leftStep bothStep rightStep newEntries state.sockets (Task.succeed Dict.empty)
                 `Task.andThen`
-                    \newSockets ->
+                    (\newSockets ->
                         Task.succeed (State newSockets newQueues newSubs)
+                    )
     in
     sendMessagesGetNewQueues `Task.andThen` cleanup
 
@@ -268,8 +271,9 @@ onSelfMsg router selfMsg state =
                 Just _ ->
                     attemptOpen router 0 name
                         `Task.andThen`
-                            \pid ->
+                            (\pid ->
                                 Task.succeed (updateSocket name (Opening 0 pid) state)
+                            )
 
         GoodOpen name socket ->
             Task.succeed (updateSocket name (Connected socket) state)
@@ -282,8 +286,9 @@ onSelfMsg router selfMsg state =
                 Just (Opening n _) ->
                     attemptOpen router (n + 1) name
                         `Task.andThen`
-                            \pid ->
+                            (\pid ->
                                 Task.succeed (updateSocket name (Opening (n + 1) pid) state)
+                            )
 
                 Just (Connected _) ->
                     Task.succeed state

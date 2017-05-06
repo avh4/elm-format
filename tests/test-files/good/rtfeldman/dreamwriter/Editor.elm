@@ -89,7 +89,7 @@ viewEditorFooter channels currentDoc fullscreen =
                 + chapterWords
 
         wordCountLabel =
-            (pluralize "word" wordCount) ++ " saved "
+            pluralize "word" wordCount ++ " saved "
     in
     div [ id "editor-footer" ]
         [ div [ id "doc-word-count" ]
@@ -149,7 +149,7 @@ pluralize noun quantity =
     if quantity == 1 then
         "1 " ++ noun
     else
-        (withCommas quantity) ++ " " ++ noun ++ "s"
+        withCommas quantity ++ " " ++ noun ++ "s"
 
 
 viewFullscreenButton : Address FullscreenState -> FullscreenState -> Html
@@ -209,7 +209,7 @@ viewFontControl execCommandChannel idAttr label command =
     span
         [ class "font-control toolbar-button toolbar-font-button"
         , id idAttr
-        , (property "unselectable" (string "on"))
+        , property "unselectable" (string "on")
         , onClick execCommandChannel command
         ]
         [ text label ]

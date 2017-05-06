@@ -902,13 +902,18 @@ data ExpressionContext
     = SyntaxSeparated
     | InfixSeparated
     | SpaceSeparated
+    | AmbiguousEnd
 
 
 expressionParens :: ExpressionContext -> ExpressionContext -> Box -> Box
 expressionParens inner outer =
     case (inner, outer) of
         (SpaceSeparated, SpaceSeparated) -> parens
-        (_, SyntaxSeparated) -> id
+        (InfixSeparated, SpaceSeparated) -> parens
+        (InfixSeparated, InfixSeparated) -> parens
+        (AmbiguousEnd, SpaceSeparated) -> parens
+        (AmbiguousEnd, InfixSeparated) -> parens
+        (AmbiguousEnd, AmbiguousEnd) -> parens
         _ -> id
 
 
@@ -941,6 +946,7 @@ formatExpression elmVersion context aexpr =
                 Elm_0_17 -> formatBinops_0_17 elmVersion left ops multiline
                 Elm_0_18 -> formatBinops_0_17 elmVersion left ops multiline
                 Elm_0_18_Upgrade -> formatBinops_0_18 elmVersion left ops multiline
+            |> expressionParens InfixSeparated context
 
         AST.Expression.Lambda patterns bodyComments expr multiline ->
             case
@@ -981,7 +987,7 @@ formatExpression elmVersion context aexpr =
                             (map formatComment bodyComments)
                             ++ [ expr' ]
                         ]
-            |> expressionParens SpaceSeparated context
+            |> expressionParens AmbiguousEnd context
 
         AST.Expression.Unary AST.Expression.Negative e ->
             prefix (punc "-") $ formatExpression elmVersion SpaceSeparated e -- TODO: This might need something stronger than SpaceSeparated?
@@ -989,7 +995,7 @@ formatExpression elmVersion context aexpr =
         AST.Expression.App left args multiline ->
           ElmStructure.application
             multiline
-            (formatExpression elmVersion SpaceSeparated left)
+            (formatExpression elmVersion AmbiguousEnd left)
             (map (\(x,y) -> formatCommented' x (formatExpression elmVersion SpaceSeparated) y) args)
             |> expressionParens SpaceSeparated context
 
@@ -1041,6 +1047,7 @@ formatExpression elmVersion context aexpr =
                         [ line $ keyword "else"
                         , indent $ formatCommented_ True (formatExpression elmVersion SyntaxSeparated) (Commented elsComments els [])
                         ]
+                    |> expressionParens AmbiguousEnd context
 
         AST.Expression.Let defs bodyComments expr ->
             let
@@ -1074,6 +1081,7 @@ formatExpression elmVersion context aexpr =
                             (map formatComment bodyComments)
                             ++ [formatExpression elmVersion SyntaxSeparated expr]
                         ]
+                    |> expressionParens AmbiguousEnd context -- TODO: not tested
 
         AST.Expression.Case (subject,multiline) clauses ->
             let
@@ -1133,6 +1141,7 @@ formatExpression elmVersion context aexpr =
                             |> List.intersperse blankLine
                             |> map indent
                         )
+                    |> expressionParens AmbiguousEnd context -- TODO: not tested
 
         AST.Expression.Tuple exprs multiline ->
             ElmStructure.group True "(" "," ")" multiline $ map (formatCommented (formatExpression elmVersion SyntaxSeparated)) exprs
@@ -1156,7 +1165,13 @@ formatExpression elmVersion context aexpr =
                 base fields trailing multiline
 
         AST.Expression.Parens expr ->
-            parens $ formatCommented (formatExpression elmVersion SyntaxSeparated) expr
+            case expr of
+                Commented [] expr' [] ->
+                    formatExpression elmVersion context expr'
+
+                _ ->
+                    formatCommented (formatExpression elmVersion SyntaxSeparated) expr
+                        |> expressionParens SpaceSeparated context
 
         AST.Expression.Unit comments ->
             formatUnit '(' ')' comments

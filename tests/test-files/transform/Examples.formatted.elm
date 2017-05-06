@@ -15,16 +15,15 @@ ratio =
 
 
 bar =
-    (if
+    if
         if a then
             True
         else
             False
-     then
+    then
         "a"
-     else
+    else
         "b"
-    )
 
 
 multilineList =

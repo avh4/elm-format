@@ -188,7 +188,7 @@ viewCurrentDocHeader : Doc -> Addresses a -> Html
 viewCurrentDocHeader currentDoc addresses =
     let
         downloadOptions =
-            { filename = (legalizeFilename currentDoc.title) ++ ".html"
+            { filename = legalizeFilename currentDoc.title ++ ".html"
             , contentType = downloadContentType
             }
     in

@@ -64,8 +64,8 @@ binary =
     1 + 2 + 3
 
 
-parens x =
-    (x)
+parens f x a =
+    f (x a)
 
 
 emptyList =
@@ -240,7 +240,7 @@ recordUpdateWithCommentedOutFields a =
 recordAccess f a b r =
     ( ().x
     , a.x
-    , (a).x
+    , (f a).x
     , ( 1, 2 ).x
     , (,,).x
     , {}.x
