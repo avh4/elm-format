@@ -313,7 +313,7 @@ letExpression =
         x =
             1
     in
-        x
+    x
 
 
 multilineDeclarationInLet =
@@ -324,7 +324,7 @@ multilineDeclarationInLet =
         string' =
             "String Prime"
     in
-        string
+    string
 
 
 ifStatement b =
@@ -353,7 +353,7 @@ multilineExpressionsInsideList =
         x =
             1
       in
-        always x
+      always x
     , if True then
         always 2
       else if False then
@@ -379,7 +379,7 @@ multilineExpressionsInsideTuple a foo =
         x =
             1
       in
-        x
+      x
     , if True then
         2
       else if False then
@@ -417,7 +417,7 @@ multilineExpressionsInsideRecord =
             x =
                 1
         in
-            x
+        x
     , b =
         if True then
             2

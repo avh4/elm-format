@@ -1054,7 +1054,7 @@ formatExpression elmVersion needsParens aexpr =
                         )
                     |> andThen
                         [ line $ keyword "in"
-                        , indent $ stack1 $
+                        , stack1 $
                             (map formatComment bodyComments)
                             ++ [formatExpression elmVersion False expr]
                         ]

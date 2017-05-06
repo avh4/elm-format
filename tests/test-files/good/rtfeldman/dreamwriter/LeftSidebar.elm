@@ -136,12 +136,12 @@ view addresses model =
                             addresses
                     }
     in
-        div [ id "left-sidebar-container", class "sidebar" ]
-            [ sidebarHeader
-            , div [ id "left-sidebar-body", class "sidebar-body" ]
-                [ sidebarBody ]
-            , sidebarFooter
-            ]
+    div [ id "left-sidebar-container", class "sidebar" ]
+        [ sidebarHeader
+        , div [ id "left-sidebar-body", class "sidebar-body" ]
+            [ sidebarBody ]
+        , sidebarFooter
+        ]
 
 
 sidebarHeaderId =
@@ -192,35 +192,35 @@ viewCurrentDocHeader currentDoc addresses =
             , contentType = downloadContentType
             }
     in
-        menu [ id sidebarHeaderId, class sidebarHeaderClass ]
-            [ menuitem
-                [ title "New"
-                , class "sidebar-header-control flaticon-add26"
-                , onClick addresses.newDoc ()
-                ]
-                []
-            , menuitem
-                [ title "Open"
-                , class "sidebar-header-control flaticon-folder63"
-                , onClick addresses.update (SetViewMode OpenMenuMode)
-                ]
-                []
-            , menuitem
-                [ title "Download"
-                , class "sidebar-header-control flaticon-cloud134"
-                , onClick addresses.download downloadOptions
-                ]
-                []
-            , menuitem
-                [ title "Print"
-                , class "sidebar-header-control flaticon-printer70"
-                , onClick addresses.print ()
-                ]
-                []
-            , menuitem
-                [ title "Settings"
-                , class "sidebar-header-control flaticon-gear33"
-                , onClick addresses.update (SetViewMode SettingsMode)
-                ]
-                []
+    menu [ id sidebarHeaderId, class sidebarHeaderClass ]
+        [ menuitem
+            [ title "New"
+            , class "sidebar-header-control flaticon-add26"
+            , onClick addresses.newDoc ()
             ]
+            []
+        , menuitem
+            [ title "Open"
+            , class "sidebar-header-control flaticon-folder63"
+            , onClick addresses.update (SetViewMode OpenMenuMode)
+            ]
+            []
+        , menuitem
+            [ title "Download"
+            , class "sidebar-header-control flaticon-cloud134"
+            , onClick addresses.download downloadOptions
+            ]
+            []
+        , menuitem
+            [ title "Print"
+            , class "sidebar-header-control flaticon-printer70"
+            , onClick addresses.print ()
+            ]
+            []
+        , menuitem
+            [ title "Settings"
+            , class "sidebar-header-control flaticon-gear33"
+            , onClick addresses.update (SetViewMode SettingsMode)
+            ]
+            []
+        ]

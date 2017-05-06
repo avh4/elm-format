@@ -91,22 +91,22 @@ viewEditorFooter channels currentDoc fullscreen =
         wordCountLabel =
             (pluralize "word" wordCount) ++ " saved "
     in
-        div [ id "editor-footer" ]
-            [ div [ id "doc-word-count" ]
-                [ text wordCountLabel
-                , WordGraph.viewWordGraph currentDoc.dailyWords
-                ]
-            , div [ id "dropbox-sync" ]
-                [ input
-                    [ id "toggle-dropbox-sync"
-                    , property "type" (string "checkbox")
-                    , onClick channels.remoteSync ()
-                    ]
-                    []
-                , label [ for "toggle-dropbox-sync" ]
-                    [ text " sync to Dropbox" ]
-                ]
+    div [ id "editor-footer" ]
+        [ div [ id "doc-word-count" ]
+            [ text wordCountLabel
+            , WordGraph.viewWordGraph currentDoc.dailyWords
             ]
+        , div [ id "dropbox-sync" ]
+            [ input
+                [ id "toggle-dropbox-sync"
+                , property "type" (string "checkbox")
+                , onClick channels.remoteSync ()
+                ]
+                []
+            , label [ for "toggle-dropbox-sync" ]
+                [ text " sync to Dropbox" ]
+            ]
+        ]
 
 
 viewOutline : Addresses a -> Doc -> FullscreenState -> Html
@@ -121,8 +121,8 @@ viewOutline channels currentDoc fullscreen =
             List.concatMap (.id >> lazyViewChapter)
                 currentDoc.chapters
     in
-        div [ id "document-page" ]
-            (outlineHeadingNodes ++ outlineChapterNodes)
+    div [ id "document-page" ]
+        (outlineHeadingNodes ++ outlineChapterNodes)
 
 
 withCommas : Int -> String
@@ -139,7 +139,7 @@ withCommas num =
                     |> toString
                     |> String.right 3
         in
-            prefix ++ "," ++ suffix
+        prefix ++ "," ++ suffix
     else
         toString num
 
@@ -169,12 +169,12 @@ viewFullscreenButton fullscreenChannel fullscreen =
                     , fullscreenTitle = "Enter Fullscreen Mode"
                     }
     in
-        div
-            [ class ("toolbar-section toolbar-button " ++ fullscreenClass)
-            , title fullscreenTitle
-            , onClick fullscreenChannel targetMode
-            ]
-            []
+    div
+        [ class ("toolbar-section toolbar-button " ++ fullscreenClass)
+        , title fullscreenTitle
+        , onClick fullscreenChannel targetMode
+        ]
+        []
 
 
 lazyViewChapter : Identifier -> List Html

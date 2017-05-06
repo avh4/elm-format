@@ -54,11 +54,11 @@ view addresses model =
                             currentNote
                     }
     in
-        div [ id "right-sidebar-container", class "sidebar" ]
-            [ div [ id "right-sidebar-body", class "sidebar-body" ]
-                [ sidebarBody ]
-            , sidebarFooter
-            ]
+    div [ id "right-sidebar-container", class "sidebar" ]
+        [ div [ id "right-sidebar-body", class "sidebar-body" ]
+            [ sidebarBody ]
+        , sidebarFooter
+        ]
 
 
 viewHeader : Addresses a -> Model -> Html
