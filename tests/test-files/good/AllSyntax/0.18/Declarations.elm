@@ -189,7 +189,7 @@ expressionDefinitionsInLet =
         def2 =
             ()
     in
-        ()
+    ()
 
 
 expressionDefinitionsInLet2 =
@@ -206,8 +206,8 @@ expressionDefinitionsInLet2 =
 
         {- AD -}
     in
-        {- AE -}
-        ()
+    {- AE -}
+    ()
 
 
 expressionDefinitionsInLet3 =
@@ -224,5 +224,5 @@ expressionDefinitionsInLet3 =
 
         --AB
     in
-        --AC
-        ()
+    --AC
+    ()

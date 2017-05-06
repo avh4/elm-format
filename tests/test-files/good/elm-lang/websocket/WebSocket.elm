@@ -190,12 +190,12 @@ onEffects router cmds subs state =
                 rightStep name connection getNewSockets =
                     closeConnection connection &> getNewSockets
             in
-                Dict.merge leftStep bothStep rightStep newEntries state.sockets (Task.succeed Dict.empty)
-                    `Task.andThen`
-                        \newSockets ->
-                            Task.succeed (State newSockets newQueues newSubs)
+            Dict.merge leftStep bothStep rightStep newEntries state.sockets (Task.succeed Dict.empty)
+                `Task.andThen`
+                    \newSockets ->
+                        Task.succeed (State newSockets newQueues newSubs)
     in
-        sendMessagesGetNewQueues `Task.andThen` cleanup
+    sendMessagesGetNewQueues `Task.andThen` cleanup
 
 
 sendMessagesHelp : List (MyCmd msg) -> SocketsDict -> QueuesDict -> Task x QueuesDict
@@ -258,7 +258,7 @@ onSelfMsg router selfMsg state =
                         |> Maybe.withDefault []
                         |> List.map (\tagger -> Platform.sendToApp router (tagger str))
             in
-                Task.sequence sends &> Task.succeed state
+            Task.sequence sends &> Task.succeed state
 
         Die name ->
             case Dict.get name state.sockets of
@@ -311,7 +311,7 @@ attemptOpen router backoff name =
             (open name router `Task.andThen` goodOpen)
                 `Task.onError` badOpen
     in
-        Process.spawn (after backoff &> actuallyAttemptOpen)
+    Process.spawn (after backoff &> actuallyAttemptOpen)
 
 
 open : String -> Platform.Router msg Msg -> Task WS.BadOpen WS.WebSocket

@@ -60,8 +60,8 @@ comments3 =
         {- comment after definitions -}
         -- ...
     in
-        {- let body -}
-        x
+    {- let body -}
+    x
 
 
 comments4 bool =
@@ -107,7 +107,7 @@ comments7 =
         y =
             ()
     in
-        ()
+    ()
 
 
 comments8 =

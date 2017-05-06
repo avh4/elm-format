@@ -102,7 +102,7 @@ start config =
                 ( newModel, additionalEffects ) =
                     config.update action oldModel
             in
-                ( newModel, Effects.batch [ accumulatedEffects, additionalEffects ] )
+            ( newModel, Effects.batch [ accumulatedEffects, additionalEffects ] )
 
         -- update : List action -> ( model, Effects action ) -> ( model, Effects action )
         update actions ( model, _ ) =
@@ -119,7 +119,7 @@ start config =
         model =
             Signal.map fst effectsAndModel
     in
-        { html = Signal.map (config.view address) model
-        , model = model
-        , tasks = Signal.map (Effects.toTask messages.address << snd) effectsAndModel
-        }
+    { html = Signal.map (config.view address) model
+    , model = model
+    , tasks = Signal.map (Effects.toTask messages.address << snd) effectsAndModel
+    }

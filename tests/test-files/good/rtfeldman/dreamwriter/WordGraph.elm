@@ -64,22 +64,22 @@ graph yOffset days =
                 ]
                 []
     in
-        svg
-            [ id "doc-word-count-graph"
-            , width <| toString graphWidth
-            , height <| toString graphHeight
+    svg
+        [ id "doc-word-count-graph"
+        , width <| toString graphWidth
+        , height <| toString graphHeight
+        ]
+        [ g
+            [ y <| toString yOffset
             ]
-            [ g
-                [ y <| toString yOffset
-                ]
-                {- SVG uses a painter algorithm, so we need axis at the end of
-                   the list to keep bars from overlapping the axis, which gets
-                   pretty ugly.
-                -}
-                (List.append (List.map (\day -> bar day yOffset) days)
-                    [ axis ]
-                )
-            ]
+            {- SVG uses a painter algorithm, so we need axis at the end of
+               the list to keep bars from overlapping the axis, which gets
+               pretty ugly.
+            -}
+            (List.append (List.map (\day -> bar day yOffset) days)
+                [ axis ]
+            )
+        ]
 
 
 scale : Int -> Int -> Int -> Float
@@ -96,7 +96,7 @@ scale top bot value =
                     toFloat range
                   )
     in
-        ratio * toFloat value
+    ratio * toFloat value
 
 
 viewWordGraph : List Entry -> Svg
@@ -135,4 +135,4 @@ viewWordGraph list =
                 [0..maxDays - 1]
                 lastTwoWeeks
     in
-        graph yOffset days
+    graph yOffset days
