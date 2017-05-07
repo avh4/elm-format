@@ -145,7 +145,7 @@ import' =
           postAs <- whitespace
           (,) preAs <$> (,) postAs <$> capVar <?> ("an alias for module `" ++ show moduleName ++ "`") -- TODO: do something correct instead of show
 
-    exposing :: IParser (Comments, PreCommented (Var.Listing Var.Value))
+    exposing :: IParser (Comments, PreCommented (Var.Listing [Commented Var.Value]))
     exposing =
       do  preExposing <- try (whitespace <* reserved "exposing")
           postExposing <- whitespace
@@ -153,7 +153,7 @@ import' =
           return (preExposing, (postExposing, imports))
 
 
-listing :: IParser a -> IParser (Var.Listing a)
+listing :: IParser a -> IParser (Var.Listing [Commented a])
 listing item =
   expecting "a listing of values and types to expose, like (..)" $
   do  _ <- try (char '(')
@@ -172,7 +172,7 @@ listing item =
       return $ listing pre post sawNewline
 
 
-listing' :: Ord a => IParser a -> IParser (Var.Listing' a ())
+listing' :: Ord a => IParser a -> IParser (Var.Listing (Var.CommentedMap a ()))
 listing' item =
     expecting "a listing of values and types to expose, like (..)" $
     do  _ <- try (char '(')
@@ -180,9 +180,9 @@ listing' item =
         pre <- whitespace
         listing <-
             choice
-              [ (\_ pre post _ -> (Var.OpenListing' (Commented pre () post))) <$> string ".."
+              [ (\_ pre post _ -> (Var.OpenListing (Commented pre () post))) <$> string ".."
               , (\x pre post sawNewline ->
-                  (Var.ExplicitListing' (x pre post) sawNewline))
+                  (Var.ExplicitListing (x pre post) sawNewline))
                     <$> commaSep1Set' ((\x -> (x, ())) <$> item) (\() () -> ())
               ]
         post <- whitespace
@@ -202,5 +202,5 @@ value =
       do  name <- capVar
           maybeCtors <- optionMaybe (try $ (,) <$> whitespace <*> listing' capVar)
           case maybeCtors of
-            Nothing -> return $ Var.Union (name, []) Var.ClosedListing'
+            Nothing -> return $ Var.Union (name, []) Var.ClosedListing
             Just (pre, ctors) -> return (Var.Union (name, pre) ctors)

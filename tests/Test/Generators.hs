@@ -72,28 +72,30 @@ instance (Arbitrary a) => Arbitrary (Reporting.Annotation.Located a) where
             return $ Reporting.Annotation.A ann a
 
 
+commented :: Gen a -> Gen (Commented a)
+commented inner =
+    do
+        a <- inner
+        return $ Commented [] a []
+
+
 instance Arbitrary AST.Variable.Value where
     arbitrary =
         do
             name <- capIdentifier
-            return $ AST.Variable.Union (name, []) AST.Variable.ClosedListing'
+            return $ AST.Variable.Union (name, []) AST.Variable.ClosedListing
 
 
-instance (Arbitrary a) => Arbitrary (AST.Variable.Listing a) where
-    arbitrary =
-        do
-            vars <- listOf arbitrary
-            multiline <- arbitrary
-            case vars of
-                [] -> return $ AST.Variable.OpenListing (Commented [] () [])
-                _ -> return $ AST.Variable.ExplicitListing (map (\x -> Commented [] x []) vars) multiline
+listing :: Gen a -> Gen (AST.Variable.Listing a)
+listing _ =
+    return $ AST.Variable.OpenListing (Commented [] () [])
 
 
 instance Arbitrary AST.Module.Module where
     arbitrary =
         do
             name <- listOf1 $ capIdentifier
-            listing <- arbitrary
+            listing <- listing (listOf $ commented arbitrary)
             moduleType <- fmap (\x -> if x then AST.Module.Port [] else AST.Module.Normal) arbitrary
             return $ AST.Module.Module
                 []

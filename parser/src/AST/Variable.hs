@@ -15,22 +15,19 @@ data Ref
 
 -- | A listing of values. Something like (a,b,c) or (..) or (a,b,..)
 data Listing a
-  = ExplicitListing [Commented a] Bool
-  | OpenListing (Commented ())
-  | ClosedListing
-  deriving (Eq, Show)
-
-
-data Listing' k v
-    = ExplicitListing' (Map k (Commented v)) Bool
-    | OpenListing' (Commented ())
-    | ClosedListing'
+    = ExplicitListing a Bool
+    | OpenListing (Commented ())
+    | ClosedListing
     deriving (Eq, Show)
+
+
+type CommentedMap k v =
+    Map k (Commented v)
 
 
 -- | A value that can be imported or exported
 data Value
     = Value !LowercaseIdentifier
     | OpValue SymbolIdentifier
-    | Union (PostCommented UppercaseIdentifier) (Listing' UppercaseIdentifier ())
+    | Union (PostCommented UppercaseIdentifier) (Listing (CommentedMap UppercaseIdentifier ()))
     deriving (Eq, Show)

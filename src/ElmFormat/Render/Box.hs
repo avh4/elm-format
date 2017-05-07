@@ -595,7 +595,7 @@ formatImport elmVersion aimport =
             formatComment c
 
 
-formatListing :: (a -> Box) -> AST.Variable.Listing a -> Maybe Box
+formatListing :: (a -> Box) -> AST.Variable.Listing [Commented a] -> Maybe Box
 formatListing format listing =
     case listing of
         AST.Variable.ClosedListing ->
@@ -608,19 +608,19 @@ formatListing format listing =
             Just $ ElmStructure.group False "(" "," ")" multiline $ map (formatCommented format) vars
 
 
-formatListingSet :: (k -> v -> a) -> (a -> Box) -> AST.Variable.Listing' k v -> Maybe Box
+formatListingSet :: (k -> v -> a) -> (a -> Box) -> AST.Variable.Listing (AST.Variable.CommentedMap k v) -> Maybe Box
 formatListingSet construct format listing =
     case listing of
-        AST.Variable.ClosedListing' ->
+        AST.Variable.ClosedListing ->
             Nothing
 
-        AST.Variable.OpenListing' comments ->
+        AST.Variable.OpenListing comments ->
             comments
                 |> formatCommented (\() -> line $ keyword "..")
                 |> parens
                 |> Just
 
-        AST.Variable.ExplicitListing' vars multiline ->
+        AST.Variable.ExplicitListing vars multiline ->
             vars
                 |> Map.assocs
                 |> map (\(k, Commented pre v post) -> formatCommented format $ Commented pre (construct k v) post)
