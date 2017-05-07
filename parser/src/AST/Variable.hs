@@ -1,6 +1,7 @@
 module AST.Variable where
 
 import AST.V0_16
+import Data.Map.Strict
 
 
 data Ref
@@ -20,9 +21,16 @@ data Listing a
   deriving (Eq, Show)
 
 
+data Listing' k v
+    = ExplicitListing' (Map k (Commented v)) Bool
+    | OpenListing' (Commented ())
+    | ClosedListing'
+    deriving (Eq, Show)
+
+
 -- | A value that can be imported or exported
 data Value
     = Value !LowercaseIdentifier
     | OpValue SymbolIdentifier
-    | Union (PostCommented UppercaseIdentifier) (Listing UppercaseIdentifier)
+    | Union (PostCommented UppercaseIdentifier) (Listing' UppercaseIdentifier ())
     deriving (Eq, Show)

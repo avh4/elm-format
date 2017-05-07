@@ -172,6 +172,25 @@ listing item =
       return $ listing pre post sawNewline
 
 
+listing' :: Ord a => IParser a -> IParser (Var.Listing' a ())
+listing' item =
+    expecting "a listing of values and types to expose, like (..)" $
+    do  _ <- try (char '(')
+        pushNewlineContext
+        pre <- whitespace
+        listing <-
+            choice
+              [ (\_ pre post _ -> (Var.OpenListing' (Commented pre () post))) <$> string ".."
+              , (\x pre post sawNewline ->
+                  (Var.ExplicitListing' (x pre post) sawNewline))
+                    <$> commaSep1Set' ((\x -> (x, ())) <$> item) (\() () -> ())
+              ]
+        post <- whitespace
+        sawNewline <- popNewlineContext
+        char ')'
+        return $ listing pre post sawNewline
+
+
 value :: IParser Var.Value
 value =
     val <|> tipe <?> "a value or type to expose"
@@ -181,7 +200,7 @@ value =
 
     tipe =
       do  name <- capVar
-          maybeCtors <- optionMaybe (try $ (,) <$> whitespace <*> listing capVar)
+          maybeCtors <- optionMaybe (try $ (,) <$> whitespace <*> listing' capVar)
           case maybeCtors of
-            Nothing -> return $ Var.Union (name, []) Var.ClosedListing
+            Nothing -> return $ Var.Union (name, []) Var.ClosedListing'
             Just (pre, ctors) -> return (Var.Union (name, pre) ctors)
