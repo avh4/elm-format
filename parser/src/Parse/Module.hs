@@ -74,7 +74,7 @@ moduleDecl_0_16 =
       preName <- whitespace
       names <- dotSep1 capVar <?> "the name of this module"
       postName <- whitespace
-      exports <- option (Var.OpenListing (Commented [] () [])) (listing value)
+      exports <- option (Var.OpenListing (Commented [] () [])) (listing $ commaSep1' value)
       preWhere <- whitespace
       reserved "where"
       return $
@@ -106,7 +106,7 @@ moduleDecl_0_17 =
 
       exports <-
         commentedKeyword "exposing" $
-          listing value
+          listing $ commaSep1' value
 
       return $
         Module.Header
@@ -149,12 +149,12 @@ import' =
     exposing =
       do  preExposing <- try (whitespace <* reserved "exposing")
           postExposing <- whitespace
-          imports <- listing value
+          imports <- listing (commaSep1' value)
           return (preExposing, (postExposing, imports))
 
 
-listing :: IParser a -> IParser (Var.Listing [Commented a])
-listing item =
+listing :: IParser (Comments -> Comments -> a) -> IParser (Var.Listing a)
+listing explicit =
   expecting "a listing of values and types to expose, like (..)" $
   do  _ <- try (char '(')
       pushNewlineContext
@@ -164,7 +164,7 @@ listing item =
             [ (\_ pre post _ -> (Var.OpenListing (Commented pre () post))) <$> string ".."
             , (\x pre post sawNewline ->
                 (Var.ExplicitListing (x pre post) sawNewline))
-                  <$> commaSep1' item
+                  <$> explicit
             ]
       post <- whitespace
       sawNewline <- popNewlineContext
@@ -172,23 +172,9 @@ listing item =
       return $ listing pre post sawNewline
 
 
-listing' :: Ord a => IParser a -> IParser (Var.Listing (Var.CommentedMap a ()))
-listing' item =
-    expecting "a listing of values and types to expose, like (..)" $
-    do  _ <- try (char '(')
-        pushNewlineContext
-        pre <- whitespace
-        listing <-
-            choice
-              [ (\_ pre post _ -> (Var.OpenListing (Commented pre () post))) <$> string ".."
-              , (\x pre post sawNewline ->
-                  (Var.ExplicitListing (x pre post) sawNewline))
-                    <$> commaSep1Set' ((\x -> (x, ())) <$> item) (\() () -> ())
-              ]
-        post <- whitespace
-        sawNewline <- popNewlineContext
-        char ')'
-        return $ listing pre post sawNewline
+commentedSet :: Ord a => IParser a -> IParser (Comments -> Comments -> Var.CommentedMap a ())
+commentedSet item =
+    commaSep1Set' ((\x -> (x, ())) <$> item) (\() () -> ())
 
 
 value :: IParser Var.Value
@@ -200,7 +186,7 @@ value =
 
     tipe =
       do  name <- capVar
-          maybeCtors <- optionMaybe (try $ (,) <$> whitespace <*> listing' capVar)
+          maybeCtors <- optionMaybe (try $ (,) <$> whitespace <*> listing (commentedSet capVar))
           case maybeCtors of
             Nothing -> return $ Var.Union (name, []) Var.ClosedListing
             Just (pre, ctors) -> return (Var.Union (name, pre) ctors)
