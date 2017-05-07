@@ -54,7 +54,7 @@ data Header = Header
     { srcTag :: SourceTag
     , name :: Commented [UppercaseIdentifier]
     , moduleSettings :: Maybe (KeywordCommented SourceSettings)
-    , exports :: KeywordCommented (Var.Listing Var.Value)
+    , exports :: KeywordCommented (Var.Listing [Commented Var.Value])
     }
     deriving (Eq, Show)
 
@@ -72,6 +72,6 @@ data UserImport
 
 data ImportMethod = ImportMethod
     { alias :: Maybe (Comments, PreCommented UppercaseIdentifier)
-    , exposedVars :: (Comments, PreCommented (Var.Listing Var.Value))
+    , exposedVars :: (Comments, PreCommented (Var.Listing [Commented Var.Value]))
     }
     deriving (Eq, Show)
