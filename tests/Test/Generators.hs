@@ -86,8 +86,8 @@ instance Arbitrary AST.Variable.Value where
             return $ AST.Variable.Union (name, []) AST.Variable.ClosedListing
 
 
-listing :: Gen a -> Gen (AST.Variable.Listing a)
-listing _ =
+listing :: Gen (AST.Variable.Listing a)
+listing =
     return $ AST.Variable.OpenListing (Commented [] () [])
 
 
@@ -95,7 +95,7 @@ instance Arbitrary AST.Module.Module where
     arbitrary =
         do
             name <- listOf1 $ capIdentifier
-            listing <- listing (listOf $ commented arbitrary)
+            listing <- listing
             moduleType <- fmap (\x -> if x then AST.Module.Port [] else AST.Module.Normal) arbitrary
             return $ AST.Module.Module
                 []

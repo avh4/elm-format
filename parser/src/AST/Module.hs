@@ -1,6 +1,7 @@
 module AST.Module
     ( Module(..), Header(..), SourceTag(..)
     , UserImport(..), ImportMethod(..)
+    , DetailedListing(..)
     ) where
 
 import qualified AST.Declaration as Declaration
@@ -54,7 +55,15 @@ data Header = Header
     { srcTag :: SourceTag
     , name :: Commented [UppercaseIdentifier]
     , moduleSettings :: Maybe (KeywordCommented SourceSettings)
-    , exports :: KeywordCommented (Var.Listing [Commented Var.Value])
+    , exports :: KeywordCommented (Var.Listing DetailedListing)
+    }
+    deriving (Eq, Show)
+
+
+data DetailedListing = DetailedListing
+    { values :: Var.CommentedMap LowercaseIdentifier ()
+    , operators :: Var.CommentedMap SymbolIdentifier ()
+    , types :: Var.CommentedMap UppercaseIdentifier (Comments, Var.Listing (Var.CommentedMap UppercaseIdentifier ()))
     }
     deriving (Eq, Show)
 
@@ -72,6 +81,6 @@ data UserImport
 
 data ImportMethod = ImportMethod
     { alias :: Maybe (Comments, PreCommented UppercaseIdentifier)
-    , exposedVars :: (Comments, PreCommented (Var.Listing [Commented Var.Value]))
+    , exposedVars :: (Comments, PreCommented (Var.Listing DetailedListing))
     }
     deriving (Eq, Show)

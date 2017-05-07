@@ -257,7 +257,7 @@ toSet merge values =
 commaSep1Set' :: Ord k => IParser (k, v) -> (v -> v -> v) -> IParser (Comments -> Comments -> Map k (Commented v))
 commaSep1Set' parser merge =
     do
-        values <- spaceySepBy1' comma parser
+        values <- commaSep1' parser
         return $ \pre post -> toSet merge $ values pre post
 
 

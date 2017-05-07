@@ -73,7 +73,7 @@ signatures and you are better off ignoring them.*
 --------------------------
 
 import List
-import Random exposing (Seed, Generator)
+import Random exposing (Generator, Seed)
 import Trampoline exposing (Trampoline(..), trampoline)
 
 

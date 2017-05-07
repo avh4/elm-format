@@ -1,4 +1,4 @@
-module StartApp (start, Config, App) where
+module StartApp (App, Config, start) where
 
 {-| This module helps you start your application in a typical Elm workflow.
 It assumes you are following [the Elm Architecture][arch] and using
