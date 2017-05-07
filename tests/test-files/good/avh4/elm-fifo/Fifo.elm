@@ -1,4 +1,4 @@
-module Fifo (Fifo, empty, insert, remove, fromList, toList) where
+module Fifo (Fifo, empty, fromList, insert, remove, toList) where
 
 {-|
 

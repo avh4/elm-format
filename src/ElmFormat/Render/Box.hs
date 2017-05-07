@@ -224,7 +224,7 @@ formatModuleLine_0_16 header =
     formatExports =
       case AST.Module.exports header of
         KeywordCommented _ _ value ->
-          case formatListing (formatVarValue elmVersion) value of
+          case formatListing (formatDetailedListing elmVersion) value of
             Just listing ->
               listing
             _ ->
@@ -278,7 +278,7 @@ formatModuleLine elmVersion header =
             [ line $ keyword "module" ]
 
     exports list =
-      case formatListing (formatVarValue elmVersion) $ list of
+      case formatListing (formatDetailedListing elmVersion) $ list of
           Just listing ->
             listing
           _ ->
@@ -453,7 +453,7 @@ formatImport elmVersion aimport =
 
                         exposing =
                           formatImportClause
-                            (formatListing (formatVarValue elmVersion))
+                            (formatListing (formatDetailedListing elmVersion))
                             "exposing"
                             (exposingPreKeyword, exposingPostKeywordAndListing)
 
@@ -595,7 +595,7 @@ formatImport elmVersion aimport =
             formatComment c
 
 
-formatListing :: (a -> Box) -> AST.Variable.Listing [Commented a] -> Maybe Box
+formatListing :: (a -> [Box]) -> AST.Variable.Listing a -> Maybe Box
 formatListing format listing =
     case listing of
         AST.Variable.ClosedListing ->
@@ -605,27 +605,36 @@ formatListing format listing =
             Just $ parens $ formatCommented (line . keyword) $ fmap (const "..") comments
 
         AST.Variable.ExplicitListing vars multiline ->
-            Just $ ElmStructure.group False "(" "," ")" multiline $ map (formatCommented format) vars
+            Just $ ElmStructure.group False "(" "," ")" multiline $ format vars
 
 
-formatListingSet :: (k -> v -> a) -> (a -> Box) -> AST.Variable.Listing (AST.Variable.CommentedMap k v) -> Maybe Box
-formatListingSet construct format listing =
-    case listing of
-        AST.Variable.ClosedListing ->
-            Nothing
+formatDetailedListing :: ElmVersion -> AST.Module.DetailedListing -> [Box]
+formatDetailedListing elmVersion listing =
+    concat
+        [ formatCommentedMap
+            (\name () -> AST.Variable.OpValue name)
+            (formatVarValue elmVersion)
+            (AST.Module.operators listing)
+        , formatCommentedMap
+            (\name (inner, listing) -> AST.Variable.Union (name, inner) listing)
+            (formatVarValue elmVersion)
+            (AST.Module.types listing)
+        , formatCommentedMap
+            (\name () -> AST.Variable.Value name)
+            (formatVarValue elmVersion)
+            (AST.Module.values listing)
+        ]
 
-        AST.Variable.OpenListing comments ->
-            comments
-                |> formatCommented (\() -> line $ keyword "..")
-                |> parens
-                |> Just
 
-        AST.Variable.ExplicitListing vars multiline ->
-            vars
-                |> Map.assocs
-                |> map (\(k, Commented pre v post) -> formatCommented format $ Commented pre (construct k v) post)
-                |> ElmStructure.group False "(" "," ")" multiline
-                |> Just
+formatCommentedMap :: (k -> v -> a) -> (a -> Box) ->  AST.Variable.CommentedMap k v -> [Box]
+formatCommentedMap construct format values =
+    let
+        format' (k, Commented pre v post)
+            = formatCommented format $ Commented pre (construct k v) post
+    in
+    values
+        |> Map.assocs
+        |> map format'
 
 
 formatVarValue :: ElmVersion -> AST.Variable.Value -> Box
@@ -639,9 +648,11 @@ formatVarValue elmVersion aval =
 
         AST.Variable.Union name listing ->
             case
-              ( formatListingSet
-                  (\name () -> name)
-                  (line . formatUppercaseIdentifier elmVersion)
+              ( formatListing
+                  (formatCommentedMap
+                      (\name () -> name)
+                      (line . formatUppercaseIdentifier elmVersion)
+                  )
                   listing
               , formatTailCommented (line . formatUppercaseIdentifier elmVersion) name
               , snd name

@@ -6,21 +6,21 @@ import Json.Decode as Json
 import Signal exposing (..)
 import Task
     exposing
-        ( succeed
+        ( andMap
+        , andThen
         , fail
+        , fromMaybe
+        , fromResult
         , map
         , map2
         , map3
         , map4
         , map5
-        , andMap
-        , andThen
-        , onError
         , mapError
+        , onError
+        , succeed
         , toMaybe
-        , fromMaybe
         , toResult
-        , fromResult
         )
 import Dict as D
     exposing
