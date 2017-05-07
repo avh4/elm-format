@@ -15,6 +15,7 @@ import qualified Cheapskate.Types as Markdown
 import qualified Control.Monad as Monad
 import qualified Data.Char as Char
 import qualified Data.List as List
+import qualified Data.Map.Strict as Map
 import qualified Data.Maybe as Maybe
 import Data.Maybe (fromMaybe, maybeToList)
 import qualified Data.Text as Text
@@ -607,6 +608,26 @@ formatListing format listing =
             Just $ ElmStructure.group False "(" "," ")" multiline $ map (formatCommented format) vars
 
 
+formatListingSet :: (k -> v -> a) -> (a -> Box) -> AST.Variable.Listing' k v -> Maybe Box
+formatListingSet construct format listing =
+    case listing of
+        AST.Variable.ClosedListing' ->
+            Nothing
+
+        AST.Variable.OpenListing' comments ->
+            comments
+                |> formatCommented (\() -> line $ keyword "..")
+                |> parens
+                |> Just
+
+        AST.Variable.ExplicitListing' vars multiline ->
+            vars
+                |> Map.assocs
+                |> map (\(k, Commented pre v post) -> formatCommented format $ Commented pre (construct k v) post)
+                |> ElmStructure.group False "(" "," ")" multiline
+                |> Just
+
+
 formatVarValue :: ElmVersion -> AST.Variable.Value -> Box
 formatVarValue elmVersion aval =
     case aval of
@@ -618,7 +639,10 @@ formatVarValue elmVersion aval =
 
         AST.Variable.Union name listing ->
             case
-              ( formatListing (line . formatUppercaseIdentifier elmVersion) listing
+              ( formatListingSet
+                  (\name () -> name)
+                  (line . formatUppercaseIdentifier elmVersion)
+                  listing
               , formatTailCommented (line . formatUppercaseIdentifier elmVersion) name
               , snd name
               )

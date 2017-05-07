@@ -76,7 +76,7 @@ instance Arbitrary AST.Variable.Value where
     arbitrary =
         do
             name <- capIdentifier
-            return $ AST.Variable.Union (name, []) AST.Variable.ClosedListing
+            return $ AST.Variable.Union (name, []) AST.Variable.ClosedListing'
 
 
 instance (Arbitrary a) => Arbitrary (AST.Variable.Listing a) where

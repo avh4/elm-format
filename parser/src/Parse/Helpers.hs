@@ -3,6 +3,7 @@ module Parse.Helpers where
 
 import Prelude hiding (until)
 import Control.Monad (guard)
+import Data.Map.Strict hiding (foldl)
 import qualified Data.Maybe as Maybe
 import Text.Parsec hiding (newline, spaces, State)
 import Text.Parsec.Indent (indented, runIndent)
@@ -242,6 +243,22 @@ commaSep1 =
 commaSep1' :: IParser a -> IParser (Comments -> Comments -> [Commented a])
 commaSep1' =
   spaceySepBy1' comma
+
+
+toSet :: Ord k => (v -> v -> v) -> [Commented (k, v)] -> Map k (Commented v)
+toSet merge values =
+    let
+        merge' (Commented pre1 a post1) (Commented pre2 b post2) =
+            Commented (pre1 ++ pre2) (merge a b) (post1 ++ post2)
+    in
+    foldl (\m (Commented pre (k, v) post) -> insertWith merge' k (Commented pre v post) m) empty values
+
+
+commaSep1Set' :: Ord k => IParser (k, v) -> (v -> v -> v) -> IParser (Comments -> Comments -> Map k (Commented v))
+commaSep1Set' parser merge =
+    do
+        values <- spaceySepBy1' comma parser
+        return $ \pre post -> toSet merge $ values pre post
 
 
 commaSep :: IParser (Comments -> Comments -> a) -> IParser (Maybe (Comments -> Comments -> [a]))
