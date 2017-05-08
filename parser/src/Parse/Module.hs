@@ -1,5 +1,6 @@
 module Parse.Module (moduleDecl, elmModule) where
 
+import qualified Control.Applicative
 import Data.Map.Strict hiding (foldl, map)
 import Elm.Utils ((|>))
 import Text.Parsec hiding (newline, spaces)
@@ -24,7 +25,7 @@ elmModule =
           [ (,) <$> addLocation (Just <$> docCommentAsMarkdown) <*> freshLine
           , (,) <$> addLocation (return Nothing) <*> return []
           ]
-      imports' <- imports
+      (preImportComments, imports', postImportComments) <- imports
       decls <- declarations
       trailingComments <-
           (++)
@@ -37,8 +38,8 @@ elmModule =
           preModule
           h
           docs
-          ((fmap Module.ImportComment (preDocsComments ++ postDocsComments)) ++ imports')
-          (decls ++ (map AST.Declaration.BodyComment trailingComments))
+          (preDocsComments ++ postDocsComments ++ preImportComments, imports')
+          ((map AST.Declaration.BodyComment postImportComments) ++ decls ++ (map AST.Declaration.BodyComment trailingComments))
 
 
 declarations :: IParser [AST.Declaration.Decl]
@@ -118,22 +119,51 @@ moduleDecl_0_17 =
           exports
 
 
-imports :: IParser [Module.UserImport]
+mergePreCommented :: (a -> a -> a) -> PreCommented a -> PreCommented a -> PreCommented a
+mergePreCommented merge (pre1, left) (pre2, right) =
+    (pre1 ++ pre2, merge left right)
+
+
+mergeDetailedListing :: Module.DetailedListing -> Module.DetailedListing -> Module.DetailedListing
+mergeDetailedListing left right =
+    Module.DetailedListing
+        (mergeCommentedMap (\() () -> ()) (Module.values left) (Module.values right))
+        (mergeCommentedMap (\() () -> ()) (Module.operators left) (Module.operators right))
+        (mergeCommentedMap (mergePreCommented $ mergeListing $ mergeCommentedMap (\() () -> ())) (Module.types left) (Module.types right))
+
+
+imports :: IParser (Comments, Map [UppercaseIdentifier] (Comments, Module.ImportMethod), Comments)
 imports =
-  concat <$> many ((:) <$> import' <*> (fmap Module.ImportComment <$> freshLine))
+    let
+        merge :: PreCommented Module.ImportMethod -> PreCommented Module.ImportMethod -> PreCommented Module.ImportMethod
+        merge (comments1, import1) (comments2, import2) =
+            ( comments1 ++ comments2
+            , Module.ImportMethod
+                (Module.alias import2 Control.Applicative.<|> Module.alias import1)
+                (mergePreCommented (mergePreCommented $ mergeListing mergeDetailedListing) (Module.exposedVars import1) (Module.exposedVars import2))
+            )
+
+        step (comments, m, finalComments) (((pre, name), method), post) =
+            ( comments ++ finalComments
+            , insertWith merge name (pre, method) m
+            , post
+            )
+
+        done :: [(Module.UserImport, Comments)] -> (Comments, Map [UppercaseIdentifier] (Comments, Module.ImportMethod), Comments)
+        done results =
+            foldl step ([], empty, []) results
+    in
+    done <$> many ((,) <$> import' <*> freshLine)
 
 
 import' :: IParser Module.UserImport
 import' =
-  Module.UserImport <$> (
   expecting "an import" $
-  addLocation $
   do  try (reserved "import")
       preName <- whitespace
       names <- dotSep1 capVar
       method' <- method names
       return ((,) preName names, method')
-  )
   where
     method :: [UppercaseIdentifier] -> IParser Module.ImportMethod
     method originalName =
@@ -170,7 +200,7 @@ listing explicit =
             ]
       post <- whitespace
       sawNewline <- popNewlineContext
-      char ')'
+      _ <- char ')'
       return $ listing pre post sawNewline
 
 
