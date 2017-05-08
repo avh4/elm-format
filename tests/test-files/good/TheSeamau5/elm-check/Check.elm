@@ -71,24 +71,18 @@ signatures and you are better off ignoring them.*
 --------------------------
 -- CORE LIBRARY IMPORTS --
 --------------------------
-
-import List
-import Random exposing (Generator, Seed)
-import Trampoline exposing (Trampoline(..), trampoline)
-
-
 -------------------------
 -- THIRD PARTY IMPORTS --
 -------------------------
-
-import Random.Extra as Random
-
-
 -------------------
 -- LOCAL IMPORTS --
 -------------------
 
 import Check.Investigator exposing (Investigator, tuple, tuple3, tuple4, tuple5)
+import List
+import Random exposing (Generator, Seed)
+import Random.Extra as Random
+import Trampoline exposing (Trampoline(..), trampoline)
 
 
 -----------

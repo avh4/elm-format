@@ -201,19 +201,18 @@ formatModuleHeader elmVersion modu =
 formatImports :: ElmVersion -> AST.Module.Module -> [Box]
 formatImports elmVersion modu =
     let
-        importSpacer first second =
-              case (first, second) of
-                  (AST.Module.ImportComment _, AST.Module.ImportComment _) ->
-                      []
-                  (AST.Module.ImportComment _, _) ->
-                      List.replicate 1 blankLine
-                  (_, AST.Module.ImportComment _) ->
-                      List.replicate 2 blankLine
-                  (_, _) ->
-                      []
+        (comments, imports) =
+            AST.Module.imports modu
     in
-        AST.Module.imports modu
-            |> intersperseMap importSpacer (formatImport elmVersion)
+    [ formatComments comments
+        |> maybeToList
+    , imports
+        |> Map.assocs
+        |> fmap (\(name, (pre, method)) -> formatImport elmVersion ((pre, name), method))
+    ]
+        |> List.filter (not . List.null)
+        |> List.intersperse [blankLine]
+        |> concat
 
 
 formatModuleLine_0_16 :: AST.Module.Header -> Box
@@ -435,164 +434,156 @@ formatDocComment docs =
 
 
 formatImport :: ElmVersion -> AST.Module.UserImport -> Box
-formatImport elmVersion aimport =
-    case aimport of
-        AST.Module.UserImport aimport' ->
-            case RA.drop aimport' of
-                (name,method) ->
-                    let
-                        as =
-                          (AST.Module.alias method)
-                            |> fmap (formatImportClause
-                            (Just . line . formatUppercaseIdentifier elmVersion)
-                            "as")
-                            |> Monad.join
+formatImport elmVersion (name, method) =
+    let
+        as =
+          (AST.Module.alias method)
+            |> fmap (formatImportClause
+            (Just . line . formatUppercaseIdentifier elmVersion)
+            "as")
+            |> Monad.join
 
-                        (exposingPreKeyword, exposingPostKeywordAndListing)
-                          = AST.Module.exposedVars method
+        (exposingPreKeyword, exposingPostKeywordAndListing)
+          = AST.Module.exposedVars method
 
-                        exposing =
-                          formatImportClause
-                            (formatListing (formatDetailedListing elmVersion))
-                            "exposing"
-                            (exposingPreKeyword, exposingPostKeywordAndListing)
+        exposing =
+          formatImportClause
+            (formatListing (formatDetailedListing elmVersion))
+            "exposing"
+            (exposingPreKeyword, exposingPostKeywordAndListing)
 
-                        formatImportClause :: (a -> Maybe Box) -> String -> (Comments, (Comments, a)) -> Maybe Box
-                        formatImportClause format keyw input =
-                          case
-                            fmap (fmap format) $ input
-                          of
-                            ([], ([], Nothing)) ->
-                              Nothing
+        formatImportClause :: (a -> Maybe Box) -> String -> (Comments, (Comments, a)) -> Maybe Box
+        formatImportClause format keyw input =
+          case
+            fmap (fmap format) $ input
+          of
+            ([], ([], Nothing)) ->
+              Nothing
 
-                            (preKeyword, (postKeyword, Just listing')) ->
-                              case
-                                ( formatHeadCommented (line . keyword) (preKeyword, keyw)
-                                , formatHeadCommented id (postKeyword, listing')
-                                )
-                              of
-                                (SingleLine keyword', SingleLine listing'') ->
-                                  Just $ line $ row
-                                    [ keyword'
-                                    , space
-                                    , listing''
-                                    ]
+            (preKeyword, (postKeyword, Just listing')) ->
+              case
+                ( formatHeadCommented (line . keyword) (preKeyword, keyw)
+                , formatHeadCommented id (postKeyword, listing')
+                )
+              of
+                (SingleLine keyword', SingleLine listing'') ->
+                  Just $ line $ row
+                    [ keyword'
+                    , space
+                    , listing''
+                    ]
 
-                                (keyword', listing'') ->
-                                  Just $ stack1
-                                    [ keyword'
-                                    , indent listing''
-                                    ]
+                (keyword', listing'') ->
+                  Just $ stack1
+                    [ keyword'
+                    , indent listing''
+                    ]
 
-                            _ ->
-                              Just $ pleaseReport "UNEXPECTED IMPORT" "import clause comments with no clause"
-                    in
-                        case
-                          ( formatHeadCommented (line . formatQualifiedUppercaseIdentifier elmVersion) name
-                          , as
-                          , exposing
-                          )
-                        of
-                          ( SingleLine name', Just (SingleLine as'), Just (SingleLine exposing') ) ->
-                            line $ row
-                              [ keyword "import"
-                              , space
-                              , name'
-                              , space
-                              , as'
-                              , space
-                              , exposing'
-                              ]
+            _ ->
+              Just $ pleaseReport "UNEXPECTED IMPORT" "import clause comments with no clause"
+    in
+    case
+        ( formatHeadCommented (line . formatQualifiedUppercaseIdentifier elmVersion) name
+        , as
+        , exposing
+        )
+    of
+        ( SingleLine name', Just (SingleLine as'), Just (SingleLine exposing') ) ->
+          line $ row
+            [ keyword "import"
+            , space
+            , name'
+            , space
+            , as'
+            , space
+            , exposing'
+            ]
 
-                          (SingleLine name', Just (SingleLine as'), Nothing) ->
-                            line $ row
-                              [ keyword "import"
-                              , space
-                              , name'
-                              , space
-                              , as'
-                              ]
+        (SingleLine name', Just (SingleLine as'), Nothing) ->
+          line $ row
+            [ keyword "import"
+            , space
+            , name'
+            , space
+            , as'
+            ]
 
-                          (SingleLine name', Nothing, Just (SingleLine exposing')) ->
-                            line $ row
-                              [ keyword "import"
-                              , space
-                              , name'
-                              , space
-                              , exposing'
-                              ]
+        (SingleLine name', Nothing, Just (SingleLine exposing')) ->
+          line $ row
+            [ keyword "import"
+            , space
+            , name'
+            , space
+            , exposing'
+            ]
 
-                          (SingleLine name', Nothing, Nothing) ->
-                            line $ row
-                              [ keyword "import"
-                              , space
-                              , name'
-                              ]
+        (SingleLine name', Nothing, Nothing) ->
+          line $ row
+            [ keyword "import"
+            , space
+            , name'
+            ]
 
-                          ( SingleLine name', Just (SingleLine as'), Just exposing' ) ->
-                            stack1
-                              [ line $ row
-                                [ keyword "import"
-                                , space
-                                , name'
-                                , space
-                                , as'
-                                ]
-                              , indent exposing'
-                              ]
+        ( SingleLine name', Just (SingleLine as'), Just exposing' ) ->
+          stack1
+            [ line $ row
+              [ keyword "import"
+              , space
+              , name'
+              , space
+              , as'
+              ]
+            , indent exposing'
+            ]
 
-                          ( SingleLine name', Just as', Just exposing' ) ->
-                            stack1
-                              [ line $ row
-                                [ keyword "import"
-                                , space
-                                , name'
-                                ]
-                              , indent as'
-                              , indent exposing'
-                              ]
+        ( SingleLine name', Just as', Just exposing' ) ->
+          stack1
+            [ line $ row
+              [ keyword "import"
+              , space
+              , name'
+              ]
+            , indent as'
+            , indent exposing'
+            ]
 
-                          ( SingleLine name', Nothing, Just exposing' ) ->
-                            stack1
-                              [ line $ row
-                                [ keyword "import"
-                                , space
-                                , name'
-                                ]
-                              , indent exposing'
-                              ]
+        ( SingleLine name', Nothing, Just exposing' ) ->
+          stack1
+            [ line $ row
+              [ keyword "import"
+              , space
+              , name'
+              ]
+            , indent exposing'
+            ]
 
-                          ( name', Just as', Just exposing' ) ->
-                            stack1
-                              [ line $ keyword "import"
-                              , indent name'
-                              , indent $ indent as'
-                              , indent $ indent exposing'
-                              ]
+        ( name', Just as', Just exposing' ) ->
+          stack1
+            [ line $ keyword "import"
+            , indent name'
+            , indent $ indent as'
+            , indent $ indent exposing'
+            ]
 
-                          ( name', Nothing, Just exposing' ) ->
-                            stack1
-                              [ line $ keyword "import"
-                              , indent name'
-                              , indent $ indent exposing'
-                              ]
+        ( name', Nothing, Just exposing' ) ->
+          stack1
+            [ line $ keyword "import"
+            , indent name'
+            , indent $ indent exposing'
+            ]
 
-                          ( name', Just as', Nothing ) ->
-                            stack1
-                              [ line $ keyword "import"
-                              , indent name'
-                              , indent $ indent as'
-                              ]
+        ( name', Just as', Nothing ) ->
+          stack1
+            [ line $ keyword "import"
+            , indent name'
+            , indent $ indent as'
+            ]
 
-                          ( name', Nothing, Nothing ) ->
-                            stack1
-                              [ line $ keyword "import"
-                              , indent name'
-                              ]
-
-
-        AST.Module.ImportComment c ->
-            formatComment c
+        ( name', Nothing, Nothing ) ->
+          stack1
+            [ line $ keyword "import"
+            , indent name'
+            ]
 
 
 formatListing :: (a -> [Box]) -> AST.Variable.Listing a -> Maybe Box

@@ -1,8 +1,8 @@
 module Component.LeftSidebar (..) where
 
-import Dreamwriter exposing (..)
-import Component.LeftSidebar.OpenMenuView as OpenMenu
 import Component.LeftSidebar.CurrentDocView as CurrentDoc
+import Component.LeftSidebar.OpenMenuView as OpenMenu
+import Dreamwriter exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)

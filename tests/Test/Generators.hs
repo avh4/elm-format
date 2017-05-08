@@ -1,5 +1,6 @@
 module Test.Generators where
 
+import Data.Map.Strict
 import Test.QuickCheck
 
 import AST.V0_16
@@ -106,5 +107,5 @@ instance Arbitrary AST.Module.Module where
                   (KeywordCommented [] [] listing)
                 )
                 (located Nothing)
-                []
+                ([], empty)
                 [ AST.Declaration.Decl $ located $ AST.Declaration.Definition (located $ AST.Pattern.Anything) [] [] (located $ AST.Expression.TupleFunction 2)]

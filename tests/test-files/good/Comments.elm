@@ -10,15 +10,12 @@ module Comments (..) where
 -}
 
 -- Comments before imports
-
-import Json.Decode as Json
-import List exposing (..)
-
-
 --
 -- Imports starting with S
 --
 
+import Json.Decode as Json
+import List exposing (..)
 import Signal exposing (foldp, map)
 import String
 

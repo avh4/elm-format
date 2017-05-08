@@ -1,12 +1,13 @@
 module AST.Module
     ( Module(..), Header(..), SourceTag(..)
-    , UserImport(..), ImportMethod(..)
+    , UserImport, ImportMethod(..)
     , DetailedListing(..)
     ) where
 
 import qualified AST.Declaration as Declaration
 import qualified AST.Variable as Var
 import qualified Cheapskate.Types as Markdown
+import Data.Map.Strict (Map)
 import qualified Reporting.Annotation as A
 import AST.V0_16
 
@@ -18,7 +19,7 @@ data Module = Module
     { initialComments :: Comments
     , header :: Header
     , docs :: A.Located (Maybe Markdown.Blocks)
-    , imports :: [UserImport]
+    , imports :: PreCommented (Map [UppercaseIdentifier] (Comments, ImportMethod))
     , body :: [Declaration.Decl]
     }
     deriving (Eq, Show)
@@ -73,10 +74,8 @@ type SourceSettings =
 
 -- IMPORTs
 
-data UserImport
-    = UserImport (A.Located (PreCommented [UppercaseIdentifier], ImportMethod))
-    | ImportComment Comment
-    deriving (Eq, Show)
+type UserImport
+    = (PreCommented [UppercaseIdentifier], ImportMethod)
 
 
 data ImportMethod = ImportMethod
