@@ -31,3 +31,9 @@ allowedParens =
     ( (x + 1) + (y - 1)
     , ()
     )
+
+
+requiredParens =
+    ( (maybeF |> Maybe.withDefault identity) 1
+    , ()
+    )

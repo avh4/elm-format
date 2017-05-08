@@ -1021,7 +1021,7 @@ formatExpression elmVersion context aexpr =
         AST.Expression.App left args multiline ->
           ElmStructure.application
             multiline
-            (formatExpression elmVersion AmbiguousEnd left)
+            (formatExpression elmVersion InfixSeparated left)
             (map (\(x,y) -> formatCommented' x (formatExpression elmVersion SpaceSeparated) y) args)
             |> expressionParens SpaceSeparated context
 
