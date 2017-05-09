@@ -1260,29 +1260,14 @@ mapIsLast f (last:[]) = f True last : []
 mapIsLast f (next:rest) = f False next : mapIsLast f rest
 
 
-formatBinops_0_17 :: ElmVersion -> AST.Expression.Expr -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)] -> Bool -> Box
+formatBinops_0_17 ::
+    ElmVersion
+    -> AST.Expression.Expr
+    -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)]
+    -> Bool
+    -> Box
 formatBinops_0_17 elmVersion left ops multiline =
-    let
-        formatPair isLast ( po, o, pe, e ) =
-            let
-                isLeftPipe =
-                    o == AST.Variable.OpRef (SymbolIdentifier "<|")
-
-                formatContext =
-                    if isLeftPipe && isLast
-                        then SyntaxSeparated
-                        else InfixSeparated
-            in
-            ( isLeftPipe
-            , po
-            , (line . formatInfixVar elmVersion) o
-            , formatCommented' pe (formatExpression elmVersion formatContext) e
-            )
-    in
-        formatBinary
-            multiline
-            (formatExpression elmVersion InfixSeparated left)
-            (mapIsLast formatPair ops)
+    formatBinops_common (,) elmVersion left ops multiline
 
 
 formatBinops_0_18 ::
@@ -1292,8 +1277,24 @@ formatBinops_0_18 ::
     -> Bool
     -> Box
 formatBinops_0_18 elmVersion left ops multiline =
+    formatBinops_common removeBackticks elmVersion left ops multiline
+
+
+formatBinops_common ::
+    (AST.Expression.Expr
+        -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)]
+        -> ( AST.Expression.Expr
+           , [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)]
+           )
+    )
+    -> ElmVersion
+    -> AST.Expression.Expr
+    -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)]
+    -> Bool
+    -> Box
+formatBinops_common transform elmVersion left ops multiline =
     let
-        (left', ops') = removeBackticks left ops
+        (left', ops') = transform left ops
 
         formatPair isLast ( po, o, pe, e ) =
             let
