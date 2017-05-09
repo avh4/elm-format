@@ -24,6 +24,10 @@ unnecessaryParens =
         () ->
             ()
     , ((r.f1).f2).f3.f4
+    , test "test" <|
+        (\() ->
+            1 |> Expect.equal 1
+        )
     )
 
 
