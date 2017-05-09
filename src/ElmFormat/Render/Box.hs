@@ -1254,20 +1254,35 @@ formatSequence left _ Nothing _ _ trailing [] =
     formatUnit left ' ' trailing
 
 
+mapIsLast :: (Bool -> a -> b) -> [a] -> [b]
+mapIsLast _ [] = []
+mapIsLast f (last:[]) = f True last : []
+mapIsLast f (next:rest) = f False next : mapIsLast f rest
+
+
 formatBinops_0_17 :: ElmVersion -> AST.Expression.Expr -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)] -> Bool -> Box
 formatBinops_0_17 elmVersion left ops multiline =
     let
-        formatPair ( po, o, pe, e ) =
-            ( o == AST.Variable.OpRef (SymbolIdentifier "<|")
+        formatPair isLast ( po, o, pe, e ) =
+            let
+                isLeftPipe =
+                    o == AST.Variable.OpRef (SymbolIdentifier "<|")
+
+                formatContext =
+                    if isLeftPipe && isLast
+                        then SyntaxSeparated
+                        else InfixSeparated
+            in
+            ( isLeftPipe
             , po
             , (line . formatInfixVar elmVersion) o
-            , formatCommented' pe (formatExpression elmVersion InfixSeparated) e
+            , formatCommented' pe (formatExpression elmVersion formatContext) e
             )
     in
         formatBinary
             multiline
             (formatExpression elmVersion InfixSeparated left)
-            (map formatPair ops)
+            (mapIsLast formatPair ops)
 
 
 formatBinops_0_18 ::
@@ -1280,17 +1295,26 @@ formatBinops_0_18 elmVersion left ops multiline =
     let
         (left', ops') = removeBackticks left ops
 
-        formatPair ( po, o, pe, e ) =
-            ( o == AST.Variable.OpRef (SymbolIdentifier "<|")
+        formatPair isLast ( po, o, pe, e ) =
+            let
+                isLeftPipe =
+                    o == AST.Variable.OpRef (SymbolIdentifier "<|")
+
+                formatContext =
+                    if isLeftPipe && isLast
+                        then SyntaxSeparated
+                        else InfixSeparated
+            in
+            ( isLeftPipe
             , po
             , (line . formatInfixVar elmVersion) o
-            , formatCommented' pe (formatExpression elmVersion InfixSeparated) e
+            , formatCommented' pe (formatExpression elmVersion formatContext) e
             )
     in
         formatBinary
             multiline
             (formatExpression elmVersion InfixSeparated left')
-            (map formatPair ops')
+            (mapIsLast formatPair ops')
 
 
 removeBackticks ::
