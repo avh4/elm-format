@@ -37,5 +37,6 @@ allowedParens =
 
 requiredParens =
     ( (maybeF |> Maybe.withDefault identity) 1
+    , Ok <| ([ 1, 2, 3 ] |> List.tail)
     , ()
     )
