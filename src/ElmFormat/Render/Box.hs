@@ -939,7 +939,7 @@ expressionParens inner outer =
         (InfixSeparated, InfixSeparated) -> parens
         (AmbiguousEnd, SpaceSeparated) -> parens
         (AmbiguousEnd, InfixSeparated) -> parens
-        (AmbiguousEnd, AmbiguousEnd) -> parens
+        (InfixSeparated, AmbiguousEnd) -> parens
         _ -> id
 
 
@@ -1303,7 +1303,7 @@ formatBinops_common transform elmVersion left ops multiline =
 
                 formatContext =
                     if isLeftPipe && isLast
-                        then SyntaxSeparated
+                        then AmbiguousEnd
                         else InfixSeparated
             in
             ( isLeftPipe
