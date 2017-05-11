@@ -35,23 +35,21 @@ elm-format --help  # See other command line options
 >
 > **The format produced by elm-format may change significantly before the 1.0.0 release.**  If this will cause problems for you, please refrain from using elm-format during the alpha- and beta-test periods.
 
-You will need to download the version appropriate for your OS, unzip it, and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.  Simpler installation options will be available once there is a stable release of elm-format.
 
-If you need to verify the downloads, see the [releases page](https://github.com/avh4/elm-format/releases) for the PGP signatures and [keybase.io/avh4](https://keybase.io/avh4) for the PGP keys.
+If you:
+  - Have a working [npm](https://www.npmjs.com/get-npm) installation
+  - Are using Elm 0.18
+  - Don't need to verify PGP signatures
 
-### For Elm 0.18
+then you can install `elm-format` with:
 
-(To upgrade your Elm 0.17 project to Elm 0.18, see the [Elm 0.18 upgrade guide](https://github.com/elm-lang/elm-platform/blob/master/upgrade-docs/0.18.md).)
+```sh
+npm install -g elm-format
+```
 
- - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.6.1-alpha/elm-format-0.18-0.6.1-alpha-mac-x64.tgz)
- - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.6.1-alpha/elm-format-0.18-0.6.1-alpha-linux-x64.tgz)
- - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.6.1-alpha/elm-format-0.18-0.6.1-alpha-win-i386.zip)
-
-### For Elm 0.17
-
- - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.6.1-alpha/elm-format-0.17-0.6.1-alpha-mac-x64.tgz)
- - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.6.1-alpha/elm-format-0.17-0.6.1-alpha-linux-x64.tgz)
- - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.6.1-alpha/elm-format-0.17-0.6.1-alpha-win-i386.zip)
+Otherwise, you will need to download the version appropriate for your OS, unzip it,
+and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.
+The downloads are on the [releases page](https://github.com/avh4/elm-format/releases/tag/0.6.1-alpha).
 
 
 ## Editor integration
