@@ -1,4 +1,4 @@
-## 0.7.0-exp-alpha
+## 0.7.0-exp
 
 Experimental changes:
   - Imports are now sorted and duplicate imports are merged
@@ -6,7 +6,7 @@ Experimental changes:
   - The body of `let` expressions are no longer indented
   - Unnecessary parentheses are now removed
 
-You can give feedback about experimental features [here](https://goo.gl/forms/kLdTN1yikfOI8ZuA3).
+You can give feedback about experimental features at <https://goo.gl/forms/kLdTN1yikfOI8ZuA3>.
 
 Bug fixes:
   - Initial `@docs` lines in module documentation are now handled correctly
