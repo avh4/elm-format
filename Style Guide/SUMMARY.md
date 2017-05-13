@@ -9,4 +9,5 @@
   * [Sections and Grouping](Sections.md)
   * [Markdown](Markdown.md)
 * Extra features
+  * [CI support](CI.md)
   * [Upgrading old Elm files](Upgrading.md)
