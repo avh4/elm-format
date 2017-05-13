@@ -1,3 +1,22 @@
+## 0.7.0-exp-alpha
+
+Experimental changes:
+  - Imports are now sorted and duplicate imports are merged
+  - `exposing` clauses in module headers are now sorted
+  - The body of `let` expressions are no longer indented
+  - Unnecessary parentheses are now removed
+
+You can give feedback about experimental features [here](https://goo.gl/forms/kLdTN1yikfOI8ZuA3).
+
+Bug fixes:
+  - Initial `@docs` lines in module documentation are now handled correctly
+  - Formatting for lambdas with multiline patterns is now implemented
+  - Code blocks in doc comments that immediately follow lists are now handled correctly
+
+Other changes:
+  - elm-format now has a contributor code of conduct
+
+
 ## 0.6.1-alpha
 
   - elm-format now formats your documentation comments:
