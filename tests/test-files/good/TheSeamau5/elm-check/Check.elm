@@ -58,11 +58,11 @@ With the DSL, claims read as either:
 It is important to note that, if you wish to deal with multi-arity functions
 using this DSL, you must deal explicitly in tuples.
 
-*Warning: The DSL follows a very strict format. Deviating from this format will
+_Warning: The DSL follows a very strict format. Deviating from this format will
 yield potentially unintelligible type errors. While not all of the type errors
 are strictly necessary, they are there to ensure that the test is authored in
 a uniform way. As a result, the following functions have horrendous type
-signatures and you are better off ignoring them.*
+signatures and you are better off ignoring them._
 
 @docs that, is, for, true, false
 

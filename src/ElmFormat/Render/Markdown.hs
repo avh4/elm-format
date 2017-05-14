@@ -161,7 +161,7 @@ formatMarkdownInline inline =
         LineBreak ->
             "\n"
         Emph inlines ->
-            "*" ++ (fold $ fmap formatMarkdownInline $ inlines) ++ "*" -- TODO: escaping
+            "_" ++ (fold $ fmap formatMarkdownInline $ inlines) ++ "_" -- TODO: escaping
         Strong inlines ->
             "**" ++ (fold $ fmap formatMarkdownInline $ inlines) ++ "**" -- TODO: escaping
         Code text ->

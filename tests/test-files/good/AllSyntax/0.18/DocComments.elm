@@ -16,6 +16,8 @@ Paragraph with
 soft breaks in
 the text.
 
+Paragraph with _italics_, **bold**.
+
 Paragraph with [link], [reference link][reflink],
 [url link](http://example.com). [link](http://example.com "with title")
 Images ![][img],
