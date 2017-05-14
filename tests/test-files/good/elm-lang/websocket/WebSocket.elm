@@ -15,7 +15,7 @@ connection once and then keep using. The major benefits of this are:
     message.
 
 2.  The server can push messages to you. With normal HTTP you would have to
-    keep *asking* for changes, but a web socket, the server can talk to you
+    keep _asking_ for changes, but a web socket, the server can talk to you
     whenever it wants. This means there is less unnecessary network traffic.
 
 The API here attempts to cover the typical usage scenarios, but if you need
