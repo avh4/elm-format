@@ -362,6 +362,7 @@ checkTransformation 0.16 QuickCheck-94f37da84c1310f03dcfa1059ce870b73c94a825--64
 checkTransformation 0.18 WindowsEol.elm
 checkTransformation 0.18 DocCommentCodeExample.elm
 checkTransformation 0.18 DocCommentMarkdownSafety.elm
+checkTransformation 0.18 DocCommentCheapskateReferenceBug.elm
 checkTransformation 0.18 Sorting.elm
 checkTransformation 0.18 UnnecessaryParens.elm
 checkUpgrade 0.18 Elm-0.18/PrimesBecomeUnderscores.elm
