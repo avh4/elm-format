@@ -401,6 +401,12 @@ processLine (lineNumber, txt) = do
          then closeContainer
          else addLeaf lineNumber (TextLine t')
 
+    Reference ->
+      case tryNewContainers lastLineIsText (T.length txt - T.length t') t' of
+        (ns, lf) -> do
+          closeContainer
+          addNew (ns, lf)
+
     -- otherwise, parse the remainder to see if we have new container starts:
     _ -> case tryNewContainers lastLineIsText (T.length txt - T.length t') t' of
 
@@ -428,11 +434,15 @@ processLine (lineNumber, txt) = do
        -- containers, and finally add the new leaf:
        (ns, lf) -> do -- close unmatched containers, add new ones
            replicateM numUnmatched closeContainer
-           mapM_ addContainer ns
-           case (reverse ns, lf) of
-             -- don't add extra blank at beginning of fenced code block
-             (FencedCode{}:_,  BlankLine{}) -> return ()
-             _ -> addLeaf lineNumber lf
+           addNew (ns, lf)
+
+  where
+    addNew (ns, lf) = do
+      mapM_ addContainer ns
+      case (reverse ns, lf) of
+        -- don't add extra blank at beginning of fenced code block
+        (FencedCode{}:_,  BlankLine{}) -> return ()
+        _ -> addLeaf lineNumber lf
 
 -- Try to match the scanners corresponding to any currently open containers.
 -- Return remaining text after matching scanners, plus the number of open
