@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
 ![experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
-[![latest version: 0.6.1-alpha](https://img.shields.io/badge/version-0.6.1--alpha-blue.svg)](https://github.com/avh4/elm-format/releases/tag/0.6.1-alpha)
+[![latest version: 0.7.0-exp](https://img.shields.io/badge/version-0.7.0--exp-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.7.0-exp)
 
 # elm-format
 
@@ -29,7 +29,7 @@ elm-format --stdin --output Main.elm  # Format input from stdin and write to fil
 elm-format --help  # See other command line options
 ```
 
-## Installation [![(latest version: 0.6.1-alpha)](https://img.shields.io/badge/version-0.6.1--alpha-blue.svg)](https://github.com/avh4/elm-format/releases/tag/0.6.1-alpha)
+## Installation [![(latest version: 0.7.0-exp)](https://img.shields.io/badge/version-0.7.0--exp-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.7.0-exp)
 
 > `elm-format` is still in alpha.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
 >
@@ -44,12 +44,12 @@ If you:
 then you can install `elm-format` with:
 
 ```sh
-npm install -g elm-format
+npm install -g elm-format@exp
 ```
 
 Otherwise, you will need to download the version appropriate for your OS, unzip it,
 and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.
-The downloads are on the [releases page](https://github.com/avh4/elm-format/releases/tag/0.6.1-alpha).
+The downloads are on the [releases page](https://github.com/avh4/elm-format/releases/tag/0.7.0-exp).
 
 
 ## Editor integration
