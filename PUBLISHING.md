@@ -58,6 +58,8 @@ brew cask install virtualbox
 
 ```
 cd package/npm
+# for experimental releases
+# npm publish --tag exp
 npm publish
 ```
 
