@@ -28,6 +28,7 @@ elm-format --stdin --output Main.elm  # Format input from stdin and write to fil
 elm-format --help  # See other command line options
 ```
 
+
 ## Installation [![(latest version: 0.7.0-exp)](https://img.shields.io/badge/version-0.7.0--exp-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.7.0-exp)
 
 > `elm-format` is still in alpha.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
@@ -35,20 +36,22 @@ elm-format --help  # See other command line options
 > **The format produced by elm-format may change significantly before the 1.0.0 release.**  If this will cause problems for you, please refrain from using elm-format during the alpha- and beta-test periods.
 
 
-If you:
-  - Have a working [npm](https://www.npmjs.com/get-npm) installation
-  - Are using Elm 0.18
-  - Don't need to verify PGP signatures
+### Experimental version
 
-then you can install `elm-format` with:
+The latest version of `elm-format` contains experimental features that may or may not appear in future releases.
+If you are able to some amount of instability on your Elm projects,
+you can help with the development of `elm-format` by using the experimental version and providing feedback.
+You can give feedback about the latest experimental version [here](https://goo.gl/forms/kLdTN1yikfOI8ZuA3).
+
+To install the experimental version:
 
 ```sh
 npm install -g elm-format@exp
 ```
 
-Otherwise, you will need to download the version appropriate for your OS, unzip it,
+or download the version appropriate for your OS from the [release page](https://github.com/avh4/elm-format/releases/tag/0.7.0-exp),
+unzip it,
 and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.
-The downloads are on the [releases page](https://github.com/avh4/elm-format/releases/tag/0.7.0-exp).
 
 
 ## Editor integration
