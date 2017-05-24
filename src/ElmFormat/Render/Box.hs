@@ -322,10 +322,101 @@ formatModuleLine elmVersion header =
       nameClause
       (whereClause ++ [exposingClause])
 
+fancyHack :: AST.Module.Module -> AST.Module.Module
+fancyHack modu =
+  let
+    exports =
+      findMainSpec (AST.Module.body modu)
+    newBody =
+      filter filterBody (AST.Module.body modu)
+  in
+    case exports of
+      Nothing -> modu
+      Just exports' ->
+        AST.Module.Module
+        (AST.Module.initialComments modu)
+        (makeHeader (AST.Module.header modu) exports')
+        (AST.Module.docs modu)
+        (AST.Module.imports modu)
+        newBody
+
+filterBody :: AST.Declaration.Decl -> Bool
+filterBody decl =
+  case isMainSpec decl of
+    Nothing ->
+      case decl of
+        AST.Declaration.Decl (RA.A _ (AST.Declaration.TypeAnnotation (AST.Variable.VarRef [] (LowercaseIdentifier "spec"), _) _)) -> False
+        _ -> True
+        
+    Just _ -> False
+
+makeListing :: [String] -> KeywordCommented (AST.Variable.Listing AST.Module.DetailedListing)
+makeListing exports =
+  KeywordCommented [] [] $
+  flip AST.Variable.ExplicitListing False $
+  AST.Module.DetailedListing
+  (exports |> fmap (\e -> (LowercaseIdentifier e, Commented [] () [])) |> Map.fromList)
+  (mempty)
+  (mempty)
+
+makeHeader :: AST.Module.Header -> [String] -> AST.Module.Header
+makeHeader oldHeader exports =
+  let
+    newListing = makeListing exports
+  in
+    AST.Module.Header
+    (AST.Module.srcTag oldHeader)
+    (AST.Module.name oldHeader)
+    (AST.Module.moduleSettings oldHeader)
+    (newListing)
+
+
+findMainSpec :: [AST.Declaration.Decl] -> Maybe [String]
+findMainSpec decls =
+  case decls of
+    [] -> Nothing
+    (first:rest) ->
+      case isMainSpec first of
+        Nothing ->
+          findMainSpec rest
+        Just result ->
+          Just result
+
+isMainSpec :: AST.Declaration.Decl -> Maybe [String]
+isMainSpec decl =
+  case decl of
+    AST.Declaration.Decl (RA.A _ (AST.Declaration.Definition (RA.A _ (AST.Pattern.VarPattern (LowercaseIdentifier "spec"))) [] _ innerExpr)) ->
+      case innerExpr of
+        RA.A _ (AST.Expression.App (RA.A _ (AST.Expression.VarExpr (AST.Variable.VarRef _ (LowercaseIdentifier "describe")))) args _) ->
+          case args of
+            [_, (_, RA.A _ ( AST.Expression.ExplicitList terms _ _ ))] ->
+              extractTerms terms
+            _ ->
+              Nothing
+
+        _ ->
+          Nothing
+    _ ->
+      Nothing
+
+extractTerms :: Sequence AST.Expression.Expr -> Maybe [String]
+extractTerms exprs =
+  sequence $ fmap extractTerm exprs
+
+extractTerm :: (Comments, PreCommented (WithEol AST.Expression.Expr)) -> Maybe String
+extractTerm (_, (_, ((RA.A _ expr ), _))) =
+  case expr of
+    (AST.Expression.VarExpr (AST.Variable.VarRef [] (LowercaseIdentifier export))) ->
+      Just export
+    _ ->
+      Nothing
+
 
 formatModule :: ElmVersion -> AST.Module.Module -> Box
-formatModule elmVersion modu =
+formatModule elmVersion modu1 =
     let
+        modu = fancyHack modu1
+
         initialComments' =
           case AST.Module.initialComments modu of
             [] ->

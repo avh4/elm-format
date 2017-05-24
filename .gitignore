@@ -5,3 +5,6 @@
 *.tix
 /.stack-work/
 /tests/elm-format
+/dist/
+/lib/
+/node_modules/
