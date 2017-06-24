@@ -297,6 +297,8 @@ echo "# elm-format test suite"
 
 checkWaysToRun
 
+checkTransformation 0.18 AddParensForAndOr.elm
+
 checkGood 0.16 Simple.elm
 checkGood 0.16 AllSyntax/0.16/AllSyntax.elm
 checkGoodAllSyntax 0.16 Module

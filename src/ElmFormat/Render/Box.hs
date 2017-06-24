@@ -21,6 +21,7 @@ import Data.Maybe (fromMaybe, maybeToList)
 import qualified Data.Text as Text
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified ElmFormat.Render.Markdown
+import qualified ElmFormat.Render.GroupBinops as GroupBinops
 import qualified ElmFormat.Version
 import qualified Parse.Parse as Parse
 import qualified Reporting.Annotation as RA
@@ -945,7 +946,7 @@ expressionParens inner outer =
 
 formatExpression :: ElmVersion -> ExpressionContext -> AST.Expression.Expr -> Box
 formatExpression elmVersion context aexpr =
-    case RA.drop aexpr of
+    case RA.drop (GroupBinops.extractAnds aexpr) of
         AST.Expression.Literal lit ->
             formatLiteral lit
 
