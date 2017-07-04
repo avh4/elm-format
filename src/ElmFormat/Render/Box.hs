@@ -792,7 +792,7 @@ formatDefinition elmVersion name args comments expr =
     body =
       stack1 $ concat
         [ map formatComment comments
-        , [ formatExpression elmVersion SyntaxSeparated expr ]
+        , [ formatExpression elmVersion SyntaxSeparated (GroupBinops.extractAnds expr) ] -- TODO: use extractAnds for all expressions
         ]
   in
     ElmStructure.definition "=" True
@@ -946,7 +946,7 @@ expressionParens inner outer =
 
 formatExpression :: ElmVersion -> ExpressionContext -> AST.Expression.Expr -> Box
 formatExpression elmVersion context aexpr =
-    case RA.drop (GroupBinops.extractAnds aexpr) of
+    case RA.drop aexpr of
         AST.Expression.Literal lit ->
             formatLiteral lit
 
