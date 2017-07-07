@@ -27,7 +27,7 @@ step (left, inners, conditions) (pre, op, post, next) =  -- TODO: Handle comment
   case op of
     Var.OpRef (SymbolIdentifier maybeAnd) ->
       if maybeAnd == "&&" then
-        ( next, [], (noRegion $ Binops left inners False) : conditions ) -- TODO: Handle multiline
+        ( next, [], packageCondition (left, inners, conditions) )
       else
         ( left, (pre, op, post, next) : inners, conditions )
 
@@ -35,21 +35,25 @@ step (left, inners, conditions) (pre, op, post, next) =  -- TODO: Handle comment
       ( left, (pre, op, post, next) : inners, conditions )
 
 
+packageCondition :: State -> [Expr]
+packageCondition (left, [], conditions) = left : conditions
+packageCondition (left, inners, conditions) =
+   (noRegion $ Binops left (reverse inners) False) : conditions
+
 
 done :: Bool -> State -> Expr'
 done multiline (left, inners, []) = (Binops left (reverse inners) multiline)
-done multiline (left, inners, conditions) =
+done multiline state =
   let
     finalConditions =
-      reverse $ (noRegion $ Binops left (reverse inners) False) : conditions --TODO: use multiline -- TODO: reverse inners is not tested
+      reverse $ packageCondition state
 
     buildOp right =
       ([], Var.OpRef (SymbolIdentifier "&&"), [], right)
   in
     case finalConditions of
       first : r ->
-        -- first
-        (Binops first (fmap buildOp r) False) -- TODO: Handle multiline
+        (Binops first (fmap buildOp r) multiline)
 
 
 nowhere :: Region.Position
