@@ -9,6 +9,7 @@ import qualified Reporting.Region as Region
 
 -- TODO: handle Ors also
 -- TODO: ensure it only groups comparison operators?
+-- TODO: make it work for expression that aren't directly the body of a definition
 extractAnds :: Expr -> Expr
 extractAnds expr =
     case expr of
@@ -19,15 +20,20 @@ extractAnds expr =
             expr
 
 
-type State = (Expr, [(Comments, Var.Ref, Comments, Expr)], [Expr])
+type State = (Expr, [(Comments, Var.Ref, Comments, Expr)], [(Expr, Var.Ref)])
+
+shiftReverse :: [(a, b)] -> a -> [(b, a)] -> (a, [(b, a)])
+shiftReverse [] last acc = (last, acc)
+shiftReverse ((prev, op):rest) last acc =
+    shiftReverse rest prev ((op, last) : acc)
 
 
 step :: State -> (Comments, Var.Ref, Comments, Expr) -> State
 step (left, inners, conditions) (pre, op, post, next) =  -- TODO: Handle comments
   case op of
-    Var.OpRef (SymbolIdentifier maybeAnd) ->
-      if maybeAnd == "&&" then
-        ( next, [], packageCondition (left, inners, conditions) )
+    Var.OpRef (SymbolIdentifier opSymbol) ->
+      if opSymbol == "&&" || opSymbol == "<|" then
+        ( next, [], (Var.OpRef (SymbolIdentifier opSymbol), packageCondition left inners) : conditions )
       else
         ( left, (pre, op, post, next) : inners, conditions )
 
@@ -35,18 +41,18 @@ step (left, inners, conditions) (pre, op, post, next) =  -- TODO: Handle comment
       ( left, (pre, op, post, next) : inners, conditions )
 
 
-packageCondition :: State -> [Expr]
-packageCondition (left, [], conditions) = left : conditions
-packageCondition (left, inners, conditions) =
-   (noRegion $ Binops left (reverse inners) False) : conditions
+packageCondition :: Expr -> [(Comments, Var.Ref, Comments, Expr)] -> Expr
+packageCondition left [] = left
+packageCondition left inners =
+    noRegion $ Binops left (reverse inners) False
 
 
 done :: Bool -> State -> Expr'
 done multiline (left, inners, []) = (Binops left (reverse inners) multiline)
-done multiline state =
+done multiline (left, inners, conditions) =
   let
     finalConditions =
-      reverse $ packageCondition state
+      reverse $ packageCondition left inners : conditions
 
     buildOp right =
       ([], Var.OpRef (SymbolIdentifier "&&"), [], right)

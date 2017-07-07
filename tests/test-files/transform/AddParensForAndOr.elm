@@ -35,3 +35,9 @@ keepsNewLinesInExistingParens =
   (1
     == 2
     + 3 * 4 - 5 + 6) && 7 /= 8
+
+doesntGroupPipes f =
+  f <| True && False
+
+doesntGroupPipes2 f =
+  True && False |> f
