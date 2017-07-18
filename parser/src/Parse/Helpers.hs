@@ -29,11 +29,10 @@ reserveds =
     , "let", "in"
     , "type"
     , "module", "where"
-    , "import", "as", "hiding", "exposing"
-    , "port", "foreign"
-    , "deriving"
+    , "import", "exposing"
+    , "as"
+    , "port"
     ]
-
 
 -- ERROR HELP
 
