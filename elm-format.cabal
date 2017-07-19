@@ -91,6 +91,7 @@ library
         ElmFormat.Filesystem
         ElmFormat.FileStore
         ElmFormat.Operation
+        ElmFormat.Render.GroupBinops
         ElmFormat.Version
         Flags
         Messages.Formatter.Format

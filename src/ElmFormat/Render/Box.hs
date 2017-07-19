@@ -21,6 +21,7 @@ import Data.Maybe (fromMaybe, maybeToList)
 import qualified Data.Text as Text
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified ElmFormat.Render.Markdown
+import qualified ElmFormat.Render.GroupBinops as GroupBinops
 import qualified ElmFormat.Version
 import qualified Parse.Parse as Parse
 import qualified Reporting.Annotation as RA
@@ -791,7 +792,7 @@ formatDefinition elmVersion name args comments expr =
     body =
       stack1 $ concat
         [ map formatComment comments
-        , [ formatExpression elmVersion SyntaxSeparated expr ]
+        , [ formatExpression elmVersion SyntaxSeparated (GroupBinops.extractAnds expr) ] -- TODO: use extractAnds for all expressions
         ]
   in
     ElmStructure.definition "=" True
