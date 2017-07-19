@@ -303,6 +303,7 @@ checkGoodAllSyntax 0.16 Module
 checkGood 0.18 AllSyntax/0.18/Declarations.elm
 checkGoodAllSyntax 0.18 Patterns
 checkGoodAllSyntax 0.18 Types
+checkGood 0.18 AllSyntax/0.18/OldKeywords.elm
 checkGood 0.18 AllSyntax/0.18/Expressions.elm
 checkGood 0.18 AllSyntax/0.18/Expressions/Unary.elm
 checkGood 0.18 AllSyntax/0.18/Expressions/BinaryOperators.elm
@@ -322,6 +323,7 @@ checkGood 0.16 AllSyntax/0.16/Range.elm
 
 checkGood 0.17 AllSyntax/0.17/Range.elm
 checkGood 0.17 AllSyntax/0.17/InfixOperators.elm
+checkGood 0.17 AllSyntax/0.17/OldKeywords.elm
 checkGood 0.17 Export.elm
 checkGoodAllSyntax 0.17 Module
 checkGoodAllSyntax 0.17 ModuleEffect
