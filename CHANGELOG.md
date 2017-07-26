@@ -1,5 +1,11 @@
 ## master (0.7.1-beta)
 
+Features promoted from 0.7.0-exp:
+  - Imports are now sorted and duplicate imports are merged
+  - `exposing` clauses in module headers are now sorted
+  - The body of `let` expressions are no longer indented
+  - Unnecessary parentheses are now removed (expect in binary operator expressions)
+
 Other changes:
   - Removed support for Elm 0.16
 
