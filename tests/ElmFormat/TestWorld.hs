@@ -63,6 +63,7 @@ testWorld files =
           }
 
 
+exec :: State.State s a -> s -> s
 exec = State.execState
 
 
