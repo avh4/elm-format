@@ -24,7 +24,10 @@ data TestWorldState =
 
 fullStdout :: TestWorldState -> String
 fullStdout state =
-    stdout state |> reverse |> concat
+    stdout state
+        |> (:) "\n" -- Append a final newline so reference files can be easily edited
+        |> reverse
+        |> concat
 
 
 instance World (State.State TestWorldState) where
