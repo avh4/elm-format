@@ -1,4 +1,4 @@
-module AllSyntax.Module (a, b, c) where
+module AllSyntax.Module exposing (a, b, c)
 
 import Dict as D
     exposing

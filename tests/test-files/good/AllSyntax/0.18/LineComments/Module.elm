@@ -5,18 +5,18 @@ module
     --A
     AllSyntax.LineComments.Module
     --B
-    ( --C
-      a
-      --D
-    , --E
-      b
-      --F
-    , --G
-      c
-      --H
-    )
     --I
-    where
+    exposing
+        ( --C
+          a
+          --D
+        , --E
+          b
+          --F
+        , --G
+          c
+          --H
+        )
 
 --J
 --K

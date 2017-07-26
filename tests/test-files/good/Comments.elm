@@ -1,4 +1,4 @@
-module Comments (..) where
+module Comments exposing (..)
 
 {-| An example of all valid Elm syntax.
 

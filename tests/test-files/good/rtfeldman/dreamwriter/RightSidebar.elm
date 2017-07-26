@@ -1,4 +1,4 @@
-module Component.RightSidebar (..) where
+module Component.RightSidebar exposing (..)
 
 import Dreamwriter exposing (..)
 import Html exposing (..)

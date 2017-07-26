@@ -1,4 +1,4 @@
-module Component.LeftSidebar (..) where
+module Component.LeftSidebar exposing (..)
 
 import Component.LeftSidebar.CurrentDocView as CurrentDoc
 import Component.LeftSidebar.OpenMenuView as OpenMenu

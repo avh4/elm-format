@@ -12,7 +12,7 @@ Available options:
   --validate               Check if files are formatted without changing them.
   --stdin                  Read from stdin, output to stdout.
   --elm-version VERSION    The Elm version of the source files being formatted.
-                           Valid values: 0.16, 0.17, 0.18. Default: 0.18
+                           Valid values: 0.17, 0.18. Default: 0.18
   --upgrade                Upgrade older Elm files to Elm 0.18 syntax
 
 Examples:

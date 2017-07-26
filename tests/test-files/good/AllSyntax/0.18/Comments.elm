@@ -1,4 +1,4 @@
-module AllSyntax.Comments (..) where
+module AllSyntax.Comments exposing (..)
 
 
 blockComment =
