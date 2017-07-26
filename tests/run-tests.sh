@@ -297,9 +297,9 @@ echo "# elm-format test suite"
 
 checkWaysToRun
 
-checkGood 0.16 Simple.elm
-checkGood 0.16 AllSyntax/0.16/AllSyntax.elm
-checkGoodAllSyntax 0.16 Module
+checkGood 0.18 Simple.elm
+checkGood 0.18 AllSyntax/0.18/AllSyntax.elm
+checkGoodAllSyntax 0.18 Module
 checkGood 0.18 AllSyntax/0.18/Declarations.elm
 checkGoodAllSyntax 0.18 Patterns
 checkGoodAllSyntax 0.18 Types
@@ -310,16 +310,15 @@ checkGood 0.18 AllSyntax/0.18/Expressions/BinaryOperators.elm
 checkGood 0.18 AllSyntax/0.18/DocComments.elm
 checkGood 0.18 AllSyntax/0.18/DocCommentsStartingWtihAtDocs.elm
 checkGood 0.18 AllSyntax/0.18/DeclaraionSpacing.elm
-checkGood 0.16 Comments.elm
-checkGood 0.16 AllSyntax/0.16/GLShader.elm
-checkGood 0.16 AllSyntax/0.16/Literals.elm
-checkGood 0.16 AllSyntax/0.16/Comments.elm
-checkGood 0.16 ApiSketch.elm
+checkGood 0.18 Comments.elm
+checkGood 0.18 AllSyntax/0.18/GLShader.elm
+checkGood 0.18 AllSyntax/0.18/Literals.elm
+checkGood 0.18 AllSyntax/0.18/Comments.elm
+checkGood 0.18 ApiSketch.elm
 checkTransformation 0.18 AllSyntax/0.18/Types.elm
 checkTransformation 0.18 AllSyntax/0.18/Patterns.elm
 
-checkGood 0.16 AllSyntax/0.16/PatternsRequireParens.elm
-checkGood 0.16 AllSyntax/0.16/Range.elm
+# checkGood 0.16 AllSyntax/0.16/PatternsRequireParens.elm
 
 checkGood 0.17 AllSyntax/0.17/Range.elm
 checkGood 0.17 AllSyntax/0.17/InfixOperators.elm
@@ -333,13 +332,13 @@ checkGood 0.18 TrueFalseInIdentifiers.elm
 checkGood 0.18 TopLevelSpacing.elm
 checkGood 0.18 WorkaroundNegativeCasePatterns.elm
 
-checkGood 0.16 evancz/start-app/StartApp.elm
-checkGood 0.16 TheSeamau5/elm-check/Check.elm
-checkGood 0.16 rtfeldman/dreamwriter/Editor.elm
-checkGood 0.16 rtfeldman/dreamwriter/LeftSidebar.elm
-checkGood 0.16 rtfeldman/dreamwriter/RightSidebar.elm
-checkGood 0.16 rtfeldman/dreamwriter/WordGraph.elm
-checkGood 0.16 avh4/elm-fifo/Fifo.elm
+checkGood 0.18 evancz/start-app/StartApp.elm
+checkGood 0.18 TheSeamau5/elm-check/Check.elm
+checkGood 0.18 rtfeldman/dreamwriter/Editor.elm
+checkGood 0.18 rtfeldman/dreamwriter/LeftSidebar.elm
+checkGood 0.18 rtfeldman/dreamwriter/RightSidebar.elm
+checkGood 0.18 rtfeldman/dreamwriter/WordGraph.elm
+checkGood 0.18 avh4/elm-fifo/Fifo.elm
 
 checkGood 0.17 elm-lang/examples/random.elm
 checkGood 0.17 elm-lang/examples/http.elm
@@ -352,15 +351,15 @@ checkBad Empty.elm
 checkBad UnexpectedComma.elm
 checkBad UnexpectedEndOfInput.elm
 
-checkTransformation 0.16 Examples.elm
-checkTransformation 0.16 TrickyModule1.elm
-checkTransformation 0.16 TrickyModule2.elm
-checkTransformation 0.16 TrickyModule3.elm
-checkTransformation 0.16 TrickyModule4.elm
-checkTransformation 0.16 LenientEqualsColon.elm
-checkTransformation 0.16 github-avh4-elm-format-184.elm
-checkTransformation 0.16 QuickCheck-4562ebccb71ea9f622fb99cdf32b2923f6f9d34f-2529668492575674138.elm
-checkTransformation 0.16 QuickCheck-94f37da84c1310f03dcfa1059ce870b73c94a825--6449652945938213463.elm
+checkTransformation 0.18 Examples.elm
+checkTransformation 0.18 TrickyModule1.elm
+checkTransformation 0.18 TrickyModule2.elm
+checkTransformation 0.18 TrickyModule3.elm
+checkTransformation 0.18 TrickyModule4.elm
+checkTransformation 0.18 LenientEqualsColon.elm
+# checkTransformation 0.16 Elm-0.16/github-avh4-elm-format-184.elm
+checkTransformation 0.18 QuickCheck-4562ebccb71ea9f622fb99cdf32b2923f6f9d34f-2529668492575674138.elm
+checkTransformation 0.18 QuickCheck-94f37da84c1310f03dcfa1059ce870b73c94a825--6449652945938213463.elm
 checkTransformation 0.18 WindowsEol.elm
 checkTransformation 0.18 DocCommentCodeExample.elm
 checkTransformation 0.18 DocCommentMarkdownSafety.elm

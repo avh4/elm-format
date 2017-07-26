@@ -1,3 +1,9 @@
+## master (0.7.1-beta)
+
+Other changes:
+  - Removed support for Elm 0.16
+
+
 ## 0.7.0-exp
 
 Experimental changes:

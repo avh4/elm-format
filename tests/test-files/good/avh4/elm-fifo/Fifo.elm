@@ -1,4 +1,4 @@
-module Fifo (Fifo, empty, fromList, insert, remove, toList) where
+module Fifo exposing (Fifo, empty, fromList, insert, remove, toList)
 
 {-|
 

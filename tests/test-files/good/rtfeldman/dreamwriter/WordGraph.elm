@@ -1,4 +1,4 @@
-module Component.WordGraph (..) where
+module Component.WordGraph exposing (..)
 
 import Svg exposing (..)
 import Svg.Attributes exposing (..)

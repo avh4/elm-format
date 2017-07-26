@@ -1,4 +1,4 @@
-module AllSyntax.GLShader (..) where
+module AllSyntax.GLShader exposing (..)
 
 
 vertexShader : Shader { position : Vec3, coord : Vec3 } { u | view : Mat4 } { vcoord : Vec2 }

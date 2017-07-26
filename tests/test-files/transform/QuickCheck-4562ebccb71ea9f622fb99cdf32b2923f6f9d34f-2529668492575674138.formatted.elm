@@ -1,13 +1,13 @@
 module
     --A
     Main
-    ( a
-    , b
-      --A
-    , --A
-      c
-    )
-    {- A -} where
+    {- A -} exposing
+        ( a
+        , b
+          --A
+        , --A
+          c
+        )
 
 
 foo =
