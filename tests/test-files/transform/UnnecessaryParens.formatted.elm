@@ -40,3 +40,17 @@ requiredParens =
     , Ok <| ([ 1, 2, 3 ] |> List.tail)
     , ()
     )
+
+
+requiredParensForTrailingCommentsInBinopsContext =
+    ()
+        |> (\() ->
+                ()
+            -- comment stay here
+           )
+
+
+requiredParensForTrailingCommentsInDefBodyContext =
+    (8
+     -- comment stay here
+    )

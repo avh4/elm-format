@@ -1197,7 +1197,8 @@ formatExpression elmVersion context aexpr =
 
                 _ ->
                     formatCommented (formatExpression elmVersion SyntaxSeparated) expr
-                        |> expressionParens SpaceSeparated context
+                        |> parens
+
 
         AST.Expression.Unit comments ->
             formatUnit '(' ')' comments

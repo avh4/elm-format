@@ -6,6 +6,9 @@ Features promoted from 0.7.0-exp:
   - The body of `let` expressions are no longer indented
   - Unnecessary parentheses are now removed (expect in binary operator expressions)
 
+Bug fixes:
+  - Parentheses are not considered unnecessary if removing them would cause a comment to move to a different AST node
+
 Other changes:
   - Removed support for Elm 0.16
 
