@@ -68,6 +68,9 @@ data Context
 formatMardownBlock :: (String -> Maybe String) -> Context -> Block -> String
 formatMardownBlock formatCode context block =
     case block of
+        ElmDocs terms ->
+            (List.intercalate "\n" $ fmap ((++) "@docs " . List.intercalate ", " . fmap Text.unpack) terms) ++ "\n"
+
         Para inlines ->
             (fold $ fmap formatMarkdownInline $ inlines) ++ "\n"
 
