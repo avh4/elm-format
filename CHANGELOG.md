@@ -8,6 +8,7 @@ Features promoted from 0.7.0-exp:
 
 Bug fixes:
   - Parentheses are not considered unnecessary if removing them would cause a comment to move to a different AST node
+  - Multiline `@docs` lines in markdown are now handled correctly
 
 Other changes:
   - Removed support for Elm 0.16
