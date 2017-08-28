@@ -19,6 +19,7 @@ data Block = Para Inlines
            | HtmlBlock Text
            | HRule
            | ReferencesBlock [(Text, Text, Text)]
+           | ElmDocs [[Text]]
            deriving (Show, Data, Typeable, Eq)
 
 -- | Attributes for fenced code blocks.  'codeLang' is the

@@ -234,12 +234,29 @@ processElts _ [] = mempty
 
 processElts refmap (L _lineNumber lf : rest) =
   case lf of
+    -- Special handling of @docs lines in Elm:
+    TextLine t | Just terms1 <- T.stripPrefix "@docs" t ->
+        let
+            docs = terms1 : map (cleanDoc . extractText) docLines
+        in
+            singleton (ElmDocs $ filter ((/=) []) $ fmap (filter ((/=) ""). fmap T.strip . T.splitOn ",") docs) <>
+            processElts refmap rest'
+        where
+            (docLines, rest') = span isDocLine rest
+            isDocLine (L _ (TextLine _)) = True
+            isDocLine _ = False
+            cleanDoc lin =
+                case T.stripPrefix "@docs" lin of
+                    Nothing -> lin
+                    Just stripped -> stripped
+
     -- Gobble text lines and make them into a Para:
     TextLine t -> singleton (Para $ parseInlines refmap txt) <>
                   processElts refmap rest'
                where txt = T.stripEnd $ joinLines $ map T.stripStart
                            $ t : map extractText textlines
                      (textlines, rest') = span isTextLine rest
+                     isTextLine (L _ (TextLine s)) | T.isPrefixOf "@docs" s = False
                      isTextLine (L _ (TextLine _)) = True
                      isTextLine _ = False
 
