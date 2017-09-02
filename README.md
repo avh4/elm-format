@@ -299,18 +299,21 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 ### Building from source
 
 ```bash
-brew install haskell-stack
+curl https://nixos.org/nix/install | sh
+source ~/.nix-profile/etc/profile.d/nix.sh
+
 git clone https://github.com/avh4/elm-format.git
+
 cd elm-format
-stack setup
-stack build
-stack install
-~/.local/bin/elm-format-0.18 --help
+nix-shell
+  cabal configure
+  cabal build
+./dist/build/elm-format-0.18/elm-format-0.18 -- help
 ```
 
 ### Running tests
 
 ```bash
-brew install shellcheck
-./tests/run-tests.sh
+nix-shell
+  ./test/run-tests.sh
 ```

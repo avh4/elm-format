@@ -3,5 +3,5 @@
 /_input2.elm
 /_stdout.txt
 *.tix
-/.stack-work/
 /tests/elm-format
+/dist/

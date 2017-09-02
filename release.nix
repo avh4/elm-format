@@ -6,13 +6,13 @@ let
       haskell = pkgs.haskell // {
         packages = pkgs.haskell.packages // {
           "${compiler}" = pkgs.haskell.packages."${compiler}".override {
-            overrides = haskellPackagesNew: haskellPackagesOld: rec {
-              elm-format = haskellPackagesNew.callPackage ./default.nix {
+            overrides = self: super: rec {
+              elm-format = self.callPackage ./default.nix {
                 git-cli = pkgs.git;
               };
 
-              indents = haskellPackagesNew.callPackage ./nix/indents.nix { };
-              optparse-applicative = haskellPackagesNew.callPackage ./nix/optparse-applicative.nix { };
+              indents = self.callPackage ./nix/indents.nix { };
+              optparse-applicative = self.callPackage ./nix/optparse-applicative.nix { };
             };
           };
         };

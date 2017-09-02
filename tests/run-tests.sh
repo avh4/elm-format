@@ -16,9 +16,9 @@ if which shellcheck; then
 	shellcheck "./package/linux/build-package.sh" || exit 1
 fi
 
-stack build || exit 1
+cabal build || exit 1
 
-ELM_FORMAT="$(stack path --local-install-root)/bin/elm-format-0.18"
+ELM_FORMAT="dist/build/elm-format-0.18/elm-format-0.18"
 if [ ! -e "$ELM_FORMAT" ]; then
 	echo "$0: ERROR: $ELM_FORMAT not found" >&2
 	exit 1
@@ -377,4 +377,4 @@ checkValidationOutputFormat
 echo
 echo "# GREAT SUCCESS!"
 
-stack test --test-arguments="--hide-successes --color auto" || exit 1
+cabal test --test-options="--hide-successes --color auto" || exit 1

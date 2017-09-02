@@ -3,7 +3,8 @@
 , HUnit, indents, json, mtl, optparse-applicative, parsec, process
 , QuickCheck, quickcheck-io, split, stdenv, tasty, tasty-golden
 , tasty-hunit, tasty-quickcheck, text
-, git-cli
+, git-cli, which
+, ShellCheck, cabal-install
 }:
 mkDerivation {
   pname = "elm-format";
@@ -19,10 +20,12 @@ mkDerivation {
   ];
   executableHaskellDepends = [ base ];
   executableToolDepends = [ git-cli ];
+  executableSystemDepends = [ cabal-install ];
   testHaskellDepends = [
     base cmark containers HUnit mtl parsec QuickCheck quickcheck-io
     split tasty tasty-golden tasty-hunit tasty-quickcheck text
   ];
+  testToolDepends = [ ShellCheck which git-cli ];
   homepage = "http://elm-lang.org";
   description = "A source code formatter for Elm";
   license = stdenv.lib.licenses.bsd3;
