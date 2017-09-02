@@ -1,4 +1,4 @@
-{ compiler ? "ghc802" }:
+{ compiler ? "ghc821" }:
 
 let
   config = {
