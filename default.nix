@@ -12,6 +12,7 @@ mkDerivation {
   src = ./.;
   isLibrary = false;
   isExecutable = true;
+  enableSharedExecutables = false;
   setupHaskellDepends = [ base Cabal directory filepath process ];
   libraryHaskellDepends = [
     ansi-terminal ansi-wl-pprint base binary bytestring containers
