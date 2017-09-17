@@ -120,7 +120,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td>:trophy: <a href="https://marketplace.visualstudio.com/items?itemName=sbrink.elm">Elm Language Support</a></td>
     <td>:warning: <a href="#visual-studio-code-installation">3 steps</a></td>
     <td>❔ TBD</td>
-    <td>:x:</td>
+    <td>:warning: requires configuration</td>
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
