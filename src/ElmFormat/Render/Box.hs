@@ -196,7 +196,6 @@ formatModuleHeader elmVersion modu =
       moduleLine
           |> mapIf (\x -> andThen [ blankLine, x ]) docs
           |> (if null imports then id else andThen imports . andThen [blankLine])
-          |> andThen [ blankLine, blankLine ]
 
 
 formatImports :: ElmVersion -> AST.Module.Module -> [Box]
@@ -334,11 +333,20 @@ formatModule elmVersion modu =
             comments ->
               (map formatComment comments)
                 ++ [ blankLine, blankLine ]
+
+        spaceBeforeBody =
+            case AST.Module.body modu of
+                [] -> 0
+                AST.Declaration.BodyComment _ : _ -> 3
+                _ -> 2
     in
       stack1 $
-        initialComments'
-          ++ (formatModuleHeader elmVersion modu)
-          : maybeToList (formatModuleBody 2 elmVersion modu)
+          concat
+              [ initialComments'
+              , [ formatModuleHeader elmVersion modu ]
+              , List.replicate spaceBeforeBody blankLine
+              , maybeToList (formatModuleBody 2 elmVersion modu)
+              ]
 
 
 formatModuleBody :: Int -> ElmVersion -> AST.Module.Module -> Maybe Box
