@@ -12,6 +12,7 @@ Bug fixes:
 
 Other changes:
   - Removed support for Elm 0.16
+  - Infix operator precedence and associativity declarations are now grouped together
 
 
 ## 0.7.0-exp

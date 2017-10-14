@@ -29,11 +29,3 @@ withAnAnnotation =
 topLevelDestructingShouldNotGroupWithAnything =
     -- This declaration should not be grouped with the ( a, b ) declaration above
     5
-
-
-{-| infix operator properties should be grouped with the declaration
--}
-infixr 5 ::?
-(::?) : Maybe a -> List a -> List a
-(::?) elem list =
-    list

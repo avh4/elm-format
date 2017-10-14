@@ -529,22 +529,24 @@ port runner =
 
 
 infixl 4 |.
+infix 1 <>
+infixr 8 <<>>
+infixr 9 ==/==
+
+
 (|.) : Data a b z -> Data b c z -> Data a b z
 (|.) =
     always
 
 
-infix 1 <>
 (<>) =
     always
 
 
-infixr 8 <<>>
 (<<>>) =
     always
 
 
-infixr 9 ==/==
 (==/==) =
     always
 

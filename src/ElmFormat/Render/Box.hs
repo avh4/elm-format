@@ -108,6 +108,7 @@ data DeclarationType
   | DStarter
   | DCloser
   | DDefinition (Maybe AST.Variable.Ref)
+  | DFixity
   | DDocComment
   deriving (Show)
 
@@ -144,7 +145,7 @@ declarationType decl =
           DDefinition $ Just $ AST.Variable.VarRef [] name
 
         AST.Declaration.Fixity _ _ _ _ name ->
-          DDefinition $ Just name
+          DFixity
 
     AST.Declaration.DocComment _ ->
       DDocComment
@@ -372,6 +373,12 @@ formatModuleBody linesBetween elmVersion modu =
               List.replicate linesBetween blankLine
             (DDocComment, DStarter) ->
               []
+            (DFixity, DFixity) ->
+              []
+            (DFixity, _) ->
+              List.replicate linesBetween blankLine
+            (_, DFixity) ->
+              List.replicate linesBetween blankLine
 
         boxes =
             intersperseMap spacer (formatDeclaration elmVersion) $
