@@ -13,6 +13,7 @@ Bug fixes:
 Syntax changes:
   - Infix operator precedence and associativity declarations are now grouped together
   - `if` expressions now have blank lines between clauses
+  - Comments immediately following `import`s now have spacing consistent with other top-level comments
 
 Other changes:
   - Removed support for Elm 0.16
