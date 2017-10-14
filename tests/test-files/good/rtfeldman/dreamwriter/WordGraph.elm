@@ -41,6 +41,7 @@ bar day yOffset =
             toString <|
                 if day.amount <= 0 then
                     yOffset
+
                 else
                     yOffset - day.amount
         , height <| toString <| abs day.amount
@@ -92,6 +93,7 @@ scale top bot value =
             graphHeight
                 / (if range == 0 then
                     0.1
+
                    else
                     toFloat range
                   )
@@ -117,6 +119,7 @@ viewWordGraph list =
                 |> (\x ->
                         if x > 0 then
                             0
+
                         else
                             x
                    )

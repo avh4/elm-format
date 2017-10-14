@@ -140,6 +140,7 @@ withCommas num =
                     |> String.right 3
         in
         prefix ++ "," ++ suffix
+
     else
         toString num
 
@@ -148,6 +149,7 @@ pluralize : String -> Int -> String
 pluralize noun quantity =
     if quantity == 1 then
         "1 " ++ noun
+
     else
         withCommas quantity ++ " " ++ noun ++ "s"
 

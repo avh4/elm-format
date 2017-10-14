@@ -1070,14 +1070,16 @@ formatExpression elmVersion context aexpr =
                             ]
                   in
                     stack1
-                      [ opening key $ formatCommented (formatExpression elmVersion SyntaxSeparated) cond
+                      [ blankLine
+                      , opening key $ formatCommented (formatExpression elmVersion SyntaxSeparated) cond
                       , indent $ formatCommented_ True (formatExpression elmVersion SyntaxSeparated) body
                       ]
             in
                 formatIf if'
                     |> andThen (map formatElseIf elseifs)
                     |> andThen
-                        [ line $ keyword "else"
+                        [ blankLine
+                        , line $ keyword "else"
                         , indent $ formatCommented_ True (formatExpression elmVersion SyntaxSeparated) (Commented elsComments els [])
                         ]
                     |> expressionParens AmbiguousEnd context

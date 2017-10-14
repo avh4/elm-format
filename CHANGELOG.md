@@ -10,9 +10,12 @@ Bug fixes:
   - Parentheses are not considered unnecessary if removing them would cause a comment to move to a different AST node
   - Multiline `@docs` lines in markdown are now handled correctly
 
+Syntax changes:
+  - Infix operator precedence and associativity declarations are now grouped together
+  - `if` expressions now have blank lines between clauses
+
 Other changes:
   - Removed support for Elm 0.16
-  - Infix operator precedence and associativity declarations are now grouped together
 
 
 ## 0.7.0-exp
