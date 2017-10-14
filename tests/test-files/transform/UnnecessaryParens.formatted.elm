@@ -11,12 +11,14 @@ unnecessaryParens =
       , stuff =
             if conditional then
                 something
+
             else
                 somethingElse
       , thing = doSomething (func arg)
       }
     , if x then
         something
+
       else
         somethingElse
     , case foo of

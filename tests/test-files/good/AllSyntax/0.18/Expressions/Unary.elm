@@ -8,6 +8,7 @@ unaryOperator a =
 multilineUnaryOperator a =
     -(if a then
         1
+
       else
         2
      )

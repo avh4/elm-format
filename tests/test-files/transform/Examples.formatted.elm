@@ -5,6 +5,7 @@ ratio =
     graphHeight
         / (if range == 0 then
             0.1
+
            else
             toFloat range
           )
@@ -18,10 +19,12 @@ bar =
     if
         if a then
             True
+
         else
             False
     then
         "a"
+
     else
         "b"
 

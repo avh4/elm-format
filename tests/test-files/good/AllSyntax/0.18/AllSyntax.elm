@@ -133,6 +133,7 @@ multilineTuple a b =
     ( 1
     , if b then
         2
+
       else
         3
     , (+) 3 4
@@ -231,18 +232,21 @@ multilineParenthesizedExpressions graphHeight range =
     graphHeight
         / (if range == 0 then
             0.1
+
            else
             toFloat range
           )
         ==/==
             (if range == 0 then
                 0.2
+
              else
                 toFloat (range - 1)
             )
         <<>>
             (if range == 0 then
                 -1.0
+
              else
                 0.0
             )
@@ -251,6 +255,7 @@ multilineParenthesizedExpressions graphHeight range =
 multilineParenthesizedExpressions2 range arg =
     (if range == 0 then
         always 0.1
+
      else
         toFloat range
     )
@@ -327,8 +332,10 @@ multilineDeclarationInLet =
 ifStatement b =
     if b == "y" then
         "YES"
+
     else if b == "Y" then
         "yes"
+
     else
         "No"
 
@@ -353,8 +360,10 @@ multilineExpressionsInsideList =
       always x
     , if True then
         always 2
+
       else if False then
         always 3
+
       else
         always 4
     , case True of
@@ -379,8 +388,10 @@ multilineExpressionsInsideTuple a foo =
       x
     , if True then
         2
+
       else if False then
         3
+
       else
         4
     , case True of
@@ -418,8 +429,10 @@ multilineExpressionsInsideRecord =
     , b =
         if True then
             2
+
         else if False then
             3
+
         else
             4
     , c =
@@ -442,17 +455,21 @@ multilineIfCondition a b =
     if
         if a == Nothing then
             True
+
         else
             False
     then
         "Yes"
+
     else if
         if b == Nothing then
             True
+
         else
             False
     then
         "Perhaps"
+
     else
         "No"
 
@@ -461,6 +478,7 @@ multilineCaseSubject a =
     case
         if a == Nothing then
             "X"
+
         else
             "Y"
     of
@@ -476,11 +494,13 @@ multilineRange =
     [
         if True then
             1
+
         else
             2
     ..
         if False then
             3
+
         else
             5
     ]
@@ -490,11 +510,13 @@ nestedMultilineRange =
     [ [
         if True then
             1
+
         else
             2
       ..
         if False then
             3
+
         else
             5
       ]
