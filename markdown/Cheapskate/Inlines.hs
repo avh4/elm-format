@@ -15,7 +15,6 @@ import Prelude hiding (takeWhile)
 import Control.Applicative
 import Data.Monoid
 import Control.Monad
-import qualified Data.Map as M
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Set as Set
@@ -351,11 +350,6 @@ pInlineLink lab = do
   tit <- option "" $ scanSpnl *> pLinkTitle <* scanSpaces
   char ')'
   return $ singleton $ Link lab (Url url) tit
-
-lookupLinkReference :: ReferenceMap
-                    -> Text                -- reference label
-                    -> Maybe (Text, Text)  -- (url, title)
-lookupLinkReference refmap key = M.lookup (normalizeReference key) refmap
 
 -- A reference link: [label], [foo][label], or [label][].
 pReferenceLink :: ReferenceMap -> Text -> Inlines -> Parser Inlines
