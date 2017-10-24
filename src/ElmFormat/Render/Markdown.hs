@@ -37,7 +37,7 @@ formatMarkdown formatCode blocks =
 
 
 mapWithPrev :: (Maybe a -> a -> b) -> [a] -> [b]
-mapWithPrev f [] = []
+mapWithPrev _ [] = []
 mapWithPrev f (first:rest) =
     f Nothing first : zipWith (\prev next -> f (Just prev) next) (first:rest) rest
 
@@ -88,7 +88,7 @@ formatMardownBlock formatCode context block =
             fold $ (if tight then id else List.intersperse "\n") $
                 fmap (formatListItem formatCode) $ zip [1..] items
 
-        CodeBlock (CodeAttr lang info) code ->
+        CodeBlock (CodeAttr lang _info) code ->
             let
                 formatted =
                     fromMaybe (Text.unpack $ ensureNewline code) $ formatCode $ Text.unpack code
