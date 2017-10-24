@@ -21,7 +21,7 @@ module Cheapskate.Util (
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Char
-import Control.Applicative
+import Control.Applicative ()
 import Cheapskate.ParserCombinators
 
 -- Utility functions.
