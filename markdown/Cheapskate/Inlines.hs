@@ -22,7 +22,7 @@ import qualified Data.Set as Set
 -- Returns tag type and whole tag.
 pHtmlTag :: Parser (HtmlTagType, Text)
 pHtmlTag = do
-  char '<'
+  _ <- char '<'
   -- do not end the tag with a > character in a quoted attribute.
   closing <- (char '/' >> return True) <|> return False
   tagname <- takeWhile1 (\c -> isAsciiAlphaNum c || c == '?' || c == '!')
@@ -36,7 +36,7 @@ pHtmlTag = do
                 return $ ss <> T.singleton x <> xs <> "=" <> v
   attrs <- T.concat <$> many attr
   final <- takeWhile (\c -> isSpace c || c == '/')
-  char '>'
+  _ <- char '>'
   let tagtype = if closing
                    then Closing tagname'
                    else case T.stripSuffix "/" final of
@@ -57,7 +57,7 @@ pQuoted c = do
 -- do for now.
 pHtmlComment :: Parser Text
 pHtmlComment = do
-  string "<!--"
+  _ <- string "<!--"
   rest <- manyTill anyChar (string "-->")
   return $ "<!--" <> T.pack rest <> "-->"
 
@@ -118,7 +118,7 @@ pLinkTitle = do
 pReference :: Parser (Text, Text, Text)
 pReference = do
   lab <- pLinkLabel
-  char ':'
+  _ <- char ':'
   scanSpnl
   url <- pLinkUrl
   tit <- option T.empty $ scanSpnl >> pLinkTitle
@@ -239,7 +239,7 @@ schemeSet = Set.fromList $ schemes ++ map T.toUpper schemes
 -- Parse a URI, using heuristics to avoid capturing final punctuation.
 pUri :: Text -> Parser Inlines
 pUri scheme = do
-  char ':'
+  _ <- char ':'
   x <- scan (OpenParens 0) uriScanner
   guard $ not $ T.null x
   let (rawuri, endingpunct) =
@@ -344,11 +344,11 @@ pLink refmap = do
 -- An inline link: [label](/url "optional title")
 pInlineLink :: Inlines -> Parser Inlines
 pInlineLink lab = do
-  char '('
+  _ <- char '('
   scanSpaces
   url <- pLinkUrl
   tit <- option "" $ scanSpnl *> pLinkTitle <* scanSpaces
-  char ')'
+  _ <- char ')'
   return $ singleton $ Link lab (Url url) tit
 
 -- A reference link: [label], [foo][label], or [label][].
@@ -361,7 +361,7 @@ pReferenceLink _ rawlab lab = do
 -- An image:  ! followed by a link.
 pImage :: ReferenceMap -> Parser Inlines
 pImage refmap = do
-  char '!'
+  _ <- char '!'
   (linkToImage <$> pLink refmap) <|> return (singleton (Str "!"))
 
 linkToImage :: Inlines -> Inlines
@@ -377,9 +377,9 @@ linkToImage ils =
 -- convert them to characters and store them as Str inlines.
 pEntity :: Parser Inlines
 pEntity = do
-  char '&'
+  _ <- char '&'
   res <- pCharEntity <|> pDecEntity <|> pHexEntity
-  char ';'
+  _ <- char ';'
   return $ singleton $ Entity $ "&" <> res <> ";"
 
 pCharEntity :: Parser Text
@@ -387,13 +387,13 @@ pCharEntity = takeWhile1 (\c -> isAscii c && isLetter c)
 
 pDecEntity :: Parser Text
 pDecEntity = do
-  char '#'
+  _ <- char '#'
   res <- takeWhile1 isDigit
   return $ "#" <> res
 
 pHexEntity :: Parser Text
 pHexEntity = do
-  char '#'
+  _ <- char '#'
   x <- char 'X' <|> char 'x'
   res <- takeWhile1 isHexDigit
   return $ "#" <> T.singleton x <> res

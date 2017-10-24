@@ -507,7 +507,7 @@ failure :: String -> IParser String
 failure msg = do
   inp <- getInput
   setInput ('x':inp)
-  anyToken
+  _ <- anyToken
   fail msg
 
 
