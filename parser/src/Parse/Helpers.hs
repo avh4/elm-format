@@ -465,7 +465,7 @@ accessible :: IParser AST.Expression.Expr -> IParser AST.Expression.Expr
 accessible exprParser =
   do  start <- getMyPosition
 
-      annotatedRootExpr@(A.A _ rootExpr) <- exprParser
+      annotatedRootExpr@(A.A _ _rootExpr) <- exprParser
 
       access <- optionMaybe (try dot <?> "a field access like .name")
 
@@ -507,7 +507,7 @@ failure :: String -> IParser String
 failure msg = do
   inp <- getInput
   setInput ('x':inp)
-  anyToken
+  _ <- anyToken
   fail msg
 
 

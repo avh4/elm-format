@@ -234,8 +234,8 @@ mergeListing merge left right =
         (Var.OpenListing (Commented pre1 () post1), Var.OpenListing (Commented pre2 () post2)) -> Var.OpenListing (Commented (pre1 ++ pre2) () (post1 ++ post2))
         (Var.ClosedListing, Var.ExplicitListing a multiline) -> Var.ExplicitListing a multiline
         (Var.ExplicitListing a multiline, Var.ClosedListing) -> Var.ExplicitListing a multiline
-        (Var.OpenListing comments, Var.ExplicitListing a multiline) -> Var.OpenListing comments
-        (Var.ExplicitListing a multiline, Var.OpenListing comments) -> Var.OpenListing comments
+        (Var.OpenListing comments, Var.ExplicitListing _a _multiline) -> Var.OpenListing comments
+        (Var.ExplicitListing _a _multiline, Var.OpenListing comments) -> Var.OpenListing comments
         (Var.ExplicitListing a multiline1, Var.ExplicitListing b multiline2) -> Var.ExplicitListing (merge a b) (multiline1 || multiline2)
 
 

@@ -45,8 +45,8 @@ toReport err =
       where
         operator =
             case op of
-              Var.VarRef namespace (LowercaseIdentifier name) -> "`" ++ name ++ "`"
-              Var.TagRef namespace (UppercaseIdentifier name) -> "`" ++ name ++ "`"
+              Var.VarRef _namespace (LowercaseIdentifier name) -> "`" ++ name ++ "`"
+              Var.TagRef _namespace (UppercaseIdentifier name) -> "`" ++ name ++ "`"
               Var.OpRef (SymbolIdentifier name) -> "(" ++ name ++ ")"
 
     TypeWithoutDefinition valueName ->
