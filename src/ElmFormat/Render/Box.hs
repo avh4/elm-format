@@ -144,7 +144,7 @@ declarationType decl =
         AST.Declaration.PortAnnotation (Commented _ name _) _ _ ->
           DDefinition $ Just $ AST.Variable.VarRef [] name
 
-        AST.Declaration.Fixity _ _ _ _ name ->
+        AST.Declaration.Fixity _ _ _ _ _name ->
           DFixity
 
     AST.Declaration.DocComment _ ->

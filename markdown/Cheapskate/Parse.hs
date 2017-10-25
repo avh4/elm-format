@@ -116,7 +116,7 @@ containerContinue c =
                          <|>
                          (do scanSpacesToColumn
                                 (markerColumn li + 1)
-                             upToCountChars (padding li - 1)
+                             _ <- upToCountChars (padding li - 1)
                                 (==' ')
                              return ())
        Reference{}    -> nfb scanBlankline >>
@@ -450,7 +450,7 @@ processLine (lineNumber, txt) = do
        -- otherwise, close all the unmatched containers, add the new
        -- containers, and finally add the new leaf:
        (ns, lf) -> do -- close unmatched containers, add new ones
-           replicateM numUnmatched closeContainer
+           _ <- replicateM numUnmatched closeContainer
            addNew (ns, lf)
 
   where
@@ -531,7 +531,7 @@ scanBlockquoteStart = scanChar '>' >> option () (scanChar ' ')
 -- a header.
 parseAtxHeaderStart :: Parser Int
 parseAtxHeaderStart = do
-  char '#'
+  _ <- char '#'
   hashes <- upToCountChars 5 (== '#')
   -- hashes must be followed by space unless empty header:
   notFollowedBy (skip (/= ' '))
@@ -551,7 +551,7 @@ parseSetextHeaderLine = do
 scanHRuleLine :: Scanner
 scanHRuleLine = do
   c <- satisfy (\c -> c == '*' || c == '_' || c == '-')
-  count 2 $ scanSpaces >> skip (== c)
+  _ <- count 2 $ scanSpaces >> skip (== c)
   skipWhile (\x -> x == ' ' || x == c)
   endOfInput
 
