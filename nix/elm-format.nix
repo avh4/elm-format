@@ -22,6 +22,9 @@ mkDerivation {
     base cmark containers HUnit mtl parsec QuickCheck quickcheck-io
     split tasty tasty-golden tasty-hunit tasty-quickcheck text
   ];
+  postInstall = ''
+    ln -s $out/bin/elm-format-0.18 $out/bin/elm-format
+  '';
   homepage = "http://elm-lang.org";
   description = "A source code formatter for Elm";
   license = stdenv.lib.licenses.bsd3;
