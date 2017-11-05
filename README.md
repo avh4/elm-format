@@ -299,13 +299,11 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 ### Building from source
 
 ```bash
-brew install haskell-stack
+curl https://nixos.org/nix/install | sh
 git clone https://github.com/avh4/elm-format.git
 cd elm-format
-stack setup
-stack build
-stack install
-~/.local/bin/elm-format-0.18 --help
+nix-env -i -f .
+elm-format-0.18 --help
 ```
 
 ### Running tests
