@@ -16,6 +16,8 @@ import qualified Box
 import qualified Data.Text as Text
 import Parse.TestHelpers
 
+import qualified Defaults
+
 
 pending :: Expr
 pending = at 0 0 0 0 $ Unit []
@@ -30,7 +32,7 @@ example name input expected =
 example' :: String -> String -> String -> TestTree
 example' name input expected =
     testCase name $
-        assertParse (fmap (Text.unpack . Box.render . formatExpression Elm_0_18 SyntaxSeparated) expr) input expected
+        assertParse (fmap (Text.unpack . Box.render Defaults.defaultTabSize . formatExpression Elm_0_18 Defaults.defaultTabSize SyntaxSeparated) expr) input expected
 
 
 commentedIntExpr (a,b,c,d) preComment postComment i =

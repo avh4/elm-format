@@ -18,7 +18,7 @@ import qualified ElmFormat.Render.Text as Render
 import qualified ElmVersion
 import qualified Test.Generators ()
 import qualified Test.ElmSourceGenerators
-
+import qualified Defaults
 
 assertStringToString :: String -> Assertion
 assertStringToString source =
@@ -28,7 +28,7 @@ assertStringToString source =
         result =
             Parse.parse source'
                 |> Parse.toEither
-                |> fmap (Render.render ElmVersion.Elm_0_17)
+                |> fmap (Render.render ElmVersion.Elm_0_17 Defaults.defaultTabSize)
     in
         assertEqual "" (Right source') result
 
@@ -38,7 +38,7 @@ astToAst ast =
     let
         result =
             ast
-                |> Render.render ElmVersion.Elm_0_17
+                |> Render.render ElmVersion.Elm_0_17 Defaults.defaultTabSize
                 |> Parse.parse
                 |> Parse.toEither
     in
@@ -54,9 +54,9 @@ simpleAst =
 
 reportFailedAst ast =
     let
-        rendering = Render.render ElmVersion.Elm_0_17 ast |> Text.unpack
+        rendering = Render.render ElmVersion.Elm_0_17 Defaults.defaultTabSize ast |> Text.unpack
         result =
-            Render.render ElmVersion.Elm_0_17 ast
+            Render.render ElmVersion.Elm_0_17 Defaults.defaultTabSize ast
                 |> Parse.parse
                 |> fmap stripRegion
                 |> show

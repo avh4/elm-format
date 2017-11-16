@@ -10,6 +10,7 @@ import qualified Data.Text as Text
 import AST.V0_16
 import Box
 import ElmFormat.Render.ElmStructure
+import Defaults
 
 
 trim :: String -> String
@@ -30,7 +31,7 @@ assertLineOutput expected actual =
 assertOutput :: String -> Box -> Assertion
 assertOutput expected actual =
     assertEqual expected expected $
-        trim $ Text.unpack $ render $ actual
+        trim $ Text.unpack $ render defaultTabSize $ actual
 
 
 word :: String -> Box
@@ -72,20 +73,20 @@ tests =
                 ]
     , testCase "group (empty)" $
         assertOutput "()\n" $
-            group True "(" "," ")" False []
+            group defaultTabSize True "(" "," ")" False []
     , testCase "group (single item, single line)" $
         assertOutput "( foo )\n" $
-            group True "(" "," ")" False [ word "foo" ]
+            group defaultTabSize True "(" "," ")" False [ word "foo" ]
     , testCase "group (single line)" $
         assertOutput "( foo, bar )\n" $
-            group True "(" "," ")" False [ word "foo", word "bar" ]
+            group defaultTabSize True "(" "," ")" False [ word "foo", word "bar" ]
     , testCase "group (single line, no spaces)" $
         assertOutput "(foo, bar)\n" $
-            group False "(" "," ")" False [ word "foo", word "bar" ]
+            group defaultTabSize False "(" "," ")" False [ word "foo", word "bar" ]
     , testCase "group (multiline)" $
         assertOutput "( aa\n  aa\n, b\n, cc\n  cc\n)\n" $
-            group True "(" "," ")" False [ block "a", word "b", block "c" ]
+            group defaultTabSize True "(" "," ")" False [ block "a", word "b", block "c" ]
     , testCase "group (forced multiline)" $
         assertOutput "( a\n, b\n, c\n)\n" $
-            group True "(" "," ")" True [ word "a", word "b", word "c" ]
+            group defaultTabSize True "(" "," ")" True [ word "a", word "b", word "c" ]
     ]

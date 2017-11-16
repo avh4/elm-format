@@ -109,14 +109,14 @@ Formats as:
     opLong
         rest
 -}
-spaceSepOrPrefix :: Box -> Box -> Box
-spaceSepOrPrefix op rest =
+spaceSepOrPrefix :: Int -> Box -> Box -> Box
+spaceSepOrPrefix tabSize op rest =
     case ( op, rest) of
         ( SingleLine op', SingleLine rest' ) ->
             line $ row [ op', space, rest' ]
 
-        ( SingleLine op', _ ) | lineLength 0 op' < 4 ->
-            prefix (row [ op', space ]) rest
+        ( SingleLine op', _ ) | lineLength tabSize 0 op' < 4 ->
+            prefix tabSize (row [ op', space ]) rest
 
         _ ->
             stack1 [ op, indent rest ]
@@ -248,8 +248,8 @@ application forceMultiline first args =
     ; child2
     >
 -}
-group :: Bool -> String -> String -> String -> Bool -> [Box] -> Box
-group innerSpaces left sep right forceMultiline children =
+group :: Int -> Bool -> String -> String -> String -> Bool -> [Box] -> Box
+group tabSize innerSpaces left sep right forceMultiline children =
   case (forceMultiline, allSingles children) of
     (_, Right []) ->
       line $ row [punc left, punc right]
@@ -268,8 +268,8 @@ group innerSpaces left sep right forceMultiline children =
 
         (first:rest) ->
           stack1 $
-            prefix (row [punc left, space]) first
-            : map (prefix $ row [punc sep, space]) rest
+            prefix tabSize (row [punc left, space]) first
+            : map (prefix tabSize $ row [punc sep, space]) rest
             ++ [ line $ punc right ]
 
 {-|
@@ -285,8 +285,8 @@ Formats as:
       , rest1
     }
 -}
-extensionGroup :: Bool -> Box -> Box -> [Box] -> Box
-extensionGroup multiline base first rest =
+extensionGroup :: Int -> Bool -> Box -> Box -> [Box] -> Box
+extensionGroup tabSize multiline base first rest =
   case
     ( multiline
     , isLine base
@@ -308,17 +308,17 @@ extensionGroup multiline base first rest =
 
     _ ->
       stack1
-        [ prefix (row [punc "{", space]) base
+        [ prefix tabSize (row [punc "{", space]) base
         , stack1
-            ( prefix (row [punc "|", space]) first
-            : map (prefix (row [punc ",", space])) rest)
+            ( prefix tabSize (row [punc "|", space]) first
+            : map (prefix tabSize (row [punc ",", space])) rest)
             |> indent
         , line $ punc "}"
         ]
 
 
-extensionGroup' :: Bool -> Box -> Box -> Box
-extensionGroup' multiline base fields =
+extensionGroup' :: Int -> Bool -> Box -> Box -> Box
+extensionGroup' tabSize multiline base fields =
   case
     ( multiline
     , base
@@ -335,7 +335,7 @@ extensionGroup' multiline base fields =
 
     _ ->
       stack1
-        [ prefix (row [punc "{", space]) base
+        [ prefix tabSize (row [punc "{", space]) base
         , indent fields
         , line $ punc "}"
         ]

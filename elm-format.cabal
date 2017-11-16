@@ -60,6 +60,7 @@ library
         AST.V0_16
         AST.Variable
         Box
+        Defaults
         Elm.Utils
         ElmFormat.Cli
         ElmFormat.Parse

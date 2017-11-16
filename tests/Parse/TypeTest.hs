@@ -12,6 +12,8 @@ import ElmFormat.Render.Box (formatType)
 import qualified Box
 import qualified Data.Text as Text
 
+import qualified Defaults
+
 
 pending = at 0 0 0 0 $ TupleType []
 
@@ -19,7 +21,7 @@ pending = at 0 0 0 0 $ TupleType []
 example :: String -> String -> String -> TestTree
 example name input expected =
     testCase name $
-        assertParse (fmap (Text.unpack . Box.render . formatType Elm_0_18) expr) input expected
+        assertParse (fmap (Text.unpack . Box.render Defaults.defaultTabSize . formatType Elm_0_18 Defaults.defaultTabSize) expr) input expected
 
 
 tests :: TestTree

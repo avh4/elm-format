@@ -2,6 +2,7 @@ module Flags where
 
 import Data.Monoid ((<>))
 import ElmVersion (ElmVersion(..))
+import Defaults
 
 import qualified Data.Maybe as Maybe
 import qualified ElmVersion
@@ -15,6 +16,7 @@ data Config = Config
     , _yes :: Bool
     , _validate :: Bool
     , _stdin :: Bool
+    , _tabSize :: Int
     , _elmVersion :: ElmVersion
     , _upgrade :: Bool
     }
@@ -82,6 +84,7 @@ flags defaultVersion =
       <*> yes
       <*> validate
       <*> stdin
+      <*> tabSize
       <*> elmVersion defaultVersion
       <*> upgrade
 
@@ -174,6 +177,17 @@ stdin =
         mconcat
         [ Opt.long "stdin"
         , Opt.help "Read from stdin, output to stdout."
+        ]
+
+tabSize :: Opt.Parser Int
+tabSize =
+    -- Opt.optional $
+    Opt.option Opt.auto $
+        mconcat
+        [ Opt.long "tabsize"
+        , Opt.metavar "SPACES"
+        , Opt.value defaultTabSize
+        , Opt.help $ "Spaces per tab (default: " ++ show defaultTabSize ++ ")"
         ]
 
 
