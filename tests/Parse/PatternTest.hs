@@ -1,21 +1,11 @@
 module Parse.PatternTest where
 
-import Elm.Utils ((|>))
-
-import Test.HUnit (Assertion, assertEqual)
 import Test.Tasty
 import Test.Tasty.HUnit
-import qualified Data.Text.Lazy as LazyText
 
 import Parse.Pattern
-import Parse.Helpers (IParser, iParse)
 import AST.V0_16
 import AST.Pattern
-import AST.Variable hiding (Alias)
-import Reporting.Annotation hiding (map, at)
-import Reporting.Region
-import Text.Parsec.Char (string)
-import Debug.Trace
 
 import Parse.TestHelpers
 
@@ -77,14 +67,6 @@ tests =
         , example "whitespace" "[ x , y ]" $ at 1 1 1 10 (List [Commented [] (at 1 3 1 4 (VarPattern (LowercaseIdentifier "x"))) [],Commented [] (at 1 7 1 8 (VarPattern (LowercaseIdentifier "y"))) []])
         , example "comments" "[{-A-}x{-B-},{-C-}y{-D-}]" $ at 1 1 1 26 (List [Commented [BlockComment ["A"]] (at 1 7 1 8 (VarPattern (LowercaseIdentifier "x"))) [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 19 1 20 (VarPattern (LowercaseIdentifier "y"))) [BlockComment ["D"]]])
         , example "newlines" "[\n x\n ,\n y\n ]" $ at 1 1 5 3 (List [Commented [] (at 2 2 2 3 (VarPattern (LowercaseIdentifier "x"))) [],Commented [] (at 4 2 4 3 (VarPattern (LowercaseIdentifier "y"))) []])
-        ]
-
-    , testGroup "cons pattern"
-        [ example "" "a::b::c" $ at 1 1 1 8 (ConsPattern (at 1 1 1 2 (VarPattern (LowercaseIdentifier "a")),[]) [Commented [] (at 1 4 1 5 (VarPattern (LowercaseIdentifier "b"))) []] ([],at 1 7 1 8 (VarPattern (LowercaseIdentifier "c"))))
-        , example "two patterns" "a::b" $ at 1 1 1 5 (ConsPattern (at 1 1 1 2 (VarPattern (LowercaseIdentifier "a")),[]) [] ([],at 1 4 1 5 (VarPattern (LowercaseIdentifier "b"))))
-        , example "whitespace" "a :: b :: c" $ at 1 1 1 12 (ConsPattern (at 1 1 1 2 (VarPattern (LowercaseIdentifier "a")),[]) [Commented [] (at 1 6 1 7 (VarPattern (LowercaseIdentifier "b"))) []] ([],at 1 11 1 12 (VarPattern (LowercaseIdentifier "c"))))
-        , example "comments" "a{-A-}::{-B-}b{-C-}::{-D-}c" $ at 1 1 1 28 (ConsPattern (at 1 1 1 2 (VarPattern (LowercaseIdentifier "a")),[BlockComment ["A"]]) [Commented [BlockComment ["B"]] (at 1 14 1 15 (VarPattern (LowercaseIdentifier "b"))) [BlockComment ["C"]]] ([BlockComment ["D"]],at 1 27 1 28 (VarPattern (LowercaseIdentifier "c"))))
-        , example "newlines" "a\n ::\n b\n ::\n c" $ at 1 1 5 3 (ConsPattern (at 1 1 1 2 (VarPattern (LowercaseIdentifier "a")),[]) [Commented [] (at 3 2 3 3 (VarPattern (LowercaseIdentifier "b"))) []] ([],at 5 2 5 3 (VarPattern (LowercaseIdentifier "c"))))
         ]
 
     , testGroup "record"

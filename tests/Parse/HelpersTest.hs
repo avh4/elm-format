@@ -1,16 +1,12 @@
 module Parse.HelpersTest where
 
-import Elm.Utils ((|>))
-
-import Test.HUnit (Assertion, assertEqual)
 import Test.Tasty
 import Test.Tasty.HUnit
 
 import AST.V0_16
-import Parse.Helpers (IParser, parens'')
-import Text.ParserCombinators.Parsec.Combinator (eof)
+import Parse.Helpers (parens'')
+import Parse.IParser
 import Text.ParserCombinators.Parsec.Char (lower)
-import Text.Parsec (string)
 
 import Parse.TestHelpers
 

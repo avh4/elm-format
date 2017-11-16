@@ -1,9 +1,7 @@
-/dist/
-/cabal.sandbox.config
 /formatted.elm
 /_input.elm
 /_input2.elm
-/.cabal-sandbox/
+/_stdout.txt
 *.tix
 /.stack-work/
 /tests/elm-format

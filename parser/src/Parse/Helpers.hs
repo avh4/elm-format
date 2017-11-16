@@ -3,9 +3,8 @@ module Parse.Helpers where
 
 import Prelude hiding (until)
 import Control.Monad (guard)
-import Control.Monad.State (State)
-import qualified Data.Char as Char
-import qualified Data.List as List
+import Data.Map.Strict hiding (foldl)
+import qualified Data.Maybe as Maybe
 import Text.Parsec hiding (newline, spaces, State)
 import Text.Parsec.Indent (indented, runIndent)
 import qualified Text.Parsec.Token as T
@@ -15,6 +14,9 @@ import qualified AST.Expression
 import qualified AST.Helpers as Help
 import qualified AST.Variable
 import qualified Parse.State as State
+import Parse.Comments
+import Parse.IParser
+import Parse.Whitespace
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Region as R
@@ -27,26 +29,22 @@ reserveds =
     , "let", "in"
     , "type"
     , "module", "where"
-    , "import", "as", "hiding", "exposing"
-    , "port", "export", "foreign"
-    , "deriving"
+    , "import", "exposing"
+    , "as"
+    , "port"
     ]
-
 
 -- ERROR HELP
 
+expecting :: String -> IParser a -> IParser a
 expecting = flip (<?>)
 
 
 -- SETUP
 
-type SourceM = State SourcePos
-type IParser a = ParsecT String State.State SourceM a
-
-
 iParse :: IParser a -> String -> Either ParseError a
-iParse parser source =
-  iParseWithState "" State.init parser source
+iParse =
+    iParseWithState "" State.init
 
 
 iParseWithState :: SourceName -> State.State -> IParser a -> String -> Either ParseError a
@@ -64,7 +62,6 @@ var =
 lowVar :: IParser LowercaseIdentifier
 lowVar =
   LowercaseIdentifier <$> makeVar lower <?> "a lower case name"
-  -- TODO: allow it to start with '_' ?
 
 
 capVar :: IParser UppercaseIdentifier
@@ -106,7 +103,7 @@ makeVar firstChar =
 reserved :: String -> IParser ()
 reserved word =
   expecting ("reserved word `" ++ word ++ "`") $
-    do  string word
+    do  _ <- string word
         notFollowedBy innerVarChar
         return ()
 
@@ -124,7 +121,7 @@ symOp =
   do  op <- many1 (satisfy Help.isSymbol) <?> "an infix operator like +"
       guard (op `notElem` [ "=", "..", "->", "--", "|", "\8594", ":" ])
       case op of
-        "." -> notFollowedBy lower >> (return $ SymbolIdentifier op)
+        "." -> notFollowedBy lower >> return (SymbolIdentifier op)
         _   -> return $ SymbolIdentifier op
 
 
@@ -175,6 +172,7 @@ verticalBar =
   const () <$> char '|' <?> "a vertical bar '|'"
 
 
+commitIf :: IParser any -> IParser a -> IParser a
 commitIf check p =
     commit <|> try p
   where
@@ -184,36 +182,61 @@ commitIf check p =
 
 -- SEPARATORS
 
-parseWhile1 :: IParser (b, z, a) -> IParser (a -> b -> x) -> IParser (a -> b -> [x])
-parseWhile1 sep parser =
-    let
-        -- step :: ((b, _, a), xff) -> ([x], (b -> x), b) -> ([x], (b -> x), b)
-        step ((sepPre, _, sepPost), nextXf) (acc, xf, lastPost) =
-            ((xf sepPre):acc, nextXf sepPost, lastPost)
 
-        -- done :: ([x], xf, b) -> [x]
-        done (acc, next, post) =
-            List.reverse $ (next post):acc
+spaceySepBy1 :: IParser sep -> IParser a -> IParser (ExposedCommentedList a)
+spaceySepBy1 sep parser =
+    let
+        -- step :: PostCommented (WithEol a) -> [Commented (WithEol a)] -> Comments -> IParser (ExposedCommentedList a)
+        step first rest post =
+            do
+                next <- withEol parser
+                choice
+                    [ try (padded sep)
+                        >>= (\(preSep, _, postSep) -> step first (Commented post next preSep : rest) postSep)
+                    , return $ Multiple first (reverse rest) (post, next)
+                    ]
+
     in
         do
-            value <- parser
-            zips <- many ((,) <$> try sep <*> parser)
-            return $ \pre post -> done $ List.foldr step ([], value pre, post) (List.reverse zips)
+            value <- withEol parser
+            choice
+                [ try (padded sep)
+                    >>= (\(preSep, _, postSep) -> step (value, preSep) [] postSep)
+                , return $ Single value
+                ]
 
 
-spaceySepBy1 :: IParser sep -> IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
-spaceySepBy1 sep parser =
-    parseWhile1 (padded sep) parser
+-- DEPRECATED: use spaceySepBy1 instead
+spaceySepBy1'' :: IParser sep -> IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
+spaceySepBy1'' sep parser =
+  let
+    combine eol post =
+      Maybe.maybeToList (fmap LineComment eol) ++ post
+  in
+    do
+        result <- spaceySepBy1 sep parser
+        case result of
+            Single (item, eol) ->
+                return $ \pre post -> [item pre (combine eol post)]
+
+            Multiple ((first, firstEol), postFirst) rest (preLast, (last, eol)) ->
+                return $ \preFirst postLast ->
+                    concat
+                        [ [first preFirst $ combine firstEol postFirst]
+                        , fmap (\(Commented pre (item, eol) post) -> item pre $ combine eol post) rest
+                        , [last preLast $ combine eol postLast ]
+                        ]
 
 
+-- DEPRECATED: use spaceySepBy1 instead
 spaceySepBy1' :: IParser sep -> IParser a -> IParser (Comments -> Comments -> [Commented a])
 spaceySepBy1' sep parser =
-    parseWhile1 (padded sep) ((\x pre post -> Commented pre x post) <$> parser)
+    spaceySepBy1'' sep ((\x pre post -> Commented pre x post) <$> parser)
 
 
 commaSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
 commaSep1 =
-  spaceySepBy1 comma
+  spaceySepBy1'' comma
 
 
 commaSep1' :: IParser a -> IParser (Comments -> Comments -> [Commented a])
@@ -221,17 +244,28 @@ commaSep1' =
   spaceySepBy1' comma
 
 
-commaSep :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
-commaSep =
-  option (\_ _ -> []) . commaSep1 -- TODO: use comments for empty list
+toSet :: Ord k => (v -> v -> v) -> [Commented (k, v)] -> Map k (Commented v)
+toSet merge values =
+    let
+        merge' (Commented pre1 a post1) (Commented pre2 b post2) =
+            Commented (pre1 ++ pre2) (merge a b) (post1 ++ post2)
+    in
+    foldl (\m (Commented pre (k, v) post) -> insertWith merge' k (Commented pre v post) m) empty values
 
 
-semiSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
-semiSep1 =
-  spaceySepBy1 semicolon
+commaSep1Set' :: Ord k => IParser (k, v) -> (v -> v -> v) -> IParser (Comments -> Comments -> Map k (Commented v))
+commaSep1Set' parser merge =
+    do
+        values <- commaSep1' parser
+        return $ \pre post -> toSet merge $ values pre post
 
 
-pipeSep1 :: IParser (Comments -> Comments -> a) -> IParser (Comments -> Comments -> [a])
+commaSep :: IParser (Comments -> Comments -> a) -> IParser (Maybe (Comments -> Comments -> [a]))
+commaSep term =
+    option Nothing (Just <$> commaSep1 term)
+
+
+pipeSep1 :: IParser a -> IParser (ExposedCommentedList a)
 pipeSep1 =
   spaceySepBy1 verticalBar
 
@@ -249,36 +283,37 @@ keyValue parseSep parseKey parseVal =
       )
 
 
-separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (e,Comments), [Commented e], (Comments,e), Bool))
+separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (e,Maybe String), [(Comments, Comments, e, Maybe String)], Bool))
 separated sep expr' =
   do  start <- getMyPosition
       _ <- pushNewlineContext
       t1 <- expr'
-      arrow <- optionMaybe $ try (whitespace <* sep)
+      arrow <- optionMaybe $ try ((,) <$> restOfLine <*> whitespace <* sep)
       case arrow of
         Nothing ->
             do  _ <- popNewlineContext
                 return $ Left t1
-        Just preArrow ->
+        Just (eolT1, preArrow) ->
             do  postArrow <- whitespace
                 t2 <- separated sep expr'
                 end <- getMyPosition
                 multiline <- popNewlineContext
-                return $ Right $
-                  case t2 of
-                    Right (_, (t2',postT2), ts, tlast, _) ->
-                      ( R.Region start end
-                      , (t1, preArrow)
-                      , ((Commented postArrow t2' postT2):ts)
-                      , tlast
-                      , multiline
-                      )
+                case t2 of
+                    Right (_, (t2',eolT2), ts, _) ->
+                      return $ Right
+                        ( R.Region start end
+                        , (t1, eolT1)
+                        , (preArrow, postArrow, t2', eolT2):ts
+                        , multiline
+                        )
                     Left t2' ->
-                      ( R.Region start end
-                      , (t1, preArrow)
-                      , []
-                      , (postArrow, t2')
-                      , multiline)
+                      do
+                        eol <- restOfLine
+                        return $ Right
+                          ( R.Region start end
+                          , (t1, eolT1)
+                          , [(preArrow, postArrow, t2', eol)]
+                          , multiline)
 
 
 dotSep1 :: IParser a -> IParser [a]
@@ -317,26 +352,20 @@ constrainedSpacePrefix' parser constraint =
 
 -- SURROUNDED BY
 
-followedBy a b =
-  do  x <- a
-      b
-      return x
-
-
 betwixt :: Char -> Char -> IParser a -> IParser a
 betwixt a b c =
-  do  char a
+  do  _ <- char a
       out <- c
-      char b <?> "a closing '" ++ [b] ++ "'"
+      _ <- char b <?> "a closing '" ++ [b] ++ "'"
       return out
 
 
 surround :: Char -> Char -> String -> IParser (Comments -> Comments -> Bool -> a) -> IParser a
 surround a z name p = do
   pushNewlineContext
-  char a
+  _ <- char a
   (pre, v, post) <- padded p
-  char z <?> unwords ["a closing", name, show z]
+  _ <- char z <?> unwords ["a closing", name, show z]
   multiline <- popNewlineContext
   return $ v pre post multiline
 
@@ -356,11 +385,21 @@ brackets =
   surround '{' '}' "bracket"
 
 
+braces' :: IParser a -> IParser a
+braces' =
+    surround' '[' ']' "brace"
+
+
+brackets' :: IParser a -> IParser a
+brackets' =
+    surround' '{' '}' "bracket"
+
+
 surround' :: Char -> Char -> String -> IParser a -> IParser a
 surround' a z name p = do
-  char a
+  _ <- char a
   v <- p
-  char z <?> unwords ["a closing", name, show z]
+  _ <- char z <?> unwords ["a closing", name, show z]
   return v
 
 
@@ -395,9 +434,9 @@ surround'' leftDelim rightDelim inner =
                   Right <$> option [v'] ((\x -> v' : x) <$> (char ',' >> sep'''))
   in
     do
-      char leftDelim
+      _ <- char leftDelim
       vs <- sep''
-      char rightDelim
+      _ <- char rightDelim
       return vs
 
 
@@ -426,7 +465,7 @@ accessible :: IParser AST.Expression.Expr -> IParser AST.Expression.Expr
 accessible exprParser =
   do  start <- getMyPosition
 
-      annotatedRootExpr@(A.A _ rootExpr) <- exprParser
+      annotatedRootExpr@(A.A _ _rootExpr) <- exprParser
 
       access <- optionMaybe (try dot <?> "a field access like .name")
 
@@ -449,114 +488,8 @@ accessible exprParser =
 
 dot :: IParser ()
 dot =
-  do  char '.'
+  do  _ <- char '.'
       notFollowedBy (char '.')
-
-
--- WHITESPACE
-
-padded :: IParser a -> IParser (Comments, a, Comments)
-padded p =
-  do  pre <- whitespace
-      out <- p
-      post <- whitespace
-      return (pre, out, post)
-
-
-spaces :: IParser Comments
-spaces =
-  let
-      blank = string " " >> return []
-      comment = ((\x -> [x]) <$> multiComment)
-      space =
-        blank
-        <|> (const [CommentTrickOpener] <$> (try $ string "{--}"))
-        <|> comment
-        <?> Syntax.whitespace
-  in
-      concat <$> many1 space
-
-
-forcedWS :: IParser Comments
-forcedWS =
-  choice
-    [ (++) <$> spaces <*> (concat <$> many nl_space)
-    , concat <$> many1 nl_space
-    ]
-  where
-    nl_space =
-      try ((++) <$> (concat <$> many1 newline) <*> option [] spaces)
-
-
--- Just eats whitespace until the next meaningful character.
-dumbWhitespace :: IParser Comments
-dumbWhitespace =
-  concat <$> many (spaces <|> newline)
-
-
-whitespace' :: IParser (Bool, Comments)
-whitespace' =
-  option (False, []) ((,) True <$> forcedWS)
-
-
-whitespace :: IParser Comments
-whitespace =
-  snd <$> whitespace'
-
-
-freshLine :: IParser Comments
-freshLine =
-      concat <$> (try ((++) <$> many1 newline <*> many space_nl) <|> try (many1 space_nl)) <?> Syntax.freshLine
-  where
-    space_nl = try $ (++) <$> spaces <*> (concat <$> many1 newline)
-
-
-newline :: IParser Comments
-newline =
-  do  result <- (simpleNewline >> return []) <|> ((\x -> [x]) <$> lineComment) <?> Syntax.newline
-      updateState $ State.setNewline
-      return result
-
-
-simpleNewline :: IParser ()
-simpleNewline =
-  do  try (string "\r\n") <|> string "\n"
-      return ()
-
-
-pushNewlineContext :: IParser ()
-pushNewlineContext =
-    updateState State.pushNewlineContext
-
-
-popNewlineContext :: IParser Bool
-popNewlineContext =
-  do  state <- getState
-      updateState State.popNewlineContext
-      return $ State.sawNewline state
-
-
-trackNewline :: IParser a -> IParser (a, Multiline)
-trackNewline parser =
-    do
-        updateState State.pushNewlineContext
-        a <- parser
-        state <- getState
-        updateState State.popNewlineContext
-        return (a, if State.sawNewline state then SplitAll else JoinAll)
-
-
-lineComment :: IParser Comment
-lineComment =
-  do  try (string "--")
-      choice
-        [ const CommentTrickCloser
-            <$> try (char '}' >> many (char ' ') >> (simpleNewline <|> eof))
-        , do
-            (comment, ()) <-
-              anyUntil $ simpleNewline <|> eof
-            return $ LineComment comment
-        ]
 
 
 commentedKeyword :: String -> IParser a -> IParser (KeywordCommented a)
@@ -568,54 +501,13 @@ commentedKeyword word parser =
     return $ KeywordCommented pre post value
 
 
-docComment :: IParser String
-docComment =
-  do  try (string "{-|")
-      many (string " ")
-      contents <- closeComment False
-      return contents
-
-
-multiComment :: IParser Comment
-multiComment =
-  do  try (string "{-" <* notFollowedBy (string "|") )
-      isCommentTrick <-
-        choice
-          [ char '-' >> return True
-          , return False
-          ]
-      many (string " ")
-      b <- closeComment False
-      return $
-        if isCommentTrick then
-          CommentTrickBlock b
-        else
-          BlockComment $ trimIndent $ lines b
-  where
-      trimIndent [] = []
-      trimIndent (l1:ls) =
-          let
-              depth = minimum $ map fst $ filter (\(a,b) -> a /= b) $ map (\l -> (length $ takeWhile Char.isSpace $ l, length l)) $ ls
-          in
-              l1 : (map (drop depth) ls)
-
-
-closeComment :: Bool -> IParser String
-closeComment keepClosingPunc =
-  (\(a,b) -> a ++ b) <$>
-    (anyUntil $
-      choice $
-        [ try ((\a b -> if keepClosingPunc then concat (a ++ [b]) else "") <$> many (string " ") <*> string "-}") <?> "the end of a comment -}"
-        , concat <$> sequence [ try (string "{-"), closeComment True, closeComment keepClosingPunc]
-        ])
-
-
 -- ODD COMBINATORS
 
+failure :: String -> IParser String
 failure msg = do
   inp <- getInput
   setInput ('x':inp)
-  anyToken
+  _ <- anyToken
   fail msg
 
 
@@ -626,32 +518,18 @@ until p end =
     go = end <|> (p >> go)
 
 
-anyUntil :: IParser a -> IParser (String, a)
-anyUntil end =
-    go ""
-  where
-    next pre =
-      do
-        nextChar <- anyChar
-        go (nextChar : pre)
-
-    go pre =
-      ((,) (reverse pre) <$> end) <|> next pre
-
-
 -- BASIC LANGUAGE LITERALS
 
 shader :: IParser String
 shader =
-  do  try (string "[glsl|")
-      rawSrc <- closeShader id
-      return rawSrc
+  do  _ <- try (string "[glsl|")
+      closeShader id
 
 
 closeShader :: (String -> a) -> IParser a
 closeShader builder =
   choice
-    [ do  try (string "|]")
+    [ do  _ <- try (string "|]")
           return (builder "")
     , do  c <- anyChar
           closeShader (builder . (c:))
@@ -688,8 +566,13 @@ str =
 
     newlineChar :: IParser String
     newlineChar =
-        choice [ char '\n' >> return "\\n"
-               , char '\r' >> return "\\r" ]
+        choice
+            [ char '\n' >> return "\\n"
+            , char '\r' >> choice
+                [ char '\n' >> return "\\n"
+                , return "\\r"
+                ]
+            ]
 
 
 sandwich :: Char -> String -> String
@@ -700,7 +583,7 @@ sandwich delim s =
 escaped :: Char -> IParser String
 escaped delim =
   try $ do
-    char '\\'
+    _ <- char '\\'
     c <- char '\\' <|> char delim
     return ['\\', c]
 

@@ -1,5 +1,5 @@
 Name: elm-format
-Version: 0.5.2-alpha
+version: 0.7.0-exp
 
 Synopsis:
     A source code formatter for Elm
@@ -19,7 +19,7 @@ Copyright:  See https://github.com/avh4/elm-format/blob/master/LICENSE
 
 Category: Build Tool
 
-Build-type: Simple
+build-type: Custom
 Cabal-version: >=1.9
 
 Extra-source-files: README.md
@@ -29,287 +29,170 @@ source-repository head
     location: git://github.com/avh4/elm-format.git
 
 
-Executable elm-format-0.18
+custom-setup
+    setup-depends:
+        base,
+        Cabal,
+        directory,
+        filepath,
+        process
+
+
+library
 
     ghc-options:
-        -threaded -O2 -W
+        -O2 -Wall -Wno-name-shadowing
 
     hs-source-dirs:
         src
         parser/src
+        markdown
 
-    Main-is:
+    exposed-modules:
+        ElmFormat
+        ElmVersion
+        -- exposed for tests
+        AST.Declaration
+        AST.Expression
+        AST.Helpers
+        AST.Module
+        AST.Pattern
+        AST.V0_16
+        AST.Variable
+        Box
+        Defaults
+        Elm.Utils
+        ElmFormat.Cli
+        ElmFormat.Parse
+        ElmFormat.Render.Box
+        ElmFormat.Render.ElmStructure
+        ElmFormat.Render.Markdown
+        ElmFormat.Render.Text
+        ElmFormat.World
+        Parse.Expression
+        Parse.Helpers
+        Parse.IParser
+        Parse.Literal
+        Parse.Markdown
+        Parse.Pattern
+        Parse.Type
+        Reporting.Annotation
+        Reporting.Region
+        Util.List
+
+    other-modules:
+        Build_elm_format
+        Cheapskate.Inlines
+        Cheapskate.Parse
+        Cheapskate.ParserCombinators
+        Cheapskate.Types
+        Cheapskate.Util
+        CommandLine.Helpers
+        ElmFormat.Execute
+        ElmFormat.Filesystem
+        ElmFormat.FileStore
+        ElmFormat.Operation
+        ElmFormat.Version
+        Flags
+        Messages.Formatter.Format
+        Messages.Formatter.HumanReadable
+        Messages.Formatter.Json
+        Messages.Strings
+        Messages.Types
+        Paths_elm_format
+        Parse.Binop
+        Parse.Common
+        Parse.Comments
+        Parse.Declaration
+        Parse.Module
+        Parse.Parse
+        Parse.State
+        Parse.Whitespace
+        Reporting.Error.Syntax
+        Reporting.Report
+        Reporting.Result
+
+    build-depends:
+        ansi-terminal >= 0.6.2.3 && < 0.7,
+        ansi-wl-pprint >= 0.6.7.3 && < 0.7,
+        base >= 4.9.0.0 && < 5,
+        binary >= 0.8.3.0 && < 0.9,
+        bytestring >= 0.10.8.1 && < 0.11,
+        containers >= 0.5.7.1 && < 0.6,
+        directory >= 1.2.6.2 && < 2,
+        filepath >= 1.4.1.0 && < 2,
+        free >= 4.12.4 && < 5,
+        indents >= 0.3.3 && < 0.4,
+        json >= 0.9.1 && < 0.10,
+        mtl >= 2.2.1 && < 3,
+        optparse-applicative >= 0.12.1.0 && < 0.13,
+        parsec >= 3.1.11 && < 4,
+        process >= 1.4.2.0 && < 2,
+        split >= 0.2.3.1 && < 0.3,
+        text >= 1.2.2.1 && < 2
+
+
+executable elm-format-0.18
+
+    ghc-options:
+        -threaded -O2 -Wall -Wno-name-shadowing
+
+    hs-source-dirs:
+        src-cli
+
+    main-is:
         Main0_18.hs
 
-    other-modules:
-        AST.Declaration
-        AST.Expression
-        AST.Helpers
-        AST.Module
-        AST.Pattern
-        AST.V0_16
-        AST.Variable
-        Box
-        CommandLine.Helpers
-        Elm.Utils
-        ElmFormat
-        ElmFormat.Filesystem
-        ElmFormat.Parse
-        ElmFormat.Render.Box
-        ElmFormat.Render.ElmStructure
-        ElmFormat.Render.Text
-        ElmVersion
-        Flags
-        Messages.Strings
-        Messages.Types
-        Parse.Binop
-        Parse.Declaration
-        Parse.Expression
-        Parse.Helpers
-        Parse.Literal
-        Parse.Module
-        Parse.Parse
-        Parse.Pattern
-        Parse.State
-        Parse.Type
-        Reporting.Annotation
-        Reporting.Error.Syntax
-        Reporting.PrettyPrint
-        Reporting.Region
-        Reporting.Report
-        Reporting.Result
-        Util.List
-
-    Build-depends:
-        aeson >= 0.11.2.1 && < 0.12,
-        ansi-terminal >= 0.6.2.3 && < 0.7,
-        ansi-wl-pprint >= 0.6.7.3 && < 0.7,
+    build-depends:
         base >= 4.9.0.0 && < 5,
-        binary >= 0.8.3.0 && < 0.9,
-        bytestring >= 0.10.8.1 && < 0.11,
-        containers >= 0.5.7.1 && < 0.6,
-        directory >= 1.2.6.2 && < 2,
-        edit-distance >= 0.2.2.1 && < 0.3,
-        filepath >= 1.4.1.0 && < 2,
-        filemanip >= 0.3.6.3 && < 0.4,
-        indents >= 0.3.3 && < 0.4,
-        mtl >= 2.2.1 && < 3,
-        optparse-applicative >= 0.12.1.0 && < 0.13,
-        parsec >= 3.1.11 && < 4,
-        pretty >= 1.1.3.3 && < 2,
-        process >= 1.4.2.0 && < 2,
-        regex-applicative >= 0.3.3 && < 0.4,
-        split >= 0.2.3.1 && < 0.3,
-        text >= 1.2.2.1 && < 2
+        elm-format
 
 
-Executable elm-format-0.17
+executable elm-format-0.17
 
     ghc-options:
-        -threaded -O2 -W
+        -threaded -O2 -Wall -Wno-name-shadowing
 
     hs-source-dirs:
-        src
-        parser/src
+        src-cli
 
-    Main-is:
+    main-is:
         Main0_17.hs
 
-    other-modules:
-        AST.Declaration
-        AST.Expression
-        AST.Helpers
-        AST.Module
-        AST.Pattern
-        AST.V0_16
-        AST.Variable
-        Box
-        CommandLine.Helpers
-        Elm.Utils
-        ElmFormat
-        ElmFormat.Filesystem
-        ElmFormat.Parse
-        ElmFormat.Render.Box
-        ElmFormat.Render.ElmStructure
-        ElmFormat.Render.Text
-        ElmVersion
-        Flags
-        Messages.Strings
-        Messages.Types
-        Parse.Binop
-        Parse.Declaration
-        Parse.Expression
-        Parse.Helpers
-        Parse.Literal
-        Parse.Module
-        Parse.Parse
-        Parse.Pattern
-        Parse.State
-        Parse.Type
-        Reporting.Annotation
-        Reporting.Error.Syntax
-        Reporting.PrettyPrint
-        Reporting.Region
-        Reporting.Report
-        Reporting.Result
-        Util.List
-
-    Build-depends:
-        aeson >= 0.11.2.1 && < 0.12,
-        ansi-terminal >= 0.6.2.3 && < 0.7,
-        ansi-wl-pprint >= 0.6.7.3 && < 0.7,
+    build-depends:
         base >= 4.9.0.0 && < 5,
-        binary >= 0.8.3.0 && < 0.9,
-        bytestring >= 0.10.8.1 && < 0.11,
-        containers >= 0.5.7.1 && < 0.6,
-        directory >= 1.2.6.2 && < 2,
-        edit-distance >= 0.2.2.1 && < 0.3,
-        filepath >= 1.4.1.0 && < 2,
-        filemanip >= 0.3.6.3 && < 0.4,
-        indents >= 0.3.3 && < 0.4,
-        mtl >= 2.2.1 && < 3,
-        optparse-applicative >= 0.12.1.0 && < 0.13,
-        parsec >= 3.1.11 && < 4,
-        pretty >= 1.1.3.3 && < 2,
-        process >= 1.4.2.0 && < 2,
-        regex-applicative >= 0.3.3 && < 0.4,
-        split >= 0.2.3.1 && < 0.3,
-        text >= 1.2.2.1 && < 2
+        elm-format
 
-Executable elm-format-0.16
+
+test-Suite elm-format-tests
+    type:
+        exitcode-stdio-1.0
 
     ghc-options:
-        -threaded -O2 -W
-
-    hs-source-dirs:
-        src
-        parser/src
-
-    Main-is:
-        Main0_16.hs
-
-    other-modules:
-        AST.Declaration
-        AST.Expression
-        AST.Helpers
-        AST.Module
-        AST.Pattern
-        AST.V0_16
-        AST.Variable
-        Box
-        CommandLine.Helpers
-        Elm.Utils
-        ElmFormat
-        ElmFormat.Filesystem
-        ElmFormat.Parse
-        ElmFormat.Render.Box
-        ElmFormat.Render.ElmStructure
-        ElmFormat.Render.Text
-        ElmVersion
-        Flags
-        Messages.Strings
-        Messages.Types
-        Parse.Binop
-        Parse.Declaration
-        Parse.Expression
-        Parse.Helpers
-        Parse.Literal
-        Parse.Module
-        Parse.Parse
-        Parse.Pattern
-        Parse.State
-        Parse.Type
-        Reporting.Annotation
-        Reporting.Error.Syntax
-        Reporting.PrettyPrint
-        Reporting.Region
-        Reporting.Report
-        Reporting.Result
-        Util.List
-
-    Build-depends:
-        aeson >= 0.11.2.1 && < 0.12,
-        ansi-terminal >= 0.6.2.3 && < 0.7,
-        ansi-wl-pprint >= 0.6.7.3 && < 0.7,
-        base >= 4.9.0.0 && < 5,
-        binary >= 0.8.3.0 && < 0.9,
-        bytestring >= 0.10.8.1 && < 0.11,
-        containers >= 0.5.7.1 && < 0.6,
-        directory >= 1.2.6.2 && < 2,
-        edit-distance >= 0.2.2.1 && < 0.3,
-        filepath >= 1.4.1.0 && < 2,
-        filemanip >= 0.3.6.3 && < 0.4,
-        indents >= 0.3.3 && < 0.4,
-        mtl >= 2.2.1 && < 3,
-        optparse-applicative >= 0.12.1.0 && < 0.13,
-        parsec >= 3.1.11 && < 4,
-        pretty >= 1.1.3.3 && < 2,
-        process >= 1.4.2.0 && < 2,
-        regex-applicative >= 0.3.3 && < 0.4,
-        split >= 0.2.3.1 && < 0.3,
-        text >= 1.2.2.1 && < 2
-
-Test-Suite elm-format-tests
-    Type:
-        exitcode-stdio-1.0
+        -threaded -Wall -Wno-name-shadowing
 
     hs-source-dirs:
         tests
-        src
-        parser/src
 
-    Main-is:
+    main-is:
         Test.hs
 
     other-modules:
-        AST.Declaration
-        AST.Expression
-        AST.Helpers
-        AST.Module
-        AST.Pattern
-        AST.V0_16
-        AST.Variable
-        Box
         BoxTest
-        Elm.Utils
-        ElmFormat.Cli
+        CommonMarkTests
         ElmFormat.CliTest
-        ElmFormat.Parse
-        ElmFormat.Render.Box
-        ElmFormat.Render.ElmStructure
         ElmFormat.Render.ElmStructureTest
-        ElmFormat.Render.Text
         ElmFormat.TestWorld
-        ElmFormat.World
-        ElmVersion
-        Flags
-        Parse.Binop
-        Parse.Declaration
-        Parse.Expression
         Parse.ExpressionTest
-        Parse.Helpers
         Parse.HelpersTest
-        Parse.Literal
         Parse.LiteralTest
-        Parse.Module
-        Parse.Parse
-        Parse.Pattern
         Parse.PatternTest
-        Parse.State
         Parse.TestHelpers
         Parse.TestHelpersTest
-        Parse.Type
         Parse.TypeTest
-        Reporting.Annotation
-        Reporting.Error.Syntax
-        Reporting.PrettyPrint
-        Reporting.Region
-        Reporting.Report
-        Reporting.Result
         Test.ElmSourceGenerators
         Test.Generators
         Test.Property
-        Util.List
         Util.ListTest
 
     build-depends:
@@ -320,25 +203,11 @@ Test-Suite elm-format-tests
         HUnit >= 1.3.1.2 && < 2,
         QuickCheck >= 2.8.2 && < 3,
         quickcheck-io >= 0.1.3 && < 0.2,
-        aeson >= 0.11.2.1 && < 0.12,
-        ansi-terminal >= 0.6.2.3 && < 0.7,
-        ansi-wl-pprint >= 0.6.7.3 && < 0.7,
         base >= 4.9.0.0 && < 5,
-        binary >= 0.8.3.0 && < 0.9,
-        bytestring >= 0.10.8.1 && < 0.11,
+        cmark >= 0.5.5 && < 0.6,
         containers >= 0.5.7.1 && < 0.6,
-        directory >= 1.2.6.2 && < 2,
-        edit-distance >= 0.2.2.1 && < 0.3,
-        filemanip >= 0.3.6.3 && < 0.4,
-        filepath >= 1.4.1.0 && < 2,
-        indents >= 0.3.3 && < 0.4,
         mtl >= 2.2.1 && < 3,
-        optparse-applicative >= 0.12.1.0 && < 0.13,
         parsec >= 3.1.11 && < 4,
-        pretty >= 1.1.3.3 && < 2,
-        process >= 1.4.2.0 && < 2,
-        regex-applicative >= 0.3.3 && < 0.4,
         split >= 0.2.3.1 && < 0.3,
         text >= 1.2.2.1 && < 2,
-        union-find >= 0.2 && < 0.3,
-        wl-pprint >= 1.2 && < 2
+        elm-format

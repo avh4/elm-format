@@ -1,4 +1,4 @@
-module Main_ exposing (declaration_, NewType_(Foo_, Foo__, Foo_oo))
+module Main_ exposing (NewType_(Foo_, Foo__, Foo_oo), declaration_)
 
 import String_ as S_S exposing (x_, x__)
 

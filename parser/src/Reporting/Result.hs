@@ -1,19 +1,17 @@
 module Reporting.Result where
 
-import Control.Applicative ((<|>))
 import qualified Control.Monad as M
 import Control.Monad.Except (Except, runExcept)
 
 import qualified Reporting.Annotation as A
 import qualified Reporting.Region as R
-import qualified Reporting.PrettyPrint as P
 
 
 -- TASK
 
 data Result warning error result =
     Result
-      (Maybe P.Dealiaser, [A.Located warning])
+      [A.Located warning]
       (RawResult [A.Located error] result)
     deriving (Show)
 
@@ -28,17 +26,17 @@ data RawResult e a
 
 ok :: a -> Result w e a
 ok value =
-  Result (Nothing, []) (Ok value)
+  Result [] (Ok value)
 
 
 throw :: R.Region -> e -> Result w e a
 throw region err =
-  Result (Nothing, []) (Err [A.A region err])
+  Result [] (Err [A.A region err])
 
 
 throwMany :: [A.Located e] -> Result w e a
 throwMany errors =
-  Result (Nothing, []) (Err errors)
+  Result [] (Err errors)
 
 
 from :: (e -> e') -> Except [A.Located e] a -> Result w e' a
@@ -64,17 +62,12 @@ mapError f (Result warnings rawResult) =
 
 warn :: R.Region -> w -> Result w e ()
 warn region warning =
-  Result (Nothing, [A.A region warning]) (Ok ())
+  Result [A.A region warning] (Ok ())
 
 
 addWarnings :: [A.Located w] -> Result w e a -> Result w e a
-addWarnings newWarnings (Result (dealiaser, warnings) rawResult) =
-  Result (dealiaser, newWarnings ++ warnings) rawResult
-
-
-addDealiaser :: P.Dealiaser -> Result w e a -> Result w e a
-addDealiaser dealiaser (Result (_, warnings) rawResult) =
-  Result (Just dealiaser, warnings) rawResult
+addWarnings newWarnings (Result warnings rawResult) =
+  Result (newWarnings ++ warnings) rawResult
 
 
 destruct :: (e -> b) -> (a -> b) -> RawResult e a -> b
@@ -85,6 +78,11 @@ destruct errFunc okFunc rawResult =
 
     Err errors ->
         errFunc errors
+
+
+toMaybe :: Result w a r -> Maybe r
+toMaybe (Result _ (Ok a)) = Just a
+toMaybe (Result _ (Err _)) = Nothing
 
 
 -- EXTRA FANCY HELPERS
@@ -103,8 +101,8 @@ instance Applicative (Result w e) where
   pure value =
       ok value
 
-  (<*>) (Result context resultFunc) (Result context' resultVal) =
-      Result (merge context context') $
+  (<*>) (Result warnings resultFunc) (Result warnings' resultVal) =
+      Result (warnings ++ warnings') $
           case (resultFunc, resultVal) of
             (Ok func, Ok val) ->
                 Ok (func val)
@@ -123,19 +121,12 @@ instance M.Monad (Result w e) where
   return value =
       ok value
 
-  (>>=) (Result context rawResult) callback =
+  (>>=) (Result warnings rawResult) callback =
       case rawResult of
           Err msg ->
-              Result context (Err msg)
+              Result warnings (Err msg)
 
           Ok value ->
-              let (Result context' rawResult') = callback value
+              let (Result warnings' rawResult') = callback value
               in
-                  Result (merge context context') rawResult'
-
-
-merge :: (Maybe a, [b]) -> (Maybe a, [b]) -> (Maybe a, [b])
-merge (dealiaser, warnings) (dealiaser', warnings') =
-  ( dealiaser <|> dealiaser'
-  , warnings ++ warnings'
-  )
+                  Result (warnings ++ warnings') rawResult'

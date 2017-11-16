@@ -3,6 +3,7 @@
 # Some commonly used options have been documented as comments in this file.
 # For advanced use and comprehensive documentation of the format, please see:
 # http://docs.haskellstack.org/en/stable/yaml_configuration/
+require-stack-version: ">= 1.4.0"
 
 # Resolver to choose a 'specific' stackage snapshot or a compiler version.
 # A snapshot resolver dictates the compiler version and the set of packages
@@ -15,7 +16,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-7.4
+resolver: lts-7.24
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.

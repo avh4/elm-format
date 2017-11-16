@@ -1,23 +1,24 @@
-module Comments (..) where
+module Comments exposing (..)
 
 {-| An example of all valid Elm syntax.
 
+
 # Section
+
 @docs fn
+
 -}
 
 -- Comments before imports
-
-import Json.Decode as Json
-import List exposing (..)
-
-
 --
 -- Imports starting with S
 --
 
+import Json.Decode as Json
+import List exposing (..)
 import Signal exposing (foldp, map)
 import String
+
 
 
 ----------------
@@ -34,8 +35,7 @@ comments2 =
     1
         -- plus
         -- plus
-        +
-            3
+        + 3
 
 
 records =
@@ -58,8 +58,8 @@ comments3 =
         {- comment after definitions -}
         -- ...
     in
-        {- let body -}
-        x
+    {- let body -}
+    x
 
 
 comments4 bool =
@@ -79,10 +79,12 @@ comments5 =
     if True then
         -- do the right thing
         ()
+
     else if False then
         -- do something
         -- redundant
         ()
+
     else
         {- do the wrong thing -}
         ()
@@ -105,16 +107,19 @@ comments7 =
         y =
             ()
     in
-        ()
+    ()
 
 
 comments8 =
-    [ {- A -} 7 {- X -}
+    [ {- A -} 7
+
+    {- X -}
     , -- B
       -- C
       8
-      -- Y
-      -- Z
+
+    -- Y
+    -- Z
     ]
 
 
@@ -125,6 +130,8 @@ expressionDefinition {- F -} _ {- G -} _ =
 
 
 infix {- A -} 7 {- B -} ===
+
+
 (===) =
     always
 
@@ -133,3 +140,11 @@ port {- A -} runner {- B -} : {- C -} Signal (Task.Task x ())
 port {- A -} runner {- B -} =
     -- C
     Signal.constant (Task.succeed ())
+
+
+blockCommentWithOnlyWhitespaceLines =
+    {-
+
+
+    -}
+    ()

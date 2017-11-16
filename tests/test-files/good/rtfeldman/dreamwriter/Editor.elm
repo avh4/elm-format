@@ -1,4 +1,4 @@
-module Component.Editor (..) where
+module Component.Editor exposing (..)
 
 import Component.WordGraph as WordGraph
 import Dreamwriter exposing (..)
@@ -89,24 +89,24 @@ viewEditorFooter channels currentDoc fullscreen =
                 + chapterWords
 
         wordCountLabel =
-            (pluralize "word" wordCount) ++ " saved "
+            pluralize "word" wordCount ++ " saved "
     in
-        div [ id "editor-footer" ]
-            [ div [ id "doc-word-count" ]
-                [ text wordCountLabel
-                , WordGraph.viewWordGraph currentDoc.dailyWords
-                ]
-            , div [ id "dropbox-sync" ]
-                [ input
-                    [ id "toggle-dropbox-sync"
-                    , property "type" (string "checkbox")
-                    , onClick channels.remoteSync ()
-                    ]
-                    []
-                , label [ for "toggle-dropbox-sync" ]
-                    [ text " sync to Dropbox" ]
-                ]
+    div [ id "editor-footer" ]
+        [ div [ id "doc-word-count" ]
+            [ text wordCountLabel
+            , WordGraph.viewWordGraph currentDoc.dailyWords
             ]
+        , div [ id "dropbox-sync" ]
+            [ input
+                [ id "toggle-dropbox-sync"
+                , property "type" (string "checkbox")
+                , onClick channels.remoteSync ()
+                ]
+                []
+            , label [ for "toggle-dropbox-sync" ]
+                [ text " sync to Dropbox" ]
+            ]
+        ]
 
 
 viewOutline : Addresses a -> Doc -> FullscreenState -> Html
@@ -121,8 +121,8 @@ viewOutline channels currentDoc fullscreen =
             List.concatMap (.id >> lazyViewChapter)
                 currentDoc.chapters
     in
-        div [ id "document-page" ]
-            (outlineHeadingNodes ++ outlineChapterNodes)
+    div [ id "document-page" ]
+        (outlineHeadingNodes ++ outlineChapterNodes)
 
 
 withCommas : Int -> String
@@ -139,7 +139,8 @@ withCommas num =
                     |> toString
                     |> String.right 3
         in
-            prefix ++ "," ++ suffix
+        prefix ++ "," ++ suffix
+
     else
         toString num
 
@@ -148,8 +149,9 @@ pluralize : String -> Int -> String
 pluralize noun quantity =
     if quantity == 1 then
         "1 " ++ noun
+
     else
-        (withCommas quantity) ++ " " ++ noun ++ "s"
+        withCommas quantity ++ " " ++ noun ++ "s"
 
 
 viewFullscreenButton : Address FullscreenState -> FullscreenState -> Html
@@ -169,12 +171,12 @@ viewFullscreenButton fullscreenChannel fullscreen =
                     , fullscreenTitle = "Enter Fullscreen Mode"
                     }
     in
-        div
-            [ class ("toolbar-section toolbar-button " ++ fullscreenClass)
-            , title fullscreenTitle
-            , onClick fullscreenChannel targetMode
-            ]
-            []
+    div
+        [ class ("toolbar-section toolbar-button " ++ fullscreenClass)
+        , title fullscreenTitle
+        , onClick fullscreenChannel targetMode
+        ]
+        []
 
 
 lazyViewChapter : Identifier -> List Html
@@ -209,7 +211,7 @@ viewFontControl execCommandChannel idAttr label command =
     span
         [ class "font-control toolbar-button toolbar-font-button"
         , id idAttr
-        , (property "unselectable" (string "on"))
+        , property "unselectable" (string "on")
         , onClick execCommandChannel command
         ]
         [ text label ]

@@ -4,7 +4,9 @@ import Text.Parsec ((<|>), choice, try)
 
 import qualified AST.Expression as E
 import qualified AST.Variable as Var
-import Parse.Helpers (IParser, commitIf, whitespace, popNewlineContext, pushNewlineContext, addLocation)
+import Parse.Helpers (commitIf, addLocation)
+import Parse.IParser
+import Parse.Whitespace
 import qualified Reporting.Annotation as A
 
 

@@ -1,0 +1,38 @@
+{
+  "name": "elm-format",
+  "version": "0.7.0-exp",
+  "description": "Install elm-format",
+  "preferGlobal": true,
+  "main": "index.js",
+  "scripts": {
+    "install": "binwrap-install",
+    "prepublish": "npm test",
+    "test": "eslint . && binwrap-test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avh4/elm-format.git"
+  },
+  "keywords": [
+    "elm-format"
+  ],
+  "author": "Aaron VonderHaar",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/avh4/elm-format/issues"
+  },
+  "files": [
+    "index.js",
+    "bin"
+  ],
+  "homepage": "https://github.com/avh4/elm-format",
+  "bin": {
+    "elm-format": "bin/elm-format"
+  },
+  "dependencies": {
+    "binwrap": "^0.1.4"
+  },
+  "devDependencies": {
+    "eslint": "^3.18.0"
+  }
+}

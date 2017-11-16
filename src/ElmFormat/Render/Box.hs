@@ -3,7 +3,6 @@ module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
 import Box
-import Data.Version (showVersion)
 import ElmVersion (ElmVersion(..))
 import Defaults
 
@@ -13,22 +12,28 @@ import qualified AST.Expression
 import qualified AST.Module
 import qualified AST.Pattern
 import qualified AST.Variable
+import qualified Cheapskate.Types as Markdown
 import qualified Control.Monad as Monad
 import qualified Data.Char as Char
 import qualified Data.List as List
+import qualified Data.Map.Strict as Map
 import qualified Data.Maybe as Maybe
+import Data.Maybe (fromMaybe, maybeToList)
+import qualified Data.Text as Text
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
-import qualified Paths_elm_format as This
+import qualified ElmFormat.Render.Markdown
+import qualified ElmFormat.Version
+import qualified Parse.Parse as Parse
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Region as Region
-import qualified Text.Regex.Applicative as Regex
+import qualified Reporting.Result as Result
 import Text.Printf (printf)
 import Util.List
 
 
 pleaseReport' :: String -> String -> Line
 pleaseReport' what details =
-    keyword $ "<elm-format-" ++ (showVersion This.version) ++ ": "++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
+    keyword $ "<elm-format-" ++ ElmFormat.Version.asString ++ ": "++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
 
 
 pleaseReport :: String -> String -> Box
@@ -58,56 +63,28 @@ parens tabSize =
     surround tabSize '(' ')'
 
 
-formatBinary :: Int -> Bool -> Box -> [ ( Bool, Box, Box ) ] -> Box
+formatBinary :: Int -> Bool -> Box -> [ ( Bool, Comments, Box, Box ) ] -> Box
 formatBinary tabSize multiline left ops =
     case ops of
         [] ->
             left
 
-        ( isLeftPipe, op, next ) : rest ->
-            case
-                ( isLeftPipe, multiline, left, op, next )
-            of
-                ( _, False, SingleLine left', SingleLine op', SingleLine next' ) ->
-                    formatBinary
-                        tabSize
-                        multiline
-                        (line $ row [ left', space, op', space, next' ])
-                        rest
-
-                ( True, _, SingleLine left', SingleLine op', _ ) ->
-                    stack1
-                        [ line $ row [ left', space, op' ]
-                        , indent $ formatBinary tabSize multiline next rest
-                        ]
-
-                ( True, _, _, _, _ ) ->
-                    stack1
-                        [ left
-                        , op
-                        , indent $ formatBinary tabSize multiline next rest
-                        ]
-
-                ( False, _, _, SingleLine op', SingleLine _ ) ->
-                    formatBinary
-                        tabSize
-                        multiline
-                        (stack1 [ left, indent $ prefix tabSize (row [ op', space ]) next])
-                        rest
-
-                ( False, _, _, SingleLine op', _ ) | lineLength tabSize 0 op' < defaultTabSize ->
-                    formatBinary
-                        tabSize
-                        multiline
-                        (stack1 [left, indent $ prefix tabSize (row [ op', space ]) next])
-                        rest
-
-                ( False, _, _, _, _ ) ->
-                    formatBinary
-                        tabSize
-                        multiline
-                        (stack1 [ left, indent op, indent $ indent next ])
-                        rest
+        ( isLeftPipe, comments, op, next ) : rest ->
+            if isLeftPipe then
+                ElmStructure.forceableSpaceSepOrIndented multiline
+                    (ElmStructure.spaceSepOrStack left $
+                        concat
+                            [ Maybe.maybeToList $ formatComments tabSize comments
+                            , [op]
+                            ]
+                    )
+                    [formatBinary tabSize multiline next rest]
+            else
+                formatBinary
+                    tabSize
+                    multiline
+                    (ElmStructure.forceableSpaceSepOrIndented multiline left [formatCommented' tabSize comments id $ ElmStructure.spaceSepOrPrefix tabSize op next])
+                    rest
 
 
 splitWhere :: (a -> Bool) -> [a] -> [[a]]
@@ -134,6 +111,7 @@ data DeclarationType
   | DStarter
   | DCloser
   | DDefinition (Maybe AST.Variable.Ref)
+  | DFixity
   | DDocComment
   deriving (Show)
 
@@ -154,7 +132,7 @@ declarationType decl =
             _ ->
               DDefinition Nothing
 
-        AST.Declaration.Datatype (Commented _ (name, _) _) _ _ ->
+        AST.Declaration.Datatype (Commented _ (name, _) _) _ ->
           DDefinition $ Just $ AST.Variable.TagRef [] name
 
         AST.Declaration.TypeAlias _ (Commented _ (name, _) _) _ ->
@@ -169,8 +147,8 @@ declarationType decl =
         AST.Declaration.PortAnnotation (Commented _ name _) _ _ ->
           DDefinition $ Just $ AST.Variable.VarRef [] name
 
-        AST.Declaration.Fixity _ _ _ _ name ->
-          DDefinition $ Just name
+        AST.Declaration.Fixity _ _ _ _ _name ->
+          DFixity
 
     AST.Declaration.DocComment _ ->
       DDocComment
@@ -206,22 +184,10 @@ formatModuleHeader elmVersion tabSize modu =
               formatModuleLine elmVersion tabSize header
 
       docs =
-          formatModuleDocs (AST.Module.docs modu)
-
-      importSpacer first second =
-            case (first, second) of
-                (AST.Module.ImportComment _, AST.Module.ImportComment _) ->
-                    []
-                (AST.Module.ImportComment _, _) ->
-                    List.replicate 1 blankLine
-                (_, AST.Module.ImportComment _) ->
-                    List.replicate 2 blankLine
-                (_, _) ->
-                    []
+          fmap (formatModuleDocs elmVersion tabSize) $ RA.drop $ AST.Module.docs modu
 
       imports =
-            AST.Module.imports modu
-                |> intersperseMap importSpacer (formatImport elmVersion tabSize)
+          formatImports elmVersion tabSize modu
 
       mapIf fn m a =
           case m of
@@ -233,7 +199,23 @@ formatModuleHeader elmVersion tabSize modu =
       moduleLine
           |> mapIf (\x -> andThen [ blankLine, x ]) docs
           |> (if null imports then id else andThen imports . andThen [blankLine])
-          |> andThen [ blankLine, blankLine ]
+
+
+formatImports :: ElmVersion -> Int -> AST.Module.Module -> [Box]
+formatImports elmVersion tabSize modu =
+    let
+        (comments, imports) =
+            AST.Module.imports modu
+    in
+    [ formatComments tabSize comments
+        |> maybeToList
+    , imports
+        |> Map.assocs
+        |> fmap (\(name, (pre, method)) -> formatImport elmVersion tabSize ((pre, name), method))
+    ]
+        |> List.filter (not . List.null)
+        |> List.intersperse [blankLine]
+        |> concat
 
 
 formatModuleLine_0_16 :: Int -> AST.Module.Header -> Box
@@ -244,11 +226,11 @@ formatModuleLine_0_16 tabSize header =
     formatExports =
       case AST.Module.exports header of
         KeywordCommented _ _ value ->
-          case formatListing tabSize (formatVarValue elmVersion tabSize) value of
+          case formatListing tabSize (formatDetailedListing elmVersion tabSize) value of
             Just listing ->
               listing
             _ ->
-                line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
+                pleaseReport "UNEXPECTED MODULE DECLARATION" "empty listing"
 
     whereClause =
       case AST.Module.exports header of
@@ -298,11 +280,11 @@ formatModuleLine elmVersion tabSize header =
             [ line $ keyword "module" ]
 
     exports list =
-      case formatListing tabSize (formatVarValue elmVersion tabSize) $ list of
+      case formatListing tabSize (formatDetailedListing elmVersion tabSize) $ list of
           Just listing ->
             listing
           _ ->
-              line $ pleaseReport' "UNEXPECTED MODULE DECLARATION" "empty listing"
+              pleaseReport "UNEXPECTED MODULE DECLARATION" "empty listing"
 
     formatSetting (k, v) =
       formatRecordPair elmVersion tabSize "=" (line . formatUppercaseIdentifier elmVersion) (k, v, False)
@@ -347,6 +329,32 @@ formatModuleLine elmVersion tabSize header =
 formatModule :: ElmVersion -> Int -> AST.Module.Module -> Box
 formatModule elmVersion tabSize modu =
     let
+        initialComments' =
+          case AST.Module.initialComments modu of
+            [] ->
+              []
+            comments ->
+              (map (formatComment tabSize) comments)
+                ++ [ blankLine, blankLine ]
+
+        spaceBeforeBody =
+            case AST.Module.body modu of
+                [] -> 0
+                AST.Declaration.BodyComment _ : _ -> 3
+                _ -> 2
+    in
+      stack1 $
+          concat
+              [ initialComments'
+              , [ formatModuleHeader elmVersion tabSize modu ]
+              , List.replicate spaceBeforeBody blankLine
+              , maybeToList (formatModuleBody 2 elmVersion tabSize modu)
+              ]
+
+
+formatModuleBody :: Int -> ElmVersion -> Int -> AST.Module.Module -> Maybe Box
+formatModuleBody linesBetween elmVersion tabSize modu =
+    let
         spacer first second =
           case (declarationType first, declarationType second) of
             (DStarter, _) ->
@@ -356,53 +364,75 @@ formatModule elmVersion tabSize modu =
             (DComment, DComment) ->
               []
             (_, DComment) ->
-              List.replicate 3 blankLine
+              List.replicate (linesBetween + 1) blankLine
             (DComment, _) ->
-              List.replicate 2 blankLine
+              List.replicate linesBetween blankLine
             (DDocComment, DDefinition _) ->
               []
             (DDefinition Nothing, DDefinition (Just _)) ->
-              List.replicate 2 blankLine
+              List.replicate linesBetween blankLine
             (DDefinition _, DStarter) ->
-              List.replicate 2 blankLine
+              List.replicate linesBetween blankLine
             (DDefinition a, DDefinition b) ->
               if a == b then
                 []
               else
-                List.replicate 2 blankLine
+                List.replicate linesBetween blankLine
             (DCloser, _) ->
-              List.replicate 2 blankLine
+              List.replicate linesBetween blankLine
             (_, DDocComment) ->
-              List.replicate 2 blankLine
+              List.replicate linesBetween blankLine
             (DDocComment, DStarter) ->
               []
+            (DFixity, DFixity) ->
+              []
+            (DFixity, _) ->
+              List.replicate linesBetween blankLine
+            (_, DFixity) ->
+              List.replicate linesBetween blankLine
 
-        body =
+        boxes =
             intersperseMap spacer (formatDeclaration elmVersion tabSize) $
                 AST.Module.body modu
-
-
-        initialComments' =
-          case AST.Module.initialComments modu of
-            [] ->
-              []
-            comments ->
-              (map (formatComment tabSize) comments)
-                ++ [ blankLine, blankLine ]
     in
-      stack1 $
-        initialComments'
-          ++ (formatModuleHeader elmVersion tabSize modu)
-          : body
+        case boxes of
+            [] -> Nothing
+            _ -> Just $ stack1 boxes
 
 
-formatModuleDocs :: RA.Located (Maybe String) -> Maybe Box
-formatModuleDocs adocs =
-    case RA.drop adocs of
-        Nothing ->
-            Nothing
-        Just docs ->
-            Just $ formatDocComment docs
+formatModuleDocs :: ElmVersion -> Int -> Markdown.Blocks -> Box
+formatModuleDocs elmVersion tabSize blocks =
+    let
+        format :: AST.Module.Module -> String
+        format modu =
+            let
+                box =
+                    case
+                        ( formatImports elmVersion tabSize modu
+                        , formatModuleBody 1 elmVersion tabSize modu
+                        )
+                    of
+                        ( [], Nothing ) -> Nothing
+                        ( imports, Nothing ) -> Just $ stack1 imports
+                        ( [], Just body) -> Just body
+                        ( imports, Just body ) -> Just $ stack1 (imports ++ [blankLine, body])
+            in
+                box
+                    |> fmap (Text.unpack . (Box.render tabSize))
+                    |> fromMaybe ""
+
+        reformat :: String -> Maybe String
+        reformat source =
+            source
+                |> Parse.parseSource
+                |> Result.toMaybe
+                |> fmap format
+
+        content :: String
+        content =
+            ElmFormat.Render.Markdown.formatMarkdown reformat blocks
+    in
+        formatDocComment content
 
 
 formatDocComment :: String -> Box
@@ -422,167 +452,159 @@ formatDocComment docs =
 
 
 formatImport :: ElmVersion -> Int -> AST.Module.UserImport -> Box
-formatImport elmVersion tabSize aimport =
-    case aimport of
-        AST.Module.UserImport aimport' ->
-            case RA.drop aimport' of
-                (name,method) ->
-                    let
-                        as =
-                          (AST.Module.alias method)
-                            |> fmap (formatImportClause
-                            (Just . line . formatUppercaseIdentifier elmVersion)
-                            "as")
-                            |> Monad.join
+formatImport elmVersion tabSize (name, method) =
+    let
+        as =
+          (AST.Module.alias method)
+            |> fmap (formatImportClause
+            (Just . line . formatUppercaseIdentifier elmVersion)
+            "as")
+            |> Monad.join
 
-                        (exposingPreKeyword, exposingPostKeywordAndListing)
-                          = AST.Module.exposedVars method
+        (exposingPreKeyword, exposingPostKeywordAndListing)
+          = AST.Module.exposedVars method
 
-                        exposing =
-                          formatImportClause
-                            (formatListing tabSize (formatVarValue elmVersion tabSize))
-                            "exposing"
-                            (exposingPreKeyword, exposingPostKeywordAndListing)
+        exposing =
+          formatImportClause
+            (formatListing tabSize (formatDetailedListing elmVersion tabSize))
+            "exposing"
+            (exposingPreKeyword, exposingPostKeywordAndListing)
 
-                        formatImportClause :: (a -> Maybe Box) -> String -> (Comments, (Comments, a)) -> Maybe Box
-                        formatImportClause format keyw input =
-                          case
-                            fmap (fmap format) $ input
-                          of
-                            ([], ([], Nothing)) ->
-                              Nothing
+        formatImportClause :: (a -> Maybe Box) -> String -> (Comments, (Comments, a)) -> Maybe Box
+        formatImportClause format keyw input =
+          case
+            fmap (fmap format) $ input
+          of
+            ([], ([], Nothing)) ->
+              Nothing
 
-                            (preKeyword, (postKeyword, Just listing')) ->
-                              case
-                                ( formatHeadCommented tabSize (line . keyword) (preKeyword, keyw)
-                                , formatHeadCommented tabSize id (postKeyword, listing')
-                                )
-                              of
-                                (SingleLine keyword', SingleLine listing'') ->
-                                  Just $ line $ row
-                                    [ keyword'
-                                    , space
-                                    , listing''
-                                    ]
+            (preKeyword, (postKeyword, Just listing')) ->
+              case
+                ( formatHeadCommented tabSize (line . keyword) (preKeyword, keyw)
+                , formatHeadCommented tabSize id (postKeyword, listing')
+                )
+              of
+                (SingleLine keyword', SingleLine listing'') ->
+                  Just $ line $ row
+                    [ keyword'
+                    , space
+                    , listing''
+                    ]
 
-                                (keyword', listing'') ->
-                                  Just $ stack1
-                                    [ keyword'
-                                    , indent listing''
-                                    ]
+                (keyword', listing'') ->
+                  Just $ stack1
+                    [ keyword'
+                    , indent listing''
+                    ]
 
-                            _ ->
-                              Just $ pleaseReport "UNEXPECTED IMPORT" "import clause comments with no clause"
-                    in
-                        case
-                          ( formatHeadCommented tabSize (line . formatQualifiedUppercaseIdentifier elmVersion) name
-                          , as
-                          , exposing
-                          )
-                        of
-                          ( SingleLine name', Just (SingleLine as'), Just (SingleLine exposing') ) ->
-                            line $ row
-                              [ keyword "import"
-                              , space
-                              , name'
-                              , space
-                              , as'
-                              , space
-                              , exposing'
-                              ]
+            _ ->
+              Just $ pleaseReport "UNEXPECTED IMPORT" "import clause comments with no clause"
+    in
+    case
+        ( formatHeadCommented tabSize (line . formatQualifiedUppercaseIdentifier elmVersion) name
+        , as
+        , exposing
+        )
+    of
+        ( SingleLine name', Just (SingleLine as'), Just (SingleLine exposing') ) ->
+          line $ row
+            [ keyword "import"
+            , space
+            , name'
+            , space
+            , as'
+            , space
+            , exposing'
+            ]
 
-                          (SingleLine name', Just (SingleLine as'), Nothing) ->
-                            line $ row
-                              [ keyword "import"
-                              , space
-                              , name'
-                              , space
-                              , as'
-                              ]
+        (SingleLine name', Just (SingleLine as'), Nothing) ->
+          line $ row
+            [ keyword "import"
+            , space
+            , name'
+            , space
+            , as'
+            ]
 
-                          (SingleLine name', Nothing, Just (SingleLine exposing')) ->
-                            line $ row
-                              [ keyword "import"
-                              , space
-                              , name'
-                              , space
-                              , exposing'
-                              ]
+        (SingleLine name', Nothing, Just (SingleLine exposing')) ->
+          line $ row
+            [ keyword "import"
+            , space
+            , name'
+            , space
+            , exposing'
+            ]
 
-                          (SingleLine name', Nothing, Nothing) ->
-                            line $ row
-                              [ keyword "import"
-                              , space
-                              , name'
-                              ]
+        (SingleLine name', Nothing, Nothing) ->
+          line $ row
+            [ keyword "import"
+            , space
+            , name'
+            ]
 
-                          ( SingleLine name', Just (SingleLine as'), Just exposing' ) ->
-                            stack1
-                              [ line $ row
-                                [ keyword "import"
-                                , space
-                                , name'
-                                , space
-                                , as'
-                                ]
-                              , indent exposing'
-                              ]
+        ( SingleLine name', Just (SingleLine as'), Just exposing' ) ->
+          stack1
+            [ line $ row
+              [ keyword "import"
+              , space
+              , name'
+              , space
+              , as'
+              ]
+            , indent exposing'
+            ]
 
-                          ( SingleLine name', Just as', Just exposing' ) ->
-                            stack1
-                              [ line $ row
-                                [ keyword "import"
-                                , space
-                                , name'
-                                ]
-                              , indent as'
-                              , indent exposing'
-                              ]
+        ( SingleLine name', Just as', Just exposing' ) ->
+          stack1
+            [ line $ row
+              [ keyword "import"
+              , space
+              , name'
+              ]
+            , indent as'
+            , indent exposing'
+            ]
 
-                          ( SingleLine name', Nothing, Just exposing' ) ->
-                            stack1
-                              [ line $ row
-                                [ keyword "import"
-                                , space
-                                , name'
-                                ]
-                              , indent exposing'
-                              ]
+        ( SingleLine name', Nothing, Just exposing' ) ->
+          stack1
+            [ line $ row
+              [ keyword "import"
+              , space
+              , name'
+              ]
+            , indent exposing'
+            ]
 
-                          ( name', Just as', Just exposing' ) ->
-                            stack1
-                              [ line $ keyword "import"
-                              , indent name'
-                              , indent $ indent as'
-                              , indent $ indent exposing'
-                              ]
+        ( name', Just as', Just exposing' ) ->
+          stack1
+            [ line $ keyword "import"
+            , indent name'
+            , indent $ indent as'
+            , indent $ indent exposing'
+            ]
 
-                          ( name', Nothing, Just exposing' ) ->
-                            stack1
-                              [ line $ keyword "import"
-                              , indent name'
-                              , indent $ indent exposing'
-                              ]
+        ( name', Nothing, Just exposing' ) ->
+          stack1
+            [ line $ keyword "import"
+            , indent name'
+            , indent $ indent exposing'
+            ]
 
-                          ( name', Just as', Nothing ) ->
-                            stack1
-                              [ line $ keyword "import"
-                              , indent name'
-                              , indent $ indent as'
-                              ]
+        ( name', Just as', Nothing ) ->
+          stack1
+            [ line $ keyword "import"
+            , indent name'
+            , indent $ indent as'
+            ]
 
-                          ( name', Nothing, Nothing ) ->
-                            stack1
-                              [ line $ keyword "import"
-                              , indent name'
-                              ]
+        ( name', Nothing, Nothing ) ->
+          stack1
+            [ line $ keyword "import"
+            , indent name'
+            ]
 
 
-        AST.Module.ImportComment c ->
-            formatComment tabSize c
-
-
-formatListing :: Int -> (a -> Box) -> AST.Variable.Listing a -> Maybe Box
+formatListing :: Int -> (a -> [Box]) -> AST.Variable.Listing a -> Maybe Box
 formatListing tabSize format listing =
     case listing of
         AST.Variable.ClosedListing ->
@@ -592,7 +614,39 @@ formatListing tabSize format listing =
             Just $ parens tabSize $ formatCommented tabSize (line . keyword) $ fmap (const "..") comments
 
         AST.Variable.ExplicitListing vars multiline ->
-            Just $ ElmStructure.group tabSize False "(" "," ")" multiline $ map (formatCommented tabSize format) vars
+            Just $ ElmStructure.group tabSize False "(" "," ")" multiline $ format vars
+
+
+formatDetailedListing :: ElmVersion -> Int -> AST.Module.DetailedListing -> [Box]
+formatDetailedListing elmVersion tabSize listing =
+    concat
+        [ formatCommentedMap
+            tabSize
+            (\name () -> AST.Variable.OpValue name)
+            (formatVarValue elmVersion tabSize)
+            (AST.Module.operators listing)
+        , formatCommentedMap
+            tabSize
+            (\name (inner, listing) -> AST.Variable.Union (name, inner) listing)
+            (formatVarValue elmVersion tabSize)
+            (AST.Module.types listing)
+        , formatCommentedMap
+            tabSize
+            (\name () -> AST.Variable.Value name)
+            (formatVarValue elmVersion tabSize)
+            (AST.Module.values listing)
+        ]
+
+
+formatCommentedMap :: Int -> (k -> v -> a) -> (a -> Box) ->  AST.Variable.CommentedMap k v -> [Box]
+formatCommentedMap tabSize construct format values =
+    let
+        format' (k, Commented pre v post)
+            = formatCommented tabSize format $ Commented pre (construct k v) post
+    in
+    values
+        |> Map.assocs
+        |> map format'
 
 
 formatVarValue :: ElmVersion -> Int -> AST.Variable.Value -> Box
@@ -606,7 +660,14 @@ formatVarValue elmVersion tabSize aval =
 
         AST.Variable.Union name listing ->
             case
-              ( formatListing tabSize (line . formatUppercaseIdentifier elmVersion) listing
+              ( formatListing
+                  tabSize
+                  (formatCommentedMap
+                      tabSize
+                      (\name () -> name)
+                      (line . formatUppercaseIdentifier elmVersion)
+                  )
+                  listing
               , formatTailCommented tabSize (line . formatUppercaseIdentifier elmVersion) name
               , snd name
               )
@@ -635,7 +696,7 @@ formatDeclaration :: ElmVersion -> Int -> AST.Declaration.Decl -> Box
 formatDeclaration elmVersion tabSize decl =
     case decl of
         AST.Declaration.DocComment docs ->
-            formatDocComment docs
+            formatModuleDocs elmVersion tabSize docs
 
         AST.Declaration.BodyComment c ->
             formatComment tabSize c
@@ -648,7 +709,7 @@ formatDeclaration elmVersion tabSize decl =
                 AST.Declaration.TypeAnnotation name typ ->
                     formatTypeAnnotation elmVersion tabSize name typ
 
-                AST.Declaration.Datatype nameWithArgs middle final ->
+                AST.Declaration.Datatype nameWithArgs tags ->
                     let
                         ctor (tag,args') =
                             case allSingles $ map (formatHeadCommented tabSize $ formatType' elmVersion tabSize ForCtor) args' of
@@ -664,7 +725,7 @@ formatDeclaration elmVersion tabSize decl =
                                         ]
                     in
                         case
-                          (map (formatCommented tabSize ctor) middle) ++ [formatHeadCommented tabSize ctor final]
+                            formatOpenCommentedList tabSize ctor tags
                         of
                           [] -> error "List can't be empty"
                           first:rest ->
@@ -709,7 +770,7 @@ formatDeclaration elmVersion tabSize decl =
                   ElmStructure.definition "=" True
                     (line $ keyword "port")
                     [formatCommented tabSize (line . formatLowercaseIdentifier elmVersion []) name]
-                    (formatCommented' tabSize bodyComments (formatExpression elmVersion tabSize False) expr)
+                    (formatCommented' tabSize bodyComments (formatExpression elmVersion tabSize SyntaxSeparated) expr)
 
                 AST.Declaration.Fixity assoc precedenceComments precedence nameComments name ->
                     case
@@ -754,7 +815,7 @@ formatDefinition elmVersion tabSize name args comments expr =
     body =
       stack1 $ concat
         [ map (formatComment tabSize) comments
-        , [ formatExpression elmVersion tabSize False expr ]
+        , [ formatExpression elmVersion tabSize SyntaxSeparated expr ]
         ]
   in
     ElmStructure.definition "=" True
@@ -789,27 +850,35 @@ formatPattern elmVersion tabSize parensRequired apattern =
         AST.Pattern.OpPattern (SymbolIdentifier name) ->
             line $ identifier $ "(" ++ name ++ ")"
 
-        AST.Pattern.ConsPattern first rest final ->
+        AST.Pattern.ConsPattern first rest ->
             let
-              first' = formatTailCommented tabSize (formatPattern elmVersion tabSize True) first
-              rest' = map (formatCommented tabSize (formatPattern elmVersion tabSize True)) rest
-              final' = formatHeadCommented tabSize (formatPattern elmVersion tabSize True) final
+                formatRight (preOp, postOp, term, eol) =
+                    ( False
+                    , preOp
+                    , line $ punc "::"
+                    , formatCommented
+                        tabSize
+                        (formatEolCommented tabSize $ formatPattern elmVersion tabSize True)
+                        (Commented postOp (term, eol) [])
+                    )
             in
-              formatBinary
-                  tabSize
-                  False
-                  first'
-                  (map ((,,) False (line $ punc "::")) (rest'++[final']))
-              |> if parensRequired then parens tabSize else id
+                formatBinary
+                    tabSize
+                    False
+                    (formatEolCommented tabSize (formatPattern elmVersion tabSize True) first)
+                    (map formatRight rest)
+                |> if parensRequired then parens tabSize else id
 
         AST.Pattern.Data ctor [] ->
             line (formatQualifiedUppercaseIdentifier elmVersion ctor)
                 |>
-                    case ctor of
-                        [_] ->
+                    case (elmVersion, ctor) of
+                        (Elm_0_16, [_]) ->
                             id
-                        _ ->
+                        (Elm_0_16, _) ->
                             if parensRequired then parens tabSize else id
+                        _ ->
+                            id
 
         AST.Pattern.Data ctor patterns ->
             ElmStructure.application
@@ -867,6 +936,13 @@ formatRecordPair elmVersion tabSize delim formatValue (Commented pre k postK, v,
     |> (\x -> Commented pre x []) |> formatCommented tabSize id
 
 
+formatPair :: Int -> (a -> Line) -> String -> (b -> Box) -> Pair a b -> Box
+formatPair tabSize formatA delim formatB (Pair a b (ForceMultiline forceMultiline)) =
+    ElmStructure.equalsPair delim forceMultiline
+        (formatTailCommented tabSize (line . formatA) a)
+        (formatHeadCommented tabSize formatB b)
+
+
 negativeCasePatternWorkaround :: Int -> Commented AST.Pattern.Pattern -> Box -> Box
 negativeCasePatternWorkaround tabSize (Commented _ (RA.A _ pattern) _) =
     case pattern of
@@ -875,8 +951,27 @@ negativeCasePatternWorkaround tabSize (Commented _ (RA.A _ pattern) _) =
         _ -> id
 
 
-formatExpression :: ElmVersion -> Int -> Bool -> AST.Expression.Expr -> Box
-formatExpression elmVersion tabSize needsParens aexpr =
+data ExpressionContext
+    = SyntaxSeparated
+    | InfixSeparated
+    | SpaceSeparated
+    | AmbiguousEnd
+
+
+expressionParens :: Int -> ExpressionContext -> ExpressionContext -> Box -> Box
+expressionParens tabSize inner outer =
+    case (inner, outer) of
+        (SpaceSeparated, SpaceSeparated) -> parens tabSize
+        (InfixSeparated, SpaceSeparated) -> parens tabSize
+        (InfixSeparated, InfixSeparated) -> parens tabSize
+        (AmbiguousEnd, SpaceSeparated) -> parens tabSize
+        (AmbiguousEnd, InfixSeparated) -> parens tabSize
+        (InfixSeparated, AmbiguousEnd) -> parens tabSize
+        _ -> id
+
+
+formatExpression :: ElmVersion -> Int -> ExpressionContext -> AST.Expression.Expr -> Box
+formatExpression elmVersion tabSize context aexpr =
     case RA.drop aexpr of
         AST.Expression.Literal lit ->
             formatLiteral lit
@@ -889,13 +984,14 @@ formatExpression elmVersion tabSize needsParens aexpr =
                 Elm_0_16 -> formatRange_0_17 elmVersion tabSize left right multiline
                 Elm_0_17 -> formatRange_0_17 elmVersion tabSize left right multiline
                 Elm_0_18 -> formatRange_0_17 elmVersion tabSize left right multiline
-                Elm_0_18_Upgrade -> formatRange_0_18 elmVersion tabSize needsParens left right
+                Elm_0_18_Upgrade -> formatRange_0_18 elmVersion tabSize context left right
 
-        AST.Expression.EmptyList comments ->
-          formatUnit tabSize '[' ']' comments
-
-        AST.Expression.ExplicitList exprs multiline ->
-            ElmStructure.group tabSize True "[" "," "]" multiline $ map (formatCommented tabSize (formatExpression elmVersion tabSize False)) exprs
+        AST.Expression.ExplicitList exprs trailing multiline ->
+            formatSequence tabSize '[' ',' (Just ']')
+                (formatExpression elmVersion tabSize SyntaxSeparated)
+                multiline
+                trailing
+                exprs
 
         AST.Expression.Binops left ops multiline ->
             case elmVersion of
@@ -903,16 +999,17 @@ formatExpression elmVersion tabSize needsParens aexpr =
                 Elm_0_17 -> formatBinops_0_17 elmVersion tabSize left ops multiline
                 Elm_0_18 -> formatBinops_0_17 elmVersion tabSize left ops multiline
                 Elm_0_18_Upgrade -> formatBinops_0_18 elmVersion tabSize left ops multiline
+            |> expressionParens tabSize InfixSeparated context
 
         AST.Expression.Lambda patterns bodyComments expr multiline ->
             case
                 ( multiline
                 , allSingles $ map (formatCommented tabSize (formatPattern elmVersion tabSize True) . (\(c,p) -> Commented c p [])) patterns
-                , bodyComments
-                , formatExpression elmVersion tabSize False expr
+                , bodyComments == []
+                , formatExpression elmVersion tabSize SyntaxSeparated expr
                 )
             of
-                (False, Right patterns', [], SingleLine expr') ->
+                (False, Right patterns', True, SingleLine expr') ->
                     line $ row
                         [ punc "\\"
                         , row $ List.intersperse space $ patterns'
@@ -921,7 +1018,7 @@ formatExpression elmVersion tabSize needsParens aexpr =
                         , space
                         , expr'
                         ]
-                (_, Right patterns', _, _) ->
+                (_, Right patterns', _, expr') ->
                     stack1
                         [ line $ row
                             [ punc "\\"
@@ -931,19 +1028,29 @@ formatExpression elmVersion tabSize needsParens aexpr =
                             ]
                         , indent $ stack1 $
                             (map (formatComment tabSize) bodyComments)
-                            ++ [ formatExpression elmVersion tabSize False expr ]
+                            ++ [ expr' ]
                         ]
-                _ ->
-                    pleaseReport "TODO" "multiline pattern in lambda"
+                (_, Left [], _, _) ->
+                    pleaseReport "UNEXPECTED LAMBDA" "no patterns"
+                (_, Left patterns', _, expr') ->
+                    stack1
+                        [ prefix tabSize (punc "\\") $ stack1 patterns'
+                        , line $ punc "->"
+                        , indent $ stack1 $
+                            (map (formatComment tabSize) bodyComments)
+                            ++ [ expr' ]
+                        ]
+            |> expressionParens tabSize AmbiguousEnd context
 
         AST.Expression.Unary AST.Expression.Negative e ->
-            prefix tabSize (punc "-") $ formatExpression elmVersion tabSize True e
+            prefix tabSize (punc "-") $ formatExpression elmVersion tabSize SpaceSeparated e -- TODO: This might need something stronger than SpaceSeparated?
 
         AST.Expression.App left args multiline ->
           ElmStructure.application
             multiline
-            (formatExpression elmVersion tabSize True left)
-            (map (\(x,y) -> formatCommented' tabSize x (formatExpression elmVersion tabSize True) y) args)
+            (formatExpression elmVersion tabSize InfixSeparated left)
+            (map (\(x,y) -> formatCommented' tabSize x (formatExpression elmVersion tabSize SpaceSeparated) y) args)
+            |> expressionParens tabSize SpaceSeparated context
 
         AST.Expression.If if' elseifs (elsComments, els) ->
             let
@@ -966,8 +1073,8 @@ formatExpression elmVersion tabSize needsParens aexpr =
 
                 formatIf (cond, body) =
                     stack1
-                        [ opening (line $ keyword "if") $ formatCommented tabSize (formatExpression elmVersion tabSize False) cond
-                        , indent $ formatCommented_ tabSize True (formatExpression elmVersion tabSize False) body
+                        [ opening (line $ keyword "if") $ formatCommented tabSize (formatExpression elmVersion tabSize SyntaxSeparated) cond
+                        , indent $ formatCommented_ tabSize True (formatExpression elmVersion tabSize SyntaxSeparated) body
                         ]
 
                 formatElseIf (ifComments, (cond, body)) =
@@ -983,16 +1090,19 @@ formatExpression elmVersion tabSize needsParens aexpr =
                             ]
                   in
                     stack1
-                      [ opening key $ formatCommented tabSize (formatExpression elmVersion tabSize False) cond
-                      , indent $ formatCommented_ tabSize True (formatExpression elmVersion tabSize False) body
+                      [ blankLine
+                      , opening key $ formatCommented tabSize (formatExpression elmVersion tabSize SyntaxSeparated) cond
+                      , indent $ formatCommented_ tabSize True (formatExpression elmVersion tabSize SyntaxSeparated) body
                       ]
             in
                 formatIf if'
                     |> andThen (map formatElseIf elseifs)
                     |> andThen
-                        [ line $ keyword "else"
-                        , indent $ formatCommented_ tabSize True (formatExpression elmVersion tabSize False) (Commented elsComments els [])
+                        [ blankLine
+                        , line $ keyword "else"
+                        , indent $ formatCommented_ tabSize True (formatExpression elmVersion tabSize SyntaxSeparated) (Commented elsComments els [])
                         ]
+                    |> expressionParens tabSize AmbiguousEnd context
 
         AST.Expression.Let defs bodyComments expr ->
             let
@@ -1021,17 +1131,18 @@ formatExpression elmVersion tabSize needsParens aexpr =
                         )
                     |> andThen
                         [ line $ keyword "in"
-                        , indent $ stack1 $
+                        , stack1 $
                             (map (formatComment tabSize) bodyComments)
-                            ++ [formatExpression elmVersion tabSize False expr]
+                            ++ [formatExpression elmVersion tabSize SyntaxSeparated expr]
                         ]
+                    |> expressionParens tabSize AmbiguousEnd context -- TODO: not tested
 
         AST.Expression.Case (subject,multiline) clauses ->
             let
                 opening =
                   case
                     ( multiline
-                    , formatCommented tabSize (formatExpression elmVersion tabSize False) subject
+                    , formatCommented tabSize (formatExpression elmVersion tabSize SyntaxSeparated) subject
                     )
                   of
                       (False, SingleLine subject') ->
@@ -1056,7 +1167,7 @@ formatExpression elmVersion tabSize needsParens aexpr =
                           |> negativeCasePatternWorkaround tabSize pat
                       , formatCommentedStack tabSize (formatPattern elmVersion tabSize False) pat
                           |> negativeCasePatternWorkaround tabSize pat
-                      , formatHeadCommentedStack tabSize (formatExpression elmVersion tabSize False) expr
+                      , formatHeadCommentedStack tabSize (formatExpression elmVersion tabSize SyntaxSeparated) expr
                       )
                     of
                         (_, _, SingleLine pat', body') ->
@@ -1084,47 +1195,39 @@ formatExpression elmVersion tabSize needsParens aexpr =
                             |> List.intersperse blankLine
                             |> map indent
                         )
+                    |> expressionParens tabSize AmbiguousEnd context -- TODO: not tested
 
         AST.Expression.Tuple exprs multiline ->
-            ElmStructure.group tabSize True "(" "," ")" multiline $ map (formatCommented tabSize (formatExpression elmVersion tabSize False)) exprs
+            ElmStructure.group tabSize True "(" "," ")" multiline $ map (formatCommented tabSize (formatExpression elmVersion tabSize SyntaxSeparated)) exprs
 
         AST.Expression.TupleFunction n ->
             line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
 
         AST.Expression.Access expr field ->
-            formatExpression elmVersion tabSize True expr -- TODO: needs to have parens in some cases (does passing True resolve this?)
+            formatExpression elmVersion tabSize SpaceSeparated expr -- TODO: does this need a different context than SpaceSeparated?
                 |> addSuffix (row $ [punc ".", formatLowercaseIdentifier elmVersion [] field])
 
         AST.Expression.AccessFunction (LowercaseIdentifier field) ->
             line $ identifier $ "." ++ (formatVarName' elmVersion field)
 
-        AST.Expression.RecordUpdate _ [] _ ->
-          pleaseReport "INVALID RECORD UPDATE" "no fields"
-
-        AST.Expression.RecordUpdate base (first:rest) multiline ->
-          ElmStructure.extensionGroup
-            tabSize
-            multiline
-            (formatCommented tabSize (formatExpression elmVersion tabSize False) base)
-            (formatRecordPair elmVersion tabSize "=" (formatExpression elmVersion tabSize False) first)
-            (map (formatRecordPair elmVersion tabSize "=" (formatExpression elmVersion tabSize False)) rest)
-
-        AST.Expression.Record pairs' multiline ->
-          ElmStructure.group tabSize True "{" "," "}" multiline $ map (formatRecordPair elmVersion tabSize "=" (formatExpression elmVersion tabSize False)) pairs'
-
-        AST.Expression.EmptyRecord [] ->
-            line $ punc "{}"
-
-        AST.Expression.EmptyRecord comments ->
-            case stack1 $ map (formatComment tabSize) comments of
-                SingleLine comments' ->
-                    line $ row [ punc "{", comments', punc "}" ]
-
-                comments' ->
-                    comments'
+        AST.Expression.Record base fields trailing multiline ->
+            formatRecordLike
+                tabSize
+                (line . formatLowercaseIdentifier elmVersion [])
+                (formatLowercaseIdentifier elmVersion [])
+                "="
+                (formatExpression elmVersion tabSize SyntaxSeparated)
+                base fields trailing multiline
 
         AST.Expression.Parens expr ->
-            parens tabSize $ formatCommented tabSize (formatExpression elmVersion tabSize False) expr
+            case expr of
+                Commented [] expr' [] ->
+                    formatExpression elmVersion tabSize context expr'
+
+                _ ->
+                    formatCommented tabSize (formatExpression elmVersion tabSize SyntaxSeparated) expr
+                        |> parens tabSize
+
 
         AST.Expression.Unit comments ->
             formatUnit tabSize '(' ')' comments
@@ -1137,20 +1240,71 @@ formatExpression elmVersion tabSize needsParens aexpr =
             ]
 
 
-formatBinops_0_17 :: ElmVersion -> Int -> AST.Expression.Expr -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)] -> Bool -> Box
-formatBinops_0_17 elmVersion tabSize left ops multiline =
+formatRecordLike ::
+    Int
+    -> (base -> Box) -> (key -> Line) -> String -> (value -> Box)
+    -> Maybe (Commented base) -> Sequence (Pair key value)-> Comments -> ForceMultiline
+    -> Box
+formatRecordLike tabSize formatBase formatKey fieldSep formatValue base' fields trailing multiline =
+    case (base', fields) of
+      ( Just base, pairs' ) ->
+          ElmStructure.extensionGroup'
+              tabSize
+              ((\(ForceMultiline b) -> b) multiline)
+              (formatCommented tabSize formatBase base)
+              (formatSequence
+                  tabSize
+                  '|' ',' Nothing
+                  (formatPair tabSize formatKey fieldSep formatValue)
+                  multiline
+                  trailing
+                  pairs')
+
+      ( Nothing, pairs' ) ->
+          formatSequence
+              tabSize
+              '{' ',' (Just '}')
+              (formatPair tabSize formatKey fieldSep formatValue)
+              multiline
+              trailing
+              pairs'
+
+
+formatSequence :: Int -> Char -> Char -> Maybe Char -> (a -> Box) -> ForceMultiline -> Comments -> Sequence a -> Box
+formatSequence tabSize left delim right formatA (ForceMultiline multiline) trailing (first:rest) =
     let
-        formatPair ( po, o, pe, e ) =
-            ( o == AST.Variable.OpRef (SymbolIdentifier "<|")
-            , formatCommented' tabSize po (line . formatInfixVar elmVersion) o
-            , formatCommented' tabSize pe (formatExpression elmVersion tabSize False) e
-            )
+        formatItem delim (pre, item) =
+            maybe id (stack' . stack' blankLine) (formatComments tabSize pre) $
+            prefix tabSize (row [ punc [delim], space ]) $
+            formatHeadCommented tabSize (formatEolCommented tabSize formatA) item
     in
-        formatBinary
-            tabSize
-            multiline
-            (formatExpression elmVersion tabSize False left)
-            (map formatPair ops)
+        ElmStructure.forceableSpaceSepOrStack multiline
+            (ElmStructure.forceableRowOrStack multiline
+                (formatItem left first)
+                (map (formatItem delim) rest)
+            )
+            (maybe [] (flip (:) [] . stack' blankLine) (formatComments tabSize trailing) ++ (Maybe.maybeToList $ fmap (line . punc . flip (:) []) right))
+formatSequence tabSize left _ (Just right) _ _ trailing [] =
+    formatUnit tabSize left right trailing
+formatSequence tabSize left _ Nothing _ _ trailing [] =
+    formatUnit tabSize left ' ' trailing
+
+
+mapIsLast :: (Bool -> a -> b) -> [a] -> [b]
+mapIsLast _ [] = []
+mapIsLast f (last:[]) = f True last : []
+mapIsLast f (next:rest) = f False next : mapIsLast f rest
+
+
+formatBinops_0_17 ::
+    ElmVersion
+    -> Int
+    -> AST.Expression.Expr
+    -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)]
+    -> Bool
+    -> Box
+formatBinops_0_17 elmVersion tabSize left ops multiline =
+    formatBinops_common (,) elmVersion tabSize left ops multiline
 
 
 formatBinops_0_18 ::
@@ -1161,20 +1315,47 @@ formatBinops_0_18 ::
     -> Bool
     -> Box
 formatBinops_0_18 elmVersion tabSize left ops multiline =
-    let
-        (left', ops') = removeBackticks left ops
+    formatBinops_common removeBackticks elmVersion tabSize left ops multiline
 
-        formatPair ( po, o, pe, e ) =
-            ( o == AST.Variable.OpRef (SymbolIdentifier "<|")
-            , formatCommented' tabSize po (line . formatInfixVar elmVersion) o
-            , formatCommented' tabSize pe (formatExpression elmVersion tabSize False) e
+
+formatBinops_common ::
+    (AST.Expression.Expr
+        -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)]
+        -> ( AST.Expression.Expr
+           , [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)]
+           )
+    )
+    -> ElmVersion
+    -> Int
+    -> AST.Expression.Expr
+    -> [(Comments, AST.Variable.Ref, Comments, AST.Expression.Expr)]
+    -> Bool
+    -> Box
+formatBinops_common transform elmVersion tabSize left ops multiline =
+    let
+        (left', ops') = transform left ops
+
+        formatPair isLast ( po, o, pe, e ) =
+            let
+                isLeftPipe =
+                    o == AST.Variable.OpRef (SymbolIdentifier "<|")
+
+                formatContext =
+                    if isLeftPipe && isLast
+                        then AmbiguousEnd
+                        else InfixSeparated
+            in
+            ( isLeftPipe
+            , po
+            , (line . formatInfixVar elmVersion) o
+            , formatCommented' tabSize pe (formatExpression elmVersion tabSize formatContext) e
             )
     in
         formatBinary
             tabSize
             multiline
-            (formatExpression elmVersion tabSize False left')
-            (map formatPair ops')
+            (formatExpression elmVersion tabSize InfixSeparated left')
+            (mapIsLast formatPair ops')
 
 
 removeBackticks ::
@@ -1191,10 +1372,7 @@ removeBackticks left ops =
             let
                 e' = noRegion $ AST.Expression.App
                     (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef v' v)
-                    [ if needsParensInSpaces e then
-                          (post, noRegion $ AST.Expression.Parens (Commented [] e []))
-                      else
-                          (post, e)
+                    [ (post, e)
                     ]
                     (FAJoinFirst JoinAll)
 
@@ -1207,14 +1385,8 @@ removeBackticks left ops =
             removeBackticks
                 (noRegion $ AST.Expression.App
                     (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef v' v)
-                    [ if needsParensInSpaces left then
-                          (pre, noRegion $ AST.Expression.Parens (Commented [] left []))
-                      else
-                          (pre, left)
-                    , if needsParensInSpaces e then
-                          (post, noRegion $ AST.Expression.Parens (Commented [] e []))
-                      else
-                          (post, e)
+                    [ (pre, left)
+                    , (post, e)
                     ]
                     (FAJoinFirst JoinAll)
                 )
@@ -1232,8 +1404,8 @@ formatRange_0_17 :: ElmVersion -> Int -> Commented AST.Expression.Expr -> Commen
 formatRange_0_17 elmVersion tabSize left right multiline =
     case
         ( multiline
-        , formatCommented tabSize (formatExpression elmVersion tabSize False) left
-        , formatCommented tabSize (formatExpression elmVersion tabSize False) right
+        , formatCommented tabSize (formatExpression elmVersion tabSize SyntaxSeparated) left
+        , formatCommented tabSize (formatExpression elmVersion tabSize SyntaxSeparated) right
         )
     of
         (False, SingleLine left', SingleLine right') ->
@@ -1262,25 +1434,18 @@ noRegion :: a -> RA.Located a
 noRegion =
     RA.at nowhere nowhere
 
-formatRange_0_18 :: ElmVersion -> Int -> Bool -> Commented AST.Expression.Expr -> Commented AST.Expression.Expr -> Box
-formatRange_0_18 elmVersion tabSize needsParens left right =
+formatRange_0_18 :: ElmVersion -> Int -> ExpressionContext -> Commented AST.Expression.Expr -> Commented AST.Expression.Expr -> Box
+formatRange_0_18 elmVersion tabSize context left right =
     case (left, right) of
         (Commented preLeft left' [], Commented preRight right' []) ->
             AST.Expression.App
                 (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
-                [ if needsParensInSpaces left' then
-                      ([], noRegion $ AST.Expression.Parens left)
-                  else
-                      (preLeft, left')
-                , if needsParensInSpaces right' then
-                      ([], noRegion $ AST.Expression.Parens right)
-                  else
-                      (preRight, right')
+                [ (preLeft, left')
+                , (preRight, right')
                 ]
                 (FAJoinFirst JoinAll)
                 |> noRegion
-                |> formatExpression elmVersion tabSize False
-                |> if needsParens then parens tabSize else id
+                |> formatExpression elmVersion tabSize context
 
         _ ->
             AST.Expression.App
@@ -1290,8 +1455,7 @@ formatRange_0_18 elmVersion tabSize needsParens left right =
                 ]
                 (FAJoinFirst JoinAll)
                 |> noRegion
-                |> formatExpression elmVersion tabSize False
-                |> if needsParens then parens tabSize else id
+                |> formatExpression elmVersion tabSize context
 
 
 formatUnit :: Int -> Char -> Char -> Comments -> Box
@@ -1313,22 +1477,24 @@ formatUnit tabSize left right comments =
             stack1 comments'
 
 
+formatComments :: Int -> Comments -> Maybe Box
+formatComments tabSize comments =
+    case fmap (formatComment tabSize) comments of
+        [] ->
+            Nothing
+
+        (first:rest) ->
+            Just $ ElmStructure.spaceSepOrStack first rest
+
+
 formatCommented_ :: Int -> Bool -> (a -> Box) -> Commented a -> Box
 formatCommented_ tabSize forceMultiline format (Commented pre inner post) =
-    case
-        ( forceMultiline
-        , allSingles $ fmap (formatComment tabSize) pre
-        , allSingles $ fmap (formatComment tabSize) post
-        , format inner
-        )
-    of
-        ( False, Right pre', Right post', SingleLine inner' ) ->
-            line $ row $ List.intersperse space $ concat [pre', [inner'], post']
-        (_, _, _, inner') ->
-            stack1 $
-                (map (formatComment tabSize) pre)
-                ++ [ inner' ]
-                ++ ( map (formatComment tabSize) post)
+    ElmStructure.forceableSpaceSepOrStack1 forceMultiline $
+        concat
+            [ Maybe.maybeToList $ (formatComments tabSize) pre
+            , [format inner]
+            , Maybe.maybeToList $ (formatComments tabSize) post
+            ]
 
 
 formatCommented :: Int -> (a -> Box) -> Commented a -> Box
@@ -1336,6 +1502,7 @@ formatCommented tabSize =
   formatCommented_ tabSize False
 
 
+-- TODO: rename to formatPreCommented
 formatHeadCommented :: Int -> (a -> Box) -> (Comments, a) -> Box
 formatHeadCommented tabSize format (pre, inner) =
     formatCommented' tabSize pre format inner
@@ -1349,6 +1516,16 @@ formatCommented' tabSize pre format inner =
 formatTailCommented :: Int -> (a -> Box) -> (a, Comments) -> Box
 formatTailCommented tabSize format (inner, post) =
   formatCommented tabSize format (Commented [] inner post)
+
+
+formatEolCommented :: Int -> (a -> Box) -> WithEol a -> Box
+formatEolCommented tabSize format (inner, post) =
+  case (post, format inner) of
+    (Nothing, box) -> box
+    (Just eol, SingleLine result) ->
+      mustBreak $ row [ result, space, punc "--", literal eol ]
+    (Just eol, box) ->
+      stack1 [ box, formatComment tabSize $ LineComment eol ]
 
 
 formatCommentedStack :: Int -> (a -> Box) -> Commented a -> Box
@@ -1369,6 +1546,12 @@ formatKeywordCommented tabSize word format (KeywordCommented pre post value) =
   ElmStructure.spaceSepOrIndented
     (formatCommented tabSize (line . keyword) (Commented pre word post))
     [ format value ]
+
+
+formatOpenCommentedList :: Int -> (a -> Box) -> OpenCommentedList a -> [Box]
+formatOpenCommentedList tabSize format (OpenCommentedList rest (preLst, lst)) =
+    (fmap (formatCommented tabSize $ formatEolCommented tabSize format) rest)
+        ++ [formatCommented tabSize (formatEolCommented tabSize format) $ Commented preLst lst []]
 
 
 formatComment :: Int -> Comment -> Box
@@ -1494,16 +1677,23 @@ formatString style s =
 
     escapeMultiQuote =
         let
-            quote =
-                Regex.sym '"'
+            step okay quotes remaining =
+                case remaining of
+                    [] ->
+                        reverse $ (concat $ replicate quotes "\"\\") ++ okay
 
-            oneOrMoreQuotes =
-                Regex.some quote
-
-            escape =
-                ("\\\"\\\"\\" ++) . (List.intersperse '\\')
+                    next : rest ->
+                        if next == '"' then
+                            step okay (quotes + 1) rest
+                        else if quotes >= 3 then
+                            step (next : (concat $ replicate quotes "\"\\") ++ okay) 0 rest
+                        else if quotes > 0 then
+                            step (next : (replicate quotes '"') ++ okay) 0 rest
+                        else
+                            step (next : okay) 0 rest
         in
-            Regex.replace $ escape <$> oneOrMoreQuotes <* quote <* quote
+            step "" 0
+
 
 
 data TypeParensRequired
@@ -1511,39 +1701,6 @@ data TypeParensRequired
     | ForCtor
     | NotRequired
     deriving (Eq)
-
-
-needsParensInSpaces :: AST.Expression.Expr -> Bool
-needsParensInSpaces (RA.A _ expr) =
-    case expr of
-      AST.Expression.Unit _ -> False
-      AST.Expression.Literal _ -> False
-      AST.Expression.VarExpr _-> False
-
-      AST.Expression.App _ _ _ -> True
-      AST.Expression.Unary _ _ -> False
-      AST.Expression.Binops _ _ _ -> True
-      AST.Expression.Parens _ -> False
-
-      AST.Expression.EmptyList _ -> False
-      AST.Expression.ExplicitList _ _ -> False
-      AST.Expression.Range _ _ _ -> False
-
-      AST.Expression.Tuple _ _ -> False
-      AST.Expression.TupleFunction _ -> False
-
-      AST.Expression.EmptyRecord _ -> False
-      AST.Expression.Record _ _ -> False
-      AST.Expression.RecordUpdate _ _ _ -> False
-      AST.Expression.Access _ _ -> False
-      AST.Expression.AccessFunction _ -> False
-
-      AST.Expression.Lambda _ _ _ _ -> True -- Maybe should be False?
-      AST.Expression.If _ _ _ -> True
-      AST.Expression.Let _ _ _ -> True
-      AST.Expression.Case _ _ -> True
-
-      AST.Expression.GLShader _ -> False
 
 
 formatType :: ElmVersion -> Int -> Type -> Box
@@ -1575,31 +1732,28 @@ formatType' elmVersion tabSize requireParens atype =
         UnitType comments ->
           formatUnit tabSize '(' ')' comments
 
-        FunctionType first rest final forceMultiline ->
-            case
-              ( forceMultiline
-              , allSingles $
-                  concat
-                    [ [formatTailCommented tabSize (formatType' elmVersion tabSize ForLambda) first]
-                    , map (formatCommented tabSize $ formatType' elmVersion tabSize ForLambda) rest
-                    , [formatHeadCommented tabSize (formatType' elmVersion tabSize ForLambda) final]
-                    ]
-              )
-            of
-                (False, Right typs) ->
-                  line $ row $ List.intersperse (row [ space, keyword "->", space]) typs
-                (True, Right []) ->
-                  pleaseReport "INVALID FUNCTION TYPE" "no terms"
-                (True, Right (first':rest')) ->
-                  (line first')
-                    |> andThen (rest' |> map line |> map (prefix tabSize $ row [keyword "->", space]))
-                (_, Left []) ->
-                  pleaseReport "INVALID FUNCTION TYPE" "no terms"
-                (_, Left (first':rest')) ->
-                  first'
-                    |> andThen (rest' |> map (prefix tabSize $ row [keyword "->", space]))
-
-            |> (if requireParens /= NotRequired then parens tabSize else id)
+        FunctionType first rest (ForceMultiline forceMultiline) ->
+            let
+                formatRight (preOp, postOp, term, eol) =
+                    ElmStructure.forceableSpaceSepOrStack1
+                        False
+                        $ concat
+                            [ Maybe.maybeToList $ formatComments tabSize preOp
+                            , [ ElmStructure.prefixOrIndented
+                                  (line $ punc "->")
+                                  (formatCommented
+                                      tabSize
+                                      (formatEolCommented tabSize $ formatType' elmVersion tabSize ForLambda)
+                                      (Commented postOp (term, eol) [])
+                                  )
+                              ]
+                            ]
+            in
+                ElmStructure.forceableSpaceSepOrStack
+                    forceMultiline
+                    (formatEolCommented tabSize (formatType' elmVersion tabSize ForLambda) first)
+                    (map formatRight rest)
+                |> if requireParens /= NotRequired then parens tabSize else id
 
         TypeVariable var ->
             line $ identifier $ formatVarName elmVersion var
@@ -1615,24 +1769,16 @@ formatType' elmVersion tabSize requireParens atype =
           parens tabSize $ formatCommented tabSize (formatType elmVersion tabSize) type'
 
         TupleType types ->
-          ElmStructure.group tabSize True "(" "," ")" False (map (formatCommented tabSize (formatType elmVersion tabSize)) types)
+          ElmStructure.group tabSize True "(" "," ")" False (map (formatCommented tabSize (formatEolCommented tabSize $ formatType elmVersion tabSize)) types)
 
-        EmptyRecordType comments ->
-          formatUnit tabSize '{' '}' comments
-
-        RecordType fields multiline ->
-          ElmStructure.group tabSize True "{" "," "}" multiline (map (formatRecordPair elmVersion tabSize ":" (formatType elmVersion tabSize)) fields)
-
-        RecordExtensionType _ [] _ ->
-          pleaseReport "INVALID RECORD TYPE EXTENSION" "no fields"
-
-        RecordExtensionType ext (first:rest) multiline ->
-          ElmStructure.extensionGroup
-            tabSize
-            multiline
-            (formatCommented tabSize (line . formatLowercaseIdentifier elmVersion []) ext)
-            (formatRecordPair elmVersion tabSize ":" (formatType elmVersion tabSize) first)
-            (map (formatRecordPair elmVersion tabSize ":" (formatType elmVersion tabSize)) rest)
+        RecordType base fields trailing multiline ->
+            formatRecordLike
+                tabSize
+                (line . formatLowercaseIdentifier elmVersion [])
+                (formatLowercaseIdentifier elmVersion [])
+                ":"
+                (formatType elmVersion tabSize)
+                base fields trailing multiline
 
 
 formatVar :: ElmVersion -> AST.Variable.Ref -> Line

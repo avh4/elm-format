@@ -4,11 +4,14 @@ module ElmFormat where
 import Elm.Utils ((|>))
 import System.Exit (exitFailure, exitSuccess)
 import Messages.Types
+import Messages.Formatter.Format
 import Control.Monad (when)
+import Control.Monad.Free
 import Data.Maybe (isJust)
 import CommandLine.Helpers
 import ElmVersion
-
+import ElmFormat.FileStore (FileStore)
+import ElmFormat.Operation (Operation)
 
 import qualified AST.Module
 import qualified Flags
@@ -17,25 +20,29 @@ import qualified Data.ByteString.Char8 as Char8
 import qualified Data.ByteString.Lazy as Lazy
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
+import qualified ElmFormat.Execute as Execute
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
+import qualified ElmFormat.FileStore as FileStore
 import qualified ElmFormat.Filesystem as FS
+import qualified ElmFormat.Operation as Operation
+import qualified ElmFormat.Version
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Result as Result
-import qualified System.Directory as Dir
 
 
 -- If elm-format was successful and formatted result differ
 -- from original content, writes the results to the output file.
 -- Otherwise, display errors and exit
 writeResult
-    :: ElmVersion
+    :: Operation f =>
+    ElmVersion
     -> Int
     -> Destination
     -> FilePath
     -> Text.Text
     -> Result.Result () Syntax.Error AST.Module.Module
-    -> IO (Maybe Bool)
+    -> Free f (Maybe Bool)
 writeResult elmVersion tabSize destination inputFile inputText result =
     case result of
         Result.Result _ (Result.Ok modu) ->
@@ -48,13 +55,14 @@ writeResult elmVersion tabSize destination inputFile inputText result =
             in
                 case destination of
                     UpdateInPlace ->
-                        (Char8.putStr rendered)
-                        >> (return Nothing)
+                        Operation.deprecatedIO $
+                        Char8.putStr rendered
+                        >> return Nothing
 
                     ValidateOnly ->
                         if inputText /= renderedText then
-                            (putStrLn $ r $ FileWouldChange inputFile)
-                            >> (return $ Just False)
+                            onInfo (FileWouldChange inputFile)
+                            >> return (Just False)
                         else
                             return $ Just True
 
@@ -64,55 +72,47 @@ writeResult elmVersion tabSize destination inputFile inputText result =
                                 inputFile /= path || inputText /= renderedText
                         in
                             if shouldWriteToFile then
-                                (ByteString.writeFile path rendered)
-                                >> (return Nothing)
+                                Operation.deprecatedIO $
+                                ByteString.writeFile path rendered
+                                >> return Nothing
                             else
                                 return Nothing
 
         Result.Result _ (Result.Err errs) ->
-            do
-                showErrors inputFile (Text.unpack inputText) errs
-                exitFailure
+            onInfo (ParseError inputFile (Text.unpack inputText) errs)
+            >> return (Just False)
 
 
-processTextInput :: ElmVersion -> Int -> Destination -> FilePath -> Text.Text -> IO (Maybe Bool)
+processTextInput :: Operation f => ElmVersion -> Int -> Destination -> FilePath -> Text.Text -> Free f (Maybe Bool)
 processTextInput elmVersion tabSize destination inputFile inputText =
     Parse.parse inputText
         |> writeResult elmVersion tabSize destination inputFile inputText
 
 
-processFileInput :: ElmVersion -> Int -> FilePath -> Destination -> IO (Maybe Bool)
+processFileInput :: Operation f => ElmVersion -> Int -> FilePath -> Destination -> Free f (Maybe Bool)
 processFileInput elmVersion tabSize inputFile destination =
     do
-        inputText <- fmap Text.decodeUtf8 $ ByteString.readFile inputFile
+        inputText <- Operation.deprecatedIO $ fmap Text.decodeUtf8 $ ByteString.readFile inputFile
         processTextInput elmVersion tabSize destination inputFile inputText
 
 
-isEitherFileOrDirectory :: FilePath -> IO Bool
-isEitherFileOrDirectory path = do
-    fileExists <- Dir.doesFileExist path
-    dirExists <- Dir.doesDirectoryExist path
-    return $ fileExists || dirExists
-
-
-resolveFile :: FilePath -> IO (Either InputFileMessage [FilePath])
+resolveFile :: FileStore f => FilePath -> Free f (Either InputFileMessage [FilePath])
 resolveFile path =
     do
-        isFile <- Dir.doesFileExist path
-        isDirectory <- Dir.doesDirectoryExist path
+        fileType <- FileStore.stat path
 
-        case (isFile, isDirectory) of
-            ( True, _ ) ->
+        case fileType of
+            FileStore.IsFile ->
                 return $ Right [path]
 
-            ( _, True ) ->
+            FileStore.IsDirectory ->
                 do
                     elmFiles <- FS.findAllElmFiles path
                     case elmFiles of
                         [] -> return $ Left $ NoElmFiles path
                         _ -> return $ Right elmFiles
 
-            ( False, False ) ->
+            FileStore.DoesNotExist ->
                 return $ Left $ FileDoesNotExist path
 
 
@@ -136,7 +136,7 @@ collectErrors list =
         foldl step (Right []) list
 
 
-resolveFiles :: [FilePath] -> IO (Either [InputFileMessage] [FilePath])
+resolveFiles :: FileStore f => [FilePath] -> Free f (Either [InputFileMessage] [FilePath])
 resolveFiles inputFiles =
     do
         result <- collectErrors <$> mapM resolveFile inputFiles
@@ -148,22 +148,29 @@ resolveFiles inputFiles =
                 return $ Right $ concat files
 
 
-handleFilesInput :: [FilePath] -> Maybe FilePath -> Bool -> Bool -> Int ->  ElmVersion -> IO (Maybe Bool)
-handleFilesInput inputFiles outputFile autoYes validateOnly tabSize elmVersion =
+handleFilesInput :: Operation f => ElmVersion -> Int -> [FilePath] -> Maybe FilePath -> Bool -> Bool -> Free f (Maybe Bool)
+handleFilesInput elmVersion tabSize inputFiles outputFile autoYes validateOnly =
     do
         elmFiles <- resolveFiles inputFiles
 
         case elmFiles of
             Left errors ->
+                Operation.deprecatedIO $
                 do
                     putStrLn $ r $ BadInputFiles errors
                     exitFailure
 
             Right [inputFile] -> do
                 realOutputFile <- decideOutputFile autoYes inputFile outputFile
-                let destination = if validateOnly then ValidateOnly else ToFile realOutputFile
-                putStrLn $ (r $ ProcessingFiles $ [inputFile])
-                processFileInput elmVersion tabSize inputFile destination
+                case realOutputFile of
+                    Nothing ->
+                        return Nothing
+
+                    Just realOutputFile' ->
+                        do
+                            let destination = if validateOnly then ValidateOnly else ToFile realOutputFile'
+                            onInfo $ ProcessingFiles [inputFile]
+                            processFileInput elmVersion tabSize inputFile destination
 
             Right elmFiles -> do
                 when (isJust outputFile)
@@ -188,7 +195,7 @@ handleFilesInput inputFiles outputFile autoYes validateOnly tabSize elmVersion =
                                     ToFile file
                         in
                             do
-                                putStrLn $ (r $ ProcessingFiles elmFiles)
+                                onInfo $ ProcessingFiles elmFiles
                                 validationResults <- mapM (\file -> processFileInput elmVersion tabSize file (dst file)) elmFiles
                                 return $ foldl merge Nothing validationResults
                     else
@@ -214,25 +221,25 @@ data Destination
     | ToFile FilePath
 
 
-determineSource :: Bool -> [FilePath] -> Either Message Source
+determineSource :: Bool -> [FilePath] -> Either ErrorMessage Source
 determineSource stdin inputFiles =
     case ( stdin, inputFiles ) of
         ( True, [] ) -> Right Stdin
-        ( False, [] ) -> Left Error_NoInputs
+        ( False, [] ) -> Left NoInputs
         ( False, first:rest ) -> Right $ FromFiles first rest
-        ( True, _:_ ) -> Left Error_TooManyInputs
+        ( True, _:_ ) -> Left TooManyInputs
 
 
-determineDestination :: Maybe FilePath -> Bool -> Either Message Destination
+determineDestination :: Maybe FilePath -> Bool -> Either ErrorMessage Destination
 determineDestination output validate =
     case ( output, validate ) of
         ( Nothing, True ) -> Right ValidateOnly
         ( Nothing, False ) -> Right UpdateInPlace
         ( Just path, False ) -> Right $ ToFile path
-        ( Just _, True ) -> Left Error_OutputAndValidate
+        ( Just _, True ) -> Left OutputAndValidate
 
 
-determineWhatToDo :: Source -> Destination -> Either Message WhatToDo
+determineWhatToDo :: Source -> Destination -> Either ErrorMessage WhatToDo
 determineWhatToDo source destination =
     case ( source, destination ) of
         ( _, ValidateOnly ) -> Right $ Validate source
@@ -240,10 +247,10 @@ determineWhatToDo source destination =
         ( Stdin, ToFile output ) -> Right $ StdinToFile output
         ( FromFiles first [], ToFile output ) -> Right $ FormatToFile first output
         ( FromFiles first rest, UpdateInPlace ) -> Right $ FormatInPlace first rest
-        ( FromFiles _ _, ToFile _ ) -> Left Error_SingleOutputWithMultipleInputs
+        ( FromFiles _ _, ToFile _ ) -> Left SingleOutputWithMultipleInputs
 
 
-determineWhatToDoFromConfig :: Flags.Config -> Either Message WhatToDo
+determineWhatToDoFromConfig :: Flags.Config -> Either ErrorMessage WhatToDo
 determineWhatToDoFromConfig config =
     do
         source <- determineSource (Flags._stdin config) (Flags._input config)
@@ -251,40 +258,37 @@ determineWhatToDoFromConfig config =
         determineWhatToDo source destination
 
 
-validate :: ElmVersion -> Int -> Source -> IO ()
+validate :: Operation f => ElmVersion -> Int -> Source -> Free f Bool
 validate elmVersion tabSize source =
     do
         result <-
             case source of
                 Stdin ->
                     do
-                        input <- Lazy.getContents
+                        input <- Operation.deprecatedIO Lazy.getContents
 
                         Lazy.toStrict input
                             |> Text.decodeUtf8
                             |> processTextInput elmVersion tabSize ValidateOnly "<STDIN>"
 
                 FromFiles first rest ->
-                    handleFilesInput (first:rest) Nothing True True tabSize elmVersion
+                    handleFilesInput elmVersion tabSize (first:rest) Nothing True True
 
         case result of
             Nothing ->
                 error "Validation should always give a result"
 
-            Just True ->
-                exitSuccess
-
-            Just False ->
-                exitFailure
+            Just isSuccess ->
+                return isSuccess
 
 
-exitWithError :: Message -> IO ()
+exitWithError :: ErrorMessage -> IO ()
 exitWithError message =
     (putStrLn $ r $ message)
         >> exitFailure
 
 
-determineVersion :: ElmVersion -> Bool -> Either Message ElmVersion
+determineVersion :: ElmVersion -> Bool -> Either ErrorMessage ElmVersion
 determineVersion elmVersion upgrade =
     case (elmVersion, upgrade) of
         (Elm_0_18, True) ->
@@ -297,17 +301,32 @@ determineVersion elmVersion upgrade =
             Right elmVersion
 
 
+exit :: Bool -> IO ()
+exit True = exitSuccess
+exit False = exitFailure
+
+
+elmFormatVersion :: String
+elmFormatVersion =
+    ElmFormat.Version.asString
+
+
+experimental :: Maybe String
+experimental =
+    ElmFormat.Version.experimental
+
+
 main :: ElmVersion -> IO ()
 main defaultVersion =
     do
-        config <- Flags.parse defaultVersion
+        config <- Flags.parse defaultVersion elmFormatVersion experimental
         let autoYes = Flags._yes config
         let tabSize = Flags._tabSize config
         let elmVersionResult = determineVersion (Flags._elmVersion config) (Flags._upgrade config)
 
         case (elmVersionResult, determineWhatToDoFromConfig config) of
-            (_, Left Error_NoInputs) ->
-                Flags.showHelpText defaultVersion
+            (_, Left NoInputs) ->
+                Flags.showHelpText defaultVersion elmFormatVersion experimental
                     >> exitFailure
 
             (_, Left message) ->
@@ -317,29 +336,33 @@ main defaultVersion =
                 exitWithError message
 
             (Right elmVersion, Right (Validate source)) ->
-                validate elmVersion tabSize source
+                do
+                    isSuccess <-
+                        validate elmVersion tabSize source
+                            |> Execute.run (Execute.forMachine elmVersion)
+                    exit isSuccess
 
             (Right elmVersion, Right (FormatInPlace first rest)) ->
                 do
-                    result <- handleFilesInput (first:rest) Nothing autoYes False tabSize elmVersion
+                    result <- foldFree Execute.forHuman $ handleFilesInput elmVersion tabSize (first:rest) Nothing autoYes False
                     case result of
-                        Nothing ->
-                            exitSuccess
+                        Just False ->
+                            exitFailure
 
-                        Just _ ->
-                            error "There shouldn't be a validation result when formatting"
+                        _ ->
+                            exitSuccess
 
             (Right elmVersion, Right (FormatToFile input output)) ->
                 do
-                    result <- handleFilesInput [input] (Just output) autoYes False tabSize elmVersion
+                    result <- foldFree Execute.forHuman $ handleFilesInput elmVersion tabSize [input] (Just output) autoYes False
                     case result of
-                        Nothing ->
+                        Just False ->
+                            exitFailure
+
+                        _ ->
                             exitSuccess
 
-                        Just _ ->
-                            error "There shouldn't be a validation result when formatting"
-
-            (Right elmVersion, Right (StdinToStdout)) ->
+            (Right elmVersion, Right StdinToStdout) ->
                 do
                     input <- Lazy.getContents
 
@@ -347,12 +370,13 @@ main defaultVersion =
                         Lazy.toStrict input
                             |> Text.decodeUtf8
                             |> processTextInput elmVersion tabSize UpdateInPlace "<STDIN>"
+                            |> foldFree Execute.forHuman
                     case result of
-                        Nothing ->
-                            exitSuccess
+                        Just False ->
+                            exitFailure
 
-                        Just _ ->
-                            error "There shouldn't be a validation result when formatting"
+                        _ ->
+                            exitSuccess
 
             (Right elmVersion, Right (StdinToFile output)) ->
                 do
@@ -362,9 +386,10 @@ main defaultVersion =
                         Lazy.toStrict input
                             |> Text.decodeUtf8
                             |> processTextInput elmVersion tabSize (ToFile output) "<STDIN>"
+                            |> foldFree Execute.forHuman
                     case result of
-                        Nothing ->
-                            exitSuccess
+                        Just False ->
+                            exitFailure
 
-                        Just _ ->
-                            error "There shouldn't be a validation result when formatting"
+                        _ ->
+                            exitSuccess

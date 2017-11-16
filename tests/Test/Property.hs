@@ -3,23 +3,20 @@ module Test.Property where
 import Prelude hiding ((>>))
 import Elm.Utils ((|>), (>>))
 
-import Data.Char
 import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck
-import Test.QuickCheck
 import Test.QuickCheck.IO ()
 
 import Reporting.Annotation (stripRegion)
 
 import qualified AST.Module
-import qualified Data.Either as Either
 import qualified Data.Text as Text
 import qualified Data.Maybe as Maybe
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified ElmVersion
-import qualified Test.Generators
+import qualified Test.Generators ()
 import qualified Test.ElmSourceGenerators
 import qualified Defaults
 

@@ -7,6 +7,8 @@ import qualified AST.Pattern as P
 import Parse.Helpers
 import qualified Parse.Literal as Literal
 import qualified Reporting.Annotation as A
+import Parse.IParser
+import Parse.Whitespace
 
 
 basic :: IParser P.Pattern
@@ -122,5 +124,5 @@ expr =
           case result of
             Left pattern ->
               pattern
-            Right (region, first, rest, final, _) ->
-              A.A region $ P.ConsPattern first rest final
+            Right (region, first, rest, _) ->
+              A.A region $ P.ConsPattern first rest

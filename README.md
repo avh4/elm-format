@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
-![experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
-[![latest version: 0.5.2-alpha](https://img.shields.io/badge/version-0.5.2--alpha-blue.svg)](https://github.com/avh4/elm-format/releases/tag/0.5.2-alpha)
+[![latest version: 0.7.0-exp](https://img.shields.io/badge/version-0.7.0--exp-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.7.0-exp)
 
 # elm-format
 
@@ -15,6 +14,7 @@ The benefits of `elm-format`:
  - It makes code **easier to read**, because there are no longer distracting minor stylistic differences between different code bases. As such, your brain can map more efficiently from source to mental model.
  - It makes code **easier to maintain**, because you can no longer have diffs related only to formatting; every diff necessarily involves a material change.
  - It **saves your team time** debating how to format things, because there is a standard tool that formats everything the same way.
+ - It **saves you time** because you don't have to nitpick over formatting details of your code.
 
 
 ## Usage
@@ -28,29 +28,30 @@ elm-format --stdin --output Main.elm  # Format input from stdin and write to fil
 elm-format --help  # See other command line options
 ```
 
-## Installation [![(latest version: 0.5.2-alpha)](https://img.shields.io/badge/version-0.5.2--alpha-blue.svg)](https://github.com/avh4/elm-format/releases/tag/0.5.2-alpha)
+
+## Installation [![(latest version: 0.7.0-exp)](https://img.shields.io/badge/version-0.7.0--exp-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.7.0-exp)
 
 > `elm-format` is still in alpha.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
 >
 > **The format produced by elm-format may change significantly before the 1.0.0 release.**  If this will cause problems for you, please refrain from using elm-format during the alpha- and beta-test periods.
 
-You will need to download the version appropriate for your OS, unzip it, and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.  Simpler installation options will be available once there is a stable release of elm-format.
 
-If you need PGP signatures, see the [releases page](https://github.com/avh4/elm-format/releases).
+### Experimental version
 
-### For Elm 0.18
+The latest version of `elm-format` contains experimental features that may or may not appear in future releases.
+If you are able to some amount of instability on your Elm projects,
+you can help with the development of `elm-format` by using the experimental version and providing feedback.
+You can give feedback about the latest experimental version [here](https://goo.gl/forms/kLdTN1yikfOI8ZuA3).
 
-(To upgrade your Elm 0.17 project to Elm 0.18, see the [Elm 0.18 upgrade guide](https://github.com/elm-lang/elm-platform/blob/master/upgrade-docs/0.18.md).)
+To install the experimental version:
 
- - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.5.2-alpha/elm-format-0.18-0.5.2-alpha-mac-x64.tgz)
- - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.5.2-alpha/elm-format-0.18-0.5.2-alpha-linux-x64.tgz)
- - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.5.2-alpha/elm-format-0.18-0.5.2-alpha-win-x64.zip)
+```sh
+npm install -g elm-format@exp
+```
 
-### For Elm 0.17
-
- - Mac: [download](https://github.com/avh4/elm-format/releases/download/0.5.2-alpha/elm-format-0.17-0.5.2-alpha-mac-x64.tgz)
- - Linux: [download](https://github.com/avh4/elm-format/releases/download/0.5.2-alpha/elm-format-0.17-0.5.2-alpha-linux-x64.tgz)
- - Windows: [download](https://github.com/avh4/elm-format/releases/download/0.5.2-alpha/elm-format-0.17-0.5.2-alpha-win-x64.zip)
+or download the version appropriate for your OS from the [release page](https://github.com/avh4/elm-format/releases/tag/0.7.0-exp),
+unzip it,
+and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.
 
 
 ## Editor integration
@@ -119,7 +120,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td>:trophy: <a href="https://marketplace.visualstudio.com/items?itemName=sbrink.elm">Elm Language Support</a></td>
     <td>:warning: <a href="#visual-studio-code-installation">3 steps</a></td>
     <td>❔ TBD</td>
-    <td>:x:</td>
+    <td>:warning: requires configuration</td>
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
@@ -292,6 +293,8 @@ This is for WebStorm and other JetBrains IDEs.
 
 
 ## Development info
+
+Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
 ### Building from source
 

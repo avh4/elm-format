@@ -1,13 +1,13 @@
-module Component.RightSidebar (..) where
+module Component.RightSidebar exposing (..)
 
 import Dreamwriter exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Lazy exposing (..)
+import List exposing (..)
 import Maybe
 import Signal exposing (Address)
-import List exposing (..)
 
 
 type alias Addresses a =
@@ -54,11 +54,11 @@ view addresses model =
                             currentNote
                     }
     in
-        div [ id "right-sidebar-container", class "sidebar" ]
-            [ div [ id "right-sidebar-body", class "sidebar-body" ]
-                [ sidebarBody ]
-            , sidebarFooter
-            ]
+    div [ id "right-sidebar-container", class "sidebar" ]
+        [ div [ id "right-sidebar-body", class "sidebar-body" ]
+            [ sidebarBody ]
+        , sidebarFooter
+        ]
 
 
 viewHeader : Addresses a -> Model -> Html

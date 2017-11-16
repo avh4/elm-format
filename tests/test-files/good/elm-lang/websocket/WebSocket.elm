@@ -1,9 +1,9 @@
 effect module WebSocket
     where { command = MyCmd, subscription = MySub }
     exposing
-        ( send
+        ( keepAlive
         , listen
-        , keepAlive
+        , send
         )
 
 {-| Web sockets make it cheaper to talk to your servers.
@@ -11,17 +11,19 @@ effect module WebSocket
 Connecting to a server takes some time, so with web sockets, you make that
 connection once and then keep using. The major benefits of this are:
 
-  1. It faster to send messages. No need to do a bunch of work for every single
-  message.
+1.  It faster to send messages. No need to do a bunch of work for every single
+    message.
 
-  2. The server can push messages to you. With normal HTTP you would have to
-  keep *asking* for changes, but a web socket, the server can talk to you
-  whenever it wants. This means there is less unnecessary network traffic.
+2.  The server can push messages to you. With normal HTTP you would have to
+    keep _asking_ for changes, but a web socket, the server can talk to you
+    whenever it wants. This means there is less unnecessary network traffic.
 
 The API here attempts to cover the typical usage scenarios, but if you need
 many unique connections to the same endpoint, you need a different library.
 
+
 # Web Sockets
+
 @docs listen, keepAlive, send
 
 -}
@@ -31,6 +33,7 @@ import Process
 import Task exposing (Task)
 import Time exposing (Time)
 import WebSocket.LowLevel as WS
+
 
 
 -- COMMANDS
@@ -47,6 +50,7 @@ type MyCmd msg
 **Note:** It is important that you are also subscribed to this address with
 `listen` or `keepAlive`. If you are not, the web socket will be created to
 send one message and then closed. Not good!
+
 -}
 send : String -> String -> Cmd msg
 send url message =
@@ -78,6 +82,7 @@ like this:
 **Note:** If the connection goes down, the effect manager tries to reconnect
 with an exponential backoff strategy. Any messages you try to `send` while the
 connection is down are queued and will be sent as soon as possible.
+
 -}
 listen : String -> (String -> msg) -> Sub msg
 listen url tagger =
@@ -89,11 +94,12 @@ for keeping a connection open for when you only need to `send` messages. So
 you might say something like this:
 
     subscriptions model =
-      keepAlive "ws://echo.websocket.org"
+        keepAlive "ws://echo.websocket.org"
 
 **Note:** If the connection goes down, the effect manager tries to reconnect
 with an exponential backoff strategy. Any messages you try to `send` while the
 connection is down are queued and will be sent as soon as possible.
+
 -}
 keepAlive : String -> Sub msg
 keepAlive url =
@@ -173,11 +179,13 @@ onEffects router cmds subs state =
                 leftStep name _ getNewSockets =
                     getNewSockets
                         `Task.andThen`
-                            \newSockets ->
+                            (\newSockets ->
                                 attemptOpen router 0 name
                                     `Task.andThen`
-                                        \pid ->
+                                        (\pid ->
                                             Task.succeed (Dict.insert name (Opening 0 pid) newSockets)
+                                        )
+                            )
 
                 bothStep name _ connection getNewSockets =
                     Task.map (Dict.insert name connection) getNewSockets
@@ -185,12 +193,13 @@ onEffects router cmds subs state =
                 rightStep name connection getNewSockets =
                     closeConnection connection &> getNewSockets
             in
-                Dict.merge leftStep bothStep rightStep newEntries state.sockets (Task.succeed Dict.empty)
-                    `Task.andThen`
-                        \newSockets ->
-                            Task.succeed (State newSockets newQueues newSubs)
+            Dict.merge leftStep bothStep rightStep newEntries state.sockets (Task.succeed Dict.empty)
+                `Task.andThen`
+                    (\newSockets ->
+                        Task.succeed (State newSockets newQueues newSubs)
+                    )
     in
-        sendMessagesGetNewQueues `Task.andThen` cleanup
+    sendMessagesGetNewQueues `Task.andThen` cleanup
 
 
 sendMessagesHelp : List (MyCmd msg) -> SocketsDict -> QueuesDict -> Task x QueuesDict
@@ -253,7 +262,7 @@ onSelfMsg router selfMsg state =
                         |> Maybe.withDefault []
                         |> List.map (\tagger -> Platform.sendToApp router (tagger str))
             in
-                Task.sequence sends &> Task.succeed state
+            Task.sequence sends &> Task.succeed state
 
         Die name ->
             case Dict.get name state.sockets of
@@ -263,8 +272,9 @@ onSelfMsg router selfMsg state =
                 Just _ ->
                     attemptOpen router 0 name
                         `Task.andThen`
-                            \pid ->
+                            (\pid ->
                                 Task.succeed (updateSocket name (Opening 0 pid) state)
+                            )
 
         GoodOpen name socket ->
             Task.succeed (updateSocket name (Connected socket) state)
@@ -277,8 +287,9 @@ onSelfMsg router selfMsg state =
                 Just (Opening n _) ->
                     attemptOpen router (n + 1) name
                         `Task.andThen`
-                            \pid ->
+                            (\pid ->
                                 Task.succeed (updateSocket name (Opening (n + 1) pid) state)
+                            )
 
                 Just (Connected _) ->
                     Task.succeed state
@@ -306,7 +317,7 @@ attemptOpen router backoff name =
             (open name router `Task.andThen` goodOpen)
                 `Task.onError` badOpen
     in
-        Process.spawn (after backoff &> actuallyAttemptOpen)
+    Process.spawn (after backoff &> actuallyAttemptOpen)
 
 
 open : String -> Platform.Router msg Msg -> Task WS.BadOpen WS.WebSocket
@@ -321,6 +332,7 @@ after : Int -> Task x ()
 after backoff =
     if backoff < 1 then
         Task.succeed ()
+
     else
         Process.sleep (toFloat (10 * 2 ^ backoff))
 

@@ -5,9 +5,7 @@ import ElmVersion (ElmVersion(..))
 
 import Test.Tasty
 import Test.Tasty.HUnit
-import Test.Tasty.Golden
 
-import ElmFormat.World
 import ElmFormat.TestWorld
 
 import qualified ElmFormat.Cli as Cli
@@ -24,7 +22,7 @@ fakeRender () = "good output"
 elmFormat :: [String] -> TestWorldState -> TestWorldState
 elmFormat args input =
     exec
-        (Cli.main Elm_0_18 fakeParse fakeRender args)
+        (Cli.main Elm_0_18 "x.x.x" Nothing fakeParse fakeRender args)
         input
 
 

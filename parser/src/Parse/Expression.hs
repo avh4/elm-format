@@ -6,11 +6,14 @@ import Text.Parsec.Indent (block, withPos, checkIndent)
 
 import qualified Parse.Binop as Binop
 import Parse.Helpers
+import Parse.Common
 import qualified Parse.Helpers as Help
 import qualified Parse.Literal as Literal
 import qualified Parse.Pattern as Pattern
 import qualified Parse.State as State
 import qualified Parse.Type as Type
+import Parse.IParser
+import Parse.Whitespace
 
 import AST.V0_16
 import qualified AST.Expression as E
@@ -43,7 +46,7 @@ negative :: IParser E.Expr'
 negative =
   do  nTerm <-
           try $
-            do  char '-'
+            do  _ <- char '-'
                 notFollowedBy (char '.' <|> char '-')
                 term
 
@@ -72,16 +75,10 @@ listTerm =
           return $ E.GLShader (filter (/='\r') rawSrc)
 
     commaSeparated =
-      do
-        pushNewlineContext
-        result <- braces'' expr
-        sawNewline <- popNewlineContext
-        return $
-          case result of
-            Left comments ->
-              E.EmptyList comments
-            Right terms ->
-              E.ExplicitList terms sawNewline
+        braces' $ checkMultiline $
+        do
+            (terms, trailing) <- sectionedGroup expr
+            return $ E.ExplicitList terms trailing
 
 
 parensTerm :: IParser E.Expr
@@ -117,45 +114,11 @@ parensTerm =
 
 recordTerm :: IParser E.Expr
 recordTerm =
-  addLocation $ brackets $ choice
-    [ do  starter <- try (addLocation rLabel)
-          postStarter <- whitespace
-          choice
-            [ update starter postStarter
-            , literal starter postStarter
-            ]
-    , return $ \pre post _ -> E.EmptyRecord (pre ++ post)
-    ]
-  where
-    update (A.A ann starter) postStarter =
-      do  try (string "|")
-          postBar <- whitespace
-          fields <- commaSep1 field
-          return $ \pre post multiline -> (E.RecordUpdate (Commented pre (A.A ann $ E.VarExpr $ Var.VarRef [] starter) postStarter) (fields postBar post) multiline)
-
-    literal (A.A _ starter) postStarter =
-      do
-          try lenientEquals
-          pushNewlineContext
-          preExpr <- whitespace
-          value <- expr
-          multiline' <- popNewlineContext
-          postExpr <- whitespace
-          choice
-            [ do  try comma
-                  preNext <- whitespace
-                  fields <- commaSep field
-                  return $ \pre post multiline -> (E.Record ((Commented pre starter postStarter, Commented preExpr value postExpr, multiline') : (fields preNext post)) multiline)
-            , return $ \pre post multiline -> (E.Record [(Commented pre starter postStarter, Commented preExpr value (postExpr ++ post), multiline')] multiline)
-            ]
-
-    field =
-      do  pushNewlineContext
-          key <- rLabel
-          (postKey, _, preExpr) <- padded lenientEquals
-          value <- expr
-          multiline <- popNewlineContext
-          return $ \pre post -> (Commented pre key postKey, Commented preExpr value post, multiline)
+    addLocation $ brackets' $ checkMultiline $
+        do
+            base <- optionMaybe $ try (commented lowVar <* string "|")
+            (fields, trailing) <- sectionedGroup (pair lowVar lenientEquals expr)
+            return $ E.Record base fields trailing
 
 
 term :: IParser E.Expr
@@ -256,7 +219,7 @@ lambdaExpr :: IParser E.Expr
 lambdaExpr =
   addLocation $
   do  pushNewlineContext
-      char '\\' <|> char '\x03BB' <?> "an anonymous function"
+      _ <- char '\\' <|> char '\x03BB' <?> "an anonymous function"
       args <- spacePrefix Pattern.term
       (preArrowComments, _, bodyComments) <- padded rightArrow
       body <- expr

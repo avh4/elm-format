@@ -1,0 +1,21 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string"
+      },
+      "line": {
+        "type": "number"
+      },
+      "column": {
+        "type": "number"
+      },
+      "message": {
+        "type": "string"
+      }
+    },
+    "required": ["path", "message"]
+  }
+}

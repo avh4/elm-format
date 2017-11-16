@@ -1,3 +1,74 @@
+## master (0.7.1-beta)
+
+Features promoted from 0.7.0-exp:
+  - Imports are now sorted and duplicate imports are merged
+  - `exposing` clauses in module headers are now sorted
+  - The body of `let` expressions are no longer indented
+  - Unnecessary parentheses are now removed (expect in binary operator expressions)
+
+Bug fixes:
+  - Parentheses are not considered unnecessary if removing them would cause a comment to move to a different AST node
+  - Multiline `@docs` lines in markdown are now handled correctly
+
+Syntax changes:
+  - Infix operator precedence and associativity declarations are now grouped together
+  - `if` expressions now have blank lines between clauses
+  - Comments immediately following `import`s now have spacing consistent with other top-level comments
+
+Other changes:
+  - Removed support for Elm 0.16
+
+
+## 0.7.0-exp
+
+Experimental changes:
+  - Imports are now sorted and duplicate imports are merged
+  - `exposing` clauses in module headers are now sorted
+  - The body of `let` expressions are no longer indented
+  - Unnecessary parentheses are now removed
+
+You can give feedback about experimental features at <https://goo.gl/forms/kLdTN1yikfOI8ZuA3>.
+
+Bug fixes:
+  - Initial `@docs` lines in module documentation are now handled correctly
+  - Formatting for lambdas with multiline patterns is now implemented
+  - Code blocks in doc comments that immediately follow lists are now handled correctly
+
+Other changes:
+  - elm-format now has a contributor code of conduct
+
+
+## 0.6.1-alpha
+
+  - elm-format now formats your documentation comments:
+      - code snippets in your documentation will be elm-formatted
+      - markdown in your documentation will be normalized
+
+
+## 0.6.0-alpha
+
+Notes:
+  - Support for Elm 0.16 is deprecated (but is still available with the `--elm-version=0.16` option).
+
+Syntax changes:
+  - Removed a workaround for an Elm 0.16 compiler bug that added extra parenthesis to qualified type tags in pattern matches
+  - End-of-line `--` comments are now kept on their original line when appropriate
+  - `--` comments in the middle of binary operator sequences no longer push the following expression to the next line
+  - `--` comments can be use to create sections in records and lists
+  - For Windows, CRLF newlines no longer corrupt literal strings
+
+Bug fixes:
+  - Empty records containing multiline comments are now handled correctly
+  - Double quotes at the end of multiline strings are now handled correctly
+  - The `where` clause in `effect module`s are now required to have at least one field (and comments are now handled correctly)
+  - Record expressions with a trailing comma are no longer allowed (and comments are now handled correctly)
+  - Block comments containing only multiple lines of whitespace no longer crash elm-format
+
+Other changes:
+  - `elm-format --validate` (meant for use in CI scripts) now reports errors as JSON
+  - When recursively searching a directory, `node_modules` folders are ignored
+
+
 ## 0.5.2-alpha
 
 Bug fixes:

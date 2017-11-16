@@ -1,35 +1,35 @@
 module Parse.LiteralTest where
 
-import Elm.Utils ((|>))
-
-import Test.HUnit (Assertion, assertEqual)
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import Parse.Literal
-import Text.ParserCombinators.Parsec.Combinator (eof)
-import AST.V0_16
-import Reporting.Annotation hiding (map, at)
-import Reporting.Region
+import Box (render)
+import Data.Text (unpack)
+import ElmFormat.Render.Box (formatLiteral)
+import Parse.Literal (literal)
+import Parse.TestHelpers (assertParse, assertParseFailure)
 
-import Parse.TestHelpers
-
-
-pending = at 0 0 0 0 $ IntNum 0 DecimalInt
+import qualified Defaults
 
 
+example :: String -> String -> String -> TestTree
 example name input expected =
     testCase name $
-        assertParse literal input expected
+        assertParse (fmap (unpack . render Defaults.defaultTabSize . formatLiteral) literal) input expected
 
 
 tests :: TestTree
 tests =
     testGroup "Parse.Literal"
     [ testGroup "Int"
-        [ example "" "99" $ IntNum 99 DecimalInt
-        , example "negative" "-99" $ IntNum (-99) DecimalInt
-        , example "hexadecimal" "0xfF" $ IntNum 255 HexadecimalInt
+        [ example "" "99" "99\n"
+        , example "negative" "-99" "-99\n"
+        , testGroup "hexadecimal"
+            [ example "small" "0xfF" "0xFF\n"
+            , example "medium" "0xfF0" "0x0FF0\n"
+            , example "large" "0xfF000" "0x000FF000\n"
+            , example "huge" "0xfF0000000" "0x0000000FF0000000\n"
+            ]
         , testCase "hexadecimal must start with 0" $
             assertParseFailure literal "xFF"
         , testCase "hexadecimal, must contain digits" $
@@ -37,17 +37,17 @@ tests =
         ]
 
     , testGroup "Float"
-        [ example "" "0.1" $ FloatNum 0.1 DecimalFloat
-        , example "negative" "-0.1" $ FloatNum (-0.1) DecimalFloat
-        , example "exponent" "9e3" $ FloatNum 9000.0 ExponentFloat
-        , example "positive exponent" "9e+3" $ FloatNum 9000.0 ExponentFloat
-        , example "negative exponent" "9e-3" $ FloatNum 0.009 ExponentFloat
-        , example "capital exponent" "9E3" $ FloatNum 9000.0 ExponentFloat
+        [ example "" "0.1" "0.1\n"
+        , example "negative" "-0.1" "-0.1\n"
+        , example "exponent" "9e3" "9.0e3\n"
+        , example "positive exponent" "9e+3" "9.0e3\n"
+        , example "negative exponent" "9e-3" "9.0e-3\n"
+        , example "capital exponent" "9E3" "9.0e3\n"
         , testCase "exponent must have exponent digits" $
             assertParseFailure literal "9E"
         , testCase "exponent must have digits" $
             assertParseFailure literal "e3"
-        , example "exponent and decimal" "9.1e3" $ FloatNum 9100.0 ExponentFloat
+        , example "exponent and decimal" "9.1e3" "9.1e3\n"
         , testCase "exponent and decimal, must have decimal digits" $
             assertParseFailure literal "9.e3"
         , testCase "must have digits" $
@@ -59,18 +59,20 @@ tests =
         ]
 
     , testGroup "String"
-        [ example "" "\"hello\"" $ Str "hello" False
-        , example "empty" "\"\"" $ Str "" False
-        , example "escaped double quote" "\"\\\"\"" $ Str "\"" False
+        [ example "" "\"hello\"" "\"hello\"\n"
+        , example "empty" "\"\"" "\"\"\n"
+        , example "escaped double quote" "\"\\\"\"" "\"\\\"\"\n"
         ]
 
     , testGroup "multiline String"
-        [ example "" "\"\"\"hello\n\"\n\"\"\"" $ Str "hello\n\"\n" True
+        [ example ""
+            "\"\"\"hello\n\"\n\"\"\""
+            "\"\"\"hello\n\"\n\"\"\"\n"
         ]
 
     , testGroup "Char"
-        [ example "" "\'a\'" $ Chr 'a'
-        , example "escaped single quote" "\'\\\'\'" $ Chr '\''
+        [ example "" "\'a\'" "\'a\'\n"
+        , example "escaped single quote" "\'\\\'\'" "\'\\\'\'\n"
         , testCase "Char (must have one character)" $
             assertParseFailure literal "\'\'"
         , testCase "Char (must have only one character)" $

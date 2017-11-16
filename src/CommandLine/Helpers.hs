@@ -1,17 +1,20 @@
 module CommandLine.Helpers where
 
+import Control.Monad.Free
+import ElmFormat.Operation (Operation)
 import System.IO
-import System.Exit (exitFailure, exitSuccess)
-import Messages.Types (Message(..))
-import Messages.Strings (renderMessage)
+import System.Exit (exitFailure)
+import Messages.Types (ErrorMessage(..), PromptMessage(..))
+import Messages.Strings (showErrorMessage, showPromptMessage)
 
+import qualified ElmFormat.Operation as Operation
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Report as Report
 import qualified Reporting.Error.Syntax as Syntax
 
 
-r :: Message -> String
-r = renderMessage
+r :: ErrorMessage -> String
+r = showErrorMessage
 
 yesOrNo :: IO Bool
 yesOrNo =
@@ -24,30 +27,30 @@ yesOrNo =
                   yesOrNo
 
 
-decideOutputFile :: Bool -> FilePath -> Maybe FilePath -> IO FilePath
+decideOutputFile :: Operation f => Bool -> FilePath -> Maybe FilePath -> Free f (Maybe FilePath)
 decideOutputFile autoYes inputFile outputFile =
     case outputFile of
         Nothing -> do -- we are overwriting the input file
             canOverwrite <- getApproval autoYes [inputFile]
             case canOverwrite of
-                True -> return inputFile
-                False -> exitSuccess
-        Just outputFile' -> return outputFile'
+                True -> return $ Just inputFile
+                False -> return Nothing
+        Just outputFile' -> return $ Just outputFile'
 
 
-getApproval :: Bool -> [FilePath] -> IO Bool
+getApproval :: Operation f => Bool -> [FilePath] -> Free f Bool
 getApproval autoYes filePaths =
     case autoYes of
         True ->
             return True
-        False -> do
-            putStrLn $ (r $ FilesWillBeOverwritten filePaths)
+        False -> Operation.deprecatedIO $ do
+            putStrLn $ (showPromptMessage $ FilesWillBeOverwritten filePaths)
             yesOrNo
 
 
-exitOnInputDirAndOutput :: IO ()
-exitOnInputDirAndOutput = do
-    putStrLn $ r Error_SingleOutputWithMultipleInputs
+exitOnInputDirAndOutput :: Operation f => f ()
+exitOnInputDirAndOutput = Operation.deprecatedIO $ do
+    putStrLn $ r SingleOutputWithMultipleInputs
     exitFailure
 
 

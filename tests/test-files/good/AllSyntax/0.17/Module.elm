@@ -1,4 +1,4 @@
-module AllSyntax.Module exposing (a, b, c)
+module AllSyntax.Module exposing ((===), D, a, b, c)
 
 
 a =

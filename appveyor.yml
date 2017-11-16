@@ -1,17 +1,30 @@
 build: off
 
+platform: x86
+
+cache:
+- 'c:\sr'
+- 'C:\Users\appveyor\AppData\Local\Programs\stack'
+
 before_test:
-- curl -sS -ostack.zip -L --insecure http://www.stackage.org/stack/windows-x86_64
+# workaround for https://github.com/appveyor/ci/issues/1426
+- set PATH=%PATH%;C:\Program Files\Git\mingw64\bin
+- curl -sS -ostack.zip -L --insecure http://www.stackage.org/stack/windows-i386
 - 7z x stack.zip stack.exe
 
-clone_folder: "c:\\stack"
+clone_folder: 'c:\stack'
 environment:
   global:
-    STACK_ROOT: "c:\\sr"
+    STACK_ROOT: 'c:\sr'
 
 test_script:
-- stack setup > nul
-# The ugly echo "" hack is to avoid complaints about 0 being an invalid file
-# descriptor
 - "set PATH=%PATH%;c:\\stack"
+- stack setup > nil
+- stack path
+- stack build
 - bash tests/run-tests.sh
+- mkdir -p dist
+- stack install --local-bin-path=dist
+
+artifacts:
+- path: 'dist\elm-format-0.18.exe'

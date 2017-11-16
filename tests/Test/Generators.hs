@@ -1,5 +1,6 @@
 module Test.Generators where
 
+import Data.Map.Strict
 import Test.QuickCheck
 
 import AST.V0_16
@@ -72,6 +73,13 @@ instance (Arbitrary a) => Arbitrary (Reporting.Annotation.Located a) where
             return $ Reporting.Annotation.A ann a
 
 
+commented :: Gen a -> Gen (Commented a)
+commented inner =
+    do
+        a <- inner
+        return $ Commented [] a []
+
+
 instance Arbitrary AST.Variable.Value where
     arbitrary =
         do
@@ -79,21 +87,16 @@ instance Arbitrary AST.Variable.Value where
             return $ AST.Variable.Union (name, []) AST.Variable.ClosedListing
 
 
-instance (Arbitrary a) => Arbitrary (AST.Variable.Listing a) where
-    arbitrary =
-        do
-            vars <- listOf arbitrary
-            multiline <- arbitrary
-            case vars of
-                [] -> return $ AST.Variable.OpenListing (Commented [] () [])
-                _ -> return $ AST.Variable.ExplicitListing (map (\x -> Commented [] x []) vars) multiline
+listing :: Gen (AST.Variable.Listing a)
+listing =
+    return $ AST.Variable.OpenListing (Commented [] () [])
 
 
 instance Arbitrary AST.Module.Module where
     arbitrary =
         do
             name <- listOf1 $ capIdentifier
-            listing <- arbitrary
+            listing <- listing
             moduleType <- fmap (\x -> if x then AST.Module.Port [] else AST.Module.Normal) arbitrary
             return $ AST.Module.Module
                 []
@@ -104,5 +107,5 @@ instance Arbitrary AST.Module.Module where
                   (KeywordCommented [] [] listing)
                 )
                 (located Nothing)
-                []
+                ([], empty)
                 [ AST.Declaration.Decl $ located $ AST.Declaration.Definition (located $ AST.Pattern.Anything) [] [] (located $ AST.Expression.TupleFunction 2)]

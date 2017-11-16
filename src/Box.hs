@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 module Box
   ( Line, identifier, keyword, punc, literal, row, space
-  , Box(SingleLine), blankLine, line, mustBreak, stack1, andThen
+  , Box(SingleLine, MustBreak), blankLine, line, mustBreak, stack', stack1, andThen
   , isLine, allSingles, lineLength
   , indent, prefix, addSuffix
   , render
@@ -229,7 +229,6 @@ render tabSize box' =
             T.snoc (renderLine tabSize 0 line') '\n'
 
 
--- TODO couldn't we just run renderLine and get the length of the resulting string?
 lineLength :: Int -> Int -> Line -> Int
 lineLength tabSize startColumn line' =
    startColumn +

@@ -1,32 +1,38 @@
 module Parse.ExpressionTest where
 
-import Elm.Utils ((|>))
-
-import Test.HUnit (Assertion, assertEqual)
 import Test.Tasty
 import Test.Tasty.HUnit
-import qualified Data.Text.Lazy as LazyText
 
 import Parse.Expression
-import Parse.Helpers (IParser, iParse)
 import AST.V0_16
 import AST.Expression
 import AST.Pattern (Pattern'(Anything))
 import qualified AST.Pattern as P
 import AST.Variable
-import Reporting.Annotation hiding (map, at)
-import Reporting.Region
 import Text.Parsec.Char (string)
-
+import ElmVersion
+import ElmFormat.Render.Box (formatExpression, ExpressionContext(..))
+import qualified Box
+import qualified Data.Text as Text
 import Parse.TestHelpers
 
+import qualified Defaults
 
+
+pending :: Expr
 pending = at 0 0 0 0 $ Unit []
 
 
+example :: String -> String -> Expr -> TestTree
 example name input expected =
     testCase name $
         assertParse expr input expected
+
+
+example' :: String -> String -> String -> TestTree
+example' name input expected =
+    testCase name $
+        assertParse (fmap (Text.unpack . Box.render Defaults.defaultTabSize . formatExpression Elm_0_18 Defaults.defaultTabSize SyntaxSeparated) expr) input expected
 
 
 commentedIntExpr (a,b,c,d) preComment postComment i =
@@ -122,18 +128,31 @@ tests =
         ]
 
     , testGroup "empty list"
-        [ example "empty" "[]" $ at 1 1 1 3 (EmptyList [])
-        , example "whitespace" "[ ]" $ at 1 1 1 4 (EmptyList [])
-        , example "comments" "[{-A-}]" $ at 1 1 1 8 (EmptyList [BlockComment ["A"]])
-        , example "newlines" "[\n ]" $ at 1 1 2 3 (EmptyList [])
+        [ example' "empty" "[]" "[]\n"
+        , example' "whitespace" "[ ]" "[]\n"
+        , example' "comments" "[{-A-}]" "[{- A -}]\n"
+        , example' "newlines" "[\n ]" "[]\n"
         ]
 
     , testGroup "List"
-        [ example "" "[1,2,3]" $ at 1 1 1 8 $ ExplicitList [intExpr' (1,2,1,3) 1, intExpr' (1,4,1,5) 2, intExpr' (1,6,1,7) 3] False
-        , example "single element" "[1]" $ at 1 1 1 4 $ ExplicitList [intExpr' (1,2,1,3) 1] False
-        , example "whitespace" "[ 1 , 2 , 3 ]" $ at 1 1 1 14 $ ExplicitList [intExpr' (1,3,1,4) 1, intExpr' (1,7,1,8) 2, intExpr' (1,11,1,12) 3] False
-        , example "comments" "[{-A-}1{-B-},{-C-}2{-D-},{-E-}3{-F-}]" $ at 1 1 1 38 $ ExplicitList [commentedIntExpr (1,7,1,8) "A" "B" 1, commentedIntExpr (1,19,1,20) "C" "D" 2, commentedIntExpr (1,31,1,32) "E" "F" 3] False
-        , example "newlines" "[\n 1\n ,\n 2\n ,\n 3\n ]" $ at 1 1 7 3 $ ExplicitList [intExpr' (2,2,2,3) 1, intExpr' (4,2,4,3) 2, intExpr' (6,2,6,3) 3] True
+        [ example' "" "[1,2,3]" "[ 1, 2, 3 ]\n"
+        , example' "single element" "[1]" "[ 1 ]\n"
+        , example' "whitespace" "[ 1 , 2 , 3 ]" "[ 1, 2, 3 ]\n"
+        , example' "comments"
+            "[{-A-}1{-B-},{-C-}2{-D-},{-E-}3{-F-}]"
+            "[ {- A -} 1\n\
+            \\n\
+            \{- B -}\n\
+            \, {- C -} 2\n\
+            \\n\
+            \{- D -}\n\
+            \, {- E -} 3\n\
+            \\n\
+            \{- F -}\n\
+            \]\n"
+        , example' "newlines"
+            "[\n 1\n ,\n 2\n ,\n 3\n ]"
+            "[ 1\n, 2\n, 3\n]\n"
         ]
 
     , testGroup "Range"
@@ -162,31 +181,54 @@ tests =
 
     , testGroup "Record"
         [ testGroup "empty"
-            [ example "" "{}" $ at 1 1 1 3 $ EmptyRecord []
-            , example "whitespace" "{ }" $ at 1 1 1 4 $ EmptyRecord []
-            , example "comments" "{{-A-}}" $ at 1 1 1 8 $ EmptyRecord [BlockComment ["A"]]
+            [ example' "" "{}" "{}\n"
+            , example' "whitespace" "{ }" "{}\n"
+            , example' "comments" "{{-A-}}" "{{- A -}}\n"
             ]
 
-        , example "" "{x=7,y=8}" $ at 1 1 1 10 $ Record [(Commented [] (LowercaseIdentifier "x") [], intExpr' (1,4,1,5) 7, False), (Commented [] (LowercaseIdentifier "y") [], intExpr' (1,8,1,9) 8, False)] False
-        , example "single field" "{x=7}" $ at 1 1 1 6 $ Record [(Commented [] (LowercaseIdentifier "x") [], intExpr' (1,4,1,5) 7, False)] False
-        , example "whitespace" "{ x = 7 , y = 8 }" $ at 1 1 1 18 $ Record [(Commented [] (LowercaseIdentifier "x") [], intExpr' (1,7,1,8) 7, False), (Commented [] (LowercaseIdentifier "y") [], intExpr' (1,15,1,16) 8, False)] False
-        , example "comments" "{{-A-}x{-B-}={-C-}7{-D-},{-E-}y{-F-}={-G-}8{-H-}}" $ at 1 1 1 50 $ Record [(Commented [BlockComment ["A"]] (LowercaseIdentifier "x") [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False), (Commented [BlockComment ["E"]] (LowercaseIdentifier "y") [BlockComment ["F"]], commentedIntExpr (1,43,1,44) "G" "H" 8, False)] False
-        , example "single field with comments" "{{-A-}x{-B-}={-C-}7{-D-}}" $ at 1 1 1 26 $ Record [(Commented [BlockComment ["A"]] (LowercaseIdentifier "x") [BlockComment ["B"]], commentedIntExpr (1,19,1,20) "C" "D" 7, False)] False
-        , example "newlines" "{\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 9 3 $ Record [(Commented [] (LowercaseIdentifier "x") [], intExpr' (4,2,4,3) 7, True), (Commented [] (LowercaseIdentifier "y") [], intExpr' (8,2,8,3) 8, True)] True
+        , example' ""
+            "{x=7,y=8}"
+            "{ x = 7, y = 8 }\n"
+        , example' "single field"
+            "{x=7}"
+            "{ x = 7 }\n"
+        , example' "whitespace"
+            "{ x = 7 , y = 8 }"
+            "{ x = 7, y = 8 }\n"
+        , example' "comments"
+            "{{-A-}x{-B-}={-C-}7{-D-},{-E-}y{-F-}={-G-}8{-H-}}"
+            "{ {- A -} x {- B -} = {- C -} 7\n\n{- D -}\n, {- E -} y {- F -} = {- G -} 8\n\n{- H -}\n}\n"
+        , example' "single field with comments"
+            "{{-A-}x{-B-}={-C-}7{-D-}}"
+            "{ {- A -} x {- B -} = {- C -} 7\n\n{- D -}\n}\n"
+        , example' "newlines"
+            "{\n x\n =\n 7\n ,\n y\n =\n 8\n }"
+            "{ x =\n    7\n, y =\n    8\n}\n"
         ]
 
     , testGroup "Record update"
-        [ example "" "{a|x=7,y=8}" $ at 1 1 1 12 (RecordUpdate (Commented [] (at 1 2 1 3 (VarExpr (VarRef [] $ LowercaseIdentifier "a"))) []) [(Commented [] (LowercaseIdentifier "x") [],Commented [] (at 1 6 1 7 (Literal (IntNum 7 DecimalInt))) [],False),(Commented [] (LowercaseIdentifier "y") [], Commented [] (at 1 10 1 11 (Literal (IntNum 8 DecimalInt))) [],False)] False)
-        , example "single field" "{a|x=7}" $ at 1 1 1 8 (RecordUpdate (Commented [] (at 1 2 1 3 (VarExpr (VarRef [] $ LowercaseIdentifier "a"))) []) [(Commented [] (LowercaseIdentifier "x") [], Commented [] (at 1 6 1 7 (Literal (IntNum 7 DecimalInt))) [],False)] False)
-        , example "whitespace" "{ a | x = 7 , y = 8 }" $ at 1 1 1 22 (RecordUpdate (Commented [] (at 1 3 1 4 (VarExpr (VarRef [] $ LowercaseIdentifier "a"))) []) [(Commented [] (LowercaseIdentifier "x") [], Commented [] (at 1 11 1 12 (Literal (IntNum 7 DecimalInt))) [],False),(Commented [] (LowercaseIdentifier "y") [], Commented [] (at 1 19 1 20 (Literal (IntNum 8 DecimalInt))) [],False)] False)
-        , example "comments" "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}" $ at 1 1 1 62 (RecordUpdate (Commented [BlockComment ["A"]] (at 1 7 1 8 (VarExpr (VarRef [] $ LowercaseIdentifier "a"))) [BlockComment ["B"]]) [(Commented [BlockComment ["C"]] (LowercaseIdentifier "x") [BlockComment ["D"]],Commented [BlockComment ["E"]] (at 1 31 1 32 (Literal (IntNum 7 DecimalInt))) [BlockComment ["F"]],False),(Commented [BlockComment ["G"]] (LowercaseIdentifier "y") [BlockComment ["H"]],Commented [BlockComment ["I"]] (at 1 55 1 56 (Literal (IntNum 8 DecimalInt))) [BlockComment ["J"]],False)] False)
-        , example "newlines" "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }" $ at 1 1 11 3 (RecordUpdate (Commented [] (at 2 2 2 3 (VarExpr (VarRef [] $ LowercaseIdentifier "a"))) []) [(Commented [] (LowercaseIdentifier "x") [], Commented [] (at 6 2 6 3 (Literal (IntNum 7 DecimalInt))) [],True),(Commented [] (LowercaseIdentifier "y") [], Commented [] (at 10 2 10 3 (Literal (IntNum 8 DecimalInt))) [],True)] True)
+        [ example' ""
+            "{a|x=7,y=8}"
+            "{ a | x = 7, y = 8 }\n"
+        , example' "single field"
+            "{a|x=7}"
+            "{ a | x = 7 }\n"
+        , example' "whitespace"
+            "{ a | x = 7 , y = 8 }"
+            "{ a | x = 7, y = 8 }\n"
+        , example' "comments"
+            "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}"
+            "{ {- A -} a {- B -}\n    | {- C -} x {- D -} = {- E -} 7\n    \n    {- F -}\n    , {- G -} y {- H -} = {- I -} 8\n    \n    {- J -}\n}\n"
+        , example' "newlines"
+            "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }"
+            "{ a\n    | x =\n        7\n    , y =\n        8\n}\n"
         , testCase "only allows simple base" $
             assertParseFailure expr "{9|x=7}"
         , testCase "only allows simple base" $
             assertParseFailure expr "{{}|x=7}"
-        , testCase "must have fields" $
-            assertParseFailure expr "{a|}"
+        , example' "no fields (elm-compiler does not allow this)"
+            "{a|}"
+            "{ a |  }\n"
         ]
 
     , testGroup "record access"

@@ -20,7 +20,10 @@ data Pattern'
     | Tuple [Commented Pattern]
     | EmptyListPattern Comments
     | List [Commented Pattern]
-    | ConsPattern (Pattern, Comments) [Commented Pattern] (Comments, Pattern)
+    | ConsPattern
+        { first :: (Pattern, Maybe String)
+        , rest :: [(Comments, Comments, Pattern, Maybe String)]
+        }
     | Record [Commented LowercaseIdentifier]
     | Alias (Pattern, Comments) (Comments, LowercaseIdentifier)
     deriving (Eq, Show)

@@ -1,22 +1,30 @@
-{-# OPTIONS_GHC -Wall #-}
 module Messages.Types where
 
 import ElmVersion
+import qualified Reporting.Annotation as A
+import qualified Reporting.Error.Syntax as Syntax
 
 -- inspired by:
 -- https://wiki.haskell.org/Internationalization_of_Haskell_programs_using_Haskell_data_types
 
-data Message
+data InfoMessage
+  = ProcessingFiles [FilePath]
+  | FileWouldChange FilePath
+  | ParseError FilePath String [A.Located Syntax.Error]
+
+
+data PromptMessage
+    = FilesWillBeOverwritten [FilePath]
+
+
+data ErrorMessage
   = ErrorsHeading
 
-  | FilesWillBeOverwritten [FilePath]
   | BadInputFiles [InputFileMessage]
-  | Error_NoInputs
-  | Error_SingleOutputWithMultipleInputs
-  | Error_TooManyInputs
-  | Error_OutputAndValidate
-  | ProcessingFiles [FilePath]
-  | FileWouldChange FilePath
+  | NoInputs
+  | SingleOutputWithMultipleInputs
+  | TooManyInputs
+  | OutputAndValidate
   | MustSpecifyVersionWithUpgrade ElmVersion
 
 

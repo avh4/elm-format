@@ -4,14 +4,11 @@ module Reporting.Report
     ( Report(Report)
     , simple
     , toString
-    , toJson
     , printError, printWarning
     ) where
 
 import Control.Applicative ((<|>))
 import Control.Monad.Writer (Writer, execWriter, tell)
-import Data.Aeson ((.=))
-import qualified Data.Aeson.Types as Json
 import qualified Data.List.Split as Split
 import System.Console.ANSI
 import System.IO (hPutStr, stderr)
@@ -62,18 +59,6 @@ render renderer location region (Report title highlight pre post) source =
       normal renderer (pre ++ "\n\n")
       grabRegion renderer highlight region source
       normal renderer ("\n" ++ if null post then "\n" else post ++ "\n\n\n")
-
-
-toJson :: [Json.Pair] -> Report -> (Maybe R.Region, [Json.Pair])
-toJson extraFields (Report title subregion pre post) =
-  let
-    fields =
-      [ "tag" .= title
-      , "overview" .= pre
-      , "details" .= post
-      ]
-  in
-    (subregion, fields ++ extraFields)
 
 
 -- RENDERING
