@@ -264,16 +264,7 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 
 ### VSCode Elm Format installation
 
-1. Install elm-format
-1. Install VSCode Elm Format
-
-    ```bash
-    ext install elm-format
-    ```
-
-1. You can run elm-format by using the `Elm: Format` command
-1. You can also run elm-format whenever you save the file by adding `formatOnSave: true` option to your [settings.json](https://code.visualstudio.com/docs/customization/userandworkspace) file.
-
+Note, Elm Format is no longer available for VS Code. Use [elm](visual-studio-code-installation) instead
 
 
 ### Sublime Text installation
