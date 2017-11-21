@@ -116,7 +116,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td>:warning: no installation instructions</td>
   </tr>
   <tr>
-    <td rowspan=2>Visual Studio Code</td>
+    <td rowspan=1>Visual Studio Code</td>
     <td>:trophy: <a href="https://marketplace.visualstudio.com/items?itemName=sbrink.elm">Elm Language Support</a></td>
     <td>:warning: <a href="#visual-studio-code-installation">3 steps</a></td>
     <td>❔ TBD</td>
@@ -124,14 +124,6 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
-  <tr>
-    <!-- Visual Studio Code -->
-    <td><a href="https://marketplace.visualstudio.com/items?itemName=abadi199.elm-format">VSCode Elm Format</a></td>
-    <td>:warning: <a href="#vscode-elm-format-installation">3 steps</a></td>
-    <td>❔ TBD</td>
-    <td>:warning: requires configuration</td>
-    <td>❔ TBD</td>
-    <td>❔ TBD</td>
   </tr>
   <tr>
     <td rowspan=1>Sublime Text</td>
