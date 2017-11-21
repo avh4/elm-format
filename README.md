@@ -264,7 +264,7 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 
 ### VSCode Elm Format installation
 
-Note, Elm Format is no longer available for VS Code. Use [elm](visual-studio-code-installation) instead
+Note, Elm Format is no longer available for VS Code. Use [elm](#visual-studio-code-installation) instead
 
 
 ### Sublime Text installation
