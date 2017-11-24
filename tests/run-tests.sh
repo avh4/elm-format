@@ -1,7 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # shellcheck disable=SC2002
 
 uname -s
+which bash
 which diff
 which grep
 which sed
