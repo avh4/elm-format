@@ -8,6 +8,7 @@ which grep
 which sed
 which tee
 which wc
+which stack
 
 
 if which shellcheck; then
@@ -17,9 +18,15 @@ if which shellcheck; then
 	shellcheck "./package/linux/build-package.sh" || exit 1
 fi
 
-stack build || exit 1
+if which nix-env; then
+	echo "$0: INFO: Detected Nixos or Nix"
+	STACK_ARGS=(--nix-pure --nix-add-gc-roots)
+	echo "$0: INFO: nix arguments will be passed to stack: ${STACK_ARGS[*]}"
+fi
 
-ELM_FORMAT="$(stack path --local-install-root)/bin/elm-format-0.18"
+stack "${STACK_ARGS[@]}" build || exit 1
+
+ELM_FORMAT="$(stack "${STACK_ARGS[@]}" path --local-install-root)/bin/elm-format-0.18"
 if [ ! -e "$ELM_FORMAT" ]; then
 	echo "$0: ERROR: $ELM_FORMAT not found" >&2
 	exit 1
@@ -379,4 +386,4 @@ checkValidationOutputFormat
 echo
 echo "# GREAT SUCCESS!"
 
-stack test --test-arguments="--hide-successes --color auto" || exit 1
+stack "${STACK_ARGS[@]}" test --test-arguments="--hide-successes --color auto" || exit 1
