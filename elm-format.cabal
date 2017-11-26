@@ -76,6 +76,7 @@ library
         Parse.Pattern
         Parse.Type
         Reporting.Annotation
+        Reporting.Error.Syntax
         Reporting.Region
         Util.List
 
@@ -107,7 +108,6 @@ library
         Parse.Parse
         Parse.State
         Parse.Whitespace
-        Reporting.Error.Syntax
         Reporting.Report
         Reporting.Result
 
@@ -182,6 +182,7 @@ test-Suite elm-format-tests
         ElmFormat.CliTest
         ElmFormat.Render.ElmStructureTest
         ElmFormat.TestWorld
+        Integration.LiteralTest
         Parse.ExpressionTest
         Parse.HelpersTest
         Parse.LiteralTest

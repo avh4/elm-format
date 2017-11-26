@@ -2,9 +2,11 @@
 module ElmFormat.Parse where
 
 import Elm.Utils ((|>))
+import AST.V0_16
 
 import qualified AST.Module
 import qualified Data.Text as Text
+import qualified Parse.Literal
 import qualified Parse.Parse as Parse
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Result as Result
@@ -32,3 +34,8 @@ toEither res =
             Right c
         Result.Result _ (Result.Err b) ->
             Left $ map RA.drop b
+
+
+parseLiteral :: Text.Text -> Result.Result () Syntax.Error Literal
+parseLiteral input =
+     Parse.parse (Text.unpack input) Parse.Literal.literal
