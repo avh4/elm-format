@@ -116,7 +116,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td>:warning: no installation instructions</td>
   </tr>
   <tr>
-    <td rowspan=2>Visual Studio Code</td>
+    <td rowspan=1>Visual Studio Code</td>
     <td>:trophy: <a href="https://marketplace.visualstudio.com/items?itemName=sbrink.elm">Elm Language Support</a></td>
     <td>:warning: <a href="#visual-studio-code-installation">3 steps</a></td>
     <td>❔ TBD</td>
@@ -124,14 +124,6 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
-  <tr>
-    <!-- Visual Studio Code -->
-    <td><a href="https://marketplace.visualstudio.com/items?itemName=abadi199.elm-format">VSCode Elm Format</a></td>
-    <td>:warning: <a href="#vscode-elm-format-installation">3 steps</a></td>
-    <td>❔ TBD</td>
-    <td>:warning: requires configuration</td>
-    <td>❔ TBD</td>
-    <td>❔ TBD</td>
   </tr>
   <tr>
     <td rowspan=1>Sublime Text</td>
@@ -264,16 +256,7 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 
 ### VSCode Elm Format installation
 
-1. Install elm-format
-1. Install VSCode Elm Format
-
-    ```bash
-    ext install elm-format
-    ```
-
-1. You can run elm-format by using the `Elm: Format` command
-1. You can also run elm-format whenever you save the file by adding `formatOnSave: true` option to your [settings.json](https://code.visualstudio.com/docs/customization/userandworkspace) file.
-
+Note, Elm Format is no longer available for VS Code. Use [elm](#visual-studio-code-installation) instead
 
 
 ### Sublime Text installation
