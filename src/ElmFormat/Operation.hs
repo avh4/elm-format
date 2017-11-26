@@ -28,6 +28,7 @@ instance FileStore OperationF where
 
 instance InfoFormatter OperationF where
     onInfo msg = InInfoFormatter $ onInfo msg
+    approve prompt = InInfoFormatter $ approve prompt
 
 
 instance Functor OperationF where
