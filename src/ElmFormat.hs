@@ -147,8 +147,19 @@ resolveFiles inputFiles =
                 return $ Right $ concat files
 
 
-handleFilesInput :: Operation f => ElmVersion -> [FilePath] -> Maybe FilePath -> Bool -> Bool -> Free f (Maybe Bool)
-handleFilesInput elmVersion inputFiles outputFile autoYes validateOnly =
+decideOutputFile :: InfoFormatter f => FilePath -> Maybe FilePath -> Free f (Maybe FilePath)
+decideOutputFile inputFile outputFile =
+    case outputFile of
+        Nothing -> do -- we are overwriting the input file
+            canOverwrite <- approve $ FilesWillBeOverwritten [inputFile]
+            case canOverwrite of
+                True -> return $ Just inputFile
+                False -> return Nothing
+        Just outputFile' -> return $ Just outputFile'
+
+
+handleFilesInput :: Operation f => ElmVersion -> [FilePath] -> Maybe FilePath -> Bool -> Free f (Maybe Bool)
+handleFilesInput elmVersion inputFiles outputFile validateOnly =
     do
         elmFiles <- resolveFiles inputFiles
 
@@ -160,7 +171,7 @@ handleFilesInput elmVersion inputFiles outputFile autoYes validateOnly =
                     exitFailure
 
             Right [inputFile] -> do
-                realOutputFile <- decideOutputFile autoYes inputFile outputFile
+                realOutputFile <- decideOutputFile inputFile outputFile
                 case realOutputFile of
                     Nothing ->
                         return Nothing
@@ -175,7 +186,7 @@ handleFilesInput elmVersion inputFiles outputFile autoYes validateOnly =
                 when (isJust outputFile)
                     exitOnInputDirAndOutput
 
-                canOverwriteFiles <- getApproval autoYes elmFiles
+                canOverwriteFiles <- approve $ FilesWillBeOverwritten elmFiles
 
                 if canOverwriteFiles
                     then
@@ -271,7 +282,7 @@ validate elmVersion source =
                             |> processTextInput elmVersion ValidateOnly "<STDIN>"
 
                 FromFiles first rest ->
-                    handleFilesInput elmVersion (first:rest) Nothing True True
+                    handleFilesInput elmVersion (first:rest) Nothing True
 
         case result of
             Nothing ->
@@ -337,12 +348,12 @@ main defaultVersion =
                 do
                     isSuccess <-
                         validate elmVersion source
-                            |> Execute.run (Execute.forMachine elmVersion)
+                            |> Execute.run (Execute.forMachine elmVersion True)
                     exit isSuccess
 
             (Right elmVersion, Right (FormatInPlace first rest)) ->
                 do
-                    result <- foldFree Execute.forHuman $ handleFilesInput elmVersion (first:rest) Nothing autoYes False
+                    result <- foldFree (Execute.forHuman autoYes) $ handleFilesInput elmVersion (first:rest) Nothing False
                     case result of
                         Just False ->
                             exitFailure
@@ -352,7 +363,7 @@ main defaultVersion =
 
             (Right elmVersion, Right (FormatToFile input output)) ->
                 do
-                    result <- foldFree Execute.forHuman $ handleFilesInput elmVersion [input] (Just output) autoYes False
+                    result <- foldFree (Execute.forHuman autoYes) $ handleFilesInput elmVersion [input] (Just output) False
                     case result of
                         Just False ->
                             exitFailure
@@ -368,7 +379,7 @@ main defaultVersion =
                         Lazy.toStrict input
                             |> Text.decodeUtf8
                             |> processTextInput elmVersion UpdateInPlace "<STDIN>"
-                            |> foldFree Execute.forHuman
+                            |> foldFree (Execute.forHuman autoYes)
                     case result of
                         Just False ->
                             exitFailure
@@ -384,7 +395,7 @@ main defaultVersion =
                         Lazy.toStrict input
                             |> Text.decodeUtf8
                             |> processTextInput elmVersion (ToFile output) "<STDIN>"
-                            |> foldFree Execute.forHuman
+                            |> foldFree (Execute.forHuman autoYes)
                     case result of
                         Just False ->
                             exitFailure

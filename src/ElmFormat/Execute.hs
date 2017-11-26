@@ -39,23 +39,23 @@ run program operations =
 
 
 {-| Execute Operations in a fashion appropriate for interacting with humans. -}
-forHuman :: OperationF a -> IO a
-forHuman operation =
+forHuman :: Bool -> OperationF a -> IO a
+forHuman autoYes operation =
     case operation of
         InFileStore op -> FileStore.execute op
-        InInfoFormatter op -> HumanReadable.format op
+        InInfoFormatter op -> HumanReadable.format autoYes op
         DeprecatedIO io -> io
 
 
 {-| Execute Operations in a fashion appropriate for use by automated scripts. -}
-forMachine :: ElmVersion -> Program OperationF Bool
-forMachine elmVersion =
+forMachine :: ElmVersion -> Bool -> Program OperationF Bool
+forMachine elmVersion autoYes =
     Program
         { init = Json.init
         , step = \operation ->
             case operation of
                 InFileStore op -> lift $ FileStore.execute op
-                InInfoFormatter op -> Json.format elmVersion op
+                InInfoFormatter op -> Json.format elmVersion autoYes op
                 DeprecatedIO io -> lift io
         , done = const Json.done
         }

@@ -10,11 +10,17 @@ import Messages.Types
 import ElmVersion (ElmVersion)
 
 
-format :: ElmVersion -> InfoFormatterF a -> StateT Bool IO a
-format elmVersion infoFormatter =
+format :: ElmVersion -> Bool -> InfoFormatterF a -> StateT Bool IO a
+format elmVersion autoYes infoFormatter =
     case infoFormatter of
         OnInfo info next ->
             showInfo elmVersion info next
+
+        Approve _prompt next ->
+            case autoYes of
+                True -> return (next True)
+                False -> return (next False)
+
 
 init :: (IO (), Bool)
 init =
