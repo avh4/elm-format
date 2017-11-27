@@ -13,6 +13,9 @@ import ElmFormat.Operation
 import ElmVersion
 
 import qualified ElmFormat.FileStore as FileStore
+import qualified ElmFormat.FileWriter as FileWriter
+import qualified ElmFormat.InputConsole as InputConsole
+import qualified ElmFormat.OutputConsole as OutputConsole
 import qualified Messages.Formatter.HumanReadable as HumanReadable
 import qualified Messages.Formatter.Json as Json
 
@@ -39,12 +42,19 @@ run program operations =
 
 
 {-| Execute Operations in a fashion appropriate for interacting with humans. -}
-forHuman :: Bool -> OperationF a -> IO a
-forHuman autoYes operation =
-    case operation of
-        InFileStore op -> FileStore.execute op
-        InInfoFormatter op -> HumanReadable.format autoYes op
-        DeprecatedIO io -> io
+forHuman :: Bool -> Program OperationF ()
+forHuman autoYes =
+    Program
+        { init = (return (), ())
+        , step = \operation ->
+              case operation of
+                  InFileStore op -> lift $ FileStore.execute op
+                  InInfoFormatter op -> lift $ HumanReadable.format autoYes op
+                  InInputConsole op -> lift $ InputConsole.execute op
+                  InOutputConsole op -> lift $ OutputConsole.execute op
+                  InFileWriter op -> lift $ FileWriter.execute op
+        , done = \() -> return ()
+        }
 
 
 {-| Execute Operations in a fashion appropriate for use by automated scripts. -}
@@ -56,6 +66,8 @@ forMachine elmVersion autoYes =
             case operation of
                 InFileStore op -> lift $ FileStore.execute op
                 InInfoFormatter op -> Json.format elmVersion autoYes op
-                DeprecatedIO io -> lift io
+                InInputConsole op -> lift $ InputConsole.execute op
+                InOutputConsole op -> lift $ OutputConsole.execute op
+                InFileWriter op -> lift $ FileWriter.execute op
         , done = const Json.done
         }

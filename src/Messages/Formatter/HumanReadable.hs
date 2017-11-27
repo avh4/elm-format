@@ -36,12 +36,8 @@ yesOrNo =
 
 renderInfo :: InfoMessage -> IO ()
 
-renderInfo (ProcessingFiles files) =
-    case files of
-        [file] ->
-            putStrLn $ "Processing file " ++ file
-        _ ->
-            putStrLn "Processing multiple files..."
+renderInfo (ProcessingFile file) =
+    putStrLn $ "Processing file " ++ file
 
 renderInfo (FileWouldChange file) =
     putStrLn $ "File would be changed " ++ file

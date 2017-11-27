@@ -34,7 +34,7 @@ done =
 
 showInfo :: ElmVersion -> InfoMessage -> a -> StateT Bool IO a
 
-showInfo _ (ProcessingFiles _) next =
+showInfo _ (ProcessingFile _) next =
     return next
 
 showInfo elmVersion (FileWouldChange file) next =
