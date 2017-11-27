@@ -8,7 +8,7 @@ import qualified Reporting.Error.Syntax as Syntax
 -- https://wiki.haskell.org/Internationalization_of_Haskell_programs_using_Haskell_data_types
 
 data InfoMessage
-  = ProcessingFiles [FilePath]
+  = ProcessingFile FilePath
   | FileWouldChange FilePath
   | ParseError FilePath String [A.Located Syntax.Error]
 

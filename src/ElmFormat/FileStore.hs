@@ -4,7 +4,9 @@ import qualified System.Directory as Dir
 
 import Prelude hiding (readFile, writeFile)
 import Control.Monad.Free
-import Data.Text
+import Data.Text (Text)
+import qualified Data.ByteString as ByteString
+import qualified Data.Text.Encoding as Text
 
 
 data FileType
@@ -46,8 +48,8 @@ instance FileStore f => FileStore (Free f) where
 execute :: FileStoreF a -> IO a
 execute operation =
     case operation of
-        ReadFile _ _ ->
-            undefined
+        ReadFile path next ->
+            next <$> Text.decodeUtf8 <$> ByteString.readFile path
 
         Stat path next ->
             do

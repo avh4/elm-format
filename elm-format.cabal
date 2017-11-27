@@ -91,7 +91,10 @@ library
         ElmFormat.Execute
         ElmFormat.Filesystem
         ElmFormat.FileStore
+        ElmFormat.FileWriter
+        ElmFormat.InputConsole
         ElmFormat.Operation
+        ElmFormat.OutputConsole
         ElmFormat.Version
         Flags
         Messages.Formatter.Format
