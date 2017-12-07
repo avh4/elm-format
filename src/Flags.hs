@@ -24,22 +24,9 @@ data Config = Config
 -- PARSE ARGUMENTS
 
 
-parse :: ElmVersion -> String -> Maybe String -> IO Config
-parse defaultElmVersion elmFormatVersion experimental =
-    Opt.customExecParser preferences (parser defaultElmVersion elmFormatVersion experimental)
-
-
-parse' :: ElmVersion -> String -> Maybe String -> [String] -> Either (Opt.ParserResult never) Config
-parse' defaultElmVersion elmFormatVersion experimental args =
-    case Opt.execParserPure preferences (parser defaultElmVersion elmFormatVersion experimental) args of
-        Opt.Success config ->
-            Right config
-
-        Opt.Failure failure ->
-            Left $ Opt.Failure failure
-
-        Opt.CompletionInvoked completion ->
-            Left $ Opt.CompletionInvoked completion
+parse :: ElmVersion -> String -> Maybe String -> [String] -> Opt.ParserResult Config
+parse defaultElmVersion elmFormatVersion experimental args =
+    Opt.execParserPure preferences (parser defaultElmVersion elmFormatVersion experimental) args
 
 
 usage :: ElmVersion -> String -> String -> Maybe String -> String
