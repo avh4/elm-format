@@ -1,7 +1,9 @@
 {-# OPTIONS_GHC -Wall #-}
 module ElmFormat where
 
-import System.Exit (exitFailure, exitSuccess)
+import System.Exit (exitFailure, exitSuccess, ExitCode(..), exitWith)
+import System.Environment (getArgs, getProgName)
+import System.IO (hPutStrLn, stderr)
 import Messages.Types
 import Messages.Formatter.Format
 import Control.Monad.Free
@@ -24,6 +26,7 @@ import qualified ElmFormat.FileWriter as FileWriter
 import qualified ElmFormat.Filesystem as FS
 import qualified ElmFormat.OutputConsole as OutputConsole
 import qualified ElmFormat.Version
+import qualified Options.Applicative as Opt
 import qualified Reporting.Result as Result
 
 
@@ -172,10 +175,28 @@ experimental =
     ElmFormat.Version.experimental
 
 
+{-| copied from Options.Applicative -}
+handleParseResult :: Opt.ParserResult a -> IO a
+handleParseResult (Opt.Success a) = return a
+handleParseResult (Opt.Failure failure) = do
+      progn <- getProgName
+      let (msg, exit) = Opt.renderFailure failure progn
+      case exit of
+        ExitSuccess -> putStrLn msg
+        _           -> hPutStrLn stderr msg
+      exitWith exit
+handleParseResult (Opt.CompletionInvoked compl) = do
+      progn <- getProgName
+      msg <- Opt.execCompletion compl progn
+      putStr msg
+      exitSuccess
+
+
 main :: ElmVersion -> IO ()
 main defaultVersion =
     do
-        config <- Flags.parse defaultVersion elmFormatVersion experimental
+        args <- getArgs
+        config <- handleParseResult $ Flags.parse defaultVersion elmFormatVersion experimental args
         let autoYes = Flags._yes config
         let elmVersionResult = determineVersion (Flags._elmVersion config) (Flags._upgrade config)
 

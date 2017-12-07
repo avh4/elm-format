@@ -6,15 +6,16 @@ import ElmVersion (ElmVersion)
 
 import qualified Flags as Flags
 import qualified ElmFormat.World as World
+import qualified Options.Applicative as Opt
 
 
 main :: World m => ElmVersion -> String -> Maybe String -> (String -> Either String a) -> (a -> String) -> [String] -> m ()
 main defaultElmVersion elmFormatVersion experimental parse render args =
     do
-        let flags = Flags.parse' defaultElmVersion elmFormatVersion experimental args
+        let flags = Flags.parse defaultElmVersion elmFormatVersion experimental args
 
         case flags of
-            Right flags ->
+            Opt.Success flags ->
                 doIt defaultElmVersion elmFormatVersion experimental parse render flags
 
 
