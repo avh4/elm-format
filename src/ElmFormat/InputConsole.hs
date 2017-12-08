@@ -2,6 +2,7 @@ module ElmFormat.InputConsole (InputConsole, InputConsoleF(..), readStdin, execu
 
 import Control.Monad.Free
 import Data.Text (Text)
+import ElmFormat.World
 import qualified Data.Text.Encoding as Text
 import qualified Data.ByteString.Lazy as Lazy
 
@@ -26,8 +27,8 @@ instance InputConsole f => InputConsole (Free f) where
     readStdin = liftF readStdin
 
 
-execute :: InputConsoleF a -> IO a
+execute :: World m => InputConsoleF a -> m a
 execute operation =
     case operation of
         ReadStdin next ->
-            next <$> Text.decodeUtf8 <$> Lazy.toStrict <$> Lazy.getContents
+            next <$> getStdin

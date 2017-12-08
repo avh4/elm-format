@@ -2,8 +2,9 @@ module ElmFormat.OutputConsole (OutputConsole, OutputConsoleF(..), writeStdout, 
 
 import Control.Monad.Free
 import Data.Text (Text)
+import ElmFormat.World (World)
 import qualified Data.Text.Encoding as Text
-import qualified Data.ByteString.Char8 as Char8
+import qualified ElmFormat.World as World
 
 
 class Functor f => OutputConsole f where
@@ -26,8 +27,8 @@ instance OutputConsole f => OutputConsole (Free f) where
     writeStdout content = liftF (writeStdout content)
 
 
-execute :: OutputConsoleF a -> IO a
+execute :: World m => OutputConsoleF a -> m a
 execute operation =
     case operation of
         WriteStdout content next ->
-            (Char8.putStr $ Text.encodeUtf8 content) *> return next
+            World.writeStdout content *> return next

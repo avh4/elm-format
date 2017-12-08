@@ -49,8 +49,8 @@ parser defaultElmVersion elmFormatVersion experimental =
         (helpInfo defaultElmVersion elmFormatVersion experimental)
 
 
-showHelpText :: ElmVersion -> String -> Maybe String -> IO ()
-showHelpText defaultElmVersion elmFormatVersion experimental = Opt.handleParseResult . Opt.Failure $
+showHelpText :: ElmVersion -> String -> Maybe String -> Opt.ParserResult never
+showHelpText defaultElmVersion elmFormatVersion experimental = Opt.Failure $
     Opt.parserFailure
         preferences
         (parser defaultElmVersion elmFormatVersion experimental)
