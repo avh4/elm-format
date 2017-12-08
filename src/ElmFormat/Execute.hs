@@ -10,6 +10,7 @@ import Elm.Utils ((|>))
 import Control.Monad.State
 import Control.Monad.Free
 import ElmFormat.Operation
+import ElmFormat.World
 import ElmVersion
 
 import qualified ElmFormat.FileStore as FileStore
@@ -20,14 +21,14 @@ import qualified Messages.Formatter.HumanReadable as HumanReadable
 import qualified Messages.Formatter.Json as Json
 
 
-data Program opF state = Program
-    { init :: (IO (), state)
-    , step :: forall a. opF a -> StateT state IO a
-    , done :: state -> IO ()
+data Program m opF state = Program
+    { init :: (m (), state)
+    , step :: forall a. opF a -> StateT state m a
+    , done :: state -> m ()
     }
 
 
-run :: Program opF state -> Free opF a -> IO a
+run :: World m => Program m opF state -> Free opF a -> m a
 run program operations =
     do
         let Program init step done = program
@@ -42,7 +43,7 @@ run program operations =
 
 
 {-| Execute Operations in a fashion appropriate for interacting with humans. -}
-forHuman :: Bool -> Program OperationF ()
+forHuman :: World m => Bool -> Program m OperationF ()
 forHuman autoYes =
     Program
         { init = (return (), ())
@@ -58,7 +59,7 @@ forHuman autoYes =
 
 
 {-| Execute Operations in a fashion appropriate for use by automated scripts. -}
-forMachine :: ElmVersion -> Bool -> Program OperationF Bool
+forMachine :: World m => ElmVersion -> Bool -> Program m OperationF Bool
 forMachine elmVersion autoYes =
     Program
         { init = Json.init

@@ -1,14 +1,17 @@
 {-# OPTIONS_GHC -Wall #-}
 module Messages.Formatter.HumanReadable (format) where
 
+import Prelude hiding (getLine, putStr, putStrLn)
+
 import Messages.Formatter.Format
 import Messages.Types
 import CommandLine.Helpers (showErrors)
 import Messages.Strings (showPromptMessage)
 import System.IO (hFlush, stdout)
+import ElmFormat.World
 
 
-format :: Bool -> InfoFormatterF a -> IO a
+format :: World m => Bool -> InfoFormatterF a -> m a
 format autoYes infoFormatter =
     case infoFormatter of
         OnInfo info next ->
@@ -23,9 +26,9 @@ format autoYes infoFormatter =
                         *> fmap next yesOrNo
 
 
-yesOrNo :: IO Bool
+yesOrNo :: World m => m Bool
 yesOrNo =
-  do  hFlush stdout
+  do  flushStdout
       input <- getLine
       case input of
         "y" -> return True
@@ -34,7 +37,7 @@ yesOrNo =
                   yesOrNo
 
 
-renderInfo :: InfoMessage -> IO ()
+renderInfo :: World m => InfoMessage -> m ()
 
 renderInfo (ProcessingFile file) =
     putStrLn $ "Processing file " ++ file

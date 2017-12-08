@@ -1,12 +1,12 @@
 module ElmFormat.FileStore (FileStore, FileStoreF(..), FileType(..), readFile, stat, listDirectory, execute) where
 
-import qualified System.Directory as Dir
-
 import Prelude hiding (readFile, writeFile)
 import Control.Monad.Free
 import Data.Text (Text)
+import ElmFormat.World hiding (readFile, listDirectory)
 import qualified Data.ByteString as ByteString
 import qualified Data.Text.Encoding as Text
+import qualified ElmFormat.World as World
 
 
 data FileType
@@ -45,20 +45,20 @@ instance FileStore f => FileStore (Free f) where
     listDirectory path = liftF (listDirectory path)
 
 
-execute :: FileStoreF a -> IO a
+execute :: World m => FileStoreF a -> m a
 execute operation =
     case operation of
         ReadFile path next ->
-            next <$> Text.decodeUtf8 <$> ByteString.readFile path
+            next <$> readUtf8File path
 
         Stat path next ->
             do
-                isFile <- Dir.doesFileExist path
-                isDirectory <- Dir.doesDirectoryExist path
+                isFile <- doesFileExist path
+                isDirectory <- doesDirectoryExist path
                 case ( isFile, isDirectory ) of
                     ( True, _ ) -> return $ next IsFile
                     ( _, True ) -> return $ next IsDirectory
                     ( False, False ) -> return $ next DoesNotExist
 
         ListDirectory path next ->
-            next <$> Dir.listDirectory path
+            next <$> World.listDirectory path

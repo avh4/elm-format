@@ -1,8 +1,10 @@
 {-# OPTIONS_GHC -Wall #-}
 module ElmFormat where
 
-import System.Exit (exitFailure, exitSuccess, ExitCode(..), exitWith)
-import System.Environment (getArgs, getProgName)
+import Prelude hiding (putStr, putStrLn)
+
+import System.Exit (ExitCode(..), exitWith)
+import System.Environment (getArgs)
 import System.IO (hPutStrLn, stderr)
 import Messages.Types
 import Messages.Formatter.Format
@@ -14,6 +16,7 @@ import ElmFormat.FileWriter (FileWriter)
 import ElmFormat.InputConsole (InputConsole)
 import ElmFormat.Operation (Operation)
 import ElmFormat.OutputConsole (OutputConsole)
+import ElmFormat.World
 
 import qualified Flags
 import qualified Data.Text as Text
@@ -141,7 +144,7 @@ determineWhatToDoFromConfig config resolvedInputFiles =
         determineWhatToDo source destination
 
 
-exitWithError :: ErrorMessage -> IO ()
+exitWithError :: World m => ErrorMessage -> m ()
 exitWithError message =
     (putStrLn $ r $ message)
         >> exitFailure
@@ -160,7 +163,7 @@ determineVersion elmVersion upgrade =
             Right elmVersion
 
 
-exit :: Bool -> IO ()
+exit :: World m => Bool -> m ()
 exit True = exitSuccess
 exit False = exitFailure
 
@@ -176,26 +179,32 @@ experimental =
 
 
 {-| copied from Options.Applicative -}
-handleParseResult :: Opt.ParserResult a -> IO a
+handleParseResult :: World m => Opt.ParserResult a -> m a
 handleParseResult (Opt.Success a) = return a
 handleParseResult (Opt.Failure failure) = do
       progn <- getProgName
       let (msg, exit) = Opt.renderFailure failure progn
       case exit of
-        ExitSuccess -> putStrLn msg
-        _           -> hPutStrLn stderr msg
-      exitWith exit
+        ExitSuccess -> putStrLn msg *> exitSuccess *> return undefined
+        _           -> putStrLnStderr msg *> exitFailure *> return undefined
 handleParseResult (Opt.CompletionInvoked compl) = do
-      progn <- getProgName
-      msg <- Opt.execCompletion compl progn
-      putStr msg
-      exitSuccess
+      -- progn <- getProgName
+      -- msg <- Opt.execCompletion compl progn
+      -- putStr msg
+      -- const undefined <$> exitSuccess
+      error "Shell completion not yet implemented"
 
 
 main :: ElmVersion -> IO ()
-main defaultVersion =
+main elmVersion =
     do
         args <- getArgs
+        main' elmVersion args
+
+
+main' :: World m => ElmVersion -> [String] -> m ()
+main' defaultVersion args =
+    do
         config <- handleParseResult $ Flags.parse defaultVersion elmFormatVersion experimental args
         let autoYes = Flags._yes config
         let elmVersionResult = determineVersion (Flags._elmVersion config) (Flags._upgrade config)
@@ -204,7 +213,7 @@ main defaultVersion =
 
         case (elmVersionResult, determineWhatToDoFromConfig config resolvedInputFiles) of
             (_, Left NoInputs) ->
-                Flags.showHelpText defaultVersion elmFormatVersion experimental
+                (handleParseResult $ Flags.showHelpText defaultVersion elmFormatVersion experimental)
                     >> exitFailure
 
             (_, Left message) ->

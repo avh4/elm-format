@@ -5,8 +5,10 @@ import qualified System.Directory as Dir
 import Prelude hiding (writeFile)
 import Control.Monad.Free
 import Data.Text (Text)
+import ElmFormat.World (World)
 import qualified Data.ByteString as ByteString
 import qualified Data.Text.Encoding as Text
+import qualified ElmFormat.World as World
 
 
 class Functor f => FileWriter f where
@@ -34,17 +36,17 @@ instance FileWriter f => FileWriter (Free f) where
     overwriteFile path content = liftF (overwriteFile path content)
 
 
-execute :: FileWriterF a -> IO a
+execute :: World m => FileWriterF a -> m a
 execute operation =
     case operation of
         WriteFile path content next ->
             do
-                exists <- Dir.doesFileExist path
+                exists <- World.doesFileExist path
                 case exists of
                     True ->
                         error "file exists and was not marked to be overwritten"
                     False ->
-                        (ByteString.writeFile path $ Text.encodeUtf8 content) *> return next
+                        World.writeUtf8File path content *> return next
 
         OverwriteFile path content next ->
-            (ByteString.writeFile path $ Text.encodeUtf8 content) *> return next
+            World.writeUtf8File path content *> return next
