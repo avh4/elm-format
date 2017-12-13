@@ -1,4 +1,4 @@
-module Integration.LiteralTest where
+module Integration.LiteralTest (tests) where
 
 import Elm.Utils ((|>))
 import Test.Tasty

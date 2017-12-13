@@ -179,14 +179,14 @@ experimental =
 
 
 {-| copied from Options.Applicative -}
-handleParseResult :: World m => Opt.ParserResult a -> m a
-handleParseResult (Opt.Success a) = return a
+handleParseResult :: World m => Opt.ParserResult a -> m (Maybe a)
+handleParseResult (Opt.Success a) = return (Just a)
 handleParseResult (Opt.Failure failure) = do
       progn <- getProgName
       let (msg, exit) = Opt.renderFailure failure progn
       case exit of
-        ExitSuccess -> putStrLn msg *> exitSuccess *> return undefined
-        _           -> putStrLnStderr msg *> exitFailure *> return undefined
+        ExitSuccess -> putStrLn msg *> exitSuccess *> return Nothing
+        _           -> putStrLnStderr msg *> exitFailure *> return Nothing
 handleParseResult (Opt.CompletionInvoked compl) = do
       -- progn <- getProgName
       -- msg <- Opt.execCompletion compl progn
@@ -206,31 +206,35 @@ main' :: World m => ElmVersion -> [String] -> m ()
 main' defaultVersion args =
     do
         config <- handleParseResult $ Flags.parse defaultVersion elmFormatVersion experimental args
-        let autoYes = Flags._yes config
-        let elmVersionResult = determineVersion (Flags._elmVersion config) (Flags._upgrade config)
-
-        resolvedInputFiles <- Execute.run (Execute.forHuman autoYes) $ resolveFiles (Flags._input config)
-
-        case (elmVersionResult, determineWhatToDoFromConfig config resolvedInputFiles) of
-            (_, Left NoInputs) ->
-                (handleParseResult $ Flags.showHelpText defaultVersion elmFormatVersion experimental)
-                    >> exitFailure
-
-            (_, Left message) ->
-                exitWithError message
-
-            (Left message, _) ->
-                exitWithError message
-
-            (Right elmVersion, Right whatToDo) ->
+        case config of
+            Nothing -> return ()
+            Just config ->
                 do
-                    let run = case (Flags._validate config) of
-                          True -> Execute.run $ Execute.forMachine elmVersion True
-                          False -> Execute.run $ Execute.forHuman autoYes
-                    result <-  run $ doIt elmVersion whatToDo
-                    if result
-                        then exitSuccess
-                        else exitFailure
+                    let autoYes = Flags._yes config
+                    let elmVersionResult = determineVersion (Flags._elmVersion config) (Flags._upgrade config)
+
+                    resolvedInputFiles <- Execute.run (Execute.forHuman autoYes) $ resolveFiles (Flags._input config)
+
+                    case (elmVersionResult, determineWhatToDoFromConfig config resolvedInputFiles) of
+                        (_, Left NoInputs) ->
+                            (handleParseResult $ Flags.showHelpText defaultVersion elmFormatVersion experimental)
+                                >> exitFailure
+
+                        (_, Left message) ->
+                            exitWithError message
+
+                        (Left message, _) ->
+                            exitWithError message
+
+                        (Right elmVersion, Right whatToDo) ->
+                            do
+                                let run = case (Flags._validate config) of
+                                      True -> Execute.run $ Execute.forMachine elmVersion True
+                                      False -> Execute.run $ Execute.forHuman autoYes
+                                result <-  run $ doIt elmVersion whatToDo
+                                if result
+                                    then exitSuccess
+                                    else exitFailure
 
 
 validate :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage ()
