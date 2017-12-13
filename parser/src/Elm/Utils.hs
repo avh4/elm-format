@@ -26,8 +26,8 @@ avoiding parenthesis.
 f <| x = f x
 
 
-infixr 0 <|
-infixl 0 |>
+infixr 1 <|
+infixl 1 |>
 
 
 (>>) :: (a -> b) -> (b -> c) -> (a -> c)

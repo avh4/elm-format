@@ -185,6 +185,7 @@ test-Suite elm-format-tests
         ElmFormat.CliTest
         ElmFormat.Render.ElmStructureTest
         ElmFormat.TestWorld
+        Integration.CliTest
         Integration.LiteralTest
         Parse.ExpressionTest
         Parse.HelpersTest

@@ -7,6 +7,7 @@ import qualified BoxTest
 import qualified CommonMarkTests
 import qualified ElmFormat.Render.ElmStructureTest
 import qualified ElmFormat.CliTest
+import qualified Integration.CliTest
 import qualified Integration.LiteralTest
 import qualified Parse.ExpressionTest
 import qualified Parse.HelpersTest
@@ -26,6 +27,7 @@ main =
             , BoxTest.tests
             , ElmFormat.Render.ElmStructureTest.tests
             , ElmFormat.CliTest.tests
+            , Integration.CliTest.tests
             , Integration.LiteralTest.tests
             , Parse.ExpressionTest.tests
             , Parse.HelpersTest.tests
