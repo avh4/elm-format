@@ -119,7 +119,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td rowspan=1>Visual Studio Code</td>
     <td>:trophy: <a href="https://marketplace.visualstudio.com/items?itemName=sbrink.elm">Elm Language Support</a></td>
     <td>:warning: <a href="#visual-studio-code-installation">3 steps</a></td>
-    <td>❔ TBD</td>
+    <td>:x: formatting moves cursor to end of file</td>
     <td>:warning: requires configuration</td>
     <td>❔ TBD</td>
     <td>❔ TBD</td>
@@ -244,19 +244,20 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 
 ### Visual Studio Code installation
 
+> Note: If you previously installed a VSCode extension called "elm-format", uninstall it (it is deprecated, and the "elm" extension now provides elm-format integration).
+
 1. Install elm-format
-1. Install Elm tools for VSCode
+1. Install [Elm Language Support](https://marketplace.visualstudio.com/items?itemName=sbrink.elm) for VSCode
 
     ```bash
     ext install elm
     ```
 
-1. SHIFT-ALT-F will format the current file
+1. Configure the extension to format on save:
 
-
-### VSCode Elm Format installation
-
-Note, Elm Format is no longer available for VS Code. Use [elm](#visual-studio-code-installation) instead
+    1. Go to `Preferences -> Settings` in the menu
+    1. Search the settings for `elm.formatOnSave`
+    1. Change the value of `elm.formatOnSave` to `true` in your User Settings
 
 
 ### Sublime Text installation
