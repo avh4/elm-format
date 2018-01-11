@@ -39,7 +39,7 @@ elm-format --help  # See other command line options
 ### Experimental version
 
 The latest version of `elm-format` contains experimental features that may or may not appear in future releases.
-If you are able to some amount of instability on your Elm projects,
+If you are able to tolerate some amount of instability on your Elm projects,
 you can help with the development of `elm-format` by using the experimental version and providing feedback.
 You can give feedback about the latest experimental version [here](https://goo.gl/forms/kLdTN1yikfOI8ZuA3).
 
