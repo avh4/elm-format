@@ -7,7 +7,6 @@ import Messages.Formatter.Format
 import Messages.Types
 import CommandLine.Helpers (showErrors)
 import Messages.Strings (showPromptMessage)
-import System.IO (hFlush, stdout)
 import ElmFormat.World
 
 
