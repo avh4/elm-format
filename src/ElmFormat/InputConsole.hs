@@ -3,8 +3,6 @@ module ElmFormat.InputConsole (InputConsole, InputConsoleF(..), readStdin, execu
 import Control.Monad.Free
 import Data.Text (Text)
 import ElmFormat.World
-import qualified Data.Text.Encoding as Text
-import qualified Data.ByteString.Lazy as Lazy
 
 
 class Functor f => InputConsole f where

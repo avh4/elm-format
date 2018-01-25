@@ -4,8 +4,6 @@ import Prelude hiding (readFile, writeFile)
 import Control.Monad.Free
 import Data.Text (Text)
 import ElmFormat.World hiding (readFile, listDirectory)
-import qualified Data.ByteString as ByteString
-import qualified Data.Text.Encoding as Text
 import qualified ElmFormat.World as World
 
 
