@@ -1,13 +1,9 @@
 module ElmFormat.FileWriter (FileWriter, FileWriterF(..), writeFile, overwriteFile, execute) where
 
-import qualified System.Directory as Dir
-
 import Prelude hiding (writeFile)
 import Control.Monad.Free
 import Data.Text (Text)
 import ElmFormat.World (World)
-import qualified Data.ByteString as ByteString
-import qualified Data.Text.Encoding as Text
 import qualified ElmFormat.World as World
 
 

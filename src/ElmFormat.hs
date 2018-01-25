@@ -3,9 +3,8 @@ module ElmFormat where
 
 import Prelude hiding (putStr, putStrLn)
 
-import System.Exit (ExitCode(..), exitWith)
+import System.Exit (ExitCode(..))
 import System.Environment (getArgs)
-import System.IO (hPutStrLn, stderr)
 import Messages.Types
 import Messages.Formatter.Format
 import Control.Monad.Free
@@ -14,7 +13,6 @@ import ElmVersion
 import ElmFormat.FileStore (FileStore)
 import ElmFormat.FileWriter (FileWriter)
 import ElmFormat.InputConsole (InputConsole)
-import ElmFormat.Operation (Operation)
 import ElmFormat.OutputConsole (OutputConsole)
 import ElmFormat.World
 

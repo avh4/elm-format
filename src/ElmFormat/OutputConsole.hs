@@ -3,7 +3,6 @@ module ElmFormat.OutputConsole (OutputConsole, OutputConsoleF(..), writeStdout, 
 import Control.Monad.Free
 import Data.Text (Text)
 import ElmFormat.World (World)
-import qualified Data.Text.Encoding as Text
 import qualified ElmFormat.World as World
 
 

@@ -11,7 +11,6 @@ import Control.Applicative ((<|>))
 import Control.Monad.Writer (Writer, execWriter, tell)
 import qualified Data.List.Split as Split
 import System.Console.ANSI
-import System.IO (hPutStr, stderr)
 import ElmFormat.World
 
 import qualified Reporting.Region as R
