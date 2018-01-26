@@ -8,7 +8,7 @@ import System.Environment (getArgs)
 import Messages.Types
 import Messages.Formatter.Format
 import Control.Monad.Free
-import CommandLine.Helpers
+import qualified CommandLine.Helpers as Helpers
 import ElmVersion
 import ElmFormat.FileStore (FileStore)
 import ElmFormat.FileWriter (FileWriter)
@@ -114,8 +114,8 @@ determineSource stdin inputFiles =
 
 
 determineDestination :: Maybe FilePath -> Bool -> Either ErrorMessage Destination
-determineDestination output validate =
-    case ( output, validate ) of
+determineDestination output doValidate =
+    case ( output, doValidate ) of
         ( Nothing, True ) -> Right ValidateOnly
         ( Nothing, False ) -> Right UpdateInPlace
         ( Just path, False ) -> Right $ ToFile path
@@ -144,7 +144,7 @@ determineWhatToDoFromConfig config resolvedInputFiles =
 
 exitWithError :: World m => ErrorMessage -> m ()
 exitWithError message =
-    (putStrLn $ r $ message)
+    (putStrLn $ Helpers.r $ message)
         >> exitFailure
 
 
@@ -159,11 +159,6 @@ determineVersion elmVersion upgrade =
 
         (_, False) ->
             Right elmVersion
-
-
-exit :: World m => Bool -> m ()
-exit True = exitSuccess
-exit False = exitFailure
 
 
 elmFormatVersion :: String
@@ -185,7 +180,7 @@ handleParseResult (Opt.Failure failure) = do
       case exit of
         ExitSuccess -> putStrLn msg *> exitSuccess *> return Nothing
         _           -> putStrLnStderr msg *> exitFailure *> return Nothing
-handleParseResult (Opt.CompletionInvoked compl) = do
+handleParseResult (Opt.CompletionInvoked _) = do
       -- progn <- getProgName
       -- msg <- Opt.execCompletion compl progn
       -- putStr msg
@@ -203,8 +198,8 @@ main elmVersion =
 main' :: World m => ElmVersion -> [String] -> m ()
 main' defaultVersion args =
     do
-        config <- handleParseResult $ Flags.parse defaultVersion elmFormatVersion experimental args
-        case config of
+        c <- handleParseResult $ Flags.parse defaultVersion elmFormatVersion experimental args
+        case c of
             Nothing -> return ()
             Just config ->
                 do
