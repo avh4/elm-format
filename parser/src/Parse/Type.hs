@@ -5,82 +5,82 @@ import Text.Parsec ((<|>), (<?>), char, many1, string, try, optionMaybe)
 
 import Parse.Helpers
 import qualified Reporting.Annotation as A
-import AST.V0_16
+import qualified AST.V0_16 as AST
 import Parse.IParser
 import Parse.Common
 import Data.Maybe (maybeToList)
 
 
-tvar :: IParser Type
+tvar :: IParser AST.Type
 tvar =
   addLocation
-    (TypeVariable <$> lowVar <?> "a type variable")
+    (AST.TypeVariable <$> lowVar <?> "a type variable")
 
 
-tuple :: IParser Type
+tuple :: IParser AST.Type
 tuple =
   addLocation $
   do  types <- parens'' (withEol expr)
       case types of
         Left comments ->
-            return $ UnitType comments
+            return $ AST.UnitType comments
         Right [] ->
-            return $ UnitType []
-        Right [Commented [] (t, Nothing) []] ->
+            return $ AST.UnitType []
+        Right [AST.Commented [] (t, Nothing) []] ->
             return $ A.drop t
-        Right [Commented pre (t, eol) post] ->
-            return $ TypeParens (Commented pre t (maybeToList (fmap LineComment eol) ++ post))
+        Right [AST.Commented pre (t, eol) post] ->
+            return $ AST.TypeParens (AST.Commented pre t (maybeToList (fmap AST.LineComment eol) ++ post))
         Right types' ->
-            return $ TupleType types'
+            return $ AST.TupleType types'
 
 
-record :: IParser Type
+record :: IParser AST.Type
 record =
     addLocation $ brackets' $ checkMultiline $
         do
             base <- optionMaybe $ try (commented lowVar <* string "|")
             (fields, trailing) <- sectionedGroup (pair lowVar lenientHasType expr)
-            return $ RecordType base fields trailing
+            return $ AST.RecordType base fields trailing
 
 
-capTypeVar :: IParser [UppercaseIdentifier]
+capTypeVar :: IParser [AST.UppercaseIdentifier]
 capTypeVar =
     dotSep1 capVar
 
 
-constructor0 :: IParser TypeConstructor
+constructor0 :: IParser AST.TypeConstructor
 constructor0 =
   do  name <- capTypeVar
-      return (NamedConstructor name)
+      return (AST.NamedConstructor name)
 
 
-constructor0' :: IParser Type
+constructor0' :: IParser AST.Type
 constructor0' =
     addLocation $
     do  ctor <- constructor0
-        return (TypeConstruction ctor [])
+        return (AST.TypeConstruction ctor [])
 
 
-term :: IParser Type
+term :: IParser AST.Type
 term =
   tuple <|> record <|> tvar <|> constructor0'
 
 
-tupleCtor :: IParser TypeConstructor
+tupleCtor :: IParser AST.TypeConstructor
 tupleCtor =
     do  ctor <- parens' (many1 (char ','))
-        return (TupleConstructor (length ctor + 1))
+        return (AST.TupleConstructor (length ctor + 1))
 
 
-app :: IParser Type
+app :: IParser AST.Type
 app =
   addLocation $
   do  f <- constructor0 <|> try tupleCtor <?> "a type constructor"
       args <- spacePrefix term
-      return $ TypeConstruction f args
+      return $ AST.TypeConstruction f args
 
 
-expr :: IParser Type
+expr :: IParser AST.Type
 expr =
   do
     result <- separated rightArrow (app <|> term)
@@ -89,16 +89,16 @@ expr =
         Left t ->
           t
         Right (region, first, rest, multiline) ->
-          A.A region $ FunctionType first rest (ForceMultiline multiline)
+          A.A region $ AST.FunctionType first rest (AST.ForceMultiline multiline)
 
 
-constructor :: IParser ([UppercaseIdentifier], [(Comments, Type)])
+constructor :: IParser ([AST.UppercaseIdentifier], [(AST.Comments, AST.Type)])
 constructor =
   (,) <$> (capTypeVar <?> "another type constructor")
       <*> spacePrefix term
 
 
-tag :: IParser (UppercaseIdentifier, [(Comments, Type)])
+tag :: IParser (AST.UppercaseIdentifier, [(AST.Comments, AST.Type)])
 tag =
   (,) <$> (capVar <?> "another type constructor")
       <*> spacePrefix term
