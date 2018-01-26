@@ -49,6 +49,8 @@ showErrorMessage OutputAndValidate =
 showErrorMessage (MustSpecifyVersionWithUpgrade elmVersion) =
     "I can only upgrade code to the latest Elm version.  To make sure I'm doing what you expect, you must also specify --elm-version=" ++ show elmVersion ++ " when you use --upgrade."
 
+showErrorMessage NoInputs =
+    "No inputs"
 
 showInputMessage :: InputFileMessage -> String
 
