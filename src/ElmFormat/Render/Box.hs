@@ -622,7 +622,7 @@ formatDetailedListing elmVersion listing =
             (formatVarValue elmVersion)
             (AST.Module.operators listing)
         , formatCommentedMap
-            (\name (inner, listing) -> AST.Variable.Union (name, inner) listing)
+            (\name (inner, listing_) -> AST.Variable.Union (name, inner) listing_)
             (formatVarValue elmVersion)
             (AST.Module.types listing)
         , formatCommentedMap
@@ -656,7 +656,7 @@ formatVarValue elmVersion aval =
             case
               ( formatListing
                   (formatCommentedMap
-                      (\name () -> name)
+                      (\name_ () -> name_)
                       (line . formatUppercaseIdentifier elmVersion)
                   )
                   listing
@@ -1255,9 +1255,9 @@ formatRecordLike formatBase formatKey fieldSep formatValue base' fields trailing
 formatSequence :: Char -> Char -> Maybe Char -> (a -> Box) -> A.ForceMultiline -> A.Comments -> A.Sequence a -> Box
 formatSequence left delim right formatA (A.ForceMultiline multiline) trailing (first:rest) =
     let
-        formatItem delim (pre, item) =
+        formatItem delim_ (pre, item) =
             maybe id (stack' . stack' blankLine) (formatComments pre) $
-            prefix (row [ punc [delim], space ]) $
+            prefix (row [ punc [delim_], space ]) $
             formatHeadCommented (formatEolCommented formatA) item
     in
         ElmStructure.forceableSpaceSepOrStack multiline
@@ -1274,7 +1274,7 @@ formatSequence left _ Nothing _ _ trailing [] =
 
 mapIsLast :: (Bool -> a -> b) -> [a] -> [b]
 mapIsLast _ [] = []
-mapIsLast f (last:[]) = f True last : []
+mapIsLast f (last_:[]) = f True last_ : []
 mapIsLast f (next:rest) = f False next : mapIsLast f rest
 
 
@@ -1314,7 +1314,7 @@ formatBinops_common transform elmVersion left ops multiline =
     let
         (left', ops') = transform left ops
 
-        formatPair isLast ( po, o, pe, e ) =
+        formatPair_ isLast ( po, o, pe, e ) =
             let
                 isLeftPipe =
                     o == AST.Variable.OpRef (A.SymbolIdentifier "<|")
@@ -1333,7 +1333,7 @@ formatBinops_common transform elmVersion left ops multiline =
         formatBinary
             multiline
             (formatExpression elmVersion InfixSeparated left')
-            (mapIsLast formatPair ops')
+            (mapIsLast formatPair_ ops')
 
 
 removeBackticks ::
