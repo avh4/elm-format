@@ -182,7 +182,6 @@ test-Suite elm-format-tests
     other-modules:
         BoxTest
         CommonMarkTests
-        ElmFormat.CliTest
         ElmFormat.Render.ElmStructureTest
         ElmFormat.TestWorld
         Integration.CliTest
