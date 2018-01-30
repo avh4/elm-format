@@ -52,11 +52,11 @@ typeDecl =
 
         Nothing ->
             do
-                tags <- pipeSep1 Type.tag <?> "a constructor for a union type"
+                tags_ <- pipeSep1 Type.tag <?> "a constructor for a union type"
                 return
                     AST.Declaration.Datatype
                         { nameWithArgs = Commented postType (name, args) preEquals
-                        , tags = exposedToOpen postEquals tags
+                        , tags = exposedToOpen postEquals tags_
                         }
 
 
