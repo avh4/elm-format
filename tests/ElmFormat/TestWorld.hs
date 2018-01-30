@@ -63,6 +63,11 @@ instance World (State.State TestWorldState) where
             state <- State.get
             State.put $ state { lastExitCode = Just 0 }
 
+    exitFailure =
+        do
+            state <- State.get
+            State.put $ state { lastExitCode = Just 1 }
+
 
 testWorld :: [(String, String)] -> TestWorldState
 testWorld files =
