@@ -197,8 +197,12 @@ main elmVersion =
 
 main' :: World m => ElmVersion -> [String] -> m ()
 main' defaultVersion args =
+    main'' defaultVersion elmFormatVersion experimental args
+
+main'' :: World m => ElmVersion -> String -> Maybe String -> [String] -> m ()
+main'' defaultVersion elmFormatVersion_ experimental_ args =
     do
-        c <- handleParseResult $ Flags.parse defaultVersion elmFormatVersion experimental args
+        c <- handleParseResult $ Flags.parse defaultVersion elmFormatVersion_ experimental_ args
         case c of
             Nothing -> return ()
             Just config ->
@@ -210,7 +214,7 @@ main' defaultVersion args =
 
                     case (elmVersionResult, determineWhatToDoFromConfig config resolvedInputFiles) of
                         (_, Left NoInputs) ->
-                            (handleParseResult $ Flags.showHelpText defaultVersion elmFormatVersion experimental)
+                            (handleParseResult $ Flags.showHelpText defaultVersion elmFormatVersion_ experimental_)
                                 >> exitFailure
 
                         (_, Left message) ->
