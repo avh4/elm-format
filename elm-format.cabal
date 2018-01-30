@@ -61,7 +61,6 @@ library
         AST.Variable
         Box
         Elm.Utils
-        ElmFormat.Cli
         ElmFormat.Parse
         ElmFormat.Render.Box
         ElmFormat.Render.ElmStructure
