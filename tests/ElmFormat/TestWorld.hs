@@ -6,7 +6,7 @@ import ElmFormat.World
 import Elm.Utils ((|>))
 import Test.Tasty (TestTree)
 import Test.Tasty.HUnit (Assertion, assertBool, assertEqual)
-import Test.Tasty.Golden (goldenVsString)
+import Test.Tasty.Golden (goldenVsStringDiff)
 
 import qualified Control.Monad.State.Lazy as State
 import qualified Data.Map.Strict as Dict
@@ -87,8 +87,8 @@ assertOutput expectedFiles context =
 
 goldenStdout :: String -> FilePath -> TestWorldState -> TestTree
 goldenStdout testName goldenFile state =
-    goldenVsString
-        testName
+    goldenVsStringDiff testName
+        (\ref new -> ["diff", "-u", ref, new])
         goldenFile
         (return $ Text.encodeUtf8 $ Text.pack $ fullStdout state)
 
