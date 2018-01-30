@@ -1,8 +1,10 @@
 module Integration.CliTest (tests) where
 
+import Prelude hiding (readFile)
 import Elm.Utils ((|>))
 import Test.Tasty
 import Test.Tasty.HUnit
+import ElmFormat.World (readFile)
 import ElmFormat.TestWorld (TestWorld, run, expectExit)
 import qualified ElmFormat
 import qualified ElmFormat.TestWorld as TestWorld
@@ -20,7 +22,17 @@ tests =
             |> run "elm-format-xxx" []
             |> TestWorld.goldenStdout "usage instructions"
                 "tests/Integration/data/usage.stdout"
+        , testCase "simple file" $ world
+            |> TestWorld.uploadFile "test.elm" "module Main exposing (..)\nf = 1"
+            |> run "elm-format" ["test.elm", "--output", "out.elm"]
+            |> TestWorld.eval (readFile "out.elm")
+            |> assertPrefix "module Main"
         ]
+
+
+assertPrefix :: String -> String -> Assertion
+assertPrefix prefix str =
+    assertEqual ("should start with " ++ prefix) prefix (take (length prefix) str)
 
 
 world :: TestWorld
