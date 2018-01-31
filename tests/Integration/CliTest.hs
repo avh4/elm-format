@@ -21,7 +21,7 @@ tests =
         , world
             |> run "elm-format-xxx" []
             |> TestWorld.goldenStdout "usage instructions"
-                "tests/Integration/data/usage.stdout"
+                "tests/usage.stdout"
         , testCase "simple file" $ world
             |> TestWorld.uploadFile "test.elm" "module Main exposing (..)\nf = 1"
             |> run "elm-format" ["test.elm", "--output", "out.elm"]
