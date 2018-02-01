@@ -6,12 +6,14 @@ import ElmFormat.World
 import Elm.Utils ((|>))
 import Test.Tasty (TestTree)
 import Test.Tasty.HUnit (Assertion, assertBool, assertEqual)
-import Test.Tasty.Golden (goldenVsString)
+import Test.Tasty.Golden (goldenVsStringDiff)
 
+import Prelude hiding (readFile, writeFile)
 import qualified Control.Monad.State.Lazy as State
 import qualified Data.Map.Strict as Dict
 import qualified Data.Text.Lazy as Text
 import qualified Data.Text.Lazy.Encoding as Text
+import qualified Data.Text as StrictText
 
 
 data TestWorldState =
@@ -35,6 +37,14 @@ fullStdout state =
 
 
 instance World (State.State TestWorldState) where
+    doesFileExist path =
+        do
+            state <- State.get
+            return $ Dict.member path (filesystem state)
+
+    doesDirectoryExist _path =
+        return False
+
     readFile path =
         do
             state <- State.get
@@ -45,10 +55,18 @@ instance World (State.State TestWorldState) where
                 Just content ->
                     return content
 
+    readUtf8File path =
+        do
+            content <- readFile path
+            return $ StrictText.pack content
+
     writeFile path content =
         do
             state <- State.get
             State.put $ state { filesystem = Dict.insert path content (filesystem state) }
+
+    writeUtf8File path content =
+        writeFile path (StrictText.unpack content)
 
     putStrLn string =
         do
@@ -62,6 +80,11 @@ instance World (State.State TestWorldState) where
         do
             state <- State.get
             State.put $ state { lastExitCode = Just 0 }
+
+    exitFailure =
+        do
+            state <- State.get
+            State.put $ state { lastExitCode = Just 1 }
 
 
 testWorld :: [(String, String)] -> TestWorldState
@@ -78,6 +101,10 @@ exec :: State.State s a -> s -> s
 exec = State.execState
 
 
+eval :: State.State s a -> s -> a
+eval = State.evalState
+
+
 assertOutput :: [(String, String)] -> TestWorldState -> Assertion
 assertOutput expectedFiles context =
     assertBool
@@ -87,14 +114,19 @@ assertOutput expectedFiles context =
 
 goldenStdout :: String -> FilePath -> TestWorldState -> TestTree
 goldenStdout testName goldenFile state =
-    goldenVsString
-        testName
+    goldenVsStringDiff testName
+        (\ref new -> ["diff", "-u", ref, new])
         goldenFile
         (return $ Text.encodeUtf8 $ Text.pack $ fullStdout state)
 
 
 init :: TestWorld
 init = testWorld []
+
+
+uploadFile :: String -> String -> TestWorld -> TestWorld
+uploadFile name content world =
+    world { filesystem = Dict.insert name content (filesystem world) }
 
 
 installProgram :: String -> ([String] -> State.State TestWorld ()) -> TestWorld -> TestWorld

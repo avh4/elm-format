@@ -89,7 +89,7 @@ function checkWaysToRun() {
 	echo "# WAYS TO RUN"
 	echo
 
-	HELP=$(cat tests/ElmFormat/CliTest/Usage.stdout)
+	HELP=$(cat tests/usage.stdout)
 
 	echo "## elm-format --help"
 	LONGHELP=$("$ELM_FORMAT" --help 2>&1)
