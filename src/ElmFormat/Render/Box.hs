@@ -180,6 +180,12 @@ formatModuleHeader elmVersion modu =
           Elm_0_18_Upgrade ->
               formatModuleLine elmVersion header
 
+          Elm_0_19 ->
+              formatModuleLine elmVersion header
+
+          Elm_0_19_Upgrade ->
+              formatModuleLine elmVersion header
+
       docs =
           fmap (formatModuleDocs elmVersion) $ RA.drop $ AST.Module.docs modu
 
@@ -972,7 +978,9 @@ formatExpression elmVersion context aexpr =
                 Elm_0_16 -> formatRange_0_17 elmVersion left right multiline
                 Elm_0_17 -> formatRange_0_17 elmVersion left right multiline
                 Elm_0_18 -> formatRange_0_17 elmVersion left right multiline
+                Elm_0_19 -> formatRange_0_18 elmVersion context left right
                 Elm_0_18_Upgrade -> formatRange_0_18 elmVersion context left right
+                Elm_0_19_Upgrade -> formatRange_0_18 elmVersion context left right
 
         AST.Expression.ExplicitList exprs trailing multiline ->
             formatSequence '[' ',' (Just ']')
@@ -986,7 +994,9 @@ formatExpression elmVersion context aexpr =
                 Elm_0_16 -> formatBinops_0_17 elmVersion left ops multiline
                 Elm_0_17 -> formatBinops_0_17 elmVersion left ops multiline
                 Elm_0_18 -> formatBinops_0_17 elmVersion left ops multiline
+                Elm_0_19 -> formatBinops_0_17 elmVersion left ops multiline
                 Elm_0_18_Upgrade -> formatBinops_0_18 elmVersion left ops multiline
+                Elm_0_19_Upgrade -> formatBinops_0_18 elmVersion left ops multiline
             |> expressionParens InfixSeparated context
 
         AST.Expression.Lambda patterns bodyComments expr multiline ->
@@ -1190,7 +1200,12 @@ formatExpression elmVersion context aexpr =
             ElmStructure.group True "(" "," ")" multiline $ map (formatCommented (formatExpression elmVersion SyntaxSeparated)) exprs
 
         AST.Expression.TupleFunction n ->
-            line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
+            case elmVersion of
+                Elm_0_19_Upgrade ->
+                    formatExpression elmVersion context (formatTupleLambda_0_19 n)
+
+                _ ->
+                    line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
 
         AST.Expression.Access expr field ->
             formatExpression elmVersion SpaceSeparated expr -- TODO: does this need a different context than SpaceSeparated?
@@ -1227,6 +1242,23 @@ formatExpression elmVersion context aexpr =
             , punc "|]"
             ]
 
+
+formatTupleLambda_0_19 :: Int -> AST.Expression.Expr
+formatTupleLambda_0_19 n =
+    -- TODO: handle n /= 2
+    (noRegion $ AST.Expression.Lambda
+        [ ([], noRegion $ AST.Pattern.VarPattern $ AST.LowercaseIdentifier "a")
+        , ([], noRegion $ AST.Pattern.VarPattern $ AST.LowercaseIdentifier "b")
+        ]
+        []
+        (noRegion $ AST.Expression.Tuple
+            [ AST.Commented [] (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef [] $ AST.LowercaseIdentifier "a") []
+            , AST.Commented [] (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef [] $ AST.LowercaseIdentifier "b") []
+            ]
+            False
+        )
+        False
+    )
 
 formatRecordLike ::
     (base -> Box) -> (key -> Line) -> String -> (value -> Box)
