@@ -256,8 +256,13 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 1. Configure the extension to format on save:
 
     1. Go to `Preferences -> Settings` in the menu
-    1. Search the settings for `elm.formatOnSave`
-    1. Change the value of `elm.formatOnSave` to `true` in your User Settings
+    1. In your User Settings, update the following value:
+    
+    ```
+    "[elm]": {
+        "editor.formatOnSave": true
+    },
+    ```
 
 
 ### Sublime Text installation
