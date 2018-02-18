@@ -1437,11 +1437,10 @@ removeBangs left ops =
     case ops of
         (pre, AST.Variable.OpRef (AST.SymbolIdentifier "!"), post, e):rest ->
             ( noRegion $ AST.Expression.Tuple
-                -- TODO: use comments
-                [ AST.Commented [] left []
+                [ AST.Commented [] left pre
                 , AST.Commented [] (noRegion $ AST.Expression.App
                     (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "batch")))
-                    [([], e)]
+                    [(post, e)]
                     (AST.FAJoinFirst AST.JoinAll)
                   )
                   []
