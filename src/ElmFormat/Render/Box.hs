@@ -1436,18 +1436,32 @@ removeBangs ::
 removeBangs left ops =
     case ops of
         (pre, AST.Variable.OpRef (AST.SymbolIdentifier "!"), post, e):rest ->
-            ( noRegion $ AST.Expression.Tuple
-                [ AST.Commented [] left pre
-                , AST.Commented [] (noRegion $ AST.Expression.App
-                    (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "batch")))
-                    [(post, e)]
-                    (AST.FAJoinFirst AST.JoinAll)
-                  )
-                  []
-                ]
-                True
-            , rest
-            )
+            case RA.drop e of
+                AST.Expression.ExplicitList [] innerComments _ ->
+                    ( noRegion $ AST.Expression.Tuple
+                        [ AST.Commented [] left pre
+                        , AST.Commented
+                            post
+                            (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "none")))
+                            innerComments
+                        ]
+                        True
+                    , rest
+                    )
+
+                _ ->
+                    ( noRegion $ AST.Expression.Tuple
+                        [ AST.Commented [] left pre
+                        , AST.Commented [] (noRegion $ AST.Expression.App
+                            (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "batch")))
+                            [(post, e)]
+                            (AST.FAJoinFirst AST.JoinAll)
+                          )
+                          []
+                        ]
+                        True
+                    , rest
+                    )
 
         _ -> (left, ops)
 

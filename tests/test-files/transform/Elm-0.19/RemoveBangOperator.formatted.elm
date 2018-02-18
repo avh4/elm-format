@@ -11,3 +11,15 @@ batch_withComments model a b =
     ( model {- A -}
     , Cmd.batch {- B -} [ a, b ]
     )
+
+
+none model =
+    ( model
+    , Cmd.none
+    )
+
+
+none_withComments model =
+    ( model {- A -}
+    , {- B -} Cmd.none {- C -}
+    )
