@@ -30,9 +30,14 @@ import Text.Printf (printf)
 import Util.List
 
 
+pleaseReport'' :: String -> String -> String
+pleaseReport'' what details =
+    "<elm-format-" ++ ElmFormat.Version.asString ++ ": "++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
+
+
 pleaseReport' :: String -> String -> Line
 pleaseReport' what details =
-    keyword $ "<elm-format-" ++ ElmFormat.Version.asString ++ ": "++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
+    keyword $ pleaseReport'' what details
 
 
 pleaseReport :: String -> String -> Box
@@ -1245,18 +1250,22 @@ formatExpression elmVersion context aexpr =
 
 formatTupleLambda_0_19 :: Int -> AST.Expression.Expr
 formatTupleLambda_0_19 n =
-    -- TODO: handle n /= 2
+    let
+      vars =
+        if n <= 26
+          then fmap (\c -> [c]) (take n ['a'..'z'])
+          else error (pleaseReport'' "UNEXPECTED TUPLE" "more than 26 elements")
+
+      makeArg varName =
+          ([], noRegion $ AST.Pattern.VarPattern $ AST.LowercaseIdentifier varName)
+
+      makeTupleItem varName =
+          AST.Commented [] (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef [] $ AST.LowercaseIdentifier varName) []
+    in
     (noRegion $ AST.Expression.Lambda
-        [ ([], noRegion $ AST.Pattern.VarPattern $ AST.LowercaseIdentifier "a")
-        , ([], noRegion $ AST.Pattern.VarPattern $ AST.LowercaseIdentifier "b")
-        ]
+        (fmap makeArg vars)
         []
-        (noRegion $ AST.Expression.Tuple
-            [ AST.Commented [] (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef [] $ AST.LowercaseIdentifier "a") []
-            , AST.Commented [] (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef [] $ AST.LowercaseIdentifier "b") []
-            ]
-            False
-        )
+        (noRegion $ AST.Expression.Tuple (fmap makeTupleItem vars) False)
         False
     )
 
