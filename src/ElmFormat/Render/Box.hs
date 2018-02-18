@@ -1001,7 +1001,7 @@ formatExpression elmVersion context aexpr =
                 Elm_0_18 -> formatBinops_0_17 elmVersion left ops multiline
                 Elm_0_19 -> formatBinops_0_17 elmVersion left ops multiline
                 Elm_0_18_Upgrade -> formatBinops_0_18 elmVersion left ops multiline
-                Elm_0_19_Upgrade -> formatBinops_0_18 elmVersion left ops multiline
+                Elm_0_19_Upgrade -> formatBinops_0_19_upgrade elmVersion left ops multiline
             |> expressionParens InfixSeparated context
 
         AST.Expression.Lambda patterns bodyComments expr multiline ->
@@ -1339,6 +1339,16 @@ formatBinops_0_18 elmVersion left ops multiline =
     formatBinops_common removeBackticks elmVersion left ops multiline
 
 
+formatBinops_0_19_upgrade ::
+    ElmVersion
+    -> AST.Expression.Expr
+    -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
+    -> Bool
+    -> Box
+formatBinops_0_19_upgrade elmVersion left ops multiline =
+    formatBinops_common removeBangs elmVersion left ops multiline
+
+
 formatBinops_common ::
     (AST.Expression.Expr
         -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
@@ -1417,6 +1427,30 @@ removeBackticks left ops =
                 (e', rest') = removeBackticks e rest
             in
                 (left, (pre, op, post, e'):rest')
+
+
+removeBangs ::
+    AST.Expression.Expr
+    -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
+    -> (AST.Expression.Expr, [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)])
+removeBangs left ops =
+    case ops of
+        (pre, AST.Variable.OpRef (AST.SymbolIdentifier "!"), post, e):rest ->
+            ( noRegion $ AST.Expression.Tuple
+                -- TODO: use comments
+                [ AST.Commented [] left []
+                , AST.Commented [] (noRegion $ AST.Expression.App
+                    (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "batch")))
+                    [([], e)]
+                    (AST.FAJoinFirst AST.JoinAll)
+                  )
+                  []
+                ]
+                True
+            , rest
+            )
+
+        _ -> (left, ops)
 
 
 formatRange_0_17 :: ElmVersion -> AST.Commented AST.Expression.Expr -> AST.Commented AST.Expression.Expr -> Bool -> Box

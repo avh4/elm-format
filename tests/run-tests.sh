@@ -382,6 +382,7 @@ checkUpgrade 0.18 Elm-0.18/SpecialBackticksBecomePipelines.elm
 checkUpgrade 0.18 Elm-0.18/RenameTupleFunctions.elm
 
 checkUpgrade 0.19 Elm-0.19/CommaFunctionsBecomeLambdas.elm
+checkUpgrade 0.19 Elm-0.19/RemoveBangOperator.elm
 
 checkValidationOutputFormat
 
