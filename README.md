@@ -72,8 +72,8 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   </tr>
   <tr>
     <td rowspan=2><a href="https://atom.io/">Atom</a></td>
-    <td>:trophy: <a href="https://atom.io/packages/elm-format">atom-elm-format</a></td>
-    <td>:white_check_mark: <a href="#atom-elm-format-installation">2 steps</a></td>
+    <td>:trophy: <a href="https://atom.io/packages/elm-format">elm-format</a></td>
+    <td>:white_check_mark: <a href="#atom-installation">2 steps</a></td>
     <td>:warning: must use format-on-save or save file before formatting</td>
     <td>:white_check_mark:</td>
     <td>:white_check_mark:</td>
@@ -152,30 +152,29 @@ If you can simplify or improve the installation instructions or add instructions
 The default behavior of `elm-format`-approved plugins is to format Elm files on save.
 
 
-### atom-elm-format installation
+### Atom installation
 
+##### Pre-install:
+1. Download the appropriate elm-format binary
+2. Moving it to `usr/local/bin` will save some time later, although you can technically place it anywhere in your file system.
+
+##### Install:
 1. Install elm-format
-1. Install atom-elm-format
+2. Install atom-beautify
+```
+$ apm install elm-format
+$ apm install atom-beautify
+```
 
-    ```
-    apm install elm-format
-    ```
+or, use the Atom package manager in Atom's settings
 
-  or use the Atom package manager in Atom's settings
+##### Post-Install:
+1. Locate the elm-format binary
+2. From Settings -> Package -> elm-format, add binary's path
 
-
-### atom-beautify installation
-
-1. Install elm-format
-1. Install atom-beautify
-
-    ```
-    apm install atom-beautify
-    ```
-
-  or use the Atom package manager in Atom's settings
-
-1. Use `^⌥B` (`CTRL-ALT-B`) to format a file
+##### Usage:
+1. Format-on-save is enabled by default
+2. Use `^⌥B` (`CTRL-ALT-B`) to format a file (optional) 
 
 
 ### elm-light installation
