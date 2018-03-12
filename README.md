@@ -143,6 +143,15 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
+  <tr>
+    <td rowspan=1><a href="https://macromates.com/">TextMate</a></td>
+    <td><a href="https://github.com/cmason/Elm.tmBundle">Elm.tmbundle</a></td>
+    <td>:warning: <a href="https://github.com/cmason/Elm.tmBundle#installation">2 steps</a></td>
+    <td>:white_check_mark:</td>
+    <td>:white_check_mark:</td>
+    <td>❔ TBD</td>
+    <td>:white_check_mark:</td>
+  </tr>
 </table>
 
 
