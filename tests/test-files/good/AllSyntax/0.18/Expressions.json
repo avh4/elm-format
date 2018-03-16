@@ -475,10 +475,36 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "base": "a",
+                        "fields": {
+                            "x": "TODO: Expr"
+                        },
+                        "type": "RecordUpdate"
+                    },
+                    {
+                        "base": "a",
+                        "fields": {
+                            "x": "TODO: Expr",
+                            "y": "TODO: Expr"
+                        },
+                        "type": "RecordUpdate"
+                    },
+                    {
+                        "base": "a",
+                        "fields": {
+                            "x": "TODO: Expr"
+                        },
+                        "type": "RecordUpdate"
+                    },
+                    {
+                        "base": "a",
+                        "fields": {
+                            "x": "TODO: Expr",
+                            "y": "TODO: Expr"
+                        },
+                        "type": "RecordUpdate"
+                    }
                 ],
                 "type": "TupleLiteral"
             },
@@ -486,7 +512,14 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "base": "a",
+                "fields": {
+                    "a": "TODO: Expr",
+                    "x": "TODO: Expr"
+                },
+                "type": "RecordUpdate"
+            },
             "name": "recordUpdateWithCommentedOutFields",
             "type": "Definition"
         },
