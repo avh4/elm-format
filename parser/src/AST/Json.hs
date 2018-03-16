@@ -42,4 +42,9 @@ instance ToJSON Expr' where
       [ ("type" , JSString $ toJSString "VariableReference")
       , ("name" , JSString $ toJSString ((List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) namespace) ++ "." ++ var))
       ]
+  showJSON (App (A _ expr) _ _) =
+    makeObj
+      [ ("type" , JSString $ toJSString "FunctionApplication")
+      , ("function", showJSON expr)
+      ]
   showJSON _ = JSString $ toJSString "TODO: Expr"
