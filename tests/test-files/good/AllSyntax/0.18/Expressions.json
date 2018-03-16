@@ -691,17 +691,83 @@
                 },
                 "declarations": [
                     {
-                        "expression": "TODO: Expr",
+                        "expression": {
+                            "branches": [
+                                {
+                                    "body": {
+                                        "name": "x",
+                                        "type": "VariableReference"
+                                    },
+                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 344 22 344 23 (VarPattern (LowercaseIdentifier \"x\")))])"
+                                },
+                                {
+                                    "body": "TODO: Expr",
+                                    "pattern": "TODO: Pattern (Anything)"
+                                }
+                            ],
+                            "subject": {
+                                "arguments": [
+                                    "TODO: Expr"
+                                ],
+                                "function": "TODO: Expr",
+                                "type": "FunctionApplication"
+                            },
+                            "type": "CaseExpression"
+                        },
                         "name": "a",
                         "type": "Definition"
                     },
                     {
-                        "expression": "TODO: Expr",
+                        "expression": {
+                            "branches": [
+                                {
+                                    "body": {
+                                        "name": "x",
+                                        "type": "VariableReference"
+                                    },
+                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 353 22 353 23 (VarPattern (LowercaseIdentifier \"x\")))])"
+                                },
+                                {
+                                    "body": "TODO: Expr",
+                                    "pattern": "TODO: Pattern (Anything)"
+                                }
+                            ],
+                            "subject": {
+                                "arguments": [
+                                    "TODO: Expr"
+                                ],
+                                "function": "TODO: Expr",
+                                "type": "FunctionApplication"
+                            },
+                            "type": "CaseExpression"
+                        },
                         "name": "b",
                         "type": "Definition"
                     },
                     {
-                        "expression": "TODO: Expr",
+                        "expression": {
+                            "branches": [
+                                {
+                                    "body": {
+                                        "name": "x",
+                                        "type": "VariableReference"
+                                    },
+                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 373 22 373 23 (VarPattern (LowercaseIdentifier \"x\")))])"
+                                },
+                                {
+                                    "body": "TODO: Expr",
+                                    "pattern": "TODO: Pattern (Anything)"
+                                }
+                            ],
+                            "subject": {
+                                "arguments": [
+                                    "TODO: Expr"
+                                ],
+                                "function": "TODO: Expr",
+                                "type": "FunctionApplication"
+                            },
+                            "type": "CaseExpression"
+                        },
                         "name": "c",
                         "type": "Definition"
                     }

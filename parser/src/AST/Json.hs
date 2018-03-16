@@ -173,6 +173,22 @@ instance ToJSON Expr' where
                   , ("body", showJSON importAliases body)
                   ]
 
+          Case (Commented _ (A _ subject) _, _) branches ->
+              makeObj
+                  [ type_ "CaseExpression"
+                  , ( "subject", showJSON importAliases subject )
+                  , ( "branches"
+                    , JSArray $ map
+                        (\(Commented _ (A _ pat) _, (_, A _ body)) ->
+                           makeObj
+                               [ ("pattern", showJSON importAliases pat)
+                               , ("body", showJSON importAliases body)
+                               ]
+                        )
+                        branches
+                    )
+                  ]
+
           _ ->
               JSString $ toJSString "TODO: Expr"
 
