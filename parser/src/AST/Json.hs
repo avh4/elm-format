@@ -114,5 +114,17 @@ instance ToJSON Expr' where
                   , ("terms", JSArray $ fmap (showJSON importAliases) (map (\(Commented _ (A _ expr) _) -> expr) exprs))
                   ]
 
+          AST.Expression.Record Nothing fields _ _ ->
+              makeObj
+                  [ ( "type", JSString $ toJSString "RecordLiteral" )
+                  , ( "fields"
+                    , makeObj $ map
+                        (\(_, (_, (Pair (LowercaseIdentifier key, _) (_, A _ value) _, _))) ->
+                           (key, showJSON importAliases value)
+                        )
+                        fields
+                    )
+                  ]
+
           _ ->
               JSString $ toJSString "TODO: Expr"
