@@ -39,8 +39,9 @@ instance ToJSON Expr' where
       ]
   showJSON (VarExpr (VarRef namespace (LowercaseIdentifier var))) =
     makeObj
-      [ ("type" , JSString $ toJSString "VariableReference")
-      , ("name" , JSString $ toJSString ((List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) namespace) ++ "." ++ var))
+      [ ("type" , JSString $ toJSString "ExternalReference")
+      , ("module", JSString $ toJSString $ List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) namespace)
+      , ("identifier", JSString $ toJSString var)
       ]
   showJSON (App (A _ expr) _ _) =
     makeObj
