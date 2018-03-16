@@ -14,8 +14,16 @@ import qualified Data.List as List
 import qualified Data.Map.Strict as Map
 
 showModule :: Module -> JSValue
-showModule (Module _ _ _ _ body) =
-    makeObj [ ("body" , JSArray $ fmap (showJSON (Map.singleton (UppercaseIdentifier "Attr") [UppercaseIdentifier "Html.Attributes"])) body) ]
+showModule (Module _ _ _ (_, imports) body) =
+    let
+        getAlias :: ImportMethod -> Maybe UppercaseIdentifier
+        getAlias importMethod =
+            fmap (snd . snd) (alias importMethod)
+
+        importAliases =
+            Map.fromList $ map (\(k, v) -> (v, k)) $ Map.toList $ Map.mapMaybe (getAlias . snd) imports
+    in
+    makeObj [ ("body" , JSArray $ fmap (showJSON importAliases) body) ]
 
 
 class ToJSON a where
