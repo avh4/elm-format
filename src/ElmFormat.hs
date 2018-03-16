@@ -361,3 +361,10 @@ doIt elmVersion whatToDo =
                     else return True
             where
                 formatFile file = (format elmVersion <$> ElmFormat.readFile file) >>= logErrorOr ElmFormat.updateFile
+
+        StdinToJson ->
+            (fmap (Text.pack . Text.JSON.encode . AST.Json.showJSON) <$> parseModule <$> readStdin) >>= logErrorOr OutputConsole.writeStdout
+
+        -- TODO: this prints "Processing such-and-such-a-file.elm" which makes the JSON output invalid
+        -- FileToJson inputFile ->
+        --     (fmap (Text.pack . Text.JSON.encode . AST.Json.showJSON) <$> parseModule <$> ElmFormat.readFile inputFile) >>= logErrorOr OutputConsole.writeStdout
