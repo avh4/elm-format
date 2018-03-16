@@ -27,4 +27,6 @@ main : Html msg
 main =
     Html.div
         [ theBestClass ]
-        [ Html.text token ]
+        [ Html.text token
+        , Html.text <| toString -pi
+        ]

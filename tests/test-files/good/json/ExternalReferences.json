@@ -63,6 +63,29 @@
                                     "type": "ExternalReference"
                                 },
                                 "type": "FunctionApplication"
+                            },
+                            {
+                                "first": {
+                                    "identifier": "text",
+                                    "module": "Html",
+                                    "type": "ExternalReference"
+                                },
+                                "operations": [
+                                    {
+                                        "operator": "<|",
+                                        "term": {
+                                            "arguments": [
+                                                "TODO: Expr"
+                                            ],
+                                            "function": {
+                                                "name": "toString",
+                                                "type": "VariableReference"
+                                            },
+                                            "type": "FunctionApplication"
+                                        }
+                                    }
+                                ],
+                                "type": "BinaryOperatorList"
                             }
                         ],
                         "type": "ListLiteral"
