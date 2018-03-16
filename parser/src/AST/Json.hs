@@ -139,8 +139,20 @@ instance ToJSON Expr' where
                           , fieldsJSON
                           ]
 
+          Lambda parameters _ (A _ body) _ ->
+              makeObj
+                  [ type_ "AnonymousFunction"
+                  , ("parameters", JSArray $ map (\(_, A _ pat) -> showJSON importAliases pat) parameters)
+                  , ("body", showJSON importAliases body)
+                  ]
+
           _ ->
               JSString $ toJSString "TODO: Expr"
+
+
+instance ToJSON Pattern' where
+  showJSON _ pattern' =
+      JSString $ toJSString $ "TODO: Pattern (" ++ show pattern' ++ ")"
 
 
 type_ :: String -> (String, JSValue)

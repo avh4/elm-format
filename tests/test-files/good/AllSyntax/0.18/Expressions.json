@@ -558,12 +558,38 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "body": {
+                    "first": {
+                        "name": "x",
+                        "type": "VariableReference"
+                    },
+                    "operations": [
+                        {
+                            "operator": "+",
+                            "term": "TODO: Expr"
+                        }
+                    ],
+                    "type": "BinaryOperatorList"
+                },
+                "parameters": [
+                    "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))"
+                ],
+                "type": "AnonymousFunction"
+            },
             "name": "lambda",
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "body": {
+                    "type": "UnitLiteral"
+                },
+                "parameters": [
+                    "TODO: Pattern (Record [Commented [] (LowercaseIdentifier \"x\") [],Commented [LineComment \"A\"] (LowercaseIdentifier \"y\") []])"
+                ],
+                "type": "AnonymousFunction"
+            },
             "name": "lambdaWithMultilinePattern",
             "type": "Definition"
         },
