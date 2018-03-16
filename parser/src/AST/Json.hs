@@ -41,39 +41,46 @@ instance ToJSON Decl where
 
 
 instance ToJSON Expr' where
-  showJSON _ (Unit _) =
-    makeObj
-      [ ("type", JSString $ toJSString "UnitLiteral") ]
-  showJSON _ (VarExpr (VarRef [] (LowercaseIdentifier var))) =
-    makeObj
-      [ ("type" , JSString $ toJSString "VariableReference")
-      , ("name" , JSString $ toJSString var)
-      ]
-  showJSON importAliases (VarExpr (VarRef namespace (LowercaseIdentifier var))) =
-    let
-        normalizedNamespace =
-            case namespace of
-                [alias] ->
-                    Map.findWithDefault namespace alias importAliases
+  showJSON importAliases expr =
+      case expr of
+          Unit _ ->
+              makeObj [ ("type", JSString $ toJSString "UnitLiteral") ]
 
-                _ ->
-                    namespace
-    in
-    makeObj
-      [ ("type" , JSString $ toJSString "ExternalReference")
-      , ("module"
-        , JSString $ toJSString $ List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) normalizedNamespace)
-      , ("identifier", JSString $ toJSString var)
-      ]
-  showJSON importAliases (App (A _ expr) args _) =
-    makeObj
-      [ ("type" , JSString $ toJSString "FunctionApplication")
-      , ("function", showJSON importAliases expr)
-      , ("arguments", JSArray $ showJSON importAliases <$> map (\(_ , A _ arg) -> arg) args)
-      ]
-  showJSON importAliases (ExplicitList terms _ _) =
-    makeObj
-      [ ("type", JSString $ toJSString "ListLiteral")
-      , ("terms", JSArray $ fmap (showJSON importAliases) (map (\(_, (_, (A _ term, _))) -> term) terms))
-      ]
-  showJSON _ _ = JSString $ toJSString "TODO: Expr"
+          VarExpr (VarRef [] (LowercaseIdentifier var)) ->
+              makeObj
+                  [ ("type" , JSString $ toJSString "VariableReference")
+                  , ("name" , JSString $ toJSString var)
+                  ]
+
+          VarExpr (VarRef namespace (LowercaseIdentifier var)) ->
+              let
+                  normalizedNamespace =
+                      case namespace of
+                          [alias] ->
+                              Map.findWithDefault namespace alias importAliases
+
+                          _ ->
+                              namespace
+              in
+              makeObj
+                  [ ("type" , JSString $ toJSString "ExternalReference")
+                  , ("module"
+                    , JSString $ toJSString $ List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) normalizedNamespace)
+                  , ("identifier", JSString $ toJSString var)
+                  ]
+
+          App (A _ expr) args _ ->
+              makeObj
+                  [ ("type" , JSString $ toJSString "FunctionApplication")
+                  , ("function", showJSON importAliases expr)
+                  , ("arguments", JSArray $ showJSON importAliases <$> map (\(_ , A _ arg) -> arg) args)
+                  ]
+
+          ExplicitList terms _ _ ->
+              makeObj
+                  [ ("type", JSString $ toJSString "ListLiteral")
+                  , ("terms", JSArray $ fmap (showJSON importAliases) (map (\(_, (_, (A _ term, _))) -> term) terms))
+                  ]
+
+          _ ->
+              JSString $ toJSString "TODO: Expr"
