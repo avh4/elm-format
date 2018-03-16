@@ -601,17 +601,47 @@
                 },
                 "declarations": [
                     {
-                        "expression": "TODO: Expr",
+                        "expression": {
+                            "else": {
+                                "else": "TODO: Expr",
+                                "if": "TODO: Expr",
+                                "then": "TODO: Expr",
+                                "type": "IfExpression"
+                            },
+                            "if": "TODO: Expr",
+                            "then": "TODO: Expr",
+                            "type": "IfExpression"
+                        },
                         "name": "a",
                         "type": "Definition"
                     },
                     {
-                        "expression": "TODO: Expr",
+                        "expression": {
+                            "else": {
+                                "else": "TODO: Expr",
+                                "if": "TODO: Expr",
+                                "then": "TODO: Expr",
+                                "type": "IfExpression"
+                            },
+                            "if": "TODO: Expr",
+                            "then": "TODO: Expr",
+                            "type": "IfExpression"
+                        },
                         "name": "b",
                         "type": "Definition"
                     },
                     {
-                        "expression": "TODO: Expr",
+                        "expression": {
+                            "else": {
+                                "else": "TODO: Expr",
+                                "if": "TODO: Expr",
+                                "then": "TODO: Expr",
+                                "type": "IfExpression"
+                            },
+                            "if": "TODO: Expr",
+                            "then": "TODO: Expr",
+                            "type": "IfExpression"
+                        },
                         "name": "c",
                         "type": "Definition"
                     }
