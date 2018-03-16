@@ -1,0 +1,31 @@
+{
+    "body": [
+        "TODO: Decl",
+        {
+            "expression": "TODO: Expr",
+            "name": "token",
+            "type": "Definition"
+        },
+        "TODO: Decl",
+        {
+            "expression": {
+                "name": "Html.text",
+                "type": "VariableReference"
+            },
+            "name": "text",
+            "type": "Definition"
+        },
+        "TODO: Decl",
+        {
+            "expression": {
+                "function": {
+                    "name": "Html.text",
+                    "type": "VariableReference"
+                },
+                "type": "FunctionApplication"
+            },
+            "name": "main",
+            "type": "Definition"
+        }
+    ]
+}
