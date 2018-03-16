@@ -33,7 +33,7 @@ class ToJSON a where
 instance ToJSON Decl where
   showJSON importAliases (Decl (A _ (Definition (A _ (VarPattern (LowercaseIdentifier var))) _ _ (A _ expr)))) =
     makeObj
-      [ ("type" , JSString $ toJSString "Definition")
+      [ type_ "Definition"
       , ("name" , JSString $ toJSString var)
       , ("expression" , showJSON importAliases expr)
       ]
@@ -44,11 +44,11 @@ instance ToJSON Expr' where
   showJSON importAliases expr =
       case expr of
           Unit _ ->
-              makeObj [ ("type", JSString $ toJSString "UnitLiteral") ]
+              makeObj [ type_ "UnitLiteral" ]
 
           VarExpr (VarRef [] (LowercaseIdentifier var)) ->
               makeObj
-                  [ ("type" , JSString $ toJSString "VariableReference")
+                  [ type_ "VariableReference"
                   , ("name" , JSString $ toJSString var)
                   ]
 
@@ -63,7 +63,7 @@ instance ToJSON Expr' where
                               namespace
               in
               makeObj
-                  [ ("type" , JSString $ toJSString "ExternalReference")
+                  [ type_ "ExternalReference"
                   , ("module"
                     , JSString $ toJSString $ List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) normalizedNamespace)
                   , ("identifier", JSString $ toJSString var)
@@ -71,14 +71,14 @@ instance ToJSON Expr' where
 
           App (A _ expr) args _ ->
               makeObj
-                  [ ("type" , JSString $ toJSString "FunctionApplication")
+                  [ type_ "FunctionApplication"
                   , ("function", showJSON importAliases expr)
                   , ("arguments", JSArray $ showJSON importAliases <$> map (\(_ , A _ arg) -> arg) args)
                   ]
 
           Binops (A _ first) rest _ ->
               makeObj
-                  [ ("type", JSString $ toJSString "BinaryOperatorList")
+                  [ type_ "BinaryOperatorList"
                   , ("first", showJSON importAliases first)
                   , ("operations"
                     , JSArray $ map
@@ -94,7 +94,7 @@ instance ToJSON Expr' where
 
           Unary Negative (A _ expr) ->
             makeObj
-                [ ("type", JSString $ toJSString "UnaryOperator")
+                [ type_ "UnaryOperator"
                 , ("operator", JSString $ toJSString "-")
                 , ("term", showJSON importAliases expr)
                 ]
@@ -104,13 +104,13 @@ instance ToJSON Expr' where
 
           ExplicitList terms _ _ ->
               makeObj
-                  [ ("type", JSString $ toJSString "ListLiteral")
+                  [ type_ "ListLiteral"
                   , ("terms", JSArray $ fmap (showJSON importAliases) (map (\(_, (_, (A _ term, _))) -> term) terms))
                   ]
 
           AST.Expression.Tuple exprs _ ->
               makeObj
-                  [ ("type", JSString $ toJSString "TupleLiteral")
+                  [ type_ "TupleLiteral"
                   , ("terms", JSArray $ fmap (showJSON importAliases) (map (\(Commented _ (A _ expr) _) -> expr) exprs))
                   ]
 
