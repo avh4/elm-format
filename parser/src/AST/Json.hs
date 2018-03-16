@@ -31,7 +31,7 @@ class ToJSON a where
 
 
 instance ToJSON Decl where
-  showJSON importAliases (Decl (A _ (Definition (A _ (VarPattern (LowercaseIdentifier var))) params _ (A _ expr)))) =
+  showJSON importAliases (Decl (A _ (Definition (A _ (VarPattern (LowercaseIdentifier var))) _ _ (A _ expr)))) =
     makeObj
       [ ("type" , JSString $ toJSString "Definition")
       , ("name" , JSString $ toJSString var)
