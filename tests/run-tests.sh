@@ -395,6 +395,7 @@ checkUpgrade 0.18 Elm-0.18/RenameTupleFunctions.elm
 checkValidationOutputFormat
 
 checkJson good/AllSyntax/0.18/Expressions.elm
+checkJson good/json/ExternalReferences.elm
 
 echo
 echo "# GREAT SUCCESS!"
