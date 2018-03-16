@@ -76,6 +76,25 @@ instance ToJSON Expr' where
                   , ("arguments", JSArray $ showJSON importAliases <$> map (\(_ , A _ arg) -> arg) args)
                   ]
 
+          Binops (A _ first) rest _ ->
+              makeObj
+                  [ ("type", JSString $ toJSString "BinaryOperatorList")
+                  , ("first", showJSON importAliases first)
+                  , ("operations"
+                    , JSArray $ map
+                        (\(_, OpRef (SymbolIdentifier ref), _, A _ expr) ->
+                           makeObj
+                               [ ("operator", JSString $ toJSString ref)
+                               , ("term", showJSON importAliases expr)
+                               ]
+                        )
+                        rest
+                    )
+                  ]
+
+          Parens (Commented _ (A _ expr) _) ->
+              showJSON importAliases expr
+
           ExplicitList terms _ _ ->
               makeObj
                   [ ("type", JSString $ toJSString "ListLiteral")
