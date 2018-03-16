@@ -68,4 +68,9 @@ instance ToJSON Expr' where
       , ("function", showJSON importAliases expr)
       , ("arguments", JSArray $ showJSON importAliases <$> map (\(_ , A _ arg) -> arg) args)
       ]
+  showJSON importAliases (ExplicitList terms _ _) =
+    makeObj
+      [ ("type", JSString $ toJSString "ListLiteral")
+      , ("terms", JSArray $ fmap (showJSON importAliases) (map (\(_, (_, (A _ term, _))) -> term) terms))
+      ]
   showJSON _ _ = JSString $ toJSString "TODO: Expr"

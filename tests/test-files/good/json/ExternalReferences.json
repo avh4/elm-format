@@ -39,8 +39,34 @@
         {
             "expression": {
                 "arguments": [
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "terms": [
+                            {
+                                "name": "theBestClass",
+                                "type": "VariableReference"
+                            }
+                        ],
+                        "type": "ListLiteral"
+                    },
+                    {
+                        "terms": [
+                            {
+                                "arguments": [
+                                    {
+                                        "name": "token",
+                                        "type": "VariableReference"
+                                    }
+                                ],
+                                "function": {
+                                    "identifier": "text",
+                                    "module": "Html",
+                                    "type": "ExternalReference"
+                                },
+                                "type": "FunctionApplication"
+                            }
+                        ],
+                        "type": "ListLiteral"
+                    }
                 ],
                 "function": {
                     "identifier": "div",
