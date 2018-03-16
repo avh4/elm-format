@@ -368,9 +368,18 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "fields": {},
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "fields": {},
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "fields": {},
+                        "type": "RecordLiteral"
+                    }
                 ],
                 "type": "ListLiteral"
             },
@@ -380,15 +389,72 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "fields": {
+                            "x": "TODO: Expr"
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "fields": {
+                            "x": "TODO: Expr",
+                            "y": "TODO: Expr"
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "fields": {
+                            "x": "TODO: Expr",
+                            "y": "TODO: Expr",
+                            "z": "TODO: Expr"
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "fields": {
+                            "x": "TODO: Expr"
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "fields": {
+                            "x": "TODO: Expr",
+                            "y": "TODO: Expr"
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "fields": {
+                            "x": "TODO: Expr",
+                            "y": "TODO: Expr",
+                            "z": "TODO: Expr"
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "fields": {
+                            "x": "TODO: Expr",
+                            "y": "TODO: Expr",
+                            "z": "TODO: Expr"
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "fields": {
+                            "x": "TODO: Expr",
+                            "y": "TODO: Expr",
+                            "z": "TODO: Expr"
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "fields": {
+                            "x": "TODO: Expr",
+                            "y": "TODO: Expr",
+                            "z": "TODO: Expr"
+                        },
+                        "type": "RecordLiteral"
+                    }
                 ],
                 "type": "TupleLiteral"
             },
@@ -396,7 +462,13 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "fields": {
+                    "a": "TODO: Expr",
+                    "x": "TODO: Expr"
+                },
+                "type": "RecordLiteral"
+            },
             "name": "recordWithCommentedOutFields",
             "type": "Definition"
         },
@@ -439,7 +511,12 @@
         {
             "expression": {
                 "arguments": [
-                    "TODO: Expr"
+                    {
+                        "fields": {
+                            "x": "TODO: Expr"
+                        },
+                        "type": "RecordLiteral"
+                    }
                 ],
                 "function": "TODO: Expr",
                 "type": "FunctionApplication"
