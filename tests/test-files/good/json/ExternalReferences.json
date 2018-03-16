@@ -75,7 +75,14 @@
                                         "operator": "<|",
                                         "term": {
                                             "arguments": [
-                                                "TODO: Expr"
+                                                {
+                                                    "operator": "-",
+                                                    "term": {
+                                                        "name": "pi",
+                                                        "type": "VariableReference"
+                                                    },
+                                                    "type": "UnaryOperator"
+                                                }
                                             ],
                                             "function": {
                                                 "name": "toString",
