@@ -41,6 +41,9 @@ instance ToJSON Decl where
 
 
 instance ToJSON Expr' where
+  showJSON _ (Unit _) =
+    makeObj
+      [ ("type", JSString $ toJSString "UnitLiteral") ]
   showJSON _ (VarExpr (VarRef [] (LowercaseIdentifier var))) =
     makeObj
       [ ("type" , JSString $ toJSString "VariableReference")
