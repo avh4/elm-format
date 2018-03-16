@@ -19,7 +19,15 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "TupleLiteral"
+            },
             "name": "literal",
             "type": "Definition"
         },
@@ -46,12 +54,65 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "first": {
+                    "name": "x",
+                    "type": "VariableReference"
+                },
+                "operations": [
+                    {
+                        "operator": "<|",
+                        "term": {
+                            "terms": [
+                                {
+                                    "name": "y",
+                                    "type": "VariableReference"
+                                },
+                                {
+                                    "name": "z",
+                                    "type": "VariableReference"
+                                }
+                            ],
+                            "type": "ListLiteral"
+                        }
+                    }
+                ],
+                "type": "BinaryOperatorList"
+            },
             "name": "infixPipeLeft",
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "first": {
+                    "terms": [
+                        {
+                            "name": "x",
+                            "type": "VariableReference"
+                        }
+                    ],
+                    "type": "ListLiteral"
+                },
+                "operations": [
+                    {
+                        "operator": "<|",
+                        "term": {
+                            "terms": [
+                                {
+                                    "name": "y",
+                                    "type": "VariableReference"
+                                },
+                                {
+                                    "name": "z",
+                                    "type": "VariableReference"
+                                }
+                            ],
+                            "type": "ListLiteral"
+                        }
+                    }
+                ],
+                "type": "BinaryOperatorList"
+            },
             "name": "infixPipeLeft2",
             "type": "Definition"
         },
@@ -101,19 +162,51 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "operator": "-",
+                "term": {
+                    "name": "x",
+                    "type": "VariableReference"
+                },
+                "type": "UnaryOperator"
+            },
             "name": "unary",
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "first": "TODO: Expr",
+                "operations": [
+                    {
+                        "operator": "+",
+                        "term": "TODO: Expr"
+                    },
+                    {
+                        "operator": "+",
+                        "term": "TODO: Expr"
+                    }
+                ],
+                "type": "BinaryOperatorList"
+            },
             "name": "binary",
             "type": "Definition"
         },
         {
             "expression": {
                 "arguments": [
-                    "TODO: Expr"
+                    {
+                        "arguments": [
+                            {
+                                "name": "a",
+                                "type": "VariableReference"
+                            }
+                        ],
+                        "function": {
+                            "name": "x",
+                            "type": "VariableReference"
+                        },
+                        "type": "FunctionApplication"
+                    }
                 ],
                 "function": {
                     "name": "f",
@@ -213,10 +306,34 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "terms": [
+                            "TODO: Expr",
+                            "TODO: Expr"
+                        ],
+                        "type": "TupleLiteral"
+                    },
+                    {
+                        "terms": [
+                            "TODO: Expr",
+                            "TODO: Expr"
+                        ],
+                        "type": "TupleLiteral"
+                    },
+                    {
+                        "terms": [
+                            "TODO: Expr",
+                            "TODO: Expr"
+                        ],
+                        "type": "TupleLiteral"
+                    },
+                    {
+                        "terms": [
+                            "TODO: Expr",
+                            "TODO: Expr"
+                        ],
+                        "type": "TupleLiteral"
+                    }
                 ],
                 "type": "ListLiteral"
             },
@@ -224,7 +341,14 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "TupleLiteral"
+            },
             "name": "tupleWithCommentedOutItems",
             "type": "Definition"
         },
@@ -254,7 +378,20 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "TupleLiteral"
+            },
             "name": "record",
             "type": "Definition"
         },
@@ -264,7 +401,15 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "TupleLiteral"
+            },
             "name": "recordUpdate",
             "type": "Definition"
         },
@@ -274,7 +419,20 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "TupleLiteral"
+            },
             "name": "recordAccess",
             "type": "Definition"
         },
