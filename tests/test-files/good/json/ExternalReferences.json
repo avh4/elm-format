@@ -9,8 +9,9 @@
         "TODO: Decl",
         {
             "expression": {
-                "name": "Html.text",
-                "type": "VariableReference"
+                "identifier": "text",
+                "module": "Html",
+                "type": "ExternalReference"
             },
             "name": "text",
             "type": "Definition"
@@ -19,8 +20,9 @@
         {
             "expression": {
                 "function": {
-                    "name": "Html.text",
-                    "type": "VariableReference"
+                    "identifier": "text",
+                    "module": "Html",
+                    "type": "ExternalReference"
                 },
                 "type": "FunctionApplication"
             },
