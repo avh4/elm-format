@@ -62,9 +62,10 @@ instance ToJSON Expr' where
         , JSString $ toJSString $ List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) normalizedNamespace)
       , ("identifier", JSString $ toJSString var)
       ]
-  showJSON importAliases (App (A _ expr) _ _) =
+  showJSON importAliases (App (A _ expr) args _) =
     makeObj
       [ ("type" , JSString $ toJSString "FunctionApplication")
       , ("function", showJSON importAliases expr)
+      , ("arguments", JSArray $ showJSON importAliases <$> map (\(_ , A _ arg) -> arg) args)
       ]
   showJSON _ _ = JSString $ toJSString "TODO: Expr"

@@ -9,6 +9,12 @@
         "TODO: Decl",
         {
             "expression": {
+                "arguments": [
+                    {
+                        "name": "token",
+                        "type": "VariableReference"
+                    }
+                ],
                 "function": {
                     "identifier": "class",
                     "module": "Html.Attributes",
@@ -32,8 +38,12 @@
         "TODO: Decl",
         {
             "expression": {
+                "arguments": [
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
                 "function": {
-                    "identifier": "text",
+                    "identifier": "div",
                     "module": "Html",
                     "type": "ExternalReference"
                 },

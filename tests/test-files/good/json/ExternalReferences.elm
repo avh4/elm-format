@@ -25,4 +25,6 @@ text =
 
 main : Html msg
 main =
-    Html.text token
+    Html.div
+        [ theBestClass ]
+        [ Html.text token ]
