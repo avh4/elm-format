@@ -92,6 +92,13 @@ instance ToJSON Expr' where
                     )
                   ]
 
+          Unary Negative (A _ expr) ->
+            makeObj
+                [ ("type", JSString $ toJSString "UnaryOperator")
+                , ("operator", JSString $ toJSString "-")
+                , ("term", showJSON importAliases expr)
+                ]
+
           Parens (Commented _ (A _ expr) _) ->
               showJSON importAliases expr
 
