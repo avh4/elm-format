@@ -329,10 +329,21 @@ data FormatResult
     = NoChange FilePath Text.Text
     | Changed FilePath Text.Text
 
-format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage FormatResult
-format elmVersion (inputFile, inputText) =
+
+parseModule :: (FilePath, Text.Text) -> Either InfoMessage AST.Module.Module
+parseModule (inputFile, inputText) =
     case Parse.parse inputText of
         Result.Result _ (Result.Ok modu) ->
+            Right modu
+
+        Result.Result _ (Result.Err errs) ->
+            Left $ ParseError inputFile (Text.unpack inputText) errs
+
+
+format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage FormatResult
+format elmVersion (inputFile, inputText) =
+    case parseModule (inputFile, inputText) of
+        Right modu ->
             let
                 outputText = Render.render elmVersion modu
             in
@@ -341,8 +352,8 @@ format elmVersion (inputFile, inputText) =
                     then NoChange inputFile outputText
                     else Changed inputFile outputText
 
-        Result.Result _ (Result.Err errs) ->
-            Left $ ParseError inputFile (Text.unpack inputText) errs
+        Left message ->
+            Left message
 
 
 readStdin :: InputConsole f => Free f (FilePath, Text.Text)
