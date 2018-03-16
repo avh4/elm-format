@@ -146,6 +146,25 @@ instance ToJSON Expr' where
                   , ("body", showJSON importAliases body)
                   ]
 
+          If (Commented _ (A _ cond') _, Commented _ (A _ thenBody') _) rest' (_, A _ elseBody) ->
+              let
+                  ifThenElse :: Expr' -> Expr' -> [(Comments, IfClause)] -> JSValue
+                  ifThenElse cond thenBody rest =
+                      makeObj
+                          [ type_ "IfExpression"
+                          , ( "if", showJSON importAliases cond )
+                          , ( "then", showJSON importAliases thenBody )
+                          , ( "else"
+                            , case rest of
+                                [] ->
+                                    showJSON importAliases elseBody
+
+                                (_, (Commented _ (A _ nextCond) _, Commented _ (A _ nextBody) _)) : nextRest ->
+                                    ifThenElse nextCond nextBody nextRest
+                            )
+                          ]
+              in
+              ifThenElse cond' thenBody' rest'
 
           Let decls _ (A _ body) ->
               makeObj
