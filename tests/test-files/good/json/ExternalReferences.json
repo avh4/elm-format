@@ -9,6 +9,19 @@
         "TODO: Decl",
         {
             "expression": {
+                "function": {
+                    "identifier": "class",
+                    "module": "Html.Attributes",
+                    "type": "ExternalReference"
+                },
+                "type": "FunctionApplication"
+            },
+            "name": "theBestClass",
+            "type": "Definition"
+        },
+        "TODO: Decl",
+        {
+            "expression": {
                 "identifier": "text",
                 "module": "Html",
                 "type": "ExternalReference"

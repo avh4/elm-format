@@ -11,41 +11,52 @@ import Reporting.Annotation hiding (map)
 import Text.JSON hiding (showJSON)
 
 import qualified Data.List as List
+import qualified Data.Map.Strict as Map
+
+showModule :: Module -> JSValue
+showModule (Module _ _ _ _ body) =
+    makeObj [ ("body" , JSArray $ fmap (showJSON (Map.singleton (UppercaseIdentifier "Attr") [UppercaseIdentifier "Html.Attributes"])) body) ]
+
 
 class ToJSON a where
-  showJSON :: a -> JSValue
-
-
-instance ToJSON Module where
-  showJSON (Module _ _ _ _ body) =
-    makeObj [ ("body" , JSArray $ fmap showJSON body) ]
+  showJSON :: Map.Map UppercaseIdentifier [UppercaseIdentifier] -> a -> JSValue
 
 
 instance ToJSON Decl where
-  showJSON (Decl (A _ (Definition (A _ (VarPattern (LowercaseIdentifier var))) params _ (A _ expr)))) =
+  showJSON importAliases (Decl (A _ (Definition (A _ (VarPattern (LowercaseIdentifier var))) params _ (A _ expr)))) =
     makeObj
       [ ("type" , JSString $ toJSString "Definition")
       , ("name" , JSString $ toJSString var)
-      , ("expression" , showJSON expr)
+      , ("expression" , showJSON importAliases expr)
       ]
-  showJSON _ = JSString $ toJSString "TODO: Decl"
+  showJSON _ _ = JSString $ toJSString "TODO: Decl"
 
 
 instance ToJSON Expr' where
-  showJSON (VarExpr (VarRef [] (LowercaseIdentifier var))) =
+  showJSON _ (VarExpr (VarRef [] (LowercaseIdentifier var))) =
     makeObj
       [ ("type" , JSString $ toJSString "VariableReference")
       , ("name" , JSString $ toJSString var)
       ]
-  showJSON (VarExpr (VarRef namespace (LowercaseIdentifier var))) =
+  showJSON importAliases (VarExpr (VarRef namespace (LowercaseIdentifier var))) =
+    let
+        normalizedNamespace =
+            case namespace of
+                [alias] ->
+                    Map.findWithDefault namespace alias importAliases
+
+                _ ->
+                    namespace
+    in
     makeObj
       [ ("type" , JSString $ toJSString "ExternalReference")
-      , ("module", JSString $ toJSString $ List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) namespace)
+      , ("module"
+        , JSString $ toJSString $ List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) normalizedNamespace)
       , ("identifier", JSString $ toJSString var)
       ]
-  showJSON (App (A _ expr) _ _) =
+  showJSON importAliases (App (A _ expr) _ _) =
     makeObj
       [ ("type" , JSString $ toJSString "FunctionApplication")
-      , ("function", showJSON expr)
+      , ("function", showJSON importAliases expr)
       ]
-  showJSON _ = JSString $ toJSString "TODO: Expr"
+  showJSON _ _ = JSString $ toJSString "TODO: Expr"
