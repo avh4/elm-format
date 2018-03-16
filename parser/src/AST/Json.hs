@@ -108,5 +108,11 @@ instance ToJSON Expr' where
                   , ("terms", JSArray $ fmap (showJSON importAliases) (map (\(_, (_, (A _ term, _))) -> term) terms))
                   ]
 
+          AST.Expression.Tuple exprs _ ->
+              makeObj
+                  [ ("type", JSString $ toJSString "TupleLiteral")
+                  , ("terms", JSArray $ fmap (showJSON importAliases) (map (\(Commented _ (A _ expr) _) -> expr) exprs))
+                  ]
+
           _ ->
               JSString $ toJSString "TODO: Expr"
