@@ -594,17 +594,90 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "body": {
+                    "fields": {},
+                    "type": "RecordLiteral"
+                },
+                "declarations": [
+                    {
+                        "expression": "TODO: Expr",
+                        "name": "a",
+                        "type": "Definition"
+                    },
+                    {
+                        "expression": "TODO: Expr",
+                        "name": "b",
+                        "type": "Definition"
+                    },
+                    {
+                        "expression": "TODO: Expr",
+                        "name": "c",
+                        "type": "Definition"
+                    }
+                ],
+                "type": "LetExpression"
+            },
             "name": "ifStatement",
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "body": {
+                    "terms": [
+                        {
+                            "name": "x",
+                            "type": "VariableReference"
+                        },
+                        {
+                            "name": "y",
+                            "type": "VariableReference"
+                        }
+                    ],
+                    "type": "TupleLiteral"
+                },
+                "declarations": [
+                    {
+                        "expression": "TODO: Expr",
+                        "name": "x",
+                        "type": "Definition"
+                    },
+                    {
+                        "expression": "TODO: Expr",
+                        "name": "y",
+                        "type": "Definition"
+                    }
+                ],
+                "type": "LetExpression"
+            },
             "name": "letStatement",
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "body": {
+                    "fields": {},
+                    "type": "RecordLiteral"
+                },
+                "declarations": [
+                    {
+                        "expression": "TODO: Expr",
+                        "name": "a",
+                        "type": "Definition"
+                    },
+                    {
+                        "expression": "TODO: Expr",
+                        "name": "b",
+                        "type": "Definition"
+                    },
+                    {
+                        "expression": "TODO: Expr",
+                        "name": "c",
+                        "type": "Definition"
+                    }
+                ],
+                "type": "LetExpression"
+            },
             "name": "caseStatement",
             "type": "Definition"
         }

@@ -146,8 +146,30 @@ instance ToJSON Expr' where
                   , ("body", showJSON importAliases body)
                   ]
 
+
+          Let decls _ (A _ body) ->
+              makeObj
+                  [ type_ "LetExpression"
+                  , ( "declarations", JSArray $ map (showJSON importAliases) decls)
+                  , ("body", showJSON importAliases body)
+                  ]
+
           _ ->
               JSString $ toJSString "TODO: Expr"
+
+
+instance ToJSON LetDeclaration where
+  showJSON importAliases letDeclaration =
+      case letDeclaration of
+          LetDefinition (A _ (VarPattern (LowercaseIdentifier var))) [] _ (A _ expr) ->
+              makeObj
+                  [ type_ "Definition"
+                  , ("name" , JSString $ toJSString var)
+                  , ("expression" , showJSON importAliases expr)
+                  ]
+
+          _ ->
+              JSString $ toJSString $ "TODO: LetDeclaration (" ++ show letDeclaration ++ ")"
 
 
 instance ToJSON Pattern' where
