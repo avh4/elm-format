@@ -1,7 +1,20 @@
 {
     "body": [
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "terms": [
+                    {
+                        "type": "UnitLiteral"
+                    },
+                    {
+                        "type": "UnitLiteral"
+                    },
+                    {
+                        "type": "UnitLiteral"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
             "name": "unit",
             "type": "Definition"
         },
@@ -20,8 +33,9 @@
         },
         {
             "expression": {
-                "name": "Bar.Baz.foo",
-                "type": "VariableReference"
+                "identifier": "foo",
+                "module": "Bar.Baz",
+                "type": "ExternalReference"
             },
             "name": "qualifiedVar",
             "type": "Definition"
@@ -42,17 +56,47 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "arguments": [
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "function": {
+                    "name": "max",
+                    "type": "VariableReference"
+                },
+                "type": "FunctionApplication"
+            },
             "name": "functionApplication",
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "arguments": [
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "function": {
+                    "name": "max",
+                    "type": "VariableReference"
+                },
+                "type": "FunctionApplication"
+            },
             "name": "functionApplicationMultilineWithFirstArg",
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "arguments": [
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "function": {
+                    "name": "max",
+                    "type": "VariableReference"
+                },
+                "type": "FunctionApplication"
+            },
             "name": "functionApplicationMultiline",
             "type": "Definition"
         },
@@ -67,27 +111,115 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "arguments": [
+                    "TODO: Expr"
+                ],
+                "function": {
+                    "name": "f",
+                    "type": "VariableReference"
+                },
+                "type": "FunctionApplication"
+            },
             "name": "parens",
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "terms": [
+                    {
+                        "terms": [],
+                        "type": "ListLiteral"
+                    },
+                    {
+                        "terms": [],
+                        "type": "ListLiteral"
+                    },
+                    {
+                        "terms": [],
+                        "type": "ListLiteral"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
             "name": "emptyList",
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "terms": [
+                    {
+                        "terms": [
+                            {
+                                "type": "UnitLiteral"
+                            },
+                            {
+                                "type": "UnitLiteral"
+                            }
+                        ],
+                        "type": "ListLiteral"
+                    },
+                    {
+                        "terms": [
+                            {
+                                "type": "UnitLiteral"
+                            },
+                            {
+                                "type": "UnitLiteral"
+                            }
+                        ],
+                        "type": "ListLiteral"
+                    },
+                    {
+                        "terms": [
+                            {
+                                "type": "UnitLiteral"
+                            },
+                            {
+                                "type": "UnitLiteral"
+                            }
+                        ],
+                        "type": "ListLiteral"
+                    },
+                    {
+                        "terms": [
+                            {
+                                "type": "UnitLiteral"
+                            },
+                            {
+                                "type": "UnitLiteral"
+                            }
+                        ],
+                        "type": "ListLiteral"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
             "name": "list",
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "ListLiteral"
+            },
             "name": "listWithCommentedOutItems",
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "ListLiteral"
+            },
             "name": "tuple",
             "type": "Definition"
         },
@@ -97,12 +229,27 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "arguments": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "function": "TODO: Expr",
+                "type": "FunctionApplication"
+            },
             "name": "tupleFunction",
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "ListLiteral"
+            },
             "name": "emptyRecord",
             "type": "Definition"
         },
@@ -132,7 +279,13 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "arguments": [
+                    "TODO: Expr"
+                ],
+                "function": "TODO: Expr",
+                "type": "FunctionApplication"
+            },
             "name": "recordAccessfunction",
             "type": "Definition"
         },
