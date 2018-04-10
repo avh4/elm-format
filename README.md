@@ -74,7 +74,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td rowspan=2><a href="https://atom.io/">Atom</a></td>
     <td>:trophy: <a href="https://atom.io/packages/elm-format">atom-elm-format</a></td>
     <td>:white_check_mark: <a href="#atom-elm-format-installation">2 steps</a></td>
-    <td>:warning: must use format-on-save or save file before formatting</td>
+    <td>:white_check_mark:</td>
     <td>:white_check_mark:</td>
     <td>:white_check_mark:</td>
     <td>:warning: no installation instructions</td>
@@ -140,6 +140,15 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td>:warning: <a href="#jetbrains-installation">4 steps</a></td>
     <td>❔ TBD</td>
     <td>:white_check_mark:</td>
+    <td>❔ TBD</td>
+    <td>❔ TBD</td>
+  </tr>
+  <tr>
+    <td rowspan=1>TextMate</td>
+    <td>:trophy: <a href="https://github.com/cmason/Elm.tmBundle">Elm.tmbundle</a></td>
+    <td>:white_check_mark: <a href="https://github.com/cmason/Elm.tmBundle#installation">2 steps</a></td>
+    <td>❔ TBD</td>
+    <td>❔ TBD</td>
     <td>❔ TBD</td>
     <td>❔ TBD</td>
   </tr>
@@ -256,8 +265,13 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 1. Configure the extension to format on save:
 
     1. Go to `Preferences -> Settings` in the menu
-    1. Search the settings for `elm.formatOnSave`
-    1. Change the value of `elm.formatOnSave` to `true` in your User Settings
+    1. In your User Settings, update the following value:
+    
+    ```
+    "[elm]": {
+        "editor.formatOnSave": true
+    },
+    ```
 
 
 ### Sublime Text installation
