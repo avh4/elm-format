@@ -16,7 +16,7 @@ require-stack-version: ">= 1.4.0"
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-7.24
+resolver: lts-11.4
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -40,7 +40,9 @@ packages:
 - '.'
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
-extra-deps: []
+extra-deps:
+- indents-0.3.3
+- concatenative-1.0.1 # required by indents-0.3.3
 
 # Override default flag values for local packages and extra-deps
 flags: {}
