@@ -536,45 +536,6 @@ closeShader builder =
     ]
 
 
-str :: IParser (String, Bool)
-str =
-  expecting "a string" $
-  do  (s, multi) <- choice [ multiStr, singleStr ]
-      result <- processAs T.stringLiteral . sandwich '\"' $ concat s
-      return (result, multi)
-  where
-    rawString quote insides =
-        quote >> manyTill insides quote
-
-    multiStr  =
-        do  result <- rawString (try (string "\"\"\"")) multilineStringChar
-            return (result, True)
-    singleStr =
-        do  result <- rawString (char '"') stringChar
-            return (result, False)
-
-    stringChar :: IParser String
-    stringChar = choice [ newlineChar, escaped '\"', (:[]) <$> satisfy (/= '\"') ]
-
-    multilineStringChar :: IParser String
-    multilineStringChar =
-        do noEnd
-           choice [ newlineChar, escaped '\"', expandQuote <$> anyChar ]
-        where
-          noEnd = notFollowedBy (string "\"\"\"")
-          expandQuote c = if c == '\"' then "\\\"" else [c]
-
-    newlineChar :: IParser String
-    newlineChar =
-        choice
-            [ char '\n' >> return "\\n"
-            , char '\r' >> choice
-                [ char '\n' >> return "\\n"
-                , return "\\r"
-                ]
-            ]
-
-
 sandwich :: Char -> String -> String
 sandwich delim s =
   delim : s ++ [delim]

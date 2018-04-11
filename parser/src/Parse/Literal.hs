@@ -1,11 +1,13 @@
 module Parse.Literal (literal) where
 
 import Prelude hiding (exponent)
-import Text.Parsec ((<|>), (<?>), digit, hexDigit, lookAhead, many1, option, string, try)
-import Parse.Helpers (chr, str)
+import Text.Parsec ((<|>), (<?>), digit, hexDigit, lookAhead, many1, option, string, try, char, notFollowedBy, choice, anyChar, satisfy, manyTill)
+import Parse.Helpers (chr, processAs, escaped, expecting, sandwich)
 import Parse.IParser
 
 import AST.V0_16
+
+import qualified Text.Parsec.Token
 
 
 literal :: IParser Literal
@@ -72,3 +74,42 @@ exponent =
       op <- option "" (string "+" <|> string "-")
       n <- many1 digit
       return ('e' : op ++ n)
+
+
+str :: IParser (String, Bool)
+str =
+  expecting "a string" $
+  do  (s, multi) <- choice [ multiStr, singleStr ]
+      result <- processAs Text.Parsec.Token.stringLiteral . sandwich '\"' $ concat s
+      return (result, multi)
+  where
+    rawString quote insides =
+        quote >> manyTill insides quote
+
+    multiStr  =
+        do  result <- rawString (try (string "\"\"\"")) multilineStringChar
+            return (result, True)
+    singleStr =
+        do  result <- rawString (char '"') stringChar
+            return (result, False)
+
+    stringChar :: IParser String
+    stringChar = choice [ newlineChar, escaped '\"', (:[]) <$> satisfy (/= '\"') ]
+
+    multilineStringChar :: IParser String
+    multilineStringChar =
+        do noEnd
+           choice [ newlineChar, escaped '\"', expandQuote <$> anyChar ]
+        where
+          noEnd = notFollowedBy (string "\"\"\"")
+          expandQuote c = if c == '\"' then "\\\"" else [c]
+
+    newlineChar :: IParser String
+    newlineChar =
+        choice
+            [ char '\n' >> return "\\n"
+            , char '\r' >> choice
+                [ char '\n' >> return "\\n"
+                , return "\\r"
+                ]
+            ]
