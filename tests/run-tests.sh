@@ -305,6 +305,8 @@ echo "# elm-format test suite"
 
 checkWaysToRun
 
+checkGood 0.19 AllSyntax/0.19/Literals.elm
+
 checkGood 0.18 Simple.elm
 checkGood 0.18 AllSyntax/0.18/AllSyntax.elm
 checkGoodAllSyntax 0.18 Module

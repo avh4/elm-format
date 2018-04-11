@@ -7,6 +7,7 @@ import Test.Tasty.HUnit
 import qualified Data.Text as Text
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
+import qualified ElmVersion
 import qualified Reporting.Error.Syntax
 
 tests :: TestTree
@@ -59,4 +60,4 @@ format source =
         |> Text.pack
         |> Parse.parseLiteral
         |> Parse.toEither
-        |> fmap Render.renderLiteral
+        |> fmap (Render.renderLiteral ElmVersion.Elm_0_18)

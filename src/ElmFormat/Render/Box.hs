@@ -22,6 +22,7 @@ import qualified Data.Text as Text
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified ElmFormat.Render.Markdown
 import qualified ElmFormat.Version
+import qualified ElmVersion
 import qualified Parse.Parse as Parse
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Region as Region
@@ -844,7 +845,7 @@ formatPattern elmVersion parensRequired apattern =
             formatUnit '(' ')' comments
 
         AST.Pattern.Literal lit ->
-            formatLiteral lit
+            formatLiteral elmVersion lit
 
         AST.Pattern.VarPattern var ->
             line $ formatLowercaseIdentifier elmVersion [] var
@@ -973,7 +974,7 @@ formatExpression :: ElmVersion -> ExpressionContext -> AST.Expression.Expr -> Bo
 formatExpression elmVersion context aexpr =
     case RA.drop aexpr of
         AST.Expression.Literal lit ->
-            formatLiteral lit
+            formatLiteral elmVersion lit
 
         AST.Expression.VarExpr v ->
             line $ formatVar elmVersion v
@@ -1656,8 +1657,8 @@ formatComment comment =
             mustBreak $ row [ punc "{--", literal c, punc "-}" ]
 
 
-formatLiteral :: AST.Literal -> Box
-formatLiteral lit =
+formatLiteral :: ElmVersion -> AST.Literal -> Box
+formatLiteral elmVersion lit =
     case lit of
         AST.IntNum i AST.DecimalInt ->
             line $ literal $ show i
@@ -1676,9 +1677,9 @@ formatLiteral lit =
         AST.FloatNum f AST.ExponentFloat ->
             line $ literal $ printf "%e" f
         AST.Chr c ->
-            formatString SChar [c]
+            formatString elmVersion SChar [c]
         AST.Str s multi ->
-            formatString (if multi then SMulti else SString) s
+            formatString elmVersion (if multi then SMulti else SString) s
         AST.Boolean b ->
             line $ literal $ show b
 
@@ -1690,8 +1691,8 @@ data StringStyle
     deriving (Eq)
 
 
-formatString :: StringStyle -> String -> Box
-formatString style s =
+formatString :: ElmVersion -> StringStyle -> String -> Box
+formatString elmVersion style s =
   case style of
       SChar ->
         stringBox "\'" id
@@ -1732,7 +1733,11 @@ formatString style s =
             [c]
 
     hex char =
-        "\\x" ++ (printf fmt $ Char.ord char)
+      case ElmVersion.style_0_19_stringEscape elmVersion of
+          True ->
+              "\\u{" ++ (printf "%04X" $ Char.ord char) ++ "}"
+          False ->
+              "\\x" ++ (printf fmt $ Char.ord char)
       where
         fmt =
           if Char.ord char <= 0xFF then

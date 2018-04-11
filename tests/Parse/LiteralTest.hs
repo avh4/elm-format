@@ -9,11 +9,13 @@ import ElmFormat.Render.Box (formatLiteral)
 import Parse.Literal (literal)
 import Parse.TestHelpers (assertParse, assertParseFailure)
 
+import qualified ElmVersion
+
 
 example :: String -> String -> String -> TestTree
 example name input expected =
     testCase name $
-        assertParse (fmap (unpack . render . formatLiteral) literal) input expected
+        assertParse (fmap (unpack . render . formatLiteral ElmVersion.Elm_0_18) literal) input expected
 
 
 tests :: TestTree

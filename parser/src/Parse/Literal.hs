@@ -199,6 +199,7 @@ charNum :: IParser Char
 charNum         = do{ code <- decimal
                               <|> do{ _ <- char 'o'; number 8 octDigit }
                               <|> do{ _ <- char 'x'; number 16 hexDigit }
+                              <|> do{ _ <- char 'u'; between (char '{') (char '}') (number 16 hexDigit) }
                     ; if code > 0x10FFFF
                       then fail "invalid escape sequence"
                       else return (toEnum (fromInteger code))
