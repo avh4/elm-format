@@ -25,6 +25,7 @@ renderBox box =
         |> Text.unlines
 
 
-renderLiteral :: Literal -> Text.Text
-renderLiteral literal =
-    renderBox $ Render.formatLiteral literal
+-- TODO: remove this and convert the Integration test to a test fixture
+renderLiteral :: ElmVersion -> Literal -> Text.Text
+renderLiteral elmVersion literal =
+    renderBox $ Render.formatLiteral elmVersion literal

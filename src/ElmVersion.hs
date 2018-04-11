@@ -27,3 +27,13 @@ parse versionString =
     "0.18" -> Right Elm_0_18
     "0.19" -> Right Elm_0_19
     _ -> Left ("Invalid Elm version \"" ++ versionString ++ "\".  Supported versions are 0.17, 0.18, 0.19")
+
+
+style_0_19_stringEscape :: ElmVersion -> Bool
+style_0_19_stringEscape elmVersion =
+    case elmVersion of
+        Elm_0_16 -> False
+        Elm_0_17 -> False
+        Elm_0_18 -> False
+        Elm_0_18_Upgrade -> False
+        _ -> True
