@@ -2,7 +2,7 @@ module Parse.Literal (literal) where
 
 import Prelude hiding (exponent)
 import Text.Parsec ((<|>), (<?>), digit, hexDigit, lookAhead, many1, option, string, try, char, notFollowedBy, choice, anyChar, satisfy, manyTill)
-import Parse.Helpers (chr, processAs, escaped, expecting, sandwich)
+import Parse.Helpers (processAs, escaped, expecting, sandwich, betwixt)
 import Parse.IParser
 
 import AST.V0_16
@@ -113,3 +113,19 @@ str =
                 , return "\\r"
                 ]
             ]
+
+
+chr :: IParser Char
+chr =
+    betwixt '\'' '\'' character <?> "a character"
+  where
+    nonQuote = satisfy (/='\'')
+
+    character =
+      do  c <- choice
+                [ escaped '\''
+                , (:) <$> char '\\' <*> many1 nonQuote
+                , (:[]) <$> nonQuote
+                ]
+
+          processAs Text.Parsec.Token.charLiteral $ sandwich '\'' c

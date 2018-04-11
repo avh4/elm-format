@@ -549,22 +549,6 @@ escaped delim =
     return ['\\', c]
 
 
-chr :: IParser Char
-chr =
-    betwixt '\'' '\'' character <?> "a character"
-  where
-    nonQuote = satisfy (/='\'')
-
-    character =
-      do  c <- choice
-                [ escaped '\''
-                , (:) <$> char '\\' <*> many1 nonQuote
-                , (:[]) <$> nonQuote
-                ]
-
-          processAs T.charLiteral $ sandwich '\'' c
-
-
 processAs :: (T.GenTokenParser String u SourceM -> IParser a) -> String -> IParser a
 processAs processor s =
     calloutParser s (processor lexer)
