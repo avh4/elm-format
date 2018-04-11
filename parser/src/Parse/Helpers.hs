@@ -7,7 +7,6 @@ import Data.Map.Strict hiding (foldl)
 import qualified Data.Maybe as Maybe
 import Text.Parsec hiding (newline, spaces, State)
 import Text.Parsec.Indent (indented, runIndent)
-import qualified Text.Parsec.Token as T
 
 import AST.V0_16
 import qualified AST.Expression
@@ -549,30 +548,10 @@ escaped delim =
     return ['\\', c]
 
 
-processAs :: (T.GenTokenParser String u SourceM -> IParser a) -> String -> IParser a
+processAs :: IParser a -> String -> IParser a
 processAs processor s =
-    calloutParser s (processor lexer)
+    calloutParser s processor
   where
     calloutParser :: String -> IParser a -> IParser a
     calloutParser inp p =
       either (fail . show) return (iParse p inp)
-
-    lexer :: T.GenTokenParser String u SourceM
-    lexer = T.makeTokenParser elmDef
-
-    -- I don't know how many of these are necessary for charLiteral/stringLiteral
-    elmDef :: T.GenLanguageDef String u SourceM
-    elmDef =
-      T.LanguageDef
-        { T.commentStart    = "{-"
-        , T.commentEnd      = "-}"
-        , T.commentLine     = "--"
-        , T.nestedComments  = True
-        , T.identStart      = undefined
-        , T.identLetter     = undefined
-        , T.opStart         = undefined
-        , T.opLetter        = undefined
-        , T.reservedNames   = reserveds
-        , T.reservedOpNames = [":", "->", "|"]
-        , T.caseSensitive   = True
-        }
