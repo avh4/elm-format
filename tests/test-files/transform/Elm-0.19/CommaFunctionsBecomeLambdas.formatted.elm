@@ -29,6 +29,10 @@ tuple3_function =
     \a b c -> ( a, b, c )
 
 
+bad_tooManyArgs =
+    ( 1, 2, 3 ) 4 5
+
+
 withComments =
     {- A -}
     \c d -> ( {- B -} 1, {- C -} 2, c, d )

@@ -1264,12 +1264,18 @@ formatExpression elmVersion context aexpr =
 
 
 formatTupleLambda_0_19 :: Int -> [(AST.Comments, AST.Expression.Expr)] -> Bool -> AST.Expression.Expr
-formatTupleLambda_0_19 n appliedArgs forceMultiline =
+formatTupleLambda_0_19 n args forceMultiline =
     let
       vars =
         if n <= 26
           then fmap (\c -> [c]) (drop (length appliedArgs) $ take n ['a'..'z'])
           else error (pleaseReport'' "UNEXPECTED TUPLE" "more than 26 elements")
+
+      appliedArgs =
+          take n args
+
+      extraArgs =
+          drop n args
 
       makeArg varName =
           ([], noRegion $ AST.Pattern.VarPattern $ AST.LowercaseIdentifier varName)
@@ -1282,13 +1288,28 @@ formatTupleLambda_0_19 n appliedArgs forceMultiline =
 
       tuple =
           (noRegion $ AST.Expression.Tuple (fmap makeInlinedValue appliedArgs ++ fmap makeTupleItem vars) forceMultiline)
+
+      replacement =
+          case vars of
+              [] ->
+                  tuple
+
+              _ : _ ->
+                  (noRegion $ AST.Expression.Lambda (fmap makeArg vars) [] tuple False)
     in
-    case vars of
+    case extraArgs of
         [] ->
-            tuple
+            replacement
 
         _ : _ ->
-            (noRegion $ AST.Expression.Lambda (fmap makeArg vars) [] tuple False)
+            let
+                multiline =
+                    if forceMultiline
+                        then AST.FASplitFirst
+                        else AST.FAJoinFirst AST.JoinAll
+            in
+            noRegion $ AST.Expression.App replacement extraArgs multiline
+
 
 formatRecordLike ::
     (base -> Box) -> (key -> Line) -> String -> (value -> Box)
