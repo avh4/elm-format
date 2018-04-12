@@ -6,3 +6,21 @@ tuple3 = (,,) 1 2 3
 tuple3_partial1 = (,,) 1 2
 tuple3_partial2 = (,,) 1
 tuple3_function = (,,)
+
+withComments = {-A-}(,,,){-B-}1{-C-}2
+needsParens f = f ((,,) 1)
+multiline_splitAll =
+    (,,)
+        { longRecordWithFields = 1, longSecondField = 2 }
+        { longRecordWithFields = 3, longSecondField = 4 }
+multiline_splitSome =
+    (,,) { longRecordWithFields = 1, longSecondField = 2 }
+        { longRecordWithFields = 3, longSecondField = 4 }
+multiline_splitFirst =
+    (,,,)
+        { longRecordWithFields = 1, longSecondField = 2 }
+multiline_fromComments =
+    (,,) 1 --A
+        2
+notMultiline_joinFirst =
+    (,,,) { longRecordWithFields = 1, longSecondField = 2 }

@@ -2,11 +2,11 @@ module Main exposing (..)
 
 
 tuple2 =
-    (\a b -> ( a, b )) 1 2
+    ( 1, 2 )
 
 
 tuple2_partial =
-    (\a b -> ( a, b )) 1
+    \b -> ( 1, b )
 
 
 tuple2_function =
@@ -14,16 +14,63 @@ tuple2_function =
 
 
 tuple3 =
-    (\a b c -> ( a, b, c )) 1 2 3
+    ( 1, 2, 3 )
 
 
 tuple3_partial1 =
-    (\a b c -> ( a, b, c )) 1 2
+    \c -> ( 1, 2, c )
 
 
 tuple3_partial2 =
-    (\a b c -> ( a, b, c )) 1
+    \b c -> ( 1, b, c )
 
 
 tuple3_function =
     \a b c -> ( a, b, c )
+
+
+withComments =
+    {- A -}
+    \c d -> ( {- B -} 1, {- C -} 2, c, d )
+
+
+needsParens f =
+    f (\b c -> ( 1, b, c ))
+
+
+multiline_splitAll =
+    \c ->
+        ( { longRecordWithFields = 1, longSecondField = 2 }
+        , { longRecordWithFields = 3, longSecondField = 4 }
+        , c
+        )
+
+
+multiline_splitSome =
+    \c ->
+        ( { longRecordWithFields = 1, longSecondField = 2 }
+        , { longRecordWithFields = 3, longSecondField = 4 }
+        , c
+        )
+
+
+multiline_splitFirst =
+    \b c d ->
+        ( { longRecordWithFields = 1, longSecondField = 2 }
+        , b
+        , c
+        , d
+        )
+
+
+multiline_fromComments =
+    \c ->
+        ( 1
+        , --A
+          2
+        , c
+        )
+
+
+notMultiline_joinFirst =
+    \b c d -> ( { longRecordWithFields = 1, longSecondField = 2 }, b, c, d )
