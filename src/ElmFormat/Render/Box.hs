@@ -1504,6 +1504,15 @@ removeBangs' left preBang remaining =
                                 (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "none")))
                                 innerComments
 
+                        AST.Expression.ExplicitList [(extraPre, (pre', (cmd, eol)))] trailing _ ->
+                            let
+                                eolComment =
+                                    case eol of
+                                        Nothing -> []
+                                        Just c -> [AST.LineComment c]
+                            in
+                            AST.Commented (post ++ extraPre ++ pre') cmd (eolComment ++ trailing)
+
                         _ ->
                             AST.Commented [] (noRegion $ AST.Expression.App
                                 (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "batch")))
