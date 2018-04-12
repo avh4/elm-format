@@ -7,6 +7,8 @@ tuple3_partial1 = (,,) 1 2
 tuple3_partial2 = (,,) 1
 tuple3_function = (,,)
 
+bad_tooManyArgs = (,,) 1 2 3 4 5
+
 withComments = {-A-}(,,,){-B-}1{-C-}2
 needsParens f = f ((,,) 1)
 multiline_splitAll =
