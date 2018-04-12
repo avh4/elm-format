@@ -1476,36 +1476,59 @@ removeBangs ::
     -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
     -> (AST.Expression.Expr, [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)])
 removeBangs left ops =
-    case ops of
-        (pre, AST.Variable.OpRef (AST.SymbolIdentifier "!"), post, e):rest ->
-            case RA.drop e of
-                AST.Expression.ExplicitList [] innerComments _ ->
-                    ( noRegion $ AST.Expression.Tuple
-                        [ AST.Commented [] left pre
-                        , AST.Commented
-                            post
-                            (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "none")))
-                            innerComments
+    removeBangs' left [] ops
+
+
+removeBangs' ::
+    AST.Expression.Expr
+    -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
+    -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
+    -> (AST.Expression.Expr, [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)])
+removeBangs' left preBang remaining =
+    case remaining of
+        [] ->
+            (left, preBang)
+
+        (pre, AST.Variable.OpRef (AST.SymbolIdentifier "!"), post, cmds):rest ->
+            let
+                left' =
+                    case preBang of
+                        [] -> left
+                        _:_ -> ( noRegion $ AST.Expression.Binops left preBang False)
+
+                cmds' =
+                    case RA.drop cmds of
+                        AST.Expression.ExplicitList [] innerComments _ ->
+                            AST.Commented
+                                post
+                                (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "none")))
+                                innerComments
+
+                        _ ->
+                            AST.Commented [] (noRegion $ AST.Expression.App
+                                (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "batch")))
+                                [(post, cmds)]
+                                (AST.FAJoinFirst AST.JoinAll)
+                              )
+                              []
+
+                tuple =
+                    noRegion $ AST.Expression.Tuple
+                        [ AST.Commented [] left' pre
+                        , cmds'
                         ]
                         True
-                    , rest
-                    )
+            in
+            removeBangs' tuple [] rest
 
-                _ ->
-                    ( noRegion $ AST.Expression.Tuple
-                        [ AST.Commented [] left pre
-                        , AST.Commented [] (noRegion $ AST.Expression.App
-                            (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "batch")))
-                            [(post, e)]
-                            (AST.FAJoinFirst AST.JoinAll)
-                          )
-                          []
-                        ]
-                        True
-                    , rest
-                    )
+        (pre, op@(AST.Variable.OpRef (AST.SymbolIdentifier ">>")), post, e):rest ->
+            removeBangs' left ((pre, op, post, e):preBang) rest
 
-        _ -> (left, ops)
+        (pre, op, post, e):rest ->
+            let
+                (e', rest') = removeBangs' e [] rest
+            in
+            (left, reverse preBang ++ (pre, op, post, e'):rest')
 
 
 formatRange_0_17 :: ElmVersion -> AST.Commented AST.Expression.Expr -> AST.Commented AST.Expression.Expr -> Bool -> Box
