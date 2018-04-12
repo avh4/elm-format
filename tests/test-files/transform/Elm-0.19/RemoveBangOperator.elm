@@ -5,6 +5,9 @@ batch_notALiteralList model cmds = model ! cmds
 none model = model ! []
 none_withComments model = model {- A -} ! {- B -} [ {- C -} ]
 
+single model a = model ! [ a ]
+single_withComments model a = model {- A -} ! {- B -} [ {- C -} a {- D -} ]
+
 inBinaryExpression model x a b = x + model ! [ a ] * [ b ]
 multipleBangs model x = x + model ! [] * model ! []
 nestedBangs model a b = model ! [ a ] ! [ b ] ! []

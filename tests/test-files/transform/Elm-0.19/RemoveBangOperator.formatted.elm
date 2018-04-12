@@ -31,10 +31,22 @@ none_withComments model =
     )
 
 
+single model a =
+    ( model
+    , a
+    )
+
+
+single_withComments model a =
+    ( model {- A -}
+    , {- B -} {- C -} a {- D -}
+    )
+
+
 inBinaryExpression model x a b =
     x
         + ( model
-          , Cmd.batch [ a ]
+          , a
           )
         * [ b ]
 
@@ -51,9 +63,9 @@ multipleBangs model x =
 
 nestedBangs model a b =
     ( ( ( model
-        , Cmd.batch [ a ]
+        , a
         )
-      , Cmd.batch [ b ]
+      , b
       )
     , Cmd.none
     )
