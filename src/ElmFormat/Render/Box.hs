@@ -1050,11 +1050,25 @@ formatExpression elmVersion context aexpr =
             prefix (punc "-") $ formatExpression elmVersion SpaceSeparated e -- TODO: This might need something stronger than SpaceSeparated?
 
         AST.Expression.App left args multiline ->
-          ElmStructure.application
-            multiline
-            (formatExpression elmVersion InfixSeparated left)
-            (map (\(x,y) -> formatCommented' x (formatExpression elmVersion SpaceSeparated) y) args)
-            |> expressionParens SpaceSeparated context
+            case (elmVersion, RA.drop left) of
+                (Elm_0_19_Upgrade, AST.Expression.TupleFunction n) ->
+                    let
+                        forceMultiline =
+                            case (multiline, args) of
+                                (_, []) -> False -- no items; don't split
+                                (AST.FASplitFirst, _) -> True -- all are split
+                                (AST.FAJoinFirst _, [_]) -> False -- only one and it's joined
+                                (AST.FAJoinFirst AST.JoinAll, _) -> False -- all are joined
+                                (AST.FAJoinFirst AST.SplitAll, _:_:_) -> True -- first is joined, but rest are split
+                    in
+                    formatExpression elmVersion context (formatTupleLambda_0_19 n args forceMultiline)
+
+                _ ->
+                    ElmStructure.application
+                      multiline
+                      (formatExpression elmVersion InfixSeparated left)
+                      (map (\(x,y) -> formatCommented' x (formatExpression elmVersion SpaceSeparated) y) args)
+                      |> expressionParens SpaceSeparated context
 
         AST.Expression.If if' elseifs (elsComments, els) ->
             let
@@ -1208,7 +1222,7 @@ formatExpression elmVersion context aexpr =
         AST.Expression.TupleFunction n ->
             case elmVersion of
                 Elm_0_19_Upgrade ->
-                    formatExpression elmVersion context (formatTupleLambda_0_19 n)
+                    formatExpression elmVersion context (formatTupleLambda_0_19 n [] False)
 
                 _ ->
                     line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
@@ -1249,12 +1263,12 @@ formatExpression elmVersion context aexpr =
             ]
 
 
-formatTupleLambda_0_19 :: Int -> AST.Expression.Expr
-formatTupleLambda_0_19 n =
+formatTupleLambda_0_19 :: Int -> [(AST.Comments, AST.Expression.Expr)] -> Bool -> AST.Expression.Expr
+formatTupleLambda_0_19 n appliedArgs forceMultiline =
     let
       vars =
         if n <= 26
-          then fmap (\c -> [c]) (take n ['a'..'z'])
+          then fmap (\c -> [c]) (drop (length appliedArgs) $ take n ['a'..'z'])
           else error (pleaseReport'' "UNEXPECTED TUPLE" "more than 26 elements")
 
       makeArg varName =
@@ -1262,13 +1276,19 @@ formatTupleLambda_0_19 n =
 
       makeTupleItem varName =
           AST.Commented [] (noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef [] $ AST.LowercaseIdentifier varName) []
+
+      makeInlinedValue (comments, expr) =
+          AST.Commented comments expr []
+
+      tuple =
+          (noRegion $ AST.Expression.Tuple (fmap makeInlinedValue appliedArgs ++ fmap makeTupleItem vars) forceMultiline)
     in
-    (noRegion $ AST.Expression.Lambda
-        (fmap makeArg vars)
-        []
-        (noRegion $ AST.Expression.Tuple (fmap makeTupleItem vars) False)
-        False
-    )
+    case vars of
+        [] ->
+            tuple
+
+        _ : _ ->
+            (noRegion $ AST.Expression.Lambda (fmap makeArg vars) [] tuple False)
 
 formatRecordLike ::
     (base -> Box) -> (key -> Line) -> String -> (value -> Box)
