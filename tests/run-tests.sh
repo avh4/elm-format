@@ -307,6 +307,11 @@ checkWaysToRun
 
 checkGood 0.19 AllSyntax/0.19/Literals.elm
 
+checkUpgrade 0.19 Elm-0.19/CommaFunctionsBecomeLambdas.elm
+checkUpgrade 0.19 Elm-0.19/RemoveBangOperator.elm
+checkUpgrade 0.19 Elm-0.19/NewStringEscapeSyntax.elm
+checkUpgrade 0.19 Elm-0.19/RemoveBasicsFlip.elm
+
 checkGood 0.18 Simple.elm
 checkGood 0.18 AllSyntax/0.18/AllSyntax.elm
 checkGoodAllSyntax 0.18 Module
@@ -382,10 +387,6 @@ checkUpgrade 0.18 Elm-0.18/RangesBecomeListRange.elm
 checkUpgrade 0.18 Elm-0.18/BackticksBecomeFunctionCalls.elm
 checkUpgrade 0.18 Elm-0.18/SpecialBackticksBecomePipelines.elm
 checkUpgrade 0.18 Elm-0.18/RenameTupleFunctions.elm
-
-checkUpgrade 0.19 Elm-0.19/CommaFunctionsBecomeLambdas.elm
-checkUpgrade 0.19 Elm-0.19/RemoveBangOperator.elm
-checkUpgrade 0.19 Elm-0.19/NewStringEscapeSyntax.elm
 
 checkValidationOutputFormat
 

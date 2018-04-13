@@ -21,6 +21,7 @@ import Data.Maybe (fromMaybe, maybeToList)
 import qualified Data.Text as Text
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified ElmFormat.Render.Markdown
+import qualified ElmFormat.Upgrade_0_19 as Upgrade_0_19
 import qualified ElmFormat.Version
 import qualified ElmVersion
 import qualified Parse.Parse as Parse
@@ -972,6 +973,13 @@ expressionParens inner outer =
 
 formatExpression :: ElmVersion -> ExpressionContext -> AST.Expression.Expr -> Box
 formatExpression elmVersion context aexpr =
+    case elmVersion of
+        Elm_0_19_Upgrade -> formatExpression' elmVersion context (Upgrade_0_19.transform aexpr)
+        _ -> formatExpression' elmVersion context aexpr
+
+
+formatExpression' :: ElmVersion -> ExpressionContext -> AST.Expression.Expr -> Box
+formatExpression' elmVersion context aexpr =
     case RA.drop aexpr of
         AST.Expression.Literal lit ->
             formatLiteral elmVersion lit
