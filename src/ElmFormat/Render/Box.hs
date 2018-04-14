@@ -1075,18 +1075,10 @@ formatExpression' elmVersion context aexpr =
                     formatExpression elmVersion context (formatTupleLambda_0_19 n args forceMultiline)
 
                 _ ->
-                    let
-                        -- TODO: this should really be used everywhere we format a (List (PreCommented Expr))
-                        flattenParenedComments (pre, e) =
-                            case RA.drop e of
-                                AST.Expression.Parens (AST.Commented pre2 e' []) ->
-                                    (pre ++ pre2, e')
-                                _ -> (pre, e)
-                    in
                     ElmStructure.application
                       multiline
                       (formatExpression elmVersion InfixSeparated left)
-                      (map (\(x,y) -> formatCommented' x (formatExpression elmVersion SpaceSeparated) y) (fmap flattenParenedComments args))
+                      (fmap (formatPreCommentedExpression elmVersion SpaceSeparated) args)
                       |> expressionParens SpaceSeparated context
 
         AST.Expression.If if' elseifs (elsComments, els) ->
@@ -1280,6 +1272,18 @@ formatExpression' elmVersion context aexpr =
             , literal $ src
             , punc "|]"
             ]
+
+
+formatPreCommentedExpression :: ElmVersion -> ExpressionContext -> AST.PreCommented AST.Expression.Expr -> Box
+formatPreCommentedExpression elmVersion context (pre, e) =
+    let
+        (pre', e') =
+            case RA.drop e of
+                AST.Expression.Parens (AST.Commented pre'' e'' []) ->
+                    (pre ++ pre'', e'')
+                _ -> (pre, e)
+    in
+    formatCommented' pre' (formatExpression elmVersion context) e'
 
 
 formatTupleLambda_0_19 :: Int -> [(AST.Comments, AST.Expression.Expr)] -> Bool -> AST.Expression.Expr
