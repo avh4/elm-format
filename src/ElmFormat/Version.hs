@@ -10,4 +10,4 @@ asString =
 
 experimental :: Maybe String
 experimental =
-    Just "https://goo.gl/forms/kLdTN1yikfOI8ZuA3"
+    Nothing
