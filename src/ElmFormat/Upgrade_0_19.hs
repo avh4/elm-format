@@ -105,6 +105,65 @@ transform expr =
                 ):argRest)
                 multiline
 
+        --
+        -- Basics.uncurry
+        --
+
+        VarExpr var | isBasics "uncurry" var ->
+            noRegion $ Lambda
+                [makeArg "f", ([], noRegion $ AST.Pattern.Tuple [makeArg' "a", makeArg' "b"]) ] []
+                (noRegion $ App
+                    (makeVarRef "f")
+                    [ ([], makeVarRef "a")
+                    , ([], makeVarRef "b")
+                    ]
+                    (FAJoinFirst JoinAll)
+                )
+                False
+
+        App (A _ (VarExpr var)) [(pre1, arg1)] _ | isBasics "uncurry" var ->
+            noRegion $ Lambda
+                [([], noRegion $ AST.Pattern.Tuple [makeArg' "a", makeArg' "b"]) ] pre1
+                (noRegion $ App arg1
+                    [ ([], makeVarRef "a")
+                    , ([], makeVarRef "b")
+                    ]
+                    (FAJoinFirst JoinAll)
+                )
+                False
+
+        App (A _ (VarExpr var)) ((pre1, arg1):(preT, A _ (AST.Expression.Tuple [Commented preA exprA postA, Commented preB exprB postB] multiline)):extraArgs) _ | isBasics "uncurry" var ->
+
+            noRegion $ Parens $
+                Commented (pre1 ++ preT)
+                    (noRegion $ App arg1
+                        ((preA ++ postA, exprA):(preB ++ postB, exprB):extraArgs)
+                        (if multiline then FASplitFirst else (FAJoinFirst JoinAll))
+                    )
+                    []
+
+        App (A _ (VarExpr var)) ((pre1, arg1):extraArgs) multiline | isBasics "uncurry" var ->
+            let
+                newMultiline =
+                    case multiline of
+                        FASplitFirst -> FASplitFirst
+                        FAJoinFirst SplitAll -> FASplitFirst
+                        FAJoinFirst JoinAll -> FAJoinFirst JoinAll
+            in
+            noRegion $ App
+                (noRegion $ Lambda
+                    [([], noRegion $ AST.Pattern.Tuple [makeArg' "a", makeArg' "b"]) ] pre1
+                    (noRegion $ App arg1
+                        [ ([], makeVarRef "a")
+                        , ([], makeVarRef "b")
+                        ]
+                        (FAJoinFirst JoinAll)
+                    )
+                    False
+                )
+                extraArgs
+                newMultiline
+
         _ ->
             expr
 
@@ -135,6 +194,11 @@ isBasics targetName var =
 makeArg :: String -> (Comments, Pattern)
 makeArg varName =
     ([], noRegion $ VarPattern $ LowercaseIdentifier varName)
+
+
+makeArg' :: String -> Commented Pattern
+makeArg' varName =
+    Commented [] (noRegion $ VarPattern $ LowercaseIdentifier varName) []
 
 
 makeVarRef :: String -> Expr
