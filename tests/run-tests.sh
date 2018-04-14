@@ -26,7 +26,7 @@ fi
 
 stack "${STACK_ARGS[@]}" build || exit 1
 
-ELM_FORMAT="$(stack "${STACK_ARGS[@]}" path --local-install-root)/bin/elm-format-0.18"
+ELM_FORMAT="$(stack "${STACK_ARGS[@]}" path --local-install-root)/bin/elm-format-0.19"
 if [ ! -e "$ELM_FORMAT" ]; then
 	echo "$0: ERROR: $ELM_FORMAT not found" >&2
 	exit 1
