@@ -249,12 +249,35 @@ inlineVar name value expr =
 
 applyLambda :: Expr -> [PreCommented Expr] -> FunctionApplicationMultiline -> Expr
 applyLambda lambda args appMultiline =
+    let
+        getMapping :: PreCommented Pattern -> PreCommented Expr -> Maybe [(LowercaseIdentifier, Expr')]
+        getMapping pat arg =
+            case (pat, arg) of
+                ( (preVar, A _ (VarPattern name))
+                 , (preArg, arg')
+                 ) ->
+                    Just [(name, Parens $ Commented (preVar ++ preArg) arg' [])]
+                _ ->
+                    Nothing
+    in
     case (RA.drop lambda, args) of
-        (Lambda ((preVar, A _ (VarPattern name)):[]) preBody body _, (pre, arg):restArgs) ->
-            noRegion $ App (noRegion $ Parens $ Commented preBody (mapExpr (inlineVar name (Parens $ Commented (preVar ++ pre) arg [])) body) []) restArgs appMultiline
+        (Lambda (pat:restVar) preBody body multiline, arg:restArgs) ->
+            case getMapping pat arg of
+                Nothing ->
+                    -- failed to destructure the next argument, so stop
+                    noRegion $ App lambda args appMultiline
 
-        (Lambda ((preVar, A _ (VarPattern name)):restVar) preBody body multiline, (pre, arg):restArgs) ->
-            applyLambda (noRegion $ Lambda restVar preBody (mapExpr (inlineVar name (Parens $ Commented (preVar ++ pre) arg [])) body) multiline) restArgs appMultiline
+                Just mappings ->
+                    let
+                        newBody = foldl (\e (name, value) -> mapExpr (inlineVar name value) e) body mappings
+                    in
+                    case restVar of
+                        [] ->
+                            -- we applied the argument and none are left, so remove the lambda
+                            noRegion $ App (noRegion $ Parens $ Commented preBody newBody []) restArgs appMultiline
+                        _:_ ->
+                            -- we applied this argument; try to apply the next argument
+                            applyLambda (noRegion $ Lambda restVar preBody newBody multiline) restArgs appMultiline
 
         (_, []) -> lambda
 
