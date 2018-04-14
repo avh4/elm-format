@@ -40,6 +40,19 @@ transform expr =
                     (FAJoinFirst JoinAll)
                 )
                 False
+
+        uncurryLambda :: Expr
+        uncurryLambda =
+            noRegion $ Lambda
+                [makeArg "f", ([], noRegion $ AST.Pattern.Tuple [makeArg' "a", makeArg' "b"]) ] []
+                (noRegion $ App
+                    (makeVarRef "f")
+                    [ ([], makeVarRef "a")
+                    , ([], makeVarRef "b")
+                    ]
+                    (FAJoinFirst JoinAll)
+                )
+                False
     in
     case RA.drop expr of
         --
@@ -67,59 +80,10 @@ transform expr =
         --
 
         VarExpr var | isBasics "uncurry" var ->
-            noRegion $ Lambda
-                [makeArg "f", ([], noRegion $ AST.Pattern.Tuple [makeArg' "a", makeArg' "b"]) ] []
-                (noRegion $ App
-                    (makeVarRef "f")
-                    [ ([], makeVarRef "a")
-                    , ([], makeVarRef "b")
-                    ]
-                    (FAJoinFirst JoinAll)
-                )
-                False
+            uncurryLambda
 
-        App (A _ (VarExpr var)) [(pre1, arg1)] _ | isBasics "uncurry" var ->
-            noRegion $ Lambda
-                [([], noRegion $ AST.Pattern.Tuple [makeArg' "a", makeArg' "b"]) ] pre1
-                (noRegion $ App arg1
-                    [ ([], makeVarRef "a")
-                    , ([], makeVarRef "b")
-                    ]
-                    (FAJoinFirst JoinAll)
-                )
-                False
-
-        App (A _ (VarExpr var)) ((pre1, arg1):(preT, A _ (AST.Expression.Tuple [Commented preA exprA postA, Commented preB exprB postB] multiline)):extraArgs) _ | isBasics "uncurry" var ->
-
-            noRegion $ Parens $
-                Commented (pre1 ++ preT)
-                    (noRegion $ App arg1
-                        ((preA ++ postA, exprA):(preB ++ postB, exprB):extraArgs)
-                        (if multiline then FASplitFirst else (FAJoinFirst JoinAll))
-                    )
-                    []
-
-        App (A _ (VarExpr var)) ((pre1, arg1):extraArgs) multiline | isBasics "uncurry" var ->
-            let
-                newMultiline =
-                    case multiline of
-                        FASplitFirst -> FASplitFirst
-                        FAJoinFirst SplitAll -> FASplitFirst
-                        FAJoinFirst JoinAll -> FAJoinFirst JoinAll
-            in
-            noRegion $ App
-                (noRegion $ Lambda
-                    [([], noRegion $ AST.Pattern.Tuple [makeArg' "a", makeArg' "b"]) ] pre1
-                    (noRegion $ App arg1
-                        [ ([], makeVarRef "a")
-                        , ([], makeVarRef "b")
-                        ]
-                        (FAJoinFirst JoinAll)
-                    )
-                    False
-                )
-                extraArgs
-                newMultiline
+        App (A _ (VarExpr var)) args multiline | isBasics "uncurry" var ->
+            applyLambda uncurryLambda args multiline
 
         _ ->
             expr
@@ -257,6 +221,15 @@ applyLambda lambda args appMultiline =
                  , (preArg, arg')
                  ) ->
                     Just [(name, Parens $ Commented (preVar ++ preArg) arg' [])]
+
+                ( (preVar, A _ (AST.Pattern.Tuple [Commented preA (A _ (VarPattern nameA)) postA, Commented preB (A _ (VarPattern nameB)) postB]))
+                 , (preArg, A _ (AST.Expression.Tuple [Commented preAe eA postAe, Commented preBe eB postBe] _))
+                 ) ->
+                    Just
+                        [ (nameA, Parens $ Commented (preVar ++ preArg) (noRegion $ Parens $ Commented (preA ++ preAe) eA (postAe ++ postA)) [])
+                        , (nameB, Parens $ Commented (preB ++ preBe) eB (postBe ++ postB))
+                        ]
+
                 _ ->
                     Nothing
     in
@@ -270,14 +243,19 @@ applyLambda lambda args appMultiline =
                 Just mappings ->
                     let
                         newBody = foldl (\e (name, value) -> mapExpr (inlineVar name value) e) body mappings
+                        newMultiline =
+                            case appMultiline of
+                                FASplitFirst -> FASplitFirst
+                                FAJoinFirst SplitAll -> FASplitFirst
+                                FAJoinFirst JoinAll -> FAJoinFirst JoinAll
                     in
                     case restVar of
                         [] ->
                             -- we applied the argument and none are left, so remove the lambda
-                            noRegion $ App (noRegion $ Parens $ Commented preBody newBody []) restArgs appMultiline
+                            noRegion $ App (noRegion $ Parens $ Commented preBody newBody []) restArgs newMultiline
                         _:_ ->
                             -- we applied this argument; try to apply the next argument
-                            applyLambda (noRegion $ Lambda restVar preBody newBody multiline) restArgs appMultiline
+                            applyLambda (noRegion $ Lambda restVar preBody newBody multiline) restArgs newMultiline
 
         (_, []) -> lambda
 
