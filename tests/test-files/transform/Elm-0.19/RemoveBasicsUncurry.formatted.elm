@@ -6,7 +6,7 @@ fullyApplied f =
 
 
 fullyApplied_comments f =
-    ({- A -} {- B -} f {- C -} {- D -} "1" {- E -} {- F -} 2)
+    ({- A -} f) {- B -} ({- C -} "1" {- D -}) ({- E -} 2 {- F -})
 
 
 notTuple f t =
@@ -14,11 +14,7 @@ notTuple f t =
 
 
 notTuple_comments f t =
-    (\( a, b ) ->
-        {- A -}
-        f a b
-    )
-        {- B -} t
+    (\( a, b ) -> ({- A -} f) a b) {- B -} t
 
 
 functionOnly f =
@@ -26,9 +22,7 @@ functionOnly f =
 
 
 functionOnly_comments f =
-    \( a, b ) ->
-        {- A -}
-        f a b
+    \( a, b ) -> ({- A -} f) a b
 
 
 unapplied =
@@ -52,9 +46,7 @@ nested f =
 
 
 multiline_fullyApplied f =
-    f
-        1
-        2
+    f 1 2
 
 
 multiline_extraArgs_notTuple f t u =
