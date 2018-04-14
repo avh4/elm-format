@@ -1057,6 +1057,9 @@ formatExpression' elmVersion context aexpr =
         AST.Expression.Unary AST.Expression.Negative e ->
             prefix (punc "-") $ formatExpression elmVersion SpaceSeparated e -- TODO: This might need something stronger than SpaceSeparated?
 
+        AST.Expression.App left [] _ ->
+            formatExpression elmVersion context left
+
         AST.Expression.App left args multiline ->
             case (elmVersion, RA.drop left) of
                 (Elm_0_19_Upgrade, AST.Expression.TupleFunction n) ->
@@ -1072,10 +1075,18 @@ formatExpression' elmVersion context aexpr =
                     formatExpression elmVersion context (formatTupleLambda_0_19 n args forceMultiline)
 
                 _ ->
+                    let
+                        -- TODO: this should really be used everywhere we format a (List (PreCommented Expr))
+                        flattenParenedComments (pre, e) =
+                            case RA.drop e of
+                                AST.Expression.Parens (AST.Commented pre2 e' []) ->
+                                    (pre ++ pre2, e')
+                                _ -> (pre, e)
+                    in
                     ElmStructure.application
                       multiline
                       (formatExpression elmVersion InfixSeparated left)
-                      (map (\(x,y) -> formatCommented' x (formatExpression elmVersion SpaceSeparated) y) args)
+                      (map (\(x,y) -> formatCommented' x (formatExpression elmVersion SpaceSeparated) y) (fmap flattenParenedComments args))
                       |> expressionParens SpaceSeparated context
 
         AST.Expression.If if' elseifs (elsComments, els) ->
