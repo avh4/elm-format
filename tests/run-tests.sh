@@ -311,6 +311,7 @@ checkUpgrade 0.19 Elm-0.19/CommaFunctionsBecomeLambdas.elm
 checkUpgrade 0.19 Elm-0.19/RemoveBangOperator.elm
 checkUpgrade 0.19 Elm-0.19/NewStringEscapeSyntax.elm
 checkUpgrade 0.19 Elm-0.19/RemoveBasicsFlip.elm
+checkUpgrade 0.19 Elm-0.19/RemoveBasicsCurry.elm
 
 checkGood 0.18 Simple.elm
 checkGood 0.18 AllSyntax/0.18/AllSyntax.elm

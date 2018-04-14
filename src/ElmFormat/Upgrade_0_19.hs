@@ -14,6 +14,10 @@ import qualified Reporting.Region as Region
 transform :: Expr -> Expr
 transform expr =
     case RA.drop expr of
+        --
+        -- Basics.flip
+        --
+
         VarExpr var | isBasics "flip" var ->
             noRegion $ Lambda
                 [makeArg "f", makeArg "b", makeArg "a"] []
@@ -47,6 +51,59 @@ transform expr =
         App (A _ (VarExpr var)) ((pre, arg1):arg2:arg3:argRest) multiline | isBasics "flip" var ->
             noRegion $ Parens
                 (Commented pre (noRegion $ App arg1 (arg3:arg2:argRest) multiline) [])
+
+        --
+        -- Basics.curry
+        --
+
+        VarExpr var | isBasics "curry" var ->
+            noRegion $ Lambda
+                [makeArg "f", makeArg "a", makeArg "b"] []
+                (noRegion $ App
+                    (makeVarRef "f")
+                    [([], noRegion $ AST.Expression.Tuple
+                         [ Commented [] (makeVarRef "a") []
+                         , Commented [] (makeVarRef "b") []
+                         ] False
+                    )]
+                    (FAJoinFirst JoinAll)
+                )
+                False
+
+        App (A _ (VarExpr var)) [(pre1, arg1)] _ | isBasics "curry" var ->
+            noRegion $ Lambda
+                [makeArg "a", makeArg "b"] pre1
+                (noRegion $ App arg1
+                    [([], noRegion $ AST.Expression.Tuple
+                        [ Commented [] (makeVarRef "a") []
+                        , Commented [] (makeVarRef "b") []
+                        ] False
+                    )]
+                    (FAJoinFirst JoinAll)
+                )
+                False
+
+        App (A _ (VarExpr var)) [(pre1, arg1),(pre2, arg2)] _ | isBasics "curry" var ->
+            noRegion $ Lambda
+                [makeArg "b"] pre1
+                (noRegion $ App arg1
+                    [([], noRegion $ AST.Expression.Tuple
+                        [ Commented pre2 arg2 []
+                        , Commented [] (makeVarRef "b") []
+                        ] False
+                    )]
+                    (FAJoinFirst JoinAll)
+                )
+                False
+
+        App (A _ (VarExpr var)) ((pre1, arg1):(pre2, arg2):(pre3, arg3):argRest) multiline | isBasics "curry" var ->
+            noRegion $ App arg1
+                ((pre1, noRegion $ AST.Expression.Tuple
+                     [ Commented pre2 arg2 []
+                     , Commented pre3 arg3 []
+                     ] False
+                ):argRest)
+                multiline
 
         _ ->
             expr
