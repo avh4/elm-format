@@ -6,7 +6,7 @@ fullyApplied f =
 
 
 fullyApplied_comments f =
-    f {- A -} ( {- B -} "1", {- C -} 2 )
+    ({- A -} f) ( {- B -} "1", {- C -} 2 )
 
 
 partiallyApplied f =
@@ -14,9 +14,7 @@ partiallyApplied f =
 
 
 partiallyApplied_comments f =
-    \b ->
-        {- A -}
-        f ( {- B -} "1", b )
+    \b -> ({- A -} f) ( {- B -} "1", b )
 
 
 functionOnly f =
@@ -24,9 +22,7 @@ functionOnly f =
 
 
 functionOnly_comments f =
-    \a b ->
-        {- A -}
-        f ( a, b )
+    \a b -> ({- A -} f) ( a, b )
 
 
 unapplied =
