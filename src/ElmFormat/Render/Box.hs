@@ -1102,7 +1102,7 @@ formatExpression' elmVersion context aexpr =
 
                 formatIf (cond, body) =
                     stack1
-                        [ opening (line $ keyword "if") $ formatCommented (formatExpression elmVersion SyntaxSeparated) cond
+                        [ opening (line $ keyword "if") $ formatCommentedExpression elmVersion SyntaxSeparated cond
                         , indent $ formatCommented_ True (formatExpression elmVersion SyntaxSeparated) body
                         ]
 
@@ -1120,7 +1120,7 @@ formatExpression' elmVersion context aexpr =
                   in
                     stack1
                       [ blankLine
-                      , opening key $ formatCommented (formatExpression elmVersion SyntaxSeparated) cond
+                      , opening key $ formatCommentedExpression elmVersion SyntaxSeparated cond
                       , indent $ formatCommented_ True (formatExpression elmVersion SyntaxSeparated) body
                       ]
             in
@@ -1172,7 +1172,7 @@ formatExpression' elmVersion context aexpr =
                 opening =
                   case
                     ( multiline
-                    , formatCommented (formatExpression elmVersion SyntaxSeparated) subject
+                    , formatCommentedExpression elmVersion SyntaxSeparated subject
                     )
                   of
                       (False, SingleLine subject') ->
@@ -1228,7 +1228,7 @@ formatExpression' elmVersion context aexpr =
                     |> expressionParens AmbiguousEnd context -- TODO: not tested
 
         AST.Expression.Tuple exprs multiline ->
-            ElmStructure.group True "(" "," ")" multiline $ map (formatCommented (formatExpression elmVersion SyntaxSeparated)) exprs
+            ElmStructure.group True "(" "," ")" multiline $ map (formatCommentedExpression elmVersion SyntaxSeparated) exprs
 
         AST.Expression.TupleFunction n ->
             case elmVersion of
@@ -1259,7 +1259,7 @@ formatExpression' elmVersion context aexpr =
                     formatExpression elmVersion context expr'
 
                 _ ->
-                    formatCommented (formatExpression elmVersion SyntaxSeparated) expr
+                    formatCommentedExpression elmVersion SyntaxSeparated expr
                         |> parens
 
 
@@ -1272,6 +1272,18 @@ formatExpression' elmVersion context aexpr =
             , literal $ src
             , punc "|]"
             ]
+
+
+formatCommentedExpression :: ElmVersion -> ExpressionContext -> AST.Commented AST.Expression.Expr -> Box
+formatCommentedExpression elmVersion context (AST.Commented pre e post) =
+    let
+        commented' =
+            case RA.drop e of
+                AST.Expression.Parens (AST.Commented pre'' e'' post'') ->
+                    AST.Commented (pre ++ pre'') e'' (post'' ++ post)
+                _ -> AST.Commented pre e post
+    in
+    formatCommented (formatExpression elmVersion context) commented'
 
 
 formatPreCommentedExpression :: ElmVersion -> ExpressionContext -> AST.PreCommented AST.Expression.Expr -> Box
@@ -1567,8 +1579,8 @@ formatRange_0_17 :: ElmVersion -> AST.Commented AST.Expression.Expr -> AST.Comme
 formatRange_0_17 elmVersion left right multiline =
     case
         ( multiline
-        , formatCommented (formatExpression elmVersion SyntaxSeparated) left
-        , formatCommented (formatExpression elmVersion SyntaxSeparated) right
+        , formatCommentedExpression elmVersion SyntaxSeparated left
+        , formatCommentedExpression elmVersion SyntaxSeparated right
         )
     of
         (False, SingleLine left', SingleLine right') ->
