@@ -39,3 +39,7 @@ extraArgs f =
 
 qualified f =
     f 1 "2"
+
+
+nested f =
+    f 3 (f 2 1)
