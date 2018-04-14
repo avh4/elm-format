@@ -8,6 +8,8 @@ import AST.Pattern
 import AST.Variable
 import Reporting.Annotation (Located(A))
 
+import qualified Data.Map.Strict as Dict
+import qualified Data.Maybe as Maybe
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Region as Region
 
@@ -15,98 +17,75 @@ import qualified Reporting.Region as Region
 transform :: Expr -> Expr
 transform expr =
     let
-        flipLambda :: Expr
-        flipLambda =
-            noRegion $ Lambda
-                [makeArg "f", makeArg "b", makeArg "a"] []
-                (noRegion $ App
-                    (makeVarRef "f")
-                    [([], makeVarRef "a"), ([], makeVarRef "b")]
-                    (FAJoinFirst JoinAll)
+        basicsReplacements =
+            Dict.fromList
+              [ ( "flip"
+                , Lambda
+                    [makeArg "f", makeArg "b", makeArg "a"] []
+                    (noRegion $ App
+                        (makeVarRef "f")
+                        [([], makeVarRef "a"), ([], makeVarRef "b")]
+                        (FAJoinFirst JoinAll)
+                    )
+                    False
                 )
-                False
+              , ( "curry"
+                , Lambda
+                    [makeArg "f", makeArg "a", makeArg "b"] []
+                    (noRegion $ App
+                        (makeVarRef "f")
+                        [([], noRegion $ AST.Expression.Tuple
+                            [ Commented [] (makeVarRef "a") []
+                            , Commented [] (makeVarRef "b") []
+                            ] False
+                        )]
+                        (FAJoinFirst JoinAll)
+                    )
+                    False
+                )
+              , ( "uncurry"
+                , Lambda
+                    [makeArg "f", ([], noRegion $ AST.Pattern.Tuple [makeArg' "a", makeArg' "b"]) ] []
+                    (noRegion $ App
+                        (makeVarRef "f")
+                        [ ([], makeVarRef "a")
+                        , ([], makeVarRef "b")
+                        ]
+                        (FAJoinFirst JoinAll)
+                    )
+                    False
+                )
+              , ( "rem"
+                , Lambda
+                    [makeArg "dividend", makeArg "divisor"] []
+                    (noRegion $ App
+                        (makeVarRef "remainderBy")
+                        [ ([], makeVarRef "divisor")
+                        , ([], makeVarRef "dividend")
+                        ]
+                        (FAJoinFirst JoinAll)
+                    )
+                    False
+                )
+              ]
 
-        curryLambda :: Expr
-        curryLambda =
-            noRegion $ Lambda
-                [makeArg "f", makeArg "a", makeArg "b"] []
-                (noRegion $ App
-                    (makeVarRef "f")
-                    [([], noRegion $ AST.Expression.Tuple
-                        [ Commented [] (makeVarRef "a") []
-                        , Commented [] (makeVarRef "b") []
-                        ] False
-                    )]
-                    (FAJoinFirst JoinAll)
-                )
-                False
+        replace var =
+            case var of
+                VarRef [] (LowercaseIdentifier name) ->
+                    Dict.lookup name basicsReplacements
 
-        uncurryLambda :: Expr
-        uncurryLambda =
-            noRegion $ Lambda
-                [makeArg "f", ([], noRegion $ AST.Pattern.Tuple [makeArg' "a", makeArg' "b"]) ] []
-                (noRegion $ App
-                    (makeVarRef "f")
-                    [ ([], makeVarRef "a")
-                    , ([], makeVarRef "b")
-                    ]
-                    (FAJoinFirst JoinAll)
-                )
-                False
+                VarRef [(UppercaseIdentifier "Basics")] (LowercaseIdentifier name) ->
+                    Dict.lookup name basicsReplacements
 
-        remLambda :: Expr
-        remLambda =
-            noRegion $ Lambda
-                [makeArg "dividend", makeArg "divisor"] []
-                (noRegion $ App
-                    (makeVarRef "remainderBy")
-                    [ ([], makeVarRef "divisor")
-                    , ([], makeVarRef "dividend")
-                    ]
-                    (FAJoinFirst JoinAll)
-                )
-                False
+                _ -> Nothing
+
     in
     case RA.drop expr of
-        --
-        -- Basics.flip
-        --
+        VarExpr var ->
+            Maybe.fromMaybe expr $ fmap noRegion $ replace var
 
-        VarExpr var | isBasics "flip" var ->
-            flipLambda
-
-        App (A _ (VarExpr var)) args multiline | isBasics "flip" var ->
-            applyLambda flipLambda args multiline
-
-        --
-        -- Basics.curry
-        --
-
-        VarExpr var | isBasics "curry" var ->
-            curryLambda
-
-        App (A _ (VarExpr var)) args multiline | isBasics "curry" var ->
-            applyLambda curryLambda args multiline
-
-        --
-        -- Basics.uncurry
-        --
-
-        VarExpr var | isBasics "uncurry" var ->
-            uncurryLambda
-
-        App (A _ (VarExpr var)) args multiline | isBasics "uncurry" var ->
-            applyLambda uncurryLambda args multiline
-
-        --
-        -- Basics.rem
-        --
-
-        VarExpr var | isBasics "rem" var ->
-            remLambda
-
-        App (A _ (VarExpr var)) args multiline | isBasics "rem" var ->
-            applyLambda remLambda args multiline
+        App (A _ (VarExpr var)) args multiline ->
+            Maybe.fromMaybe expr $ fmap (\new -> applyLambda (noRegion new) args multiline) $ replace var
 
         _ ->
             expr
@@ -125,14 +104,6 @@ nowhere =
 noRegion :: a -> RA.Located a
 noRegion =
     RA.at nowhere nowhere
-
-
-isBasics :: String -> Ref -> Bool
-isBasics targetName var =
-    case var of
-        VarRef [] (LowercaseIdentifier name) | name == targetName -> True
-        VarRef [(UppercaseIdentifier "Basics")] (LowercaseIdentifier name) | name == targetName -> True
-        _ -> False
 
 
 makeArg :: String -> (Comments, Pattern)
