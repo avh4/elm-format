@@ -53,6 +53,19 @@ transform expr =
                     (FAJoinFirst JoinAll)
                 )
                 False
+
+        remLambda :: Expr
+        remLambda =
+            noRegion $ Lambda
+                [makeArg "dividend", makeArg "divisor"] []
+                (noRegion $ App
+                    (makeVarRef "remainderBy")
+                    [ ([], makeVarRef "divisor")
+                    , ([], makeVarRef "dividend")
+                    ]
+                    (FAJoinFirst JoinAll)
+                )
+                False
     in
     case RA.drop expr of
         --
@@ -84,6 +97,16 @@ transform expr =
 
         App (A _ (VarExpr var)) args multiline | isBasics "uncurry" var ->
             applyLambda uncurryLambda args multiline
+
+        --
+        -- Basics.rem
+        --
+
+        VarExpr var | isBasics "rem" var ->
+            remLambda
+
+        App (A _ (VarExpr var)) args multiline | isBasics "rem" var ->
+            applyLambda remLambda args multiline
 
         _ ->
             expr
