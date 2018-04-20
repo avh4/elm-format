@@ -4,6 +4,9 @@
   "description": "Install elm-format",
   "preferGlobal": true,
   "main": "index.js",
+  "engines": {
+    "node": ">=4.0.0"
+  },
   "scripts": {
     "install": "binwrap-install",
     "prepublish": "npm test",
