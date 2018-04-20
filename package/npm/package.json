@@ -22,7 +22,9 @@
     "url": "https://github.com/avh4/elm-format/issues"
   },
   "files": [
-    "index.js"
+    "index.js",
+    "bin",
+    "bin/elm-format"
   ],
   "homepage": "https://github.com/avh4/elm-format",
   "bin": {
