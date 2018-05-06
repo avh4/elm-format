@@ -1,4 +1,4 @@
-## master (0.7.1-beta)
+## master (0.8.0-beta)
 
 Features promoted from 0.7.0-exp:
   - Imports are now sorted and duplicate imports are merged
@@ -7,7 +7,7 @@ Features promoted from 0.7.0-exp:
   - Unnecessary parentheses are now removed (except in binary operator expressions)
 
 Bug fixes:
-  - Parentheses are not considered unnecessary if removing them would cause a comment to move to a different AST node
+  - Parentheses are no longer removed if doing so would cause a comment to move to a different AST node
   - Multiline `@docs` lines in markdown are now handled correctly
 
 Syntax changes:
