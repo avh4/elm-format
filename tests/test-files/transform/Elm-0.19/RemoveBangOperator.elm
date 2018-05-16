@@ -17,3 +17,8 @@ withHighPrecedenceOperators_rightAssoc f g x = f << g ! [] << x
 withFunctionApplication f g x = f x ! g x
 
 doesntMessUpOtherBinops f g h = (f >> g >> h, f << g << h)
+
+bangFunction model = (!) model []
+bangFunction_unapplied = (!)
+bangFunction_partiallyApplied model = (!) model
+bangFunction_extraArgs model = (!) model [] ()
