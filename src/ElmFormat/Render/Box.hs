@@ -97,19 +97,19 @@ splitWhere :: (a -> Bool) -> [a] -> [[a]]
 splitWhere predicate list =
     let
         merge acc result =
-            (reverse acc):result
+            ReversedList.push (ReversedList.toList acc) result
 
         step (acc,result) next =
             if predicate next then
-                ([], merge (next:acc) result)
+                (ReversedList.empty, merge (ReversedList.push next acc) result)
             else
-                (next:acc, result)
+                (ReversedList.push next acc, result)
     in
       list
-          |> foldl step ([],[])
+          |> foldl step (ReversedList.empty, ReversedList.empty)
           |> uncurry merge
+          |> ReversedList.toList
           |> dropWhile null
-          |> reverse
 
 
 data DeclarationType
