@@ -101,3 +101,7 @@ withFunctionApplication f g x =
     ( f x
     , Cmd.batch (g x)
     )
+
+
+doesntMessUpOtherBinops f g h =
+    ( f >> g >> h, f << g << h )
