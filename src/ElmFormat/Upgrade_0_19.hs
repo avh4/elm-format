@@ -10,8 +10,10 @@ import Reporting.Annotation (Located(A))
 
 import qualified Data.Map.Strict as Dict
 import qualified Data.Maybe as Maybe
+import qualified ElmFormat.Version
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Region as Region
+import qualified ReversedList
 
 
 transform :: Expr -> Expr
@@ -90,6 +92,18 @@ transform expr =
 
                 _ -> Nothing
 
+        makeTuple n =
+            let
+                vars =
+                  if n <= 26
+                    then fmap (\c -> [c]) (take n ['a'..'z'])
+                    else error (pleaseReport'' "UNEXPECTED TUPLE" "more than 26 elements")
+            in
+                Lambda
+                    (fmap makeArg vars)
+                    []
+                    (noRegion $ AST.Expression.Tuple (fmap (\v -> Commented [] (makeVarRef v) []) vars) False)
+                    False
     in
     case RA.drop expr of
         VarExpr var ->
@@ -98,6 +112,12 @@ transform expr =
         App (A _ (VarExpr var)) args multiline ->
             Maybe.fromMaybe expr $ fmap (\new -> applyLambda (noRegion new) args multiline) $ replace var
 
+        TupleFunction n ->
+            noRegion $ makeTuple n
+
+        App (A _ (TupleFunction n)) args multiline ->
+            applyLambda (noRegion $ makeTuple n) args multiline
+
         _ ->
             expr
 
@@ -105,6 +125,12 @@ transform expr =
 --
 -- Generic helpers
 --
+
+
+pleaseReport'' :: String -> String -> String
+pleaseReport'' what details =
+    "<elm-format-" ++ ElmFormat.Version.asString ++ ": "++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
+
 
 
 nowhere :: Region.Position
@@ -209,11 +235,30 @@ instance MapExpr LetDeclaration where
           _ -> d
 
 
-inlineVar :: LowercaseIdentifier -> Expr' -> Expr' -> Expr'
-inlineVar name value expr =
+inlineVar :: LowercaseIdentifier -> Bool -> Expr' -> Expr' -> Expr'
+inlineVar name insertMultiline value expr =
+    Maybe.fromMaybe expr $ inlineVar' name insertMultiline value expr
+
+
+inlineVar' :: LowercaseIdentifier -> Bool -> Expr' -> Expr' -> Maybe Expr'
+inlineVar' name insertMultiline value expr =
     case expr of
-        VarExpr (VarRef [] n) | n == name -> value
-        _ -> mapExpr (inlineVar name value) expr
+        VarExpr (VarRef [] n) | n == name -> Just value
+
+        AST.Expression.Tuple terms' multiline ->
+            let
+                step (acc, expand) t@(Commented pre (A _ term) post) =
+                    case inlineVar' name insertMultiline value term of
+                        Nothing -> (ReversedList.push t acc, expand)
+                        Just term' -> (ReversedList.push (Commented pre (noRegion term') post) acc, insertMultiline || expand)
+
+                (terms'', multiline'') = foldl step (ReversedList.empty, multiline) terms'
+            in
+            Just $ AST.Expression.Tuple (ReversedList.toList terms'') multiline''
+
+        -- TODO: handle expanding multiline in contexts other than tuples
+
+        _ -> Just $ mapExpr (inlineVar name insertMultiline value) expr
 
 
 applyLambda :: Expr -> [PreCommented Expr] -> FunctionApplicationMultiline -> Expr
@@ -247,7 +292,7 @@ applyLambda lambda args appMultiline =
 
                 Just mappings ->
                     let
-                        newBody = foldl (\e (name, value) -> mapExpr (inlineVar name value) e) body mappings
+                        newBody = foldl (\e (name, value) -> mapExpr (inlineVar name (appMultiline == FASplitFirst) value) e) body mappings
                         newMultiline =
                             case appMultiline of
                                 FASplitFirst -> FASplitFirst
