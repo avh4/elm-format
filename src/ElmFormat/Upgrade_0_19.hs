@@ -77,6 +77,17 @@ transform expr =
                 VarRef [(UppercaseIdentifier "Basics")] (LowercaseIdentifier name) ->
                     Dict.lookup name basicsReplacements
 
+                OpRef (SymbolIdentifier "!") ->
+                    Just $
+                    Lambda
+                      [makeArg "model", makeArg "cmds"] []
+                      (noRegion $ Binops
+                          (makeVarRef "model")
+                          [([], var, [], makeVarRef "cmds")]
+                          False
+                      )
+                      False
+
                 _ -> Nothing
 
     in

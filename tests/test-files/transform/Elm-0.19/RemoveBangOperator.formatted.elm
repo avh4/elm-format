@@ -105,3 +105,31 @@ withFunctionApplication f g x =
 
 doesntMessUpOtherBinops f g h =
     ( f >> g >> h, f << g << h )
+
+
+bangFunction model =
+    ( model
+    , Cmd.batch []
+    )
+
+
+bangFunction_unapplied =
+    \model cmds ->
+        ( model
+        , Cmd.batch cmds
+        )
+
+
+bangFunction_partiallyApplied model =
+    \cmds ->
+        ( model
+        , Cmd.batch cmds
+        )
+
+
+bangFunction_extraArgs model =
+    (( model
+     , Cmd.batch []
+     )
+    )
+        ()
