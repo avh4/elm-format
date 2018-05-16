@@ -28,6 +28,8 @@ import qualified Parse.Parse as Parse
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Region as Region
 import qualified Reporting.Result as Result
+import qualified ReversedList
+import ReversedList (Reversed)
 import Text.Printf (printf)
 import Util.List
 
@@ -1511,25 +1513,25 @@ removeBangs ::
     -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
     -> (AST.Expression.Expr, [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)])
 removeBangs left ops =
-    removeBangs' left [] ops
+    removeBangs' left ReversedList.empty ops
 
 
 removeBangs' ::
     AST.Expression.Expr
-    -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
+    -> Reversed (AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)
     -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
     -> (AST.Expression.Expr, [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)])
 removeBangs' left preBang remaining =
     case remaining of
         [] ->
-            (left, preBang)
+            (left, ReversedList.toList preBang)
 
         (pre, AST.Variable.OpRef (AST.SymbolIdentifier "!"), post, cmds):rest ->
             let
                 left' =
-                    case preBang of
-                        [] -> left
-                        _:_ -> ( noRegion $ AST.Expression.Binops left preBang False)
+                    case ReversedList.isEmpty preBang of
+                        True -> left
+                        False -> ( noRegion $ AST.Expression.Binops left (ReversedList.toList preBang) False)
 
                 cmds' =
                     case RA.drop cmds of
@@ -1563,16 +1565,16 @@ removeBangs' left preBang remaining =
                         ]
                         True
             in
-            removeBangs' tuple [] rest
+            removeBangs' tuple ReversedList.empty rest
 
         (pre, op@(AST.Variable.OpRef (AST.SymbolIdentifier ">>")), post, e):rest ->
-            removeBangs' left ((pre, op, post, e):preBang) rest
+            removeBangs' left (ReversedList.push (pre, op, post, e) preBang) rest
 
         (pre, op, post, e):rest ->
             let
-                (e', rest') = removeBangs' e [] rest
+                (e', rest') = removeBangs' e ReversedList.empty rest
             in
-            (left, reverse preBang ++ (pre, op, post, e'):rest')
+            (left, ReversedList.toList preBang ++ (pre, op, post, e'):rest')
 
 
 formatRange_0_17 :: ElmVersion -> AST.Commented AST.Expression.Expr -> AST.Commented AST.Expression.Expr -> Bool -> Box

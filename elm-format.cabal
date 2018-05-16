@@ -113,6 +113,7 @@ library
         Parse.Whitespace
         Reporting.Report
         Reporting.Result
+        ReversedList
 
     build-depends:
         ansi-terminal >= 0.8.0.2 && < 0.9,
