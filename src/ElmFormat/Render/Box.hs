@@ -15,6 +15,7 @@ import qualified AST.Variable
 import qualified Cheapskate.Types as Markdown
 import qualified Control.Monad as Monad
 import qualified Data.Char as Char
+import qualified Data.Foldable as Foldable
 import qualified Data.List as List
 import qualified Data.Map.Strict as Map
 import qualified Data.Maybe as Maybe
@@ -176,25 +177,38 @@ formatModuleHeader elmVersion modu =
       header =
         AST.Module.header modu
 
+      documentedVars =
+          AST.Module.docs modu
+              |> RA.drop
+              |> fmap Foldable.toList
+              |> Maybe.fromMaybe []
+              |> concatMap extractDocs
+
+      extractDocs block =
+          case block of
+              Markdown.ElmDocs vars ->
+                  fmap Text.unpack (concat vars)
+              _ -> []
+
       moduleLine =
         case elmVersion of
           Elm_0_16 ->
             formatModuleLine_0_16 header
 
           Elm_0_17 ->
-            formatModuleLine elmVersion header
+            formatModuleLine elmVersion documentedVars header
 
           Elm_0_18 ->
-            formatModuleLine elmVersion header
+            formatModuleLine elmVersion documentedVars header
 
           Elm_0_18_Upgrade ->
-              formatModuleLine elmVersion header
+              formatModuleLine elmVersion documentedVars header
 
           Elm_0_19 ->
-              formatModuleLine elmVersion header
+              formatModuleLine elmVersion documentedVars header
 
           Elm_0_19_Upgrade ->
-              formatModuleLine elmVersion header
+              formatModuleLine elmVersion documentedVars header
 
       docs =
           fmap (formatModuleDocs elmVersion) $ RA.drop $ AST.Module.docs modu
@@ -274,8 +288,8 @@ formatModuleLine_0_16 header =
           ]
 
 
-formatModuleLine :: ElmVersion -> AST.Module.Header -> Box
-formatModuleLine elmVersion header =
+formatModuleLine :: ElmVersion -> [String] -> AST.Module.Header -> Box
+formatModuleLine elmVersion documentedVars header =
   let
     tag =
       case AST.Module.srcTag header of
@@ -293,11 +307,22 @@ formatModuleLine elmVersion header =
             [ line $ keyword "module" ]
 
     exports list =
-      case formatListing (formatDetailedListing elmVersion) $ list of
-          Just listing ->
-            listing
-          _ ->
-              pleaseReport "UNEXPECTED MODULE DECLARATION" "empty listing"
+      let
+          finalValue =
+              case (elmVersion, list, documentedVars) of
+                  (Elm_0_19_Upgrade, AST.Variable.OpenListing (AST.Commented pre () post), first:rest) ->
+                      AST.Variable.ExplicitListing
+                          (AST.Module.DetailedListing
+                              ((LowercaseIdentifier first, AST.Commented pre () post):(rest |> fmap (\v -> (LowercaseIdentifier v, AST.Commented [] () []))) |> Map.fromList)
+                              Map.empty
+                              Map.empty
+                          )
+                          False
+                  _ -> list
+      in
+      case formatListing (formatDetailedListing elmVersion) finalValue of
+          Just listing -> listing
+          _ -> pleaseReport "UNEXPECTED MODULE DECLARATION" "empty listing"
 
     formatSetting (k, v) =
       formatRecordPair elmVersion "=" (line . formatUppercaseIdentifier elmVersion) (k, v, False)
