@@ -16,8 +16,11 @@ import qualified Reporting.Region as Region
 import qualified ReversedList
 
 
-transform :: Expr -> Expr
-transform expr =
+transform ::
+    Dict.Map LowercaseIdentifier [UppercaseIdentifier]
+    -> Dict.Map [UppercaseIdentifier] UppercaseIdentifier
+    -> Expr -> Expr
+transform exposed importAliases expr =
     let
         basicsReplacements =
             Dict.fromList
@@ -118,9 +121,46 @@ transform expr =
         App (A _ (TupleFunction n)) args multiline ->
             applyLambda (noRegion $ makeTuple n) args multiline
 
+        ExplicitList terms' trailing multiline ->
+            let
+                ha = (fmap UppercaseIdentifier ["Html", "Attributes"])
+                styleExposed = Dict.lookup (LowercaseIdentifier "style") exposed == Just ha
+                haAlias = Dict.lookup ha importAliases
+            in
+            noRegion $ ExplicitList (concat $ fmap (expandHtmlStyle styleExposed haAlias) $ terms') trailing multiline
+
         _ ->
             expr
 
+
+expandHtmlStyle :: Bool -> Maybe UppercaseIdentifier -> (Comments, PreCommented (WithEol Expr)) -> [(Comments, PreCommented (WithEol Expr))]
+expandHtmlStyle styleExposed importAlias (preComma, (pre, (term, eol))) =
+    let
+        lambda fRef =
+            Lambda
+                [([], noRegion $ AST.Pattern.Tuple [makeArg' "a", makeArg' "b"]) ] []
+                (noRegion $ App
+                    (noRegion $ VarExpr $ fRef)
+                    [ ([], makeVarRef "a")
+                    , ([], makeVarRef "b")
+                    ]
+                    (FAJoinFirst JoinAll)
+                )
+                False
+
+        isHtmlAttributesStyle var =
+            case var of
+                VarRef [UppercaseIdentifier "Html", UppercaseIdentifier "Attributes"] (LowercaseIdentifier "style") -> True
+                VarRef [alias] (LowercaseIdentifier "style") | Just alias == importAlias -> True
+                VarRef [] (LowercaseIdentifier "style") -> styleExposed
+                _ -> False
+    in
+    case RA.drop term of
+        App (A _ (VarExpr var)) [(xx, A _ (ExplicitList styles trailing multiline))] _ | isHtmlAttributesStyle var ->
+            fmap (\(preComma', (pre', (style, eol'))) -> (preComma', (pre', (applyLambda (noRegion $ lambda var) [([], style)] (FAJoinFirst JoinAll), eol')))) styles
+
+        _ ->
+            [(preComma, (pre, (term, eol)))]
 
 --
 -- Generic helpers
