@@ -156,8 +156,8 @@ expandHtmlStyle styleExposed importAlias (preComma, (pre, (term, eol))) =
                 _ -> False
     in
     case RA.drop term of
-        App (A _ (VarExpr var)) [(xx, A _ (ExplicitList styles trailing multiline))] _ | isHtmlAttributesStyle var ->
-            fmap (\(preComma', (pre', (style, eol'))) -> (preComma', (pre', (applyLambda (noRegion $ lambda var) [([], style)] (FAJoinFirst JoinAll), eol')))) styles
+        App (A _ (VarExpr var)) [(preStyle, A _ (ExplicitList styles trailing _))] _ | isHtmlAttributesStyle var ->
+            fmap (\(preComma', (pre', (style, eol'))) -> (preComma ++ preComma', (pre ++ preStyle ++ pre' ++ trailing ++ (Maybe.maybeToList $ fmap LineComment eol), (applyLambda (noRegion $ lambda var) [([], style)] (FAJoinFirst JoinAll), eol')))) styles
 
         _ ->
             [(preComma, (pre, (term, eol)))]
