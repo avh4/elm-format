@@ -14,6 +14,7 @@ Syntax changes:
   - Infix operator precedence and associativity declarations are now grouped together
   - `if` expressions now have blank lines between clauses
   - Comments immediately following `import`s now have spacing consistent with other top-level comments
+  - `module` lines now have `exposing` at the end of the line, and exposed listings are indented less when multiline
 
 Other changes:
   - Removed support for Elm 0.16
