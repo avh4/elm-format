@@ -18,6 +18,8 @@ Syntax changes:
 
 Other changes:
   - Removed support for Elm 0.16
+  - Added support for Elm 0.19
+  - Added Elm 0.19 support for `--upgrade`
 
 
 ## 0.7.0-exp
