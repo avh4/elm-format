@@ -287,7 +287,7 @@ typeAnnotation fn =
     (\(v, pre, post) e -> fn (v, pre) (post, e)) <$> try start <*> Type.expr
   where
     start =
-      do  v <- (Var.VarRef [] <$> lowVar) <|> parens' (Var.OpRef <$> symOp)
+      do  v <- (Var.VarRef [] <$> lowVar) <|> (Var.OpRef <$> symOpInParens)
           (preColon, _, postColon) <- padded hasType
           return (v, preColon, postColon)
 

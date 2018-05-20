@@ -306,6 +306,7 @@ echo "# elm-format test suite"
 checkWaysToRun
 
 checkGood 0.19 AllSyntax/0.19/Literals.elm
+checkGood 0.19 AllSyntax/0.19/InfixDeclaration.elm
 
 checkUpgrade 0.19 Elm-0.19/CommaFunctionsBecomeLambdas.elm
 checkUpgrade 0.19 Elm-0.19/RemoveBangOperator.elm

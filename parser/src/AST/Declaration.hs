@@ -27,6 +27,7 @@ data Declaration
     | PortAnnotation (Commented LowercaseIdentifier) Comments Type
     | PortDefinition (Commented LowercaseIdentifier) Comments Expression.Expr
     | Fixity Assoc Comments Int Comments Var.Ref
+    | Fixity_0_19 (PreCommented Assoc) (PreCommented Int) (Commented SymbolIdentifier) (PreCommented LowercaseIdentifier)
     deriving (Eq, Show)
 
 

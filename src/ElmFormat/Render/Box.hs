@@ -155,8 +155,11 @@ declarationType decl =
         AST.Declaration.PortAnnotation (AST.Commented _ name _) _ _ ->
           DDefinition $ Just $ AST.Variable.VarRef [] name
 
-        AST.Declaration.Fixity _ _ _ _ _name ->
+        AST.Declaration.Fixity _ _ _ _ _ ->
           DFixity
+
+        AST.Declaration.Fixity_0_19 _ _ _ _ ->
+            DFixity
 
     AST.Declaration.DocComment _ ->
       DDocComment
@@ -882,6 +885,23 @@ formatDeclaration elmVersion importInfo decl =
                                 ]
                         _ ->
                             pleaseReport "TODO" "multiline fixity declaration"
+
+                AST.Declaration.Fixity_0_19 assoc precedence name value ->
+                    let
+                        formatAssoc a =
+                            case a of
+                                AST.Declaration.L -> keyword "left "
+                                AST.Declaration.R -> keyword "right"
+                                AST.Declaration.N -> keyword "non  "
+                    in
+                    ElmStructure.spaceSepOrIndented
+                        (line $ keyword "infix")
+                        [ formatHeadCommented (line . formatAssoc) assoc
+                        , formatHeadCommented (line . literal . show) precedence
+                        , formatCommented (line . formatSymbolIdentifierInParens) name
+                        , line $ keyword "="
+                        , formatHeadCommented (line . identifier . formatVarName elmVersion) value
+                        ]
 
 
 formatNameWithArgs :: ElmVersion -> (AST.UppercaseIdentifier, [(AST.Comments, AST.LowercaseIdentifier)]) -> Box
@@ -1987,6 +2007,7 @@ formatVar elmVersion var =
     case var of
         AST.Variable.VarRef namespace name ->
             formatLowercaseIdentifier elmVersion namespace name
+
         AST.Variable.TagRef namespace name ->
             case namespace of
                 [] -> identifier $ formatVarName'' elmVersion name
@@ -1996,8 +2017,14 @@ formatVar elmVersion var =
                         , punc "."
                         , identifier $ formatVarName'' elmVersion name
                         ]
-        AST.Variable.OpRef (AST.SymbolIdentifier name) ->
-            identifier $ "(" ++ name ++ ")"
+
+        AST.Variable.OpRef name ->
+            formatSymbolIdentifierInParens name
+
+
+formatSymbolIdentifierInParens :: AST.SymbolIdentifier -> Line
+formatSymbolIdentifierInParens (AST.SymbolIdentifier name) =
+    identifier $ "(" ++ name ++ ")"
 
 
 formatInfixVar :: ElmVersion -> AST.Variable.Ref -> Line

@@ -124,6 +124,11 @@ symOp =
         _   -> return $ SymbolIdentifier op
 
 
+symOpInParens :: IParser SymbolIdentifier
+symOpInParens =
+    parens' symOp
+
+
 -- COMMON SYMBOLS
 
 equals :: IParser ()
