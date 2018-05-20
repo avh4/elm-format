@@ -309,10 +309,10 @@ formatModuleLine elmVersion documentedVars header =
             (formatTailCommented (line . keyword) ("effect", comments))
             [ line $ keyword "module" ]
 
-    exports list =
+    exports =
       let
           finalValue =
-              case (elmVersion, list, documentedVars) of
+              case (elmVersion, exportsList, documentedVars) of
                   (Elm_0_19_Upgrade, AST.Variable.OpenListing (AST.Commented pre () post), first:rest) ->
                       AST.Variable.ExplicitListing
                           (AST.Module.DetailedListing
@@ -321,7 +321,7 @@ formatModuleLine elmVersion documentedVars header =
                               Map.empty
                           )
                           False
-                  _ -> list
+                  _ -> exportsList
       in
       case formatListing (formatDetailedListing elmVersion) finalValue of
           Just listing -> listing
@@ -340,8 +340,8 @@ formatModuleLine elmVersion documentedVars header =
         |> fmap (\x -> [x])
         |> Maybe.fromMaybe []
 
-    exposingClause =
-      formatKeywordCommented "exposing" exports $ AST.Module.exports header
+    AST.KeywordCommented preExposing postExposing exportsList =
+        AST.Module.exports header
 
     nameClause =
       case
@@ -362,9 +362,12 @@ formatModuleLine elmVersion documentedVars header =
             , indent $ name'
             ]
   in
-    ElmStructure.spaceSepOrIndented
-      nameClause
-      (whereClause ++ [exposingClause])
+  ElmStructure.spaceSepOrIndented
+      (ElmStructure.spaceSepOrIndented
+          nameClause
+          (whereClause ++ [formatCommented (line . keyword) (AST.Commented preExposing "exposing" postExposing)])
+      )
+      [ exports ]
 
 
 formatModule :: ElmVersion -> AST.Module.Module -> Box
