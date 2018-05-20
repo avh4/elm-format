@@ -764,25 +764,34 @@ formatVarValue elmVersion aval =
                   listing
               , formatTailCommented (line . formatUppercaseIdentifier elmVersion) name
               , snd name
+              , elmVersion
               )
             of
-                (Just (SingleLine listing'), SingleLine name', []) ->
+                (_, _, _, Elm_0_19_Upgrade) ->
+                    formatTailCommented
+                        (\n -> line $ row [ formatUppercaseIdentifier elmVersion n, keyword "(..)" ])
+                        name
+
+                (Just (SingleLine listing'), SingleLine name', [], _) ->
                     line $ row
                         [ name'
                         , listing'
                         ]
-                (Just (SingleLine listing'), SingleLine name', _) ->
+
+                (Just (SingleLine listing'), SingleLine name', _, _) ->
                     line $ row
                         [ name'
                         , space
                         , listing'
                         ]
-                (Just listing', name', _) ->
+
+                (Just listing', name', _, _) ->
                   stack1
                     [ name'
                     , indent $ listing'
                     ]
-                (Nothing, name', _) ->
+
+                (Nothing, name', _, _) ->
                     name'
 
 
