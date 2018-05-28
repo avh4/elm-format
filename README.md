@@ -272,7 +272,15 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
         "editor.formatOnSave": true
     },
     ```
-
+    
+    On Windows you may [need](https://github.com/Krzysztof-Cieslak/vscode-elm/issues/191#issuecomment-371465313) to add `editor.formatOnSaveTimeout`:
+    
+    ```
+    "[elm]": {
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveTimeout": 1500
+    },
+    ```
 
 ### Sublime Text installation
 
