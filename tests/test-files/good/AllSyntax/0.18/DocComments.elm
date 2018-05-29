@@ -140,3 +140,13 @@ increment x =
 increment : Int -> Int
 increment x =
     x + 1
+
+
+{-| Escaped characters should not be changed ¯\\\_(ツ)\_/¯
+
+  - (\\\\) asd
+  - not-quite shruggie ¯\_(ツ)\_/¯
+
+-}
+escapedCharacters =
+    ()
