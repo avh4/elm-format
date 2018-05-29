@@ -1,4 +1,4 @@
-module X exposing (..)
+module X exposing (abc)
 
 
 abc x =

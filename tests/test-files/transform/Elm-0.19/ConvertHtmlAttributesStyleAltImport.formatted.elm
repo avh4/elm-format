@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (convertsStyle, doesntConvertLocalStyle, style)
 
 import Html
 import Html.Attributes as HA

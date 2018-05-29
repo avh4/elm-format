@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (chars, multilineString, string)
 
 
 string =

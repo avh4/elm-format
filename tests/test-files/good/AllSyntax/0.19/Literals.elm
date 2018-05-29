@@ -1,4 +1,4 @@
-module AllSyntax.Literals exposing (..)
+module AllSyntax.Literals exposing (unit)
 
 
 unit =

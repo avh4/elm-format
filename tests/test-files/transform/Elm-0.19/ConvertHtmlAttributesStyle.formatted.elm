@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (comments, convertsExposedStyle, convertsStyle, doesntConvertOtherFunctions)
 
 import Html
 import Html.Attributes exposing (style)

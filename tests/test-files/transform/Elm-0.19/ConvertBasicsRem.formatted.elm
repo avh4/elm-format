@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (extraArgs, fullyApplied, fullyApplied_comments, partiallyApplied, qualified, unapplied)
 
 
 fullyApplied =
