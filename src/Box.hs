@@ -222,11 +222,11 @@ render :: Box -> T.Text
 render box' =
     case box' of
         SingleLine line' ->
-            T.snoc (renderLine 0 line') '\n'
+            T.snoc (T.stripEnd $ renderLine 0 line') '\n'
         Stack l1 l2 rest ->
-            T.unlines $ map (renderLine 0) (l1 : l2 : rest)
+            T.unlines $ map (T.stripEnd . renderLine 0) (l1 : l2 : rest)
         MustBreak line' ->
-            T.snoc (renderLine 0 line') '\n'
+            T.snoc (T.stripEnd $ renderLine 0 line') '\n'
 
 
 lineLength :: Int -> Line -> Int

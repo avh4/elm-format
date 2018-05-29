@@ -9,6 +9,7 @@ Features promoted from 0.7.0-exp:
 Bug fixes:
   - Parentheses are no longer removed if doing so would cause a comment to move to a different AST node
   - Multiline `@docs` lines in markdown are now handled correctly
+  - Trailing whitespace in multiline strings is no longer removed
 
 Syntax changes:
   - Infix operator precedence and associativity declarations are now grouped together
