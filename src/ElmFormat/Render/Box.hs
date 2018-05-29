@@ -184,8 +184,7 @@ formatModuleHeader elmVersion modu =
           AST.Module.docs modu
               |> RA.drop
               |> fmap Foldable.toList
-              |> Maybe.fromMaybe []
-              |> concatMap extractDocs
+              |> fmap (concatMap extractDocs)
 
       extractDocs block =
           case block of
@@ -193,25 +192,42 @@ formatModuleHeader elmVersion modu =
                   fmap Text.unpack (concat vars)
               _ -> []
 
+      varsToExpose =
+          case documentedVars of
+              Just vars -> vars
+              Nothing ->
+                  AST.Module.body modu
+                      |> concatMap extractVarName
+
+      extractVarName decl =
+          case decl of
+              AST.Declaration.DocComment _ -> []
+              AST.Declaration.BodyComment _ -> []
+              AST.Declaration.Decl (RA.A _ (AST.Declaration.PortAnnotation (AST.Commented _ (LowercaseIdentifier name) _) _ _)) -> [ name ]
+              AST.Declaration.Decl (RA.A _ (AST.Declaration.Definition (RA.A _ (AST.Pattern.VarPattern (LowercaseIdentifier name))) _ _ _)) -> [ name ]
+              AST.Declaration.Decl (RA.A _ (AST.Declaration.Datatype (AST.Commented _ (UppercaseIdentifier name, _) _) _)) -> [ name ]
+              AST.Declaration.Decl (RA.A _ (AST.Declaration.TypeAlias _ (AST.Commented _ (UppercaseIdentifier name, _) _) _)) -> [ name ]
+              AST.Declaration.Decl (RA.A _ _) -> []
+
       moduleLine =
         case elmVersion of
           Elm_0_16 ->
             formatModuleLine_0_16 header
 
           Elm_0_17 ->
-            formatModuleLine elmVersion documentedVars header
+            formatModuleLine elmVersion varsToExpose header
 
           Elm_0_18 ->
-            formatModuleLine elmVersion documentedVars header
+            formatModuleLine elmVersion varsToExpose header
 
           Elm_0_18_Upgrade ->
-              formatModuleLine elmVersion documentedVars header
+              formatModuleLine elmVersion varsToExpose header
 
           Elm_0_19 ->
-              formatModuleLine elmVersion documentedVars header
+              formatModuleLine elmVersion varsToExpose header
 
           Elm_0_19_Upgrade ->
-              formatModuleLine elmVersion documentedVars header
+              formatModuleLine elmVersion varsToExpose header
 
       docs =
           fmap (formatModuleDocs elmVersion) $ RA.drop $ AST.Module.docs modu
@@ -292,7 +308,7 @@ formatModuleLine_0_16 header =
 
 
 formatModuleLine :: ElmVersion -> [String] -> AST.Module.Header -> Box
-formatModuleLine elmVersion documentedVars header =
+formatModuleLine elmVersion varsToExpose header =
   let
     tag =
       case AST.Module.srcTag header of
@@ -312,8 +328,13 @@ formatModuleLine elmVersion documentedVars header =
     exports =
       let
           finalValue =
-              case (elmVersion, exportsList, documentedVars) of
-                  (Elm_0_19_Upgrade, AST.Variable.OpenListing (AST.Commented pre () post), first:rest) ->
+              case
+                  ( ElmVersion.style_0_19_cannotExposeOpenListing elmVersion
+                  , exportsList
+                  , varsToExpose
+                  )
+              of
+                  (True, AST.Variable.OpenListing (AST.Commented pre () post), first:rest) ->
                       AST.Variable.ExplicitListing
                           (AST.Module.DetailedListing
                               ((LowercaseIdentifier first, AST.Commented pre () post):(rest |> fmap (\v -> (LowercaseIdentifier v, AST.Commented [] () []))) |> Map.fromList)

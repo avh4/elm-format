@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (bangFunction, bangFunction_extraArgs, bangFunction_partiallyApplied, bangFunction_unapplied, batch, batch_notALiteralList, batch_withComments, doesntMessUpOtherBinops, inBinaryExpression, multipleBangs, nestedBangs, none, none_withComments, single, single_withComments, withFunctionApplication, withHighPrecedenceOperators_leftAssoc, withHighPrecedenceOperators_leftAssoc_complex, withHighPrecedenceOperators_rightAssoc)
 
 
 batch model a b =

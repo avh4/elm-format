@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (extraArgs, extraArgs_notTuple, fullyApplied, fullyApplied_comments, functionOnly, functionOnly_comments, multiline_extraArgs_notTuple, multiline_fullyApplied, nested, notTuple, notTuple_comments, qualified, unapplied)
 
 
 fullyApplied f =

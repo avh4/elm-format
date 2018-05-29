@@ -37,3 +37,13 @@ style_0_19_stringEscape elmVersion =
         Elm_0_18 -> False
         Elm_0_18_Upgrade -> False
         _ -> True
+
+
+style_0_19_cannotExposeOpenListing :: ElmVersion -> Bool
+style_0_19_cannotExposeOpenListing elmVersion =
+    case elmVersion of
+        Elm_0_16 -> False
+        Elm_0_17 -> False
+        Elm_0_18 -> False
+        Elm_0_18_Upgrade -> False
+        _ -> True
