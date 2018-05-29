@@ -20,9 +20,6 @@ renderBox :: Box.Box -> Text.Text
 renderBox box =
     box
         |> Box.render
-        |> Text.lines
-        |> map Text.stripEnd
-        |> Text.unlines
 
 
 -- TODO: remove this and convert the Integration test to a test fixture

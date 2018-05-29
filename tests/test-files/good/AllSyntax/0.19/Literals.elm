@@ -81,6 +81,13 @@ multilineString =
 """
 
 
+multilineString_keepsTrailingWhitespace =
+    """   3   
+  2  
+ 1 
+"""
+
+
 multilineStringQuoteHandling =
     [ """trailing double quote\""""
     , """trailing double quote 2\"\""""
