@@ -703,7 +703,8 @@ type alias Grid style variation msg =
 
 {-| An interface to css grid. Here's a basic example:
 
-    grid MyGridStyle []
+    grid MyGridStyle
+        []
         { columns = [ px 100, px 100, px 100, px 100 ]
         , rows =
             [ px 100
@@ -712,7 +713,7 @@ type alias Grid style variation msg =
             , px 100
             ]
         , cells =
-             [ cell
+            [ cell
                 { start = ( 0, 0 )
                 , width = 1
                 , height = 1
@@ -780,7 +781,8 @@ type alias NamedGrid style variation msg =
 
 Here's an example:
 
-    namedGrid MyGridStyle []
+    namedGrid MyGridStyle
+        []
         { columns = [ px 200, px 200, px 200, fill 1 ]
         , rows =
             [ px 200 => [ spanAll "header" ]
@@ -898,8 +900,8 @@ spanAll name =
 
 {-| Turn an element into a link.
 
-    link "http://zombo.com"
-        <| el MyStyle (text "Welcome to Zombocom")
+    link "http://zombo.com" <|
+        el MyStyle (text "Welcome to Zombocom")
 
 Wraps an element in an `<a>` and sets the href. `rel` properties are set to `noopener` and `noreferrer`.
 
@@ -922,8 +924,8 @@ link src el =
 
 Depending on the browsers configiration, it may open in a new window.
 
-    newTab "http://zombo.com"
-        <| el MyStyle (text "Welcome to Zombocom")
+    newTab "http://zombo.com" <|
+        el MyStyle (text "Welcome to Zombocom")
 
 Same as `target "_blank"`
 
@@ -945,8 +947,8 @@ newTab src el =
 
 {-| Make a link that will download a file
 
-    download "http://zombo.com/schedule.pdf"
-        <| el MyStyle (text "Welcome to Zombocom")
+    download "http://zombo.com/schedule.pdf" <|
+        el MyStyle (text "Welcome to Zombocom")
 
 -}
 download : String -> Element style variation msg -> Element style variation msg
@@ -969,7 +971,8 @@ download src el =
         { src = "http://zombo.com/schedule.pdf"
         , filename = "zombocomSchedule.pdf"
         }
-        <| el MyStyle (text "Welcome to Zombocom")
+    <|
+        el MyStyle (text "Welcome to Zombocom")
 
 -}
 downloadAs : { src : String, filename : String } -> Element style variation msg -> Element style variation msg
@@ -992,8 +995,9 @@ downloadAs { src, filename } el =
 
 is sugar for
 
-    if (x == 5) then
+    if x == 5 then
         text "yay, it's 5"
+
     else
         empty
 
@@ -1009,13 +1013,14 @@ when bool elm =
 
 {-| Another helper function that defaults to `empty`
 
-    whenJust (Just ("Hi!")) text
+    whenJust (Just "Hi!") text
 
 is sugar for
 
     case maybe of
         Nothing ->
             empty
+
         Just x ->
             text x
 

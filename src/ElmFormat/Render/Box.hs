@@ -6,7 +6,7 @@ import Box
 import ElmVersion (ElmVersion(..))
 
 import qualified AST.V0_16 as AST
-import AST.V0_16 (UppercaseIdentifier(..), LowercaseIdentifier(..))
+import AST.V0_16 (UppercaseIdentifier(..), LowercaseIdentifier(..), WithEol)
 import qualified AST.Declaration
 import qualified AST.Expression
 import qualified AST.Module
@@ -124,42 +124,14 @@ data DeclarationType
   deriving (Show)
 
 
-declarationType :: AST.Declaration.TopLevelStructure AST.Declaration.Declaration -> DeclarationType
-declarationType decl =
+declarationType :: (a -> BodyEntryType) -> AST.Declaration.TopLevelStructure a -> DeclarationType
+declarationType entryType decl =
   case decl of
-    AST.Declaration.Entry adecl ->
-      case RA.drop adecl of
-        AST.Declaration.Definition pat _ _ _ ->
-          case RA.drop pat of
-            AST.Pattern.VarPattern name ->
-              DDefinition $ Just $ AST.Variable.VarRef [] name
-
-            AST.Pattern.OpPattern name ->
-              DDefinition $ Just $ AST.Variable.OpRef name
-
-            _ ->
-              DDefinition Nothing
-
-        AST.Declaration.Datatype (AST.Commented _ (name, _) _) _ ->
-          DDefinition $ Just $ AST.Variable.TagRef [] name
-
-        AST.Declaration.TypeAlias _ (AST.Commented _ (name, _) _) _ ->
-          DDefinition $ Just $ AST.Variable.TagRef [] name
-
-        AST.Declaration.PortDefinition (AST.Commented _ name _) _ _ ->
-          DDefinition $ Just $ AST.Variable.VarRef [] name
-
-        AST.Declaration.TypeAnnotation (name, _) _ ->
-          DDefinition $ Just name
-
-        AST.Declaration.PortAnnotation (AST.Commented _ name _) _ _ ->
-          DDefinition $ Just $ AST.Variable.VarRef [] name
-
-        AST.Declaration.Fixity _ _ _ _ _ ->
-          DFixity
-
-        AST.Declaration.Fixity_0_19 _ _ _ _ ->
-            DFixity
+    AST.Declaration.Entry entry ->
+        case entryType $ RA.drop entry of
+            BodyNamed name -> DDefinition (Just name)
+            BodyUnnamed -> DDefinition Nothing
+            BodyFixity -> DFixity
 
     AST.Declaration.DocComment _ ->
       DDocComment
@@ -230,7 +202,7 @@ formatModuleHeader elmVersion modu =
               formatModuleLine elmVersion varsToExpose header
 
       docs =
-          fmap (formatModuleDocs elmVersion) $ RA.drop $ AST.Module.docs modu
+          fmap (formatModuleDocs elmVersion (makeImportInfo modu)) $ RA.drop $ AST.Module.docs modu
 
       imports =
           formatImports elmVersion modu
@@ -424,45 +396,9 @@ data ImportInfo =
         }
 
 
-formatModuleBody :: Int -> ElmVersion -> AST.Module.Module -> Maybe Box
-formatModuleBody linesBetween elmVersion modu =
+makeImportInfo :: AST.Module.Module -> ImportInfo
+makeImportInfo modu =
     let
-        spacer first second =
-          case (declarationType first, declarationType second) of
-            (DStarter, _) ->
-              []
-            (_, DCloser) ->
-              []
-            (DComment, DComment) ->
-              []
-            (_, DComment) ->
-              List.replicate (linesBetween + 1) blankLine
-            (DComment, _) ->
-              List.replicate linesBetween blankLine
-            (DDocComment, DDefinition _) ->
-              []
-            (DDefinition Nothing, DDefinition (Just _)) ->
-              List.replicate linesBetween blankLine
-            (DDefinition _, DStarter) ->
-              List.replicate linesBetween blankLine
-            (DDefinition a, DDefinition b) ->
-              if a == b then
-                []
-              else
-                List.replicate linesBetween blankLine
-            (DCloser, _) ->
-              List.replicate linesBetween blankLine
-            (_, DDocComment) ->
-              List.replicate linesBetween blankLine
-            (DDocComment, DStarter) ->
-              []
-            (DFixity, DFixity) ->
-              []
-            (DFixity, _) ->
-              List.replicate linesBetween blankLine
-            (_, DFixity) ->
-              List.replicate linesBetween blankLine
-
         -- these are things we know will get exposed for certain modules when we see "exposing (..)"
         -- only things that are currently useful for Elm 0.19 upgrade are included
         knownModuleContents :: Map.Map [UppercaseIdentifier] [LowercaseIdentifier]
@@ -510,14 +446,95 @@ formatModuleBody linesBetween elmVersion modu =
                             Map.singleton importName alias
 
                         Nothing -> mempty
+    in
+    ImportInfo exposed aliases
 
-        importInfo =
-            ImportInfo exposed aliases
+
+formatModuleBody :: Int -> ElmVersion -> AST.Module.Module -> Maybe Box
+formatModuleBody linesBetween elmVersion modu =
+    let
+        entryType adecl =
+            case adecl of
+                AST.Declaration.Definition pat _ _ _ ->
+                    case RA.drop pat of
+                        AST.Pattern.VarPattern name ->
+                            BodyNamed $ AST.Variable.VarRef [] name
+
+                        AST.Pattern.OpPattern name ->
+                            BodyNamed $ AST.Variable.OpRef name
+
+                        _ ->
+                            BodyUnnamed
+
+                AST.Declaration.Datatype (AST.Commented _ (name, _) _) _ ->
+                    BodyNamed $ AST.Variable.TagRef [] name
+
+                AST.Declaration.TypeAlias _ (AST.Commented _ (name, _) _) _ ->
+                    BodyNamed $ AST.Variable.TagRef [] name
+
+                AST.Declaration.PortDefinition (AST.Commented _ name _) _ _ ->
+                    BodyNamed $ AST.Variable.VarRef [] name
+
+                AST.Declaration.TypeAnnotation (name, _) _ ->
+                    BodyNamed name
+
+                AST.Declaration.PortAnnotation (AST.Commented _ name _) _ _ ->
+                    BodyNamed $ AST.Variable.VarRef [] name
+
+                AST.Declaration.Fixity _ _ _ _ _ ->
+                    BodyFixity
+
+                AST.Declaration.Fixity_0_19 _ _ _ _ ->
+                    BodyFixity
+    in
+    formatTopLevelBody linesBetween elmVersion (makeImportInfo modu) entryType (formatDeclaration elmVersion (makeImportInfo modu)) (AST.Module.body modu)
+
+
+data BodyEntryType
+    = BodyNamed AST.Variable.Ref
+    | BodyUnnamed
+    | BodyFixity
+
+
+formatTopLevelBody ::
+    Int
+    -> ElmVersion
+    -> ImportInfo
+    -> (a -> BodyEntryType)
+    -> (a -> Box)
+    -> [AST.Declaration.TopLevelStructure a]
+    -> Maybe Box
+formatTopLevelBody linesBetween elmVersion importInfo entryType formatEntry body =
+    let
+        extraLines n =
+            List.replicate n blankLine
+
+        spacer first second =
+            case (declarationType entryType first, declarationType entryType second) of
+                (DStarter, _) -> 0
+                (_, DCloser) -> 0
+                (DComment, DComment) -> 0
+                (_, DComment) -> linesBetween + 1
+                (DComment, _) -> linesBetween
+                (DDocComment, DDefinition _) -> 0
+                (DDefinition Nothing, DDefinition (Just _)) -> linesBetween
+                (DDefinition _, DStarter) -> linesBetween
+                (DDefinition Nothing, DDefinition Nothing) -> linesBetween
+                (DDefinition a, DDefinition b) ->
+                    if a == b
+                        then 0
+                        else linesBetween
+                (DCloser, _) -> linesBetween
+                (_, DDocComment) -> linesBetween
+                (DDocComment, DStarter) -> 0
+                (DFixity, DFixity) -> 0
+                (DFixity, _) -> linesBetween
+                (_, DFixity) -> linesBetween
 
         boxes =
-            intersperseMap spacer
-                (formatTopLevelStructure elmVersion (formatDeclaration elmVersion importInfo)) $
-                AST.Module.body modu
+            intersperseMap (\a b -> extraLines $ spacer a b)
+                (formatTopLevelStructure elmVersion importInfo formatEntry)
+                body
     in
         case boxes of
             [] -> Nothing
@@ -526,6 +543,9 @@ formatModuleBody linesBetween elmVersion modu =
 
 data ElmCodeBlock
     = ModuleCode AST.Module.Module
+    | ExpressionsCode [AST.Declaration.TopLevelStructure (WithEol AST.Expression.Expr)]
+    deriving (Show)
+
 
 -- TODO: there must be an existing haskell function that does this, right?
 firstOf :: [a -> Maybe b] -> a -> Maybe b
@@ -537,14 +557,16 @@ firstOf options value =
                 Just result -> Just result
                 Nothing -> firstOf rest value
 
-formatModuleDocs :: ElmVersion -> Markdown.Blocks -> Box
-formatModuleDocs elmVersion blocks =
+
+formatModuleDocs :: ElmVersion -> ImportInfo -> Markdown.Blocks -> Box
+formatModuleDocs elmVersion importInfo blocks =
     let
         parse :: String -> Maybe ElmCodeBlock
         parse source =
             source
                 |> firstOf
-                    [ fmap ModuleCode . Result.toMaybe . Parse.parseSource
+                    [ fmap ModuleCode . Result.toMaybe . Parse.parseModule
+                    , fmap ExpressionsCode . Result.toMaybe . Parse.parseExpressions
                     ]
 
         format :: ElmCodeBlock -> String
@@ -552,6 +574,15 @@ formatModuleDocs elmVersion blocks =
             case result of
                 ModuleCode modu ->
                     formatModuleCode modu
+
+                ExpressionsCode expressions ->
+                    let
+                        entryType _ = BodyUnnamed
+                    in
+                    expressions
+                        |> formatTopLevelBody 1 elmVersion importInfo entryType (formatEolCommented $ formatExpression elmVersion importInfo SyntaxSeparated)
+                        |> fmap (Text.unpack . Box.render)
+                        |> fromMaybe ""
 
         formatModuleCode :: AST.Module.Module -> String
         formatModuleCode modu =
@@ -839,11 +870,11 @@ formatVarValue elmVersion aval =
                     name'
 
 
-formatTopLevelStructure :: ElmVersion -> (a -> Box) -> AST.Declaration.TopLevelStructure a -> Box
-formatTopLevelStructure elmVersion formatEntry topLevelStructure =
+formatTopLevelStructure :: ElmVersion -> ImportInfo -> (a -> Box) -> AST.Declaration.TopLevelStructure a -> Box
+formatTopLevelStructure elmVersion importInfo formatEntry topLevelStructure =
     case topLevelStructure of
         AST.Declaration.DocComment docs ->
-            formatModuleDocs elmVersion docs
+            formatModuleDocs elmVersion importInfo docs
 
         AST.Declaration.BodyComment c ->
             formatComment c
