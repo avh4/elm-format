@@ -217,10 +217,10 @@ type alias FailureOptions =
 Example :
 
     claim_sort_idempotent =
-      claim "Sort is idempotent"
-        (\list -> List.sort (List.sort (list))
-        (\list -> List.sort (list))
-        (list int)
+        claim "Sort is idempotent"
+            (\list -> List.sort (List.sort list))
+            (\list -> List.sort list)
+            (list int)
 
 -}
 claim : String -> (a -> b) -> (a -> b) -> Investigator a -> Claim

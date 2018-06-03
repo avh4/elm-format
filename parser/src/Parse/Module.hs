@@ -1,4 +1,4 @@
-module Parse.Module (moduleDecl, elmModule) where
+module Parse.Module (moduleDecl, elmModule, topLevel) where
 
 import qualified Control.Applicative
 import Data.Map.Strict hiding (foldl, map)
