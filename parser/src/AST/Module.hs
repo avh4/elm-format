@@ -4,7 +4,7 @@ module AST.Module
     , DetailedListing(..)
     ) where
 
-import qualified AST.Declaration as Declaration
+import AST.Declaration (TopLevelStructure, Declaration)
 import qualified AST.Variable as Var
 import qualified Cheapskate.Types as Markdown
 import Data.Map.Strict (Map)
@@ -20,7 +20,7 @@ data Module = Module
     , header :: Header
     , docs :: A.Located (Maybe Markdown.Blocks)
     , imports :: PreCommented (Map [UppercaseIdentifier] (Comments, ImportMethod))
-    , body :: [Declaration.Decl]
+    , body :: [TopLevelStructure Declaration]
     }
     deriving (Eq, Show)
 

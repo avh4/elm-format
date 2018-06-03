@@ -124,10 +124,10 @@ data DeclarationType
   deriving (Show)
 
 
-declarationType :: AST.Declaration.Decl -> DeclarationType
+declarationType :: AST.Declaration.TopLevelStructure AST.Declaration.Declaration -> DeclarationType
 declarationType decl =
   case decl of
-    AST.Declaration.Decl adecl ->
+    AST.Declaration.Entry adecl ->
       case RA.drop adecl of
         AST.Declaration.Definition pat _ _ _ ->
           case RA.drop pat of
@@ -203,11 +203,11 @@ formatModuleHeader elmVersion modu =
           case decl of
               AST.Declaration.DocComment _ -> []
               AST.Declaration.BodyComment _ -> []
-              AST.Declaration.Decl (RA.A _ (AST.Declaration.PortAnnotation (AST.Commented _ (LowercaseIdentifier name) _) _ _)) -> [ name ]
-              AST.Declaration.Decl (RA.A _ (AST.Declaration.Definition (RA.A _ (AST.Pattern.VarPattern (LowercaseIdentifier name))) _ _ _)) -> [ name ]
-              AST.Declaration.Decl (RA.A _ (AST.Declaration.Datatype (AST.Commented _ (UppercaseIdentifier name, _) _) _)) -> [ name ]
-              AST.Declaration.Decl (RA.A _ (AST.Declaration.TypeAlias _ (AST.Commented _ (UppercaseIdentifier name, _) _) _)) -> [ name ]
-              AST.Declaration.Decl (RA.A _ _) -> []
+              AST.Declaration.Entry (RA.A _ (AST.Declaration.PortAnnotation (AST.Commented _ (LowercaseIdentifier name) _) _ _)) -> [ name ]
+              AST.Declaration.Entry (RA.A _ (AST.Declaration.Definition (RA.A _ (AST.Pattern.VarPattern (LowercaseIdentifier name))) _ _ _)) -> [ name ]
+              AST.Declaration.Entry (RA.A _ (AST.Declaration.Datatype (AST.Commented _ (UppercaseIdentifier name, _) _) _)) -> [ name ]
+              AST.Declaration.Entry (RA.A _ (AST.Declaration.TypeAlias _ (AST.Commented _ (UppercaseIdentifier name, _) _) _)) -> [ name ]
+              AST.Declaration.Entry (RA.A _ _) -> []
 
       moduleLine =
         case elmVersion of
@@ -515,7 +515,8 @@ formatModuleBody linesBetween elmVersion modu =
             ImportInfo exposed aliases
 
         boxes =
-            intersperseMap spacer (formatDeclaration elmVersion importInfo) $
+            intersperseMap spacer
+                (formatTopLevelStructure elmVersion (formatDeclaration elmVersion importInfo)) $
                 AST.Module.body modu
     in
         case boxes of
@@ -838,122 +839,127 @@ formatVarValue elmVersion aval =
                     name'
 
 
-formatDeclaration :: ElmVersion -> ImportInfo -> AST.Declaration.Decl -> Box
-formatDeclaration elmVersion importInfo decl =
-    case decl of
+formatTopLevelStructure :: ElmVersion -> (a -> Box) -> AST.Declaration.TopLevelStructure a -> Box
+formatTopLevelStructure elmVersion formatEntry topLevelStructure =
+    case topLevelStructure of
         AST.Declaration.DocComment docs ->
             formatModuleDocs elmVersion docs
 
         AST.Declaration.BodyComment c ->
             formatComment c
 
-        AST.Declaration.Decl adecl ->
-            case RA.drop adecl of
-                AST.Declaration.Definition name args comments expr ->
-                    formatDefinition elmVersion importInfo name args comments expr
+        AST.Declaration.Entry entry ->
+            formatEntry (RA.drop entry)
 
-                AST.Declaration.TypeAnnotation name typ ->
-                    formatTypeAnnotation elmVersion name typ
 
-                AST.Declaration.Datatype nameWithArgs tags ->
-                    let
-                        ctor (tag,args') =
-                            case allSingles $ map (formatHeadCommented $ formatType' elmVersion ForCtor) args' of
-                                Right args'' ->
-                                    line $ row $ List.intersperse space $ (formatUppercaseIdentifier elmVersion tag):args''
-                                Left [] ->
-                                    line $ formatUppercaseIdentifier elmVersion tag
-                                Left args'' ->
-                                    stack1
-                                        [ line $ formatUppercaseIdentifier elmVersion tag
-                                        , stack1 args''
-                                            |> indent
-                                        ]
-                    in
-                        case
-                            formatOpenCommentedList ctor tags
-                        of
-                          [] -> error "List can't be empty"
-                          first:rest ->
-                              case formatCommented (formatNameWithArgs elmVersion) nameWithArgs of
-                                SingleLine nameWithArgs' ->
-                                  stack1
-                                    [ line $ row
-                                        [ keyword "type"
-                                        , space
-                                        , nameWithArgs'
-                                        ]
-                                    , first
-                                        |> prefix (row [punc "=", space])
-                                        |> andThen (map (prefix (row [punc "|", space])) rest)
-                                        |> indent
-                                    ]
-                                nameWithArgs' ->
-                                  stack1
-                                    [ line $ keyword "type"
-                                    , indent $ nameWithArgs'
-                                    , first
-                                        |> prefix (row [punc "=", space])
-                                        |> andThen (map (prefix (row [punc "|", space])) rest)
-                                        |> indent
-                                    ]
+formatDeclaration :: ElmVersion -> ImportInfo -> AST.Declaration.Declaration -> Box
+formatDeclaration elmVersion importInfo decl =
+    case decl of
+        AST.Declaration.Definition name args comments expr ->
+            formatDefinition elmVersion importInfo name args comments expr
 
-                AST.Declaration.TypeAlias preAlias nameWithArgs typ ->
-                  ElmStructure.definition "=" True
-                    (line $ keyword "type")
-                    [ formatHeadCommented (line . keyword) (preAlias, "alias")
-                    , formatCommented (formatNameWithArgs elmVersion) nameWithArgs
-                    ]
-                    (formatHeadCommentedStack (formatType elmVersion) typ)
+        AST.Declaration.TypeAnnotation name typ ->
+            formatTypeAnnotation elmVersion name typ
 
-                AST.Declaration.PortAnnotation name typeComments typ ->
-                  ElmStructure.definition ":" False
-                    (line $ keyword "port")
-                    [ formatCommented (line . formatLowercaseIdentifier elmVersion []) name ]
-                    (formatCommented' typeComments (formatType elmVersion) typ)
-
-                AST.Declaration.PortDefinition name bodyComments expr ->
-                  ElmStructure.definition "=" True
-                    (line $ keyword "port")
-                    [formatCommented (line . formatLowercaseIdentifier elmVersion []) name]
-                    (formatCommented' bodyComments (formatExpression elmVersion importInfo SyntaxSeparated) expr)
-
-                AST.Declaration.Fixity assoc precedenceComments precedence nameComments name ->
-                    case
-                        ( formatCommented' nameComments (line . formatInfixVar elmVersion) name
-                        , formatCommented' precedenceComments (line . literal . show) precedence
-                        )
-                    of
-                        (SingleLine name', SingleLine precedence') ->
-                            line $ row
-                                [ case assoc of
-                                      AST.Declaration.L -> keyword "infixl"
-                                      AST.Declaration.R -> keyword "infixr"
-                                      AST.Declaration.N -> keyword "infix"
-                                , space
-                                , precedence'
-                                , space
-                                , name'
+        AST.Declaration.Datatype nameWithArgs tags ->
+            let
+                ctor (tag,args') =
+                    case allSingles $ map (formatHeadCommented $ formatType' elmVersion ForCtor) args' of
+                        Right args'' ->
+                            line $ row $ List.intersperse space $ (formatUppercaseIdentifier elmVersion tag):args''
+                        Left [] ->
+                            line $ formatUppercaseIdentifier elmVersion tag
+                        Left args'' ->
+                            stack1
+                                [ line $ formatUppercaseIdentifier elmVersion tag
+                                , stack1 args''
+                                    |> indent
                                 ]
-                        _ ->
-                            pleaseReport "TODO" "multiline fixity declaration"
+            in
+                case
+                    formatOpenCommentedList ctor tags
+                of
+                    [] -> error "List can't be empty"
+                    first:rest ->
+                        case formatCommented (formatNameWithArgs elmVersion) nameWithArgs of
+                        SingleLine nameWithArgs' ->
+                            stack1
+                            [ line $ row
+                                [ keyword "type"
+                                , space
+                                , nameWithArgs'
+                                ]
+                            , first
+                                |> prefix (row [punc "=", space])
+                                |> andThen (map (prefix (row [punc "|", space])) rest)
+                                |> indent
+                            ]
+                        nameWithArgs' ->
+                            stack1
+                            [ line $ keyword "type"
+                            , indent $ nameWithArgs'
+                            , first
+                                |> prefix (row [punc "=", space])
+                                |> andThen (map (prefix (row [punc "|", space])) rest)
+                                |> indent
+                            ]
 
-                AST.Declaration.Fixity_0_19 assoc precedence name value ->
-                    let
-                        formatAssoc a =
-                            case a of
-                                AST.Declaration.L -> keyword "left "
-                                AST.Declaration.R -> keyword "right"
-                                AST.Declaration.N -> keyword "non  "
-                    in
-                    ElmStructure.spaceSepOrIndented
-                        (line $ keyword "infix")
-                        [ formatHeadCommented (line . formatAssoc) assoc
-                        , formatHeadCommented (line . literal . show) precedence
-                        , formatCommented (line . formatSymbolIdentifierInParens) name
-                        , line $ keyword "="
-                        , formatHeadCommented (line . identifier . formatVarName elmVersion) value
+        AST.Declaration.TypeAlias preAlias nameWithArgs typ ->
+            ElmStructure.definition "=" True
+            (line $ keyword "type")
+            [ formatHeadCommented (line . keyword) (preAlias, "alias")
+            , formatCommented (formatNameWithArgs elmVersion) nameWithArgs
+            ]
+            (formatHeadCommentedStack (formatType elmVersion) typ)
+
+        AST.Declaration.PortAnnotation name typeComments typ ->
+            ElmStructure.definition ":" False
+            (line $ keyword "port")
+            [ formatCommented (line . formatLowercaseIdentifier elmVersion []) name ]
+            (formatCommented' typeComments (formatType elmVersion) typ)
+
+        AST.Declaration.PortDefinition name bodyComments expr ->
+            ElmStructure.definition "=" True
+            (line $ keyword "port")
+            [formatCommented (line . formatLowercaseIdentifier elmVersion []) name]
+            (formatCommented' bodyComments (formatExpression elmVersion importInfo SyntaxSeparated) expr)
+
+        AST.Declaration.Fixity assoc precedenceComments precedence nameComments name ->
+            case
+                ( formatCommented' nameComments (line . formatInfixVar elmVersion) name
+                , formatCommented' precedenceComments (line . literal . show) precedence
+                )
+            of
+                (SingleLine name', SingleLine precedence') ->
+                    line $ row
+                        [ case assoc of
+                                AST.Declaration.L -> keyword "infixl"
+                                AST.Declaration.R -> keyword "infixr"
+                                AST.Declaration.N -> keyword "infix"
+                        , space
+                        , precedence'
+                        , space
+                        , name'
                         ]
+                _ ->
+                    pleaseReport "TODO" "multiline fixity declaration"
+
+        AST.Declaration.Fixity_0_19 assoc precedence name value ->
+            let
+                formatAssoc a =
+                    case a of
+                        AST.Declaration.L -> keyword "left "
+                        AST.Declaration.R -> keyword "right"
+                        AST.Declaration.N -> keyword "non  "
+            in
+            ElmStructure.spaceSepOrIndented
+                (line $ keyword "infix")
+                [ formatHeadCommented (line . formatAssoc) assoc
+                , formatHeadCommented (line . literal . show) precedence
+                , formatCommented (line . formatSymbolIdentifierInParens) name
+                , line $ keyword "="
+                , formatHeadCommented (line . identifier . formatVarName elmVersion) value
+                ]
 
 
 formatNameWithArgs :: ElmVersion -> (AST.UppercaseIdentifier, [(AST.Comments, AST.LowercaseIdentifier)]) -> Box

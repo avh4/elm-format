@@ -26,7 +26,7 @@ elmModule =
           , (,) <$> addLocation (return Nothing) <*> return []
           ]
       (preImportComments, imports', postImportComments) <- imports
-      decls <- declarations
+      decls <- topLevel Decl.declaration
       trailingComments <-
           (++)
               <$> option [] freshLine
@@ -42,17 +42,17 @@ elmModule =
           ((map AST.Declaration.BodyComment postImportComments) ++ decls ++ (map AST.Declaration.BodyComment trailingComments))
 
 
-declarations :: IParser [AST.Declaration.Decl]
-declarations =
-  (++) <$> ((\x -> [x]) <$> Decl.declaration)
-      <*> (concat <$> many freshDef)
+topLevel :: IParser a -> IParser [AST.Declaration.TopLevelStructure a]
+topLevel entry =
+  (++) <$> ((\x -> [x]) <$> Decl.topLevelStructure entry)
+      <*> (concat <$> many (freshDef entry))
 
 
-freshDef :: IParser [AST.Declaration.Decl]
-freshDef =
+freshDef :: IParser a -> IParser [AST.Declaration.TopLevelStructure a]
+freshDef entry =
     commitIf (freshLine >> (letter <|> char '_')) $
       do  comments <- freshLine
-          decl <- Decl.declaration
+          decl <- Decl.topLevelStructure entry
           return $ (map AST.Declaration.BodyComment comments) ++ [decl]
 
 
