@@ -1,0 +1,50 @@
+# stack installation from https://github.com/samdoshi/docker-haskell-stack
+FROM buildpack-deps:stretch
+# FROM tianon/wine:latest
+
+ENV STACK_VERSION 1.7.1
+
+ENV STACK_DOWNLOAD_URL https://github.com/commercialhaskell/stack/releases/download/v$STACK_VERSION/stack-$STACK_VERSION-windows-i386.zip
+ENV DEBIAN_FRONTEND noninteractive
+ENV PATH $PATH:/root/.local/bin
+ENV LANG C.UTF-8
+
+RUN apt-get update -q && \
+    apt-get install -qy wget unzip netbase apt-transport-https && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN dpkg --add-architecture i386 && \
+    wget -nc https://dl.winehq.org/wine-builds/Release.key && \
+    apt-key add Release.key && \
+    echo 'deb https://dl.winehq.org/wine-builds/debian/ stretch main' > /etc/apt/sources.list.d/wine.list && \
+    # apt-add-repository https://dl.winehq.org/wine-builds/ubuntu/ && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends winehq-stable && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Download stack
+RUN mkdir -p /root/.local/bin && \
+    wget -q -Ostack.zip $STACK_DOWNLOAD_URL && \
+    unzip stack.zip -d /root/.local/bin/ && \
+    rm stack.zip
+
+# Create a `stack` executable that will invoke stack.exe via wine
+RUN echo '#!/bin/sh\nWINEDEBUG=-all wine /root/.local/bin/stack.exe "$@"' > /root/.local/bin/stack && \
+    chmod +x /root/.local/bin/stack
+
+# RUN wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks && \
+#     chmod +x winetricks && \
+#     mv -v winetricks /root/.local/bin/
+# RUN winetricks nocrashdialog
+
+# Install elm-format dependencies
+COPY stack.yaml ./
+RUN stack setup --verbose
+
+# Build elm-format dependencies
+COPY elm-format.cabal ./
+# RUN stack build --only-snapshot
+# RUN stack build --only-dependencies
+# RUN stack build --test --only-dependencies
