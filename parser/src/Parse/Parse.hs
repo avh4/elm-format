@@ -1,20 +1,31 @@
 {-# OPTIONS_GHC -Wall #-}
-module Parse.Parse (parse, parseSource) where
+module Parse.Parse (parse, parseModule, parseExpressions) where
 
 import qualified Text.Parsec.Error as Parsec
 
+import AST.V0_16 (WithEol)
+import qualified AST.Declaration
+import qualified AST.Expression
 import qualified AST.Module
+import Parse.Comments (withEol)
+import qualified Parse.Expression
 import Parse.Helpers
-import qualified Parse.Module as Module
+import qualified Parse.Module
 import qualified Reporting.Region as R
 import qualified Reporting.Error.Syntax as Error
 import qualified Reporting.Result as Result
 import Parse.IParser
+import Text.Parsec (eof)
 
 
-parseSource :: String -> Result.Result () Error.Error AST.Module.Module
-parseSource src =
-  parse src Module.elmModule
+parseModule :: String -> Result.Result () Error.Error AST.Module.Module
+parseModule src =
+  parse src Parse.Module.elmModule
+
+
+parseExpressions :: String -> Result.Result () Error.Error [AST.Declaration.TopLevelStructure (WithEol AST.Expression.Expr)]
+parseExpressions src =
+    parse src (Parse.Module.topLevel (withEol Parse.Expression.expr) <* eof)
 
 
 -- RUN PARSERS

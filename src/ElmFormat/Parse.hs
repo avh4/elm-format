@@ -16,7 +16,7 @@ import qualified Reporting.Annotation as RA
 parse :: Text.Text -> Result.Result () Syntax.Error AST.Module.Module
 parse input =
     Text.unpack input
-        |> Parse.parseSource
+        |> Parse.parseModule
 
 
 toMaybe :: Result.Result a b c -> Maybe c

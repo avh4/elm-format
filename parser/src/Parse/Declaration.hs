@@ -13,12 +13,17 @@ import Parse.IParser
 import Parse.Whitespace
 
 
-declaration :: IParser AST.Declaration.Decl
+declaration :: IParser Declaration
 declaration =
-  choice
-    [ AST.Declaration.DocComment <$> docCommentAsMarkdown
-    , AST.Declaration.Decl <$> addLocation (typeDecl <|> infixDecl <|> port <|> definition)
-    ]
+    typeDecl <|> infixDecl <|> port <|> definition
+
+
+topLevelStructure :: IParser a -> IParser (TopLevelStructure a)
+topLevelStructure entry =
+    choice
+        [ DocComment <$> docCommentAsMarkdown
+        , Entry <$> addLocation entry
+        ]
 
 
 
