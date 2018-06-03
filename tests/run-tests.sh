@@ -364,6 +364,7 @@ checkGood 0.18 rtfeldman/dreamwriter/LeftSidebar.elm
 checkGood 0.18 rtfeldman/dreamwriter/RightSidebar.elm
 checkGood 0.18 rtfeldman/dreamwriter/WordGraph.elm
 checkGood 0.18 avh4/elm-fifo/Fifo.elm
+checkGood 0.19 mdgriffith/style-elements/Element.elm
 
 checkGood 0.17 elm-lang/examples/random.elm
 checkGood 0.17 elm-lang/examples/http.elm
