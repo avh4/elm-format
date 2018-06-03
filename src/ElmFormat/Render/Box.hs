@@ -523,11 +523,37 @@ formatModuleBody linesBetween elmVersion modu =
             _ -> Just $ stack1 boxes
 
 
+data ElmCodeBlock
+    = ModuleCode AST.Module.Module
+
+-- TODO: there must be an existing haskell function that does this, right?
+firstOf :: [a -> Maybe b] -> a -> Maybe b
+firstOf options value =
+    case options of
+        [] -> Nothing
+        (next:rest) ->
+            case next value of
+                Just result -> Just result
+                Nothing -> firstOf rest value
+
 formatModuleDocs :: ElmVersion -> Markdown.Blocks -> Box
 formatModuleDocs elmVersion blocks =
     let
-        format :: AST.Module.Module -> String
-        format modu =
+        parse :: String -> Maybe ElmCodeBlock
+        parse source =
+            source
+                |> firstOf
+                    [ fmap ModuleCode . Result.toMaybe . Parse.parseSource
+                    ]
+
+        format :: ElmCodeBlock -> String
+        format result =
+            case result of
+                ModuleCode modu ->
+                    formatModuleCode modu
+
+        formatModuleCode :: AST.Module.Module -> String
+        formatModuleCode modu =
             let
                 box =
                     case
@@ -544,16 +570,9 @@ formatModuleDocs elmVersion blocks =
                     |> fmap (Text.unpack . Box.render)
                     |> fromMaybe ""
 
-        reformat :: String -> Maybe String
-        reformat source =
-            source
-                |> Parse.parseSource
-                |> Result.toMaybe
-                |> fmap format
-
         content :: String
         content =
-            ElmFormat.Render.Markdown.formatMarkdown reformat blocks
+            ElmFormat.Render.Markdown.formatMarkdown (fmap format . parse) blocks
     in
         formatDocComment content
 
