@@ -21,3 +21,14 @@ f x =
 -}
 g y =
     y + (4 * y)
+
+
+{-| Format expressions in code blocks
+
+    h 20 --> 21
+
+    h 21 --> 22
+
+-}
+h z =
+    z + 1
