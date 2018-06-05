@@ -1645,66 +1645,78 @@ removeBangs ::
     -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
     -> (AST.Expression.Expr, [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)])
 removeBangs left ops =
-    removeBangs' left ReversedList.empty ops
+    let
+        cmds' post cmds =
+            case RA.drop cmds of
+                AST.Expression.ExplicitList [] innerComments _ ->
+                    AST.Commented
+                        post
+                        (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "none")))
+                        innerComments
+
+                AST.Expression.ExplicitList [(extraPre, (pre', (cmd, eol)))] trailing _ ->
+                    let
+                        eolComment =
+                            case eol of
+                                Nothing -> []
+                                Just c -> [AST.LineComment c]
+                    in
+                    AST.Commented (post ++ extraPre ++ pre') cmd (eolComment ++ trailing)
+
+                _ ->
+                    AST.Commented [] (noRegion $ AST.Expression.App
+                        (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "batch")))
+                        [(post, cmds)]
+                        (AST.FAJoinFirst AST.JoinAll)
+                      )
+                      []
+
+        tuple left' pre post cmds =
+            noRegion $ AST.Expression.Tuple
+                [ AST.Commented [] left' pre
+                , cmds' post cmds
+                ]
+                True
+
+        shouldFold opi =
+            case opi of
+                ">>" -> True
+                _ -> False
+    in
+    binopToFunction (AST.SymbolIdentifier "!") shouldFold tuple left ReversedList.empty ops
 
 
-removeBangs' ::
-    AST.Expression.Expr
+binopToFunction ::
+    AST.SymbolIdentifier
+    -> (String -> Bool)
+    -> (AST.Expression.Expr -> AST.Comments -> AST.Comments -> AST.Expression.Expr -> AST.Expression.Expr)
+    -> AST.Expression.Expr
     -> Reversed (AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)
     -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
     -> (AST.Expression.Expr, [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)])
-removeBangs' left preBang remaining =
+binopToFunction target shouldFold applyFn left preBang remaining =
     case remaining of
         [] ->
             (left, ReversedList.toList preBang)
 
-        (pre, AST.Variable.OpRef (AST.SymbolIdentifier "!"), post, cmds):rest ->
+        (pre, AST.Variable.OpRef sym, post, cmds):rest | sym == target ->
             let
                 left' =
                     case ReversedList.isEmpty preBang of
                         True -> left
                         False -> ( noRegion $ AST.Expression.Binops left (ReversedList.toList preBang) False)
 
-                cmds' =
-                    case RA.drop cmds of
-                        AST.Expression.ExplicitList [] innerComments _ ->
-                            AST.Commented
-                                post
-                                (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "none")))
-                                innerComments
-
-                        AST.Expression.ExplicitList [(extraPre, (pre', (cmd, eol)))] trailing _ ->
-                            let
-                                eolComment =
-                                    case eol of
-                                        Nothing -> []
-                                        Just c -> [AST.LineComment c]
-                            in
-                            AST.Commented (post ++ extraPre ++ pre') cmd (eolComment ++ trailing)
-
-                        _ ->
-                            AST.Commented [] (noRegion $ AST.Expression.App
-                                (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "batch")))
-                                [(post, cmds)]
-                                (AST.FAJoinFirst AST.JoinAll)
-                              )
-                              []
-
                 tuple =
-                    noRegion $ AST.Expression.Tuple
-                        [ AST.Commented [] left' pre
-                        , cmds'
-                        ]
-                        True
+                    applyFn left' pre post cmds
             in
-            removeBangs' tuple ReversedList.empty rest
+            binopToFunction target shouldFold applyFn tuple ReversedList.empty rest
 
-        (pre, op@(AST.Variable.OpRef (AST.SymbolIdentifier ">>")), post, e):rest ->
-            removeBangs' left (ReversedList.push (pre, op, post, e) preBang) rest
+        (pre, op@(AST.Variable.OpRef (AST.SymbolIdentifier opi)), post, e):rest | shouldFold opi ->
+            binopToFunction target shouldFold applyFn left (ReversedList.push (pre, op, post, e) preBang) rest
 
         (pre, op, post, e):rest ->
             let
-                (e', rest') = removeBangs' e ReversedList.empty rest
+                (e', rest') = binopToFunction target shouldFold applyFn e ReversedList.empty rest
             in
             (left, ReversedList.toList preBang ++ (pre, op, post, e'):rest')
 
