@@ -2046,7 +2046,7 @@ formatString elmVersion style s =
             hex c
         else if c == ' ' then
             [c]
-        else if c == '\xA0' then
+        else if ElmVersion.style_0_19_stringEscape elmVersion == False && c == '\xA0' then
             [c] -- Workaround for https://github.com/elm-lang/elm-compiler/issues/1279
         else if Char.isSpace c then
             hex c
