@@ -1556,7 +1556,10 @@ formatBinops_0_19_upgrade ::
     -> Bool
     -> Box
 formatBinops_0_19_upgrade elmVersion importInfo left ops multiline =
-    formatBinops_common removeBangs elmVersion importInfo left ops multiline
+    let
+        transform = uncurry removeBangs . uncurry removeMod
+    in
+    formatBinops_common (curry transform) elmVersion importInfo left ops multiline
 
 
 formatBinops_common ::
@@ -1645,69 +1648,145 @@ removeBangs ::
     -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
     -> (AST.Expression.Expr, [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)])
 removeBangs left ops =
-    removeBangs' left ReversedList.empty ops
+    let
+        cmds' post cmds =
+            case RA.drop cmds of
+                AST.Expression.ExplicitList [] innerComments _ ->
+                    AST.Commented
+                        post
+                        (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "none")))
+                        innerComments
+
+                AST.Expression.ExplicitList [(extraPre, (pre', (cmd, eol)))] trailing _ ->
+                    let
+                        eolComment =
+                            case eol of
+                                Nothing -> []
+                                Just c -> [AST.LineComment c]
+                    in
+                    AST.Commented (post ++ extraPre ++ pre') cmd (eolComment ++ trailing)
+
+                _ ->
+                    AST.Commented [] (noRegion $ AST.Expression.App
+                        (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "batch")))
+                        [(post, cmds)]
+                        (AST.FAJoinFirst AST.JoinAll)
+                      )
+                      []
+
+        tuple left' pre post cmds =
+            noRegion $ AST.Expression.Tuple
+                [ AST.Commented [] left' pre
+                , cmds' post cmds
+                ]
+                True
+
+        shouldFold opi =
+            case opi of
+                ">>" -> FoldIfLeft
+                _ -> NeverFold
+    in
+    binopToFunction (AST.SymbolIdentifier "!") shouldFold tuple left ReversedList.empty ops
 
 
-removeBangs' ::
+removeMod ::
     AST.Expression.Expr
+    -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
+    -> (AST.Expression.Expr, [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)])
+removeMod left ops =
+    let
+        tuple left' pre post right' =
+            noRegion $ AST.Expression.App
+                (noRegion $ AST.Expression.VarExpr $ AST.Variable.OpRef (AST.SymbolIdentifier "%"))
+                [ (pre, left')
+                , (post, right')
+                ]
+                (AST.FAJoinFirst AST.JoinAll)
+
+
+        shouldFold opi =
+            case opi of
+                ">>" -> AlwaysFold
+                "<<" -> AlwaysFold
+                "^" -> AlwaysFold
+                _ -> NeverFold
+    in
+    binopToFunction (AST.SymbolIdentifier "%") shouldFold tuple left ReversedList.empty ops
+
+
+data ShouldFold
+    = AlwaysFold
+    | FoldIfLeft
+    | NeverFold
+
+
+collectRightFold :: ShouldFold -> Bool
+collectRightFold AlwaysFold = True
+collectRightFold FoldIfLeft = False
+collectRightFold NeverFold = False
+
+
+collectLeftFold :: ShouldFold -> Bool
+collectLeftFold AlwaysFold = True
+collectLeftFold FoldIfLeft = True
+collectLeftFold NeverFold = False
+
+
+binopToFunction ::
+    AST.SymbolIdentifier
+    -> (String -> ShouldFold)
+    -> (AST.Expression.Expr -> AST.Comments -> AST.Comments -> AST.Expression.Expr -> AST.Expression.Expr)
+    -> AST.Expression.Expr
     -> Reversed (AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)
     -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
     -> (AST.Expression.Expr, [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)])
-removeBangs' left preBang remaining =
+binopToFunction target shouldFold applyFn left preBang remaining =
     case remaining of
         [] ->
             (left, ReversedList.toList preBang)
 
-        (pre, AST.Variable.OpRef (AST.SymbolIdentifier "!"), post, cmds):rest ->
+        (pre, AST.Variable.OpRef sym, post, cmds):rest | sym == target ->
             let
                 left' =
                     case ReversedList.isEmpty preBang of
                         True -> left
                         False -> ( noRegion $ AST.Expression.Binops left (ReversedList.toList preBang) False)
 
-                cmds' =
-                    case RA.drop cmds of
-                        AST.Expression.ExplicitList [] innerComments _ ->
-                            AST.Commented
-                                post
-                                (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "none")))
-                                innerComments
-
-                        AST.Expression.ExplicitList [(extraPre, (pre', (cmd, eol)))] trailing _ ->
-                            let
-                                eolComment =
-                                    case eol of
-                                        Nothing -> []
-                                        Just c -> [AST.LineComment c]
-                            in
-                            AST.Commented (post ++ extraPre ++ pre') cmd (eolComment ++ trailing)
-
-                        _ ->
-                            AST.Commented [] (noRegion $ AST.Expression.App
-                                (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "batch")))
-                                [(post, cmds)]
-                                (AST.FAJoinFirst AST.JoinAll)
-                              )
-                              []
+                (right', rest') =
+                    collectRight (collectRightFold . shouldFold) cmds ReversedList.empty rest
 
                 tuple =
-                    noRegion $ AST.Expression.Tuple
-                        [ AST.Commented [] left' pre
-                        , cmds'
-                        ]
-                        True
+                    applyFn left' pre post right'
             in
-            removeBangs' tuple ReversedList.empty rest
+            binopToFunction target shouldFold applyFn tuple ReversedList.empty rest'
 
-        (pre, op@(AST.Variable.OpRef (AST.SymbolIdentifier ">>")), post, e):rest ->
-            removeBangs' left (ReversedList.push (pre, op, post, e) preBang) rest
+        (pre, op@(AST.Variable.OpRef (AST.SymbolIdentifier opi)), post, e):rest | collectLeftFold $ shouldFold opi ->
+            binopToFunction target shouldFold applyFn left (ReversedList.push (pre, op, post, e) preBang) rest
 
         (pre, op, post, e):rest ->
             let
-                (e', rest') = removeBangs' e ReversedList.empty rest
+                (e', rest') = binopToFunction target shouldFold applyFn e ReversedList.empty rest
             in
             (left, ReversedList.toList preBang ++ (pre, op, post, e'):rest')
 
+collectRight ::
+    (String -> Bool)
+    -> AST.Expression.Expr
+    -> Reversed (AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)
+    -> [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)]
+    -> (AST.Expression.Expr, [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)])
+collectRight shouldFold leftMost collectedLeft rest =
+    case rest of
+        (pre, op@(AST.Variable.OpRef (AST.SymbolIdentifier opi)), post, e):rest' | shouldFold opi ->
+            collectRight shouldFold leftMost (ReversedList.push (pre, op, post, e) collectedLeft) rest'
+
+        _ ->
+            -- terminate if either rest is empty, or the next op fails the shouldFold test
+            ( case ReversedList.isEmpty collectedLeft of
+                True -> leftMost
+                False -> noRegion $ AST.Expression.Binops leftMost (ReversedList.toList collectedLeft) False
+            , rest
+            )
 
 formatRange_0_17 :: ElmVersion -> ImportInfo -> AST.Commented AST.Expression.Expr -> AST.Commented AST.Expression.Expr -> Bool -> Box
 formatRange_0_17 elmVersion importInfo left right multiline =
