@@ -93,6 +93,19 @@ transform exposed importAliases expr =
                       )
                       False
 
+                OpRef (SymbolIdentifier "%") ->
+                    Just $
+                    Lambda
+                      [makeArg "dividend", makeArg "modulus"] []
+                      (noRegion $ App
+                          (makeVarRef "modBy")
+                          [ ([], makeVarRef "modulus")
+                          , ([], makeVarRef "dividend")
+                          ]
+                          (FAJoinFirst JoinAll)
+                      )
+                      False
+
                 _ -> Nothing
 
         makeTuple n =
