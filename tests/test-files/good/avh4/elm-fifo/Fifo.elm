@@ -1,4 +1,8 @@
-module Fifo exposing (Fifo, empty, fromList, insert, remove, toList)
+module Fifo exposing
+    ( Fifo, empty, fromList
+    , insert, remove
+    , toList
+    )
 
 {-|
 

@@ -1,4 +1,9 @@
-module ListExports exposing (X, a, b, c)
+module ListExports exposing
+    ( a
+    , X
+    , Y(..)
+    , b, c
+    )
 
 {-|
 
@@ -8,9 +13,19 @@ module ListExports exposing (X, a, b, c)
 # Heading
 
 @docs X
+@docs Y
 @docs b, c
 
 -}
+
+
+type alias X =
+    ()
+
+
+type Y
+    = Y1
+    | Y2
 
 
 a =

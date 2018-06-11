@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (Model, Msg(..), init, main, subscriptions, update, view)
 
 import Html exposing (Html)
 import Html.App as Html

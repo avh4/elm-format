@@ -1,4 +1,4 @@
-port module Spelling exposing (..)
+port module Spelling exposing (Model, Msg(..), check, init, main, subscriptions, suggestions, update, view)
 
 import Html exposing (..)
 import Html.App as Html

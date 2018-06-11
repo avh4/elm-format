@@ -1,4 +1,4 @@
-module AllSyntax.Comments exposing (..)
+module AllSyntax.Comments exposing (blockComment, indentedMultilineBlockComment, multilineCommentTrickDisabled, nestedBlockComment)
 
 
 blockComment =

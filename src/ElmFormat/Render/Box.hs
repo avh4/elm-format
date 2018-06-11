@@ -6,7 +6,7 @@ import Box
 import ElmVersion (ElmVersion(..))
 
 import qualified AST.V0_16 as AST
-import AST.V0_16 (UppercaseIdentifier(..), LowercaseIdentifier(..), WithEol)
+import AST.V0_16 (UppercaseIdentifier(..), LowercaseIdentifier(..), SymbolIdentifier(..), WithEol)
 import qualified AST.Declaration
 import qualified AST.Expression
 import qualified AST.Module
@@ -18,8 +18,11 @@ import qualified Data.Char as Char
 import qualified Data.Foldable as Foldable
 import qualified Data.List as List
 import qualified Data.Map.Strict as Map
-import qualified Data.Maybe as Maybe
 import Data.Maybe (fromMaybe, maybeToList)
+import qualified Data.Maybe as Maybe
+import Data.Set (Set)
+import qualified Data.Set as Set
+import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified ElmFormat.Render.Markdown
@@ -146,39 +149,138 @@ declarationType entryType decl =
       DComment
 
 
+sortVars :: Set (AST.Commented AST.Variable.Value) -> [[AST.Variable.Ref]] -> Set AST.Variable.Value -> ([[AST.Commented AST.Variable.Value]], AST.Comments)
+sortVars fromExposing fromDocs fromModule =
+    let
+        refToValue (AST.Variable.VarRef _ name) = AST.Commented [] (AST.Variable.Value name) []
+        refToValue (AST.Variable.TagRef _ name) = AST.Commented [] (AST.Variable.Union (name, []) AST.Variable.ClosedListing) []
+        refToValue (AST.Variable.OpRef name) = AST.Commented [] (AST.Variable.OpValue name) []
+
+        varOrder :: AST.Commented AST.Variable.Value -> (Int, String)
+        varOrder (AST.Commented _ (AST.Variable.OpValue (SymbolIdentifier name)) _) = (1, name)
+        varOrder (AST.Commented _ (AST.Variable.Union (UppercaseIdentifier name, _) _) _) = (2, name)
+        varOrder (AST.Commented _ (AST.Variable.Value (LowercaseIdentifier name)) _) = (3, name)
+
+        listedInDocs =
+            fromDocs
+                |> fmap (Maybe.mapMaybe (\v -> Map.lookup (varName $ refToValue v) allowedInDocs))
+                |> fmap (fmap (\v -> AST.Commented [] v []))
+                |> filter (not . List.null)
+
+        listedInExposing =
+            fromExposing
+                |> Set.toList
+                |> List.sortOn varOrder
+
+        varName (AST.Commented _ (AST.Variable.Value (LowercaseIdentifier name)) _) = name
+        varName (AST.Commented _ (AST.Variable.OpValue (SymbolIdentifier name)) _) = name
+        varName (AST.Commented _ (AST.Variable.Union (UppercaseIdentifier name, _) _) _) = name
+
+        allowedInDocs =
+            fromExposing
+                |> Set.union (Set.map (\v -> AST.Commented [] v []) fromModule)
+                |> Set.toList
+                |> fmap (\(AST.Commented pre var post)-> (varName (AST.Commented pre var post), var))
+                |> Map.fromList
+
+        allFromDocs =
+            Set.fromList $ fmap varName $ concat listedInDocs
+
+        inDocs x =
+            Set.member (varName x) allFromDocs
+
+        remainingFromExposing =
+            listedInExposing
+                |> filter (not . inDocs)
+                |> (\x -> if List.null x then [] else [x])
+
+        listedByUser =
+            listedInDocs ++ remainingFromExposing
+
+        commentsFromReorderedVars =
+            listedInExposing
+                |> filter inDocs
+                |> fmap (\(AST.Commented pre _ post) -> pre ++ post)
+                |> concat
+    in
+    case (List.null $ concat listedByUser) of
+        False ->
+            ( listedByUser, commentsFromReorderedVars )
+
+        True ->
+            -- we have no exposing, and no docs; use from module
+            fromModule
+                |> Set.toList
+                |> fmap (\x -> AST.Commented [] x [])
+                |> List.sortOn varOrder
+                |> (\x -> if List.null x then [] else [x])
+                |> (\x -> (x, []))
+
+
 formatModuleHeader :: ElmVersion -> AST.Module.Module -> Box
 formatModuleHeader elmVersion modu =
   let
       header =
         AST.Module.header modu
 
+      documentedVars :: [[AST.Variable.Ref]]
       documentedVars =
           AST.Module.docs modu
               |> RA.drop
               |> fmap Foldable.toList
-              |> fmap (concatMap extractDocs)
+              |> Maybe.fromMaybe []
+              |> concatMap extractDocs
 
       extractDocs block =
           case block of
               Markdown.ElmDocs vars ->
-                  fmap Text.unpack (concat vars)
+                  fmap (fmap textToRef) vars
               _ -> []
 
-      varsToExpose =
-          case documentedVars of
-              Just vars -> vars
-              Nothing ->
-                  AST.Module.body modu
-                      |> concatMap extractVarName
+      textToRef :: Text -> AST.Variable.Ref
+      textToRef text =
+          case Text.unpack text of
+              s@(c:_) | Char.isUpper c -> AST.Variable.TagRef [] (UppercaseIdentifier s)
+              s@(c:_) | Char.isLower c -> AST.Variable.VarRef [] (LowercaseIdentifier s)
+              '(':a:')':[] -> AST.Variable.OpRef (SymbolIdentifier $ a:[])
+              '(':a:b:')':[] -> AST.Variable.OpRef (SymbolIdentifier $ a:b:[])
+              s -> AST.Variable.VarRef [] (LowercaseIdentifier s)
 
+      definedVars :: Set AST.Variable.Value
+      definedVars =
+          AST.Module.body modu
+              |> concatMap extractVarName
+              |> Set.fromList
+
+      AST.KeywordCommented _ _ exportsList =
+          AST.Module.exports header
+
+      detailedListingToSet :: AST.Variable.Listing AST.Module.DetailedListing -> Set (AST.Commented AST.Variable.Value)
+      detailedListingToSet (AST.Variable.OpenListing _) = Set.empty
+      detailedListingToSet AST.Variable.ClosedListing = Set.empty
+      detailedListingToSet (AST.Variable.ExplicitListing (AST.Module.DetailedListing values operators types) _) =
+          Set.unions
+              [ Map.assocs values |> fmap (\(name, AST.Commented pre () post) -> AST.Commented pre (AST.Variable.Value name) post) |> Set.fromList
+              , Map.assocs operators |> fmap (\(name, AST.Commented pre () post) -> AST.Commented pre (AST.Variable.OpValue name) post) |> Set.fromList
+              , Map.assocs types |> fmap (\(name, AST.Commented pre (preListing, listing) post) -> AST.Commented pre (AST.Variable.Union (name, preListing) listing) post) |> Set.fromList
+              ]
+
+      varsToExpose =
+          sortVars
+              (detailedListingToSet exportsList)
+              documentedVars
+              definedVars
+
+      extractVarName :: AST.Declaration.TopLevelStructure AST.Declaration.Declaration -> [AST.Variable.Value]
       extractVarName decl =
           case decl of
               AST.Declaration.DocComment _ -> []
               AST.Declaration.BodyComment _ -> []
-              AST.Declaration.Entry (RA.A _ (AST.Declaration.PortAnnotation (AST.Commented _ (LowercaseIdentifier name) _) _ _)) -> [ name ]
-              AST.Declaration.Entry (RA.A _ (AST.Declaration.Definition (RA.A _ (AST.Pattern.VarPattern (LowercaseIdentifier name))) _ _ _)) -> [ name ]
-              AST.Declaration.Entry (RA.A _ (AST.Declaration.Datatype (AST.Commented _ (UppercaseIdentifier name, _) _) _)) -> [ name ]
-              AST.Declaration.Entry (RA.A _ (AST.Declaration.TypeAlias _ (AST.Commented _ (UppercaseIdentifier name, _) _) _)) -> [ name ]
+              AST.Declaration.Entry (RA.A _ (AST.Declaration.PortAnnotation (AST.Commented _ (LowercaseIdentifier name) _) _ _)) -> [ AST.Variable.Value (LowercaseIdentifier name) ]
+              AST.Declaration.Entry (RA.A _ (AST.Declaration.Definition (RA.A _ (AST.Pattern.VarPattern (LowercaseIdentifier name))) _ _ _)) -> [ AST.Variable.Value (LowercaseIdentifier name) ]
+              AST.Declaration.Entry (RA.A _ (AST.Declaration.Definition (RA.A _ (AST.Pattern.Record fields)) _ _ _)) -> fmap (\(AST.Commented _ f _) -> AST.Variable.Value f) fields
+              AST.Declaration.Entry (RA.A _ (AST.Declaration.Datatype (AST.Commented _ (UppercaseIdentifier name, _) _) _)) -> [ AST.Variable.Union (UppercaseIdentifier name, []) (AST.Variable.OpenListing (AST.Commented [] () []))]
+              AST.Declaration.Entry (RA.A _ (AST.Declaration.TypeAlias _ (AST.Commented _ (UppercaseIdentifier name, _) _) _)) -> [ AST.Variable.Union (UppercaseIdentifier name, []) AST.Variable.ClosedListing ]
               AST.Declaration.Entry (RA.A _ _) -> []
 
       moduleLine =
@@ -279,8 +381,8 @@ formatModuleLine_0_16 header =
           ]
 
 
-formatModuleLine :: ElmVersion -> [String] -> AST.Module.Header -> Box
-formatModuleLine elmVersion varsToExpose header =
+formatModuleLine :: ElmVersion -> ([[AST.Commented AST.Variable.Value]], AST.Comments) -> AST.Module.Header -> Box
+formatModuleLine elmVersion (varsToExpose, extraComments) header =
   let
     tag =
       case AST.Module.srcTag header of
@@ -298,27 +400,16 @@ formatModuleLine elmVersion varsToExpose header =
             [ line $ keyword "module" ]
 
     exports =
-      let
-          finalValue =
-              case
-                  ( ElmVersion.style_0_19_cannotExposeOpenListing elmVersion
-                  , exportsList
-                  , varsToExpose
-                  )
-              of
-                  (True, AST.Variable.OpenListing (AST.Commented pre () post), first:rest) ->
-                      AST.Variable.ExplicitListing
-                          (AST.Module.DetailedListing
-                              ((LowercaseIdentifier first, AST.Commented pre () post):(rest |> fmap (\v -> (LowercaseIdentifier v, AST.Commented [] () []))) |> Map.fromList)
-                              Map.empty
-                              Map.empty
-                          )
-                          False
-                  _ -> exportsList
-      in
-      case formatListing (formatDetailedListing elmVersion) finalValue of
-          Just listing -> listing
-          _ -> pleaseReport "UNEXPECTED MODULE DECLARATION" "empty listing"
+          case varsToExpose of
+              [] -> line $ keyword "(..)"
+              [oneGroup] ->
+                  oneGroup
+                      |> fmap (formatCommented $ formatVarValue elmVersion)
+                      |> ElmStructure.group' False "(" "," (maybeToList (formatComments extraComments)) ")" False
+              _ ->
+                  varsToExpose
+                      |> fmap (ElmStructure.group False "" "," "" False . fmap (formatCommented $ formatVarValue elmVersion))
+                      |> ElmStructure.group' False "(" "," (maybeToList (formatComments extraComments)) ")" True
 
     formatSetting (k, v) =
       formatRecordPair elmVersion "=" (line . formatUppercaseIdentifier elmVersion) (k, v, False)
@@ -333,7 +424,7 @@ formatModuleLine elmVersion varsToExpose header =
         |> fmap (\x -> [x])
         |> Maybe.fromMaybe []
 
-    AST.KeywordCommented preExposing postExposing exportsList =
+    AST.KeywordCommented preExposing postExposing _ =
         AST.Module.exports header
 
     nameClause =
@@ -826,7 +917,7 @@ formatVarValue elmVersion aval =
         AST.Variable.Value val ->
             line $ formatLowercaseIdentifier elmVersion [] val
 
-        AST.Variable.OpValue (AST.SymbolIdentifier name) ->
+        AST.Variable.OpValue (SymbolIdentifier name) ->
             line $ identifier $ "(" ++ name ++ ")"
 
         AST.Variable.Union name listing ->
@@ -842,7 +933,7 @@ formatVarValue elmVersion aval =
               , elmVersion
               )
             of
-                (_, _, _, Elm_0_19_Upgrade) ->
+                (Just _, _, _, Elm_0_19_Upgrade) ->
                     formatTailCommented
                         (\n -> line $ row [ formatUppercaseIdentifier elmVersion n, keyword "(..)" ])
                         name
@@ -1048,7 +1139,7 @@ formatPattern elmVersion parensRequired apattern =
         AST.Pattern.VarPattern var ->
             line $ formatLowercaseIdentifier elmVersion [] var
 
-        AST.Pattern.OpPattern (AST.SymbolIdentifier name) ->
+        AST.Pattern.OpPattern (SymbolIdentifier name) ->
             line $ identifier $ "(" ++ name ++ ")"
 
         AST.Pattern.ConsPattern first rest ->
@@ -1582,7 +1673,7 @@ formatBinops_common transform elmVersion importInfo left ops multiline =
         formatPair_ isLast ( po, o, pe, e ) =
             let
                 isLeftPipe =
-                    o == AST.Variable.OpRef (AST.SymbolIdentifier "<|")
+                    o == AST.Variable.OpRef (SymbolIdentifier "<|")
 
                 formatContext =
                     if isLeftPipe && isLast
@@ -1621,7 +1712,7 @@ removeBackticks left ops =
 
                 (e'', rest') = removeBackticks e' rest
             in
-                (left, (pre, AST.Variable.OpRef $ AST.SymbolIdentifier "|>", [], e''):rest')
+                (left, (pre, AST.Variable.OpRef $ SymbolIdentifier "|>", [], e''):rest')
 
         (pre, AST.Variable.VarRef v' v, post, e):rest ->
             -- Convert other backtick operators to normal function application
@@ -1686,7 +1777,7 @@ removeBangs left ops =
                 ">>" -> FoldIfLeft
                 _ -> NeverFold
     in
-    binopToFunction (AST.SymbolIdentifier "!") shouldFold tuple left ReversedList.empty ops
+    binopToFunction (SymbolIdentifier "!") shouldFold tuple left ReversedList.empty ops
 
 
 removeMod ::
@@ -1697,7 +1788,7 @@ removeMod left ops =
     let
         tuple left' pre post right' =
             noRegion $ AST.Expression.App
-                (noRegion $ AST.Expression.VarExpr $ AST.Variable.OpRef (AST.SymbolIdentifier "%"))
+                (noRegion $ AST.Expression.VarExpr $ AST.Variable.OpRef (SymbolIdentifier "%"))
                 [ (pre, left')
                 , (post, right')
                 ]
@@ -1711,7 +1802,7 @@ removeMod left ops =
                 "^" -> AlwaysFold
                 _ -> NeverFold
     in
-    binopToFunction (AST.SymbolIdentifier "%") shouldFold tuple left ReversedList.empty ops
+    binopToFunction (SymbolIdentifier "%") shouldFold tuple left ReversedList.empty ops
 
 
 data ShouldFold
@@ -1733,7 +1824,7 @@ collectLeftFold NeverFold = False
 
 
 binopToFunction ::
-    AST.SymbolIdentifier
+    SymbolIdentifier
     -> (String -> ShouldFold)
     -> (AST.Expression.Expr -> AST.Comments -> AST.Comments -> AST.Expression.Expr -> AST.Expression.Expr)
     -> AST.Expression.Expr
@@ -1760,7 +1851,7 @@ binopToFunction target shouldFold applyFn left preBang remaining =
             in
             binopToFunction target shouldFold applyFn tuple ReversedList.empty rest'
 
-        (pre, op@(AST.Variable.OpRef (AST.SymbolIdentifier opi)), post, e):rest | collectLeftFold $ shouldFold opi ->
+        (pre, op@(AST.Variable.OpRef (SymbolIdentifier opi)), post, e):rest | collectLeftFold $ shouldFold opi ->
             binopToFunction target shouldFold applyFn left (ReversedList.push (pre, op, post, e) preBang) rest
 
         (pre, op, post, e):rest ->
@@ -1777,7 +1868,7 @@ collectRight ::
     -> (AST.Expression.Expr, [(AST.Comments, AST.Variable.Ref, AST.Comments, AST.Expression.Expr)])
 collectRight shouldFold leftMost collectedLeft rest =
     case rest of
-        (pre, op@(AST.Variable.OpRef (AST.SymbolIdentifier opi)), post, e):rest' | shouldFold opi ->
+        (pre, op@(AST.Variable.OpRef (SymbolIdentifier opi)), post, e):rest' | shouldFold opi ->
             collectRight shouldFold leftMost (ReversedList.push (pre, op, post, e) collectedLeft) rest'
 
         _ ->
@@ -2190,8 +2281,8 @@ formatVar elmVersion var =
             formatSymbolIdentifierInParens name
 
 
-formatSymbolIdentifierInParens :: AST.SymbolIdentifier -> Line
-formatSymbolIdentifierInParens (AST.SymbolIdentifier name) =
+formatSymbolIdentifierInParens :: SymbolIdentifier -> Line
+formatSymbolIdentifierInParens (SymbolIdentifier name) =
     identifier $ "(" ++ name ++ ")"
 
 
@@ -2208,7 +2299,7 @@ formatInfixVar elmVersion var =
                 , formatVar elmVersion var
                 , punc "`"
                 ]
-        AST.Variable.OpRef (AST.SymbolIdentifier name) ->
+        AST.Variable.OpRef (SymbolIdentifier name) ->
             identifier name
 
 

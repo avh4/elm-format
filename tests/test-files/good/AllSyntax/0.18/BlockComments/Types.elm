@@ -1,4 +1,4 @@
-module AllSyntax.BlockComments.Types exposing (..)
+module AllSyntax.BlockComments.Types exposing (emptyRecord, record, recordExtension)
 
 
 emptyRecord : {{- M -}} -> ()
