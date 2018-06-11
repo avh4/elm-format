@@ -1,4 +1,4 @@
-module Comments exposing (..)
+module Comments exposing (fn)
 
 {-| An example of all valid Elm syntax.
 

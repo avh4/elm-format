@@ -1,4 +1,7 @@
-module Main exposing (..)
+module Main exposing
+    ( x
+    , increment, escapedCharacters
+    )
 
 {-| Example of markdown in doc comments.
 
@@ -6,6 +9,7 @@ module Main exposing (..)
 # Section
 
 @docs x
+@docs increment, escapedCharacters
 
 
 # Another section

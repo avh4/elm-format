@@ -4,7 +4,7 @@ module ElmFormat.Render.ElmStructure
   , forceableRowOrStack
   , spaceSepOrIndented, forceableSpaceSepOrIndented, spaceSepOrPrefix, prefixOrIndented
   , equalsPair, definition
-  , application, group, extensionGroup, extensionGroup' )
+  , application, group, group', extensionGroup, extensionGroup' )
   where
 
 
@@ -250,26 +250,33 @@ application forceMultiline first args =
 -}
 group :: Bool -> String -> String -> String -> Bool -> [Box] -> Box
 group innerSpaces left sep right forceMultiline children =
-  case (forceMultiline, allSingles children) of
-    (_, Right []) ->
-      line $ row [punc left, punc right]
+  group' innerSpaces left sep [] right forceMultiline children
 
-    (False, Right ls) ->
+
+group' :: Bool -> String -> String -> [Box] -> String -> Bool -> [Box] -> Box
+group' innerSpaces left sep extraFooter right forceMultiline children =
+  case (forceMultiline, allSingles children, allSingles extraFooter) of
+    (_, Right [], Right efs) ->
+      line $ row $ concat [[punc left], efs, [punc right]]
+
+    (False, Right ls, Right efs) ->
       line $ row $ concat
         [ if innerSpaces then [punc left, space] else [punc left]
-        , List.intersperse (row [punc sep, space]) ls
+        , List.intersperse (row [punc sep, space]) (ls ++ efs)
         , if innerSpaces then [space, punc right] else [punc right]
         ]
 
     _ ->
       case children of
         [] ->
+          -- TODO: might lose extraFooter in this case, but can that ever happen?
           line $ row [ punc left, punc right]
 
         (first:rest) ->
           stack1 $
             prefix (row [punc left, space]) first
             : map (prefix $ row [punc sep, space]) rest
+            ++ extraFooter
             ++ [ line $ punc right ]
 
 {-|

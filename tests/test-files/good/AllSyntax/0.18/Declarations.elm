@@ -1,4 +1,4 @@
-module AllSyntax.Declarations exposing (..)
+module AllSyntax.Declarations exposing (DataType1(..), DataType2(..), DataType3(..), DataTypeWithCommentedOutConstructors(..), DataTypeWithEolComments1(..), DataTypeWithEolComments2(..), DataTypeWithParams1(..), DataTypeWithParams2(..), DataTypeWithParams3(..), TypeAlias1, TypeAlias2, TypeAlias3, TypeAliasMultiline, expressionDefinition, expressionDefinitionNoPatterns, expressionDefinitionsInLet, expressionDefinitionsInLet2, expressionDefinitionsInLet3, expressionTypeAnnotation1, expressionTypeAnnotation2, expressionTypeAnnotation3, expressionTypeAnnotation4, expressionTypeAnnotationForcedMultiline)
 
 --
 -- Union type

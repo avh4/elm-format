@@ -1,4 +1,4 @@
-module AllSyntax.OldKeywords exposing (..)
+module AllSyntax.OldKeywords exposing (OldKeywords, deriving, foreign, hiding)
 
 
 type alias OldKeywords =

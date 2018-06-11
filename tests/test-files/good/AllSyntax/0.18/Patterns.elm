@@ -1,4 +1,4 @@
-module AllSyntax.Patterns exposing (..)
+module AllSyntax.Patterns exposing (Foo(..), asAlias, complexCons, consList, data, emptyList, list, literal, parens, patternWithQualifiedConstructorAsCosntructorArgument, patternWithUnqualifiedConstructorAsCosntructorArgument, record, tuple, unit, variable, wildcard)
 
 
 type Foo

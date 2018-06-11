@@ -1,4 +1,4 @@
-module Component.WordGraph exposing (..)
+module Component.WordGraph exposing (Day, Entry, bar, barMargin, barWidth, graph, graphHeight, maxDays, scale, viewWordGraph)
 
 import Svg exposing (..)
 import Svg.Attributes exposing (..)

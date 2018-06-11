@@ -20,6 +20,8 @@ Syntax changes:
   - `if` expressions now have blank lines between clauses
   - Comments immediately following `import`s now have spacing consistent with other top-level comments
   - `module` lines now have `exposing` at the end of the line, and exposed listings are indented less when multiline
+  - `module` lines now sort and group the `exposing` clause based on `@docs` lines in the module documentation
+  - `module exposing (..)` is replaced with an explicit list based on the documentation of the module
 
 Other changes:
   - Removed support for Elm 0.16

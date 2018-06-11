@@ -1,84 +1,23 @@
 module Element exposing
-    ( Attribute
-    , Device
-    , Element
-    , Grid
-    , GridPosition
-    , NamedGrid
-    , NamedGridPosition
-    , NamedOnGrid
-    , OnGrid
-    , above
-    , article
-    , aside
-    , below
-    , bold
-    , button
-    , cell
-    , circle
-    , classifyDevice
-    , column
-    , decorativeImage
-    , download
-    , downloadAs
-    , el
-    , embedStylesheet
-    , empty
-    , footer
-    , full
-    , grid
-    , h1
-    , h2
-    , h3
-    , h4
-    , h5
-    , h6
-    , hairline
-    , header
-    , html
-    , image
-    , italic
-    , layout
-    , link
-    , mainContent
-    , map
-    , mapAll
+    ( layout, viewport
+    , Element, Attribute
+    , empty, text, el, when, whenJust, html, map, mapAll, full
+    , row, column, wrappedRow, wrappedColumn
+    , textLayout, paragraph
+    , table, Grid, NamedGrid, grid, namedGrid, GridPosition, NamedGridPosition, OnGrid, NamedOnGrid, cell, named, span, spanAll
+    , below, above, onRight, onLeft, within, screen
+    , link, newTab, download, downloadAs
+    , node, button, hairline, article, section, aside, spacer, circle
+    , navigation, navigationColumn
+    , header, mainContent, footer, sidebar, search
     , modal
-    , named
-    , namedGrid
-    , navigation
-    , navigationColumn
-    , newTab
-    , node
-    , onLeft
-    , onRight
-    , paragraph
-    , responsive
-    , row
-    , screen
-      -- , numbered
-      -- , bulleted
-    , search
-    , section
-    , sidebar
-    , spacer
-    , span
-    , spanAll
-    , strike
-    , sub
-    , subheading
-    , super
-    , table
-    , text
-    , textLayout
-    , toHtml
-    , underline
-    , viewport
-    , when
-    , whenJust
-    , within
-    , wrappedColumn
-    , wrappedRow
+    , h1, h2, h3, h4, h5, h6, subheading
+    , image, decorativeImage
+    , bold, italic, strike, underline, sub, super
+    , Device, classifyDevice, responsive
+    , toHtml, embedStylesheet
+    -- , numbered
+    -- , bulleted
     )
 
 {-|
