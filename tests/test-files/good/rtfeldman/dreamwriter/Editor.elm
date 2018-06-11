@@ -1,4 +1,4 @@
-module Component.Editor exposing (..)
+module Component.Editor exposing (Addresses, Model, initialModel, lazyViewChapter, pluralize, view, viewChapterBody, viewChapterHeading, viewEditor, viewEditorFooter, viewEditorHeader, viewFontControl, viewFullscreenButton, viewOutline, withCommas)
 
 import Component.WordGraph as WordGraph
 import Dreamwriter exposing (..)

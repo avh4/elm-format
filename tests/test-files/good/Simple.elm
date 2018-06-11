@@ -1,4 +1,4 @@
-module Simple exposing (..)
+module Simple exposing (token)
 
 
 token : String

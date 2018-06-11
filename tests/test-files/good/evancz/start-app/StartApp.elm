@@ -1,4 +1,4 @@
-module StartApp exposing (App, Config, start)
+module StartApp exposing (start, Config, App)
 
 {-| This module helps you start your application in a typical Elm workflow.
 It assumes you are following [the Elm Architecture][arch] and using
