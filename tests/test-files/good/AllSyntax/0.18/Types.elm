@@ -1,4 +1,4 @@
-module AllSyntax.Types exposing (..)
+module AllSyntax.Types exposing (Constructor, Function, Parens, Record, RecordExtensionWithCommentedOutTerms, RecordWithCommentedOutTerms, Tuple, TupleConstructor, TupleWithCommentedOutTerms, Unit, Variable, emptyRecord, recordExtension)
 
 import Dict exposing (Dict)
 

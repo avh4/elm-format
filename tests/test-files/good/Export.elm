@@ -1,4 +1,4 @@
-module Export exposing (..)
+module Export exposing (export)
 
 
 export : String

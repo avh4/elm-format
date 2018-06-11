@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (allowedParens, requiredParens, requiredParensForTrailingCommentsInBinopsContext, requiredParensForTrailingCommentsInDefBodyContext, unnecessaryParens)
 
 
 unnecessaryParens =

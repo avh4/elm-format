@@ -1,4 +1,4 @@
-module Component.RightSidebar exposing (..)
+module Component.RightSidebar exposing (Addresses, Model, initialModel, onInput, view, viewCurrentNoteBody, viewCurrentNoteFooter, viewHeader, viewNoteListing, viewNoteListings)
 
 import Dreamwriter exposing (..)
 import Html exposing (..)

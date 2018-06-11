@@ -1,64 +1,16 @@
 module Basics exposing
-    ( (&&)
-    , (*)
-    , (+)
+    ( Int, Float, (+), (-), (*), (/), (//), (^)
+    , toFloat, round, floor, ceiling, truncate
+    , (==), (/=)
+    , (<), (>), (<=), (>=), max, min, compare, Order(..)
+    , Bool(..), not, (&&), (||), xor
     , (++)
-    , (-)
-    , (/)
-    , (//)
-    , (/=)
-    , (<)
-    , (<<)
-    , (<=)
-    , (<|)
-    , (==)
-    , (>)
-    , (>=)
-    , (>>)
-    , (^)
-    , (|>)
-    , (||)
-    , Bool(..)
-    , Float
-    , Int
-    , Never
-    , Order(..)
-    , abs
-    , acos
-    , always
-    , asin
-    , atan
-    , atan2
-    , ceiling
-    , clamp
-    , compare
-    , cos
-    , degrees
-    , e
-    , floor
-    , fromPolar
-    , identity
-    , isInfinite
-    , isNaN
-    , logBase
-    , max
-    , min
-    , modBy
-    , negate
-    , never
-    , not
-    , pi
-    , radians
-    , remainderBy
-    , round
-    , sin
-    , sqrt
-    , tan
-    , toFloat
-    , toPolar
-    , truncate
-    , turns
-    , xor
+    , modBy, remainderBy, negate, abs, clamp, sqrt, logBase, e
+    , degrees, radians, turns
+    , pi, cos, sin, tan, acos, asin, atan, atan2
+    , toPolar, fromPolar
+    , isNaN, isInfinite
+    , identity, always, (<|), (|>), (<<), (>>), Never, never
     )
 
 {-| Tons of useful functions that get imported by default.
