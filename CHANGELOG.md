@@ -14,6 +14,7 @@ Bug fixes:
   - Multiline `@docs` lines in markdown are now handled correctly
   - Trailing whitespace in multiline strings is no longer removed
   - Special characters in doc comments are now escaped more correctly
+  - On Windows, special folders are now correctly skipped when traversing the filesystem
 
 Syntax changes:
   - Infix operator precedence and associativity declarations are now grouped together
