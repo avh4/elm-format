@@ -3,7 +3,7 @@ module ElmFormat.Filesystem where
 import Control.Monad.Free
 import ElmFormat.FileStore
 import System.FilePath ((</>))
-import Data.Text (pack, isSuffixOf)
+import qualified System.FilePath as FilePath
 
 
 collectFiles :: Monad m => (a -> m [a]) -> a -> m [a]
@@ -52,7 +52,7 @@ isSkippable path =
 
 hasExtension :: String -> FilePath -> Bool
 hasExtension ext path =
-    pack ext `isSuffixOf` pack path
+    ext == FilePath.takeExtension path
 
 
 findAllElmFiles :: FileStore f => FilePath -> Free f [FilePath]
@@ -62,7 +62,4 @@ findAllElmFiles inputFile =
 
 hasFilename :: String -> FilePath -> Bool
 hasFilename name path =
-    or
-        [ isSuffixOf (pack $ '/' : name) (pack path)
-        , name == path
-        ]
+    name == FilePath.takeFileName path
