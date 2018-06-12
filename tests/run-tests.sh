@@ -2,23 +2,23 @@
 # shellcheck disable=SC2002
 
 uname -s
-which bash
-which diff
-which grep
-which sed
-which tee
-which wc
-which stack
+command -v bash
+command -v diff
+command -v grep
+command -v sed
+command -v tee
+command -v wc
+command -v stack
 
 
-if which shellcheck; then
+if command -v shellcheck; then
 	shellcheck "./tests/run-tests.sh" || exit 1
 	shellcheck "./package/collect_files.sh" || exit 1
 	shellcheck "./package/mac/build-package.sh" || exit 1
 	shellcheck "./package/linux/build-package.sh" || exit 1
 fi
 
-if which nix-env; then
+if command -v nix-env; then
 	echo "$0: INFO: Detected Nixos or Nix"
 	STACK_ARGS=(--nix-pure --nix-add-gc-roots)
 	echo "$0: INFO: nix arguments will be passed to stack: ${STACK_ARGS[*]}"
@@ -35,7 +35,7 @@ echo "Testing $ELM_FORMAT"
 cp "$ELM_FORMAT" tests/elm-format
 ELM_FORMAT="tests/elm-format"
 
-if which md5 > /dev/null; then
+if command -v md5 > /dev/null; then
 	MD5="md5"
 else
 	MD5="md5sum"
