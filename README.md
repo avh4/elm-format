@@ -119,7 +119,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td rowspan=1>Visual Studio Code</td>
     <td>:trophy: <a href="https://marketplace.visualstudio.com/items?itemName=sbrink.elm">Elm Language Support</a></td>
     <td>:warning: <a href="#visual-studio-code-installation">3 steps</a></td>
-    <td>:x: formatting moves cursor to end of file</td>
+    <td>:white_check_mark:</td>
     <td>:warning: requires configuration</td>
     <td>❔ TBD</td>
     <td>❔ TBD</td>
