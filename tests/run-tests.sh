@@ -395,6 +395,7 @@ checkTransformation 0.18 DocCommentCheapskateReferenceBug.elm
 checkTransformation 0.18 DocCommentAtDocs.elm
 checkTransformation 0.18 Sorting.elm
 checkTransformation 0.18 UnnecessaryParens.elm
+checkTransformation 0.18 MissingImportParens.elm
 checkUpgrade 0.18 Elm-0.18/PrimesBecomeUnderscores.elm
 checkUpgrade 0.18 Elm-0.18/RangesBecomeListRange.elm
 checkUpgrade 0.18 Elm-0.18/BackticksBecomeFunctionCalls.elm
