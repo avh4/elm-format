@@ -19,8 +19,8 @@ string =
 
 
 rawCR =
-    "\x0D"
+    "\r"
 
 
 escapedCR =
-    "\x0D"
+    "\r"

@@ -2125,6 +2125,8 @@ formatString elmVersion style s =
             [c]
         else if c == '\n' then
             "\\n"
+        else if c == '\r' then
+            "\\r"
         else if c == '\t' then
             "\\t"
         else if c == '\\' then

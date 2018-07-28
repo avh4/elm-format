@@ -20,4 +20,4 @@ string = "
 rawCR = ""
 
 
-escapedCR = "\x0D"
+escapedCR = "\r"
