@@ -92,6 +92,9 @@ instance ToJSON Expr' where
                   , ("identifier", JSString $ toJSString var)
                   ]
 
+          VarExpr (TagRef [] (UppercaseIdentifier tag)) ->
+            variableReference tag
+
           VarExpr (OpRef (SymbolIdentifier sym)) ->
             variableReference sym
 

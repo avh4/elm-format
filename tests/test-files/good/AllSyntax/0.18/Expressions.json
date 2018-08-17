@@ -1404,7 +1404,10 @@
                                         "value": 1
                                     }
                                 ],
-                                "function": "TODO: Expr",
+                                "function": {
+                                    "name": "Just",
+                                    "type": "VariableReference"
+                                },
                                 "type": "FunctionApplication"
                             },
                             "type": "CaseExpression"
@@ -1443,7 +1446,10 @@
                                         "value": 1
                                     }
                                 ],
-                                "function": "TODO: Expr",
+                                "function": {
+                                    "name": "Just",
+                                    "type": "VariableReference"
+                                },
                                 "type": "FunctionApplication"
                             },
                             "type": "CaseExpression"
@@ -1482,7 +1488,10 @@
                                         "value": 1
                                     }
                                 ],
-                                "function": "TODO: Expr",
+                                "function": {
+                                    "name": "Just",
+                                    "type": "VariableReference"
+                                },
                                 "type": "FunctionApplication"
                             },
                             "type": "CaseExpression"
