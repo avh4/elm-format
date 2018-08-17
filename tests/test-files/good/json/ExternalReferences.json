@@ -72,7 +72,10 @@
                                 },
                                 "operations": [
                                     {
-                                        "operator": "<|",
+                                        "operator": {
+                                            "name": "<|",
+                                            "type": "VariableReference"
+                                        },
                                         "term": {
                                             "arguments": [
                                                 {

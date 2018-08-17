@@ -81,6 +81,12 @@ instance ToJSON Expr' where
                   , ("identifier", JSString $ toJSString var)
                   ]
 
+          VarExpr (OpRef (SymbolIdentifier sym)) ->
+            makeObj
+                [ type_ "VariableReference"
+                , ( "name", JSString $ toJSString sym )
+                ]
+
           App (A _ expr) args _ ->
               makeObj
                   [ type_ "FunctionApplication"
@@ -94,9 +100,9 @@ instance ToJSON Expr' where
                   , ("first", showJSON importAliases first)
                   , ("operations"
                     , JSArray $ map
-                        (\(_, OpRef (SymbolIdentifier ref), _, A _ expr) ->
+                        (\(_, op, _, A _ expr) ->
                            makeObj
-                               [ ("operator", JSString $ toJSString ref)
+                               [ ("operator", showJSON importAliases $ VarExpr op)
                                , ("term", showJSON importAliases expr)
                                ]
                         )
