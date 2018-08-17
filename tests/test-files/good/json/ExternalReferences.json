@@ -28,6 +28,16 @@
                 "function": {
                     "identifier": "class",
                     "module": "Html.Attributes",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 15,
+                            "line": 18
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 18
+                        }
+                    },
                     "type": "ExternalReference"
                 },
                 "type": "FunctionApplication"
@@ -40,6 +50,16 @@
             "expression": {
                 "identifier": "text",
                 "module": "Html",
+                "sourceLocation": {
+                    "end": {
+                        "col": 14,
+                        "line": 23
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 23
+                    }
+                },
                 "type": "ExternalReference"
             },
             "name": "text",
@@ -90,6 +110,16 @@
                                 "function": {
                                     "identifier": "text",
                                     "module": "Html",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 20,
+                                            "line": 30
+                                        },
+                                        "start": {
+                                            "col": 11,
+                                            "line": 30
+                                        }
+                                    },
                                     "type": "ExternalReference"
                                 },
                                 "type": "FunctionApplication"
@@ -98,6 +128,16 @@
                                 "first": {
                                     "identifier": "text",
                                     "module": "Html",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 20,
+                                            "line": 31
+                                        },
+                                        "start": {
+                                            "col": 11,
+                                            "line": 31
+                                        }
+                                    },
                                     "type": "ExternalReference"
                                 },
                                 "operations": [
@@ -164,6 +204,16 @@
                 "function": {
                     "identifier": "div",
                     "module": "Html",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 13,
+                            "line": 28
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 28
+                        }
+                    },
                     "type": "ExternalReference"
                 },
                 "type": "FunctionApplication"

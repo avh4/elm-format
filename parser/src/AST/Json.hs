@@ -87,6 +87,7 @@ instance ToJSON Expr where
                 [ type_ "ExternalReference"
                 , ("module", JSString $ toJSString "Basics")
                 , ("identifier", JSString $ toJSString $ show value)
+                , sourceLocation importAliases region
                 ]
 
           VarExpr (VarRef [] (LowercaseIdentifier var)) ->
@@ -107,6 +108,7 @@ instance ToJSON Expr where
                   , ("module"
                     , JSString $ toJSString $ List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) normalizedNamespace)
                   , ("identifier", JSString $ toJSString var)
+                  , sourceLocation importAliases region
                   ]
 
           VarExpr (TagRef [] (UppercaseIdentifier tag)) ->
