@@ -21,6 +21,16 @@
         {
             "expression": {
                 "name": "x",
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 13
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 13
+                    }
+                },
                 "type": "VariableReference"
             },
             "name": "var",
@@ -38,6 +48,16 @@
         {
             "expression": {
                 "name": "+",
+                "sourceLocation": {
+                    "end": {
+                        "col": 8,
+                        "line": 21
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 21
+                    }
+                },
                 "type": "VariableReference"
             },
             "name": "operator",
@@ -47,22 +67,62 @@
             "expression": {
                 "first": {
                     "name": "x",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 6,
+                            "line": 25
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 25
+                        }
+                    },
                     "type": "VariableReference"
                 },
                 "operations": [
                     {
                         "operator": {
                             "name": "<|",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 0,
+                                    "line": 0
+                                },
+                                "start": {
+                                    "col": 0,
+                                    "line": 0
+                                }
+                            },
                             "type": "VariableReference"
                         },
                         "term": {
                             "terms": [
                                 {
                                     "name": "y",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 12,
+                                            "line": 26
+                                        },
+                                        "start": {
+                                            "col": 11,
+                                            "line": 26
+                                        }
+                                    },
                                     "type": "VariableReference"
                                 },
                                 {
                                     "name": "z",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 12,
+                                            "line": 27
+                                        },
+                                        "start": {
+                                            "col": 11,
+                                            "line": 27
+                                        }
+                                    },
                                     "type": "VariableReference"
                                 }
                             ],
@@ -81,6 +141,16 @@
                     "terms": [
                         {
                             "name": "x",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 8,
+                                    "line": 32
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 32
+                                }
+                            },
                             "type": "VariableReference"
                         }
                     ],
@@ -90,16 +160,46 @@
                     {
                         "operator": {
                             "name": "<|",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 0,
+                                    "line": 0
+                                },
+                                "start": {
+                                    "col": 0,
+                                    "line": 0
+                                }
+                            },
                             "type": "VariableReference"
                         },
                         "term": {
                             "terms": [
                                 {
                                     "name": "y",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 12,
+                                            "line": 35
+                                        },
+                                        "start": {
+                                            "col": 11,
+                                            "line": 35
+                                        }
+                                    },
                                     "type": "VariableReference"
                                 },
                                 {
                                     "name": "z",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 12,
+                                            "line": 36
+                                        },
+                                        "start": {
+                                            "col": 11,
+                                            "line": 36
+                                        }
+                                    },
                                     "type": "VariableReference"
                                 }
                             ],
@@ -132,6 +232,16 @@
                 ],
                 "function": {
                     "name": "max",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 8,
+                            "line": 41
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 41
+                        }
+                    },
                     "type": "VariableReference"
                 },
                 "type": "FunctionApplication"
@@ -159,6 +269,16 @@
                 ],
                 "function": {
                     "name": "max",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 8,
+                            "line": 45
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 45
+                        }
+                    },
                     "type": "VariableReference"
                 },
                 "type": "FunctionApplication"
@@ -186,6 +306,16 @@
                 ],
                 "function": {
                     "name": "max",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 8,
+                            "line": 50
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 50
+                        }
+                    },
                     "type": "VariableReference"
                 },
                 "type": "FunctionApplication"
@@ -198,6 +328,16 @@
                 "operator": "-",
                 "term": {
                     "name": "x",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 56
+                        },
+                        "start": {
+                            "col": 6,
+                            "line": 56
+                        }
+                    },
                     "type": "VariableReference"
                 },
                 "type": "UnaryOperator"
@@ -218,6 +358,16 @@
                     {
                         "operator": {
                             "name": "+",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 0,
+                                    "line": 0
+                                },
+                                "start": {
+                                    "col": 0,
+                                    "line": 0
+                                }
+                            },
                             "type": "VariableReference"
                         },
                         "term": {
@@ -231,6 +381,16 @@
                     {
                         "operator": {
                             "name": "+",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 0,
+                                    "line": 0
+                                },
+                                "start": {
+                                    "col": 0,
+                                    "line": 0
+                                }
+                            },
                             "type": "VariableReference"
                         },
                         "term": {
@@ -254,11 +414,31 @@
                         "arguments": [
                             {
                                 "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 11,
+                                        "line": 64
+                                    },
+                                    "start": {
+                                        "col": 10,
+                                        "line": 64
+                                    }
+                                },
                                 "type": "VariableReference"
                             }
                         ],
                         "function": {
                             "name": "x",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 9,
+                                    "line": 64
+                                },
+                                "start": {
+                                    "col": 8,
+                                    "line": 64
+                                }
+                            },
                             "type": "VariableReference"
                         },
                         "type": "FunctionApplication"
@@ -266,6 +446,16 @@
                 ],
                 "function": {
                     "name": "f",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 6,
+                            "line": 64
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 64
+                        }
+                    },
                     "type": "VariableReference"
                 },
                 "type": "FunctionApplication"
@@ -519,6 +709,16 @@
                 ],
                 "function": {
                     "name": ",,",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 9,
+                            "line": 140
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 140
+                        }
+                    },
                     "type": "VariableReference"
                 },
                 "type": "FunctionApplication"
@@ -984,6 +1184,16 @@
                         "field": "x",
                         "record": {
                             "name": "a",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 8,
+                                    "line": 238
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 238
+                                }
+                            },
                             "type": "VariableReference"
                         },
                         "type": "RecordAccess"
@@ -994,11 +1204,31 @@
                             "arguments": [
                                 {
                                     "name": "a",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 11,
+                                            "line": 239
+                                        },
+                                        "start": {
+                                            "col": 10,
+                                            "line": 239
+                                        }
+                                    },
                                     "type": "VariableReference"
                                 }
                             ],
                             "function": {
                                 "name": "f",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 239
+                                    },
+                                    "start": {
+                                        "col": 8,
+                                        "line": 239
+                                    }
+                                },
                                 "type": "VariableReference"
                             },
                             "type": "FunctionApplication"
@@ -1032,6 +1262,16 @@
                         "field": "x",
                         "record": {
                             "name": ",,",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 11,
+                                    "line": 241
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 241
+                                }
+                            },
                             "type": "VariableReference"
                         },
                         "type": "RecordAccess"
@@ -1096,6 +1336,16 @@
                             "field": "x",
                             "record": {
                                 "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 8,
+                                        "line": 245
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 245
+                                    }
+                                },
                                 "type": "VariableReference"
                             },
                             "type": "RecordAccess"
@@ -1140,12 +1390,32 @@
                 "body": {
                     "first": {
                         "name": "x",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 254
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 254
+                            }
+                        },
                         "type": "VariableReference"
                     },
                     "operations": [
                         {
                             "operator": {
                                 "name": "+",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 0,
+                                        "line": 0
+                                    },
+                                    "start": {
+                                        "col": 0,
+                                        "line": 0
+                                    }
+                                },
                                 "type": "VariableReference"
                             },
                             "term": {
@@ -1325,10 +1595,30 @@
                     "terms": [
                         {
                             "name": "x",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 8,
+                                    "line": 329
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 329
+                                }
+                            },
                             "type": "VariableReference"
                         },
                         {
                             "name": "y",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 11,
+                                    "line": 329
+                                },
+                                "start": {
+                                    "col": 10,
+                                    "line": 329
+                                }
+                            },
                             "type": "VariableReference"
                         }
                     ],
@@ -1379,6 +1669,16 @@
                                 {
                                     "body": {
                                         "name": "x",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 22,
+                                                "line": 337
+                                            },
+                                            "start": {
+                                                "col": 21,
+                                                "line": 337
+                                            }
+                                        },
                                         "type": "VariableReference"
                                     },
                                     "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 336 22 336 23 (VarPattern (LowercaseIdentifier \"x\")))])"
@@ -1406,6 +1706,16 @@
                                 ],
                                 "function": {
                                     "name": "Just",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 22,
+                                            "line": 335
+                                        },
+                                        "start": {
+                                            "col": 18,
+                                            "line": 335
+                                        }
+                                    },
                                     "type": "VariableReference"
                                 },
                                 "type": "FunctionApplication"
@@ -1421,6 +1731,16 @@
                                 {
                                     "body": {
                                         "name": "x",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 22,
+                                                "line": 349
+                                            },
+                                            "start": {
+                                                "col": 21,
+                                                "line": 349
+                                            }
+                                        },
                                         "type": "VariableReference"
                                     },
                                     "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 345 22 345 23 (VarPattern (LowercaseIdentifier \"x\")))])"
@@ -1448,6 +1768,16 @@
                                 ],
                                 "function": {
                                     "name": "Just",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 30,
+                                            "line": 343
+                                        },
+                                        "start": {
+                                            "col": 26,
+                                            "line": 343
+                                        }
+                                    },
                                     "type": "VariableReference"
                                 },
                                 "type": "FunctionApplication"
@@ -1463,6 +1793,16 @@
                                 {
                                     "body": {
                                         "name": "x",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 22,
+                                                "line": 369
+                                            },
+                                            "start": {
+                                                "col": 21,
+                                                "line": 369
+                                            }
+                                        },
                                         "type": "VariableReference"
                                     },
                                     "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 365 22 365 23 (VarPattern (LowercaseIdentifier \"x\")))])"
@@ -1490,6 +1830,16 @@
                                 ],
                                 "function": {
                                     "name": "Just",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 21,
+                                            "line": 361
+                                        },
+                                        "start": {
+                                            "col": 17,
+                                            "line": 361
+                                        }
+                                    },
                                     "type": "VariableReference"
                                 },
                                 "type": "FunctionApplication"

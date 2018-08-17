@@ -12,6 +12,16 @@
                 "arguments": [
                     {
                         "name": "token",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 21,
+                                "line": 18
+                            },
+                            "start": {
+                                "col": 16,
+                                "line": 18
+                            }
+                        },
                         "type": "VariableReference"
                     }
                 ],
@@ -43,6 +53,16 @@
                         "terms": [
                             {
                                 "name": "theBestClass",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 23,
+                                        "line": 29
+                                    },
+                                    "start": {
+                                        "col": 11,
+                                        "line": 29
+                                    }
+                                },
                                 "type": "VariableReference"
                             }
                         ],
@@ -54,6 +74,16 @@
                                 "arguments": [
                                     {
                                         "name": "token",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 26,
+                                                "line": 30
+                                            },
+                                            "start": {
+                                                "col": 21,
+                                                "line": 30
+                                            }
+                                        },
                                         "type": "VariableReference"
                                     }
                                 ],
@@ -74,6 +104,16 @@
                                     {
                                         "operator": {
                                             "name": "<|",
+                                            "sourceLocation": {
+                                                "end": {
+                                                    "col": 0,
+                                                    "line": 0
+                                                },
+                                                "start": {
+                                                    "col": 0,
+                                                    "line": 0
+                                                }
+                                            },
                                             "type": "VariableReference"
                                         },
                                         "term": {
@@ -82,6 +122,16 @@
                                                     "operator": "-",
                                                     "term": {
                                                         "name": "pi",
+                                                        "sourceLocation": {
+                                                            "end": {
+                                                                "col": 36,
+                                                                "line": 31
+                                                            },
+                                                            "start": {
+                                                                "col": 34,
+                                                                "line": 31
+                                                            }
+                                                        },
                                                         "type": "VariableReference"
                                                     },
                                                     "type": "UnaryOperator"
@@ -89,6 +139,16 @@
                                             ],
                                             "function": {
                                                 "name": "toString",
+                                                "sourceLocation": {
+                                                    "end": {
+                                                        "col": 32,
+                                                        "line": 31
+                                                    },
+                                                    "start": {
+                                                        "col": 24,
+                                                        "line": 31
+                                                    }
+                                                },
                                                 "type": "VariableReference"
                                             },
                                             "type": "FunctionApplication"
