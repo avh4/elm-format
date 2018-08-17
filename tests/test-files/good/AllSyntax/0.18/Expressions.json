@@ -973,15 +973,135 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "field": "x",
+                        "record": {
+                            "type": "UnitLiteral"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "name": "a",
+                            "type": "VariableReference"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "arguments": [
+                                {
+                                    "name": "a",
+                                    "type": "VariableReference"
+                                }
+                            ],
+                            "function": {
+                                "name": "f",
+                                "type": "VariableReference"
+                            },
+                            "type": "FunctionApplication"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "terms": [
+                                {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 1
+                                },
+                                {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 2
+                                }
+                            ],
+                            "type": "TupleLiteral"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "name": ",,",
+                            "type": "VariableReference"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "display": {
+                                "fieldOrder": []
+                            },
+                            "fields": {},
+                            "type": "RecordLiteral"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "display": {
+                                "fieldOrder": [
+                                    "x"
+                                ]
+                            },
+                            "fields": {
+                                "x": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 1
+                                }
+                            },
+                            "type": "RecordLiteral"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "base": "r",
+                            "display": {
+                                "fieldOrder": [
+                                    "x"
+                                ]
+                            },
+                            "fields": {
+                                "x": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 1
+                                }
+                            },
+                            "type": "RecordUpdate"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "y",
+                        "record": {
+                            "field": "x",
+                            "record": {
+                                "name": "a",
+                                "type": "VariableReference"
+                            },
+                            "type": "RecordAccess"
+                        },
+                        "type": "RecordAccess"
+                    }
                 ],
                 "type": "TupleLiteral"
             },
