@@ -5,6 +5,16 @@
                 "type": "UnitLiteral"
             },
             "name": "unit",
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 5
+                },
+                "start": {
+                    "col": 1,
+                    "line": 4
+                }
+            },
             "type": "Definition"
         },
         {
@@ -44,6 +54,16 @@
                 "type": "ListLiteral"
             },
             "name": "boolean",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 11
+                },
+                "start": {
+                    "col": 1,
+                    "line": 8
+                }
+            },
             "type": "Definition"
         },
         {
@@ -95,6 +115,16 @@
                 "type": "ListLiteral"
             },
             "name": "integer",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 21
+                },
+                "start": {
+                    "col": 1,
+                    "line": 14
+                }
+            },
             "type": "Definition"
         },
         {
@@ -105,21 +135,61 @@
                 "type": "ListLiteral"
             },
             "name": "float",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 26
+                },
+                "start": {
+                    "col": 1,
+                    "line": 24
+                }
+            },
             "type": "Definition"
         },
         {
             "expression": "TODO: Expr",
             "name": "string",
+            "sourceLocation": {
+                "end": {
+                    "col": 13,
+                    "line": 30
+                },
+                "start": {
+                    "col": 1,
+                    "line": 29
+                }
+            },
             "type": "Definition"
         },
         {
             "expression": "TODO: Expr",
             "name": "stringWithUnicodeCharacters",
+            "sourceLocation": {
+                "end": {
+                    "col": 22,
+                    "line": 34
+                },
+                "start": {
+                    "col": 1,
+                    "line": 33
+                }
+            },
             "type": "Definition"
         },
         {
             "expression": "TODO: Expr",
             "name": "stringWithSpecialEscapedCharacters",
+            "sourceLocation": {
+                "end": {
+                    "col": 15,
+                    "line": 38
+                },
+                "start": {
+                    "col": 1,
+                    "line": 37
+                }
+            },
             "type": "Definition"
         },
         {
@@ -132,26 +202,76 @@
                 "type": "ListLiteral"
             },
             "name": "stringWithEscapedControlCharacters",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 45
+                },
+                "start": {
+                    "col": 1,
+                    "line": 41
+                }
+            },
             "type": "Definition"
         },
         {
             "expression": "TODO: Expr",
             "name": "stringWithWindowsWorkaroundCharacters",
+            "sourceLocation": {
+                "end": {
+                    "col": 8,
+                    "line": 50
+                },
+                "start": {
+                    "col": 1,
+                    "line": 48
+                }
+            },
             "type": "Definition"
         },
         {
             "expression": "TODO: Expr",
             "name": "stringWithEscapedNonPrintCharacters",
+            "sourceLocation": {
+                "end": {
+                    "col": 33,
+                    "line": 54
+                },
+                "start": {
+                    "col": 1,
+                    "line": 53
+                }
+            },
             "type": "Definition"
         },
         {
             "expression": "TODO: Expr",
             "name": "stringWithWhitespace",
+            "sourceLocation": {
+                "end": {
+                    "col": 20,
+                    "line": 58
+                },
+                "start": {
+                    "col": 1,
+                    "line": 57
+                }
+            },
             "type": "Definition"
         },
         {
             "expression": "TODO: Expr",
             "name": "char",
+            "sourceLocation": {
+                "end": {
+                    "col": 8,
+                    "line": 62
+                },
+                "start": {
+                    "col": 1,
+                    "line": 61
+                }
+            },
             "type": "Definition"
         },
         {
@@ -170,6 +290,16 @@
                 "type": "ListLiteral"
             },
             "name": "unicodeChars",
+            "sourceLocation": {
+                "end": {
+                    "col": 52,
+                    "line": 66
+                },
+                "start": {
+                    "col": 1,
+                    "line": 65
+                }
+            },
             "type": "Definition"
         },
         {
@@ -183,6 +313,16 @@
                 "type": "ListLiteral"
             },
             "name": "escapedSpecialChars",
+            "sourceLocation": {
+                "end": {
+                    "col": 31,
+                    "line": 70
+                },
+                "start": {
+                    "col": 1,
+                    "line": 69
+                }
+            },
             "type": "Definition"
         },
         {
@@ -195,6 +335,16 @@
                 "type": "ListLiteral"
             },
             "name": "escapedControlChars",
+            "sourceLocation": {
+                "end": {
+                    "col": 31,
+                    "line": 74
+                },
+                "start": {
+                    "col": 1,
+                    "line": 73
+                }
+            },
             "type": "Definition"
         },
         {
@@ -208,6 +358,16 @@
                 "type": "ListLiteral"
             },
             "name": "escapedNonPrintChars",
+            "sourceLocation": {
+                "end": {
+                    "col": 49,
+                    "line": 78
+                },
+                "start": {
+                    "col": 1,
+                    "line": 77
+                }
+            },
             "type": "Definition"
         },
         {
@@ -220,11 +380,31 @@
                 "type": "ListLiteral"
             },
             "name": "whitespaceChars",
+            "sourceLocation": {
+                "end": {
+                    "col": 32,
+                    "line": 82
+                },
+                "start": {
+                    "col": 1,
+                    "line": 81
+                }
+            },
             "type": "Definition"
         },
         {
             "expression": "TODO: Expr",
             "name": "multilineString",
+            "sourceLocation": {
+                "end": {
+                    "col": 4,
+                    "line": 96
+                },
+                "start": {
+                    "col": 1,
+                    "line": 85
+                }
+            },
             "type": "Definition"
         },
         {
@@ -243,6 +423,16 @@
                 "type": "ListLiteral"
             },
             "name": "multilineStringQuoteHandling",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 109
+                },
+                "start": {
+                    "col": 1,
+                    "line": 99
+                }
+            },
             "type": "Definition"
         }
     ]

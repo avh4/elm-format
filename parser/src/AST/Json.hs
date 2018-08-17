@@ -56,11 +56,12 @@ instance ToJSON Region.Position where
 
 
 instance ToJSON (TopLevelStructure Declaration) where
-  showJSON importAliases (Entry (A _ (Definition (A _ (VarPattern (LowercaseIdentifier var))) _ _ expr))) =
+  showJSON importAliases (Entry (A region (Definition (A _ (VarPattern (LowercaseIdentifier var))) _ _ expr))) =
     makeObj
       [ type_ "Definition"
       , ("name" , JSString $ toJSString var)
       , ("expression" , showJSON importAliases expr)
+      , sourceLocation importAliases region
       ]
   showJSON _ _ = JSString $ toJSString "TODO: Decl"
 

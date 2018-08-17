@@ -4,6 +4,16 @@
         {
             "expression": "TODO: Expr",
             "name": "token",
+            "sourceLocation": {
+                "end": {
+                    "col": 12,
+                    "line": 13
+                },
+                "start": {
+                    "col": 1,
+                    "line": 12
+                }
+            },
             "type": "Definition"
         },
         "TODO: Decl",
@@ -43,6 +53,16 @@
                 "type": "FunctionApplication"
             },
             "name": "theBestClass",
+            "sourceLocation": {
+                "end": {
+                    "col": 21,
+                    "line": 18
+                },
+                "start": {
+                    "col": 1,
+                    "line": 17
+                }
+            },
             "type": "Definition"
         },
         "TODO: Decl",
@@ -63,6 +83,16 @@
                 "type": "ExternalReference"
             },
             "name": "text",
+            "sourceLocation": {
+                "end": {
+                    "col": 14,
+                    "line": 23
+                },
+                "start": {
+                    "col": 1,
+                    "line": 22
+                }
+            },
             "type": "Definition"
         },
         "TODO: Decl",
@@ -219,6 +249,16 @@
                 "type": "FunctionApplication"
             },
             "name": "main",
+            "sourceLocation": {
+                "end": {
+                    "col": 10,
+                    "line": 32
+                },
+                "start": {
+                    "col": 1,
+                    "line": 27
+                }
+            },
             "type": "Definition"
         }
     ]
