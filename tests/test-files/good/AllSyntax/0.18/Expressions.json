@@ -1200,7 +1200,11 @@
                                     "type": "IntLiteral",
                                     "value": 3
                                 },
-                                "if": "TODO: Expr",
+                                "if": {
+                                    "identifier": "False",
+                                    "module": "Basics",
+                                    "type": "ExternalReference"
+                                },
                                 "then": {
                                     "display": {
                                         "representation": "DecimalInt"
@@ -1210,7 +1214,11 @@
                                 },
                                 "type": "IfExpression"
                             },
-                            "if": "TODO: Expr",
+                            "if": {
+                                "identifier": "True",
+                                "module": "Basics",
+                                "type": "ExternalReference"
+                            },
                             "then": {
                                 "display": {
                                     "representation": "DecimalInt"
@@ -1233,7 +1241,11 @@
                                     "type": "IntLiteral",
                                     "value": 3
                                 },
-                                "if": "TODO: Expr",
+                                "if": {
+                                    "identifier": "False",
+                                    "module": "Basics",
+                                    "type": "ExternalReference"
+                                },
                                 "then": {
                                     "display": {
                                         "representation": "DecimalInt"
@@ -1243,7 +1255,11 @@
                                 },
                                 "type": "IfExpression"
                             },
-                            "if": "TODO: Expr",
+                            "if": {
+                                "identifier": "True",
+                                "module": "Basics",
+                                "type": "ExternalReference"
+                            },
                             "then": {
                                 "display": {
                                     "representation": "DecimalInt"
@@ -1266,7 +1282,11 @@
                                     "type": "IntLiteral",
                                     "value": 3
                                 },
-                                "if": "TODO: Expr",
+                                "if": {
+                                    "identifier": "False",
+                                    "module": "Basics",
+                                    "type": "ExternalReference"
+                                },
                                 "then": {
                                     "display": {
                                         "representation": "DecimalInt"
@@ -1276,7 +1296,11 @@
                                 },
                                 "type": "IfExpression"
                             },
-                            "if": "TODO: Expr",
+                            "if": {
+                                "identifier": "True",
+                                "module": "Basics",
+                                "type": "ExternalReference"
+                            },
                             "then": {
                                 "display": {
                                     "representation": "DecimalInt"
