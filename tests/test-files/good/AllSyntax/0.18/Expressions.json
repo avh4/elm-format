@@ -21,7 +21,48 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 3866
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 9223372036854775807
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 9223372036854775807
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": -9223372036854775808
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": -9223372036854775808
+                    },
                     "TODO: Expr",
                     "TODO: Expr",
                     "TODO: Expr"
@@ -119,8 +160,20 @@
         {
             "expression": {
                 "arguments": [
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 2
+                    }
                 ],
                 "function": {
                     "name": "max",
@@ -134,8 +187,20 @@
         {
             "expression": {
                 "arguments": [
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 2
+                    }
                 ],
                 "function": {
                     "name": "max",
@@ -149,8 +214,20 @@
         {
             "expression": {
                 "arguments": [
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 2
+                    }
                 ],
                 "function": {
                     "name": "max",
@@ -175,15 +252,33 @@
         },
         {
             "expression": {
-                "first": "TODO: Expr",
+                "first": {
+                    "display": {
+                        "representation": "DecimalInt"
+                    },
+                    "type": "IntLiteral",
+                    "value": 1
+                },
                 "operations": [
                     {
                         "operator": "+",
-                        "term": "TODO: Expr"
+                        "term": {
+                            "display": {
+                                "representation": "DecimalInt"
+                            },
+                            "type": "IntLiteral",
+                            "value": 2
+                        }
                     },
                     {
                         "operator": "+",
-                        "term": "TODO: Expr"
+                        "term": {
+                            "display": {
+                                "representation": "DecimalInt"
+                            },
+                            "type": "IntLiteral",
+                            "value": 3
+                        }
                     }
                 ],
                 "type": "BinaryOperatorList"
@@ -294,9 +389,27 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 4
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 6
+                    }
                 ],
                 "type": "ListLiteral"
             },
@@ -308,29 +421,77 @@
                 "terms": [
                     {
                         "terms": [
-                            "TODO: Expr",
-                            "TODO: Expr"
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
                         ],
                         "type": "TupleLiteral"
                     },
                     {
                         "terms": [
-                            "TODO: Expr",
-                            "TODO: Expr"
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
                         ],
                         "type": "TupleLiteral"
                     },
                     {
                         "terms": [
-                            "TODO: Expr",
-                            "TODO: Expr"
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
                         ],
                         "type": "TupleLiteral"
                     },
                     {
                         "terms": [
-                            "TODO: Expr",
-                            "TODO: Expr"
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
                         ],
                         "type": "TupleLiteral"
                     }
@@ -343,9 +504,27 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 4
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 6
+                    }
                 ],
                 "type": "TupleLiteral"
             },
@@ -355,9 +534,27 @@
         {
             "expression": {
                 "arguments": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 2
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 3
+                    }
                 ],
                 "function": "TODO: Expr",
                 "type": "FunctionApplication"
@@ -391,67 +588,193 @@
                 "terms": [
                     {
                         "fields": {
-                            "x": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            }
                         },
                         "type": "RecordLiteral"
                     },
                     {
                         "fields": {
-                            "x": "TODO: Expr",
-                            "y": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
                         },
                         "type": "RecordLiteral"
                     },
                     {
                         "fields": {
-                            "x": "TODO: Expr",
-                            "y": "TODO: Expr",
-                            "z": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            },
+                            "z": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 3
+                            }
                         },
                         "type": "RecordLiteral"
                     },
                     {
                         "fields": {
-                            "x": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            }
                         },
                         "type": "RecordLiteral"
                     },
                     {
                         "fields": {
-                            "x": "TODO: Expr",
-                            "y": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
                         },
                         "type": "RecordLiteral"
                     },
                     {
                         "fields": {
-                            "x": "TODO: Expr",
-                            "y": "TODO: Expr",
-                            "z": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            },
+                            "z": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 3
+                            }
                         },
                         "type": "RecordLiteral"
                     },
                     {
                         "fields": {
-                            "x": "TODO: Expr",
-                            "y": "TODO: Expr",
-                            "z": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            },
+                            "z": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 3
+                            }
                         },
                         "type": "RecordLiteral"
                     },
                     {
                         "fields": {
-                            "x": "TODO: Expr",
-                            "y": "TODO: Expr",
-                            "z": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            },
+                            "z": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 3
+                            }
                         },
                         "type": "RecordLiteral"
                     },
                     {
                         "fields": {
-                            "x": "TODO: Expr",
-                            "y": "TODO: Expr",
-                            "z": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            },
+                            "z": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 3
+                            }
                         },
                         "type": "RecordLiteral"
                     }
@@ -464,8 +787,20 @@
         {
             "expression": {
                 "fields": {
-                    "a": "TODO: Expr",
-                    "x": "TODO: Expr"
+                    "a": {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 4
+                    },
+                    "x": {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    }
                 },
                 "type": "RecordLiteral"
             },
@@ -478,30 +813,66 @@
                     {
                         "base": "a",
                         "fields": {
-                            "x": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            }
                         },
                         "type": "RecordUpdate"
                     },
                     {
                         "base": "a",
                         "fields": {
-                            "x": "TODO: Expr",
-                            "y": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
                         },
                         "type": "RecordUpdate"
                     },
                     {
                         "base": "a",
                         "fields": {
-                            "x": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            }
                         },
                         "type": "RecordUpdate"
                     },
                     {
                         "base": "a",
                         "fields": {
-                            "x": "TODO: Expr",
-                            "y": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
                         },
                         "type": "RecordUpdate"
                     }
@@ -515,8 +886,20 @@
             "expression": {
                 "base": "a",
                 "fields": {
-                    "a": "TODO: Expr",
-                    "x": "TODO: Expr"
+                    "a": {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 4
+                    },
+                    "x": {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    }
                 },
                 "type": "RecordUpdate"
             },
@@ -546,7 +929,13 @@
                 "arguments": [
                     {
                         "fields": {
-                            "x": "TODO: Expr"
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            }
                         },
                         "type": "RecordLiteral"
                     }
@@ -567,7 +956,13 @@
                     "operations": [
                         {
                             "operator": "+",
-                            "term": "TODO: Expr"
+                            "term": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            }
                         }
                     ],
                     "type": "BinaryOperatorList"
@@ -603,13 +998,31 @@
                     {
                         "expression": {
                             "else": {
-                                "else": "TODO: Expr",
+                                "else": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 3
+                                },
                                 "if": "TODO: Expr",
-                                "then": "TODO: Expr",
+                                "then": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 2
+                                },
                                 "type": "IfExpression"
                             },
                             "if": "TODO: Expr",
-                            "then": "TODO: Expr",
+                            "then": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
                             "type": "IfExpression"
                         },
                         "name": "a",
@@ -618,13 +1031,31 @@
                     {
                         "expression": {
                             "else": {
-                                "else": "TODO: Expr",
+                                "else": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 3
+                                },
                                 "if": "TODO: Expr",
-                                "then": "TODO: Expr",
+                                "then": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 2
+                                },
                                 "type": "IfExpression"
                             },
                             "if": "TODO: Expr",
-                            "then": "TODO: Expr",
+                            "then": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
                             "type": "IfExpression"
                         },
                         "name": "b",
@@ -633,13 +1064,31 @@
                     {
                         "expression": {
                             "else": {
-                                "else": "TODO: Expr",
+                                "else": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 3
+                                },
                                 "if": "TODO: Expr",
-                                "then": "TODO: Expr",
+                                "then": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 2
+                                },
                                 "type": "IfExpression"
                             },
                             "if": "TODO: Expr",
-                            "then": "TODO: Expr",
+                            "then": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
                             "type": "IfExpression"
                         },
                         "name": "c",
@@ -668,12 +1117,24 @@
                 },
                 "declarations": [
                     {
-                        "expression": "TODO: Expr",
+                        "expression": {
+                            "display": {
+                                "representation": "DecimalInt"
+                            },
+                            "type": "IntLiteral",
+                            "value": 1
+                        },
                         "name": "x",
                         "type": "Definition"
                     },
                     {
-                        "expression": "TODO: Expr",
+                        "expression": {
+                            "display": {
+                                "representation": "DecimalInt"
+                            },
+                            "type": "IntLiteral",
+                            "value": 2
+                        },
                         "name": "y",
                         "type": "Definition"
                     }
@@ -698,16 +1159,28 @@
                                         "name": "x",
                                         "type": "VariableReference"
                                     },
-                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 344 22 344 23 (VarPattern (LowercaseIdentifier \"x\")))])"
+                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 349 22 349 23 (VarPattern (LowercaseIdentifier \"x\")))])"
                                 },
                                 {
-                                    "body": "TODO: Expr",
+                                    "body": {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "type": "IntLiteral",
+                                        "value": 2
+                                    },
                                     "pattern": "TODO: Pattern (Anything)"
                                 }
                             ],
                             "subject": {
                                 "arguments": [
-                                    "TODO: Expr"
+                                    {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "type": "IntLiteral",
+                                        "value": 1
+                                    }
                                 ],
                                 "function": "TODO: Expr",
                                 "type": "FunctionApplication"
@@ -725,16 +1198,28 @@
                                         "name": "x",
                                         "type": "VariableReference"
                                     },
-                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 353 22 353 23 (VarPattern (LowercaseIdentifier \"x\")))])"
+                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 358 22 358 23 (VarPattern (LowercaseIdentifier \"x\")))])"
                                 },
                                 {
-                                    "body": "TODO: Expr",
+                                    "body": {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "type": "IntLiteral",
+                                        "value": 2
+                                    },
                                     "pattern": "TODO: Pattern (Anything)"
                                 }
                             ],
                             "subject": {
                                 "arguments": [
-                                    "TODO: Expr"
+                                    {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "type": "IntLiteral",
+                                        "value": 1
+                                    }
                                 ],
                                 "function": "TODO: Expr",
                                 "type": "FunctionApplication"
@@ -752,16 +1237,28 @@
                                         "name": "x",
                                         "type": "VariableReference"
                                     },
-                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 373 22 373 23 (VarPattern (LowercaseIdentifier \"x\")))])"
+                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 378 22 378 23 (VarPattern (LowercaseIdentifier \"x\")))])"
                                 },
                                 {
-                                    "body": "TODO: Expr",
+                                    "body": {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "type": "IntLiteral",
+                                        "value": 2
+                                    },
                                     "pattern": "TODO: Pattern (Anything)"
                                 }
                             ],
                             "subject": {
                                 "arguments": [
-                                    "TODO: Expr"
+                                    {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "type": "IntLiteral",
+                                        "value": 1
+                                    }
                                 ],
                                 "function": "TODO: Expr",
                                 "type": "FunctionApplication"

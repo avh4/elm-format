@@ -47,6 +47,17 @@ instance ToJSON Expr' where
           Unit _ ->
               makeObj [ type_ "UnitLiteral" ]
 
+          AST.Expression.Literal (IntNum value repr) ->
+              makeObj
+                  [ type_ "IntLiteral"
+                  , ("value", JSRational False $ toRational value)
+                  , ("display"
+                    , makeObj
+                        [ ("representation", showJSON importAliases repr)
+                        ]
+                    )
+                  ]
+
           VarExpr (VarRef [] (LowercaseIdentifier var)) ->
               makeObj
                   [ type_ "VariableReference"
@@ -206,6 +217,11 @@ instance ToJSON LetDeclaration where
 
           _ ->
               JSString $ toJSString $ "TODO: LetDeclaration (" ++ show letDeclaration ++ ")"
+
+
+instance ToJSON IntRepresentation where
+    showJSON _ DecimalInt = JSString $ toJSString $ "DecimalInt"
+    showJSON _ HexadecimalInt = JSString $ toJSString $ "HexadecimalInt"
 
 
 instance ToJSON Pattern' where
