@@ -1,0 +1,221 @@
+{
+    "body": [
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "unit",
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "boolean",
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 3866
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 9223372036854775807
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 9223372036854775807
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": -9223372036854775808
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": -9223372036854775808
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "integer",
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    "TODO: Expr"
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "float",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "string",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "stringWithUnicodeCharacters",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "stringWithSpecialEscapedCharacters",
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "stringWithEscapedControlCharacters",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "stringWithWindowsWorkaroundCharacters",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "stringWithEscapedNonPrintCharacters",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "stringWithWhitespace",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "char",
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "unicodeChars",
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "escapedSpecialChars",
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "escapedControlChars",
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "escapedNonPrintChars",
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "whitespaceChars",
+            "type": "Definition"
+        },
+        {
+            "expression": "TODO: Expr",
+            "name": "multilineString",
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr",
+                    "TODO: Expr"
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "multilineStringQuoteHandling",
+            "type": "Definition"
+        }
+    ]
+}
