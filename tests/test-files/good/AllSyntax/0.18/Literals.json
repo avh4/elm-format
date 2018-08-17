@@ -13,11 +13,31 @@
                     {
                         "identifier": "True",
                         "module": "Basics",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 9
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 9
+                            }
+                        },
                         "type": "ExternalReference"
                     },
                     {
                         "identifier": "False",
                         "module": "Basics",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 10
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 10
+                            }
+                        },
                         "type": "ExternalReference"
                     }
                 ],

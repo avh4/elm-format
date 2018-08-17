@@ -40,6 +40,16 @@
             "expression": {
                 "identifier": "foo",
                 "module": "Bar.Baz",
+                "sourceLocation": {
+                    "end": {
+                        "col": 16,
+                        "line": 17
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 17
+                    }
+                },
                 "type": "ExternalReference"
             },
             "name": "qualifiedVar",
@@ -1473,6 +1483,16 @@
                                 "if": {
                                     "identifier": "False",
                                     "module": "Basics",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 26,
+                                            "line": 272
+                                        },
+                                        "start": {
+                                            "col": 21,
+                                            "line": 272
+                                        }
+                                    },
                                     "type": "ExternalReference"
                                 },
                                 "then": {
@@ -1487,6 +1507,16 @@
                             "if": {
                                 "identifier": "True",
                                 "module": "Basics",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 20,
+                                        "line": 269
+                                    },
+                                    "start": {
+                                        "col": 16,
+                                        "line": 269
+                                    }
+                                },
                                 "type": "ExternalReference"
                             },
                             "then": {
@@ -1514,6 +1544,16 @@
                                 "if": {
                                     "identifier": "False",
                                     "module": "Basics",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 42,
+                                            "line": 284
+                                        },
+                                        "start": {
+                                            "col": 37,
+                                            "line": 284
+                                        }
+                                    },
                                     "type": "ExternalReference"
                                 },
                                 "then": {
@@ -1528,6 +1568,16 @@
                             "if": {
                                 "identifier": "True",
                                 "module": "Basics",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 28,
+                                        "line": 279
+                                    },
+                                    "start": {
+                                        "col": 24,
+                                        "line": 279
+                                    }
+                                },
                                 "type": "ExternalReference"
                             },
                             "then": {
@@ -1555,6 +1605,16 @@
                                 "if": {
                                     "identifier": "False",
                                     "module": "Basics",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 22,
+                                            "line": 307
+                                        },
+                                        "start": {
+                                            "col": 17,
+                                            "line": 307
+                                        }
+                                    },
                                     "type": "ExternalReference"
                                 },
                                 "then": {
@@ -1569,6 +1629,16 @@
                             "if": {
                                 "identifier": "True",
                                 "module": "Basics",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 21,
+                                        "line": 296
+                                    },
+                                    "start": {
+                                        "col": 17,
+                                        "line": 296
+                                    }
+                                },
                                 "type": "ExternalReference"
                             },
                             "then": {
