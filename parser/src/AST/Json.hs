@@ -181,6 +181,13 @@ instance ToJSON Expr' where
                             )
                           ]
 
+          Access (A _ base) (LowercaseIdentifier field) ->
+            makeObj
+                [ type_ "RecordAccess"
+                , ( "record", showJSON importAliases base )
+                , ( "field", JSString $ toJSString field )
+                ]
+
           Lambda parameters _ (A _ body) _ ->
               makeObj
                   [ type_ "AnonymousFunction"
