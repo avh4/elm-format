@@ -16,6 +16,16 @@
                 "type": "ListLiteral"
             },
             "name": "unit",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 9
+                },
+                "start": {
+                    "col": 1,
+                    "line": 4
+                }
+            },
             "type": "Definition"
         },
         {
@@ -34,6 +44,16 @@
                 "type": "VariableReference"
             },
             "name": "var",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 13
+                },
+                "start": {
+                    "col": 1,
+                    "line": 12
+                }
+            },
             "type": "Definition"
         },
         {
@@ -53,6 +73,16 @@
                 "type": "ExternalReference"
             },
             "name": "qualifiedVar",
+            "sourceLocation": {
+                "end": {
+                    "col": 16,
+                    "line": 17
+                },
+                "start": {
+                    "col": 1,
+                    "line": 16
+                }
+            },
             "type": "Definition"
         },
         {
@@ -71,6 +101,16 @@
                 "type": "VariableReference"
             },
             "name": "operator",
+            "sourceLocation": {
+                "end": {
+                    "col": 8,
+                    "line": 21
+                },
+                "start": {
+                    "col": 1,
+                    "line": 20
+                }
+            },
             "type": "Definition"
         },
         {
@@ -143,6 +183,16 @@
                 "type": "BinaryOperatorList"
             },
             "name": "infixPipeLeft",
+            "sourceLocation": {
+                "end": {
+                    "col": 10,
+                    "line": 28
+                },
+                "start": {
+                    "col": 1,
+                    "line": 24
+                }
+            },
             "type": "Definition"
         },
         {
@@ -220,6 +270,16 @@
                 "type": "BinaryOperatorList"
             },
             "name": "infixPipeLeft2",
+            "sourceLocation": {
+                "end": {
+                    "col": 10,
+                    "line": 37
+                },
+                "start": {
+                    "col": 1,
+                    "line": 31
+                }
+            },
             "type": "Definition"
         },
         {
@@ -257,6 +317,16 @@
                 "type": "FunctionApplication"
             },
             "name": "functionApplication",
+            "sourceLocation": {
+                "end": {
+                    "col": 12,
+                    "line": 41
+                },
+                "start": {
+                    "col": 1,
+                    "line": 40
+                }
+            },
             "type": "Definition"
         },
         {
@@ -294,6 +364,16 @@
                 "type": "FunctionApplication"
             },
             "name": "functionApplicationMultilineWithFirstArg",
+            "sourceLocation": {
+                "end": {
+                    "col": 10,
+                    "line": 46
+                },
+                "start": {
+                    "col": 1,
+                    "line": 44
+                }
+            },
             "type": "Definition"
         },
         {
@@ -331,6 +411,16 @@
                 "type": "FunctionApplication"
             },
             "name": "functionApplicationMultiline",
+            "sourceLocation": {
+                "end": {
+                    "col": 10,
+                    "line": 52
+                },
+                "start": {
+                    "col": 1,
+                    "line": 49
+                }
+            },
             "type": "Definition"
         },
         {
@@ -353,6 +443,16 @@
                 "type": "UnaryOperator"
             },
             "name": "unary",
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 56
+                },
+                "start": {
+                    "col": 1,
+                    "line": 55
+                }
+            },
             "type": "Definition"
         },
         {
@@ -415,6 +515,16 @@
                 "type": "BinaryOperatorList"
             },
             "name": "binary",
+            "sourceLocation": {
+                "end": {
+                    "col": 14,
+                    "line": 60
+                },
+                "start": {
+                    "col": 1,
+                    "line": 59
+                }
+            },
             "type": "Definition"
         },
         {
@@ -471,6 +581,16 @@
                 "type": "FunctionApplication"
             },
             "name": "parens",
+            "sourceLocation": {
+                "end": {
+                    "col": 12,
+                    "line": 64
+                },
+                "start": {
+                    "col": 1,
+                    "line": 63
+                }
+            },
             "type": "Definition"
         },
         {
@@ -492,6 +612,16 @@
                 "type": "ListLiteral"
             },
             "name": "emptyList",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 72
+                },
+                "start": {
+                    "col": 1,
+                    "line": 67
+                }
+            },
             "type": "Definition"
         },
         {
@@ -545,6 +675,16 @@
                 "type": "ListLiteral"
             },
             "name": "list",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 96
+                },
+                "start": {
+                    "col": 1,
+                    "line": 75
+                }
+            },
             "type": "Definition"
         },
         {
@@ -575,6 +715,16 @@
                 "type": "ListLiteral"
             },
             "name": "listWithCommentedOutItems",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 108
+                },
+                "start": {
+                    "col": 1,
+                    "line": 99
+                }
+            },
             "type": "Definition"
         },
         {
@@ -660,6 +810,16 @@
                 "type": "ListLiteral"
             },
             "name": "tuple",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 126
+                },
+                "start": {
+                    "col": 1,
+                    "line": 111
+                }
+            },
             "type": "Definition"
         },
         {
@@ -690,6 +850,16 @@
                 "type": "TupleLiteral"
             },
             "name": "tupleWithCommentedOutItems",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 136
+                },
+                "start": {
+                    "col": 1,
+                    "line": 129
+                }
+            },
             "type": "Definition"
         },
         {
@@ -734,6 +904,16 @@
                 "type": "FunctionApplication"
             },
             "name": "tupleFunction",
+            "sourceLocation": {
+                "end": {
+                    "col": 15,
+                    "line": 140
+                },
+                "start": {
+                    "col": 1,
+                    "line": 139
+                }
+            },
             "type": "Definition"
         },
         {
@@ -764,6 +944,16 @@
                 "type": "ListLiteral"
             },
             "name": "emptyRecord",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 148
+                },
+                "start": {
+                    "col": 1,
+                    "line": 143
+                }
+            },
             "type": "Definition"
         },
         {
@@ -1022,6 +1212,16 @@
                 "type": "TupleLiteral"
             },
             "name": "record",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 197
+                },
+                "start": {
+                    "col": 1,
+                    "line": 151
+                }
+            },
             "type": "Definition"
         },
         {
@@ -1051,6 +1251,16 @@
                 "type": "RecordLiteral"
             },
             "name": "recordWithCommentedOutFields",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 208
+                },
+                "start": {
+                    "col": 1,
+                    "line": 200
+                }
+            },
             "type": "Definition"
         },
         {
@@ -1148,6 +1358,16 @@
                 "type": "TupleLiteral"
             },
             "name": "recordUpdate",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 221
+                },
+                "start": {
+                    "col": 1,
+                    "line": 211
+                }
+            },
             "type": "Definition"
         },
         {
@@ -1178,6 +1398,16 @@
                 "type": "RecordUpdate"
             },
             "name": "recordUpdateWithCommentedOutFields",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 233
+                },
+                "start": {
+                    "col": 1,
+                    "line": 224
+                }
+            },
             "type": "Definition"
         },
         {
@@ -1366,6 +1596,16 @@
                 "type": "TupleLiteral"
             },
             "name": "recordAccess",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 246
+                },
+                "start": {
+                    "col": 1,
+                    "line": 236
+                }
+            },
             "type": "Definition"
         },
         {
@@ -1393,6 +1633,16 @@
                 "type": "FunctionApplication"
             },
             "name": "recordAccessfunction",
+            "sourceLocation": {
+                "end": {
+                    "col": 17,
+                    "line": 250
+                },
+                "start": {
+                    "col": 1,
+                    "line": 249
+                }
+            },
             "type": "Definition"
         },
         {
@@ -1445,6 +1695,16 @@
                 "type": "AnonymousFunction"
             },
             "name": "lambda",
+            "sourceLocation": {
+                "end": {
+                    "col": 16,
+                    "line": 254
+                },
+                "start": {
+                    "col": 1,
+                    "line": 253
+                }
+            },
             "type": "Definition"
         },
         {
@@ -1458,6 +1718,16 @@
                 "type": "AnonymousFunction"
             },
             "name": "lambdaWithMultilinePattern",
+            "sourceLocation": {
+                "end": {
+                    "col": 11,
+                    "line": 263
+                },
+                "start": {
+                    "col": 1,
+                    "line": 257
+                }
+            },
             "type": "Definition"
         },
         {
@@ -1657,6 +1927,16 @@
                 "type": "LetExpression"
             },
             "name": "ifStatement",
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 318
+                },
+                "start": {
+                    "col": 1,
+                    "line": 266
+                }
+            },
             "type": "Definition"
         },
         {
@@ -1721,6 +2001,16 @@
                 "type": "LetExpression"
             },
             "name": "letStatement",
+            "sourceLocation": {
+                "end": {
+                    "col": 13,
+                    "line": 329
+                },
+                "start": {
+                    "col": 1,
+                    "line": 321
+                }
+            },
             "type": "Definition"
         },
         {
@@ -1923,6 +2213,16 @@
                 "type": "LetExpression"
             },
             "name": "caseStatement",
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 378
+                },
+                "start": {
+                    "col": 1,
+                    "line": 332
+                }
+            },
             "type": "Definition"
         }
     ]
