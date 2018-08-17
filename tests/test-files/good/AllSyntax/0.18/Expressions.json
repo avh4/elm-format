@@ -36,7 +36,10 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "name": "+",
+                "type": "VariableReference"
+            },
             "name": "operator",
             "type": "Definition"
         },
@@ -48,7 +51,10 @@
                 },
                 "operations": [
                     {
-                        "operator": "<|",
+                        "operator": {
+                            "name": "<|",
+                            "type": "VariableReference"
+                        },
                         "term": {
                             "terms": [
                                 {
@@ -82,7 +88,10 @@
                 },
                 "operations": [
                     {
-                        "operator": "<|",
+                        "operator": {
+                            "name": "<|",
+                            "type": "VariableReference"
+                        },
                         "term": {
                             "terms": [
                                 {
@@ -207,7 +216,10 @@
                 },
                 "operations": [
                     {
-                        "operator": "+",
+                        "operator": {
+                            "name": "+",
+                            "type": "VariableReference"
+                        },
                         "term": {
                             "display": {
                                 "representation": "DecimalInt"
@@ -217,7 +229,10 @@
                         }
                     },
                     {
-                        "operator": "+",
+                        "operator": {
+                            "name": "+",
+                            "type": "VariableReference"
+                        },
                         "term": {
                             "display": {
                                 "representation": "DecimalInt"
@@ -1006,7 +1021,10 @@
                     },
                     "operations": [
                         {
-                            "operator": "+",
+                            "operator": {
+                                "name": "+",
+                                "type": "VariableReference"
+                            },
                             "term": {
                                 "display": {
                                     "representation": "DecimalInt"
