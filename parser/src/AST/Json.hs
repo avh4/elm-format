@@ -39,6 +39,22 @@ class ToJSON a where
   showJSON :: Map.Map UppercaseIdentifier [UppercaseIdentifier] -> a -> JSValue
 
 
+instance ToJSON Region.Region where
+    showJSON x region =
+        makeObj
+            [ ( "start", showJSON x $ Region.start region )
+            , ( "end", showJSON x $ Region.end region )
+            ]
+
+
+instance ToJSON Region.Position where
+    showJSON _ pos =
+        makeObj
+            [ ( "line", JSRational False $ toRational $ Region.line pos )
+            , ( "col", JSRational False $ toRational $ Region.column pos )
+            ]
+
+
 instance ToJSON (TopLevelStructure Declaration) where
   showJSON importAliases (Entry (A _ (Definition (A _ (VarPattern (LowercaseIdentifier var))) _ _ expr))) =
     makeObj
@@ -50,7 +66,7 @@ instance ToJSON (TopLevelStructure Declaration) where
 
 
 instance ToJSON Expr where
-  showJSON importAliases (A _ expr) =
+  showJSON importAliases (A region expr) =
       case expr of
           Unit _ ->
               makeObj [ type_ "UnitLiteral" ]
@@ -74,7 +90,7 @@ instance ToJSON Expr where
                 ]
 
           VarExpr (VarRef [] (LowercaseIdentifier var)) ->
-            variableReference var
+            variableReference importAliases region var
 
           VarExpr (VarRef namespace (LowercaseIdentifier var)) ->
               let
@@ -94,10 +110,10 @@ instance ToJSON Expr where
                   ]
 
           VarExpr (TagRef [] (UppercaseIdentifier tag)) ->
-            variableReference tag
+            variableReference importAliases region tag
 
           VarExpr (OpRef (SymbolIdentifier sym)) ->
-            variableReference sym
+            variableReference importAliases region sym
 
           App expr args _ ->
               makeObj
@@ -148,7 +164,7 @@ instance ToJSON Expr where
             pleaseReport "INVALID TUPLE CONSTRUCTOR" ("n=" ++ show n)
 
           TupleFunction n ->
-            variableReference $ replicate (n-1) ','
+            variableReference importAliases region $ replicate (n-1) ','
 
           AST.Expression.Record base fields _ _ ->
               let
@@ -253,12 +269,18 @@ instance ToJSON Expr where
               JSString $ toJSString "TODO: Expr"
 
 
-variableReference :: String -> JSValue
-variableReference name =
+variableReference :: Map.Map UppercaseIdentifier [UppercaseIdentifier] -> Region.Region -> String -> JSValue
+variableReference x region name =
     makeObj
         [ type_ "VariableReference"
-        , ("name" , JSString $ toJSString name)
+        , ( "name" , JSString $ toJSString name )
+        , sourceLocation x region
         ]
+
+
+sourceLocation :: Map.Map UppercaseIdentifier [UppercaseIdentifier] -> Region.Region -> (String, JSValue)
+sourceLocation x region =
+    ( "sourceLocation", showJSON x region )
 
 
 instance ToJSON LetDeclaration where
