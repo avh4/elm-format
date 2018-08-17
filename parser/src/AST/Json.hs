@@ -130,11 +130,18 @@ instance ToJSON Expr' where
               let
                   fieldsJSON =
                       ( "fields"
-                      , makeObj $ map
+                      , makeObj $ fmap
                           (\(_, (_, (Pair (LowercaseIdentifier key, _) (_, A _ value) _, _))) ->
                              (key, showJSON importAliases value)
                           )
                           fields
+                      )
+
+                  fieldOrder =
+                      ( "fieldOrder"
+                      , JSArray $
+                            fmap (JSString . toJSString) $
+                            fmap (\(_, (_, (Pair (LowercaseIdentifier key, _) _ _, _))) -> key) fields
                       )
               in
               case base of
@@ -143,12 +150,22 @@ instance ToJSON Expr' where
                           [ type_ "RecordUpdate"
                           , ("base", JSString $ toJSString identifier)
                           , fieldsJSON
+                          , ( "display"
+                            , makeObj
+                                [ fieldOrder
+                                ]
+                            )
                           ]
 
                   Nothing ->
                       makeObj
                           [ type_ "RecordLiteral"
                           , fieldsJSON
+                          , ( "display"
+                            , makeObj
+                                [ fieldOrder
+                                ]
+                            )
                           ]
 
           Lambda parameters _ (A _ body) _ ->

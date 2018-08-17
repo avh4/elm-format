@@ -512,14 +512,23 @@
             "expression": {
                 "terms": [
                     {
+                        "display": {
+                            "fieldOrder": []
+                        },
                         "fields": {},
                         "type": "RecordLiteral"
                     },
                     {
+                        "display": {
+                            "fieldOrder": []
+                        },
                         "fields": {},
                         "type": "RecordLiteral"
                     },
                     {
+                        "display": {
+                            "fieldOrder": []
+                        },
                         "fields": {},
                         "type": "RecordLiteral"
                     }
@@ -533,6 +542,11 @@
             "expression": {
                 "terms": [
                     {
+                        "display": {
+                            "fieldOrder": [
+                                "x"
+                            ]
+                        },
                         "fields": {
                             "x": {
                                 "display": {
@@ -545,63 +559,12 @@
                         "type": "RecordLiteral"
                     },
                     {
-                        "fields": {
-                            "x": {
-                                "display": {
-                                    "representation": "DecimalInt"
-                                },
-                                "type": "IntLiteral",
-                                "value": 1
-                            },
-                            "y": {
-                                "display": {
-                                    "representation": "DecimalInt"
-                                },
-                                "type": "IntLiteral",
-                                "value": 2
-                            }
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
                         },
-                        "type": "RecordLiteral"
-                    },
-                    {
-                        "fields": {
-                            "x": {
-                                "display": {
-                                    "representation": "DecimalInt"
-                                },
-                                "type": "IntLiteral",
-                                "value": 1
-                            },
-                            "y": {
-                                "display": {
-                                    "representation": "DecimalInt"
-                                },
-                                "type": "IntLiteral",
-                                "value": 2
-                            },
-                            "z": {
-                                "display": {
-                                    "representation": "DecimalInt"
-                                },
-                                "type": "IntLiteral",
-                                "value": 3
-                            }
-                        },
-                        "type": "RecordLiteral"
-                    },
-                    {
-                        "fields": {
-                            "x": {
-                                "display": {
-                                    "representation": "DecimalInt"
-                                },
-                                "type": "IntLiteral",
-                                "value": 1
-                            }
-                        },
-                        "type": "RecordLiteral"
-                    },
-                    {
                         "fields": {
                             "x": {
                                 "display": {
@@ -621,6 +584,13 @@
                         "type": "RecordLiteral"
                     },
                     {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y",
+                                "z"
+                            ]
+                        },
                         "fields": {
                             "x": {
                                 "display": {
@@ -647,6 +617,55 @@
                         "type": "RecordLiteral"
                     },
                     {
+                        "display": {
+                            "fieldOrder": [
+                                "x"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            }
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y",
+                                "z"
+                            ]
+                        },
                         "fields": {
                             "x": {
                                 "display": {
@@ -673,6 +692,13 @@
                         "type": "RecordLiteral"
                     },
                     {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y",
+                                "z"
+                            ]
+                        },
                         "fields": {
                             "x": {
                                 "display": {
@@ -699,6 +725,46 @@
                         "type": "RecordLiteral"
                     },
                     {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y",
+                                "z"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            },
+                            "z": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 3
+                            }
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y",
+                                "z"
+                            ]
+                        },
                         "fields": {
                             "x": {
                                 "display": {
@@ -732,6 +798,12 @@
         },
         {
             "expression": {
+                "display": {
+                    "fieldOrder": [
+                        "x",
+                        "a"
+                    ]
+                },
                 "fields": {
                     "a": {
                         "display": {
@@ -758,6 +830,11 @@
                 "terms": [
                     {
                         "base": "a",
+                        "display": {
+                            "fieldOrder": [
+                                "x"
+                            ]
+                        },
                         "fields": {
                             "x": {
                                 "display": {
@@ -771,6 +848,12 @@
                     },
                     {
                         "base": "a",
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
+                        },
                         "fields": {
                             "x": {
                                 "display": {
@@ -791,6 +874,11 @@
                     },
                     {
                         "base": "a",
+                        "display": {
+                            "fieldOrder": [
+                                "x"
+                            ]
+                        },
                         "fields": {
                             "x": {
                                 "display": {
@@ -804,6 +892,12 @@
                     },
                     {
                         "base": "a",
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
+                        },
                         "fields": {
                             "x": {
                                 "display": {
@@ -831,6 +925,12 @@
         {
             "expression": {
                 "base": "a",
+                "display": {
+                    "fieldOrder": [
+                        "x",
+                        "a"
+                    ]
+                },
                 "fields": {
                     "a": {
                         "display": {
@@ -874,6 +974,11 @@
             "expression": {
                 "arguments": [
                     {
+                        "display": {
+                            "fieldOrder": [
+                                "x"
+                            ]
+                        },
                         "fields": {
                             "x": {
                                 "display": {
@@ -937,6 +1042,9 @@
         {
             "expression": {
                 "body": {
+                    "display": {
+                        "fieldOrder": []
+                    },
                     "fields": {},
                     "type": "RecordLiteral"
                 },
@@ -1093,6 +1201,9 @@
         {
             "expression": {
                 "body": {
+                    "display": {
+                        "fieldOrder": []
+                    },
                     "fields": {},
                     "type": "RecordLiteral"
                 },
