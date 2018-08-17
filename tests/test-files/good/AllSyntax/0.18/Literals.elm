@@ -1,4 +1,4 @@
-module AllSyntax.Literals exposing (..)
+module AllSyntax.Literals exposing (boolean, char, escapedControlChars, escapedNonPrintChars, escapedSpecialChars, multilineString, multilineStringQuoteHandling, string, stringWithEscapedControlCharacters, stringWithEscapedNonPrintCharacters, stringWithSpecialEscapedCharacters, stringWithUnicodeCharacters, stringWithWhitespace, stringWithWindowsWorkaroundCharacters, unicodeChars, unit, whitespaceChars)
 
 
 unit =

@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (annotationShouldBeGroupedWithItsDefinition, topLevelDestructingShouldNotGroupWithAnything, withADefinition, withAnAnnotation)
 
 {-| Module comment.
 -}

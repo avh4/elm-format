@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleInstances #-}
 module AST.Json where
 
 import AST.Declaration
@@ -30,8 +31,8 @@ class ToJSON a where
   showJSON :: Map.Map UppercaseIdentifier [UppercaseIdentifier] -> a -> JSValue
 
 
-instance ToJSON Decl where
-  showJSON importAliases (Decl (A _ (Definition (A _ (VarPattern (LowercaseIdentifier var))) _ _ (A _ expr)))) =
+instance ToJSON (TopLevelStructure Declaration) where
+  showJSON importAliases (Entry (A _ (Definition (A _ (VarPattern (LowercaseIdentifier var))) _ _ (A _ expr)))) =
     makeObj
       [ type_ "Definition"
       , ("name" , JSString $ toJSString var)

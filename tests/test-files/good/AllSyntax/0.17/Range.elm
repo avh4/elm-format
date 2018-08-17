@@ -1,4 +1,4 @@
-module AllSyntax.Expressions exposing (..)
+module AllSyntax.Expressions exposing (range)
 
 
 range =

@@ -1,4 +1,4 @@
-module AllSyntax.LineComments.Types exposing (..)
+module AllSyntax.LineComments.Types exposing (emptyRecord, record, recordExtension)
 
 import Dict
 

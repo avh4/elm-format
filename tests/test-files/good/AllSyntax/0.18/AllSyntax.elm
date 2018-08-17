@@ -1,4 +1,7 @@
-module AllSyntax exposing (Data(A, B, C), MultilineData(..), Type, fn, tuple)
+module AllSyntax exposing
+    ( fn
+    , Data(A, B, C), MultilineData(..), Type, tuple
+    )
 
 {-| An example of all valid Elm syntax.
 

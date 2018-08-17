@@ -34,7 +34,7 @@ data Comment
     | CommentTrickOpener
     | CommentTrickCloser
     | CommentTrickBlock String
-    deriving (Eq, Show)
+    deriving (Eq, Ord, Show)
 
 
 type Comments = [Comment]
@@ -42,7 +42,7 @@ type Comments = [Comment]
 
 data Commented a =
     Commented Comments a Comments
-    deriving (Eq, Show)
+    deriving (Eq, Ord, Show)
 
 
 instance Functor Commented where

@@ -1,4 +1,4 @@
-module AllSyntax.BlockComments.Patterns exposing (..)
+module AllSyntax.BlockComments.Patterns exposing (Foo(..), asAlias, complexCons, consList, data, emptyList, list, literal, parens, record, tuple, unit, variable, wildcard)
 
 
 type Foo

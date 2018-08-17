@@ -156,7 +156,7 @@ formatMarkdownInline :: Inline -> String
 formatMarkdownInline inline =
     case inline of
         Str text ->
-            Text.unpack text
+            Text.unpack $ Text.concatMap fix text
         Space ->
             " "
         SoftBreak ->
@@ -206,3 +206,20 @@ formatMarkdownInline inline =
             Text.unpack text
         RawHtml text ->
             Text.unpack text
+    where
+        fix c =
+            case c of
+                '\\' -> Text.pack "\\\\"
+                -- TODO: only at the beginning of words
+                '`' -> Text.pack "\\`"
+                '_' -> Text.pack "\\_"
+                '*' -> Text.pack "\\*"
+                -- TODO: {}  curly braces (when?)
+                -- TODO: []  square brackets (when?)
+                -- TODO: ()  parentheses (when?)
+                -- TODO: #   hash mark (only at the beginning of lines, and within header lines?)
+                -- TODO: -   minus sign (hyphen) (only at the beginning of lines?)
+                -- TODO: +   plus sign (when?)
+                -- TODO: .   dot (when?)
+                -- TODO: !   exclamation mark (when?)
+                _ -> Text.singleton c

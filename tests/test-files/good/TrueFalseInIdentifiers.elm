@@ -1,4 +1,4 @@
-module Test exposing (..)
+module Test exposing (ExpressionType(..), expressionTypes, typename)
 
 
 type ExpressionType

@@ -7,4 +7,4 @@ import qualified ElmFormat
 
 main :: IO ()
 main =
-    ElmFormat.main Elm_0_17
+    ElmFormat.main Elm_0_19

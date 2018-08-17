@@ -165,8 +165,11 @@ determineVersion elmVersion upgrade =
         (Elm_0_18, True) ->
             Right Elm_0_18_Upgrade
 
+        (Elm_0_19, True) ->
+            Right Elm_0_19_Upgrade
+
         (_, True) ->
-            Left $ MustSpecifyVersionWithUpgrade Elm_0_18_Upgrade
+            Left $ MustSpecifyVersionWithUpgrade Elm_0_19_Upgrade
 
         (_, False) ->
             Right elmVersion
