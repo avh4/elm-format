@@ -10,8 +10,16 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "identifier": "True",
+                        "module": "Basics",
+                        "type": "ExternalReference"
+                    },
+                    {
+                        "identifier": "False",
+                        "module": "Basics",
+                        "type": "ExternalReference"
+                    }
                 ],
                 "type": "ListLiteral"
             },

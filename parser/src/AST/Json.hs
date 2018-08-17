@@ -65,6 +65,13 @@ instance ToJSON Expr' where
                     )
                   ]
 
+          AST.Expression.Literal (Boolean value) ->
+            makeObj
+                [ type_ "ExternalReference"
+                , ("module", JSString $ toJSString "Basics")
+                , ("identifier", JSString $ toJSString $ show value)
+                ]
+
           VarExpr (VarRef [] (LowercaseIdentifier var)) ->
             variableReference var
 
