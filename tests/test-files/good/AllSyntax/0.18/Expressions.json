@@ -20,60 +20,6 @@
         },
         {
             "expression": {
-                "terms": [
-                    {
-                        "display": {
-                            "representation": "DecimalInt"
-                        },
-                        "type": "IntLiteral",
-                        "value": 1
-                    },
-                    {
-                        "display": {
-                            "representation": "HexadecimalInt"
-                        },
-                        "type": "IntLiteral",
-                        "value": 3866
-                    },
-                    {
-                        "display": {
-                            "representation": "HexadecimalInt"
-                        },
-                        "type": "IntLiteral",
-                        "value": 9223372036854775807
-                    },
-                    {
-                        "display": {
-                            "representation": "DecimalInt"
-                        },
-                        "type": "IntLiteral",
-                        "value": 9223372036854775807
-                    },
-                    {
-                        "display": {
-                            "representation": "HexadecimalInt"
-                        },
-                        "type": "IntLiteral",
-                        "value": -9223372036854775808
-                    },
-                    {
-                        "display": {
-                            "representation": "DecimalInt"
-                        },
-                        "type": "IntLiteral",
-                        "value": -9223372036854775808
-                    },
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
-                ],
-                "type": "TupleLiteral"
-            },
-            "name": "literal",
-            "type": "Definition"
-        },
-        {
-            "expression": {
                 "name": "x",
                 "type": "VariableReference"
             },
@@ -1159,7 +1105,7 @@
                                         "name": "x",
                                         "type": "VariableReference"
                                     },
-                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 349 22 349 23 (VarPattern (LowercaseIdentifier \"x\")))])"
+                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 336 22 336 23 (VarPattern (LowercaseIdentifier \"x\")))])"
                                 },
                                 {
                                     "body": {
@@ -1198,7 +1144,7 @@
                                         "name": "x",
                                         "type": "VariableReference"
                                     },
-                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 358 22 358 23 (VarPattern (LowercaseIdentifier \"x\")))])"
+                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 345 22 345 23 (VarPattern (LowercaseIdentifier \"x\")))])"
                                 },
                                 {
                                     "body": {
@@ -1237,7 +1183,7 @@
                                         "name": "x",
                                         "type": "VariableReference"
                                     },
-                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 378 22 378 23 (VarPattern (LowercaseIdentifier \"x\")))])"
+                                    "pattern": "TODO: Pattern (Data [UppercaseIdentifier \"Just\"] [([],at 365 22 365 23 (VarPattern (LowercaseIdentifier \"x\")))])"
                                 },
                                 {
                                     "body": {
