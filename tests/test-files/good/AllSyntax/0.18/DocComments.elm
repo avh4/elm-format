@@ -1,4 +1,7 @@
-module Main exposing (..)
+module Main exposing
+    ( x
+    , increment, escapedCharacters
+    )
 
 {-| Example of markdown in doc comments.
 
@@ -6,6 +9,7 @@ module Main exposing (..)
 # Section
 
 @docs x
+@docs increment, escapedCharacters
 
 
 # Another section
@@ -140,3 +144,13 @@ increment x =
 increment : Int -> Int
 increment x =
     x + 1
+
+
+{-| Escaped characters should not be changed ¯\\\_(ツ)\_/¯
+
+  - (\\\\) asd
+  - not-quite shruggie ¯\_(ツ)\_/¯
+
+-}
+escapedCharacters =
+    ()

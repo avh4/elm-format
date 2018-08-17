@@ -25,5 +25,5 @@ function build-flavor() {
     tar zcvf "$BUILD".tgz -C dist/package-scripts elm-format
 }
 
+build-flavor 0.19
 build-flavor 0.18
-build-flavor 0.17

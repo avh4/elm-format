@@ -1,4 +1,8 @@
-module DocCommentAtDocs exposing (x, y, z)
+module DocCommentAtDocs exposing
+    ( x
+    , y
+    , z
+    )
 
 {-|
 

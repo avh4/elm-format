@@ -38,7 +38,7 @@ assertPrefix prefix str =
 world :: TestWorld
 world =
     TestWorld.init
-        |> TestWorld.installProgram "elm-format" (ElmFormat.main' ElmVersion.Elm_0_18)
+        |> TestWorld.installProgram "elm-format" (ElmFormat.main' ElmVersion.Elm_0_19)
+        |> TestWorld.installProgram "elm-format-0.19" (ElmFormat.main' ElmVersion.Elm_0_19)
         |> TestWorld.installProgram "elm-format-0.18" (ElmFormat.main' ElmVersion.Elm_0_18)
-        |> TestWorld.installProgram "elm-format-0.17" (ElmFormat.main' ElmVersion.Elm_0_17)
-        |> TestWorld.installProgram "elm-format-xxx" (ElmFormat.main'' ElmVersion.Elm_0_18 "x.x.x" Nothing)
+        |> TestWorld.installProgram "elm-format-xxx" (ElmFormat.main'' ElmVersion.Elm_0_19 "x.x.x" Nothing)

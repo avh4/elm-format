@@ -18,7 +18,7 @@ data Listing a
     = ExplicitListing a Bool
     | OpenListing (Commented ())
     | ClosedListing
-    deriving (Eq, Show)
+    deriving (Eq, Ord, Show)
 
 
 type CommentedMap k v =
@@ -30,4 +30,4 @@ data Value
     = Value !LowercaseIdentifier
     | OpValue SymbolIdentifier
     | Union (PostCommented UppercaseIdentifier) (Listing (CommentedMap UppercaseIdentifier ()))
-    deriving (Eq, Show)
+    deriving (Eq, Ord, Show)

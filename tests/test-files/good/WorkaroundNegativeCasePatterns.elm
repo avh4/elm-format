@@ -1,4 +1,4 @@
-module MinusErr exposing (..)
+module MinusErr exposing (errFloats, errInts)
 
 
 errInts : Int -> Int

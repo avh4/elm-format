@@ -177,8 +177,8 @@ elmVersion defaultVersion =
           concat
             [ "The Elm version of the source files being formatted.  "
             , "Valid values: "
-            , show ElmVersion.Elm_0_17 ++ ", "
-            , show ElmVersion.Elm_0_18 ++ ".  "
+            , show ElmVersion.Elm_0_18 ++ ", "
+            , show ElmVersion.Elm_0_19 ++ ".  "
             , "Default: " ++ show defaultVersion
             ]
       ]
@@ -189,7 +189,7 @@ upgrade =
     Opt.switch $
         mconcat
         [ Opt.long "upgrade"
-        , Opt.help "Upgrade older Elm files to Elm 0.18 syntax"
+        , Opt.help "Upgrade older Elm files to Elm 0.19 syntax"
         ]
 
 

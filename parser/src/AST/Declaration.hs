@@ -27,6 +27,7 @@ data Declaration
     | PortAnnotation (Commented LowercaseIdentifier) Comments Type
     | PortDefinition (Commented LowercaseIdentifier) Comments Expression.Expr
     | Fixity Assoc Comments Int Comments Var.Ref
+    | Fixity_0_19 (PreCommented Assoc) (PreCommented Int) (Commented SymbolIdentifier) (PreCommented LowercaseIdentifier)
     deriving (Eq, Show)
 
 
@@ -54,16 +55,16 @@ assocToString assoc =
 -- DECLARATION PHASES
 
 
-data Decl
+data TopLevelStructure a
     = DocComment Markdown.Blocks
     | BodyComment Comment
-    | Decl (A.Located Declaration)
+    | Entry (A.Located a)
     deriving (Eq, Show)
 
 
-instance A.Strippable Decl where
+instance A.Strippable a => A.Strippable (TopLevelStructure a) where
   stripRegion d =
     case d of
-        Decl d' ->
-            Decl $ A.stripRegion $ A.map A.stripRegion d'
+        Entry d' ->
+            Entry $ A.stripRegion $ A.map A.stripRegion d'
         _ -> d

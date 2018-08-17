@@ -1,4 +1,11 @@
-module Check exposing (..)
+module Check exposing
+    ( claim, claimTrue, claimFalse
+    , quickCheck, check
+    , suite
+    , Claim, Evidence, UnitEvidence, SuccessOptions, FailureOptions
+    , claim2True, claim2False, claim3, claim3True, claim3False, claim4, claim4True, claim4False, claim5, claim5True, claim5False
+    , that, is, for, true, false
+    )
 
 {-| Property Based Testing module in Elm.
 
@@ -217,10 +224,10 @@ type alias FailureOptions =
 Example :
 
     claim_sort_idempotent =
-      claim "Sort is idempotent"
-        (\list -> List.sort (List.sort (list))
-        (\list -> List.sort (list))
-        (list int)
+        claim "Sort is idempotent"
+            (\list -> List.sort (List.sort list))
+            (\list -> List.sort list)
+            (list int)
 
 -}
 claim : String -> (a -> b) -> (a -> b) -> Investigator a -> Claim

@@ -1,4 +1,4 @@
-## master (0.7.1-beta)
+## master (0.8.0-beta)
 
 Features promoted from 0.7.0-exp:
   - Imports are now sorted and duplicate imports are merged
@@ -6,17 +6,28 @@ Features promoted from 0.7.0-exp:
   - The body of `let` expressions are no longer indented
   - Unnecessary parentheses are now removed (except in binary operator expressions)
 
+Other new features:
+  - Expressions in doc comment code blocks are now formatted
+
 Bug fixes:
-  - Parentheses are not considered unnecessary if removing them would cause a comment to move to a different AST node
+  - Parentheses are no longer removed if doing so would cause a comment to move to a different AST node
   - Multiline `@docs` lines in markdown are now handled correctly
+  - Trailing whitespace in multiline strings is no longer removed
+  - Special characters in doc comments are now escaped more correctly
+  - On Windows, special folders are now correctly skipped when traversing the filesystem
 
 Syntax changes:
   - Infix operator precedence and associativity declarations are now grouped together
   - `if` expressions now have blank lines between clauses
   - Comments immediately following `import`s now have spacing consistent with other top-level comments
+  - `module` lines now have `exposing` at the end of the line, and exposed listings are indented less when multiline
+  - `module` lines now sort and group the `exposing` clause based on `@docs` lines in the module documentation
+  - `module exposing (..)` is replaced with an explicit list based on the documentation of the module
 
 Other changes:
   - Removed support for Elm 0.16
+  - Added support for Elm 0.19
+  - Added Elm 0.19 support for `--upgrade`
 
 
 ## 0.7.0-exp

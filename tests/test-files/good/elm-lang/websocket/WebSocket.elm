@@ -1,10 +1,4 @@
-effect module WebSocket
-    where { command = MyCmd, subscription = MySub }
-    exposing
-        ( keepAlive
-        , listen
-        , send
-        )
+effect module WebSocket where { command = MyCmd, subscription = MySub } exposing (listen, keepAlive, send)
 
 {-| Web sockets make it cheaper to talk to your servers.
 

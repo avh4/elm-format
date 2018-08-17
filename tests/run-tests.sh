@@ -2,23 +2,23 @@
 # shellcheck disable=SC2002
 
 uname -s
-which bash
-which diff
-which grep
-which sed
-which tee
-which wc
-which stack
+command -v bash
+command -v diff
+command -v grep
+command -v sed
+command -v tee
+command -v wc
+command -v stack
 
 
-if which shellcheck; then
+if command -v shellcheck; then
 	shellcheck "./tests/run-tests.sh" || exit 1
 	shellcheck "./package/collect_files.sh" || exit 1
 	shellcheck "./package/mac/build-package.sh" || exit 1
 	shellcheck "./package/linux/build-package.sh" || exit 1
 fi
 
-if which nix-env; then
+if command -v nix-env; then
 	echo "$0: INFO: Detected Nixos or Nix"
 	STACK_ARGS=(--nix-pure --nix-add-gc-roots)
 	echo "$0: INFO: nix arguments will be passed to stack: ${STACK_ARGS[*]}"
@@ -26,7 +26,7 @@ fi
 
 stack "${STACK_ARGS[@]}" build || exit 1
 
-ELM_FORMAT="$(stack "${STACK_ARGS[@]}" path --local-install-root)/bin/elm-format-0.18"
+ELM_FORMAT="$(stack "${STACK_ARGS[@]}" path --local-install-root)/bin/elm-format-0.19"
 if [ ! -e "$ELM_FORMAT" ]; then
 	echo "$0: ERROR: $ELM_FORMAT not found" >&2
 	exit 1
@@ -35,7 +35,7 @@ echo "Testing $ELM_FORMAT"
 cp "$ELM_FORMAT" tests/elm-format
 ELM_FORMAT="tests/elm-format"
 
-if which md5 > /dev/null; then
+if command -v md5 > /dev/null; then
 	MD5="md5"
 else
 	MD5="md5sum"
@@ -316,6 +316,24 @@ echo "# elm-format test suite"
 
 checkWaysToRun
 
+checkGood 0.19 AllSyntax/0.19/Literals.elm
+checkGood 0.19 AllSyntax/0.19/InfixDeclaration.elm
+
+checkTransformation 0.19 Elm-0.19/ExplicitlyListExposedValues.elm
+
+checkUpgrade 0.19 Elm-0.19/CommaFunctionsBecomeLambdas.elm
+checkUpgrade 0.19 Elm-0.19/RemoveBangOperator.elm
+checkUpgrade 0.19 Elm-0.19/NewStringEscapeSyntax.elm
+checkUpgrade 0.19 Elm-0.19/RemoveBasicsFlip.elm
+checkUpgrade 0.19 Elm-0.19/RemoveBasicsCurry.elm
+checkUpgrade 0.19 Elm-0.19/RemoveBasicsUncurry.elm
+checkUpgrade 0.19 Elm-0.19/ConvertBasicsRem.elm
+checkUpgrade 0.19 Elm-0.19/ConvertBasicsModBy.elm
+checkUpgrade 0.19 Elm-0.19/ConvertHtmlAttributesStyle.elm
+checkUpgrade 0.19 Elm-0.19/ConvertHtmlAttributesStyleAltImport.elm
+checkUpgrade 0.19 Elm-0.19/ListExports.elm
+checkUpgrade 0.19 Elm-0.19/OpenExplicitConstructorImports.elm
+
 checkGood 0.18 Simple.elm
 checkGood 0.18 AllSyntax/0.18/AllSyntax.elm
 checkGoodAllSyntax 0.18 Module
@@ -358,6 +376,8 @@ checkGood 0.18 rtfeldman/dreamwriter/LeftSidebar.elm
 checkGood 0.18 rtfeldman/dreamwriter/RightSidebar.elm
 checkGood 0.18 rtfeldman/dreamwriter/WordGraph.elm
 checkGood 0.18 avh4/elm-fifo/Fifo.elm
+checkGood 0.19 mdgriffith/style-elements/Element.elm
+checkGood 0.19 elm/core/Basics.elm
 
 checkGood 0.17 elm-lang/examples/random.elm
 checkGood 0.17 elm-lang/examples/http.elm

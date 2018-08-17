@@ -1,4 +1,4 @@
-module Component.LeftSidebar exposing (..)
+module Component.LeftSidebar exposing (Addresses, Model, Update(..), ViewMode(..), downloadContentType, illegalFilenameCharMatcher, initialModel, legalizeFilename, sidebarHeaderClass, sidebarHeaderId, transition, view, viewCurrentDocFooter, viewCurrentDocHeader, viewOpenMenuFooter, viewOpenMenuHeader)
 
 import Component.LeftSidebar.CurrentDocView as CurrentDoc
 import Component.LeftSidebar.OpenMenuView as OpenMenu

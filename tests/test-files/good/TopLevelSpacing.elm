@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (Model, class, classList, id)
 
 
 { id, class, classList } =

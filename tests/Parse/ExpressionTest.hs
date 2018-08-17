@@ -9,9 +9,10 @@ import AST.Expression
 import AST.Pattern (Pattern'(Anything))
 import qualified AST.Pattern as P
 import AST.Variable
+import qualified Data.Map.Strict as Map
 import Text.Parsec.Char (string)
 import ElmVersion
-import ElmFormat.Render.Box (formatExpression, ExpressionContext(..))
+import ElmFormat.Render.Box (formatExpression, ExpressionContext(..), ImportInfo(..))
 import qualified Box
 import qualified Data.Text as Text
 import Parse.TestHelpers
@@ -27,10 +28,15 @@ example name input expected =
         assertParse expr input expected
 
 
+importInfo :: ImportInfo
+importInfo =
+    ImportInfo Map.empty Map.empty
+
+
 example' :: String -> String -> String -> TestTree
 example' name input expected =
     testCase name $
-        assertParse (fmap (Text.unpack . Box.render . formatExpression Elm_0_18 SyntaxSeparated) expr) input expected
+        assertParse (fmap (Text.unpack . Box.render . formatExpression Elm_0_18 importInfo SyntaxSeparated) expr) input expected
 
 
 commentedIntExpr (a,b,c,d) preComment postComment i =
@@ -216,7 +222,7 @@ tests =
             "{ a | x = 7, y = 8 }\n"
         , example' "comments"
             "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}"
-            "{ {- A -} a {- B -}\n    | {- C -} x {- D -} = {- E -} 7\n    \n    {- F -}\n    , {- G -} y {- H -} = {- I -} 8\n    \n    {- J -}\n}\n"
+            "{ {- A -} a {- B -}\n    | {- C -} x {- D -} = {- E -} 7\n\n    {- F -}\n    , {- G -} y {- H -} = {- I -} 8\n\n    {- J -}\n}\n"
         , example' "newlines"
             "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }"
             "{ a\n    | x =\n        7\n    , y =\n        8\n}\n"

@@ -7,7 +7,6 @@ import Data.Map.Strict hiding (foldl)
 import qualified Data.Maybe as Maybe
 import Text.Parsec hiding (newline, spaces, State)
 import Text.Parsec.Indent (indented, runIndent)
-import qualified Text.Parsec.Token as T
 
 import AST.V0_16
 import qualified AST.Expression
@@ -123,6 +122,11 @@ symOp =
       case op of
         "." -> notFollowedBy lower >> return (SymbolIdentifier op)
         _   -> return $ SymbolIdentifier op
+
+
+symOpInParens :: IParser SymbolIdentifier
+symOpInParens =
+    parens' symOp
 
 
 -- COMMON SYMBOLS
@@ -536,45 +540,6 @@ closeShader builder =
     ]
 
 
-str :: IParser (String, Bool)
-str =
-  expecting "a string" $
-  do  (s, multi) <- choice [ multiStr, singleStr ]
-      result <- processAs T.stringLiteral . sandwich '\"' $ concat s
-      return (result, multi)
-  where
-    rawString quote insides =
-        quote >> manyTill insides quote
-
-    multiStr  =
-        do  result <- rawString (try (string "\"\"\"")) multilineStringChar
-            return (result, True)
-    singleStr =
-        do  result <- rawString (char '"') stringChar
-            return (result, False)
-
-    stringChar :: IParser String
-    stringChar = choice [ newlineChar, escaped '\"', (:[]) <$> satisfy (/= '\"') ]
-
-    multilineStringChar :: IParser String
-    multilineStringChar =
-        do noEnd
-           choice [ newlineChar, escaped '\"', expandQuote <$> anyChar ]
-        where
-          noEnd = notFollowedBy (string "\"\"\"")
-          expandQuote c = if c == '\"' then "\\\"" else [c]
-
-    newlineChar :: IParser String
-    newlineChar =
-        choice
-            [ char '\n' >> return "\\n"
-            , char '\r' >> choice
-                [ char '\n' >> return "\\n"
-                , return "\\r"
-                ]
-            ]
-
-
 sandwich :: Char -> String -> String
 sandwich delim s =
   delim : s ++ [delim]
@@ -588,46 +553,10 @@ escaped delim =
     return ['\\', c]
 
 
-chr :: IParser Char
-chr =
-    betwixt '\'' '\'' character <?> "a character"
-  where
-    nonQuote = satisfy (/='\'')
-
-    character =
-      do  c <- choice
-                [ escaped '\''
-                , (:) <$> char '\\' <*> many1 nonQuote
-                , (:[]) <$> nonQuote
-                ]
-
-          processAs T.charLiteral $ sandwich '\'' c
-
-
-processAs :: (T.GenTokenParser String u SourceM -> IParser a) -> String -> IParser a
+processAs :: IParser a -> String -> IParser a
 processAs processor s =
-    calloutParser s (processor lexer)
+    calloutParser s processor
   where
     calloutParser :: String -> IParser a -> IParser a
     calloutParser inp p =
       either (fail . show) return (iParse p inp)
-
-    lexer :: T.GenTokenParser String u SourceM
-    lexer = T.makeTokenParser elmDef
-
-    -- I don't know how many of these are necessary for charLiteral/stringLiteral
-    elmDef :: T.GenLanguageDef String u SourceM
-    elmDef =
-      T.LanguageDef
-        { T.commentStart    = "{-"
-        , T.commentEnd      = "-}"
-        , T.commentLine     = "--"
-        , T.nestedComments  = True
-        , T.identStart      = undefined
-        , T.identLetter     = undefined
-        , T.opStart         = undefined
-        , T.opLetter        = undefined
-        , T.reservedNames   = reserveds
-        , T.reservedOpNames = [":", "->", "|"]
-        , T.caseSensitive   = True
-        }
