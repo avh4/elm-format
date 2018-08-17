@@ -13,6 +13,13 @@ import Text.JSON hiding (showJSON)
 
 import qualified Data.List as List
 import qualified Data.Map.Strict as Map
+import qualified ElmFormat.Version
+
+
+pleaseReport :: String -> String -> a
+pleaseReport what details =
+    error ("<elm-format-" ++ ElmFormat.Version.asString ++ ": "++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >")
+
 
 showModule :: Module -> JSValue
 showModule (Module _ _ _ (_, imports) body) =
@@ -59,10 +66,7 @@ instance ToJSON Expr' where
                   ]
 
           VarExpr (VarRef [] (LowercaseIdentifier var)) ->
-              makeObj
-                  [ type_ "VariableReference"
-                  , ("name" , JSString $ toJSString var)
-                  ]
+            variableReference var
 
           VarExpr (VarRef namespace (LowercaseIdentifier var)) ->
               let
@@ -82,10 +86,7 @@ instance ToJSON Expr' where
                   ]
 
           VarExpr (OpRef (SymbolIdentifier sym)) ->
-            makeObj
-                [ type_ "VariableReference"
-                , ( "name", JSString $ toJSString sym )
-                ]
+            variableReference sym
 
           App (A _ expr) args _ ->
               makeObj
@@ -131,6 +132,12 @@ instance ToJSON Expr' where
                   [ type_ "TupleLiteral"
                   , ("terms", JSArray $ fmap (showJSON importAliases) (map (\(Commented _ (A _ expr) _) -> expr) exprs))
                   ]
+
+          TupleFunction n | n <= 1 ->
+            pleaseReport "INVALID TUPLE CONSTRUCTOR" ("n=" ++ show n)
+
+          TupleFunction n ->
+            variableReference $ replicate (n-1) ','
 
           AST.Expression.Record base fields _ _ ->
               let
@@ -226,6 +233,14 @@ instance ToJSON Expr' where
 
           _ ->
               JSString $ toJSString "TODO: Expr"
+
+
+variableReference :: String -> JSValue
+variableReference name =
+    makeObj
+        [ type_ "VariableReference"
+        , ("name" , JSString $ toJSString name)
+        ]
 
 
 instance ToJSON LetDeclaration where

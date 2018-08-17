@@ -517,7 +517,10 @@
                         "value": 3
                     }
                 ],
-                "function": "TODO: Expr",
+                "function": {
+                    "name": ",,",
+                    "type": "VariableReference"
+                },
                 "type": "FunctionApplication"
             },
             "name": "tupleFunction",
