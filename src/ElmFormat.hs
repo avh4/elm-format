@@ -16,6 +16,8 @@ import ElmFormat.InputConsole (InputConsole)
 import ElmFormat.OutputConsole (OutputConsole)
 import ElmFormat.World
 
+import qualified AST.Json
+import qualified AST.Module
 import qualified Flags
 import qualified Data.Text as Text
 import qualified ElmFormat.Execute as Execute
@@ -29,6 +31,7 @@ import qualified ElmFormat.OutputConsole as OutputConsole
 import qualified ElmFormat.Version
 import qualified Options.Applicative as Opt
 import qualified Reporting.Result as Result
+import qualified Text.JSON
 
 
 resolveFile :: FileStore f => FilePath -> Free f (Either InputFileMessage [FilePath])
@@ -90,6 +93,8 @@ data WhatToDo
     | StdinToStdout
     | ValidateStdin
     | ValidateFiles FilePath [FilePath]
+    | FileToJson FilePath
+    | StdinToJson
 
 
 data Source
@@ -101,6 +106,7 @@ data Destination
     = ValidateOnly
     | UpdateInPlace
     | ToFile FilePath
+    | ToJson
 
 
 determineSource :: Bool -> Either [InputFileMessage] [FilePath] -> Either ErrorMessage Source
@@ -113,13 +119,15 @@ determineSource stdin inputFiles =
         ( True, Right (_:_) ) -> Left TooManyInputs
 
 
-determineDestination :: Maybe FilePath -> Bool -> Either ErrorMessage Destination
-determineDestination output doValidate =
-    case ( output, doValidate ) of
-        ( Nothing, True ) -> Right ValidateOnly
-        ( Nothing, False ) -> Right UpdateInPlace
-        ( Just path, False ) -> Right $ ToFile path
-        ( Just _, True ) -> Left OutputAndValidate
+determineDestination :: Maybe FilePath -> Bool -> Bool -> Either ErrorMessage Destination
+determineDestination output doValidate json =
+    case ( output, doValidate, json ) of
+        ( _, True, True ) -> Left OutputAndValidate
+        ( Nothing, True, False ) -> Right ValidateOnly
+        ( Nothing, False, False ) -> Right UpdateInPlace
+        ( Just path, False, False ) -> Right $ ToFile path
+        ( Just _, True, _ ) -> Left OutputAndValidate
+        ( _, False, True ) -> Right ToJson
 
 
 determineWhatToDo :: Source -> Destination -> Either ErrorMessage WhatToDo
@@ -128,17 +136,20 @@ determineWhatToDo source destination =
         ( Stdin, ValidateOnly ) -> Right $ ValidateStdin
         ( FromFiles first rest, ValidateOnly) -> Right $ ValidateFiles first rest
         ( Stdin, UpdateInPlace ) -> Right StdinToStdout
+        ( Stdin, ToJson ) -> Right StdinToJson
         ( Stdin, ToFile output ) -> Right $ StdinToFile output
         ( FromFiles first [], ToFile output ) -> Right $ FormatToFile first output
         ( FromFiles first rest, UpdateInPlace ) -> Right $ FormatInPlace first rest
         ( FromFiles _ _, ToFile _ ) -> Left SingleOutputWithMultipleInputs
+        ( FromFiles first [], ToJson ) -> Right $ FileToJson first
+        ( FromFiles _ _, ToJson ) -> Left SingleOutputWithMultipleInputs
 
 
 determineWhatToDoFromConfig :: Flags.Config -> Either [InputFileMessage] [FilePath] -> Either ErrorMessage WhatToDo
 determineWhatToDoFromConfig config resolvedInputFiles =
     do
         source <- determineSource (Flags._stdin config) resolvedInputFiles
-        destination <- determineDestination (Flags._output config) (Flags._validate config)
+        destination <- determineDestination (Flags._output config) (Flags._validate config) (Flags._json config)
         determineWhatToDo source destination
 
 
@@ -254,10 +265,21 @@ data FormatResult
     = NoChange FilePath Text.Text
     | Changed FilePath Text.Text
 
-format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage FormatResult
-format elmVersion (inputFile, inputText) =
+
+parseModule :: (FilePath, Text.Text) -> Either InfoMessage AST.Module.Module
+parseModule (inputFile, inputText) =
     case Parse.parse inputText of
         Result.Result _ (Result.Ok modu) ->
+            Right modu
+
+        Result.Result _ (Result.Err errs) ->
+            Left $ ParseError inputFile (Text.unpack inputText) errs
+
+
+format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage FormatResult
+format elmVersion (inputFile, inputText) =
+    case parseModule (inputFile, inputText) of
+        Right modu ->
             let
                 outputText = Render.render elmVersion modu
             in
@@ -266,8 +288,8 @@ format elmVersion (inputFile, inputText) =
                     then NoChange inputFile outputText
                     else Changed inputFile outputText
 
-        Result.Result _ (Result.Err errs) ->
-            Left $ ParseError inputFile (Text.unpack inputText) errs
+        Left message ->
+            Left message
 
 
 readStdin :: InputConsole f => Free f (FilePath, Text.Text)
@@ -342,3 +364,10 @@ doIt elmVersion whatToDo =
                     else return True
             where
                 formatFile file = (format elmVersion <$> ElmFormat.readFile file) >>= logErrorOr ElmFormat.updateFile
+
+        StdinToJson ->
+            (fmap (Text.pack . Text.JSON.encode . AST.Json.showModule) <$> parseModule <$> readStdin) >>= logErrorOr OutputConsole.writeStdout
+
+        -- TODO: this prints "Processing such-and-such-a-file.elm" which makes the JSON output invalid
+        -- FileToJson inputFile ->
+        --     (fmap (Text.pack . Text.JSON.encode . AST.Json.showJSON) <$> parseModule <$> ElmFormat.readFile inputFile) >>= logErrorOr OutputConsole.writeStdout
