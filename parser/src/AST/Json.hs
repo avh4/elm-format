@@ -4,6 +4,7 @@ module AST.Json where
 
 import AST.Declaration
 import AST.Expression
+import AST.MapNamespace
 import AST.Module
 import AST.Pattern
 import AST.Variable
@@ -31,24 +32,32 @@ showModule (Module _ _ _ (_, imports) body) =
 
         importAliases =
             Map.fromList $ map (\(k, v) -> (v, k)) $ Map.toList $ Map.mapMaybe (getAlias . snd) imports
+
+        normalizeNamespace namespace =
+            case namespace of
+                [alias] ->
+                    Map.findWithDefault namespace alias importAliases
+
+                _ ->
+                    namespace
     in
-    makeObj [ ("body" , JSArray $ fmap (showJSON importAliases) body) ]
+    makeObj [ ("body" , JSArray $ fmap showJSON $ mapNamespace normalizeNamespace body) ]
 
 
 class ToJSON a where
-  showJSON :: Map.Map UppercaseIdentifier [UppercaseIdentifier] -> a -> JSValue
+  showJSON :: a -> JSValue
 
 
 instance ToJSON Region.Region where
-    showJSON x region =
+    showJSON region =
         makeObj
-            [ ( "start", showJSON x $ Region.start region )
-            , ( "end", showJSON x $ Region.end region )
+            [ ( "start", showJSON $ Region.start region )
+            , ( "end", showJSON $ Region.end region )
             ]
 
 
 instance ToJSON Region.Position where
-    showJSON _ pos =
+    showJSON pos =
         makeObj
             [ ( "line", JSRational False $ toRational $ Region.line pos )
             , ( "col", JSRational False $ toRational $ Region.column pos )
@@ -56,18 +65,18 @@ instance ToJSON Region.Position where
 
 
 instance ToJSON (TopLevelStructure Declaration) where
-  showJSON importAliases (Entry (A region (Definition (A _ (VarPattern (LowercaseIdentifier var))) _ _ expr))) =
+  showJSON (Entry (A region (Definition (A _ (VarPattern (LowercaseIdentifier var))) _ _ expr))) =
     makeObj
       [ type_ "Definition"
       , ("name" , JSString $ toJSString var)
-      , ("expression" , showJSON importAliases expr)
-      , sourceLocation importAliases region
+      , ("expression" , showJSON expr)
+      , sourceLocation region
       ]
-  showJSON _ _ = JSString $ toJSString "TODO: Decl"
+  showJSON _ = JSString $ toJSString "TODO: Decl"
 
 
 instance ToJSON Expr where
-  showJSON importAliases (A region expr) =
+  showJSON (A region expr) =
       case expr of
           Unit _ ->
               makeObj [ type_ "UnitLiteral" ]
@@ -78,7 +87,7 @@ instance ToJSON Expr where
                   , ("value", JSRational False $ toRational value)
                   , ("display"
                     , makeObj
-                        [ ("representation", showJSON importAliases repr)
+                        [ ("representation", showJSON repr)
                         ]
                     )
                   ]
@@ -88,53 +97,44 @@ instance ToJSON Expr where
                 [ type_ "ExternalReference"
                 , ("module", JSString $ toJSString "Basics")
                 , ("identifier", JSString $ toJSString $ show value)
-                , sourceLocation importAliases region
+                , sourceLocation region
                 ]
 
           VarExpr (VarRef [] (LowercaseIdentifier var)) ->
-            variableReference importAliases region var
+            variableReference region var
 
           VarExpr (VarRef namespace (LowercaseIdentifier var)) ->
-              let
-                  normalizedNamespace =
-                      case namespace of
-                          [alias] ->
-                              Map.findWithDefault namespace alias importAliases
-
-                          _ ->
-                              namespace
-              in
               makeObj
                   [ type_ "ExternalReference"
                   , ("module"
-                    , JSString $ toJSString $ List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) normalizedNamespace)
+                    , JSString $ toJSString $ List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) namespace)
                   , ("identifier", JSString $ toJSString var)
-                  , sourceLocation importAliases region
+                  , sourceLocation region
                   ]
 
           VarExpr (TagRef [] (UppercaseIdentifier tag)) ->
-            variableReference importAliases region tag
+            variableReference region tag
 
           VarExpr (OpRef (SymbolIdentifier sym)) ->
-            variableReference importAliases region sym
+            variableReference region sym
 
           App expr args _ ->
               makeObj
                   [ type_ "FunctionApplication"
-                  , ("function", showJSON importAliases expr)
-                  , ("arguments", JSArray $ showJSON importAliases <$> map (\(_ , arg) -> arg) args)
+                  , ("function", showJSON expr)
+                  , ("arguments", JSArray $ showJSON <$> map (\(_ , arg) -> arg) args)
                   ]
 
           Binops first rest _ ->
               makeObj
                   [ type_ "BinaryOperatorList"
-                  , ("first", showJSON importAliases first)
+                  , ("first", showJSON first)
                   , ("operations"
                     , JSArray $ map
                         (\(_, op, _, expr) ->
                            makeObj
-                               [ ("operator", showJSON importAliases $ noRegion $ VarExpr op)
-                               , ("term", showJSON importAliases expr)
+                               [ ("operator", showJSON $ noRegion $ VarExpr op)
+                               , ("term", showJSON expr)
                                ]
                         )
                         rest
@@ -145,29 +145,29 @@ instance ToJSON Expr where
             makeObj
                 [ type_ "UnaryOperator"
                 , ("operator", JSString $ toJSString "-")
-                , ("term", showJSON importAliases expr)
+                , ("term", showJSON expr)
                 ]
 
           Parens (Commented _ expr _) ->
-              showJSON importAliases expr
+              showJSON expr
 
           ExplicitList terms _ _ ->
               makeObj
                   [ type_ "ListLiteral"
-                  , ("terms", JSArray $ fmap (showJSON importAliases) (map (\(_, (_, (term, _))) -> term) terms))
+                  , ("terms", JSArray $ fmap showJSON (map (\(_, (_, (term, _))) -> term) terms))
                   ]
 
           AST.Expression.Tuple exprs _ ->
               makeObj
                   [ type_ "TupleLiteral"
-                  , ("terms", JSArray $ fmap (showJSON importAliases) (map (\(Commented _ expr _) -> expr) exprs))
+                  , ("terms", JSArray $ fmap showJSON (map (\(Commented _ expr _) -> expr) exprs))
                   ]
 
           TupleFunction n | n <= 1 ->
             pleaseReport "INVALID TUPLE CONSTRUCTOR" ("n=" ++ show n)
 
           TupleFunction n ->
-            variableReference importAliases region $ replicate (n-1) ','
+            variableReference region $ replicate (n-1) ','
 
           AST.Expression.Record base fields _ _ ->
               let
@@ -175,7 +175,7 @@ instance ToJSON Expr where
                       ( "fields"
                       , makeObj $ fmap
                           (\(_, (_, (Pair (LowercaseIdentifier key, _) (_, value) _, _))) ->
-                             (key, showJSON importAliases value)
+                             (key, showJSON value)
                           )
                           fields
                       )
@@ -214,15 +214,15 @@ instance ToJSON Expr where
           Access base (LowercaseIdentifier field) ->
             makeObj
                 [ type_ "RecordAccess"
-                , ( "record", showJSON importAliases base )
+                , ( "record", showJSON base )
                 , ( "field", JSString $ toJSString field )
                 ]
 
           Lambda parameters _ body _ ->
               makeObj
                   [ type_ "AnonymousFunction"
-                  , ("parameters", JSArray $ map (\(_, A _ pat) -> showJSON importAliases pat) parameters)
-                  , ("body", showJSON importAliases body)
+                  , ("parameters", JSArray $ map (\(_, A _ pat) -> showJSON pat) parameters)
+                  , ("body", showJSON body)
                   ]
 
           If (Commented _ cond' _, Commented _ thenBody' _) rest' (_, elseBody) ->
@@ -231,12 +231,12 @@ instance ToJSON Expr where
                   ifThenElse cond thenBody rest =
                       makeObj
                           [ type_ "IfExpression"
-                          , ( "if", showJSON importAliases cond )
-                          , ( "then", showJSON importAliases thenBody )
+                          , ( "if", showJSON cond )
+                          , ( "then", showJSON thenBody )
                           , ( "else"
                             , case rest of
                                 [] ->
-                                    showJSON importAliases elseBody
+                                    showJSON elseBody
 
                                 (_, (Commented _ nextCond _, Commented _ nextBody _)) : nextRest ->
                                     ifThenElse nextCond nextBody nextRest
@@ -248,20 +248,20 @@ instance ToJSON Expr where
           Let decls _ body ->
               makeObj
                   [ type_ "LetExpression"
-                  , ( "declarations", JSArray $ map (showJSON importAliases) decls)
-                  , ("body", showJSON importAliases body)
+                  , ( "declarations", JSArray $ map showJSON decls)
+                  , ("body", showJSON body)
                   ]
 
           Case (Commented _ subject _, _) branches ->
               makeObj
                   [ type_ "CaseExpression"
-                  , ( "subject", showJSON importAliases subject )
+                  , ( "subject", showJSON subject )
                   , ( "branches"
                     , JSArray $ map
                         (\(Commented _ (A _ pat) _, (_, body)) ->
                            makeObj
-                               [ ("pattern", showJSON importAliases pat)
-                               , ("body", showJSON importAliases body)
+                               [ ("pattern", showJSON pat)
+                               , ("body", showJSON body)
                                ]
                         )
                         branches
@@ -272,28 +272,28 @@ instance ToJSON Expr where
               JSString $ toJSString "TODO: Expr"
 
 
-variableReference :: Map.Map UppercaseIdentifier [UppercaseIdentifier] -> Region.Region -> String -> JSValue
-variableReference x region name =
+variableReference :: Region.Region -> String -> JSValue
+variableReference region name =
     makeObj
         [ type_ "VariableReference"
         , ( "name" , JSString $ toJSString name )
-        , sourceLocation x region
+        , sourceLocation region
         ]
 
 
-sourceLocation :: Map.Map UppercaseIdentifier [UppercaseIdentifier] -> Region.Region -> (String, JSValue)
-sourceLocation x region =
-    ( "sourceLocation", showJSON x region )
+sourceLocation :: Region.Region -> (String, JSValue)
+sourceLocation region =
+    ( "sourceLocation", showJSON region )
 
 
 instance ToJSON LetDeclaration where
-  showJSON importAliases letDeclaration =
+  showJSON letDeclaration =
       case letDeclaration of
           LetDefinition (A _ (VarPattern (LowercaseIdentifier var))) [] _ expr ->
               makeObj
                   [ type_ "Definition"
                   , ("name" , JSString $ toJSString var)
-                  , ("expression" , showJSON importAliases expr)
+                  , ("expression" , showJSON expr)
                   ]
 
           _ ->
@@ -301,12 +301,12 @@ instance ToJSON LetDeclaration where
 
 
 instance ToJSON IntRepresentation where
-    showJSON _ DecimalInt = JSString $ toJSString $ "DecimalInt"
-    showJSON _ HexadecimalInt = JSString $ toJSString $ "HexadecimalInt"
+    showJSON DecimalInt = JSString $ toJSString $ "DecimalInt"
+    showJSON HexadecimalInt = JSString $ toJSString $ "HexadecimalInt"
 
 
 instance ToJSON Pattern' where
-  showJSON _ pattern' =
+  showJSON pattern' =
       JSString $ toJSString $ "TODO: Pattern (" ++ show pattern' ++ ")"
 
 
