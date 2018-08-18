@@ -4,6 +4,9 @@
   "description": "Install elm-format",
   "preferGlobal": true,
   "main": "index.js",
+  "engines": {
+    "node": ">=4.0.0"
+  },
   "scripts": {
     "install": "binwrap-install",
     "prepublish": "npm test",
@@ -23,7 +26,8 @@
   },
   "files": [
     "index.js",
-    "bin"
+    "bin",
+    "bin/elm-format"
   ],
   "homepage": "https://github.com/avh4/elm-format",
   "bin": {
