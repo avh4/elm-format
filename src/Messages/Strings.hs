@@ -27,7 +27,7 @@ showErrorMessage ErrorsHeading = "ERRORS"
 
 showErrorMessage (BadInputFiles filePaths) =
   unlines
-    [ "There was a problem reading one or more of the specified input files:"
+    [ "There was a problem reading one or more of the specified INPUT paths:"
     , ""
     , unlines $ map ((++) "    " . showInputMessage) filePaths
     , "Please check the given paths."
@@ -55,7 +55,7 @@ showErrorMessage NoInputs =
 showInputMessage :: InputFileMessage -> String
 
 showInputMessage (FileDoesNotExist path) =
-    path ++ ": File does not exist"
+    path ++ ": No such file or directory"
 
 showInputMessage (NoElmFiles path) =
     path ++ ": Directory does not contain any *.elm files"
