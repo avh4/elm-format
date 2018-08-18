@@ -28,6 +28,7 @@ Syntax changes:
 
 Other changes:
   - Removed support for Elm 0.16
+  - Installing with `npm install --ignore-scripts` is now supported
 
 
 ## 0.7.0-exp
