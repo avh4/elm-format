@@ -82,6 +82,7 @@ library
     other-modules:
         AST.Json
         AST.MapExpr
+        AST.MapNamespace
         Build_elm_format
         Cheapskate.Inlines
         Cheapskate.Parse
