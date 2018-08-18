@@ -18,8 +18,9 @@ brew cask install virtualbox
 ## Preparation
 
 1. Create a github issue to draft the release notes.
-1. Edit `elm-format.cabal` to remove `-dev` from the version and make sure the version number is correct.
+1. Update the version number in `elm-format.cabal`.
 1. Edit `CHANGELOG.md` to set the correct version number.
+1. If this is a stable release, update references to the version in `README.md`.
 1. Update `ElmFormat.Version.experimental` to `Just <survey URL>` for experimental versions and `Nothing` otherwise.
 1. `(cd package/npm && npm version "<new version>")`
 1. Commit the changes "Bump version to *new version*"
