@@ -305,7 +305,7 @@ function checkJson() {
 
 	echo
 	echo "## ${1%.*}.json"
-	time cat "$INPUT" | "$ELM_FORMAT" --stdin --json | python -mjson.tool > "$OUTPUT"
+	time cat "$INPUT" | "$ELM_FORMAT" --stdin --json | python -mjson.tool | tr -d '\015' > "$OUTPUT"
 	returnCodeShouldEqual 0
 	compareFiles "$EXPECTED" "$OUTPUT"
 }
