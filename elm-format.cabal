@@ -80,6 +80,7 @@ library
         Util.List
 
     other-modules:
+        AST.MapExpr
         Build_elm_format
         Cheapskate.Inlines
         Cheapskate.Parse
