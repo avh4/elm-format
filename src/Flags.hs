@@ -199,4 +199,5 @@ json =
         mconcat
             [ Opt.long "json"
             , Opt.help "Instead of formatting, write the AST to stdout."
+            , Opt.internal
             ]
