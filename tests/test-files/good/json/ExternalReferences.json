@@ -1,0 +1,265 @@
+{
+    "body": [
+        "TODO: Decl",
+        {
+            "expression": "TODO: Expr",
+            "name": "token",
+            "sourceLocation": {
+                "end": {
+                    "col": 12,
+                    "line": 13
+                },
+                "start": {
+                    "col": 1,
+                    "line": 12
+                }
+            },
+            "type": "Definition"
+        },
+        "TODO: Decl",
+        {
+            "expression": {
+                "arguments": [
+                    {
+                        "name": "token",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 21,
+                                "line": 18
+                            },
+                            "start": {
+                                "col": 16,
+                                "line": 18
+                            }
+                        },
+                        "type": "VariableReference"
+                    }
+                ],
+                "function": {
+                    "identifier": "class",
+                    "module": "Html.Attributes",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 15,
+                            "line": 18
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 18
+                        }
+                    },
+                    "type": "ExternalReference"
+                },
+                "type": "FunctionApplication"
+            },
+            "name": "theBestClass",
+            "sourceLocation": {
+                "end": {
+                    "col": 21,
+                    "line": 18
+                },
+                "start": {
+                    "col": 1,
+                    "line": 17
+                }
+            },
+            "type": "Definition"
+        },
+        "TODO: Decl",
+        {
+            "expression": {
+                "identifier": "text",
+                "module": "Html",
+                "sourceLocation": {
+                    "end": {
+                        "col": 14,
+                        "line": 23
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 23
+                    }
+                },
+                "type": "ExternalReference"
+            },
+            "name": "text",
+            "sourceLocation": {
+                "end": {
+                    "col": 14,
+                    "line": 23
+                },
+                "start": {
+                    "col": 1,
+                    "line": 22
+                }
+            },
+            "type": "Definition"
+        },
+        "TODO: Decl",
+        {
+            "expression": {
+                "arguments": [
+                    {
+                        "terms": [
+                            {
+                                "name": "theBestClass",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 23,
+                                        "line": 29
+                                    },
+                                    "start": {
+                                        "col": 11,
+                                        "line": 29
+                                    }
+                                },
+                                "type": "VariableReference"
+                            }
+                        ],
+                        "type": "ListLiteral"
+                    },
+                    {
+                        "terms": [
+                            {
+                                "arguments": [
+                                    {
+                                        "name": "token",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 26,
+                                                "line": 30
+                                            },
+                                            "start": {
+                                                "col": 21,
+                                                "line": 30
+                                            }
+                                        },
+                                        "type": "VariableReference"
+                                    }
+                                ],
+                                "function": {
+                                    "identifier": "text",
+                                    "module": "Html",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 20,
+                                            "line": 30
+                                        },
+                                        "start": {
+                                            "col": 11,
+                                            "line": 30
+                                        }
+                                    },
+                                    "type": "ExternalReference"
+                                },
+                                "type": "FunctionApplication"
+                            },
+                            {
+                                "first": {
+                                    "identifier": "text",
+                                    "module": "Html",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 20,
+                                            "line": 31
+                                        },
+                                        "start": {
+                                            "col": 11,
+                                            "line": 31
+                                        }
+                                    },
+                                    "type": "ExternalReference"
+                                },
+                                "operations": [
+                                    {
+                                        "operator": {
+                                            "name": "<|",
+                                            "sourceLocation": {
+                                                "end": {
+                                                    "col": 0,
+                                                    "line": 0
+                                                },
+                                                "start": {
+                                                    "col": 0,
+                                                    "line": 0
+                                                }
+                                            },
+                                            "type": "VariableReference"
+                                        },
+                                        "term": {
+                                            "arguments": [
+                                                {
+                                                    "operator": "-",
+                                                    "term": {
+                                                        "name": "pi",
+                                                        "sourceLocation": {
+                                                            "end": {
+                                                                "col": 36,
+                                                                "line": 31
+                                                            },
+                                                            "start": {
+                                                                "col": 34,
+                                                                "line": 31
+                                                            }
+                                                        },
+                                                        "type": "VariableReference"
+                                                    },
+                                                    "type": "UnaryOperator"
+                                                }
+                                            ],
+                                            "function": {
+                                                "name": "toString",
+                                                "sourceLocation": {
+                                                    "end": {
+                                                        "col": 32,
+                                                        "line": 31
+                                                    },
+                                                    "start": {
+                                                        "col": 24,
+                                                        "line": 31
+                                                    }
+                                                },
+                                                "type": "VariableReference"
+                                            },
+                                            "type": "FunctionApplication"
+                                        }
+                                    }
+                                ],
+                                "type": "BinaryOperatorList"
+                            }
+                        ],
+                        "type": "ListLiteral"
+                    }
+                ],
+                "function": {
+                    "identifier": "div",
+                    "module": "Html",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 13,
+                            "line": 28
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 28
+                        }
+                    },
+                    "type": "ExternalReference"
+                },
+                "type": "FunctionApplication"
+            },
+            "name": "main",
+            "sourceLocation": {
+                "end": {
+                    "col": 10,
+                    "line": 32
+                },
+                "start": {
+                    "col": 1,
+                    "line": 27
+                }
+            },
+            "type": "Definition"
+        }
+    ]
+}

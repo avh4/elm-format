@@ -9,16 +9,12 @@ unit =
     ]
 
 
-literal =
-    ( 1
-    , 2.0
-    , "string"
-    , 'c'
-    )
-
-
 var x =
     x
+
+
+qualifiedVar =
+    Bar.Baz.foo
 
 
 operator =

@@ -282,7 +282,7 @@ function checkValidationOutputFormat() {
 	echo
 
 	echo "## with unformatted files outputs in expected json format"
-	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate | sed -e "s/$(git describe --abbrev=8 --always)/<version>/" | tee "$OUTPUT"
+	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate | sed -e "s/ elm-format-[-.0-9a-z]* / elm-format-<version> /" | tee "$OUTPUT"
 	compareFiles tests/test-files/validate1.json "$OUTPUT"
 
 	echo "## with invalid files outputs in expected json format"
@@ -298,6 +298,17 @@ function checkValidationOutputFormat() {
 	echo "------------------------------"
 }
 
+function checkJson() {
+	INPUT="tests/test-files/$1"
+	OUTPUT="formatted.json"
+	EXPECTED="tests/test-files/${1%.*}.json"
+
+	echo
+	echo "## ${1%.*}.json"
+	time cat "$INPUT" | "$ELM_FORMAT" --stdin --json | python -mjson.tool | tr -d '\015' > "$OUTPUT"
+	returnCodeShouldEqual 0
+	compareFiles "$EXPECTED" "$OUTPUT"
+}
 
 echo
 echo
@@ -402,6 +413,10 @@ checkUpgrade 0.18 Elm-0.18/SpecialBackticksBecomePipelines.elm
 checkUpgrade 0.18 Elm-0.18/RenameTupleFunctions.elm
 
 checkValidationOutputFormat
+
+checkJson good/AllSyntax/0.18/Expressions.elm
+checkJson good/AllSyntax/0.18/Literals.elm
+checkJson good/json/ExternalReferences.elm
 
 echo
 echo "# GREAT SUCCESS!"
