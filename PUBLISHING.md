@@ -25,7 +25,7 @@ brew cask install virtualbox
 1. `(cd package/npm && npm version "<new version>")`
 1. Commit the changes "Bump version to *new version*"
 1. Create a signed tag for the new version. `git tag -s <version> -m <version>`
-1. Push the tag.
+1. Push the tag. `git push origin <version>`
 1. Wait for CI to successfully build the tag.
 
 
