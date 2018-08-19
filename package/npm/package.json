@@ -1,11 +1,12 @@
 {
   "name": "elm-format",
-  "version": "0.8.0-alpha-elm019rc1-rc2",
+  "version": "0.8.0-rc3",
   "description": "Install elm-format",
   "preferGlobal": true,
   "main": "index.js",
   "scripts": {
     "install": "binwrap-install",
+    "prepare": "binwrap-prepare",
     "prepublish": "npm test",
     "test": "eslint . && binwrap-test"
   },
@@ -30,7 +31,7 @@
     "elm-format": "bin/elm-format"
   },
   "dependencies": {
-    "binwrap": "^0.1.4"
+    "binwrap": "^0.2.0"
   },
   "devDependencies": {
     "eslint": "^3.18.0"

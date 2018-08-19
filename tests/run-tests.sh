@@ -285,10 +285,6 @@ function checkValidationOutputFormat() {
 	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate | sed -e "s/ elm-format-[-.0-9a-z]* / elm-format-<version> /" | tee "$OUTPUT"
 	compareFiles tests/test-files/validate1.json "$OUTPUT"
 
-	echo "## with invalid files outputs in expected json format"
-	"$ELM_FORMAT" "tests/test-files/bad/Empty.elm" --validate | tee "$OUTPUT"
-	compareFiles tests/test-files/bad/Empty.validate.json "$OUTPUT"
-
 	echo "## with formatted file with output in json outputs empty list"
 	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --yes > /dev/null
 	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate | tee "$OUTPUT"
@@ -386,7 +382,6 @@ checkGood 0.17 elm-lang/examples/websockets.elm
 checkGood 0.17 elm-lang/examples/Spelling.elm
 checkGood 0.17 elm-lang/websocket/WebSocket.elm
 
-checkBad Empty.elm
 checkBad UnexpectedComma.elm
 checkBad UnexpectedEndOfInput.elm
 
@@ -406,6 +401,7 @@ checkTransformation 0.18 DocCommentCheapskateReferenceBug.elm
 checkTransformation 0.18 DocCommentAtDocs.elm
 checkTransformation 0.18 Sorting.elm
 checkTransformation 0.18 UnnecessaryParens.elm
+checkTransformation 0.18 Empty.elm
 checkUpgrade 0.18 Elm-0.18/PrimesBecomeUnderscores.elm
 checkUpgrade 0.18 Elm-0.18/RangesBecomeListRange.elm
 checkUpgrade 0.18 Elm-0.18/BackticksBecomeFunctionCalls.elm
