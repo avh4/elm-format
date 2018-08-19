@@ -17,6 +17,7 @@ Bug fixes:
   - Trailing whitespace in multiline strings is no longer removed
   - Special characters in doc comments are now escaped more correctly
   - On Windows, special folders are now correctly skipped when traversing the filesystem
+  - Initial comments in doc comment code blocks are no longer removed
 
 Syntax changes:
   - Infix operator precedence and associativity declarations are now grouped together
