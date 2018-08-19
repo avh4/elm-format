@@ -634,8 +634,9 @@ formatTopLevelBody linesBetween elmVersion importInfo entryType formatEntry body
 
 
 data ElmCodeBlock
-    = ModuleCode AST.Module.Module
+    = DeclarationsCode [TopLevelStructure Declaration]
     | ExpressionsCode [TopLevelStructure (WithEol AST.Expression.Expr)]
+    | ModuleCode AST.Module.Module -- This can maybe be removed now that DeclaractionsCode is added -- will a doc comment ever contain a full module?
     deriving (Show)
 
 
@@ -657,8 +658,9 @@ formatModuleDocs elmVersion importInfo blocks =
         parse source =
             source
                 |> firstOf
-                    [ fmap ModuleCode . Result.toMaybe . Parse.parseModule
+                    [ fmap DeclarationsCode . Result.toMaybe . Parse.parseDeclarations
                     , fmap ExpressionsCode . Result.toMaybe . Parse.parseExpressions
+                    , fmap ModuleCode . Result.toMaybe . Parse.parseModule -- Not sure if this will catch anything useful that parseDeclaractions doesn't
                     ]
 
         format :: ElmCodeBlock -> String
@@ -666,6 +668,11 @@ formatModuleDocs elmVersion importInfo blocks =
             case result of
                 ModuleCode modu ->
                     formatModuleCode modu
+
+                DeclarationsCode declarations ->
+                    formatModuleBody 1 elmVersion importInfo declarations
+                        |> fmap (Text.unpack . Box.render)
+                        |> fromMaybe ""
 
                 ExpressionsCode expressions ->
                     let
@@ -687,7 +694,7 @@ formatModuleDocs elmVersion importInfo blocks =
                 box =
                     case
                         ( formatImports elmVersion modu
-                        , formatModuleBody 1 elmVersion (makeImportInfo modu) topLevels
+                        , formatModuleBody 1 elmVersion importInfo topLevels
                         )
                     of
                         ( [], Nothing ) -> Nothing
