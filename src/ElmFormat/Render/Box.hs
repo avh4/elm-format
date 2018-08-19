@@ -7,6 +7,7 @@ import ElmVersion (ElmVersion(..))
 
 import qualified AST.V0_16 as AST
 import AST.V0_16 (UppercaseIdentifier(..), LowercaseIdentifier(..), SymbolIdentifier(..), WithEol)
+import AST.Declaration (TopLevelStructure, Declaration)
 import qualified AST.Declaration
 import qualified AST.Expression
 import qualified AST.Module
@@ -127,7 +128,7 @@ data DeclarationType
   deriving (Show)
 
 
-declarationType :: (a -> BodyEntryType) -> AST.Declaration.TopLevelStructure a -> DeclarationType
+declarationType :: (a -> BodyEntryType) -> TopLevelStructure a -> DeclarationType
 declarationType entryType decl =
   case decl of
     AST.Declaration.Entry entry ->
@@ -271,7 +272,7 @@ formatModuleHeader elmVersion modu =
               documentedVars
               definedVars
 
-      extractVarName :: AST.Declaration.TopLevelStructure AST.Declaration.Declaration -> [AST.Variable.Value]
+      extractVarName :: TopLevelStructure Declaration -> [AST.Variable.Value]
       extractVarName decl =
           case decl of
               AST.Declaration.DocComment _ -> []
@@ -476,7 +477,7 @@ formatModule elmVersion modu =
               [ initialComments'
               , [ formatModuleHeader elmVersion modu ]
               , List.replicate spaceBeforeBody blankLine
-              , maybeToList (formatModuleBody 2 elmVersion modu)
+              , maybeToList $ formatModuleBody 2 elmVersion (makeImportInfo modu) (AST.Module.body modu)
               ]
 
 
@@ -541,8 +542,8 @@ makeImportInfo modu =
     ImportInfo exposed aliases
 
 
-formatModuleBody :: Int -> ElmVersion -> AST.Module.Module -> Maybe Box
-formatModuleBody linesBetween elmVersion modu =
+formatModuleBody :: Int -> ElmVersion -> ImportInfo -> [TopLevelStructure Declaration] -> Maybe Box
+formatModuleBody linesBetween elmVersion importInfo body =
     let
         entryType adecl =
             case adecl of
@@ -578,7 +579,7 @@ formatModuleBody linesBetween elmVersion modu =
                 AST.Declaration.Fixity_0_19 _ _ _ _ ->
                     BodyFixity
     in
-    formatTopLevelBody linesBetween elmVersion (makeImportInfo modu) entryType (formatDeclaration elmVersion (makeImportInfo modu)) (AST.Module.body modu)
+    formatTopLevelBody linesBetween elmVersion importInfo entryType (formatDeclaration elmVersion importInfo) body
 
 
 data BodyEntryType
@@ -593,7 +594,7 @@ formatTopLevelBody ::
     -> ImportInfo
     -> (a -> BodyEntryType)
     -> (a -> Box)
-    -> [AST.Declaration.TopLevelStructure a]
+    -> [TopLevelStructure a]
     -> Maybe Box
 formatTopLevelBody linesBetween elmVersion importInfo entryType formatEntry body =
     let
@@ -634,7 +635,7 @@ formatTopLevelBody linesBetween elmVersion importInfo entryType formatEntry body
 
 data ElmCodeBlock
     = ModuleCode AST.Module.Module
-    | ExpressionsCode [AST.Declaration.TopLevelStructure (WithEol AST.Expression.Expr)]
+    | ExpressionsCode [TopLevelStructure (WithEol AST.Expression.Expr)]
     deriving (Show)
 
 
@@ -681,7 +682,7 @@ formatModuleDocs elmVersion importInfo blocks =
                 box =
                     case
                         ( formatImports elmVersion modu
-                        , formatModuleBody 1 elmVersion modu
+                        , formatModuleBody 1 elmVersion (makeImportInfo modu) (AST.Module.body modu)
                         )
                     of
                         ( [], Nothing ) -> Nothing
@@ -961,7 +962,7 @@ formatVarValue elmVersion aval =
                     name'
 
 
-formatTopLevelStructure :: ElmVersion -> ImportInfo -> (a -> Box) -> AST.Declaration.TopLevelStructure a -> Box
+formatTopLevelStructure :: ElmVersion -> ImportInfo -> (a -> Box) -> TopLevelStructure a -> Box
 formatTopLevelStructure elmVersion importInfo formatEntry topLevelStructure =
     case topLevelStructure of
         AST.Declaration.DocComment docs ->
@@ -974,7 +975,7 @@ formatTopLevelStructure elmVersion importInfo formatEntry topLevelStructure =
             formatEntry (RA.drop entry)
 
 
-formatDeclaration :: ElmVersion -> ImportInfo -> AST.Declaration.Declaration -> Box
+formatDeclaration :: ElmVersion -> ImportInfo -> Declaration -> Box
 formatDeclaration elmVersion importInfo decl =
     case decl of
         AST.Declaration.Definition name args comments expr ->
