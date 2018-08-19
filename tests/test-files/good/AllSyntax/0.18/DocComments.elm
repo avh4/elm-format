@@ -120,6 +120,15 @@ Nested with loose items
 -}
 
 
+{-| Top-level comments in an Elm code example are retained.
+
+    -- Compiles to the CSS "display: none"
+
+    invisible : Style
+    invisible =
+        display none
+
+-}
 x =
     ()
 
