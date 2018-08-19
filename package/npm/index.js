@@ -10,6 +10,7 @@ var root = "https://github.com/avh4/elm-format/releases/download/" +
   binVersion;
 
 module.exports = binwrap({
+  dirname: __dirname,
   binaries: ["elm-format"],
   urls: {
     "darwin-x64": root + "-mac-x64.tgz",

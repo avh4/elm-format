@@ -1,4 +1,4 @@
-## master (0.8.0-beta)
+## master (0.8.0)
 
 Features promoted from 0.7.0-exp:
   - Imports are now sorted and duplicate imports are merged
@@ -7,6 +7,8 @@ Features promoted from 0.7.0-exp:
   - Unnecessary parentheses are now removed (except in binary operator expressions)
 
 Other new features:
+  - Added support for Elm 0.19
+  - Added Elm 0.19 support for `--upgrade`
   - Expressions in doc comment code blocks are now formatted
 
 Bug fixes:
@@ -15,6 +17,7 @@ Bug fixes:
   - Trailing whitespace in multiline strings is no longer removed
   - Special characters in doc comments are now escaped more correctly
   - On Windows, special folders are now correctly skipped when traversing the filesystem
+  - Initial comments in doc comment code blocks are no longer removed
 
 Syntax changes:
   - Infix operator precedence and associativity declarations are now grouped together
@@ -26,8 +29,7 @@ Syntax changes:
 
 Other changes:
   - Removed support for Elm 0.16
-  - Added support for Elm 0.19
-  - Added Elm 0.19 support for `--upgrade`
+  - Installing with `npm install --ignore-scripts` is now supported
 
 
 ## 0.7.0-exp

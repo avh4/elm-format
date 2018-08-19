@@ -1,3 +1,5 @@
+## First time setup
+
 ```bash
 brew install caskroom/cask/brew-cask
 brew cask install vagrant
@@ -8,37 +10,40 @@ vagrant plugin install vagrant-winrm
 vagrant winrm -c "dir"
 ```
 
-# Open VirtualBox and show the Windows VM
+## Start Windows VM
 
-# Download and install Haskell Stack (32-bit)
+  - `(cd package/win && vagrant up)`
+  - Open VirtualBox and show the runnning Windows VM
+ - Start Git Bash (Right click on Windows Desktop -> "Git Bash Here")
 
-stack setup
-choco install devbox-common
-choco install poshgit
-#choco install sourcetree
-#choco install tortoisegit
 
-# Restart shell
+## Provisioning (first time only)
+
+  - Download and install Haskell Stack (32-bit)
+  - `stack setup`
+  - `choco install devbox-common`
+  - `choco install poshgit`
+  <!-- - #choco install sourcetree -->
+  <!-- - #choco install tortoisegit -->
+  - Restart shell
 
 
 ## Build Windows binary
 
-```bash
-cd package/win/elm-format
-git fetch
-git checkout <version tag>
+From the host computer:
 
-## !! Make sure you are in package/win/elm-format !!
-git clean -dfx
-## !! Make sure you are in package/win/elm-format !!
-```
+  - `cd package/win/elm-format`
+  - `git fetch`
 
- - Start Git Bash
+From the Windows VM:
 
-```bash
-cd /c/vagrant/elm-format
-/c/vagrant/build-package.sh
-```
+  - `cd /c/vagrant/elm-format`
+  - `git checkout <version tag>`
+  - ## !! Make sure you are on the Windows VM !!
+    `git clean -dfx`
+    ## !! Make sure you are on the Windows VM !!
+  - `/c/vagrant/build-package.sh`
+
 
 ## back to host computer
 # cd ./package/win/
