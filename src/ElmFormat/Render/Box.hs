@@ -455,8 +455,8 @@ formatModuleLine elmVersion (varsToExpose, extraComments) header =
       [ exports ]
 
 
-formatModule :: ElmVersion -> AST.Module.Module -> Box
-formatModule elmVersion modu =
+formatModule :: ElmVersion -> Bool -> Int -> AST.Module.Module -> Box
+formatModule elmVersion showModuleLine spacing modu =
     let
         initialComments' =
           case AST.Module.initialComments modu of
@@ -469,15 +469,17 @@ formatModule elmVersion modu =
         spaceBeforeBody =
             case AST.Module.body modu of
                 [] -> 0
-                AST.Declaration.BodyComment _ : _ -> 3
-                _ -> 2
+                AST.Declaration.BodyComment _ : _ -> spacing + 1
+                _ -> spacing
     in
       stack1 $
           concat
               [ initialComments'
-              , [ formatModuleHeader elmVersion modu ]
+              , if showModuleLine
+                    then [ formatModuleHeader elmVersion modu ]
+                    else formatImports elmVersion modu
               , List.replicate spaceBeforeBody blankLine
-              , maybeToList $ formatModuleBody 2 elmVersion (makeImportInfo modu) (AST.Module.body modu)
+              , maybeToList $ formatModuleBody spacing elmVersion (makeImportInfo modu) (AST.Module.body modu)
               ]
 
 
@@ -607,6 +609,7 @@ formatTopLevelBody linesBetween elmVersion importInfo entryType formatEntry body
                 (_, DCloser) -> 0
                 (DComment, DComment) -> 0
                 (_, DComment) -> linesBetween + 1
+                (DComment, DDefinition _) -> if linesBetween == 1 then 0 else linesBetween
                 (DComment, _) -> linesBetween
                 (DDocComment, DDefinition _) -> 0
                 (DDefinition Nothing, DDefinition (Just _)) -> linesBetween
@@ -636,7 +639,7 @@ formatTopLevelBody linesBetween elmVersion importInfo entryType formatEntry body
 data ElmCodeBlock
     = DeclarationsCode [TopLevelStructure Declaration]
     | ExpressionsCode [TopLevelStructure (WithEol AST.Expression.Expr)]
-    | ModuleCode AST.Module.Module -- This can maybe be removed now that DeclaractionsCode is added -- will a doc comment ever contain a full module?
+    | ModuleCode AST.Module.Module
     deriving (Show)
 
 
@@ -660,14 +663,15 @@ formatModuleDocs elmVersion importInfo blocks =
                 |> firstOf
                     [ fmap DeclarationsCode . Result.toMaybe . Parse.parseDeclarations
                     , fmap ExpressionsCode . Result.toMaybe . Parse.parseExpressions
-                    , fmap ModuleCode . Result.toMaybe . Parse.parseModule -- Not sure if this will catch anything useful that parseDeclaractions doesn't
+                    , fmap ModuleCode . Result.toMaybe . Parse.parseModule
                     ]
 
         format :: ElmCodeBlock -> String
         format result =
             case result of
                 ModuleCode modu ->
-                    formatModuleCode modu
+                    formatModule elmVersion False 1 modu
+                        |> (Text.unpack . Box.render)
 
                 DeclarationsCode declarations ->
                     formatModuleBody 1 elmVersion importInfo declarations
@@ -682,29 +686,6 @@ formatModuleDocs elmVersion importInfo blocks =
                         |> formatTopLevelBody 1 elmVersion importInfo entryType (formatEolCommented $ formatExpression elmVersion importInfo SyntaxSeparated)
                         |> fmap (Text.unpack . Box.render)
                         |> fromMaybe ""
-
-        formatModuleCode :: AST.Module.Module -> String
-        formatModuleCode modu =
-            let
-                topLevels =
-                    mconcat
-                        [ fmap AST.Declaration.BodyComment $ AST.Module.initialComments modu
-                        , AST.Module.body modu
-                        ]
-                box =
-                    case
-                        ( formatImports elmVersion modu
-                        , formatModuleBody 1 elmVersion importInfo topLevels
-                        )
-                    of
-                        ( [], Nothing ) -> Nothing
-                        ( imports, Nothing ) -> Just $ stack1 imports
-                        ( [], Just body) -> Just body
-                        ( imports, Just body ) -> Just $ stack1 (imports ++ [blankLine, body])
-            in
-                box
-                    |> fmap (Text.unpack . Box.render)
-                    |> fromMaybe ""
 
         content :: String
         content =

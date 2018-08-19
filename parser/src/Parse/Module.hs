@@ -44,7 +44,7 @@ elmModule =
 
 topLevel :: IParser a -> IParser [AST.Declaration.TopLevelStructure a]
 topLevel entry =
-  (++) <$> ((\x -> [x]) <$> Decl.topLevelStructure entry)
+  (++) <$> option [] (((\x -> [x]) <$> Decl.topLevelStructure entry))
       <*> (concat <$> many (freshDef entry))
 
 

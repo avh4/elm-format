@@ -13,7 +13,7 @@ import qualified ElmFormat.Render.Box as Render
 
 render :: ElmVersion -> AST.Module.Module -> Text.Text
 render elmVersion modu =
-    renderBox $ Render.formatModule elmVersion modu
+    renderBox $ Render.formatModule elmVersion True 2 modu
 
 
 renderBox :: Box.Box -> Text.Text
