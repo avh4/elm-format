@@ -133,6 +133,19 @@ x =
     ()
 
 
+{-| Top-level comments in an Elm code example are retained.
+
+    {-| Compiles to the CSS "display: none"
+    -}
+    invisible : Style
+    invisible =
+        display none
+
+-}
+y =
+    ()
+
+
 {-| Code block following a list. In this case we fallback to a fenced code block
 because some markdown implementations parse this differently (notably, marked and
 elm-markdown differ from commonmark). marked will parse an indented code block
