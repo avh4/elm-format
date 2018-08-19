@@ -679,10 +679,15 @@ formatModuleDocs elmVersion importInfo blocks =
         formatModuleCode :: AST.Module.Module -> String
         formatModuleCode modu =
             let
+                topLevels =
+                    mconcat
+                        [ fmap AST.Declaration.BodyComment $ AST.Module.initialComments modu
+                        , AST.Module.body modu
+                        ]
                 box =
                     case
                         ( formatImports elmVersion modu
-                        , formatModuleBody 1 elmVersion (makeImportInfo modu) (AST.Module.body modu)
+                        , formatModuleBody 1 elmVersion (makeImportInfo modu) topLevels
                         )
                     of
                         ( [], Nothing ) -> Nothing
