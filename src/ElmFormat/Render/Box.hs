@@ -150,8 +150,8 @@ declarationType entryType decl =
       DComment
 
 
-sortVars :: Set (AST.Commented AST.Variable.Value) -> [[AST.Variable.Ref]] -> Set AST.Variable.Value -> ([[AST.Commented AST.Variable.Value]], AST.Comments)
-sortVars fromExposing fromDocs fromModule =
+sortVars :: Bool -> Set (AST.Commented AST.Variable.Value) -> [[AST.Variable.Ref]] -> Set AST.Variable.Value -> ([[AST.Commented AST.Variable.Value]], AST.Comments)
+sortVars forceMultiline fromExposing fromDocs fromModule =
     let
         refToValue (AST.Variable.VarRef _ name) = AST.Commented [] (AST.Variable.Value name) []
         refToValue (AST.Variable.TagRef _ name) = AST.Commented [] (AST.Variable.Union (name, []) AST.Variable.ClosedListing) []
@@ -193,10 +193,6 @@ sortVars fromExposing fromDocs fromModule =
         remainingFromExposing =
             listedInExposing
                 |> filter (not . inDocs)
-                |> (\x -> if List.null x then [] else [x])
-
-        listedByUser =
-            listedInDocs ++ remainingFromExposing
 
         commentsFromReorderedVars =
             listedInExposing
@@ -204,9 +200,11 @@ sortVars fromExposing fromDocs fromModule =
                 |> fmap (\(AST.Commented pre _ post) -> pre ++ post)
                 |> concat
     in
-    case (List.null $ concat listedByUser) of
+    case (List.null $ concat listedInDocs) && (List.null remainingFromExposing) of
         False ->
-            ( listedByUser, commentsFromReorderedVars )
+            if List.null listedInDocs && forceMultiline
+                then ( fmap (\x -> [x]) remainingFromExposing, commentsFromReorderedVars )
+                else ( listedInDocs ++ if List.null remainingFromExposing then [] else [ remainingFromExposing ], commentsFromReorderedVars )
 
         True ->
             -- we have no exposing, and no docs; use from module
@@ -266,8 +264,13 @@ formatModuleHeader elmVersion modu =
               , Map.assocs types |> fmap (\(name, AST.Commented pre (preListing, listing) post) -> AST.Commented pre (AST.Variable.Union (name, preListing) listing) post) |> Set.fromList
               ]
 
+      detailedListingIsMultiline :: AST.Variable.Listing a -> Bool
+      detailedListingIsMultiline (AST.Variable.ExplicitListing _ isMultiline) = isMultiline
+      detailedListingIsMultiline _ = False
+
       varsToExpose =
           sortVars
+              (detailedListingIsMultiline exportsList)
               (detailedListingToSet exportsList)
               documentedVars
               definedVars
