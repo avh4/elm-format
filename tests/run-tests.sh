@@ -333,6 +333,7 @@ checkUpgrade 0.19 Elm-0.19/OpenExplicitConstructorImports.elm
 checkGood 0.18 Simple.elm
 checkGood 0.18 AllSyntax/0.18/AllSyntax.elm
 checkGoodAllSyntax 0.18 Module
+checkGood 0.18 AllSyntax/0.18/ModuleMultiline.elm
 checkGood 0.18 AllSyntax/0.18/Declarations.elm
 checkGoodAllSyntax 0.18 Patterns
 checkGoodAllSyntax 0.18 Types
