@@ -14,7 +14,7 @@ vagrant winrm -c "dir"
 
   - `(cd package/win && vagrant up)`
   - Open VirtualBox and show the runnning Windows VM
- - Start Git Bash (Right click on Windows Desktop -> "Git Bash Here")
+  - Start Git Bash (Right click on Windows Desktop -> "Git Bash Here")
 
 
 ## Provisioning (first time only)
