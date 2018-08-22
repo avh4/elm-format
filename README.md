@@ -1,11 +1,11 @@
 [![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
-[![latest version: 0.7.0-exp](https://img.shields.io/badge/version-0.7.0--exp-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.7.0-exp)
+[![latest version: 0.8.0](https://img.shields.io/badge/version-0.8.0--orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.0)
 
 # elm-format
 
-> `elm-format` is still in alpha.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
+> `elm-format` is still in beta.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
 >
-> **The format produced by elm-format may change significantly before the 1.0.0 release.**  If this will cause problems for you, please refrain from using elm-format during the alpha- and beta-test periods.
+> **The format produced by elm-format may change significantly before the 1.0.0 release.**  If this will cause problems for you, please refrain from using elm-format during the beta-test period.
 
 `elm-format` formats [Elm](http://elm-lang.org) source code according to a standard set of rules based on [the official Elm Style Guide](http://elm-lang.org/docs/style-guide). It is inspired by the popular [gofmt](https://blog.golang.org/go-fmt-your-code).
 
@@ -29,29 +29,24 @@ elm-format --help  # See other command line options
 ```
 
 
-## Installation [![(latest version: 0.7.0-exp)](https://img.shields.io/badge/version-0.7.0--exp-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.7.0-exp)
+## Installation [![(latest version: 0.8.0)](https://img.shields.io/badge/version-0.8.0--orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.0)
 
-> `elm-format` is still in alpha.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
+> `elm-format` is still in beta.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
 >
-> **The format produced by elm-format may change significantly before the 1.0.0 release.**  If this will cause problems for you, please refrain from using elm-format during the alpha- and beta-test periods.
+> **The format produced by elm-format may change significantly before the 1.0.0 release.**  If this will cause problems for you, please refrain from using elm-format during the beta-test period.
 
-
-### Experimental version
-
-The latest version of `elm-format` contains experimental features that may or may not appear in future releases.
-If you are able to tolerate some amount of instability on your Elm projects,
-you can help with the development of `elm-format` by using the experimental version and providing feedback.
-You can give feedback about the latest experimental version [here](https://goo.gl/forms/kLdTN1yikfOI8ZuA3).
-
-To install the experimental version:
+To install `elm-format` for Elm 0.19:
 
 ```sh
-npm install -g elm-format@exp
+npm install -g elm-format
 ```
 
-or download the version appropriate for your OS from the [release page](https://github.com/avh4/elm-format/releases/tag/0.7.0-exp),
+or download the version appropriate for your OS from the [release page](https://github.com/avh4/elm-format/releases/tag/0.8.0),
 unzip it,
 and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.
+
+To use `elm-format` with Elm 0.18, either pass the `--elm-version=0.18` when running `elm-format`,
+or use the `*-0.18-*` binaries available from the [release page](https://github.com/avh4/elm-format/releases/tag/0.8.0).
 
 
 ## Editor integration
@@ -303,7 +298,7 @@ cd elm-format
 stack setup
 stack build
 stack install
-~/.local/bin/elm-format-0.18 --help
+~/.local/bin/elm-format-0.19 --help
 ```
 
 ### Running tests
