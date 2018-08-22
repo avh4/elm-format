@@ -17,7 +17,7 @@ brew cask install virtualbox
 
 ## Preparation
 
-1. Create a github issue to draft the release notes.
+1. Create `Release Notes/<version>.md` to draft the release notes.
 1. Update the version number in `elm-format.cabal`.
 1. Edit `CHANGELOG.md` to set the correct version number.
 1. If this is a stable release, update references to the version in `README.md`.

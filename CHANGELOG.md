@@ -1,4 +1,4 @@
-## master (0.8.0)
+## 0.8.0
 
 Features promoted from 0.7.0-exp:
   - Imports are now sorted and duplicate imports are merged

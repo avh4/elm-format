@@ -18,11 +18,11 @@ if command -v shellcheck; then
 	shellcheck "./package/linux/build-package.sh" || exit 1
 fi
 
-if command -v nix-env; then
-	echo "$0: INFO: Detected Nixos or Nix"
-	STACK_ARGS=(--nix-pure --nix-add-gc-roots)
-	echo "$0: INFO: nix arguments will be passed to stack: ${STACK_ARGS[*]}"
-fi
+# if command -v nix-env; then
+# 	echo "$0: INFO: Detected Nixos or Nix"
+# 	STACK_ARGS=(--nix-pure --nix-add-gc-roots)
+# 	echo "$0: INFO: nix arguments will be passed to stack: ${STACK_ARGS[*]}"
+# fi
 
 stack "${STACK_ARGS[@]}" build || exit 1
 
