@@ -244,6 +244,22 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
   ```
   let g:elm_format_autosave = 1
   ```
+  
+  
+### Vim Ex Command - pluginless alternative
+1. Add the following to your `~/.vimrc`:
+
+  ```vim
+  command ElmFormat :silent %!elm-format --stdin                 " defines a custom :ElmFormat ex command
+  nnoremap ef :ElmFormat<cr>                                     " bind the command to <leader> e f
+  autocmd FileType elm autocmd BufWritePre <buffer> :ElmFormat   " runs :ElmFormat on save
+  ```
+  
+or without the named command:
+
+ ```vim
+  autocmd FileType elm autocmd BufWritePre <buffer> :silent %!elm-format --stdin  " runs elm-format on save
+  ```
 
 
 ### Visual Studio Code installation
