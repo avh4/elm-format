@@ -411,6 +411,7 @@ checkUpgrade 0.18 Elm-0.18/RenameTupleFunctions.elm
 
 checkValidationOutputFormat
 
+checkJson good/AllSyntax/0.18/Module.elm
 checkJson good/AllSyntax/0.18/Expressions.elm
 checkJson good/AllSyntax/0.18/Literals.elm
 checkJson good/json/ExternalReferences.elm

@@ -1,0 +1,139 @@
+{
+    "body": [
+        {
+            "expression": {
+                "display": {
+                    "representation": "DecimalInt"
+                },
+                "type": "IntLiteral",
+                "value": 1
+            },
+            "name": "a",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 35
+                },
+                "start": {
+                    "col": 1,
+                    "line": 34
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "display": {
+                    "representation": "DecimalInt"
+                },
+                "type": "IntLiteral",
+                "value": 2
+            },
+            "name": "b",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 39
+                },
+                "start": {
+                    "col": 1,
+                    "line": 38
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "display": {
+                    "representation": "DecimalInt"
+                },
+                "type": "IntLiteral",
+                "value": 3
+            },
+            "name": "c",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 43
+                },
+                "start": {
+                    "col": 1,
+                    "line": 42
+                }
+            },
+            "type": "Definition"
+        }
+    ],
+    "imports": {
+        "Dict": {
+            "as": "D",
+            "exposing": {
+                "types": {
+                    "Dict": "NoTags"
+                },
+                "values": {
+                    "empty": true,
+                    "fromList": true
+                }
+            }
+        },
+        "Json.Decode": {
+            "as": "Json",
+            "exposing": null
+        },
+        "Maybe": {
+            "as": "Maybe",
+            "exposing": {
+                "types": {
+                    "Maybe": {
+                        "Just": true,
+                        "Nothing": true
+                    }
+                },
+                "values": {
+                    "map": true
+                }
+            }
+        },
+        "Result": {
+            "as": "Result",
+            "exposing": {
+                "types": {
+                    "Result": "AllTags"
+                },
+                "values": {}
+            }
+        },
+        "Signal": {
+            "as": "Signal",
+            "exposing": "Everything"
+        },
+        "String": {
+            "as": "String",
+            "exposing": null
+        },
+        "Task": {
+            "as": "Task",
+            "exposing": {
+                "types": {},
+                "values": {
+                    "andMap": true,
+                    "andThen": true,
+                    "fail": true,
+                    "fromMaybe": true,
+                    "fromResult": true,
+                    "map": true,
+                    "map2": true,
+                    "map3": true,
+                    "map4": true,
+                    "map5": true,
+                    "mapError": true,
+                    "onError": true,
+                    "succeed": true,
+                    "toMaybe": true,
+                    "toResult": true
+                }
+            }
+        }
+    }
+}

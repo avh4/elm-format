@@ -261,5 +261,41 @@
             },
             "type": "Definition"
         }
-    ]
+    ],
+    "imports": {
+        "Date": {
+            "as": "Date",
+            "exposing": {
+                "types": {
+                    "Month": "AllTags"
+                },
+                "values": {}
+            }
+        },
+        "Foo.Bar": {
+            "as": "Bar",
+            "exposing": null
+        },
+        "Foo.Baz": {
+            "as": "Foo.Baz",
+            "exposing": "Everything"
+        },
+        "Html": {
+            "as": "Html",
+            "exposing": null
+        },
+        "Html.Attributes": {
+            "as": "Attr",
+            "exposing": null
+        },
+        "Html.Events": {
+            "as": "Event",
+            "exposing": {
+                "types": {},
+                "values": {
+                    "onClick": true
+                }
+            }
+        }
+    }
 }
