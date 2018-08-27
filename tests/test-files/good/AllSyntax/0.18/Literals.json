@@ -436,5 +436,6 @@
             "type": "Definition"
         }
     ],
-    "imports": {}
+    "imports": {},
+    "moduleName": "AllSyntax.Literals"
 }

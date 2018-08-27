@@ -135,5 +135,6 @@
                 }
             }
         }
-    }
+    },
+    "moduleName": "AllSyntax.Module"
 }

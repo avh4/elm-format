@@ -1,4 +1,4 @@
-module Target exposing (..)
+module ExternalReferences exposing (..)
 
 import Date exposing (Month(..))
 import Foo.Bar as Bar
