@@ -24,7 +24,7 @@ pleaseReport what details =
 
 
 showModule :: Module -> JSValue
-showModule (Module _ _ _ (_, imports) body) =
+showModule (Module _ (Header _ (Commented _ name _) _ _) _ (_, imports) body) =
     let
         getAlias :: ImportMethod -> Maybe UppercaseIdentifier
         getAlias importMethod =
@@ -53,7 +53,8 @@ showModule (Module _ _ _ (_, imports) body) =
             )
     in
     makeObj
-        [ ( "imports", makeObj $ fmap importJson $ Map.toList imports )
+        [ ( "moduleName", showJSON name )
+        , ( "imports", makeObj $ fmap importJson $ Map.toList imports )
         , ( "body" , JSArray $ fmap showJSON $ mapNamespace normalizeNamespace body )
         ]
 
@@ -76,6 +77,10 @@ instance ToJSON Region.Position where
             [ ( "line", JSRational False $ toRational $ Region.line pos )
             , ( "col", JSRational False $ toRational $ Region.column pos )
             ]
+
+
+instance ToJSON (List UppercaseIdentifier) where
+    showJSON = JSString . toJSString . List.intercalate "." . fmap (\(UppercaseIdentifier v) -> v)
 
 
 showImportListingJSON :: Listing DetailedListing -> JSValue
@@ -142,7 +147,7 @@ instance ToJSON Expr where
               makeObj
                   [ type_ "ExternalReference"
                   , ("module"
-                    , JSString $ toJSString $ List.intercalate "." $ map (\(UppercaseIdentifier v) -> v) namespace)
+                    , showJSON namespace)
                   , ("identifier", JSString $ toJSString var)
                   , sourceLocation region
                   ]
