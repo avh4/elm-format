@@ -40,8 +40,22 @@ showModule (Module _ _ _ (_, imports) body) =
 
                 _ ->
                     namespace
+
+        importJson (moduleName, (_, ImportMethod alias (_, (_, exposing)))) =
+            let
+                name = List.intercalate "." $ fmap (\(UppercaseIdentifier n) -> n) moduleName
+            in
+            ( name
+            , makeObj
+                [ ( "as", JSString $ toJSString $ maybe name (\(_, (_, UppercaseIdentifier n)) -> n) alias)
+                , ( "exposing", showImportListingJSON exposing )
+                ]
+            )
     in
-    makeObj [ ("body" , JSArray $ fmap showJSON $ mapNamespace normalizeNamespace body) ]
+    makeObj
+        [ ( "imports", makeObj $ fmap importJson $ Map.toList imports )
+        , ( "body" , JSArray $ fmap showJSON $ mapNamespace normalizeNamespace body )
+        ]
 
 
 class ToJSON a where
@@ -61,6 +75,27 @@ instance ToJSON Region.Position where
         makeObj
             [ ( "line", JSRational False $ toRational $ Region.line pos )
             , ( "col", JSRational False $ toRational $ Region.column pos )
+            ]
+
+
+showImportListingJSON :: Listing DetailedListing -> JSValue
+showImportListingJSON (ExplicitListing a _) = showJSON a
+showImportListingJSON (OpenListing (Commented _ () _)) = JSString $ toJSString "Everything"
+showImportListingJSON ClosedListing = JSNull
+
+
+showTagListingJSON :: Listing (CommentedMap UppercaseIdentifier ()) -> JSValue
+showTagListingJSON (ExplicitListing tags _) =
+    makeObj $ fmap (\(UppercaseIdentifier k, Commented _ () _) -> (k, JSBool True)) $ Map.toList tags
+showTagListingJSON (OpenListing (Commented _ () _)) = JSString $ toJSString "AllTags"
+showTagListingJSON ClosedListing = JSString $ toJSString "NoTags"
+
+
+instance ToJSON DetailedListing where
+    showJSON (DetailedListing values _operators types) =
+        makeObj
+            [ ( "values", makeObj $ fmap (\(LowercaseIdentifier k) -> (k, JSBool True)) $ Map.keys values )
+            , ( "types", makeObj $ fmap (\(UppercaseIdentifier k, (Commented _ (_, listing) _)) -> (k, showTagListingJSON listing)) $ Map.toList types )
             ]
 
 

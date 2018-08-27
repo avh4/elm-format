@@ -2,11 +2,13 @@ module AllSyntax.Module exposing (a, b, c)
 
 import Dict as D
     exposing
-        ( empty
+        ( Dict
+        , empty
         , fromList
         )
 import Json.Decode as Json
 import Maybe exposing (Maybe(Just, Nothing), map)
+import Result exposing (Result(..))
 import Signal exposing (..)
 import String
 import Task
