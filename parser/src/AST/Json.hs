@@ -11,6 +11,7 @@ import AST.Module
 import AST.Pattern
 import AST.Variable
 import AST.V0_16
+import Data.Maybe (mapMaybe)
 import Reporting.Annotation hiding (map)
 import Text.JSON hiding (showJSON)
 
@@ -64,8 +65,56 @@ showModule (Module _ maybeHeader _ (_, imports) body) =
     makeObj
         [ ( "moduleName", showJSON name )
         , ( "imports", makeObj $ fmap importJson $ Map.toList imports )
-        , ( "body" , JSArray $ fmap showJSON $ mapNamespace normalizeNamespace body )
+        , ( "body" , JSArray $ fmap showJSON $ mergeDeclarations $ mapNamespace normalizeNamespace body )
         ]
+
+
+data MergedTopLevelStructure
+    = MergedDefinition
+        { _definitionLocation :: Region.Region
+        , _name :: LowercaseIdentifier
+        , _args :: List (PreCommented Pattern)
+        , _preEquals :: Comments
+        , _expression :: Expr
+        , _doc :: Maybe Comment
+        , _annotation :: Maybe (Comments, Comments, Type)
+        }
+    | TodoTopLevelStructure String
+
+
+mergeDeclarations :: List (TopLevelStructure Declaration) -> List MergedTopLevelStructure
+mergeDeclarations decls =
+    let
+        collectAnnotation decl =
+            case decl of
+                Entry (A _ (TypeAnnotation (VarRef [] name, preColon) (postColon, typ))) -> Just (name, (preColon, postColon, typ))
+                _ -> Nothing
+
+        annotations :: Map.Map LowercaseIdentifier (Comments, Comments, Type)
+        annotations =
+            Map.fromList $ mapMaybe collectAnnotation decls
+
+        merge decl =
+            case decl of
+                Entry (A region (Definition (A _ (VarPattern name)) args preEquals expr)) ->
+                    Just $ MergedDefinition
+                        { _definitionLocation = region
+                        , _name = name
+                        , _args = args
+                        , _preEquals = preEquals
+                        , _expression = expr
+                        , _doc = Nothing -- TODO: merge docs
+                        , _annotation = Map.lookup name annotations
+                        }
+
+                Entry (A _ (TypeAnnotation _ _)) ->
+                    -- TODO: retain annotations that don't have a matching definition
+                    Nothing
+
+                _ ->
+                    Just $ TodoTopLevelStructure (show decl)
+    in
+    mapMaybe merge decls
 
 
 class ToJSON a where
@@ -113,15 +162,28 @@ instance ToJSON DetailedListing where
             ]
 
 
-instance ToJSON (TopLevelStructure Declaration) where
-  showJSON (Entry (A region (Definition (A _ (VarPattern (LowercaseIdentifier var))) _ _ expr))) =
-    makeObj
-      [ type_ "Definition"
-      , ("name" , JSString $ toJSString var)
-      , ("expression" , showJSON expr)
-      , sourceLocation region
-      ]
-  showJSON _ = JSString $ toJSString "TODO: Decl"
+instance ToJSON MergedTopLevelStructure where
+    showJSON (TodoTopLevelStructure what) =
+        JSString $ toJSString ("TODO: " ++ what)
+    showJSON (MergedDefinition region (LowercaseIdentifier name) args _ expression doc annotation) =
+        makeObj
+            [ type_ "Definition"
+            , ( "name" , JSString $ toJSString name )
+            , ( "returnType", maybe JSNull (\(_, _, t) -> showJSON t) annotation )
+            , ( "expression" , showJSON expression )
+            , sourceLocation region
+            ]
+
+-- instance ToJSON (TopLevelStructure Declaration) where
+--   showJSON (Entry (A region (Definition (A _ (VarPattern (LowercaseIdentifier var))) _ _ expr))) =
+--     makeObj
+--       [ type_ "Definition"
+--       , ( "name" , JSString $ toJSString var )
+--       , ( "returnType", JSNull )
+--       , ( "expression" , showJSON expr )
+--       , sourceLocation region
+--       ]
+--   showJSON _ = JSString $ toJSString "TODO: Decl"
 
 
 instance ToJSON Expr where
@@ -398,6 +460,34 @@ instance ToJSON FloatRepresentation where
 instance ToJSON Pattern' where
   showJSON pattern' =
       JSString $ toJSString $ "TODO: Pattern (" ++ show pattern' ++ ")"
+
+
+instance ToJSON Type where
+    showJSON (A _ type') =
+        case type' of
+            TypeConstruction (NamedConstructor name) args ->
+                makeObj
+                    [ type_ "TypeReference"
+                    , ( "name", showJSON name )
+                    , ( "module", JSNull )
+                    , ( "arguments", JSArray $ fmap (showJSON . snd) args )
+                    ]
+
+            TypeVariable (LowercaseIdentifier name) ->
+                makeObj
+                    [ type_ "TypeVariable"
+                    , ( "name", JSString $ toJSString name )
+                    ]
+
+            FunctionType (first, _) rest _ ->
+                makeObj
+                    [ type_ "FunctionType"
+                    , ( "returnType", showJSON first) -- TODO
+                    , ( "argumentTypes", JSNull )
+                    ]
+
+            _ ->
+                JSString $ toJSString $ "TODO: Type (" ++ show type' ++ ")"
 
 
 type_ :: String -> (String, JSValue)
