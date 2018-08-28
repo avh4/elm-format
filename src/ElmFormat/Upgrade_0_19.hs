@@ -148,7 +148,7 @@ transform exposed importAliases expr =
 
 
 expandHtmlStyle :: Bool -> Maybe UppercaseIdentifier -> (Comments, PreCommented (WithEol Expr)) -> [(Comments, PreCommented (WithEol Expr))]
-expandHtmlStyle styleExposed importAlias (preComma, (pre, (term, eol))) =
+expandHtmlStyle styleExposed importAlias (preComma, (pre, WithEol term eol)) =
     let
         lambda fRef =
             Lambda
@@ -171,10 +171,10 @@ expandHtmlStyle styleExposed importAlias (preComma, (pre, (term, eol))) =
     in
     case RA.drop term of
         App (A _ (VarExpr var)) [(preStyle, A _ (ExplicitList styles trailing _))] _ | isHtmlAttributesStyle var ->
-            fmap (\(preComma', (pre', (style, eol'))) -> (preComma ++ preComma', (pre ++ preStyle ++ pre' ++ trailing ++ (Maybe.maybeToList $ fmap LineComment eol), (applyLambda (noRegion $ lambda var) [([], style)] (FAJoinFirst JoinAll), eol')))) styles
+            fmap (\(preComma', (pre', WithEol style eol')) -> (preComma ++ preComma', (pre ++ preStyle ++ pre' ++ trailing ++ (Maybe.maybeToList $ fmap LineComment eol), WithEol (applyLambda (noRegion $ lambda var) [([], style)] (FAJoinFirst JoinAll)) eol'))) styles
 
         _ ->
-            [(preComma, (pre, (term, eol)))]
+            [(preComma, (pre, WithEol term eol))]
 
 --
 -- Generic helpers

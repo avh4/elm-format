@@ -21,7 +21,7 @@ data Pattern'
     | EmptyListPattern Comments
     | List [Commented Pattern]
     | ConsPattern
-        { first :: (Pattern, Maybe String)
+        { first :: WithEol Pattern
         , rest :: [(Comments, Comments, Pattern, Maybe String)]
         }
     | EmptyRecordPattern Comments
