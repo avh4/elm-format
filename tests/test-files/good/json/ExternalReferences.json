@@ -78,8 +78,8 @@
                         "type": "TypeVariable"
                     }
                 ],
-                "module": null,
-                "name": "Attr.Attribute",
+                "module": "Html.Attributes",
+                "name": "Attribute",
                 "type": "TypeReference"
             },
             "sourceLocation": {
@@ -112,11 +112,23 @@
             },
             "name": "text",
             "returnType": {
-                "argumentTypes": null,
+                "argumentTypes": [
+                    {
+                        "arguments": [],
+                        "module": null,
+                        "name": "String",
+                        "type": "TypeReference"
+                    }
+                ],
                 "returnType": {
-                    "arguments": [],
+                    "arguments": [
+                        {
+                            "name": "msg",
+                            "type": "TypeVariable"
+                        }
+                    ],
                     "module": null,
-                    "name": "String",
+                    "name": "Html",
                     "type": "TypeReference"
                 },
                 "type": "FunctionType"

@@ -20,6 +20,8 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Maybe as Maybe
 import qualified ElmFormat.Version
 import qualified Reporting.Region as Region
+import qualified ReversedList
+import ReversedList (Reversed)
 
 
 pleaseReport :: String -> String -> a
@@ -138,7 +140,12 @@ instance ToJSON Region.Position where
 
 
 instance ToJSON (List UppercaseIdentifier) where
-    showJSON = JSString . toJSString . List.intercalate "." . fmap (\(UppercaseIdentifier v) -> v)
+    showJSON [] = JSNull
+    showJSON namespace = (JSString . toJSString . List.intercalate "." . fmap (\(UppercaseIdentifier v) -> v)) namespace
+
+
+instance ToJSON UppercaseIdentifier where
+    showJSON (UppercaseIdentifier name) = JSString $ toJSString name
 
 
 showImportListingJSON :: Listing DetailedListing -> JSValue
@@ -295,7 +302,7 @@ instance ToJSON Expr where
           ExplicitList terms _ _ ->
               makeObj
                   [ type_ "ListLiteral"
-                  , ("terms", JSArray $ fmap showJSON (map (\(_, (_, (term, _))) -> term) terms))
+                  , ("terms", JSArray $ fmap showJSON (map (\(_, (_, WithEol term _)) -> term) terms))
                   ]
 
           AST.Expression.Tuple exprs _ ->
@@ -315,7 +322,7 @@ instance ToJSON Expr where
                   fieldsJSON =
                       ( "fields"
                       , makeObj $ fmap
-                          (\(_, (_, (Pair (LowercaseIdentifier key, _) (_, value) _, _))) ->
+                          (\(_, (_, WithEol (Pair (LowercaseIdentifier key, _) (_, value) _) _)) ->
                              (key, showJSON value)
                           )
                           fields
@@ -325,7 +332,7 @@ instance ToJSON Expr where
                       ( "fieldOrder"
                       , JSArray $
                             fmap (JSString . toJSString) $
-                            fmap (\(_, (_, (Pair (LowercaseIdentifier key, _) _ _, _))) -> key) fields
+                            fmap (\(_, (_, WithEol (Pair (LowercaseIdentifier key, _) _ _) _)) -> key) fields
                       )
               in
               case base of
@@ -465,11 +472,11 @@ instance ToJSON Pattern' where
 instance ToJSON Type where
     showJSON (A _ type') =
         case type' of
-            TypeConstruction (NamedConstructor name) args ->
+            TypeConstruction (NamedConstructor namespace name) args ->
                 makeObj
                     [ type_ "TypeReference"
                     , ( "name", showJSON name )
-                    , ( "module", JSNull )
+                    , ( "module", showJSON namespace )
                     , ( "arguments", JSArray $ fmap (showJSON . snd) args )
                     ]
 
@@ -479,15 +486,29 @@ instance ToJSON Type where
                     , ( "name", JSString $ toJSString name )
                     ]
 
-            FunctionType (first, _) rest _ ->
-                makeObj
-                    [ type_ "FunctionType"
-                    , ( "returnType", showJSON first) -- TODO
-                    , ( "argumentTypes", JSNull )
-                    ]
+            FunctionType first rest _ ->
+                case firstRestToRestLast first rest of
+                    (args, WithEol last _) ->
+                        makeObj
+                            [ type_ "FunctionType"
+                            , ( "returnType", showJSON last)
+                            , ( "argumentTypes", JSArray $ fmap (\(WithEol t _, _, _) -> showJSON t) $ args )
+                            ]
 
             _ ->
                 JSString $ toJSString $ "TODO: Type (" ++ show type' ++ ")"
+        where
+            firstRestToRestLast :: WithEol x -> List (a, b, x, Maybe String) -> (List (WithEol x, a, b), WithEol x)
+            firstRestToRestLast first rest =
+                done $ foldl (flip step) (ReversedList.empty, first) rest
+                where
+                    step :: (a, b, x, Maybe String) -> (Reversed (WithEol x, a, b), WithEol x) -> (Reversed (WithEol x, a, b), WithEol x)
+                    step (a, b, next, dn) (acc, last) =
+                        (ReversedList.push (last, a, b) acc, WithEol next dn)
+
+                    done :: (Reversed (WithEol x, a, b), WithEol x) -> (List (WithEol x, a, b), WithEol x)
+                    done (acc, last) =
+                        (ReversedList.toList acc, last)
 
 
 type_ :: String -> (String, JSValue)

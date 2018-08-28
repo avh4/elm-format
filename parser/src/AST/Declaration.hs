@@ -62,6 +62,12 @@ data TopLevelStructure a
     deriving (Eq, Show)
 
 
+instance Functor TopLevelStructure where
+    fmap f (Entry a) = Entry (fmap f a)
+    fmap _ (DocComment blocks) = DocComment blocks
+    fmap _ (BodyComment comment) = BodyComment comment
+
+
 instance A.Strippable a => A.Strippable (TopLevelStructure a) where
   stripRegion d =
     case d of
