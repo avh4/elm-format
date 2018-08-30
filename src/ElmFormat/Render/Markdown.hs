@@ -72,10 +72,10 @@ formatMardownBlock formatCode context block =
             (List.intercalate "\n" $ fmap ((++) "@docs " . List.intercalate ", " . fmap Text.unpack) terms) ++ "\n"
 
         Para inlines ->
-            (fold $ fmap formatMarkdownInline $ inlines) ++ "\n"
+            (fold $ fmap (formatMarkdownInline True) $ inlines) ++ "\n"
 
         Header level inlines ->
-            "\n" ++ replicate level '#' ++ " " ++ (fold $ fmap formatMarkdownInline $ inlines) ++ "\n"
+            "\n" ++ replicate level '#' ++ " " ++ (fold $ fmap (formatMarkdownInline True) $ inlines) ++ "\n"
 
         Blockquote blocks ->
             formatMarkdown' formatCode False False False (toList blocks)
@@ -152,11 +152,11 @@ prefix preFirst preRest (first:rest) =
     (preFirst ++ first) : fmap ((++) preRest) rest
 
 
-formatMarkdownInline :: Inline -> String
-formatMarkdownInline inline =
+formatMarkdownInline :: Bool -> Inline -> String
+formatMarkdownInline fixSpecialChars inline =
     case inline of
         Str text ->
-            Text.unpack $ Text.concatMap fix text
+            Text.unpack $ (if fixSpecialChars then Text.concatMap fix else id) text
         Space ->
             " "
         SoftBreak ->
@@ -164,22 +164,24 @@ formatMarkdownInline inline =
         LineBreak ->
             "\n"
         Emph inlines ->
-            "_" ++ (fold $ fmap formatMarkdownInline $ inlines) ++ "_" -- TODO: escaping
+            "_" ++ (fold $ fmap (formatMarkdownInline True) $ inlines) ++ "_" -- TODO: escaping
         Strong inlines ->
-            "**" ++ (fold $ fmap formatMarkdownInline $ inlines) ++ "**" -- TODO: escaping
+            "**" ++ (fold $ fmap (formatMarkdownInline True) $ inlines) ++ "**" -- TODO: escaping
         Code text ->
             "`" ++ Text.unpack text ++ "`" -- TODO: escape backticks
 
         Link inlines (Url url) title ->
             let
-                text = fold $ fmap formatMarkdownInline $ inlines
+                text = fold $ fmap (formatMarkdownInline False) $ inlines
 
                 title' = Text.unpack title
                 url' = Text.unpack url
             in
                 if text == url' && title' == ""
                     then
-                        "<" ++ url' ++ ">"
+                        if fixSpecialChars
+                            then "<" ++ url' ++ ">"
+                            else url'
                     else
                         "[" ++ text
                             ++ "](" ++ Text.unpack url
@@ -188,7 +190,7 @@ formatMarkdownInline inline =
 
         Link inlines (Ref ref) _ ->
             let
-                text = fold $ fmap formatMarkdownInline $ inlines
+                text = fold $ fmap (formatMarkdownInline False) $ inlines
 
                 ref' = Text.unpack ref
             in
@@ -197,7 +199,7 @@ formatMarkdownInline inline =
                     else "[" ++ text ++ "][" ++ ref' ++ "]"
 
         Image inlines url title ->
-            "![" ++ (fold $ fmap formatMarkdownInline $ inlines)
+            "![" ++ (fold $ fmap (formatMarkdownInline False) $ inlines)
                 ++ "](" ++ Text.unpack url
                 ++ (if Text.unpack title == "" then "" else " \"" ++ Text.unpack title ++ "\"")
                 ++ ")"
