@@ -2,6 +2,7 @@
 
 Bug fixes:
   - URLs in doc comments containing special markdown characters are handled more correctly
+  - For Elm 0.18 and earlier, tag listings of documented custom types are no longer converted to `(..)`
 
 
 ## 0.8.0
