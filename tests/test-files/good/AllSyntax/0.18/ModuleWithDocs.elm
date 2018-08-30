@@ -1,4 +1,13 @@
-module AllSyntax.Module exposing (CustomType(TagA), a, b, c)
+module AllSyntax.ModuleWithDocs exposing
+    ( CustomType(TagA), a
+    , b, c
+    )
+
+{-|
+
+@docs CustomType, a
+
+-}
 
 import Dict as D
     exposing

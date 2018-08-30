@@ -153,9 +153,9 @@ declarationType entryType decl =
 sortVars :: Bool -> Set (AST.Commented AST.Variable.Value) -> [[AST.Variable.Ref]] -> Set AST.Variable.Value -> ([[AST.Commented AST.Variable.Value]], AST.Comments)
 sortVars forceMultiline fromExposing fromDocs fromModule =
     let
-        refToValue (AST.Variable.VarRef _ name) = AST.Commented [] (AST.Variable.Value name) []
-        refToValue (AST.Variable.TagRef _ name) = AST.Commented [] (AST.Variable.Union (name, []) AST.Variable.ClosedListing) []
-        refToValue (AST.Variable.OpRef name) = AST.Commented [] (AST.Variable.OpValue name) []
+        refName (AST.Variable.VarRef _ (LowercaseIdentifier name)) = name
+        refName (AST.Variable.TagRef _ (UppercaseIdentifier name)) = name
+        refName (AST.Variable.OpRef (SymbolIdentifier name)) = name
 
         varOrder :: AST.Commented AST.Variable.Value -> (Int, String)
         varOrder (AST.Commented _ (AST.Variable.OpValue (SymbolIdentifier name)) _) = (1, name)
@@ -164,9 +164,9 @@ sortVars forceMultiline fromExposing fromDocs fromModule =
 
         listedInDocs =
             fromDocs
-                |> fmap (Maybe.mapMaybe (\v -> Map.lookup (varName $ refToValue v) allowedInDocs))
-                |> fmap (fmap (\v -> AST.Commented [] v []))
+                |> fmap (Maybe.mapMaybe (\v -> Map.lookup (refName v) allowedInDocs))
                 |> filter (not . List.null)
+                |> fmap (fmap (\v -> AST.Commented [] v []))
 
         listedInExposing =
             fromExposing
@@ -177,12 +177,15 @@ sortVars forceMultiline fromExposing fromDocs fromModule =
         varName (AST.Commented _ (AST.Variable.OpValue (SymbolIdentifier name)) _) = name
         varName (AST.Commented _ (AST.Variable.Union (UppercaseIdentifier name, _) _) _) = name
 
-        allowedInDocs =
-            fromExposing
-                |> Set.union (Set.map (\v -> AST.Commented [] v []) fromModule)
-                |> Set.toList
+        varSetToMap set =
+            Set.toList set
                 |> fmap (\(AST.Commented pre var post)-> (varName (AST.Commented pre var post), var))
                 |> Map.fromList
+
+        allowedInDocs =
+            Map.union
+                (varSetToMap fromExposing)
+                (varSetToMap $ Set.map (\v -> AST.Commented [] v []) fromModule)
 
         allFromDocs =
             Set.fromList $ fmap varName $ concat listedInDocs
