@@ -1,3 +1,9 @@
+## master (0.8.1)
+
+Bug fixes:
+  - URLs in doc comments containing special markdown characters are handled more correctly
+
+
 ## 0.8.0
 
 Features promoted from 0.7.0-exp:
