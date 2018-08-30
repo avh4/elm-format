@@ -177,12 +177,15 @@ sortVars forceMultiline fromExposing fromDocs fromModule =
         varName (AST.Commented _ (AST.Variable.OpValue (SymbolIdentifier name)) _) = name
         varName (AST.Commented _ (AST.Variable.Union (UppercaseIdentifier name, _) _) _) = name
 
-        allowedInDocs =
-            fromExposing
-                |> Set.union (Set.map (\v -> AST.Commented [] v []) fromModule)
-                |> Set.toList
+        varSetToMap set =
+            Set.toList set
                 |> fmap (\(AST.Commented pre var post)-> (varName (AST.Commented pre var post), var))
                 |> Map.fromList
+
+        allowedInDocs =
+            Map.union
+                (varSetToMap fromExposing)
+                (varSetToMap $ Set.map (\v -> AST.Commented [] v []) fromModule)
 
         allFromDocs =
             Set.fromList $ fmap varName $ concat listedInDocs
