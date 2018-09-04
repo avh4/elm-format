@@ -632,7 +632,7 @@ formatTopLevelBody linesBetween elmVersion importInfo entryType formatEntry body
                 (DStarter, _) -> 0
                 (_, DCloser) -> 0
                 (DComment, DComment) -> 0
-                (_, DComment) -> linesBetween + 1
+                (_, DComment) -> if linesBetween == 1 then 1 else linesBetween + 1
                 (DComment, DDefinition _) -> if linesBetween == 1 then 0 else linesBetween
                 (DComment, _) -> linesBetween
                 (DDocComment, DDefinition _) -> 0
