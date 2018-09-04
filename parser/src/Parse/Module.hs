@@ -181,7 +181,11 @@ import' =
     exposing =
       do  preExposing <- try (whitespace <* reserved "exposing")
           postExposing <- whitespace
-          imports <- listing detailedListing
+          imports <-
+            choice
+              [ listing detailedListing
+              , listingWithoutParens
+              ]
           return (preExposing, (postExposing, imports))
 
 
@@ -202,6 +206,15 @@ listing explicit =
       sawNewline <- popNewlineContext
       _ <- char ')'
       return $ listing pre post sawNewline
+
+
+listingWithoutParens :: IParser (Var.Listing Module.DetailedListing)
+listingWithoutParens =
+  expecting "a listing of values and types to expose, but with missing parentheses" $
+  choice
+    [ (\_ -> (Var.OpenListing (Commented [] () []))) <$> string ".."
+    , (\x -> (Var.ExplicitListing (x [] []) False)) <$> detailedListing
+    ]
 
 
 commentedSet :: Ord a => IParser a -> IParser (Comments -> Comments -> Var.CommentedMap a ())
