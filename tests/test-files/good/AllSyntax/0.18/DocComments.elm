@@ -12,6 +12,11 @@ module Main exposing
 @docs increment, escapedCharacters
 
 
+# Duplicate docs
+
+@docs x
+
+
 # Another section
 
 Simple paragraph.
@@ -68,6 +73,9 @@ Followed by a paragraph.
 ## Example Elm expressions
 
     x == ()
+
+    -- commented expression
+    y /= ()
 
 ```bash
 echo "non-Elm code block"

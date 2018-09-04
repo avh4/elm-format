@@ -150,6 +150,23 @@ declarationType entryType decl =
       DComment
 
 
+removeDuplicates :: Ord a => [[a]] -> [[a]]
+removeDuplicates input =
+    foldl step (ReversedList.empty, Set.empty) input |> fst |> ReversedList.toList
+    where
+        step :: Ord a => (Reversed [a], Set a) -> [a] -> (Reversed [a], Set a)
+        step (acc, seen) next =
+            case foldl stepChildren (ReversedList.empty, seen) next |> (\(a,b) -> (ReversedList.toList a, b)) of
+                ([], seen') -> (acc, seen')
+                (children', seen') -> (ReversedList.push children' acc, seen')
+
+        stepChildren :: Ord a => (Reversed a, Set a) -> a -> (Reversed a, Set a)
+        stepChildren (acc, seen) next =
+            if Set.member next seen
+                then (acc, seen)
+                else (ReversedList.push next acc, Set.insert next seen)
+
+
 sortVars :: Bool -> Set (AST.Commented AST.Variable.Value) -> [[AST.Variable.Ref]] -> Set AST.Variable.Value -> ([[AST.Commented AST.Variable.Value]], AST.Comments)
 sortVars forceMultiline fromExposing fromDocs fromModule =
     let
@@ -167,6 +184,7 @@ sortVars forceMultiline fromExposing fromDocs fromModule =
                 |> fmap (Maybe.mapMaybe (\v -> Map.lookup (refName v) allowedInDocs))
                 |> filter (not . List.null)
                 |> fmap (fmap (\v -> AST.Commented [] v []))
+                |> removeDuplicates
 
         listedInExposing =
             fromExposing
@@ -614,7 +632,7 @@ formatTopLevelBody linesBetween elmVersion importInfo entryType formatEntry body
                 (DStarter, _) -> 0
                 (_, DCloser) -> 0
                 (DComment, DComment) -> 0
-                (_, DComment) -> linesBetween + 1
+                (_, DComment) -> if linesBetween == 1 then 1 else linesBetween + 1
                 (DComment, DDefinition _) -> if linesBetween == 1 then 0 else linesBetween
                 (DComment, _) -> linesBetween
                 (DDocComment, DDefinition _) -> 0
