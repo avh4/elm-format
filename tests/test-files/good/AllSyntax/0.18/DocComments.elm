@@ -12,6 +12,11 @@ module Main exposing
 @docs increment, escapedCharacters
 
 
+# Duplicate docs
+
+@docs x
+
+
 # Another section
 
 Simple paragraph.
