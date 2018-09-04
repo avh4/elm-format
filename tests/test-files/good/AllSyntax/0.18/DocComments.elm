@@ -74,6 +74,9 @@ Followed by a paragraph.
 
     x == ()
 
+    -- commented expression
+    y /= ()
+
 ```bash
 echo "non-Elm code block"
 ```
