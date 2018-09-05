@@ -6,6 +6,9 @@ Bug fixes:
   - Listing a value more than once in module documentation no longer results in an invalid module line
   - Code blocks in doc comments containing commented Elm expressions are now correctly separated by a single blank line
 
+New features:
+  - Missing parens are automatically added for import lines
+
 
 ## 0.8.0
 
