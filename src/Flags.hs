@@ -15,7 +15,7 @@ data Config = Config
     , _yes :: Bool
     , _validate :: Bool
     , _stdin :: Bool
-    , _elmVersion :: ElmVersion
+    , _elmVersion :: Maybe ElmVersion
     , _upgrade :: Bool
     , _json :: Bool
     }
@@ -25,16 +25,16 @@ data Config = Config
 -- PARSE ARGUMENTS
 
 
-parse :: ElmVersion -> String -> Maybe String -> [String] -> Opt.ParserResult Config
-parse defaultElmVersion elmFormatVersion experimental args =
-    Opt.execParserPure preferences (parser defaultElmVersion elmFormatVersion experimental) args
+parse :: String -> Maybe String -> [String] -> Opt.ParserResult Config
+parse elmFormatVersion experimental args =
+    Opt.execParserPure preferences (parser elmFormatVersion experimental) args
 
 
-usage :: ElmVersion -> String -> String -> Maybe String -> String
-usage defaultVersion progName version experimental =
+usage :: String -> String -> Maybe String -> String
+usage progName version experimental =
     fst $
     Opt.renderFailure
-        (Opt.parserFailure preferences (parser defaultVersion version experimental) Opt.ShowHelpText mempty)
+        (Opt.parserFailure preferences (parser version experimental) Opt.ShowHelpText mempty)
         progName
 
 
@@ -43,18 +43,18 @@ preferences =
     Opt.prefs (mempty <> Opt.showHelpOnError)
 
 
-parser :: ElmVersion -> String -> Maybe String -> Opt.ParserInfo Config
-parser defaultElmVersion elmFormatVersion experimental =
+parser :: String -> Maybe String -> Opt.ParserInfo Config
+parser elmFormatVersion experimental =
     Opt.info
-        (Opt.helper <*> flags defaultElmVersion)
-        (helpInfo defaultElmVersion elmFormatVersion experimental)
+        (Opt.helper <*> flags)
+        (helpInfo elmFormatVersion experimental)
 
 
-showHelpText :: ElmVersion -> String -> Maybe String -> Opt.ParserResult never
-showHelpText defaultElmVersion elmFormatVersion experimental = Opt.Failure $
+showHelpText :: String -> Maybe String -> Opt.ParserResult never
+showHelpText elmFormatVersion experimental = Opt.Failure $
     Opt.parserFailure
         preferences
-        (parser defaultElmVersion elmFormatVersion experimental)
+        (parser elmFormatVersion experimental)
         Opt.ShowHelpText
         mempty
 
@@ -62,23 +62,23 @@ showHelpText defaultElmVersion elmFormatVersion experimental = Opt.Failure $
 
 -- COMMANDS
 
-flags :: ElmVersion -> Opt.Parser Config
-flags defaultVersion =
+flags :: Opt.Parser Config
+flags =
     Config
       <$> Opt.many input
       <*> output
       <*> yes
       <*> validate
       <*> stdin
-      <*> elmVersion defaultVersion
+      <*> elmVersion
       <*> upgrade
       <*> json
 
 
 -- HELP
 
-helpInfo :: ElmVersion -> String -> Maybe String -> Opt.InfoMod Config
-helpInfo defaultElmVersion elmFormatVersion experimental =
+helpInfo :: String -> Maybe String -> Opt.InfoMod Config
+helpInfo elmFormatVersion experimental =
     mconcat
         [ Opt.fullDesc
         , Opt.headerDoc $ Just top
@@ -88,7 +88,7 @@ helpInfo defaultElmVersion elmFormatVersion experimental =
   where
     top =
         PP.vcat $ concat
-            [ [ PP.text $ "elm-format-" ++ show defaultElmVersion ++ " " ++ elmFormatVersion ]
+            [ [ PP.text $ "elm-format " ++ elmFormatVersion ]
             , case experimental of
                   Just surveyUrl ->
                       [ (PP.<$>) (PP.text "") $
@@ -165,9 +165,8 @@ stdin =
         ]
 
 
-elmVersion :: ElmVersion -> Opt.Parser ElmVersion
-elmVersion defaultVersion =
-  fmap (Maybe.fromMaybe defaultVersion)$
+elmVersion :: Opt.Parser (Maybe ElmVersion)
+elmVersion =
   Opt.optional $
   Opt.option (Opt.eitherReader ElmVersion.parse) $
     mconcat
@@ -179,7 +178,7 @@ elmVersion defaultVersion =
             , "Valid values: "
             , show ElmVersion.Elm_0_18 ++ ", "
             , show ElmVersion.Elm_0_19 ++ ".  "
-            , "Default: " ++ show defaultVersion
+            , "Default: auto"
             ]
       ]
 

@@ -16,13 +16,11 @@ stack clean
 stack build
 
 function build-flavor() {
-    FLAVOR="$1"
-    BUILD="elm-format-${FLAVOR}-${VERSION}-${PLATFORM}"
+    BUILD="elm-format-${VERSION}-${PLATFORM}"
     mkdir -p dist/package-scripts
-    ELM_FORMAT="$(stack path --local-install-root)/bin/elm-format-${FLAVOR}"
+    ELM_FORMAT="$(stack path --local-install-root)/bin/elm-format"
     cp "$ELM_FORMAT" dist/package-scripts/elm-format
     tar zcvf "$BUILD".tgz -C dist/package-scripts elm-format
 }
 
-build-flavor 0.19
-build-flavor 0.18
+build-flavor

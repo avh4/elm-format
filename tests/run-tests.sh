@@ -26,7 +26,7 @@ fi
 
 stack "${STACK_ARGS[@]}" build || exit 1
 
-ELM_FORMAT="$(stack "${STACK_ARGS[@]}" path --local-install-root)/bin/elm-format-0.19"
+ELM_FORMAT="$(stack "${STACK_ARGS[@]}" path --local-install-root)/bin/elm-format"
 if [ ! -e "$ELM_FORMAT" ]; then
 	echo "$0: ERROR: $ELM_FORMAT not found" >&2
 	exit 1
@@ -107,91 +107,91 @@ function checkWaysToRun() {
 	shouldOutputTheSameIgnoringEol "$HELP" "$NOARGS"
 
 	echo "## elm-format INPUT --validate does not change things"
-	"$ELM_FORMAT" "$INPUT_2" --validate 1>/dev/null
+	"$ELM_FORMAT" "$INPUT_2" --elm-version=0.19 --validate 1>/dev/null
 	compareFiles "tests/test-files/transform/Examples.elm" "$INPUT_2"
 	returnCodeShouldEqual 0
 
 	echo "## elm-format INPUT --validate with unformatted file exits 1"
-	"$ELM_FORMAT" "$INPUT_2" --validate 1>/dev/null
+	"$ELM_FORMAT" "$INPUT_2" --elm-version=0.19 --validate 1>/dev/null
 	returnCodeShouldEqual 1
 
 	echo "## elm-format INPUT --validate with formatted file exits 0"
-	"$ELM_FORMAT" "$INPUT_2" --yes 1>/dev/null
-	"$ELM_FORMAT" "$INPUT_2" --validate 1>/dev/null
+	"$ELM_FORMAT" "$INPUT_2" --elm-version=0.19 --yes 1>/dev/null
+	"$ELM_FORMAT" "$INPUT_2" --elm-version=0.19 --validate 1>/dev/null
 	returnCodeShouldEqual 0
 
 	echo "## elm-format INPUT (answer = y)"
-	echo "y" | "$ELM_FORMAT" "$INPUT" 1>/dev/null
+	echo "y" | "$ELM_FORMAT" "$INPUT" --elm-version=0.19 1>/dev/null
 	returnCodeShouldEqual 0
 
 	echo "## elm-format INPUT (answer = n)"
-	echo "n" | "$ELM_FORMAT" "$INPUT" 1>/dev/null
+	echo "n" | "$ELM_FORMAT" "$INPUT" --elm-version=0.19 1>/dev/null
 	returnCodeShouldEqual 0
 
 	echo "## elm-format INPUT --yes"
-	"$ELM_FORMAT" "$INPUT" --yes 1>/dev/null
+	"$ELM_FORMAT" "$INPUT" --elm-version=0.19 --yes 1>/dev/null
 	returnCodeShouldEqual 0
 
 	echo "## elm-format --yes INPUT"
-	"$ELM_FORMAT" --yes "$INPUT" 1>/dev/null
+	"$ELM_FORMAT" --elm-version=0.19 --yes "$INPUT" 1>/dev/null
 	returnCodeShouldEqual 0
 
 	echo "## elm-format NONEXISTENT"
-	"$ELM_FORMAT" "$NONEXISTENT" 1>/dev/null
+	"$ELM_FORMAT" --elm-version=0.19 "$NONEXISTENT" 1>/dev/null
 	returnCodeShouldEqual 1
 
 	echo "## elm-format INPUT --output OUTPUT"
-	"$ELM_FORMAT" "$INPUT" --output "$OUTPUT" 1>/dev/null
+	"$ELM_FORMAT" "$INPUT" --elm-version=0.19 --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 0
 	compareFiles "$INPUT" "$OUTPUT" 1>/dev/null
 
 	echo "## cat INPUT | elm-format --stdin"
-	cat "$INPUT" | "$ELM_FORMAT" --stdin > "$OUTPUT"
+	cat "$INPUT" | "$ELM_FORMAT" --elm-version=0.19 --stdin > "$OUTPUT"
 	returnCodeShouldEqual 0
 	compareFiles "$INPUT" "$OUTPUT"
 
 	echo "## cat INPUT | elm-format --stdin INPUT"
-	STDOUT=$(cat "$INPUT" | "$ELM_FORMAT" --stdin "$INPUT" 2>&1)
+	STDOUT=$(cat "$INPUT" | "$ELM_FORMAT" --elm-version=0.19 --stdin "$INPUT" 2>&1)
 	returnCodeShouldEqual 1
 
 	echo "## cat INPUT | elm-format --stdin --output OUTPUT"
-	cat "$INPUT" | "$ELM_FORMAT" --stdin --output "$OUTPUT" 1>/dev/null
+	cat "$INPUT" | "$ELM_FORMAT" --elm-version=0.19 --stdin --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 0
 	compareFiles "$INPUT" "$OUTPUT" 1>/dev/null
 
 	echo "## cat INPUT | elm-format INPUT --stdin --output OUTPUT"
-	cat "$INPUT" | "$ELM_FORMAT" "$INPUT" --stdin --output "$OUTPUT" 1>/dev/null
+	cat "$INPUT" | "$ELM_FORMAT" "$INPUT" --elm-version=0.19 --stdin --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 1
 
 	echo "## elm-format DIRECTORY --output OUTPUT"
-	"$ELM_FORMAT" "$DIRECTORY" --output "$OUTPUT" 1>/dev/null
+	"$ELM_FORMAT" "$DIRECTORY" --elm-version=0.19 --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 1
 
 	echo "## elm-format DIRECTORY (answer = n)"
-	echo "n" | "$ELM_FORMAT" "$DIRECTORY" 1>/dev/null
+	echo "n" | "$ELM_FORMAT" --elm-version=0.19 "$DIRECTORY" 1>/dev/null
 	returnCodeShouldEqual 0
 
 	echo "## elm-format DIRECTORY (answer = y)"
-	echo "y" | "$ELM_FORMAT" "$RECURSIVE_DIRECTORY" 1>/dev/null 2>/dev/null
+	echo "y" | "$ELM_FORMAT" --elm-version=0.19 "$RECURSIVE_DIRECTORY" 1>/dev/null 2>/dev/null
 	returnCodeShouldEqual 1
 	# invalid file in the nested directory
 	# if recursion didn't work, return code would be 0
 	# because it never got to the nested invalid file
 
 	echo "## elm-format DIRECTORY --yes"
-	"$ELM_FORMAT" "$DIRECTORY" --yes 1>/dev/null 2>/dev/null
+	"$ELM_FORMAT" "$DIRECTORY" --elm-version=0.19 --yes 1>/dev/null 2>/dev/null
 	returnCodeShouldEqual 1
 
 	echo "## elm-format EMPTY_DIRECTORY"
-	"$ELM_FORMAT" "$EMPTY_DIR" 1>/dev/null
+	"$ELM_FORMAT" "$EMPTY_DIR" --elm-version=0.19 1>/dev/null
 	returnCodeShouldEqual 1
 
 	echo "## elm-format INPUT --validate"
-	"$ELM_FORMAT" "$INPUT" --validate 1>/dev/null
+	"$ELM_FORMAT" "$INPUT" --elm-version=0.19 --validate 1>/dev/null
 	returnCodeShouldEqual 0
 
 	echo "## elm-format INPUT --validate --yes"
-	"$ELM_FORMAT" "$INPUT" --validate --yes 1>/dev/null
+	"$ELM_FORMAT" "$INPUT" --elm-version=0.19 --validate --yes 1>/dev/null
 	returnCodeShouldEqual 0
 
 	echo "# OK!"
@@ -231,7 +231,7 @@ function checkBad() {
 		echo "Running on Windows; skipping checkBad"
 		return
 	fi
-	STDOUT=$(cat "$INPUT" | "$ELM_FORMAT" --stdin 2>&1)
+	STDOUT=$(cat "$INPUT" | "$ELM_FORMAT" --elm-version=0.19 --stdin 2>&1)
 	returnCodeShouldEqual 1
 	echo "DEBUG: return code was 1"
 	outputShouldRoughlyMatchPatterns "$EXPECTED" "$STDOUT"
@@ -282,12 +282,12 @@ function checkValidationOutputFormat() {
 	echo
 
 	echo "## with unformatted files outputs in expected json format"
-	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate | sed -e "s/ elm-format-[-.0-9a-z]* / elm-format-<version> /" | tee "$OUTPUT"
+	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --elm-version=0.19 --validate | sed -e "s/ elm-format-[-.0-9a-z]* / elm-format-<version> /" | tee "$OUTPUT"
 	compareFiles tests/test-files/validate1.json "$OUTPUT"
 
 	echo "## with formatted file with output in json outputs empty list"
-	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --yes > /dev/null
-	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --validate | tee "$OUTPUT"
+	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --elm-version=0.19 --yes > /dev/null
+	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --elm-version=0.19 --validate | tee "$OUTPUT"
 	compareFiles tests/test-files/validate2.json "$OUTPUT"
 
 	echo "# OK!"
@@ -301,7 +301,7 @@ function checkJson() {
 
 	echo
 	echo "## ${1%.*}.json"
-	time cat "$INPUT" | "$ELM_FORMAT" --stdin --json | python -mjson.tool | tr -d '\015' > "$OUTPUT"
+	time cat "$INPUT" | "$ELM_FORMAT" --elm-version=0.19 --stdin --json | python -mjson.tool | tr -d '\015' > "$OUTPUT"
 	returnCodeShouldEqual 0
 	compareFiles "$EXPECTED" "$OUTPUT"
 }
