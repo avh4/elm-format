@@ -6,7 +6,7 @@ var binVersion = packageInfo.version;
 
 var root = "https://github.com/avh4/elm-format/releases/download/" +
   binVersion +
-  "/elm-format-0.19-" +
+  "/elm-format-" +
   binVersion;
 
 module.exports = binwrap({

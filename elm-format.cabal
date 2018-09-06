@@ -138,7 +138,7 @@ library
         text >= 1.2.2.1 && < 2
 
 
-executable elm-format-0.19
+executable elm-format
 
     ghc-options:
         -threaded -O2 -Wall -Wno-name-shadowing
@@ -147,23 +147,7 @@ executable elm-format-0.19
         src-cli
 
     main-is:
-        Main0_19.hs
-
-    build-depends:
-        base >= 4.9.0.0 && < 5,
-        elm-format
-
-
-executable elm-format-0.18
-
-    ghc-options:
-        -threaded -O2 -Wall -Wno-name-shadowing
-
-    hs-source-dirs:
-        src-cli
-
-    main-is:
-        Main0_18.hs
+        Main.hs
 
     build-depends:
         base >= 4.9.0.0 && < 5,

@@ -298,7 +298,7 @@ cd elm-format
 stack setup
 stack build
 stack install
-~/.local/bin/elm-format-0.19 --help
+~/.local/bin/elm-format --help
 ```
 
 ### Running tests
