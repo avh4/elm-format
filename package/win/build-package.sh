@@ -17,13 +17,11 @@ stack clean
 stack build
 
 function build-flavor() {
-    FLAVOR="$1"
-    BUILD="elm-format-${FLAVOR}-${VERSION}-${PLATFORM}"
+    BUILD="elm-format-${VERSION}-${PLATFORM}"
     mkdir -p dist/package-scripts
-    ELM_FORMAT="$(stack path --local-install-root)/bin/elm-format-${FLAVOR}${BINEXT}"
+    ELM_FORMAT="$(stack path --local-install-root)/bin/elm-format${BINEXT}"
     cp "$ELM_FORMAT" "dist/package-scripts/elm-format${BINEXT}"
     tar zcvf "$BUILD".tgz -C dist/package-scripts "elm-format${BINEXT}"
 }
 
-build-flavor 0.19
-build-flavor 0.18
+build-flavor

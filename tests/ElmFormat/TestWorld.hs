@@ -68,6 +68,11 @@ instance World (State.State TestWorldState) where
     writeUtf8File path content =
         writeFile path (StrictText.unpack content)
 
+    putStr string =
+        do
+            state <- State.get
+            State.put $ state { stdout = string : stdout state }
+
     putStrLn string =
         do
             state <- State.get

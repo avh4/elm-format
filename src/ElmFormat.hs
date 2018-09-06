@@ -202,50 +202,75 @@ handleParseResult (Opt.CompletionInvoked _) = do
       error "Shell completion not yet implemented"
 
 
-main :: ElmVersion -> IO ()
-main elmVersion =
+main :: IO ()
+main =
     do
         args <- getArgs
-        main' elmVersion args
+        main' args
 
 
-main' :: World m => ElmVersion -> [String] -> m ()
-main' defaultVersion args =
-    main'' defaultVersion elmFormatVersion experimental args
+main' :: World m => [String] -> m ()
+main' args =
+    main'' elmFormatVersion experimental args
 
-main'' :: World m => ElmVersion -> String -> Maybe String -> [String] -> m ()
-main'' defaultVersion elmFormatVersion_ experimental_ args =
+main'' :: World m => String -> Maybe String -> [String] -> m ()
+main'' elmFormatVersion_ experimental_ args =
     do
-        c <- handleParseResult $ Flags.parse defaultVersion elmFormatVersion_ experimental_ args
+        c <- handleParseResult $ Flags.parse elmFormatVersion_ experimental_ args
         case c of
             Nothing -> return ()
             Just config ->
                 do
                     let autoYes = Flags._yes config
-                    let elmVersionResult = determineVersion (Flags._elmVersion config) (Flags._upgrade config)
-
                     resolvedInputFiles <- Execute.run (Execute.forHuman autoYes) $ resolveFiles (Flags._input config)
 
-                    case (elmVersionResult, determineWhatToDoFromConfig config resolvedInputFiles) of
-                        (_, Left NoInputs) ->
-                            (handleParseResult $ Flags.showHelpText defaultVersion elmFormatVersion_ experimental_)
+                    case determineWhatToDoFromConfig config resolvedInputFiles of
+                        Left NoInputs ->
+                            (handleParseResult $ Flags.showHelpText elmFormatVersion_ experimental_)
                                 >> exitFailure
 
-                        (_, Left message) ->
+                        Left message ->
                             exitWithError message
 
-                        (Left message, _) ->
-                            exitWithError message
+                        Right whatToDo -> do
+                            elmVersionChoice <- case Flags._elmVersion config of
+                                Just v -> return $ Right v
+                                Nothing -> autoDetectElmVersion
 
-                        (Right elmVersion, Right whatToDo) ->
-                            do
-                                let run = case (Flags._validate config) of
-                                      True -> Execute.run $ Execute.forMachine elmVersion True
-                                      False -> Execute.run $ Execute.forHuman autoYes
-                                result <-  run $ doIt elmVersion whatToDo
-                                if result
-                                    then exitSuccess
-                                    else exitFailure
+                            case elmVersionChoice of
+                                Left message ->
+                                    putStr message *> exitFailure
+
+                                Right elmVersionChoice' -> do
+                                    let elmVersionResult = determineVersion elmVersionChoice' (Flags._upgrade config)
+
+                                    case elmVersionResult of
+                                        Left message ->
+                                            exitWithError message
+
+                                        Right elmVersion ->
+                                            do
+                                                let run = case (Flags._validate config) of
+                                                        True -> Execute.run $ Execute.forMachine elmVersion True
+                                                        False -> Execute.run $ Execute.forHuman autoYes
+                                                result <-  run $ doIt elmVersion whatToDo
+                                                if result
+                                                    then exitSuccess
+                                                    else exitFailure
+
+
+autoDetectElmVersion :: World m => m (Either String ElmVersion)
+autoDetectElmVersion =
+    do
+        hasElmJson <- doesFileExist "elm.json"
+        if hasElmJson
+            then return $ Right Elm_0_19
+            else
+                do
+                    hasElmPackageJson <- doesFileExist "elm-package.json"
+                    if hasElmPackageJson
+                        then return $ Right Elm_0_18
+                        else return $ Left "I couldn't figure out what version of Elm you are using!\n\nYou should either run elm-format from the directory containing\nyour elm.json (for Elm 0.19) or elm-package.json (for Elm 0.18),\nor tell me which version of Elm with --elm-version=0.19 or --elm-version=0.18\n\n"
 
 
 validate :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage ()

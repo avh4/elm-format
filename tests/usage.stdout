@@ -1,4 +1,4 @@
-elm-format-0.19 x.x.x
+elm-format x.x.x
 
 Usage: elm-format [INPUT] [--output FILE] [--yes] [--validate] [--stdin]
                   [--elm-version VERSION] [--upgrade]
@@ -12,7 +12,7 @@ Available options:
   --validate               Check if files are formatted without changing them.
   --stdin                  Read from stdin, output to stdout.
   --elm-version VERSION    The Elm version of the source files being formatted.
-                           Valid values: 0.18, 0.19. Default: 0.19
+                           Valid values: 0.18, 0.19. Default: auto
   --upgrade                Upgrade older Elm files to Elm 0.19 syntax
 
 Examples:
