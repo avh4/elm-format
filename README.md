@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
-[![latest version: 0.8.0](https://img.shields.io/badge/version-0.8.0--orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.0)
+[![latest version: 0.8.0](https://img.shields.io/badge/version-0.8.0-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.0)
 
 # elm-format
 
@@ -29,7 +29,7 @@ elm-format --help  # See other command line options
 ```
 
 
-## Installation [![(latest version: 0.8.0)](https://img.shields.io/badge/version-0.8.0--orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.0)
+## Installation [![(latest version: 0.8.0)](https://img.shields.io/badge/version-0.8.0-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.0)
 
 > `elm-format` is still in beta.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
 >
