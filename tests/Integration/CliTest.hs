@@ -8,7 +8,6 @@ import ElmFormat.World (readFile)
 import ElmFormat.TestWorld (TestWorld, run, expectExit)
 import qualified ElmFormat
 import qualified ElmFormat.TestWorld as TestWorld
-import qualified ElmVersion
 
 
 tests :: TestTree
@@ -24,9 +23,29 @@ tests =
                 "tests/usage.stdout"
         , testCase "simple file" $ world
             |> TestWorld.uploadFile "test.elm" "module Main exposing (..)\nf = 1"
-            |> run "elm-format" ["test.elm", "--output", "out.elm"]
+            |> run "elm-format" ["test.elm", "--output", "out.elm", "--elm-version=0.19"]
             |> TestWorld.eval (readFile "out.elm")
             |> assertPrefix "module Main"
+        , testGroup "auto-detects Elm version"
+            [ testCase "for Elm 0.19 applications" $ world
+                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"
+                |> TestWorld.uploadFile "elm.json" "{\"elm-version\": \"0.19.0\"}"
+                |> run "elm-format" ["test.elm", "--validate"]
+                |> expectExit 0
+            , testCase "for Elm 0.19 packages" $ world
+                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"
+                |> TestWorld.uploadFile "elm.json" "{\"elm-version\": \"0.19.0 <= v < 0.20.0\"}"
+                |> run "elm-format" ["test.elm", "--validate"]
+                |> expectExit 0
+            , testCase "for Elm 0.18" $ world
+                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\x2000'\n"
+                |> TestWorld.uploadFile "elm-package.json" "{\"elm-version\": \"0.18.0 <= v < 0.19.0\"}"
+                |> run "elm-format" ["test.elm", "--validate"]
+                |> expectExit 0
+            , world
+                |> run "elm-format" ["--stdin"]
+                |> TestWorld.goldenStdout "can't autodetect" "tests/autodetect-error.stdout"
+            ]
         ]
 
 
@@ -38,7 +57,5 @@ assertPrefix prefix str =
 world :: TestWorld
 world =
     TestWorld.init
-        |> TestWorld.installProgram "elm-format" (ElmFormat.main' ElmVersion.Elm_0_19)
-        |> TestWorld.installProgram "elm-format-0.19" (ElmFormat.main' ElmVersion.Elm_0_19)
-        |> TestWorld.installProgram "elm-format-0.18" (ElmFormat.main' ElmVersion.Elm_0_18)
-        |> TestWorld.installProgram "elm-format-xxx" (ElmFormat.main'' ElmVersion.Elm_0_19 "x.x.x" Nothing)
+        |> TestWorld.installProgram "elm-format" ElmFormat.main'
+        |> TestWorld.installProgram "elm-format-xxx" (ElmFormat.main'' "x.x.x" Nothing)

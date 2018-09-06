@@ -1,13 +1,15 @@
 ## master (0.8.1)
 
+New features:
+  - `elm-format` now automatically detects your Elm version based on your `elm.json` or `elm-package.json`.
+    You can use the `--elm-version` option if the automatic detection fails.
+  - Missing parens are automatically added for import lines
+
 Bug fixes:
   - URLs in doc comments containing special markdown characters are handled more correctly
   - For Elm 0.18 and earlier, tag listings of documented custom types are no longer converted to `(..)`
   - Listing a value more than once in module documentation no longer results in an invalid module line
   - Code blocks in doc comments containing commented Elm expressions are now correctly separated by a single blank line
-
-New features:
-  - Missing parens are automatically added for import lines
 
 
 ## 0.8.0
