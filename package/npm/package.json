@@ -1,6 +1,6 @@
 {
   "name": "elm-format",
-  "version": "0.8.0",
+  "version": "0.8.1-rc1",
   "description": "Install elm-format",
   "preferGlobal": true,
   "main": "index.js",

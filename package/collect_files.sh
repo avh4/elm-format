@@ -12,7 +12,7 @@ tar zxvf "elm-format-${VERSION}-win-i386.tgz"
 zip "elm-format-${VERSION}-win-i386.zip" elm-format.exe
 popd
 
-cp -v package/win/elm-format/elm-format-*-"${VERSION}"-win-i386.zip ./
+cp -v package/win/elm-format/elm-format-"${VERSION}"-win-i386.zip ./
 
 for i in elm-format-${VERSION}-{mac-x64.tgz,win-i386.zip,linux-x64.tgz}; do
   keybase pgp sign --detached --infile "$i" --outfile "$i".asc
