@@ -10,6 +10,7 @@ Bug fixes:
   - For Elm 0.18 and earlier, tag listings of documented custom types are no longer converted to `(..)`
   - Listing a value more than once in module documentation no longer results in an invalid module line
   - Code blocks in doc comments containing commented Elm expressions are now correctly separated by a single blank line
+  - When converting `exposing (..)` to an explicit listing, undocumented values are not longer hidden
 
 
 ## 0.8.0
