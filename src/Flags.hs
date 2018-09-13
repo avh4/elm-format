@@ -3,7 +3,6 @@ module Flags where
 import Data.Monoid ((<>))
 import ElmVersion (ElmVersion(..))
 
-import qualified Data.Maybe as Maybe
 import qualified ElmVersion
 import qualified Options.Applicative as Opt
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
