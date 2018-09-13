@@ -3,6 +3,7 @@ module ListExports exposing
     , X
     , Y(..)
     , b, c
+    , p, q
     )
 
 {-|
@@ -28,6 +29,10 @@ type Y
     | Y2
 
 
+q =
+    4
+
+
 a =
     1
 
@@ -38,3 +43,7 @@ b =
 
 c =
     3
+
+
+p =
+    5
