@@ -167,8 +167,8 @@ removeDuplicates input =
                 else (ReversedList.push next acc, Set.insert next seen)
 
 
-sortVars :: Bool -> Set (AST.Commented AST.Variable.Value) -> [[AST.Variable.Ref]] -> Set AST.Variable.Value -> ([[AST.Commented AST.Variable.Value]], AST.Comments)
-sortVars forceMultiline fromExposing fromDocs fromModule =
+sortVars :: Bool -> Set (AST.Commented AST.Variable.Value) -> [[AST.Variable.Ref]] -> ([[AST.Commented AST.Variable.Value]], AST.Comments)
+sortVars forceMultiline fromExposing fromDocs =
     let
         refName (AST.Variable.VarRef _ (LowercaseIdentifier name)) = name
         refName (AST.Variable.TagRef _ (UppercaseIdentifier name)) = name
@@ -201,9 +201,7 @@ sortVars forceMultiline fromExposing fromDocs fromModule =
                 |> Map.fromList
 
         allowedInDocs =
-            Map.union
-                (varSetToMap fromExposing)
-                (varSetToMap $ Set.map (\v -> AST.Commented [] v []) fromModule)
+            varSetToMap fromExposing
 
         allFromDocs =
             Set.fromList $ fmap varName $ concat listedInDocs
@@ -221,20 +219,9 @@ sortVars forceMultiline fromExposing fromDocs fromModule =
                 |> fmap (\(AST.Commented pre _ post) -> pre ++ post)
                 |> concat
     in
-    case (List.null $ concat listedInDocs) && (List.null remainingFromExposing) of
-        False ->
-            if List.null listedInDocs && forceMultiline
-                then ( fmap (\x -> [x]) remainingFromExposing, commentsFromReorderedVars )
-                else ( listedInDocs ++ if List.null remainingFromExposing then [] else [ remainingFromExposing ], commentsFromReorderedVars )
-
-        True ->
-            -- we have no exposing, and no docs; use from module
-            fromModule
-                |> Set.toList
-                |> fmap (\x -> AST.Commented [] x [])
-                |> List.sortOn varOrder
-                |> (\x -> if List.null x then [] else [x])
-                |> (\x -> (x, []))
+    if List.null listedInDocs && forceMultiline
+        then ( fmap (\x -> [x]) remainingFromExposing, commentsFromReorderedVars )
+        else ( listedInDocs ++ if List.null remainingFromExposing then [] else [ remainingFromExposing ], commentsFromReorderedVars )
 
 
 formatModuleHeader :: ElmVersion -> AST.Module.Module -> Box
@@ -266,19 +253,20 @@ formatModuleHeader elmVersion modu =
               '(':a:b:')':[] -> AST.Variable.OpRef (SymbolIdentifier $ a:b:[])
               s -> AST.Variable.VarRef [] (LowercaseIdentifier s)
 
-      definedVars :: Set AST.Variable.Value
+      definedVars :: Set (AST.Commented AST.Variable.Value)
       definedVars =
           AST.Module.body modu
               |> concatMap extractVarName
+              |> fmap (\x -> AST.Commented [] x [])
               |> Set.fromList
 
       AST.KeywordCommented _ _ exportsList =
           AST.Module.exports header
 
-      detailedListingToSet :: AST.Variable.Listing AST.Module.DetailedListing -> Set (AST.Commented AST.Variable.Value)
-      detailedListingToSet (AST.Variable.OpenListing _) = Set.empty
-      detailedListingToSet AST.Variable.ClosedListing = Set.empty
-      detailedListingToSet (AST.Variable.ExplicitListing (AST.Module.DetailedListing values operators types) _) =
+      detailedListingToSet :: Set (AST.Commented AST.Variable.Value) -> AST.Variable.Listing AST.Module.DetailedListing -> Set (AST.Commented AST.Variable.Value)
+      detailedListingToSet allAvailable (AST.Variable.OpenListing _) = allAvailable
+      detailedListingToSet _ AST.Variable.ClosedListing = Set.empty
+      detailedListingToSet _ (AST.Variable.ExplicitListing (AST.Module.DetailedListing values operators types) _) =
           Set.unions
               [ Map.assocs values |> fmap (\(name, AST.Commented pre () post) -> AST.Commented pre (AST.Variable.Value name) post) |> Set.fromList
               , Map.assocs operators |> fmap (\(name, AST.Commented pre () post) -> AST.Commented pre (AST.Variable.OpValue name) post) |> Set.fromList
@@ -292,9 +280,8 @@ formatModuleHeader elmVersion modu =
       varsToExpose =
           sortVars
               (detailedListingIsMultiline exportsList)
-              (detailedListingToSet exportsList)
+              (detailedListingToSet definedVars exportsList)
               documentedVars
-              definedVars
 
       extractVarName :: TopLevelStructure Declaration -> [AST.Variable.Value]
       extractVarName decl =
