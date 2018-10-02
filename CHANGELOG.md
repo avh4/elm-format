@@ -1,4 +1,4 @@
-## master (0.8.1)
+## 0.8.1
 
 New features:
   - `elm-format` now automatically detects your Elm version based on your `elm.json` or `elm-package.json`.
