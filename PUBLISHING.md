@@ -67,3 +67,13 @@ npm dist-tag add elm-format@<new version> elm0.18.0
 npm dist-tag add elm-format@<new version> elm0.19.0
 npm dist-tag add elm-format@<new version> exp
 ```
+
+
+## Nix
+
+```
+cd package/nix
+./build.sh
+```
+
+Then `cd nixpkgs`, push the resulting branch, and make a PR to https://github.com/NixOS/nixpkgs with the title "elm-format: [old version] -> [new version]"
