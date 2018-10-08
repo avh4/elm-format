@@ -700,7 +700,18 @@ formatModuleDocs elmVersion importInfo blocks =
 
         content :: String
         content =
-            ElmFormat.Render.Markdown.formatMarkdown (fmap format . parse) blocks
+            ElmFormat.Render.Markdown.formatMarkdown (fmap format . parse) $ fmap cleanBlock blocks
+
+        cleanBlock :: Markdown.Block -> Markdown.Block
+        cleanBlock block =
+            case block of
+                Markdown.ElmDocs docs ->
+                    Markdown.ElmDocs $
+                        (fmap . fmap)
+                            (Text.replace (Text.pack "(..)") (Text.pack ""))
+                            docs
+                _ ->
+                    block
     in
         formatDocComment content
 
