@@ -7,7 +7,9 @@ import Parse.IParser
 import qualified Parse.Markdown as Markdown
 import qualified Parse.State as State
 import qualified Reporting.Error.Syntax as Syntax
-import Text.Parsec hiding (newline, spaces, State)
+import Parse.Primitives (try)
+import Parse.ParsecAdapter (string, (<|>), many, many1, choice, option)
+-- import Text.Parsec hiding (newline, spaces, State)
 
 
 padded :: IParser a -> IParser (Comments, a, Comments)
@@ -27,7 +29,7 @@ spaces =
         blank
         <|> (const [CommentTrickOpener] <$> (try $ string "{--}"))
         <|> comment
-        <?> Syntax.whitespace
+        -- <?> Syntax.whitespace
   in
       concat <$> many1 space
 
@@ -61,14 +63,14 @@ whitespace =
 
 freshLine :: IParser Comments
 freshLine =
-      concat <$> (try ((++) <$> many1 newline <*> many space_nl) <|> try (many1 space_nl)) <?> Syntax.freshLine
+      concat <$> (try ((++) <$> many1 newline <*> many space_nl) <|> try (many1 space_nl)) -- <?> Syntax.freshLine
   where
     space_nl = try $ (++) <$> spaces <*> (concat <$> many1 newline)
 
 
 newline :: IParser Comments
 newline =
-    (simpleNewline >> return []) <|> ((\x -> [x]) <$> lineComment) <?> Syntax.newline
+    (simpleNewline >> return []) <|> ((\x -> [x]) <$> lineComment) -- <?> Syntax.newline
 
 
 simpleNewline :: IParser ()
