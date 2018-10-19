@@ -234,8 +234,6 @@ caseExpr =
       (e, multilineSubject) <- trackNewline $ (\(pre, e, post) -> Commented pre e post) <$> padded expr
       reserved "of"
       firstPatternComments <- whitespace
-      -- We think this is bc of the bug where newlines don't propagate to outer contexts, let's see if things break by commenting it
-      updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
       result <- cases firstPatternComments
       return $ E.Case (e, multilineToBool multilineSubject) result
   where
