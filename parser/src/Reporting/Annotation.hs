@@ -31,9 +31,9 @@ at start end value =
     A (R.Region start end) value
 
 
-merge :: Located a -> Located b -> value -> Located value
-merge (A region1 _) (A region2 _) value =
-    A (R.merge region1 region2) value
+-- merge :: Located a -> Located b -> value -> Located value
+-- merge (A region1 _) (A region2 _) value =
+--     A (R.merge region1 region2) value
 
 
 sameAs :: Located a -> b -> Located b

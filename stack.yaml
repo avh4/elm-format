@@ -40,9 +40,7 @@ packages:
 - '.'
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
-extra-deps:
-- indents-0.3.3
-- concatenative-1.0.1 # required by indents-0.3.3
+extra-deps: []
 
 # Override default flag values for local packages and extra-deps
 flags: {}

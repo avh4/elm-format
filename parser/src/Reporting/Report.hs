@@ -1,230 +1,85 @@
-{-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Reporting.Report
-    ( Report(Report)
-    , simple
-    , toString
-    , printError, printWarning
-    ) where
+    ( Report(..)
+    , toDoc
+    , toCodeSnippet
+    , toCodePair
+    )
+    where
 
-import Control.Applicative ((<|>))
-import Control.Monad.Writer (Writer, execWriter, tell)
-import qualified Data.List.Split as Split
-import System.Console.ANSI
-import ElmFormat.World
 
+import qualified Reporting.Doc as D
 import qualified Reporting.Region as R
+import qualified Reporting.Render.Code as Code
 
 
-data Report = Report
+
+-- BUILD REPORTS
+
+
+data Report =
+  Report
     { _title :: String
-    , _highlight :: Maybe R.Region
-    , _preHint :: String
-    , _postHint :: String
-    }
-    deriving (Show)
-
-
-simple :: String -> String -> String -> Report
-simple title pre post =
-  Report title Nothing pre post
-
-
-toString :: String -> R.Region -> Report -> String -> String
-toString location region report source =
-  execWriter (render plain location region report source)
-
-
-printError :: World m => String -> R.Region -> Report -> String -> m ()
-printError location region report source =
-  render (ansi Error) location region report source
-
-
-printWarning :: World m => String -> R.Region -> Report -> String -> m ()
-printWarning location region report source =
-  render (ansi Warning) location region report source
-
-
-render
-    :: (Monad m)
-    => Renderer m
-    -> String
-    -> R.Region
-    -> Report
-    -> String
-    -> m ()
-render renderer location region (Report title highlight pre post) source =
-  do  messageBar renderer title location
-      normal renderer (pre ++ "\n\n")
-      grabRegion renderer highlight region source
-      normal renderer ("\n" ++ if null post then "\n" else post ++ "\n\n\n")
-
-
--- RENDERING
-
-data Renderer m = Renderer
-    { normal :: String -> m ()
-    , header :: String -> m ()
-    , accent :: String -> m ()
+    , _region :: R.Region
+    , _sgstns :: [String]
+    , _message :: D.Doc
     }
 
 
-plain :: Renderer (Writer String)
-plain =
-  Renderer tell tell tell
+toDoc :: FilePath -> Report -> D.Doc
+toDoc filePath (Report title _ _ message) =
+  D.vcat
+    [ messageBar title filePath
+    , ""
+    , message
+    , ""
+    ]
 
 
-data Type = Error | Warning
-
-
-ansi :: World m => Type -> Renderer m
-ansi tipe =
+messageBar :: String -> FilePath -> D.Doc
+messageBar title filePath =
   let
-    put =
-      putStrStderr
-
-    put' intensity color string =
-      do  putSgrStderr [SetColor Foreground intensity color]
-          put string
-          putSgrStderr [Reset]
-
-    accentColor =
-      case tipe of
-        Error -> Red
-        Warning -> Yellow
+    usedSpace =
+      4 + length title + 1 + length filePath
   in
-    Renderer
-      put
-      (put' Dull Cyan)
-      (put' Dull accentColor)
+    D.dullcyan $ D.fromString $
+      "-- " ++ title
+      ++ " " ++ replicate (max 1 (80 - usedSpace)) '-'
+      ++ " " ++ filePath
 
 
 
-
--- REPORT HEADER
-
-messageBar :: Renderer m -> String -> String -> m ()
-messageBar renderer tag location =
-  let
-    usedSpace = 4 + length tag + 1 + length location
-  in
-    header renderer $
-      "-- " ++ tag ++ " "
-      ++ replicate (max 1 (80 - usedSpace)) '-'
-      ++ " " ++ location ++ "\n\n"
+-- CODE FORMATTING
 
 
--- REGIONS
-
-grabRegion
-    :: (Monad m)
-    => Renderer m
-    -> Maybe R.Region
-    -> R.Region
-    -> String
-    -> m ()
-grabRegion renderer maybeSubRegion region@(R.Region start end) source =
-  let
-    (R.Position startLine startColumn) = start
-    (R.Position endLine endColumn) = end
-
-    (|>) = flip ($)
-
-    relevantLines =
-        -- Using `lines` here will strip the last line.
-        Split.splitOn "\n" source
-          |> drop (startLine - 1)
-          |> take (endLine - startLine + 1)
-  in
-  case relevantLines of
-    [] ->
-        normal renderer ""
-
-    [sourceLine] ->
-        singleLineRegion renderer startLine sourceLine $
-          case maybeSubRegion of
-            Nothing ->
-                (0, startColumn, endColumn, length sourceLine)
-
-            Just (R.Region s e) ->
-                (startColumn, R.column s, R.column e, endColumn)
-
-    firstLine : rest ->
-        let
-          filteredFirstLine =
-              replicate (startColumn - 1) ' '
-              ++ drop (startColumn - 1) firstLine
-
-          filteredLastLine =
-              take (endColumn) (last rest)
-
-          focusedRelevantLines =
-              filteredFirstLine : init rest ++ [filteredLastLine]
-
-          lineNumbersWidth =
-              length (show endLine)
-
-          subregion =
-              maybeSubRegion <|> Just region
-
-          numberedLines =
-              zipWith
-                (addLineNumber renderer subregion lineNumbersWidth)
-                [startLine .. endLine]
-                focusedRelevantLines
-        in
-          mapM_ (\line -> line >> normal renderer "\n") numberedLines
+toCodeSnippet :: Code.Source -> R.Region -> Maybe R.Region -> (D.Doc, D.Doc) -> D.Doc
+toCodeSnippet source region highlight (preHint, postHint) =
+  D.vcat
+    [ preHint
+    , ""
+    , Code.render source region highlight
+    , postHint
+    ]
 
 
-addLineNumber
-    :: (Monad m)
-    => Renderer m
-    -> Maybe R.Region
-    -> Int
-    -> Int
-    -> String
-    -> m ()
-addLineNumber renderer maybeSubRegion width n line =
-  let
-    number =
-      if n < 0 then " " else show n
+toCodePair :: Code.Source -> R.Region -> R.Region -> (D.Doc, D.Doc) -> (D.Doc, D.Doc, D.Doc) -> D.Doc
+toCodePair source r1 r2 (oneStart, oneEnd) (twoStart, twoMiddle, twoEnd) =
+  case Code.renderPair source r1 r2 of
+    Code.OneLine codeDocs ->
+      D.vcat
+        [ oneStart
+        , ""
+        , codeDocs
+        , oneEnd
+        ]
 
-    lineNumber =
-      replicate (width - length number) ' ' ++ number ++ "│"
-
-    spacer (R.Region start end) =
-      if R.line start <= n && n <= R.line end
-        then accent renderer ">"
-        else normal renderer " "
-  in
-    do  normal renderer lineNumber
-        maybe (normal renderer " ") spacer maybeSubRegion
-        normal renderer line
-
-
-singleLineRegion
-    :: (Monad m)
-    => Renderer m
-    -> Int
-    -> String
-    -> (Int, Int, Int, Int)
-    -> m ()
-singleLineRegion renderer lineNum sourceLine (start, innerStart, innerEnd, end) =
-  let
-    width =
-      length (show lineNum)
-
-    underline =
-      replicate (innerStart + width + 1) ' '
-      ++ replicate (max 1 (innerEnd - innerStart)) '^'
-
-    (|>) = flip ($)
-
-    trimmedSourceLine =
-        sourceLine
-          |> drop (start - 1)
-          |> take (end - start + 1)
-          |> (++) (replicate (start - 1) ' ')
-  in
-    do  addLineNumber renderer Nothing width lineNum trimmedSourceLine
-        accent renderer $ "\n" ++ underline
+    Code.TwoChunks code1 code2 ->
+      D.vcat
+        [ twoStart
+        , ""
+        , code1
+        , twoMiddle
+        , ""
+        , code2
+        , twoEnd
+        ]
