@@ -191,21 +191,18 @@ import' =
 
 listing :: IParser (Comments -> Comments -> a) -> IParser (Var.Listing a)
 listing explicit =
-  expecting "a listing of values and types to expose, like (..)" $
-  do  _ <- try (char '(')
-      pushNewlineContext
-      pre <- whitespace
-      listing <-
-          choice
-            [ (\_ pre post _ -> (Var.OpenListing (Commented pre () post))) <$> string ".."
-            , (\x pre post sawNewline ->
-                (Var.ExplicitListing (x pre post) sawNewline))
-                  <$> explicit
-            ]
-      post <- whitespace
-      sawNewline <- popNewlineContext
-      _ <- char ')'
-      return $ listing pre post sawNewline
+  let
+    subparser = choice
+        [ (\_ pre post _ -> (Var.OpenListing (Commented pre () post))) <$> string ".."
+        , (\x pre post sawNewline -> (Var.ExplicitListing (x pre post) sawNewline)) <$>
+            explicit
+        ]
+  in
+    expecting "a listing of values and types to expose, like (..)" $
+    do  _ <- try (char '(')
+        ((pre, listing, post), multiline) <- trackNewline ((,,) <$> whitespace <*> subparser <*> whitespace)
+        _ <- char ')'
+        return $ listing pre post $ multilineToBool multiline
 
 
 listingWithoutParens :: IParser (Var.Listing Module.DetailedListing)

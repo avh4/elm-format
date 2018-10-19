@@ -5,6 +5,7 @@ import Parse.IParser
 import AST.V0_16
 
 
+
 commented :: IParser a -> IParser (Commented a)
 commented inner =
     Commented <$> whitespace <*> inner <*> whitespace
@@ -23,9 +24,7 @@ preCommented a =
 withEol :: IParser a -> IParser (WithEol a)
 withEol a =
     do
-        pushNewlineContext
-        result <- a
-        multiline <- popNewlineContext
-        if multiline
-            then return (result, Nothing)
-            else (,) result <$> restOfLine
+        (result, multiline) <- trackNewline a
+        case multiline of
+            SplitAll -> return (result, Nothing)
+            JoinAll -> (,) result <$> restOfLine
