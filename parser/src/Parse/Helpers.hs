@@ -289,35 +289,36 @@ keyValue parseSep parseKey parseVal =
 
 separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (e,Maybe String), [(Comments, Comments, e, Maybe String)], Bool))
 separated sep expr' =
-  do  start <- getMyPosition
-      _ <- pushNewlineContext
-      t1 <- expr'
-      arrow <- optionMaybe $ try ((,) <$> restOfLine <*> whitespace <* sep)
-      case arrow of
-        Nothing ->
-            do  _ <- popNewlineContext
-                return $ Left t1
-        Just (eolT1, preArrow) ->
-            do  postArrow <- whitespace
-                t2 <- separated sep expr'
-                end <- getMyPosition
-                multiline <- popNewlineContext
-                case t2 of
-                    Right (_, (t2',eolT2), ts, _) ->
-                      return $ Right
-                        ( R.Region start end
-                        , (t1, eolT1)
-                        , (preArrow, postArrow, t2', eolT2):ts
-                        , multiline
-                        )
-                    Left t2' ->
-                      do
-                        eol <- restOfLine
-                        return $ Right
-                          ( R.Region start end
-                          , (t1, eolT1)
-                          , [(preArrow, postArrow, t2', eol)]
-                          , multiline)
+  let
+    subparser =
+      do  start <- getMyPosition
+          t1 <- expr'
+          arrow <- optionMaybe $ try ((,) <$> restOfLine <*> whitespace <* sep)
+          case arrow of
+            Nothing ->
+                return $ \_multiline -> Left t1
+            Just (eolT1, preArrow) ->
+                do  postArrow <- whitespace
+                    t2 <- separated sep expr'
+                    end <- getMyPosition
+                    case t2 of
+                        Right (_, (t2',eolT2), ts, _) ->
+                          return $ \multiline -> Right
+                            ( R.Region start end
+                            , (t1, eolT1)
+                            , (preArrow, postArrow, t2', eolT2):ts
+                            , multiline
+                            )
+                        Left t2' ->
+                          do
+                            eol <- restOfLine
+                            return $ \multiline -> Right
+                              ( R.Region start end
+                              , (t1, eolT1)
+                              , [(preArrow, postArrow, t2', eol)]
+                              , multiline)
+  in
+    (\(f, multiline) -> f $ multilineToBool multiline) <$> trackNewline subparser
 
 
 dotSep1 :: IParser a -> IParser [a]
@@ -365,13 +366,24 @@ betwixt a b c =
 
 
 surround :: Char -> Char -> String -> IParser (Comments -> Comments -> Bool -> a) -> IParser a
-surround a z name p = do
-  pushNewlineContext
-  _ <- char a
-  (pre, v, post) <- padded p
-  _ <- char z <?> unwords ["a closing", name, show z]
-  multiline <- popNewlineContext
-  return $ v pre post multiline
+surround a z name p =
+  let
+    -- subparser :: IParser (Bool -> a)
+    subparser = do
+      _ <- char a
+      (pre, v, post) <- padded p
+      _ <- char z <?> unwords ["a closing", name, show z]
+      return $ \multiline -> v pre post multiline
+    in
+      (\(f, multiline) -> f (multilineToBool multiline)) <$> trackNewline subparser
+
+
+-- TODO: push the Multiline type further up in the AST and get rid of this
+multilineToBool :: Multiline -> Bool
+multilineToBool multine =
+  case multine of
+    SplitAll -> True
+    JoinAll -> False
 
 
 braces :: IParser (Comments -> Comments -> Bool -> a) -> IParser a

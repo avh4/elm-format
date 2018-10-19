@@ -49,7 +49,5 @@ sectionedGroup term =
 checkMultiline :: IParser (ForceMultiline -> a) -> IParser a
 checkMultiline inner =
     do
-        pushNewlineContext
-        a <- inner
-        multiline <- popNewlineContext
-        return $ a (ForceMultiline multiline)
+        (a, multiline) <- trackNewline inner
+        return $ a (ForceMultiline $ multilineToBool multiline)

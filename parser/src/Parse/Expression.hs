@@ -138,10 +138,8 @@ head' (a:_) = Just a
 appExpr :: IParser E.Expr
 appExpr =
   expecting "an expression" $
-  do  pushNewlineContext
-      start <- getMyPosition
-      t <- term
-      sawNewlineInInitialTerm <- popNewlineContext
+  do  start <- getMyPosition
+      (t, initialTermMultiline) <- trackNewline term
       ts <- constrainedSpacePrefix term
       end <- getMyPosition
       return $
@@ -152,15 +150,15 @@ appExpr =
                 let
                     multiline =
                         case
-                            ( sawNewlineInInitialTerm
+                            ( initialTermMultiline
                             , fromMaybe (JoinAll) $ fmap snd $ head' ts
                             , any (isMultiline . snd) $ tail ts
                             )
                         of
-                            (True, _, _ ) -> FASplitFirst
-                            (False, JoinAll, True) -> FAJoinFirst SplitAll
-                            (False, JoinAll, False) -> FAJoinFirst JoinAll
-                            (False, SplitAll, _) -> FASplitFirst
+                            (SplitAll, _, _ ) -> FASplitFirst
+                            (JoinAll, JoinAll, True) -> FAJoinFirst SplitAll
+                            (JoinAll, JoinAll, False) -> FAJoinFirst JoinAll
+                            (JoinAll, SplitAll, _) -> FASplitFirst
                 in
                     A.at start end $ E.App t (fmap fst ts) multiline
 
@@ -217,27 +215,27 @@ ifClause =
 
 lambdaExpr :: IParser E.Expr
 lambdaExpr =
-  addLocation $
-  do  pushNewlineContext
+  let
+    subparser = do
       _ <- char '\\' <|> char '\x03BB' <?> "an anonymous function"
       args <- spacePrefix Pattern.term
       (preArrowComments, _, bodyComments) <- padded rightArrow
       body <- expr
-      multiline <- popNewlineContext
-      return $ E.Lambda args (preArrowComments ++ bodyComments) body multiline
+      return (args, preArrowComments, bodyComments, body)
+  in
+    addLocation $
+        do  ((args, preArrowComments, bodyComments, body), multiline) <- trackNewline subparser
+            return $ E.Lambda args (preArrowComments ++ bodyComments) body $ multilineToBool multiline
 
 
 caseExpr :: IParser E.Expr'
 caseExpr =
   do  try (reserved "case")
-      pushNewlineContext
-      e <- (\(pre, e, post) -> Commented pre e post) <$> padded expr
+      (e, multilineSubject) <- trackNewline $ (\(pre, e, post) -> Commented pre e post) <$> padded expr
       reserved "of"
-      multilineSubject <- popNewlineContext
       firstPatternComments <- whitespace
-      updateState $ State.setNewline -- because if statements are always formatted as multiline, we pretend we saw a newline here to avoid problems with the Box rendering model
       result <- cases firstPatternComments
-      return $ E.Case (e, multilineSubject) result
+      return $ E.Case (e, multilineToBool multilineSubject) result
   where
     case_ preComments =
       do
