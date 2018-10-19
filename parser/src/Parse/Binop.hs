@@ -4,7 +4,7 @@ import Text.Parsec ((<|>), choice, try)
 
 import qualified AST.Expression as E
 import qualified AST.Variable as Var
-import Parse.Helpers (commitIf, addLocation)
+import Parse.Helpers (commitIf, addLocation, multilineToBool)
 import Parse.IParser
 import Parse.Whitespace
 import qualified Reporting.Annotation as A
@@ -17,16 +17,13 @@ binops
     -> IParser E.Expr
 binops term last anyOp =
   addLocation $
-  do  pushNewlineContext
-      e <- term
-      ops <- nextOps
-      sawNewline <- popNewlineContext
+  do  ((e, ops), multiline) <- trackNewline ((,) <$> term <*> nextOps)
       return $
         case ops of
           [] ->
             A.drop e
           _ ->
-            E.Binops e ops sawNewline
+            E.Binops e ops $ multilineToBool multiline
   where
     nextOps =
       choice
