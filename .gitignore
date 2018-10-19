@@ -6,3 +6,5 @@
 *.tix
 /.stack-work/
 /tests/elm-format
+.vscode
+.DS_Store
