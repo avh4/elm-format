@@ -1,6 +1,6 @@
 module Parse.IParser where
 
-import Control.Monad.State (State)
-import qualified Parse.Primitives.Internals as I
+import Parse.Primitives (Parser)
 
-type IParser a = I.Parser a
+-- TODO: inline this
+type IParser a = Parser a

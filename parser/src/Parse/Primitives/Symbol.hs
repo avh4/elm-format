@@ -14,18 +14,18 @@ import Prelude hiding (length)
 import Control.Exception (assert)
 import qualified Data.ByteString.Internal as B
 import qualified Data.ByteString.Char8 as Char8
-import qualified Data.Char as Char
-import qualified Data.IntSet as IntSet
+-- import qualified Data.Char as Char
+-- import qualified Data.IntSet as IntSet
 -- import qualified Data.Vector as Vector
-import Foreign.ForeignPtr (ForeignPtr)
-import GHC.Word (Word8)
+-- import Foreign.ForeignPtr (ForeignPtr)
+-- import GHC.Word (Word8)
 
-import qualified Elm.Name as N
+-- import qualified Elm.Name as N
 import Parse.Primitives.Internals (Parser(..), State(..), expect, noError)
 import qualified Parse.Primitives.Internals as I
 import qualified Parse.Primitives.Variable as Var
 import qualified Reporting.Error.Syntax as E
-import Reporting.Error.Syntax (Theory(..), BadOp(..))
+import Reporting.Error.Syntax (Theory(..)) --, BadOp(..))
 
 
 
@@ -92,10 +92,10 @@ underscore =
 --   Vector.generate 128 (\i -> IntSet.member i binopCharSet)
 
 
-{-# NOINLINE binopCharSet #-}
-binopCharSet :: IntSet.IntSet
-binopCharSet =
-  IntSet.fromList (map Char.ord "+-/*=.<>:&|^?%!")
+-- {-# NOINLINE binopCharSet #-}
+-- binopCharSet :: IntSet.IntSet
+-- binopCharSet =
+--   IntSet.fromList (map Char.ord "+-/*=.<>:&|^?%!")
 
 
 

@@ -49,7 +49,6 @@ library
         markdown
 
     exposed-modules:
-        Elm.Name
         ElmFormat
         ElmVersion
         -- exposed for tests
@@ -76,7 +75,6 @@ library
         Parse.Pattern
         Parse.Type
         Reporting.Annotation
-        Reporting.Doc
         Reporting.Error.Syntax
         Reporting.Region
         Util.List
@@ -93,6 +91,7 @@ library
         Cheapskate.Util
         CommandLine.Helpers
         Data.Index
+        Elm.Name
         ElmFormat.Execute
         ElmFormat.Filesystem
         ElmFormat.FileStore
@@ -116,9 +115,13 @@ library
         Parse.Module
         Parse.Parse
         Parse.ParsecAdapter
+        Parse.Primitives
         Parse.Primitives.Internals
-        Parse.State
+        Parse.Primitives.Symbol
+        Parse.Primitives.Variable
+        Parse.Primitives.Whitespace
         Parse.Whitespace
+        Reporting.Doc
         Reporting.Render.Code
         Reporting.Report
         Reporting.Result

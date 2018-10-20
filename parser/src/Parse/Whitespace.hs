@@ -2,13 +2,16 @@ module Parse.Whitespace where
 
 import AST.V0_16
 import qualified Cheapskate.Types as Markdown
+import qualified Data.ByteString as ByteString
 import qualified Data.Char as Char
+import qualified Data.Text as Text
+import Data.Text.Encoding (decodeUtf8)
 import Parse.IParser
 import qualified Parse.Markdown as Markdown
-import qualified Parse.State as State
-import qualified Reporting.Error.Syntax as Syntax
+-- import qualified Reporting.Error.Syntax as Syntax
 import Parse.Primitives (try)
-import Parse.ParsecAdapter (string, (<|>), many, many1, choice, option)
+import Parse.Primitives.Internals (Parser(..), State(..))
+import Parse.ParsecAdapter (string, (<|>), many, many1, choice, option, char, eof, lookAhead, notFollowedBy, anyWord8)
 -- import Text.Parsec hiding (newline, spaces, State)
 
 
@@ -76,18 +79,24 @@ newline =
 simpleNewline :: IParser ()
 simpleNewline =
   do  _ <- try (string "\r\n") <|> string "\n"
-      updateState State.setNewline
       return ()
 
 
 trackNewline :: IParser a -> IParser (a, Multiline)
-trackNewline parser =
-    do
-        updateState State.pushNewlineContext
-        a <- parser
-        state <- getState
-        updateState State.popNewlineContext
-        return (a, if State.sawNewline state then SplitAll else JoinAll)
+trackNewline (Parser parser) =
+    Parser $ \state@(State _ _ _ _ row _ _) cok _ eok err ->
+        let
+            cok' a newState@(State _ _ _ _ newRow _ _) e =
+                if newRow > row
+                    then cok (a, SplitAll) newState e
+                    else cok (a, JoinAll) newState e
+
+            eok' a newState e =
+                -- Nothing was consumed, so there cannot have been a newline
+                eok (a, JoinAll) newState e
+
+        in
+        parser state cok' err eok' err
 
 
 lineComment :: IParser Comment
@@ -160,19 +169,19 @@ closeComment keepClosingPunc =
   uncurry (++) <$>
     anyUntil
       (choice
-        [ try ((\a b -> if keepClosingPunc then concat (a ++ [b]) else "") <$> many (string " ") <*> string "-}") <?> "the end of a comment -}"
+        [ try ((\a b -> if keepClosingPunc then concat (a ++ [b]) else "") <$> many (string " ") <*> string "-}") -- <?> "the end of a comment -}"
         , concat <$> sequence [ try (string "{-"), closeComment True, closeComment keepClosingPunc]
         ])
 
 
 anyUntil :: IParser a -> IParser (String, a)
 anyUntil end =
-    go ""
+  go []
   where
     next pre =
       do
-        nextChar <- anyChar
-        go (nextChar : pre)
+        nextByte <- anyWord8
+        go (nextByte : pre)
 
     go pre =
-      ((,) (reverse pre) <$> end) <|> next pre
+      ((,) (Text.unpack . decodeUtf8 . ByteString.pack $ reverse pre) <$> end) <|> next pre

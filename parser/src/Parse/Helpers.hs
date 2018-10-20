@@ -5,16 +5,17 @@ import Prelude hiding (until)
 import Control.Monad (guard)
 import Data.Map.Strict hiding (foldl)
 import qualified Data.Maybe as Maybe
-import Text.Parsec hiding (newline, spaces, State)
-import Text.Parsec.Indent (indented, runIndent)
 
 import AST.V0_16
 import qualified AST.Expression
 import qualified AST.Helpers as Help
 import qualified AST.Variable
-import qualified Parse.State as State
+import qualified Data.Text as Text
+import Data.Text.Encoding (encodeUtf8)
 import Parse.Comments
 import Parse.IParser
+import Parse.ParsecAdapter (string, (<|>), many, many1, choice, option, char, eof, lookAhead, notFollowedBy, anyWord8)
+import Parse.Primitives (run, getPosition, try, oneOf)
 import Parse.Whitespace
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
@@ -41,14 +42,10 @@ expecting = flip (<?>)
 
 -- SETUP
 
-iParse :: IParser a -> String -> Either ParseError a
-iParse =
-    iParseWithState "" State.init
+iParse :: IParser a -> String -> Either Syntax.Error a
+iParse parser input =
+    run parser (encodeUtf8 $ Text.pack input)
 
-
-iParseWithState :: SourceName -> State.State -> IParser a -> String -> Either ParseError a
-iParseWithState sourceName state aParser input =
-  runIndent sourceName $ runParserT aParser state sourceName input
 
 
 -- VARIABLES
@@ -95,7 +92,7 @@ makeVar :: IParser Char -> IParser String
 makeVar firstChar =
   do  variable <- (:) <$> firstChar <*> many innerVarChar
       if variable `elem` reserveds
-        then fail (Syntax.keyword variable)
+        then fail () -- (Syntax.keyword variable)
         else return variable
 
 
@@ -291,7 +288,7 @@ separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (e,Maybe S
 separated sep expr' =
   let
     subparser =
-      do  start <- getMyPosition
+      do  start <- getPosition
           t1 <- expr'
           arrow <- optionMaybe $ try ((,) <$> restOfLine <*> whitespace <* sep)
           case arrow of
@@ -300,7 +297,7 @@ separated sep expr' =
             Just (eolT1, preArrow) ->
                 do  postArrow <- whitespace
                     t2 <- separated sep expr'
-                    end <- getMyPosition
+                    end <- getPosition
                     case t2 of
                         Right (_, (t2',eolT2), ts, _) ->
                           return $ \multiline -> Right
@@ -350,7 +347,7 @@ constrainedSpacePrefix' parser constraint =
 
       spacing = do
         (n, comments) <- whitespace'
-        _ <- constraint (not n) <?> Syntax.whitespace
+        _ <- constraint (not n) -- <?> Syntax.whitespace
         indented
         return comments
 
@@ -458,9 +455,11 @@ surround'' leftDelim rightDelim inner =
 
 -- HELPERS FOR EXPRESSIONS
 
+
+-- TODO: inline this
 getMyPosition :: IParser R.Position
 getMyPosition =
-  R.fromSourcePos <$> getPosition
+    getPosition
 
 
 addLocation :: IParser a -> IParser (A.Located a)
@@ -471,15 +470,15 @@ addLocation expr =
 
 located :: IParser a -> IParser (R.Position, a, R.Position)
 located parser =
-  do  start <- getMyPosition
+  do  start <- getPosition
       value <- parser
-      end <- getMyPosition
+      end <- getPosition
       return (start, value, end)
 
 
 accessible :: IParser AST.Expression.Expr -> IParser AST.Expression.Expr
 accessible exprParser =
-  do  start <- getMyPosition
+  do  start <- getPosition
 
       annotatedRootExpr@(A.A _ _rootExpr) <- exprParser
 
@@ -492,7 +491,7 @@ accessible exprParser =
         Just _ ->
           accessible $
             do  v <- lowVar
-                end <- getMyPosition
+                end <- getPosition
                 return . A.at start end $
                     -- case rootExpr of
                     --   AST.Expression.VarExpr (AST.Variable.VarRef name@(c:_))
