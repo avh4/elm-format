@@ -251,18 +251,13 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 > Note: If you previously installed a VSCode extension called "elm-format", uninstall it (it is deprecated, and the "elm" extension now provides elm-format integration).
 
 1. Install elm-format
-1. Install [Elm Language Support](https://marketplace.visualstudio.com/items?itemName=sbrink.elm) for VSCode
-
-    ```bash
-    ext install elm
-    ```
-
+1. Install the extension [Elm Language Support](https://marketplace.visualstudio.com/items?itemName=sbrink.elm) for VSCode, which includes syntax and error highlighting
 1. Configure the extension to format on save:
 
-    1. Go to `Preferences -> Settings` in the menu
-    1. In your User Settings, update the following value:
-    
-    ```
+    1. Find your `settings.json` file ([instructions](https://code.visualstudio.com/docs/getstarted/settings#_settings-file-locations)).
+    1. Add the following key-value pair to your `settings.json`:
+
+    ```json
     "[elm]": {
         "editor.formatOnSave": true
     },
