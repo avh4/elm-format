@@ -2,7 +2,21 @@
     "body": [
         "TODO: Decl",
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 12,
+                        "line": 13
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 13
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "XYZZY"
+            },
             "name": "token",
             "sourceLocation": {
                 "end": {
