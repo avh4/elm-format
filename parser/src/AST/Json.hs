@@ -132,6 +132,17 @@ instance ToJSON Expr where
                     )
                   ]
 
+          AST.Expression.Literal (FloatNum value repr) ->
+              makeObj
+                  [ type_ "FloatLiteral"
+                  , ("value", JSRational False $ toRational value)
+                  , ("display"
+                    , makeObj
+                        [ ("representation", showJSON repr)
+                        ]
+                    )
+                  ]
+
           AST.Expression.Literal (Boolean value) ->
             makeObj
                 [ type_ "ExternalReference"
@@ -343,6 +354,11 @@ instance ToJSON LetDeclaration where
 instance ToJSON IntRepresentation where
     showJSON DecimalInt = JSString $ toJSString $ "DecimalInt"
     showJSON HexadecimalInt = JSString $ toJSString $ "HexadecimalInt"
+
+
+instance ToJSON FloatRepresentation where
+    showJSON DecimalFloat = JSString $ toJSString "DecimalFloat"
+    showJSON ExponentFloat = JSString $ toJSString "ExponentFloat"
 
 
 instance ToJSON Pattern' where
