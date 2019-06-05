@@ -130,7 +130,13 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr"
+                    {
+                        "display": {
+                            "representation": "DecimalFloat"
+                        },
+                        "type": "FloatLiteral",
+                        "value": 2
+                    }
                 ],
                 "type": "ListLiteral"
             },
