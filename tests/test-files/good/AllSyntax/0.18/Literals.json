@@ -154,7 +154,21 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 13,
+                        "line": 30
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 30
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "string"
+            },
             "name": "string",
             "sourceLocation": {
                 "end": {
@@ -169,7 +183,21 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 22,
+                        "line": 34
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 34
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "a b'`<>{}/\u06a5\ud83d\ude00\u3041\u2f83\ud835\udfdf"
+            },
             "name": "stringWithUnicodeCharacters",
             "sourceLocation": {
                 "end": {
@@ -184,7 +212,21 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 15,
+                        "line": 38
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 38
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "\t\n\\\""
+            },
             "name": "stringWithSpecialEscapedCharacters",
             "sourceLocation": {
                 "end": {
@@ -201,9 +243,51 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 65,
+                                "line": 42
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 42
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\u000b\f\r\u000e\u000f"
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 73,
+                                "line": 43
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 43
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f"
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 13,
+                                "line": 44
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 44
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "\u007f"
+                    }
                 ],
                 "type": "ListLiteral"
             },
@@ -221,7 +305,21 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 8,
+                        "line": 50
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 50
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "\u00a0"
+            },
             "name": "stringWithWindowsWorkaroundCharacters",
             "sourceLocation": {
                 "end": {
@@ -236,7 +334,21 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 33,
+                        "line": 54
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 54
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "\u06dd\ufffb\ud804\udcbd\udb40\udc7f"
+            },
             "name": "stringWithEscapedNonPrintCharacters",
             "sourceLocation": {
                 "end": {
@@ -251,7 +363,21 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 20,
+                        "line": 58
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 58
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "\u00a0\u2000\u205f"
+            },
             "name": "stringWithWhitespace",
             "sourceLocation": {
                 "end": {
@@ -266,7 +392,21 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "module": "Char",
+                "sourceLocation": {
+                    "end": {
+                        "col": 8,
+                        "line": 62
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 62
+                    }
+                },
+                "type": "CharLiteral",
+                "value": "c"
+            },
             "name": "char",
             "sourceLocation": {
                 "end": {
@@ -283,15 +423,141 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 66
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 66
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "a"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 66
+                            },
+                            "start": {
+                                "col": 12,
+                                "line": 66
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": " "
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 20,
+                                "line": 66
+                            },
+                            "start": {
+                                "col": 17,
+                                "line": 66
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "/"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 25,
+                                "line": 66
+                            },
+                            "start": {
+                                "col": 22,
+                                "line": 66
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\""
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 30,
+                                "line": 66
+                            },
+                            "start": {
+                                "col": 27,
+                                "line": 66
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u06a5"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 35,
+                                "line": 66
+                            },
+                            "start": {
+                                "col": 32,
+                                "line": 66
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\ud83d\ude00"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 40,
+                                "line": 66
+                            },
+                            "start": {
+                                "col": 37,
+                                "line": 66
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u3041"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 45,
+                                "line": 66
+                            },
+                            "start": {
+                                "col": 42,
+                                "line": 66
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u2f83"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 50,
+                                "line": 66
+                            },
+                            "start": {
+                                "col": 47,
+                                "line": 66
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\ud835\udfdf"
+                    }
                 ],
                 "type": "ListLiteral"
             },
@@ -311,10 +577,66 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 70
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 70
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\t"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 70
+                            },
+                            "start": {
+                                "col": 13,
+                                "line": 70
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\n"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 70
+                            },
+                            "start": {
+                                "col": 19,
+                                "line": 70
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\\"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 29,
+                                "line": 70
+                            },
+                            "start": {
+                                "col": 25,
+                                "line": 70
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "'"
+                    }
                 ],
                 "type": "ListLiteral"
             },
@@ -334,9 +656,51 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 13,
+                                "line": 74
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 74
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u0000"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 21,
+                                "line": 74
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 74
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u001f"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 29,
+                                "line": 74
+                            },
+                            "start": {
+                                "col": 23,
+                                "line": 74
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u007f"
+                    }
                 ],
                 "type": "ListLiteral"
             },
@@ -356,10 +720,66 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 78
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 78
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u06dd"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 25,
+                                "line": 78
+                            },
+                            "start": {
+                                "col": 17,
+                                "line": 78
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\ufffb"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 36,
+                                "line": 78
+                            },
+                            "start": {
+                                "col": 27,
+                                "line": 78
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\ud804\udcbd"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 47,
+                                "line": 78
+                            },
+                            "start": {
+                                "col": 38,
+                                "line": 78
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\udb40\udc7f"
+                    }
                 ],
                 "type": "ListLiteral"
             },
@@ -379,9 +799,51 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 82
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 82
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u00a0"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 20,
+                                "line": 82
+                            },
+                            "start": {
+                                "col": 12,
+                                "line": 82
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u2000"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 30,
+                                "line": 82
+                            },
+                            "start": {
+                                "col": 22,
+                                "line": 82
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u205f"
+                    }
                 ],
                 "type": "ListLiteral"
             },
@@ -399,7 +861,21 @@
             "type": "Definition"
         },
         {
-            "expression": "TODO: Expr",
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 4,
+                        "line": 96
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 86
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "normals = \"a b'`<>{}/\u06a5\ud83d\ude00\u3041\u2f83\ud835\udfdf\"\n\"\t\\\n\"\"\n\"\"\"\n\"\"\"\"\n\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\u000b\f\r\u000e\u000f\n\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f\n\u007f\n\u06dd\ufffb\ud804\udcbd\udb40\udc7f\n\u00a0\u2000\u205f\n"
+            },
             "name": "multilineString",
             "sourceLocation": {
                 "end": {
@@ -416,15 +892,141 @@
         {
             "expression": {
                 "terms": [
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr",
-                    "TODO: Expr"
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 36,
+                                "line": 100
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 100
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "trailing double quote\""
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 40,
+                                "line": 101
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 101
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "trailing double quote 2\"\""
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 42,
+                                "line": 102
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 102
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "trailing double quote 3\"\"\""
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 44,
+                                "line": 103
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 103
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "trailing double quote 4\"\"\"\""
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 51,
+                                "line": 104
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 104
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "embedded triple double quotes (\"\"\")"
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 62,
+                                "line": 105
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 105
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "embedded triple double quotes (\"\"\") (\"\"\"\")"
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 37,
+                                "line": 106
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 106
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "\"\"leading double quote 2"
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 42,
+                                "line": 107
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 107
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "\"\"\" leading double quote 3"
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 44,
+                                "line": 108
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 108
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "\"\"\"\" leading double quote 4"
+                    }
                 ],
                 "type": "ListLiteral"
             },

@@ -151,6 +151,22 @@ instance ToJSON Expr where
                 , sourceLocation region
                 ]
 
+          AST.Expression.Literal (Chr chr) ->
+              makeObj
+                  [ type_ "CharLiteral"
+                  , ("module", JSString $ toJSString "Char")
+                  , ("value", JSString $ toJSString [chr])
+                  , sourceLocation region
+                  ]
+
+          AST.Expression.Literal (Str str _) ->
+              makeObj
+                  [ type_ "StringLiteral"
+                  , ("module", JSString $ toJSString "String")
+                  , ("value", JSString $ toJSString str)
+                  , sourceLocation region
+                  ]
+
           VarExpr (VarRef [] (LowercaseIdentifier var)) ->
             variableReference region var
 
