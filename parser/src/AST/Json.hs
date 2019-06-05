@@ -335,8 +335,17 @@ instance ToJSON Expr where
                     )
                   ]
 
-          _ ->
-              JSString $ toJSString "TODO: Expr"
+          VarExpr _ ->
+              JSString $ toJSString "TODO: VarExpr"
+
+          Range _ _ _ ->
+              JSString $ toJSString "TODO: Range"
+
+          AccessFunction _ ->
+              JSString $ toJSString "TODO: AccessFunction"
+
+          GLShader _ ->
+              JSString $ toJSString "TODO: GLShader"
 
 
 variableReference :: Region.Region -> String -> JSValue
