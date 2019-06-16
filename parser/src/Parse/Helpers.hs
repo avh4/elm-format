@@ -15,7 +15,7 @@ import qualified Data.Char as Char
 import Data.Text.Encoding (encodeUtf8)
 import Parse.Comments
 import Parse.IParser
-import Parse.ParsecAdapter (string, (<|>), (<?>), many, many1, choice, option, satisfy, char, eof, lookAhead, notFollowedBy, anyWord8)
+import Parse.ParsecAdapter (string, (<|>), (<?>), many, many1, choice, option, optionMaybe, satisfy, char, eof, lookAhead, notFollowedBy, anyWord8)
 import Parse.Primitives (run, getPosition, try, oneOf)
 import Parse.Whitespace
 import qualified Reporting.Annotation as A
@@ -518,14 +518,6 @@ commentedKeyword word parser =
 
 
 -- ODD COMBINATORS
-
-failure :: String -> IParser String
-failure msg = do
-  inp <- getInput
-  setInput ('x':inp)
-  _ <- anyToken
-  fail msg
-
 
 until :: IParser a -> IParser b -> IParser b
 until p end =

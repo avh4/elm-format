@@ -5,7 +5,7 @@ module Parse.ParsecAdapter
   , many
   , many1
   , choice
-  , option
+  , option, optionMaybe
   , satisfy
   , char
   , eof
@@ -100,12 +100,13 @@ char c =
                 cok c (State fp newOffset terminal indent newRow newCol ctx) noError
 
 
+infix  0 <?>
 (<?>) :: Parser a -> String -> Parser a
 a <?> message =
     -- TODO: convert uses of <?> to how elm/compiler does things
     a
 
-
+infixr 1 <|>
 (<|>) :: Parser a -> Parser a -> Parser a
 a <|> b =
   oneOf [ a, b ]
@@ -158,6 +159,11 @@ choice =
 option :: a -> Parser a -> Parser a
 option a parser =
     oneOf [parser, pure a]
+
+
+optionMaybe :: Parser a -> Parser (Maybe a)
+optionMaybe parser =
+    option Nothing (fmap Just parser)
 
 
 eof :: Parser ()
