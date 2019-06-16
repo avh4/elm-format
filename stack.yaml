@@ -3,7 +3,7 @@
 # Some commonly used options have been documented as comments in this file.
 # For advanced use and comprehensive documentation of the format, please see:
 # http://docs.haskellstack.org/en/stable/yaml_configuration/
-require-stack-version: ">= 1.7.1"
+require-stack-version: ">= 2.1.1"
 
 # Resolver to choose a 'specific' stackage snapshot or a compiler version.
 # A snapshot resolver dictates the compiler version and the set of packages
@@ -16,7 +16,7 @@ require-stack-version: ">= 1.7.1"
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-11.4
+resolver: lts-13.25
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -43,6 +43,7 @@ packages:
 extra-deps:
 - indents-0.3.3
 - concatenative-1.0.1 # required by indents-0.3.3
+- binary-0.8.7.0 # lts-13.25 only has 0.8.6.0
 
 # Override default flag values for local packages and extra-deps
 flags: {}
