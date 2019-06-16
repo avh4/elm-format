@@ -11,10 +11,11 @@ import qualified AST.Expression
 import qualified AST.Helpers as Help
 import qualified AST.Variable
 import qualified Data.Text as Text
+import qualified Data.Char as Char
 import Data.Text.Encoding (encodeUtf8)
 import Parse.Comments
 import Parse.IParser
-import Parse.ParsecAdapter (string, (<|>), many, many1, choice, option, char, eof, lookAhead, notFollowedBy, anyWord8)
+import Parse.ParsecAdapter (string, (<|>), (<?>), many, many1, choice, option, satisfy, char, eof, lookAhead, notFollowedBy, anyWord8)
 import Parse.Primitives (run, getPosition, try, oneOf)
 import Parse.Whitespace
 import qualified Reporting.Annotation as A
@@ -57,12 +58,12 @@ var =
 
 lowVar :: IParser LowercaseIdentifier
 lowVar =
-  LowercaseIdentifier <$> makeVar lower <?> "a lower case name"
+  LowercaseIdentifier <$> makeVar (satisfy Char.isLower) <?> "a lower case name"
 
 
 capVar :: IParser UppercaseIdentifier
 capVar =
-  UppercaseIdentifier <$> makeVar upper <?> "an upper case name"
+  UppercaseIdentifier <$> makeVar (satisfy Char.isUpper) <?> "an upper case name"
 
 
 qualifiedVar :: IParser AST.Variable.Ref
@@ -85,7 +86,7 @@ rLabel = lowVar
 
 innerVarChar :: IParser Char
 innerVarChar =
-  alphaNum <|> char '_' <|> char '\'' <?> "more letters in this name"
+  (satisfy Char.isAlphaNum) <|> char '_' <|> char '\'' <?> "more letters in this name"
 
 
 makeVar :: IParser Char -> IParser String
@@ -117,7 +118,7 @@ symOp =
   do  op <- many1 (satisfy Help.isSymbol) <?> "an infix operator like +"
       guard (op `notElem` [ "=", "..", "->", "--", "|", "\8594", ":" ])
       case op of
-        "." -> notFollowedBy lower >> return (SymbolIdentifier op)
+        "." -> notFollowedBy (satisfy Char.isLower) >> return (SymbolIdentifier op)
         _   -> return $ SymbolIdentifier op
 
 

@@ -1,10 +1,12 @@
 module Parse.ParsecAdapter
   ( string
   , (<|>)
+  , (<?>)
   , many
   , many1
   , choice
   , option
+  , satisfy
   , char
   , eof
   , lookAhead
@@ -23,6 +25,7 @@ import Data.Word (Word8)
 import qualified Data.ByteString as B
 -- import qualified Data.ByteString.Char8 as C
 -- import Data.Char (ord)
+import qualified Data.Char as Char
 import qualified Data.Text as T
 import Foreign.ForeignPtr (ForeignPtr)
 -- import qualified Reporting.Region as R
@@ -48,22 +51,42 @@ string str =
 
 
 data EatStringResult
-  = Err E.ParseError
-  | Ok Int Int Int
+    = Err E.ParseError
+    | Ok Int Int Int
 
 
 eatWord8s :: [Word8] -> ForeignPtr Word8 -> Int -> Int -> Int -> Int -> EatStringResult
 eatWord8s str fp offset terminal row col =
-  case str of
-    [] -> Ok offset row col
-    0x0A {- \n -} : _ -> error "eatWord8s doesn't support matching '\\n'"
-    h : t ->
-      if offset >= terminal then
-        Err noError
-      else if h == unsafeIndex fp offset then
-        eatWord8s t fp (offset + 1) terminal row (col + 1)
-      else
-        Err noError
+    case str of
+        [] -> Ok offset row col
+        0x0A {- \n -} : _ -> error "eatWord8s doesn't support matching '\\n'"
+        h : t ->
+            if offset >= terminal then
+                Err noError
+            else if h == unsafeIndex fp offset then
+                eatWord8s t fp (offset + 1) terminal row (col + 1)
+            else
+                Err noError
+
+
+satisfy :: (Char -> Bool) -> Parser Char
+satisfy f =
+    let
+        (Parser p) = anyWord8
+    in
+    Parser $ \state cok cerr _ eerr ->
+        p state
+            (\a newState e ->
+               let
+                   c = Char.chr $ fromEnum a
+               in
+               if f c
+                   then cok c newState e
+                   else eerr noError
+            )
+            (\           e -> cerr e)
+            (\_ _        _ -> error "satisfy got empty from anyWord8")
+            (\           e -> eerr e)
 
 
 char :: Char -> Parser Char
@@ -77,9 +100,16 @@ char c =
                 cok c (State fp newOffset terminal indent newRow newCol ctx) noError
 
 
+(<?>) :: Parser a -> String -> Parser a
+a <?> message =
+    -- TODO: convert uses of <?> to how elm/compiler does things
+    a
+
+
 (<|>) :: Parser a -> Parser a -> Parser a
 a <|> b =
   oneOf [ a, b ]
+
 
 many1 :: Parser a -> Parser [a]
 many1 (Parser parser) =
