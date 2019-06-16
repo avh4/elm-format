@@ -119,23 +119,23 @@ library
         ReversedList
 
     build-depends:
-        ansi-terminal >= 0.8.0.2 && < 0.9,
-        ansi-wl-pprint >= 0.6.7.3 && < 0.7,
-        base >= 4.9.0.0 && < 5,
-        binary >= 0.8.3.0 && < 0.9,
-        bytestring >= 0.10.8.1 && < 0.11,
+        ansi-terminal >= 0.8.2 && < 0.9,
+        ansi-wl-pprint >= 0.6.8.2 && < 0.7,
+        base >= 4.12.0.0 && < 5,
+        binary >= 0.8.7.0 && < 0.9,
+        bytestring >= 0.10.8.2 && < 0.11,
         containers >= 0.6.0.1 && < 0.7,
-        directory >= 1.2.6.2 && < 2,
-        filepath >= 1.4.1.0 && < 2,
-        free >= 5.0.1 && < 6,
+        directory >= 1.3.3.0 && < 2,
+        filepath >= 1.4.2.1 && < 2,
+        free >= 5.1.1 && < 6,
         indents >= 0.3.3 && < 0.4,
-        json >= 0.9.1 && < 0.10,
-        mtl >= 2.2.1 && < 3,
-        optparse-applicative >= 0.14.2.0 && < 0.15,
-        parsec >= 3.1.11 && < 4,
-        process >= 1.4.2.0 && < 2,
-        split >= 0.2.3.1 && < 0.3,
-        text >= 1.2.2.1 && < 2
+        json >= 0.9.3 && < 0.10,
+        mtl >= 2.2.2 && < 3,
+        optparse-applicative >= 0.14.3.0 && < 0.15,
+        parsec >= 3.1.13.0 && < 4,
+        process >= 1.6.5.0 && < 2,
+        split >= 0.2.3.3 && < 0.3,
+        text >= 1.2.3.1 && < 2
 
 
 executable elm-format
@@ -150,7 +150,7 @@ executable elm-format
         Main.hs
 
     build-depends:
-        base >= 4.9.0.0 && < 5,
+        base >= 4.12.0.0 && < 5,
         elm-format
 
 
@@ -187,18 +187,18 @@ test-Suite elm-format-tests
         Util.ListTest
 
     build-depends:
-        tasty >= 1.0.1.1 && < 2,
-        tasty-golden >= 2.3.1.1 && < 3,
+        tasty >= 1.2 && < 2,
+        tasty-golden >= 2.3.2 && < 3,
         tasty-hunit >= 0.10.0.1 && < 0.11,
         tasty-quickcheck >= 0.10.1 && < 0.11,
-        HUnit >= 1.3.1.2 && < 2,
-        QuickCheck >= 2.8.2 && < 3,
+        HUnit >= 1.6.0.0 && < 2,
+        QuickCheck >= 2.12.6.1 && < 3,
         quickcheck-io >= 0.2.0 && < 0.3,
-        base >= 4.9.0.0 && < 5,
-        cmark >= 0.5.5 && < 0.6,
+        base >= 4.12.0.0 && < 5,
+        cmark >= 0.5.6.3 && < 0.6,
         containers >= 0.6.0.1 && < 0.7,
-        mtl >= 2.2.1 && < 3,
-        parsec >= 3.1.11 && < 4,
-        split >= 0.2.3.1 && < 0.3,
-        text >= 1.2.2.1 && < 2,
+        mtl >= 2.2.2 && < 3,
+        parsec >= 3.1.13.0 && < 4,
+        split >= 0.2.3.3 && < 0.3,
+        text >= 1.2.3.1 && < 2,
         elm-format
