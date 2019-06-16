@@ -43,7 +43,6 @@ packages:
 extra-deps:
 - indents-0.3.3
 - concatenative-1.0.1 # required by indents-0.3.3
-- containers-0.5.11.0 # TODO: try 0.6.0.1
 - binary-0.8.7.0 # lts-13.25 only has 0.8.6.0
 
 # Override default flag values for local packages and extra-deps
