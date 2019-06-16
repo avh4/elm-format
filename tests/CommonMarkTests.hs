@@ -129,7 +129,7 @@ makeTest i name input output =
 
       formatted = ElmFormat.Render.Markdown.formatMarkdown (const Nothing) (Parse.Markdown.parse $ Strict.unpack source)
 
-      specOutput = Strict.map (\c -> if c == '→' then '\t' else c) $ Strict.pack output
+      -- specOutput = Strict.map (\c -> if c == '→' then '\t' else c) $ Strict.pack output
 
       description = "formatted markdown should render the same as the original\n\n"
           ++ Strict.unpack source
