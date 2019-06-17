@@ -7,7 +7,7 @@ module Parse.ParsecAdapter
   , choice
   , option, optionMaybe
   , satisfy
-  , char
+  , char, anyChar
   , eof
   , lookAhead
   , notFollowedBy
@@ -98,6 +98,11 @@ char c =
 
             Ok newOffset newRow newCol ->
                 cok c (State fp newOffset terminal indent newRow newCol ctx) noError
+
+
+anyChar :: Parser Char
+anyChar =
+    fmap (Char.chr . fromEnum) anyWord8
 
 
 infix  0 <?>

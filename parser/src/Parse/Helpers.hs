@@ -15,7 +15,7 @@ import qualified Data.Char as Char
 import Data.Text.Encoding (encodeUtf8)
 import Parse.Comments
 import Parse.IParser
-import Parse.ParsecAdapter (string, (<|>), (<?>), many, many1, choice, option, optionMaybe, satisfy, char, eof, lookAhead, notFollowedBy, anyWord8)
+import Parse.ParsecAdapter (string, (<|>), (<?>), many, many1, choice, option, optionMaybe, satisfy, char, eof, lookAhead, notFollowedBy, anyWord8, anyChar)
 import Parse.Primitives (run, getPosition, try, oneOf)
 import Parse.Whitespace
 import qualified Reporting.Annotation as A
@@ -340,7 +340,7 @@ constrainedSpacePrefix parser =
 constrainedSpacePrefix' :: IParser a -> (Bool -> IParser b) -> IParser [((Comments, a), Multiline)]
 constrainedSpacePrefix' parser constraint =
     many $ trackNewline $ choice
-      [ comment <$> try (const <$> spacing <*> lookAhead (oneOf "[({")) <*> parser
+      [ comment <$> try (const <$> spacing <*> lookAhead (oneOf $ fmap char "[({")) <*> parser
       , try (comment <$> spacing <*> parser)
       ]
     where
