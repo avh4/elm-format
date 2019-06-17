@@ -15,7 +15,6 @@ import Text.JSON hiding (showJSON)
 import qualified Data.List as List
 import qualified Data.Map.Strict as Map
 import qualified ElmFormat.Version
-import qualified Reporting.Region as Region
 
 
 pleaseReport :: String -> String -> a
@@ -63,19 +62,19 @@ class ToJSON a where
   showJSON :: a -> JSValue
 
 
-instance ToJSON Region.Region where
-    showJSON region =
+instance ToJSON Region where
+    showJSON (Region start end) =
         makeObj
-            [ ( "start", showJSON $ Region.start region )
-            , ( "end", showJSON $ Region.end region )
+            [ ( "start", showJSON start )
+            , ( "end", showJSON end )
             ]
 
 
-instance ToJSON Region.Position where
-    showJSON pos =
+instance ToJSON Position where
+    showJSON (Position line column) =
         makeObj
-            [ ( "line", JSRational False $ toRational $ Region.line pos )
-            , ( "col", JSRational False $ toRational $ Region.column pos )
+            [ ( "line", JSRational False $ toRational line )
+            , ( "col", JSRational False $ toRational column )
             ]
 
 
@@ -105,7 +104,7 @@ instance ToJSON DetailedListing where
 
 
 instance ToJSON (TopLevelStructure Declaration) where
-  showJSON (Entry (A region (Definition (A _ (VarPattern (LowercaseIdentifier var))) _ _ expr))) =
+  showJSON (Entry (At region (Definition (At _ (VarPattern (LowercaseIdentifier var))) _ _ expr))) =
     makeObj
       [ type_ "Definition"
       , ("name" , JSString $ toJSString var)
@@ -116,7 +115,7 @@ instance ToJSON (TopLevelStructure Declaration) where
 
 
 instance ToJSON Expr where
-  showJSON (A region expr) =
+  showJSON (At region expr) =
       case expr of
           Unit _ ->
               makeObj [ type_ "UnitLiteral" ]
@@ -261,7 +260,7 @@ instance ToJSON Expr where
           Lambda parameters _ body _ ->
               makeObj
                   [ type_ "AnonymousFunction"
-                  , ("parameters", JSArray $ map (\(_, A _ pat) -> showJSON pat) parameters)
+                  , ("parameters", JSArray $ map (\(_, At _ pat) -> showJSON pat) parameters)
                   , ("body", showJSON body)
                   ]
 
@@ -298,7 +297,7 @@ instance ToJSON Expr where
                   , ( "subject", showJSON subject )
                   , ( "branches"
                     , JSArray $ map
-                        (\(Commented _ (A _ pat) _, (_, body)) ->
+                        (\(Commented _ (At _ pat) _, (_, body)) ->
                            makeObj
                                [ ("pattern", showJSON pat)
                                , ("body", showJSON body)
@@ -312,7 +311,7 @@ instance ToJSON Expr where
               JSString $ toJSString "TODO: Expr"
 
 
-variableReference :: Region.Region -> String -> JSValue
+variableReference :: Region -> String -> JSValue
 variableReference region name =
     makeObj
         [ type_ "VariableReference"
@@ -321,7 +320,7 @@ variableReference region name =
         ]
 
 
-sourceLocation :: Region.Region -> (String, JSValue)
+sourceLocation :: Region -> (String, JSValue)
 sourceLocation region =
     ( "sourceLocation", showJSON region )
 
@@ -329,7 +328,7 @@ sourceLocation region =
 instance ToJSON LetDeclaration where
   showJSON letDeclaration =
       case letDeclaration of
-          LetDefinition (A _ (VarPattern (LowercaseIdentifier var))) [] _ expr ->
+          LetDefinition (At _ (VarPattern (LowercaseIdentifier var))) [] _ expr ->
               makeObj
                   [ type_ "Definition"
                   , ("name" , JSString $ toJSString var)
@@ -355,11 +354,6 @@ type_ t =
     ("type", JSString $ toJSString t)
 
 
-nowhere :: Region.Position
-nowhere =
-    Region.Position 0 0
-
-
 noRegion :: a -> Located a
 noRegion =
-    at nowhere nowhere
+    At zero

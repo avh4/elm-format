@@ -1,62 +1,118 @@
-module Reporting.Annotation where
+{-# OPTIONS_GHC -Wall #-}
+module Reporting.Annotation
+  ( Located(..)
+  , Position(..)
+  , Region(..)
+  , traverse
+  , toValue
+  , merge
+  , at
+  , toRegion
+  , mergeRegions
+  , zero
+  , one
+  , Strippable, stripRegion
+  )
+  where
 
-import Prelude hiding (map)
-import qualified Reporting.Region as R
-import qualified Data.String as String
+
+import Prelude hiding (traverse)
+import Control.Monad (liftM2)
+import Data.Binary (Binary, get, put)
+import Data.Word (Word16)
 
 
--- ANNOTATION
+
+-- LOCATED
+
 
 data Located a =
-    A R.Region a
-    deriving (Eq)
+  At Region a  -- TODO see if unpacking region is helpful
+  deriving (Eq, Show)
 
 
-instance (Show a) => Show (Located a) where
-    showsPrec p (A r a) = showParen (p > 10) $
-        showString $ String.unwords
-            [ "at"
-            , show (R.line $ R.start r)
-            , show (R.column $ R.start r)
-            , show (R.line $ R.end r)
-            , show (R.column $ R.end r)
-            , showsPrec 99 a ""
-            ]
+instance Functor Located where
+  fmap f (At region a) =
+    At region (f a)
 
 
--- CREATE
-
-at :: R.Position -> R.Position -> a -> Located a
-at start end value =
-    A (R.Region start end) value
+traverse :: (Functor f) => (a -> f b) -> Located a -> f (Located b)
+traverse func (At region value) =
+  At region <$> func value
 
 
--- merge :: Located a -> Located b -> value -> Located value
--- merge (A region1 _) (A region2 _) value =
---     A (R.merge region1 region2) value
+toValue :: Located a -> a
+toValue (At _ value) =
+  value
 
 
-sameAs :: Located a -> b -> Located b
-sameAs (A annotation _) value =
-    A annotation value
+merge :: Located a -> Located b -> value -> Located value
+merge (At r1 _) (At r2 _) value =
+  At (mergeRegions r1 r2) value
 
 
--- MANIPULATE
 
-map :: (a -> b) -> Located a -> Located b
-map f (A annotation value) =
-    A annotation (f value)
+-- POSITION
 
 
-drop :: Located a -> a
-drop (A _ value) =
-    value
+data Position =
+  Position
+    {-# UNPACK #-} !Word16
+    {-# UNPACK #-} !Word16
+  deriving (Eq, Show)
+
+
+at :: Position -> Position -> a -> Located a
+at start end a =
+  At (Region start end) a
+
+
+
+-- REGION
+
+
+data Region = Region Position Position
+  deriving (Eq, Show)
+
+
+toRegion :: Located a -> Region
+toRegion (At region _) =
+  region
+
+
+mergeRegions :: Region -> Region -> Region
+mergeRegions (Region start _) (Region _ end) =
+  Region start end
+
+
+zero :: Region
+zero =
+  Region (Position 0 0) (Position 0 0)
+
+
+one :: Region
+one =
+  Region (Position 1 1) (Position 1 1)
+
+
+instance Binary Region where
+  put (Region a b) = put a >> put b
+  get = liftM2 Region get get
+
+
+instance Binary Position where
+  put (Position a b) = put a >> put b
+  get = liftM2 Position get get
+
+
+
+-- FOR ELM-FORMAT
 
 
 class Strippable a where
-  stripRegion :: a -> a
+    stripRegion :: a -> a
 
 
 instance Strippable (Located a) where
-  stripRegion (A _ value) =
-    A (R.Region (R.Position 0 0) (R.Position 0 0)) value
+    stripRegion (At _ value) =
+        At (Region (Position 0 0) (Position 0 0)) value

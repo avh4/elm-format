@@ -76,7 +76,6 @@ library
         Parse.Type
         Reporting.Annotation
         Reporting.Error.Syntax
-        Reporting.Region
         Util.List
 
     other-modules:

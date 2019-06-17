@@ -31,8 +31,7 @@ import Foreign.ForeignPtr (ForeignPtr)
 -- import qualified Reporting.Region as R
 import qualified Reporting.Error.Syntax as E
 import Data.Text.Encoding (encodeUtf8)
-import Parse.Primitives.Internals (Parser(Parser), State(State), unsafeIndex, noError, oneOf)
-import Parse.Primitives (endOfFile)
+import Parse.Primitives (Parser(Parser), State(State), unsafeIndex, noError, oneOf)
 
 
 toWord8 :: String -> [Word8]
@@ -173,7 +172,11 @@ optionMaybe parser =
 
 eof :: Parser ()
 eof =
-    endOfFile
+    Parser $ \(State fp offset terminal indent row col ctx) cok cerr eok eerr ->
+        if offset >= terminal then
+            eok noError
+        else
+            eerr noError
 
 
 lookAhead :: Parser a -> Parser a

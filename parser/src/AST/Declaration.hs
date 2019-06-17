@@ -35,7 +35,7 @@ instance A.Strippable Declaration where
   stripRegion d =
     case d of
         Definition a b c e ->
-            Definition (A.stripRegion a) b c (A.stripRegion $ A.map A.stripRegion e)
+            Definition (A.stripRegion a) b c (A.stripRegion $ fmap A.stripRegion e)
         _ -> d
 
 -- INFIX STUFF
@@ -66,5 +66,5 @@ instance A.Strippable a => A.Strippable (TopLevelStructure a) where
   stripRegion d =
     case d of
         Entry d' ->
-            Entry $ A.stripRegion $ A.map A.stripRegion d'
+            Entry $ A.stripRegion $ fmap A.stripRegion d'
         _ -> d

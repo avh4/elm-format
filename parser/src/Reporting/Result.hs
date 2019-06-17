@@ -46,7 +46,7 @@ from f except =
         ok answer
 
     Left errors ->
-        throwMany (map (A.map f) errors)
+        throwMany (map (fmap f) errors)
 
 
 mapError :: (e -> e') -> Result w e a -> Result w e' a
@@ -57,7 +57,7 @@ mapError f (Result warnings rawResult) =
           Ok v
 
       Err msgs ->
-          Err (map (A.map f) msgs)
+          Err (map (fmap f) msgs)
 
 
 warn :: R.Region -> w -> Result w e ()

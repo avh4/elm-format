@@ -56,4 +56,4 @@ instance MapNamespace a => MapNamespace (TopLevelStructure a) where
             _ -> struct
 
 instance MapNamespace a => MapNamespace (Located a) where
-    mapNamespace f (A region a) = A region (mapNamespace f a)
+    mapNamespace f (At region a) = At region (mapNamespace f a)

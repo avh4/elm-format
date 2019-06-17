@@ -7,8 +7,13 @@ module Reporting.Doc
   , P.hcat, P.hsep, P.indent, P.sep, P.vcat
   , P.red, P.cyan, P.magenta, P.green, P.blue, P.black, P.yellow
   , P.dullred, P.dullcyan, P.dullyellow
-
-  , fromString, fromText, fromName, fromInt
+  --
+  , fromChars
+  , fromName
+  , fromVersion
+  , fromPackage
+  , fromInt
+  --
   , toAnsi, toString, toLine
   -- , encode
 
@@ -43,19 +48,24 @@ import qualified Data.Index as Index
 -- FROM
 
 
-fromString :: String -> P.Doc
-fromString =
+fromChars :: String -> P.Doc
+fromChars =
   P.text
 
 
-fromText :: Text.Text -> P.Doc
-fromText txt =
-  P.text (Text.unpack txt)
-
-
-fromName :: N.Name -> P.Doc
+fromName :: Name.Name -> P.Doc
 fromName name =
-  P.text (N.toString name)
+  P.text (Name.toChars name)
+
+
+fromVersion :: V.Version -> P.Doc
+fromVersion vsn =
+  P.text (V.toChars vsn)
+
+
+fromPackage :: Pkg.Name -> P.Doc
+fromPackage pkg =
+  P.text (Pkg.toChars pkg)
 
 
 fromInt :: Int -> P.Doc
