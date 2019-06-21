@@ -19,6 +19,10 @@ stringWithUnicodeCharacters =
     "a b'`<>{}/ڥ😀ぁ⾃𝟟"
 
 
+stringWithEscapedCharacterFollowedByHexDigit =
+    "😀0😀9😀a😀F"
+
+
 stringWithSpecialEscapedCharacters =
     "\t\n\\\""
 
