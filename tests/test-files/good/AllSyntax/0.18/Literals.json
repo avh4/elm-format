@@ -225,9 +225,9 @@
                     }
                 },
                 "type": "StringLiteral",
-                "value": "\t\n\\\""
+                "value": "\ud83d\ude000\ud83d\ude009\ud83d\ude00a\ud83d\ude00F"
             },
-            "name": "stringWithSpecialEscapedCharacters",
+            "name": "stringWithEscapedCharacterFollowedByHexDigit",
             "sourceLocation": {
                 "end": {
                     "col": 15,
@@ -242,17 +242,46 @@
         },
         {
             "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 15,
+                        "line": 42
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 42
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "\t\n\\\""
+            },
+            "name": "stringWithSpecialEscapedCharacters",
+            "sourceLocation": {
+                "end": {
+                    "col": 15,
+                    "line": 42
+                },
+                "start": {
+                    "col": 1,
+                    "line": 41
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
                 "terms": [
                     {
                         "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 65,
-                                "line": 42
+                                "line": 46
                             },
                             "start": {
                                 "col": 7,
-                                "line": 42
+                                "line": 46
                             }
                         },
                         "type": "StringLiteral",
@@ -263,11 +292,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 73,
-                                "line": 43
+                                "line": 47
                             },
                             "start": {
                                 "col": 7,
-                                "line": 43
+                                "line": 47
                             }
                         },
                         "type": "StringLiteral",
@@ -278,11 +307,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 13,
-                                "line": 44
+                                "line": 48
                             },
                             "start": {
                                 "col": 7,
-                                "line": 44
+                                "line": 48
                             }
                         },
                         "type": "StringLiteral",
@@ -295,11 +324,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 45
+                    "line": 49
                 },
                 "start": {
                     "col": 1,
-                    "line": 41
+                    "line": 45
                 }
             },
             "type": "Definition"
@@ -310,11 +339,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 8,
-                        "line": 50
+                        "line": 54
                     },
                     "start": {
                         "col": 5,
-                        "line": 50
+                        "line": 54
                     }
                 },
                 "type": "StringLiteral",
@@ -324,11 +353,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 8,
-                    "line": 50
+                    "line": 54
                 },
                 "start": {
                     "col": 1,
-                    "line": 48
+                    "line": 52
                 }
             },
             "type": "Definition"
@@ -339,11 +368,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 33,
-                        "line": 54
+                        "line": 58
                     },
                     "start": {
                         "col": 5,
-                        "line": 54
+                        "line": 58
                     }
                 },
                 "type": "StringLiteral",
@@ -353,35 +382,6 @@
             "sourceLocation": {
                 "end": {
                     "col": 33,
-                    "line": 54
-                },
-                "start": {
-                    "col": 1,
-                    "line": 53
-                }
-            },
-            "type": "Definition"
-        },
-        {
-            "expression": {
-                "module": "String",
-                "sourceLocation": {
-                    "end": {
-                        "col": 20,
-                        "line": 58
-                    },
-                    "start": {
-                        "col": 5,
-                        "line": 58
-                    }
-                },
-                "type": "StringLiteral",
-                "value": "\u00a0\u2000\u205f"
-            },
-            "name": "stringWithWhitespace",
-            "sourceLocation": {
-                "end": {
-                    "col": 20,
                     "line": 58
                 },
                 "start": {
@@ -393,10 +393,10 @@
         },
         {
             "expression": {
-                "module": "Char",
+                "module": "String",
                 "sourceLocation": {
                     "end": {
-                        "col": 8,
+                        "col": 20,
                         "line": 62
                     },
                     "start": {
@@ -404,13 +404,13 @@
                         "line": 62
                     }
                 },
-                "type": "CharLiteral",
-                "value": "c"
+                "type": "StringLiteral",
+                "value": "\u00a0\u2000\u205f"
             },
-            "name": "char",
+            "name": "stringWithWhitespace",
             "sourceLocation": {
                 "end": {
-                    "col": 8,
+                    "col": 20,
                     "line": 62
                 },
                 "start": {
@@ -422,149 +422,24 @@
         },
         {
             "expression": {
-                "terms": [
-                    {
-                        "module": "Char",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 10,
-                                "line": 66
-                            },
-                            "start": {
-                                "col": 7,
-                                "line": 66
-                            }
-                        },
-                        "type": "CharLiteral",
-                        "value": "a"
+                "module": "Char",
+                "sourceLocation": {
+                    "end": {
+                        "col": 8,
+                        "line": 66
                     },
-                    {
-                        "module": "Char",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 15,
-                                "line": 66
-                            },
-                            "start": {
-                                "col": 12,
-                                "line": 66
-                            }
-                        },
-                        "type": "CharLiteral",
-                        "value": " "
-                    },
-                    {
-                        "module": "Char",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 20,
-                                "line": 66
-                            },
-                            "start": {
-                                "col": 17,
-                                "line": 66
-                            }
-                        },
-                        "type": "CharLiteral",
-                        "value": "/"
-                    },
-                    {
-                        "module": "Char",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 25,
-                                "line": 66
-                            },
-                            "start": {
-                                "col": 22,
-                                "line": 66
-                            }
-                        },
-                        "type": "CharLiteral",
-                        "value": "\""
-                    },
-                    {
-                        "module": "Char",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 30,
-                                "line": 66
-                            },
-                            "start": {
-                                "col": 27,
-                                "line": 66
-                            }
-                        },
-                        "type": "CharLiteral",
-                        "value": "\u06a5"
-                    },
-                    {
-                        "module": "Char",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 35,
-                                "line": 66
-                            },
-                            "start": {
-                                "col": 32,
-                                "line": 66
-                            }
-                        },
-                        "type": "CharLiteral",
-                        "value": "\ud83d\ude00"
-                    },
-                    {
-                        "module": "Char",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 40,
-                                "line": 66
-                            },
-                            "start": {
-                                "col": 37,
-                                "line": 66
-                            }
-                        },
-                        "type": "CharLiteral",
-                        "value": "\u3041"
-                    },
-                    {
-                        "module": "Char",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 45,
-                                "line": 66
-                            },
-                            "start": {
-                                "col": 42,
-                                "line": 66
-                            }
-                        },
-                        "type": "CharLiteral",
-                        "value": "\u2f83"
-                    },
-                    {
-                        "module": "Char",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 50,
-                                "line": 66
-                            },
-                            "start": {
-                                "col": 47,
-                                "line": 66
-                            }
-                        },
-                        "type": "CharLiteral",
-                        "value": "\ud835\udfdf"
+                    "start": {
+                        "col": 5,
+                        "line": 66
                     }
-                ],
-                "type": "ListLiteral"
+                },
+                "type": "CharLiteral",
+                "value": "c"
             },
-            "name": "unicodeChars",
+            "name": "char",
             "sourceLocation": {
                 "end": {
-                    "col": 52,
+                    "col": 8,
                     "line": 66
                 },
                 "start": {
@@ -581,7 +456,7 @@
                         "module": "Char",
                         "sourceLocation": {
                             "end": {
-                                "col": 11,
+                                "col": 10,
                                 "line": 70
                             },
                             "start": {
@@ -590,60 +465,135 @@
                             }
                         },
                         "type": "CharLiteral",
-                        "value": "\t"
+                        "value": "a"
                     },
                     {
                         "module": "Char",
                         "sourceLocation": {
                             "end": {
+                                "col": 15,
+                                "line": 70
+                            },
+                            "start": {
+                                "col": 12,
+                                "line": 70
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": " "
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 20,
+                                "line": 70
+                            },
+                            "start": {
                                 "col": 17,
                                 "line": 70
-                            },
-                            "start": {
-                                "col": 13,
-                                "line": 70
                             }
                         },
                         "type": "CharLiteral",
-                        "value": "\n"
+                        "value": "/"
                     },
                     {
                         "module": "Char",
                         "sourceLocation": {
                             "end": {
-                                "col": 23,
-                                "line": 70
-                            },
-                            "start": {
-                                "col": 19,
-                                "line": 70
-                            }
-                        },
-                        "type": "CharLiteral",
-                        "value": "\\"
-                    },
-                    {
-                        "module": "Char",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 29,
-                                "line": 70
-                            },
-                            "start": {
                                 "col": 25,
                                 "line": 70
+                            },
+                            "start": {
+                                "col": 22,
+                                "line": 70
                             }
                         },
                         "type": "CharLiteral",
-                        "value": "'"
+                        "value": "\""
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 30,
+                                "line": 70
+                            },
+                            "start": {
+                                "col": 27,
+                                "line": 70
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u06a5"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 35,
+                                "line": 70
+                            },
+                            "start": {
+                                "col": 32,
+                                "line": 70
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\ud83d\ude00"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 40,
+                                "line": 70
+                            },
+                            "start": {
+                                "col": 37,
+                                "line": 70
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u3041"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 45,
+                                "line": 70
+                            },
+                            "start": {
+                                "col": 42,
+                                "line": 70
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u2f83"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 50,
+                                "line": 70
+                            },
+                            "start": {
+                                "col": 47,
+                                "line": 70
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\ud835\udfdf"
                     }
                 ],
                 "type": "ListLiteral"
             },
-            "name": "escapedSpecialChars",
+            "name": "unicodeChars",
             "sourceLocation": {
                 "end": {
-                    "col": 31,
+                    "col": 52,
                     "line": 70
                 },
                 "start": {
@@ -660,7 +610,7 @@
                         "module": "Char",
                         "sourceLocation": {
                             "end": {
-                                "col": 13,
+                                "col": 11,
                                 "line": 74
                             },
                             "start": {
@@ -669,22 +619,37 @@
                             }
                         },
                         "type": "CharLiteral",
-                        "value": "\u0000"
+                        "value": "\t"
                     },
                     {
                         "module": "Char",
                         "sourceLocation": {
                             "end": {
-                                "col": 21,
+                                "col": 17,
                                 "line": 74
                             },
                             "start": {
-                                "col": 15,
+                                "col": 13,
                                 "line": 74
                             }
                         },
                         "type": "CharLiteral",
-                        "value": "\u001f"
+                        "value": "\n"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 74
+                            },
+                            "start": {
+                                "col": 19,
+                                "line": 74
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\\"
                     },
                     {
                         "module": "Char",
@@ -694,17 +659,17 @@
                                 "line": 74
                             },
                             "start": {
-                                "col": 23,
+                                "col": 25,
                                 "line": 74
                             }
                         },
                         "type": "CharLiteral",
-                        "value": "\u007f"
+                        "value": "'"
                     }
                 ],
                 "type": "ListLiteral"
             },
-            "name": "escapedControlChars",
+            "name": "escapedSpecialChars",
             "sourceLocation": {
                 "end": {
                     "col": 31,
@@ -724,7 +689,7 @@
                         "module": "Char",
                         "sourceLocation": {
                             "end": {
-                                "col": 15,
+                                "col": 13,
                                 "line": 78
                             },
                             "start": {
@@ -733,60 +698,45 @@
                             }
                         },
                         "type": "CharLiteral",
-                        "value": "\u06dd"
+                        "value": "\u0000"
                     },
                     {
                         "module": "Char",
                         "sourceLocation": {
                             "end": {
-                                "col": 25,
+                                "col": 21,
                                 "line": 78
                             },
                             "start": {
-                                "col": 17,
+                                "col": 15,
                                 "line": 78
                             }
                         },
                         "type": "CharLiteral",
-                        "value": "\ufffb"
+                        "value": "\u001f"
                     },
                     {
                         "module": "Char",
                         "sourceLocation": {
                             "end": {
-                                "col": 36,
+                                "col": 29,
                                 "line": 78
                             },
                             "start": {
-                                "col": 27,
+                                "col": 23,
                                 "line": 78
                             }
                         },
                         "type": "CharLiteral",
-                        "value": "\ud804\udcbd"
-                    },
-                    {
-                        "module": "Char",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 47,
-                                "line": 78
-                            },
-                            "start": {
-                                "col": 38,
-                                "line": 78
-                            }
-                        },
-                        "type": "CharLiteral",
-                        "value": "\udb40\udc7f"
+                        "value": "\u007f"
                     }
                 ],
                 "type": "ListLiteral"
             },
-            "name": "escapedNonPrintChars",
+            "name": "escapedControlChars",
             "sourceLocation": {
                 "end": {
-                    "col": 49,
+                    "col": 31,
                     "line": 78
                 },
                 "start": {
@@ -803,12 +753,91 @@
                         "module": "Char",
                         "sourceLocation": {
                             "end": {
-                                "col": 10,
+                                "col": 15,
                                 "line": 82
                             },
                             "start": {
                                 "col": 7,
                                 "line": 82
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u06dd"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 25,
+                                "line": 82
+                            },
+                            "start": {
+                                "col": 17,
+                                "line": 82
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\ufffb"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 36,
+                                "line": 82
+                            },
+                            "start": {
+                                "col": 27,
+                                "line": 82
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\ud804\udcbd"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 47,
+                                "line": 82
+                            },
+                            "start": {
+                                "col": 38,
+                                "line": 82
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\udb40\udc7f"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "escapedNonPrintChars",
+            "sourceLocation": {
+                "end": {
+                    "col": 49,
+                    "line": 82
+                },
+                "start": {
+                    "col": 1,
+                    "line": 81
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 86
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 86
                             }
                         },
                         "type": "CharLiteral",
@@ -819,11 +848,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 20,
-                                "line": 82
+                                "line": 86
                             },
                             "start": {
                                 "col": 12,
-                                "line": 82
+                                "line": 86
                             }
                         },
                         "type": "CharLiteral",
@@ -834,11 +863,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 30,
-                                "line": 82
+                                "line": 86
                             },
                             "start": {
                                 "col": 22,
-                                "line": 82
+                                "line": 86
                             }
                         },
                         "type": "CharLiteral",
@@ -851,11 +880,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 32,
-                    "line": 82
+                    "line": 86
                 },
                 "start": {
                     "col": 1,
-                    "line": 81
+                    "line": 85
                 }
             },
             "type": "Definition"
@@ -866,11 +895,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 4,
-                        "line": 96
+                        "line": 100
                     },
                     "start": {
                         "col": 5,
-                        "line": 86
+                        "line": 90
                     }
                 },
                 "type": "StringLiteral",
@@ -880,11 +909,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 4,
-                    "line": 96
+                    "line": 100
                 },
                 "start": {
                     "col": 1,
-                    "line": 85
+                    "line": 89
                 }
             },
             "type": "Definition"
@@ -897,11 +926,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 36,
-                                "line": 100
+                                "line": 104
                             },
                             "start": {
                                 "col": 7,
-                                "line": 100
+                                "line": 104
                             }
                         },
                         "type": "StringLiteral",
@@ -912,11 +941,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 40,
-                                "line": 101
+                                "line": 105
                             },
                             "start": {
                                 "col": 7,
-                                "line": 101
+                                "line": 105
                             }
                         },
                         "type": "StringLiteral",
@@ -927,11 +956,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 42,
-                                "line": 102
+                                "line": 106
                             },
                             "start": {
                                 "col": 7,
-                                "line": 102
+                                "line": 106
                             }
                         },
                         "type": "StringLiteral",
@@ -942,11 +971,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 44,
-                                "line": 103
+                                "line": 107
                             },
                             "start": {
                                 "col": 7,
-                                "line": 103
+                                "line": 107
                             }
                         },
                         "type": "StringLiteral",
@@ -957,11 +986,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 51,
-                                "line": 104
+                                "line": 108
                             },
                             "start": {
                                 "col": 7,
-                                "line": 104
+                                "line": 108
                             }
                         },
                         "type": "StringLiteral",
@@ -972,11 +1001,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 62,
-                                "line": 105
+                                "line": 109
                             },
                             "start": {
                                 "col": 7,
-                                "line": 105
+                                "line": 109
                             }
                         },
                         "type": "StringLiteral",
@@ -987,11 +1016,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 37,
-                                "line": 106
+                                "line": 110
                             },
                             "start": {
                                 "col": 7,
-                                "line": 106
+                                "line": 110
                             }
                         },
                         "type": "StringLiteral",
@@ -1002,11 +1031,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 42,
-                                "line": 107
+                                "line": 111
                             },
                             "start": {
                                 "col": 7,
-                                "line": 107
+                                "line": 111
                             }
                         },
                         "type": "StringLiteral",
@@ -1017,11 +1046,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 44,
-                                "line": 108
+                                "line": 112
                             },
                             "start": {
                                 "col": 7,
-                                "line": 108
+                                "line": 112
                             }
                         },
                         "type": "StringLiteral",
@@ -1034,11 +1063,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 109
+                    "line": 113
                 },
                 "start": {
                     "col": 1,
-                    "line": 99
+                    "line": 103
                 }
             },
             "type": "Definition"
