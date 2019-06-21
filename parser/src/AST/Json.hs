@@ -185,6 +185,9 @@ instance ToJSON Expr where
           VarExpr (OpRef (SymbolIdentifier sym)) ->
             variableReference region sym
 
+          VarExpr _ ->
+              JSString $ toJSString "TODO: VarExpr"
+
           App expr args _ ->
               makeObj
                   [ type_ "FunctionApplication"
@@ -334,9 +337,6 @@ instance ToJSON Expr where
                         branches
                     )
                   ]
-
-          VarExpr _ ->
-              JSString $ toJSString "TODO: VarExpr"
 
           Range _ _ _ ->
               JSString $ toJSString "TODO: Range"
