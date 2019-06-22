@@ -132,6 +132,17 @@ instance ToJSON Expr where
                     )
                   ]
 
+          AST.Expression.Literal (FloatNum value repr) ->
+              makeObj
+                  [ type_ "FloatLiteral"
+                  , ("value", JSRational False $ toRational value)
+                  , ("display"
+                    , makeObj
+                        [ ("representation", showJSON repr)
+                        ]
+                    )
+                  ]
+
           AST.Expression.Literal (Boolean value) ->
             makeObj
                 [ type_ "ExternalReference"
@@ -139,6 +150,22 @@ instance ToJSON Expr where
                 , ("identifier", JSString $ toJSString $ show value)
                 , sourceLocation region
                 ]
+
+          AST.Expression.Literal (Chr chr) ->
+              makeObj
+                  [ type_ "CharLiteral"
+                  , ("module", JSString $ toJSString "Char")
+                  , ("value", JSString $ toJSString [chr])
+                  , sourceLocation region
+                  ]
+
+          AST.Expression.Literal (Str str _) ->
+              makeObj
+                  [ type_ "StringLiteral"
+                  , ("module", JSString $ toJSString "String")
+                  , ("value", JSString $ toJSString str)
+                  , sourceLocation region
+                  ]
 
           VarExpr (VarRef [] (LowercaseIdentifier var)) ->
             variableReference region var
@@ -157,6 +184,9 @@ instance ToJSON Expr where
 
           VarExpr (OpRef (SymbolIdentifier sym)) ->
             variableReference region sym
+
+          VarExpr _ ->
+              JSString $ toJSString "TODO: VarExpr"
 
           App expr args _ ->
               makeObj
@@ -308,8 +338,14 @@ instance ToJSON Expr where
                     )
                   ]
 
-          _ ->
-              JSString $ toJSString "TODO: Expr"
+          Range _ _ _ ->
+              JSString $ toJSString "TODO: Range"
+
+          AccessFunction _ ->
+              JSString $ toJSString "TODO: AccessFunction"
+
+          GLShader _ ->
+              JSString $ toJSString "TODO: GLShader"
 
 
 variableReference :: Region.Region -> String -> JSValue
@@ -343,6 +379,11 @@ instance ToJSON LetDeclaration where
 instance ToJSON IntRepresentation where
     showJSON DecimalInt = JSString $ toJSString $ "DecimalInt"
     showJSON HexadecimalInt = JSString $ toJSString $ "HexadecimalInt"
+
+
+instance ToJSON FloatRepresentation where
+    showJSON DecimalFloat = JSString $ toJSString "DecimalFloat"
+    showJSON ExponentFloat = JSString $ toJSString "ExponentFloat"
 
 
 instance ToJSON Pattern' where

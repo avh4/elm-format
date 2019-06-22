@@ -1629,7 +1629,7 @@
                         "type": "RecordLiteral"
                     }
                 ],
-                "function": "TODO: Expr",
+                "function": "TODO: AccessFunction",
                 "type": "FunctionApplication"
             },
             "name": "recordAccessfunction",
