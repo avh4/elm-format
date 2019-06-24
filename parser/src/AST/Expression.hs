@@ -73,13 +73,13 @@ instance A.Strippable Expr' where
     case d of
       App e0 es b ->
         App
-          (A.stripRegion $ A.map A.stripRegion e0)
-          (map (fmap (A.stripRegion . A.map A.stripRegion)) es)
+          (A.stripRegion $ fmap A.stripRegion e0)
+          (map (fmap (A.stripRegion . fmap A.stripRegion)) es)
           b
 
       Tuple es b ->
         Tuple
-          (map (fmap (A.stripRegion . A.map A.stripRegion)) es)
+          (map (fmap (A.stripRegion . fmap A.stripRegion)) es)
           b
 
       _ -> d

@@ -76,7 +76,6 @@ library
         Parse.Type
         Reporting.Annotation
         Reporting.Error.Syntax
-        Reporting.Region
         Util.List
 
     other-modules:
@@ -90,6 +89,8 @@ library
         Cheapskate.Types
         Cheapskate.Util
         CommandLine.Helpers
+        Data.Index
+        Elm.Name
         ElmFormat.Execute
         ElmFormat.Filesystem
         ElmFormat.FileStore
@@ -112,8 +113,15 @@ library
         Parse.Declaration
         Parse.Module
         Parse.Parse
-        Parse.State
+        Parse.ParsecAdapter
+        Parse.Primitives
+        Parse.Primitives.Internals
+        Parse.Primitives.Symbol
+        Parse.Primitives.Variable
+        Parse.Primitives.Whitespace
         Parse.Whitespace
+        Reporting.Doc
+        Reporting.Render.Code
         Reporting.Report
         Reporting.Result
         ReversedList
@@ -128,11 +136,9 @@ library
         directory >= 1.3.3.0 && < 2,
         filepath >= 1.4.2.1 && < 2,
         free >= 5.1.1 && < 6,
-        indents >= 0.3.3 && < 0.4,
         json >= 0.9.3 && < 0.10,
         mtl >= 2.2.2 && < 3,
         optparse-applicative >= 0.14.3.0 && < 0.15,
-        parsec >= 3.1.13.0 && < 4,
         process >= 1.6.5.0 && < 2,
         split >= 0.2.3.3 && < 0.3,
         text >= 1.2.3.1 && < 2
@@ -198,7 +204,6 @@ test-Suite elm-format-tests
         cmark >= 0.5.6.3 && < 0.6,
         containers >= 0.6.0.1 && < 0.7,
         mtl >= 2.2.2 && < 3,
-        parsec >= 3.1.13.0 && < 4,
         split >= 0.2.3.3 && < 0.3,
         text >= 1.2.3.1 && < 2,
         elm-format

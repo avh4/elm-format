@@ -10,7 +10,6 @@ import Parse.Common
 import qualified Parse.Helpers as Help
 import qualified Parse.Literal as Literal
 import qualified Parse.Pattern as Pattern
-import qualified Parse.State as State
 import qualified Parse.Type as Type
 import Parse.IParser
 import Parse.Whitespace

@@ -9,6 +9,7 @@ import ElmFormat.World
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Report as Report
 import qualified Reporting.Error.Syntax as Syntax
+import qualified Reporting.Doc as Doc
 
 
 r :: ErrorMessage -> String
@@ -23,4 +24,4 @@ showErrors filename source errs = do
 
 printError :: World m => String -> String -> RA.Located Syntax.Error -> m ()
 printError filename source (RA.A range err) =
-    Report.printError filename range (Syntax.toReport err) source
+    Doc.toAnsi $ Report.toDoc filename range (Syntax.toReport err) source

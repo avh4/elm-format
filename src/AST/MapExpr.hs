@@ -13,7 +13,7 @@ class MapExpr a where
 
 
 instance MapExpr (Located Expr') where
-    mapExpr f (A region a) = A region (f a)
+    mapExpr f (At region a) = At region (f a)
 
 
 instance MapExpr IfClause where
