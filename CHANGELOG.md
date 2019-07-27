@@ -1,3 +1,9 @@
+## master
+
+Bug fixes:
+  - Error messages are now correctly set to stderr
+
+
 ## 0.8.1
 
 New features:
