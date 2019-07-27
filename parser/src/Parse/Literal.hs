@@ -148,7 +148,7 @@ characterChar   = charLetter <|> charEscape
 charEscape :: IParser Char
 charEscape      = do{ _ <- char '\\'; escapeCode }
 charLetter :: IParser Char
-charLetter      = satisfy (\c -> (c /= '\'') && (c /= '\\') && (c > '\026'))
+charLetter      = satisfy (\c -> (c /= '\'') && (c /= '\\') && (c > '\026') || (c == '\t'))
 
 
 stringLiteral :: IParser String
@@ -166,7 +166,7 @@ stringChar      =   do{ c <- stringLetter; return (Just c) }
                 <?> "string character"
 
 stringLetter :: IParser Char
-stringLetter    = satisfy (\c -> (c /= '"') && (c /= '\\') && (c > '\026'))
+stringLetter    = satisfy (\c -> (c /= '"') && (c /= '\\') && (c > '\026') || (c == '\t'))
 
 stringEscape :: IParser (Maybe Char)
 stringEscape    = do{ _ <- char '\\'
