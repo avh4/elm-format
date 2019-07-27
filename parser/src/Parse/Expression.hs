@@ -10,7 +10,6 @@ import Parse.Common
 import qualified Parse.Helpers as Help
 import qualified Parse.Literal as Literal
 import qualified Parse.Pattern as Pattern
-import qualified Parse.State as State
 import qualified Parse.Type as Type
 import Parse.IParser
 import Parse.Whitespace
@@ -19,13 +18,14 @@ import AST.V0_16
 import qualified AST.Expression as E
 import qualified AST.Pattern as P
 import qualified AST.Variable as Var
+import ElmVersion
 import qualified Reporting.Annotation as A
 
 
 --------  Basic Terms  --------
 
-varTerm :: IParser E.Expr'
-varTerm =
+varTerm :: ElmVersion -> IParser E.Expr'
+varTerm elmVersion =
     let
         resolve v =
             case v of
@@ -33,37 +33,37 @@ varTerm =
                 Var.TagRef [] (UppercaseIdentifier "False") -> E.Literal $ Boolean False
                 _ -> E.VarExpr v
     in
-        resolve <$> var
+        resolve <$> var elmVersion
 
 
-accessor :: IParser E.Expr'
-accessor =
-  do  lbl <- try (string "." >> rLabel)
+accessor :: ElmVersion -> IParser E.Expr'
+accessor elmVersion =
+  do  lbl <- try (string "." >> rLabel elmVersion)
       return $ E.AccessFunction lbl
 
 
-negative :: IParser E.Expr'
-negative =
+negative :: ElmVersion -> IParser E.Expr'
+negative elmVersion =
   do  nTerm <-
           try $
             do  _ <- char '-'
                 notFollowedBy (char '.' <|> char '-')
-                term
+                term elmVersion
 
       return $ E.Unary E.Negative nTerm
 
 
 --------  Complex Terms  --------
 
-listTerm :: IParser E.Expr'
-listTerm =
+listTerm :: ElmVersion -> IParser E.Expr'
+listTerm elmVersion =
     shader' <|> try (braces range) <|> commaSeparated
   where
     range =
       do
-          lo <- expr
+          lo <- expr elmVersion
           (loPost, _, hiPre) <- padded (string "..")
-          hi <- expr
+          hi <- expr elmVersion
           return $ \loPre hiPost multiline ->
               E.Range
                   (Commented loPre lo loPost)
@@ -77,14 +77,14 @@ listTerm =
     commaSeparated =
         braces' $ checkMultiline $
         do
-            (terms, trailing) <- sectionedGroup expr
+            (terms, trailing) <- sectionedGroup (expr elmVersion)
             return $ E.ExplicitList terms trailing
 
 
-parensTerm :: IParser E.Expr
-parensTerm =
+parensTerm :: ElmVersion -> IParser E.Expr
+parensTerm elmVersion =
   choice
-    [ try (addLocation $ parens' opFn)
+    [ try (addLocation $ parens' opFn )
     , try (addLocation $ parens' tupleFn)
     , do
           (start, e, end) <- located $ parens (parened <|> unit)
@@ -92,14 +92,14 @@ parensTerm =
     ]
   where
     opFn =
-      E.VarExpr <$> anyOp
+      E.VarExpr <$> anyOp elmVersion
 
     tupleFn =
       do  commas <- many1 comma
           return $ E.TupleFunction (length commas + 1)
 
     parened =
-      do  expressions <- commaSep1 ((\e a b -> Commented a e b) <$> expr)
+      do  expressions <- commaSep1 ((\e a b -> Commented a e b) <$> expr elmVersion)
           return $ \pre post multiline ->
             case expressions pre post of
               [single] ->
@@ -112,19 +112,19 @@ parensTerm =
         return $ \pre post _ -> E.Unit (pre ++ post)
 
 
-recordTerm :: IParser E.Expr
-recordTerm =
+recordTerm :: ElmVersion -> IParser E.Expr
+recordTerm elmVersion =
     addLocation $ brackets' $ checkMultiline $
         do
-            base <- optionMaybe $ try (commented lowVar <* string "|")
-            (fields, trailing) <- sectionedGroup (pair lowVar lenientEquals expr)
+            base <- optionMaybe $ try (commented (lowVar elmVersion) <* string "|")
+            (fields, trailing) <- sectionedGroup (pair (lowVar elmVersion) lenientEquals (expr elmVersion))
             return $ E.Record base fields trailing
 
 
-term :: IParser E.Expr
-term =
-  addLocation (choice [ E.Literal <$> Literal.literal, listTerm, accessor, negative ])
-    <|> accessible (addLocation varTerm <|> parensTerm <|> recordTerm)
+term :: ElmVersion -> IParser E.Expr
+term elmVersion =
+  addLocation (choice [ E.Literal <$> Literal.literal, listTerm elmVersion, accessor elmVersion, negative elmVersion ])
+    <|> accessible elmVersion (addLocation (varTerm elmVersion) <|> parensTerm elmVersion <|> recordTerm elmVersion)
     <?> "an expression"
 
 
@@ -135,12 +135,12 @@ head' [] = Nothing
 head' (a:_) = Just a
 
 
-appExpr :: IParser E.Expr
-appExpr =
+appExpr :: ElmVersion -> IParser E.Expr
+appExpr elmVersion =
   expecting "an expression" $
   do  start <- getMyPosition
-      (t, initialTermMultiline) <- trackNewline term
-      ts <- constrainedSpacePrefix term
+      (t, initialTermMultiline) <- trackNewline (term elmVersion)
+      ts <- constrainedSpacePrefix (term elmVersion)
       end <- getMyPosition
       return $
           case ts of
@@ -165,47 +165,47 @@ appExpr =
 
 --------  Normal Expressions  --------
 
-expr :: IParser E.Expr
-expr =
-  addLocation (choice [ letExpr, caseExpr, ifExpr ])
-    <|> lambdaExpr
-    <|> binaryExpr
+expr :: ElmVersion -> IParser E.Expr
+expr elmVersion =
+  addLocation (choice [ letExpr elmVersion, caseExpr elmVersion, ifExpr elmVersion ])
+    <|> lambdaExpr elmVersion
+    <|> binaryExpr elmVersion
     <?> "an expression"
 
 
-binaryExpr :: IParser E.Expr
-binaryExpr =
-    Binop.binops appExpr lastExpr anyOp
+binaryExpr :: ElmVersion -> IParser E.Expr
+binaryExpr elmVersion =
+    Binop.binops (appExpr elmVersion) lastExpr (anyOp elmVersion)
   where
     lastExpr =
-        addLocation (choice [ letExpr, caseExpr, ifExpr ])
-        <|> lambdaExpr
+        addLocation (choice [ letExpr elmVersion, caseExpr elmVersion, ifExpr elmVersion ])
+        <|> lambdaExpr elmVersion
         <?> "an expression"
 
 
-ifExpr :: IParser E.Expr'
-ifExpr =
+ifExpr :: ElmVersion -> IParser E.Expr'
+ifExpr elmVersion =
   let
     elseKeyword =
-      (reserved "else" <?> "an 'else' branch")
+      (reserved elmVersion "else" <?> "an 'else' branch")
         >> whitespace
   in
     do
-      first <- ifClause
-      rest <- many (try $ (,) <$> elseKeyword <*> ifClause)
-      final <- (,) <$> elseKeyword <*> expr
+      first <- ifClause elmVersion
+      rest <- many (try $ (,) <$> elseKeyword <*> ifClause elmVersion)
+      final <- (,) <$> elseKeyword <*> expr elmVersion
 
       return $ E.If first rest final
 
 
-ifClause :: IParser E.IfClause
-ifClause =
+ifClause :: ElmVersion -> IParser E.IfClause
+ifClause elmVersion =
   do
-    try (reserved "if")
+    try (reserved elmVersion "if")
     preCondition <- whitespace
-    condition <- expr
-    (postCondition, _, bodyComments) <- padded (reserved "then")
-    thenBranch <- expr
+    condition <- expr elmVersion
+    (postCondition, _, bodyComments) <- padded (reserved elmVersion "then")
+    thenBranch <- expr elmVersion
     preElse <- whitespace <?> "an 'else' branch"
     return
       ( Commented preCondition condition postCondition
@@ -213,14 +213,14 @@ ifClause =
       )
 
 
-lambdaExpr :: IParser E.Expr
-lambdaExpr =
+lambdaExpr :: ElmVersion -> IParser E.Expr
+lambdaExpr elmVersion =
   let
     subparser = do
       _ <- char '\\' <|> char '\x03BB' <?> "an anonymous function"
-      args <- spacePrefix Pattern.term
+      args <- spacePrefix (Pattern.term elmVersion)
       (preArrowComments, _, bodyComments) <- padded rightArrow
-      body <- expr
+      body <- expr elmVersion
       return (args, preArrowComments, bodyComments, body)
   in
     addLocation $
@@ -228,11 +228,11 @@ lambdaExpr =
             return $ E.Lambda args (preArrowComments ++ bodyComments) body $ multilineToBool multiline
 
 
-caseExpr :: IParser E.Expr'
-caseExpr =
-  do  try (reserved "case")
-      (e, multilineSubject) <- trackNewline $ (\(pre, e, post) -> Commented pre e post) <$> padded expr
-      reserved "of"
+caseExpr :: ElmVersion -> IParser E.Expr'
+caseExpr elmVersion =
+  do  try (reserved elmVersion "case")
+      (e, multilineSubject) <- trackNewline $ (\(pre, e, post) -> Commented pre e post) <$> padded (expr elmVersion)
+      reserved elmVersion "of"
       firstPatternComments <- whitespace
       result <- cases firstPatternComments
       return $ E.Case (e, multilineToBool multilineSubject) result
@@ -242,10 +242,10 @@ caseExpr =
           (patternComments, p, (preArrowComments, _, bodyComments)) <-
               try ((,,)
                   <$> whitespace
-                  <*> (checkIndent >> Pattern.expr)
+                  <*> (checkIndent >> Pattern.expr elmVersion)
                   <*> padded rightArrow
                   )
-          result <- expr
+          result <- expr elmVersion
           return
             ( Commented (preComments ++ patternComments) p preArrowComments
             , (bodyComments, result)
@@ -263,49 +263,49 @@ caseExpr =
 -- LET
 
 
-letExpr :: IParser E.Expr'
-letExpr =
-  do  try (reserved "let")
+letExpr :: ElmVersion -> IParser E.Expr'
+letExpr elmVersion =
+  do  try (reserved elmVersion "let")
       commentsAfterLet <- map E.LetComment <$> whitespace
       defs <-
         block $
-          do  def <- typeAnnotation E.LetAnnotation <|> definition E.LetDefinition
+          do  def <- typeAnnotation elmVersion E.LetAnnotation <|> definition elmVersion E.LetDefinition
               commentsAfterDef <- whitespace
               return $ def : (map E.LetComment commentsAfterDef)
-      _ <- reserved "in"
+      _ <- reserved elmVersion "in"
       bodyComments <- whitespace
-      E.Let (commentsAfterLet ++ concat defs) bodyComments <$> expr
+      E.Let (commentsAfterLet ++ concat defs) bodyComments <$> expr elmVersion
 
 
 
 -- TYPE ANNOTATION
 
-typeAnnotation :: ((Var.Ref, Comments) -> (Comments, Type) -> a) -> IParser a
-typeAnnotation fn =
-    (\(v, pre, post) e -> fn (v, pre) (post, e)) <$> try start <*> Type.expr
+typeAnnotation :: ElmVersion -> ((Var.Ref, Comments) -> (Comments, Type) -> a) -> IParser a
+typeAnnotation elmVersion fn =
+    (\(v, pre, post) e -> fn (v, pre) (post, e)) <$> try start <*> Type.expr elmVersion
   where
     start =
-      do  v <- (Var.VarRef [] <$> lowVar) <|> (Var.OpRef <$> symOpInParens)
+      do  v <- (Var.VarRef [] <$> lowVar elmVersion) <|> (Var.OpRef <$> symOpInParens)
           (preColon, _, postColon) <- padded hasType
           return (v, preColon, postColon)
 
 
 -- DEFINITION
 
-definition :: (P.Pattern -> [(Comments, P.Pattern)] -> Comments -> E.Expr -> a) -> IParser a
-definition fn =
+definition :: ElmVersion -> (P.Pattern -> [(Comments, P.Pattern)] -> Comments -> E.Expr -> a) -> IParser a
+definition elmVersion fn =
   withPos $
     do
-        (name, args) <- defStart
+        (name, args) <- defStart elmVersion
         (preEqualsComments, _, postEqualsComments) <- padded equals
-        body <- expr
+        body <- expr elmVersion
         return $ fn name args (preEqualsComments ++ postEqualsComments) body
 
 
-defStart :: IParser (P.Pattern, [(Comments, P.Pattern)])
-defStart =
+defStart :: ElmVersion -> IParser (P.Pattern, [(Comments, P.Pattern)])
+defStart elmVersion =
     choice
-      [ do  pattern <- try Pattern.term
+      [ do  pattern <- try $ Pattern.term elmVersion
             func pattern
       , do  opPattern <- addLocation (P.OpPattern <$> parens' symOp)
             func opPattern
@@ -315,10 +315,10 @@ defStart =
     func pattern =
         case pattern of
           A.A _ (P.VarPattern _) ->
-              ((,) pattern) <$> spacePrefix Pattern.term
+              ((,) pattern) <$> spacePrefix (Pattern.term elmVersion)
 
           A.A _ (P.OpPattern _) ->
-              ((,) pattern) <$> spacePrefix Pattern.term
+              ((,) pattern) <$> spacePrefix (Pattern.term elmVersion)
 
           _ ->
               return (pattern, [])

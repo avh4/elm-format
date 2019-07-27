@@ -672,9 +672,9 @@ formatModuleDocs elmVersion importInfo blocks =
         parse source =
             source
                 |> firstOf
-                    [ fmap DeclarationsCode . Result.toMaybe . Parse.parseDeclarations
-                    , fmap ExpressionsCode . Result.toMaybe . Parse.parseExpressions
-                    , fmap ModuleCode . Result.toMaybe . Parse.parseModule
+                    [ fmap DeclarationsCode . Result.toMaybe . Parse.parseDeclarations elmVersion
+                    , fmap ExpressionsCode . Result.toMaybe . Parse.parseExpressions elmVersion
+                    , fmap ModuleCode . Result.toMaybe . Parse.parseModule elmVersion
                     ]
 
         format :: ElmCodeBlock -> String

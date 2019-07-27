@@ -3,6 +3,7 @@
 Bug fixes:
   - Error messages are now correctly set to stderr
   - Literal tabs are now allowed in String and Char literals, as is allowed by Elm 0.19
+  - Char literals immediately following variable names are now correctly handled for Elm 0.19
 
 
 ## 0.8.1

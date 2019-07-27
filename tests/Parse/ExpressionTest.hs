@@ -25,7 +25,7 @@ pending = at 0 0 0 0 $ Unit []
 example :: String -> String -> Expr -> TestTree
 example name input expected =
     testCase name $
-        assertParse expr input expected
+        assertParse (expr Elm_0_19) input expected
 
 
 importInfo :: ImportInfo
@@ -36,7 +36,7 @@ importInfo =
 example' :: String -> String -> String -> TestTree
 example' name input expected =
     testCase name $
-        assertParse (fmap (Text.unpack . Box.render . formatExpression Elm_0_18 importInfo SyntaxSeparated) expr) input expected
+        assertParse (fmap (Text.unpack . Box.render . formatExpression Elm_0_19 importInfo SyntaxSeparated) (expr Elm_0_19)) input expected
 
 
 commentedIntExpr (a,b,c,d) preComment postComment i =
@@ -86,9 +86,9 @@ tests =
         , testGroup "symbolic operator"
             [ example "" "(+)" $ at 1 1 1 4 $ VarExpr $ (OpRef $ SymbolIdentifier "+")
             , testCase "does not allow whitespace" $
-                assertParseFailure expr "( + )"
+                assertParseFailure (expr Elm_0_19) "( + )"
             , testCase "doew not allow comments" $
-                assertParseFailure expr "({-A-}+{-B-})"
+                assertParseFailure (expr Elm_0_19) "({-A-}+{-B-})"
             ]
         ]
 
@@ -105,13 +105,13 @@ tests =
         [ testGroup "negative"
             [ example "" "-True" $ at 1 1 1 6 $ Unary Negative $ at 1 2 1 6 $ Literal $ Boolean True
             , testCase "must not have whitespace" $
-                assertParseFailure expr "- True"
+                assertParseFailure (expr Elm_0_19) "- True"
             , testCase "must not have comment" $
-                assertParseFailure expr "-{- -}True"
+                assertParseFailure (expr Elm_0_19) "-{- -}True"
             , testCase "does not apply to '-'" $
-                assertParseFailure expr "--True"
+                assertParseFailure (expr Elm_0_19) "--True"
             , testCase "does not apply to '.'" $
-                assertParseFailure expr "-.foo"
+                assertParseFailure (expr Elm_0_19) "-.foo"
             ]
         ]
 
@@ -175,12 +175,12 @@ tests =
 
     , testGroup "tuple constructor"
         [ example "" "(,,)" $ at 1 1 1 5 $ TupleFunction 3
-        , testCase "does not allow whitespace (1)" $ assertParseFailure expr "( ,,)"
-        , testCase "does not allow whitespace (2)" $ assertParseFailure expr "(, ,)"
-        , testCase "does not allow whitespace (3)" $ assertParseFailure expr "(,, )"
-        , testCase "does not allow comments (1)" $ assertParseFailure expr "({-A-},,)"
-        , testCase "does not allow comments (2)" $ assertParseFailure expr "(,{-A-},)"
-        , testCase "does not allow comments (3)" $ assertParseFailure expr "(,,{-A-})"
+        , testCase "does not allow whitespace (1)" $ assertParseFailure (expr Elm_0_19) "( ,,)"
+        , testCase "does not allow whitespace (2)" $ assertParseFailure (expr Elm_0_19) "(, ,)"
+        , testCase "does not allow whitespace (3)" $ assertParseFailure (expr Elm_0_19) "(,, )"
+        , testCase "does not allow comments (1)" $ assertParseFailure (expr Elm_0_19) "({-A-},,)"
+        , testCase "does not allow comments (2)" $ assertParseFailure (expr Elm_0_19) "(,{-A-},)"
+        , testCase "does not allow comments (3)" $ assertParseFailure (expr Elm_0_19) "(,,{-A-})"
         ]
 
     , testGroup "Record"
@@ -227,9 +227,9 @@ tests =
             "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }"
             "{ a\n    | x =\n        7\n    , y =\n        8\n}\n"
         , testCase "only allows simple base" $
-            assertParseFailure expr "{9|x=7}"
+            assertParseFailure (expr Elm_0_19) "{9|x=7}"
         , testCase "only allows simple base" $
-            assertParseFailure expr "{{}|x=7}"
+            assertParseFailure (expr Elm_0_19) "{{}|x=7}"
         , example' "no fields (elm-compiler does not allow this)"
             "{a|}"
             "{ a |  }\n"
@@ -239,9 +239,9 @@ tests =
         [ example "" "x.f1" $ at 1 1 1 5 (Access (at 1 1 1 2 (VarExpr (VarRef [] $ LowercaseIdentifier "x"))) (LowercaseIdentifier "f1"))
         , example "nested" "x.f1.f2" $ at 1 1 1 8 (Access (at 1 1 1 5 (Access (at 1 1 1 2 (VarExpr (VarRef [] $ LowercaseIdentifier "x"))) (LowercaseIdentifier "f1"))) (LowercaseIdentifier "f2"))
         , testCase "does not allow symbolic field names" $
-            assertParseFailure expr "x.+"
+            assertParseFailure (expr Elm_0_19) "x.+"
         , testCase "does not allow symbolic field names" $
-            assertParseFailure expr "x.(+)"
+            assertParseFailure (expr Elm_0_19) "x.(+)"
         ]
 
     , testGroup "record access fuction"
@@ -255,13 +255,13 @@ tests =
         , example "comments" "\\{-A-}x{-B-}y{-C-}->{-D-}9" $ at 1 1 1 27 $ Lambda [([BlockComment ["A"]], at 1 7 1 8 $ P.VarPattern $ LowercaseIdentifier "x"), ([BlockComment ["B"]], at 1 13 1 14 $ P.VarPattern $ LowercaseIdentifier "y")] [BlockComment ["C"], BlockComment ["D"]] (intExpr (1,26,1,27) 9) False
         , example "newlines" "\\\n x\n y\n ->\n 9" $ at 1 1 5 3 $ Lambda [([], at 2 2 2 3 $ P.VarPattern $ LowercaseIdentifier "x"), ([], at 3 2 3 3 $ P.VarPattern $ LowercaseIdentifier "y")] [] (intExpr (5,2,5,3) 9) True
         , testCase "arrow must not contain whitespace" $
-            assertParseFailure expr "\\x y - > 9"
+            assertParseFailure (expr Elm_0_19) "\\x y - > 9"
         ]
 
     , testGroup "if statement"
         [ example "" "if x then y else z" $ at 1 1 1 19 (If (Commented [] (at 1 4 1 5 (VarExpr (VarRef [] $ LowercaseIdentifier "x"))) [],Commented [] (at 1 11 1 12 (VarExpr (VarRef [] $ LowercaseIdentifier "y"))) []) [] ([],at 1 18 1 19 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
-        , example "comments" "if{-A-}x{-B-}then{-C-}y{-D-}else{-E-}if{-F-}x'{-G-}then{-H-}y'{-I-}else{-J-}z" $ at 1 1 1 78 (If (Commented [BlockComment ["A"]] (at 1 8 1 9 (VarExpr (VarRef [] $ LowercaseIdentifier "x"))) [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 23 1 24 (VarExpr (VarRef [] $ LowercaseIdentifier "y"))) [BlockComment ["D"]]) [([BlockComment ["E"]],(Commented [BlockComment ["F"]] (at 1 45 1 47 (VarExpr (VarRef [] $ LowercaseIdentifier "x'"))) [BlockComment ["G"]],Commented [BlockComment ["H"]] (at 1 61 1 63 (VarExpr (VarRef [] $ LowercaseIdentifier "y'"))) [BlockComment ["I"]]))] ([BlockComment ["J"]],at 1 77 1 78 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
-        , example "else if" "if x then y else if x' then y' else if x'' then y'' else z" $ at 1 1 1 59 (If (Commented [] (at 1 4 1 5 (VarExpr (VarRef [] $ LowercaseIdentifier "x"))) [],Commented [] (at 1 11 1 12 (VarExpr (VarRef [] $ LowercaseIdentifier "y"))) []) [([],(Commented [] (at 1 21 1 23 (VarExpr (VarRef [] $ LowercaseIdentifier "x'"))) [],Commented [] (at 1 29 1 31 (VarExpr (VarRef [] $ LowercaseIdentifier "y'"))) [])),([],(Commented [] (at 1 40 1 43 (VarExpr (VarRef [] $ LowercaseIdentifier "x''"))) [],Commented [] (at 1 49 1 52 (VarExpr (VarRef [] $ LowercaseIdentifier "y''"))) []))] ([],at 1 58 1 59 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "comments" "if{-A-}x{-B-}then{-C-}y{-D-}else{-E-}if{-F-}x_{-G-}then{-H-}y_{-I-}else{-J-}z" $ at 1 1 1 78 (If (Commented [BlockComment ["A"]] (at 1 8 1 9 (VarExpr (VarRef [] $ LowercaseIdentifier "x"))) [BlockComment ["B"]],Commented [BlockComment ["C"]] (at 1 23 1 24 (VarExpr (VarRef [] $ LowercaseIdentifier "y"))) [BlockComment ["D"]]) [([BlockComment ["E"]],(Commented [BlockComment ["F"]] (at 1 45 1 47 (VarExpr (VarRef [] $ LowercaseIdentifier "x_"))) [BlockComment ["G"]],Commented [BlockComment ["H"]] (at 1 61 1 63 (VarExpr (VarRef [] $ LowercaseIdentifier "y_"))) [BlockComment ["I"]]))] ([BlockComment ["J"]],at 1 77 1 78 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "else if" "if x1 then y1 else if x2 then y2 else if x3 then y3 else z" $ at 1 1 1 59 (If (Commented [] (at 1 4 1 6 (VarExpr (VarRef [] $ LowercaseIdentifier "x1"))) [],Commented [] (at 1 12 1 14 (VarExpr (VarRef [] $ LowercaseIdentifier "y1"))) []) [([],(Commented [] (at 1 23 1 25 (VarExpr (VarRef [] $ LowercaseIdentifier "x2"))) [],Commented [] (at 1 31 1 33 (VarExpr (VarRef [] $ LowercaseIdentifier "y2"))) [])),([],(Commented [] (at 1 42 1 44 (VarExpr (VarRef [] $ LowercaseIdentifier "x3"))) [],Commented [] (at 1 50 1 52 (VarExpr (VarRef [] $ LowercaseIdentifier "y3"))) []))] ([],at 1 58 1 59 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
         , example "newlines" "if\n x\n then\n y\n else\n z" $ at 1 1 6 3 (If (Commented [] (at 2 2 2 3 (VarExpr (VarRef [] $ LowercaseIdentifier "x"))) [],Commented [] (at 4 2 4 3 (VarExpr (VarRef [] $ LowercaseIdentifier "y"))) []) [] ([],at 6 2 6 3 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
         ]
 
@@ -273,11 +273,11 @@ tests =
         , example "comments" "let{-A-}a{-B-}={-C-}b{-D-}in{-E-}z" $ at 1 1 1 35 (Let [LetComment (BlockComment ["A"]),LetDefinition (at 1 9 1 10 (P.VarPattern (LowercaseIdentifier "a"))) [] [BlockComment ["B"],BlockComment ["C"]] (at 1 21 1 22 (VarExpr (VarRef [] $ LowercaseIdentifier "b"))),LetComment (BlockComment ["D"])] [BlockComment ["E"]] (at 1 34 1 35 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
         , example "newlines" "let\n a\n =\n b\nin\n z" $ at 1 1 6 3 (Let [LetDefinition (at 2 2 2 3 (P.VarPattern (LowercaseIdentifier "a"))) [] [] (at 4 2 4 3 (VarExpr (VarRef [] $ LowercaseIdentifier "b")))] [] (at 6 2 6 3 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
         , testCase "must have at least one definition" $
-            assertParseFailure expr "let in z"
+            assertParseFailure (expr Elm_0_19) "let in z"
         , testGroup "declarations must start at the same column" $
-            [ testCase "(1)" $ assertParseFailure expr "let a=b\n   c=d\nin z"
-            , testCase "(2)" $ assertParseFailure expr "let a=b\n     c=d\nin z"
-            , testCase "(3)" $ assertParseFailure expr "let  a=b\n   c=d\nin z"
+            [ testCase "(1)" $ assertParseFailure (expr Elm_0_19) "let a=b\n   c=d\nin z"
+            , testCase "(2)" $ assertParseFailure (expr Elm_0_19) "let a=b\n     c=d\nin z"
+            , testCase "(3)" $ assertParseFailure (expr Elm_0_19) "let  a=b\n   c=d\nin z"
             ]
         ]
 
@@ -288,11 +288,11 @@ tests =
         , example "comments" "case{-A-}9{-B-}of{-C-}\n{-D-}1{-E-}->{-F-}10{-G-}\n{-H-}_{-I-}->{-J-}20" $ at 1 1 3 21 (Case (Commented [BlockComment ["A"]] (at 1 10 1 11 (Literal (IntNum 9 DecimalInt))) [BlockComment ["B"]],False) [(Commented [BlockComment ["C"],BlockComment ["D"]] (at 2 6 2 7 (P.Literal (IntNum 1 DecimalInt))) [BlockComment ["E"]],([BlockComment ["F"]],at 2 19 2 21 (Literal (IntNum 10 DecimalInt)))),(Commented [BlockComment ["G"],BlockComment ["H"]] (at 3 6 3 7 Anything) [BlockComment ["I"]],([BlockComment ["J"]],at 3 19 3 21 (Literal (IntNum 20 DecimalInt))))])
         , example "newlines" "case\n 9\n of\n 1\n ->\n 10\n _\n ->\n 20" $ at 1 1 9 4 (Case (Commented [] (at 2 2 2 3 (Literal (IntNum 9 DecimalInt))) [],True) [(Commented [] (at 4 2 4 3 (P.Literal (IntNum 1 DecimalInt))) [],([],at 6 2 6 4 (Literal (IntNum 10 DecimalInt)))),(Commented [] (at 7 2 7 3 Anything) [],([],at 9 2 9 4 (Literal (IntNum 20 DecimalInt))))])
         , testCase "should not consume trailing whitespace" $
-            assertParse (expr >> string "\nX") "case 9 of\n 1->10\n _->20\nX" $ "\nX"
+            assertParse (expr Elm_0_19>> string "\nX") "case 9 of\n 1->10\n _->20\nX" $ "\nX"
         , testGroup "clauses must start at the same column"
-            [ testCase "(1)" $ assertParseFailure expr "case 9 of\n 1->10\n_->20"
-            , testCase "(2)" $ assertParseFailure expr "case 9 of\n 1->10\n  _->20"
-            , testCase "(3)" $ assertParseFailure expr "case 9 of\n  1->10\n _->20"
+            [ testCase "(1)" $ assertParseFailure (expr Elm_0_19) "case 9 of\n 1->10\n_->20"
+            , testCase "(2)" $ assertParseFailure (expr Elm_0_19) "case 9 of\n 1->10\n  _->20"
+            , testCase "(3)" $ assertParseFailure (expr Elm_0_19) "case 9 of\n  1->10\n _->20"
             ]
         ]
     ]
