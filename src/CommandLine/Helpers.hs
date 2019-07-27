@@ -17,7 +17,7 @@ r = showErrorMessage
 
 showErrors :: World m => String -> String -> [RA.Located Syntax.Error] ->  m ()
 showErrors filename source errs = do
-    putStrLn (r ErrorsHeading)
+    putStrLnStderr (r ErrorsHeading)
     mapM_ (printError filename source) errs
 
 
