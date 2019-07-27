@@ -4,4 +4,3 @@ You should either run elm-format from the directory containing
 your elm.json (for Elm 0.19) or elm-package.json (for Elm 0.18),
 or tell me which version of Elm with --elm-version=0.19 or --elm-version=0.18
 
-

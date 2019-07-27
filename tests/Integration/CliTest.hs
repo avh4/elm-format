@@ -26,6 +26,10 @@ tests =
             |> run "elm-format" ["test.elm", "--output", "out.elm", "--elm-version=0.19"]
             |> TestWorld.eval (readFile "out.elm")
             |> assertPrefix "module Main"
+        , world
+            |> TestWorld.queueStdin "syntax error:True"
+            |> run "elm-format" ["--stdin", "--elm-version=0.19"]
+            |> TestWorld.goldenStderr "using --stdin writes errors to stderr" "tests/stdin-error.stderr"
         , testGroup "auto-detects Elm version"
             [ testCase "for Elm 0.19 applications" $ world
                 |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"

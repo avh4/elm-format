@@ -155,7 +155,7 @@ determineWhatToDoFromConfig config resolvedInputFiles =
 
 exitWithError :: World m => ErrorMessage -> m ()
 exitWithError message =
-    (putStrLn $ Helpers.r $ message)
+    (putStrLnStderr $ Helpers.r $ message)
         >> exitFailure
 
 
