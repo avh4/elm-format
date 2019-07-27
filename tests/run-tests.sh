@@ -315,9 +315,10 @@ checkWaysToRun
 checkGood 0.19 AllSyntax/0.19/Literals.elm
 checkGood 0.19 AllSyntax/0.19/InfixDeclaration.elm
 
+checkTransformation 0.19 ClarifyNegativeExponentiationPrecedence.elm
 checkTransformation 0.19 Elm-0.19/ExplicitlyListExposedValues.elm
 checkTransformation 0.19 Elm-0.19/ParseTabsInLiterals.elm
-checkTransformation 0.19 ClarifyNegativeExponentiationPrecedence.elm
+checkTransformation 0.19 Elm-0.19/DistinguishCharStartFromRef.elm
 
 checkUpgrade 0.19 Elm-0.19/CommaFunctionsBecomeLambdas.elm
 checkUpgrade 0.19 Elm-0.19/RemoveBangOperator.elm
