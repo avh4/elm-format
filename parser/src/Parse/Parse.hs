@@ -7,6 +7,7 @@ import AST.V0_16 (WithEol)
 import AST.Declaration (TopLevelStructure, Declaration)
 import qualified AST.Expression
 import qualified AST.Module
+import ElmVersion hiding (parse)
 import Parse.Comments (withEol)
 import qualified Parse.Declaration
 import qualified Parse.Expression
@@ -19,19 +20,19 @@ import Parse.IParser
 import Text.Parsec (eof)
 
 
-parseModule :: String -> Result.Result () Error.Error AST.Module.Module
-parseModule src =
-  parse src Parse.Module.elmModule
+parseModule :: ElmVersion -> String -> Result.Result () Error.Error AST.Module.Module
+parseModule elmVersion src =
+    parse src (Parse.Module.elmModule elmVersion)
 
 
-parseDeclarations :: String -> Result.Result () Error.Error [TopLevelStructure Declaration]
-parseDeclarations src =
-    parse src (Parse.Module.topLevel Parse.Declaration.declaration <* eof)
+parseDeclarations :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure Declaration]
+parseDeclarations elmVersion src =
+    parse src (Parse.Module.topLevel (Parse.Declaration.declaration elmVersion) <* eof)
 
 
-parseExpressions :: String -> Result.Result () Error.Error [TopLevelStructure (WithEol AST.Expression.Expr)]
-parseExpressions src =
-    parse src (Parse.Module.topLevel (withEol Parse.Expression.expr) <* eof)
+parseExpressions :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure (WithEol AST.Expression.Expr)]
+parseExpressions elmVersion src =
+    parse src (Parse.Module.topLevel (withEol $ Parse.Expression.expr elmVersion) <* eof)
 
 
 -- RUN PARSERS

@@ -6,15 +6,15 @@ import Test.Tasty.HUnit
 import Parse.Pattern
 import AST.V0_16
 import AST.Pattern
+import ElmVersion
 
 import Parse.TestHelpers
 
 
-pending = at 0 0 0 0 Anything
-
+example :: String -> String -> Pattern -> TestTree
 example name input expected =
     testCase name $
-        assertParse expr input expected
+        assertParse (expr Elm_0_19) input expected
 
 
 tests :: TestTree
@@ -76,7 +76,7 @@ tests =
         , example "comments" "{{-A-}a{-B-},{-C-}b{-D-}}" $ at 1 1 1 26 (Record [Commented [BlockComment ["A"]] (LowercaseIdentifier "a") [BlockComment ["B"]],Commented [BlockComment ["C"]] (LowercaseIdentifier "b") [BlockComment ["D"]]])
         , example "newlines" "{\n a\n ,\n b\n }" $ at 1 1 5 3 (Record [Commented [] (LowercaseIdentifier "a") [],Commented [] (LowercaseIdentifier "b") []])
         , testCase "must have at least one field" $
-            assertParseFailure expr "{}"
+            assertParseFailure (expr Elm_0_19) "{}"
         ]
 
     , testGroup "alias"
@@ -88,6 +88,6 @@ tests =
         , example "nested" "(_ as x)as y" $ at 1 1 1 13 (Alias (at 1 2 1 8 (Alias (at 1 2 1 3 Anything,[]) ([],LowercaseIdentifier "x")),[]) ([],LowercaseIdentifier "y"))
         , example "nested (whitespace)" "(_ as x) as y" $ at 1 1 1 14 (Alias (at 1 2 1 8 (Alias (at 1 2 1 3 Anything,[]) ([],LowercaseIdentifier "x")),[]) ([],LowercaseIdentifier "y"))
         , testCase "nesting required parentheses" $
-            assertParseFailure expr "_ as x as y"
+            assertParseFailure (expr Elm_0_19) "_ as x as y"
         ]
     ]
