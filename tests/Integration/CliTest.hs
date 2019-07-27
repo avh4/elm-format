@@ -46,9 +46,10 @@ tests =
                 |> TestWorld.uploadFile "elm-package.json" "{\"elm-version\": \"0.18.0 <= v < 0.19.0\"}"
                 |> run "elm-format" ["test.elm", "--validate"]
                 |> expectExit 0
-            , world
-                |> run "elm-format" ["--stdin"]
-                |> TestWorld.goldenStdout "can't autodetect" "tests/autodetect-error.stdout"
+            , testCase "default to Elm 0.19" $ world
+                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"
+                |> run "elm-format" ["test.elm", "--validate"]
+                |> expectExit 0
             ]
         ]
 
