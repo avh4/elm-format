@@ -19,7 +19,7 @@ pending = at 0 0 0 0 $ TupleType []
 example :: String -> String -> String -> TestTree
 example name input expected =
     testCase name $
-        assertParse (fmap (Text.unpack . Box.render . formatType Elm_0_18) expr) input expected
+        assertParse (fmap (Text.unpack . Box.render . formatType Elm_0_19) (expr Elm_0_19)) input expected
 
 
 tests :: TestTree
@@ -100,9 +100,9 @@ tests =
             \        n\n\
             \}\n"
         , testCase "only allows simple base" $
-            assertParseFailure expr "{()|x:m}"
+            assertParseFailure (expr Elm_0_19) "{()|x:m}"
         , testCase "only allows simple base" $
-            assertParseFailure expr "{{}|x:m}"
+            assertParseFailure (expr Elm_0_19) "{{}|x:m}"
         , example "no fields (elm-compiler does not allow this)"
             "{a|}"
             "{ a |  }\n"

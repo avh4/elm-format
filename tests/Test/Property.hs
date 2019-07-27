@@ -26,9 +26,9 @@ assertStringToString source =
         source' = Text.pack source
 
         result =
-            Parse.parse source'
+            Parse.parse ElmVersion.Elm_0_19 source'
                 |> Parse.toEither
-                |> fmap (Render.render ElmVersion.Elm_0_17)
+                |> fmap (Render.render ElmVersion.Elm_0_19)
     in
         assertEqual "" (Right source') result
 
@@ -38,8 +38,8 @@ astToAst ast =
     let
         result =
             ast
-                |> Render.render ElmVersion.Elm_0_17
-                |> Parse.parse
+                |> Render.render ElmVersion.Elm_0_19
+                |> Parse.parse ElmVersion.Elm_0_19
                 |> Parse.toEither
     in
         assertEqual ""
@@ -48,16 +48,16 @@ astToAst ast =
 
 
 simpleAst =
-    case Parse.toEither $ Parse.parse $ Text.pack "module Main exposing (foo)\n\n\nfoo =\n  8\n" of
+    case Parse.toEither $ Parse.parse ElmVersion.Elm_0_19 $ Text.pack "module Main exposing (foo)\n\n\nfoo =\n  8\n" of
         Right ast -> ast
 
 
 reportFailedAst ast =
     let
-        rendering = Render.render ElmVersion.Elm_0_17 ast |> Text.unpack
+        rendering = Render.render ElmVersion.Elm_0_19 ast |> Text.unpack
         result =
-            Render.render ElmVersion.Elm_0_17 ast
-                |> Parse.parse
+            Render.render ElmVersion.Elm_0_19 ast
+                |> Parse.parse ElmVersion.Elm_0_19
                 |> fmap stripRegion
                 |> show
     in
@@ -85,11 +85,11 @@ propertyTests =
     , testGroup "valid Elm files"
         [ testProperty "should parse"
             $ forAll Test.ElmSourceGenerators.elmModule $ withCounterexample id
-              $ Text.pack >> Parse.parse >> Parse.toMaybe >> Maybe.isJust
+              $ Text.pack >> Parse.parse ElmVersion.Elm_0_19 >> Parse.toMaybe >> Maybe.isJust
 
         , testProperty "should parse to the same AST after formatting"
             $ forAll Test.ElmSourceGenerators.elmModule $ withCounterexample id
-              $ Text.pack >> Parse.parse >> Parse.toMaybe
+              $ Text.pack >> Parse.parse ElmVersion.Elm_0_19 >> Parse.toMaybe
                 >> fmap astToAst
                 >> Maybe.fromMaybe (assertFailure "failed to parse original")
         ]
