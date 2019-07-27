@@ -89,7 +89,9 @@ rLabel = lowVar
 
 innerVarChar :: ElmVersion -> IParser Char
 innerVarChar elmVersion =
-  alphaNum <|> char '_' <|> char '\'' <?> "more letters in this name"
+    if syntax_0_19_disallowApostropheInVars elmVersion
+        then alphaNum <|> char '_' <?> "more letters in this name"
+        else alphaNum <|> char '_' <|> char '\'' <?> "more letters in this name"
 
 
 makeVar :: ElmVersion -> IParser Char -> IParser String
