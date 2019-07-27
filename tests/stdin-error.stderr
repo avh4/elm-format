@@ -1,0 +1,14 @@
+ERRORS
+-- SYNTAX PROBLEM ------------------------------------------------------ <STDIN>
+
+I ran into something unexpected when parsing your code!
+
+1│ syntax error:True
+               ^
+I am looking for one of the following things:
+
+    =
+    a pattern
+    whitespace
+
+

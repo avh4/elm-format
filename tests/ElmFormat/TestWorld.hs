@@ -8,7 +8,7 @@ import Test.Tasty (TestTree)
 import Test.Tasty.HUnit (Assertion, assertBool, assertEqual)
 import Test.Tasty.Golden (goldenVsStringDiff)
 
-import Prelude hiding (readFile, writeFile)
+import Prelude hiding (putStr, readFile, writeFile)
 import qualified Control.Monad.State.Lazy as State
 import qualified Data.Map.Strict as Dict
 import qualified Data.Text.Lazy as Text
@@ -19,7 +19,9 @@ import qualified Data.Text as StrictText
 data TestWorldState =
     TestWorldState
         { filesystem :: Dict.Map String String
+        , queuedStdin :: String
         , stdout :: [String]
+        , stderr :: [String]
         , programs :: Dict.Map String ([String] -> State.State TestWorld ())
         , lastExitCode :: Maybe Int
         }
@@ -31,7 +33,13 @@ type TestWorld = TestWorldState
 fullStdout :: TestWorldState -> String
 fullStdout state =
     stdout state
-        |> (:) "\n" -- Append a final newline so reference files can be easily edited
+        |> reverse
+        |> concat
+
+
+fullStderr :: TestWorldState -> String
+fullStderr state =
+    stderr state
         |> reverse
         |> concat
 
@@ -68,6 +76,12 @@ instance World (State.State TestWorldState) where
     writeUtf8File path content =
         writeFile path (StrictText.unpack content)
 
+    getStdin =
+        do
+            state <- State.get
+            State.put $ state { queuedStdin = [] }
+            return $ StrictText.pack (queuedStdin state)
+
     putStr string =
         do
             state <- State.get
@@ -76,7 +90,24 @@ instance World (State.State TestWorldState) where
     putStrLn string =
         do
             state <- State.get
-            State.put $ state { stdout = string : stdout state }
+            State.put $ state { stdout = (string ++ "\n") : stdout state }
+
+    writeStdout text =
+        putStr (StrictText.unpack text)
+
+    putStrStderr string =
+        do
+            state <- State.get
+            State.put $ state { stderr = string : stderr state }
+
+    putStrLnStderr string =
+        do
+            state <- State.get
+            State.put $ state { stderr = (string ++ "\n") : stderr state }
+
+    putSgrStderr _ =
+        -- NOTE: tests currently ignore SGRs (used for displaying colors in error messages)
+        return ()
 
     getProgName =
         return "elm-format"
@@ -96,7 +127,9 @@ testWorld :: [(String, String)] -> TestWorldState
 testWorld files =
       TestWorldState
           { filesystem = Dict.fromList files
+          , queuedStdin = ""
           , stdout = []
+          , stderr = []
           , programs = mempty
           , lastExitCode = Nothing
           }
@@ -110,6 +143,11 @@ eval :: State.State s a -> s -> a
 eval = State.evalState
 
 
+queueStdin :: String -> TestWorldState -> TestWorldState
+queueStdin newStdin state =
+    state { queuedStdin = newStdin }
+
+
 assertOutput :: [(String, String)] -> TestWorldState -> Assertion
 assertOutput expectedFiles context =
     assertBool
@@ -118,11 +156,21 @@ assertOutput expectedFiles context =
 
 
 goldenStdout :: String -> FilePath -> TestWorldState -> TestTree
-goldenStdout testName goldenFile state =
+goldenStdout =
+    goldenOutputStream fullStdout
+
+
+goldenStderr :: String -> FilePath -> TestWorldState -> TestTree
+goldenStderr =
+    goldenOutputStream fullStderr
+
+
+goldenOutputStream :: (TestWorldState -> String) -> String -> FilePath -> TestWorldState -> TestTree
+goldenOutputStream getStream testName goldenFile state =
     goldenVsStringDiff testName
         (\ref new -> ["diff", "-u", ref, new])
         goldenFile
-        (return $ Text.encodeUtf8 $ Text.pack $ fullStdout state)
+        (return $ Text.encodeUtf8 $ Text.pack $ getStream state)
 
 
 init :: TestWorld
