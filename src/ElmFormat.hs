@@ -275,7 +275,7 @@ autoDetectElmVersion =
 
 validate :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage ()
 validate elmVersion (inputFile, inputText) =
-    case Parse.parse inputText of
+    case Parse.parse elmVersion inputText of
         Result.Result _ (Result.Ok modu) ->
             if inputText /= Render.render elmVersion modu then
                 Left $ FileWouldChange inputFile
@@ -291,9 +291,9 @@ data FormatResult
     | Changed FilePath Text.Text
 
 
-parseModule :: (FilePath, Text.Text) -> Either InfoMessage AST.Module.Module
-parseModule (inputFile, inputText) =
-    case Parse.parse inputText of
+parseModule :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage AST.Module.Module
+parseModule elmVersion (inputFile, inputText) =
+    case Parse.parse elmVersion inputText of
         Result.Result _ (Result.Ok modu) ->
             Right modu
 
@@ -303,7 +303,7 @@ parseModule (inputFile, inputText) =
 
 format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage FormatResult
 format elmVersion (inputFile, inputText) =
-    case parseModule (inputFile, inputText) of
+    case parseModule elmVersion (inputFile, inputText) of
         Right modu ->
             let
                 outputText = Render.render elmVersion modu
@@ -391,7 +391,7 @@ doIt elmVersion whatToDo =
                 formatFile file = (format elmVersion <$> ElmFormat.readFile file) >>= logErrorOr ElmFormat.updateFile
 
         StdinToJson ->
-            (fmap (Text.pack . Text.JSON.encode . AST.Json.showModule) <$> parseModule <$> readStdin) >>= logErrorOr OutputConsole.writeStdout
+            (fmap (Text.pack . Text.JSON.encode . AST.Json.showModule) <$> parseModule elmVersion <$> readStdin) >>= logErrorOr OutputConsole.writeStdout
 
         -- TODO: this prints "Processing such-and-such-a-file.elm" which makes the JSON output invalid
         -- FileToJson inputFile ->

@@ -6,21 +6,22 @@ import Text.Parsec ((<|>), (<?>), char, many1, string, try, optionMaybe)
 import Parse.Helpers
 import qualified Reporting.Annotation as A
 import qualified AST.V0_16 as AST
+import ElmVersion
 import Parse.IParser
 import Parse.Common
 import Data.Maybe (maybeToList)
 
 
-tvar :: IParser AST.Type
-tvar =
+tvar :: ElmVersion -> IParser AST.Type
+tvar elmVersion =
   addLocation
-    (AST.TypeVariable <$> lowVar <?> "a type variable")
+    (AST.TypeVariable <$> lowVar elmVersion <?> "a type variable")
 
 
-tuple :: IParser AST.Type
-tuple =
+tuple :: ElmVersion -> IParser AST.Type
+tuple elmVersion =
   addLocation $
-  do  types <- parens'' (withEol expr)
+  do  types <- parens'' (withEol $ expr elmVersion)
       case types of
         Left comments ->
             return $ AST.UnitType comments
@@ -34,36 +35,36 @@ tuple =
             return $ AST.TupleType types'
 
 
-record :: IParser AST.Type
-record =
+record :: ElmVersion -> IParser AST.Type
+record elmVersion =
     addLocation $ brackets' $ checkMultiline $
         do
-            base <- optionMaybe $ try (commented lowVar <* string "|")
-            (fields, trailing) <- sectionedGroup (pair lowVar lenientHasType expr)
+            base <- optionMaybe $ try (commented (lowVar elmVersion) <* string "|")
+            (fields, trailing) <- sectionedGroup (pair (lowVar elmVersion) lenientHasType (expr elmVersion))
             return $ AST.RecordType base fields trailing
 
 
-capTypeVar :: IParser [AST.UppercaseIdentifier]
-capTypeVar =
-    dotSep1 capVar
+capTypeVar :: ElmVersion -> IParser [AST.UppercaseIdentifier]
+capTypeVar elmVersion =
+    dotSep1 (capVar elmVersion)
 
 
-constructor0 :: IParser AST.TypeConstructor
-constructor0 =
-  do  name <- capTypeVar
+constructor0 :: ElmVersion -> IParser AST.TypeConstructor
+constructor0 elmVersion =
+  do  name <- capTypeVar elmVersion
       return (AST.NamedConstructor name)
 
 
-constructor0' :: IParser AST.Type
-constructor0' =
+constructor0' :: ElmVersion -> IParser AST.Type
+constructor0' elmVersion =
     addLocation $
-    do  ctor <- constructor0
+    do  ctor <- constructor0 elmVersion
         return (AST.TypeConstruction ctor [])
 
 
-term :: IParser AST.Type
-term =
-  tuple <|> record <|> tvar <|> constructor0'
+term :: ElmVersion -> IParser AST.Type
+term elmVersion =
+  tuple elmVersion <|> record elmVersion <|> tvar elmVersion <|> constructor0' elmVersion
 
 
 tupleCtor :: IParser AST.TypeConstructor
@@ -72,18 +73,18 @@ tupleCtor =
         return (AST.TupleConstructor (length ctor + 1))
 
 
-app :: IParser AST.Type
-app =
+app :: ElmVersion -> IParser AST.Type
+app elmVersion =
   addLocation $
-  do  f <- constructor0 <|> try tupleCtor <?> "a type constructor"
-      args <- spacePrefix term
+  do  f <- constructor0 elmVersion <|> try tupleCtor <?> "a type constructor"
+      args <- spacePrefix (term elmVersion)
       return $ AST.TypeConstruction f args
 
 
-expr :: IParser AST.Type
-expr =
+expr :: ElmVersion -> IParser AST.Type
+expr elmVersion =
   do
-    result <- separated rightArrow (app <|> term)
+    result <- separated rightArrow (app elmVersion <|> term elmVersion)
     return $
       case result of
         Left t ->
@@ -92,13 +93,13 @@ expr =
           A.A region $ AST.FunctionType first rest (AST.ForceMultiline multiline)
 
 
-constructor :: IParser ([AST.UppercaseIdentifier], [(AST.Comments, AST.Type)])
-constructor =
-  (,) <$> (capTypeVar <?> "another type constructor")
-      <*> spacePrefix term
+constructor :: ElmVersion -> IParser ([AST.UppercaseIdentifier], [(AST.Comments, AST.Type)])
+constructor elmVersion =
+  (,) <$> (capTypeVar elmVersion<?> "another type constructor")
+      <*> spacePrefix (term elmVersion)
 
 
-tag :: IParser (AST.UppercaseIdentifier, [(AST.Comments, AST.Type)])
-tag =
-  (,) <$> (capVar <?> "another type constructor")
-      <*> spacePrefix term
+tag :: ElmVersion -> IParser (AST.UppercaseIdentifier, [(AST.Comments, AST.Type)])
+tag elmVersion =
+  (,) <$> (capVar elmVersion <?> "another type constructor")
+      <*> spacePrefix (term elmVersion)

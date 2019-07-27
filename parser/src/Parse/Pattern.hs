@@ -4,6 +4,7 @@ import Text.Parsec ((<|>), (<?>), char, choice, optionMaybe, try)
 
 import AST.V0_16
 import qualified AST.Pattern as P
+import ElmVersion
 import Parse.Helpers
 import qualified Parse.Literal as Literal
 import qualified Reporting.Annotation as A
@@ -11,13 +12,13 @@ import Parse.IParser
 import Parse.Whitespace
 
 
-basic :: IParser P.Pattern
-basic =
+basic :: ElmVersion -> IParser P.Pattern
+basic elmVersion =
   addLocation $
     choice
       [ char '_' >> return P.Anything
-      , P.VarPattern <$> lowVar
-      , chunksToPattern <$> dotSep1 capVar
+      , P.VarPattern <$> lowVar elmVersion
+      , chunksToPattern <$> dotSep1 (capVar elmVersion)
       , P.Literal <$> Literal.literal
       ]
   where
@@ -33,8 +34,8 @@ basic =
               P.Data name []
 
 
-asPattern :: IParser P.Pattern -> IParser P.Pattern
-asPattern patternParser =
+asPattern :: ElmVersion -> IParser P.Pattern -> IParser P.Pattern
+asPattern elmVersion patternParser =
   do  (start, pattern, _) <- located patternParser
 
       maybeAlias <- optionMaybe asAlias
@@ -48,23 +49,23 @@ asPattern patternParser =
             return pattern
   where
     asAlias =
-      do  preAs <- try (whitespace <* reserved "as")
+      do  preAs <- try (whitespace <* reserved elmVersion "as")
           postAs <- whitespace
-          var <- lowVar
+          var <- lowVar elmVersion
           return (preAs, (postAs, var))
 
 
-record :: IParser P.Pattern
-record =
+record :: ElmVersion -> IParser P.Pattern
+record elmVersion =
   addLocation $
   do
-      v <- brackets ((\f a b _ -> f a b) <$> commaSep1 ((\x pre post -> Commented pre x post) <$> lowVar))
+      v <- brackets ((\f a b _ -> f a b) <$> commaSep1 ((\x pre post -> Commented pre x post) <$> lowVar elmVersion))
       return $ P.Record v
 
 
-tuple :: IParser P.Pattern
-tuple =
-  do  (start, patterns, end) <- located $ parens'' expr
+tuple :: ElmVersion -> IParser P.Pattern
+tuple elmVersion =
+  do  (start, patterns, end) <- located $ parens'' (expr elmVersion)
 
       return $
         case patterns of
@@ -84,11 +85,11 @@ tuple =
             A.at start end $ P.Tuple patterns
 
 
-list :: IParser P.Pattern
-list =
+list :: ElmVersion -> IParser P.Pattern
+list elmVersion =
   addLocation $
   do
-    result <- braces'' expr
+    result <- braces'' (expr elmVersion)
     return $
       case result of
         Left comments ->
@@ -97,29 +98,29 @@ list =
           P.List patterns
 
 
-term :: IParser P.Pattern
-term =
-  choice [ record, tuple, list, basic ]
+term :: ElmVersion -> IParser P.Pattern
+term elmVersion =
+  choice [ record elmVersion, tuple elmVersion, list elmVersion, basic elmVersion ]
     <?> "a pattern"
 
 
-patternConstructor :: IParser P.Pattern
-patternConstructor =
+patternConstructor :: ElmVersion -> IParser P.Pattern
+patternConstructor elmVersion =
   addLocation $
-    do  v <- dotSep1 capVar
+    do  v <- dotSep1 (capVar elmVersion)
         case v of
           [UppercaseIdentifier "True"]  -> return $ P.Literal (Boolean True)
           [UppercaseIdentifier "False"] -> return $ P.Literal (Boolean False)
-          _       -> P.Data v <$> spacePrefix term
+          _       -> P.Data v <$> spacePrefix (term elmVersion)
 
 
-expr :: IParser P.Pattern
-expr =
-    asPattern subPattern <?> "a pattern"
+expr :: ElmVersion -> IParser P.Pattern
+expr elmVersion =
+    asPattern elmVersion subPattern <?> "a pattern"
   where
     subPattern =
       do
-        result <- separated cons (patternConstructor <|> term)
+        result <- separated cons (patternConstructor elmVersion <|> term elmVersion)
         return $
           case result of
             Left pattern ->
