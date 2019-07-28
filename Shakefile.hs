@@ -17,6 +17,7 @@ main = shakeArgs shakeOptions $ do
             [ "_build/stack-test.ok"
             , "_build/run-tests.ok"
             , "_build/tests/test-files/good-json.ok"
+            , "_build/tests/test-files/good/AllSyntax/0.19.ok"
             , "_build/shellcheck.ok"
             ]
 
@@ -61,6 +62,7 @@ main = shakeArgs shakeOptions $ do
         cmd_ "stack test"
         writeFile' out ""
 
+
     --
     -- integration tests
     --
@@ -76,6 +78,32 @@ main = shakeArgs shakeOptions $ do
         cmd_ "bash" script
         writeFile' out ""
 
+
+    -- Elm files
+
+    "_build/tests/test-files/good/AllSyntax/0.19.ok" %> \out -> do
+        elmFiles <- getDirectoryFiles ""
+            [ "tests/test-files/good/AllSyntax/0.19//*.elm"
+            ]
+        let oks = ["_build" </> f -<.> "elm_matches" | f <- elmFiles]
+        need oks
+        writeFile' out ""
+
+    "_build/tests/test-files/good/AllSyntax/0.19//*.elm_formatted" %> \out -> do
+        let source = dropDirectory1 $ out -<.> "elm"
+        need [ elmFormat, source ]
+        cmd_ elmFormat source "--output" out "--elm-version=0.19"
+
+    "_build/tests//*.elm_matches" %> \out -> do
+        let actual = out -<.> "elm_formatted"
+        let expected = dropDirectory1 $ out -<.> "elm"
+        need [ actual, expected ]
+        cmd_ "diff" "-u" actual expected
+        writeFile' out ""
+
+
+    -- JSON files
+
     "_build/tests/test-files/good-json.ok" %> \out -> do
         jsonFiles <- getDirectoryFiles ""
             [ "tests/test-files/good//*.json"
@@ -86,9 +114,8 @@ main = shakeArgs shakeOptions $ do
 
     "_build/tests//*.json_formatted" %> \out -> do
         let script = "tests/format-json.sh"
-        need [ elmFormat, script ]
         let source = dropDirectory1 $ out -<.> "elm"
-        need [ source ]
+        need [ elmFormat, script, source ]
         cmd_ script elmFormat source out
 
     "_build/tests//*.json_matches" %> \out -> do
@@ -97,6 +124,7 @@ main = shakeArgs shakeOptions $ do
         need [ actual, expected ]
         cmd_ "diff" "-u" actual expected
         writeFile' out ""
+
 
     --
     -- shellcheck
