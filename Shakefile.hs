@@ -18,6 +18,7 @@ main = shakeArgs shakeOptions $ do
             , "_build/run-tests.ok"
             , "_build/tests/test-files/good-json.ok"
             , "_build/tests/test-files/good/AllSyntax/0.19.ok"
+            , "_build/tests/test-files/good/AllSyntax/0.18.ok"
             , "_build/shellcheck.ok"
             ]
 
@@ -81,6 +82,14 @@ main = shakeArgs shakeOptions $ do
 
     -- Elm files
 
+    "_build/tests/test-files/good/AllSyntax/0.18.ok" %> \out -> do
+        elmFiles <- getDirectoryFiles ""
+            [ "tests/test-files/good/AllSyntax/0.18//*.elm"
+            ]
+        let oks = ["_build" </> f -<.> "elm_matches" | f <- elmFiles]
+        need oks
+        writeFile' out ""
+
     "_build/tests/test-files/good/AllSyntax/0.19.ok" %> \out -> do
         elmFiles <- getDirectoryFiles ""
             [ "tests/test-files/good/AllSyntax/0.19//*.elm"
@@ -88,6 +97,11 @@ main = shakeArgs shakeOptions $ do
         let oks = ["_build" </> f -<.> "elm_matches" | f <- elmFiles]
         need oks
         writeFile' out ""
+
+    "_build/tests/test-files/good/AllSyntax/0.18//*.elm_formatted" %> \out -> do
+        let source = dropDirectory1 $ out -<.> "elm"
+        need [ elmFormat, source ]
+        cmd_ elmFormat source "--output" out "--elm-version=0.18"
 
     "_build/tests/test-files/good/AllSyntax/0.19//*.elm_formatted" %> \out -> do
         let source = dropDirectory1 $ out -<.> "elm"
