@@ -65,7 +65,7 @@ function compareFiles() {
 
 function checkWaysToRun() {
 	cp "tests/test-files/good/Elm-0.18/Simple.elm" "_input.elm"
-	cp "tests/test-files/transform/Examples.elm" "_input2.elm"
+	cp "tests/test-files/transform/Elm-0.18/Examples.elm" "_input2.elm"
 
 	INPUT="_input.elm"
 	INPUT_2="_input2.elm"
@@ -100,7 +100,7 @@ function checkWaysToRun() {
 
 	echo "## elm-format INPUT --validate does not change things"
 	"$ELM_FORMAT" "$INPUT_2" --elm-version=0.19 --validate 1>/dev/null
-	compareFiles "tests/test-files/transform/Examples.elm" "$INPUT_2"
+	compareFiles "tests/test-files/transform/Elm-0.18/Examples.elm" "$INPUT_2"
 	returnCodeShouldEqual 0
 
 	echo "## elm-format INPUT --validate with unformatted file exits 1"
@@ -206,27 +206,14 @@ function checkBad() {
 	outputShouldRoughlyMatchPatterns "$EXPECTED" "$STDOUT"
 }
 
-function checkTransformation() {
-	ELM_VERSION="$1"
-	INPUT="tests/test-files/transform/$2"
-	OUTPUT="formatted.elm"
-	EXPECTED="tests/test-files/transform/${2%.*}.formatted.elm"
-
-	echo
-	echo "## transform/$2"
-	time "$ELM_FORMAT" "$INPUT" --output "$OUTPUT" --elm-version "$ELM_VERSION" 1>/dev/null
-	returnCodeShouldEqual 0
-	compareFiles "$EXPECTED" "$OUTPUT"
-}
-
 function checkUpgrade() {
 	ELM_VERSION="$1"
-	INPUT="tests/test-files/transform/$2"
+	INPUT="tests/test-files/upgrade/$2"
 	OUTPUT="formatted.elm"
-	EXPECTED="tests/test-files/transform/${2%.*}.formatted.elm"
+	EXPECTED="tests/test-files/upgrade/${2%.*}.formatted.elm"
 
 	echo
-	echo "## transform/$2"
+	echo "## upgrade/$2"
 	time "$ELM_FORMAT" "$INPUT" --output "$OUTPUT" --upgrade --elm-version "$ELM_VERSION" 1>/dev/null
 	returnCodeShouldEqual 0
 	compareFiles "$EXPECTED" "$OUTPUT"
@@ -238,8 +225,8 @@ function checkValidationOutputFormat() {
 		echo "Running on Windows; skipping checkValidationOutputFormat"
 		return
 	fi
-	cp "tests/test-files/transform/Examples.elm" "_input.elm"
-	cp "tests/test-files/transform/Examples.elm" "_input2.elm"
+	cp "tests/test-files/transform/Elm-0.18/Examples.elm" "_input.elm"
+	cp "tests/test-files/transform/Elm-0.18/Examples.elm" "_input2.elm"
 
 	INPUT="_input.elm"
 	INPUT_2="_input2.elm"
@@ -269,11 +256,6 @@ echo "# elm-format test suite"
 
 checkWaysToRun
 
-checkTransformation 0.19 ClarifyNegativeExponentiationPrecedence.elm
-checkTransformation 0.19 Elm-0.19/ExplicitlyListExposedValues.elm
-checkTransformation 0.19 Elm-0.19/ParseTabsInLiterals.elm
-checkTransformation 0.19 Elm-0.19/DistinguishCharStartFromRef.elm
-
 checkUpgrade 0.19 Elm-0.19/CommaFunctionsBecomeLambdas.elm
 checkUpgrade 0.19 Elm-0.19/RemoveBangOperator.elm
 checkUpgrade 0.19 Elm-0.19/NewStringEscapeSyntax.elm
@@ -287,30 +269,9 @@ checkUpgrade 0.19 Elm-0.19/ConvertHtmlAttributesStyleAltImport.elm
 checkUpgrade 0.19 Elm-0.19/ListExports.elm
 checkUpgrade 0.19 Elm-0.19/OpenExplicitConstructorImports.elm
 
-checkTransformation 0.18 AllSyntax/0.18/Types.elm
-checkTransformation 0.18 AllSyntax/0.18/Patterns.elm
-
 checkBad UnexpectedComma.elm
 checkBad UnexpectedEndOfInput.elm
 
-checkTransformation 0.18 Examples.elm
-checkTransformation 0.18 TrickyModule1.elm
-checkTransformation 0.18 TrickyModule2.elm
-checkTransformation 0.18 TrickyModule3.elm
-checkTransformation 0.18 TrickyModule4.elm
-checkTransformation 0.18 LenientEqualsColon.elm
-# checkTransformation 0.16 Elm-0.16/github-avh4-elm-format-184.elm
-checkTransformation 0.18 QuickCheck-4562ebccb71ea9f622fb99cdf32b2923f6f9d34f-2529668492575674138.elm
-checkTransformation 0.18 QuickCheck-94f37da84c1310f03dcfa1059ce870b73c94a825--6449652945938213463.elm
-checkTransformation 0.18 WindowsEol.elm
-checkTransformation 0.18 DocCommentCodeExample.elm
-checkTransformation 0.18 DocCommentMarkdownSafety.elm
-checkTransformation 0.18 DocCommentCheapskateReferenceBug.elm
-checkTransformation 0.18 DocCommentAtDocs.elm
-checkTransformation 0.18 Sorting.elm
-checkTransformation 0.18 UnnecessaryParens.elm
-checkTransformation 0.18 Empty.elm
-checkTransformation 0.18 MissingImportParens.elm
 checkUpgrade 0.18 Elm-0.18/PrimesBecomeUnderscores.elm
 checkUpgrade 0.18 Elm-0.18/RangesBecomeListRange.elm
 checkUpgrade 0.18 Elm-0.18/BackticksBecomeFunctionCalls.elm
