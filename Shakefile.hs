@@ -3,6 +3,7 @@ import Development.Shake.Command
 import Development.Shake.FilePath
 import Development.Shake.Util
 import Debug.Trace
+import Control.Monad (forM_)
 
 main :: IO ()
 main = shakeArgs shakeOptions $ do
@@ -88,44 +89,21 @@ main = shakeArgs shakeOptions $ do
 
     -- Elm files
 
-    "_build/tests/test-files/good/Elm-0.17.ok" %> \out -> do
-        elmFiles <- getDirectoryFiles ""
-            [ "tests/test-files/good/Elm-0.17//*.elm"
-            ]
-        let oks = ["_build" </> f -<.> "elm_matches" | f <- elmFiles]
-        need oks
-        writeFile' out ""
+    let elmVersions = [ "0.17", "0.18", "0.19" ]
 
-    "_build/tests/test-files/good/Elm-0.18.ok" %> \out -> do
-        elmFiles <- getDirectoryFiles ""
-            [ "tests/test-files/good/Elm-0.18//*.elm"
-            ]
-        let oks = ["_build" </> f -<.> "elm_matches" | f <- elmFiles]
-        need oks
-        writeFile' out ""
+    forM_ elmVersions $ \elmVersion -> do
+        ("_build/tests/test-files/good/Elm-" ++ elmVersion ++ ".ok") %> \out -> do
+            elmFiles <- getDirectoryFiles ""
+                [ "tests/test-files/good/Elm-" ++ elmVersion ++ "//*.elm"
+                ]
+            let oks = ["_build" </> f -<.> "elm_matches" | f <- elmFiles]
+            need oks
+            writeFile' out ""
 
-    "_build/tests/test-files/good/Elm-0.19.ok" %> \out -> do
-        elmFiles <- getDirectoryFiles ""
-            [ "tests/test-files/good/Elm-0.19//*.elm"
-            ]
-        let oks = ["_build" </> f -<.> "elm_matches" | f <- elmFiles]
-        need oks
-        writeFile' out ""
-
-    "_build/tests/test-files/good/Elm-0.17//*.elm_formatted" %> \out -> do
-        let source = dropDirectory1 $ out -<.> "elm"
-        need [ elmFormat, source ]
-        cmd_ elmFormat source "--output" out "--elm-version=0.17"
-
-    "_build/tests/test-files/good/Elm-0.18//*.elm_formatted" %> \out -> do
-        let source = dropDirectory1 $ out -<.> "elm"
-        need [ elmFormat, source ]
-        cmd_ elmFormat source "--output" out "--elm-version=0.18"
-
-    "_build/tests/test-files/good/Elm-0.19//*.elm_formatted" %> \out -> do
-        let source = dropDirectory1 $ out -<.> "elm"
-        need [ elmFormat, source ]
-        cmd_ elmFormat source "--output" out "--elm-version=0.19"
+        ("_build/tests/test-files/good/Elm-" ++ elmVersion ++ "//*.elm_formatted") %> \out -> do
+            let source = dropDirectory1 $ out -<.> "elm"
+            need [ elmFormat, source ]
+            cmd_ elmFormat source "--output" out ("--elm-version=" ++ elmVersion)
 
     "_build/tests//*.elm_matches" %> \out -> do
         let actual = out -<.> "elm_formatted"
