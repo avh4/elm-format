@@ -2,7 +2,6 @@ import Development.Shake
 import Development.Shake.Command
 import Development.Shake.FilePath
 import Development.Shake.Util
-import Debug.Trace
 import Control.Monad (forM_)
 
 main :: IO ()
@@ -171,7 +170,7 @@ main = shakeArgs shakeOptions $ do
         writeFile' out ""
 
     "_build//*.shellcheck.ok" %> \out -> do
-        let script = traceShowId $ dropDirectory1 $ dropExtension $ dropExtension out
+        let script = dropDirectory1 $ dropExtension $ dropExtension out
         need [ shellcheck, script ]
         cmd_ shellcheck script
         writeFile' out ""
