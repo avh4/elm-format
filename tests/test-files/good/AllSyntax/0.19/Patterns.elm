@@ -73,6 +73,14 @@ record { a, b } =
     ()
 
 
+emptyRecord {}
+    {{- 1 -}}
+    { --2
+    }
+    =
+    ()
+
+
 asAlias (() as x) =
     ()
 

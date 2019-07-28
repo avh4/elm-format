@@ -1205,6 +1205,9 @@ formatPattern elmVersion parensRequired apattern =
         AST.Pattern.List patterns ->
             ElmStructure.group True "[" "," "]" False $ map (formatCommented $ formatPattern elmVersion False) patterns
 
+        AST.Pattern.EmptyRecordPattern comments ->
+            formatUnit '{' '}' comments
+
         AST.Pattern.Record fields ->
             ElmStructure.group True "{" "," "}" False $ map (formatCommented $ line . formatLowercaseIdentifier elmVersion []) fields
 
