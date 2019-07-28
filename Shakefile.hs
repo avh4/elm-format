@@ -23,6 +23,13 @@ main = shakeArgs shakeOptions $ do
     phony "clean" $ do
         cmd_ "stack clean"
         removeFilesAfter "_build" [ "//*" ]
+        removeFilesAfter ""
+            [ "_input.elm"
+            , "_input2.elm"
+            , "formatted.elm"
+            , "formatted.json"
+            , "_stdout.txt"
+            ]
 
     --
     -- build
