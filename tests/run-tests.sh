@@ -292,10 +292,6 @@ echo "# elm-format test suite"
 
 checkWaysToRun
 
-checkGood 0.19 AllSyntax/0.19/Literals.elm
-checkGood 0.19 AllSyntax/0.19/InfixDeclaration.elm
-checkGood 0.19 AllSyntax/0.19/Patterns.elm
-
 checkTransformation 0.19 ClarifyNegativeExponentiationPrecedence.elm
 checkTransformation 0.19 Elm-0.19/ExplicitlyListExposedValues.elm
 checkTransformation 0.19 Elm-0.19/ParseTabsInLiterals.elm
