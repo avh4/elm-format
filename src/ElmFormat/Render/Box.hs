@@ -224,12 +224,13 @@ sortVars forceMultiline fromExposing fromDocs =
         else ( listedInDocs ++ if List.null remainingFromExposing then [] else [ remainingFromExposing ], commentsFromReorderedVars )
 
 
-formatModuleHeader :: ElmVersion -> AST.Module.Module -> Box
-formatModuleHeader elmVersion modu =
+formatModuleHeader :: ElmVersion -> Bool -> AST.Module.Module -> [Box]
+formatModuleHeader elmVersion addDefaultHeader modu =
   let
-      header =
-        AST.Module.header modu
-            |> Maybe.fromMaybe AST.Module.defaultHeader
+      maybeHeader =
+        if addDefaultHeader
+            then Just (AST.Module.header modu |> Maybe.fromMaybe AST.Module.defaultHeader)
+            else AST.Module.header modu
 
       documentedVars :: [[AST.Variable.Ref]]
       documentedVars =
@@ -262,7 +263,7 @@ formatModuleHeader elmVersion modu =
               |> Set.fromList
 
       AST.KeywordCommented _ _ exportsList =
-          AST.Module.exports header
+          AST.Module.exports (maybeHeader |> Maybe.fromMaybe AST.Module.defaultHeader)
 
       detailedListingToSet :: Set (AST.Commented AST.Variable.Value) -> AST.Variable.Listing AST.Module.DetailedListing -> Set (AST.Commented AST.Variable.Value)
       detailedListingToSet allAvailable (AST.Variable.OpenListing _) = allAvailable
@@ -296,7 +297,7 @@ formatModuleHeader elmVersion modu =
               AST.Declaration.Entry (RA.A _ (AST.Declaration.TypeAlias _ (AST.Commented _ (UppercaseIdentifier name, _) _) _)) -> [ AST.Variable.Union (UppercaseIdentifier name, []) AST.Variable.ClosedListing ]
               AST.Declaration.Entry (RA.A _ _) -> []
 
-      moduleLine =
+      formatModuleLine' header =
         case elmVersion of
           Elm_0_16 ->
             formatModuleLine_0_16 header
@@ -321,17 +322,14 @@ formatModuleHeader elmVersion modu =
 
       imports =
           formatImports elmVersion modu
-
-      mapIf fn m a =
-          case m of
-              Just x ->
-                  fn x a
-              Nothing ->
-                  a
   in
-      moduleLine
-          |> mapIf (\x -> andThen [ blankLine, x ]) docs
-          |> (if null imports then id else andThen imports . andThen [blankLine])
+  List.intercalate [ blankLine ] $ concat
+      [ maybeToList $ fmap (return . formatModuleLine') maybeHeader
+      , maybeToList $ fmap return docs
+      , if null imports
+          then []
+          else [ imports ]
+      ]
 
 
 formatImports :: ElmVersion -> AST.Module.Module -> [Box]
@@ -468,7 +466,7 @@ formatModuleLine elmVersion (varsToExpose, extraComments) header =
 
 
 formatModule :: ElmVersion -> Bool -> Int -> AST.Module.Module -> Box
-formatModule elmVersion showModuleLine spacing modu =
+formatModule elmVersion addDefaultHeader spacing modu =
     let
         initialComments' =
           case AST.Module.initialComments modu of
@@ -487,9 +485,7 @@ formatModule elmVersion showModuleLine spacing modu =
       stack1 $
           concat
               [ initialComments'
-              , if showModuleLine
-                    then [ formatModuleHeader elmVersion modu ]
-                    else formatImports elmVersion modu
+              , formatModuleHeader elmVersion addDefaultHeader modu
               , List.replicate spaceBeforeBody blankLine
               , maybeToList $ formatModuleBody spacing elmVersion (makeImportInfo modu) (AST.Module.body modu)
               ]
