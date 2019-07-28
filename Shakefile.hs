@@ -86,7 +86,11 @@ main = shakeArgs shakeOptions $ do
         let script = "tests/run-tests.sh"
         need [ script, elmFormat ]
         testFiles <- getDirectoryFiles ""
-            [ "tests/test-files//*.elm"
+            [ "tests/test-files/good/json//*.elm"
+            , "tests/test-files/bad//*.elm"
+            , "tests/test-files/transform//*.elm"
+            , "tests/test-files/directory//*.elm"
+            , "tests/test-files/recursive-directory//*.elm"
             , "tests/test-files/*.json"
             ]
         need testFiles
