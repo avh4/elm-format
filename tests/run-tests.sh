@@ -208,9 +208,9 @@ function checkGood() {
 }
 
 function checkGoodAllSyntax() {
-	checkGood "$1" "AllSyntax/$1/$2.elm"
-	checkGood "$1" "AllSyntax/$1/BlockComments/$2.elm"
-	checkGood "$1" "AllSyntax/$1/LineComments/$2.elm"
+	checkGood "$1" "Elm-$1/AllSyntax/$2.elm"
+	checkGood "$1" "Elm-$1/AllSyntax/BlockComments/$2.elm"
+	checkGood "$1" "Elm-$1/AllSyntax/LineComments/$2.elm"
 }
 
 function checkBad() {
@@ -316,11 +316,11 @@ checkGood 0.18 ApiSketch.elm
 checkTransformation 0.18 AllSyntax/0.18/Types.elm
 checkTransformation 0.18 AllSyntax/0.18/Patterns.elm
 
-# checkGood 0.16 AllSyntax/0.16/PatternsRequireParens.elm
+# checkGood 0.16 Elm-0.16/AllSyntax/PatternsRequireParens.elm
 
-checkGood 0.17 AllSyntax/0.17/Range.elm
-checkGood 0.17 AllSyntax/0.17/InfixOperators.elm
-checkGood 0.17 AllSyntax/0.17/OldKeywords.elm
+checkGood 0.17 Elm-0.17/AllSyntax/Range.elm
+checkGood 0.17 Elm-0.17/AllSyntax/InfixOperators.elm
+checkGood 0.17 Elm-0.17/AllSyntax/OldKeywords.elm
 checkGood 0.17 Export.elm
 checkGoodAllSyntax 0.17 Module
 checkGoodAllSyntax 0.17 ModuleEffect
