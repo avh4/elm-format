@@ -305,5 +305,6 @@ stack install
 
 ```bash
 brew install shellcheck
-./tests/run-tests.sh
+stack install shake
+stack runhaskell Shakefile.hs
 ```
