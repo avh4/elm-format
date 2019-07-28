@@ -13,7 +13,6 @@ import qualified Data.Sequence as Seq
 import Data.Sequence (singleton, (<|), viewl, ViewL(..))
 import Prelude hiding (takeWhile)
 import Control.Applicative
-import Data.Monoid
 import Control.Monad
 import Data.Text (Text)
 import qualified Data.Text as T
