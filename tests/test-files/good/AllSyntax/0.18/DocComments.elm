@@ -77,6 +77,11 @@ Followed by a paragraph.
     -- commented expression
     y /= ()
 
+
+## Example Elm code with only a module line
+
+    module Foo exposing (x)
+
 ```bash
 echo "non-Elm code block"
 ```
