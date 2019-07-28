@@ -62,7 +62,7 @@ Link with special characters: [Media_features](https://developer.mozilla.org/en-
 Followed by a paragraph.
 
 
-## Example Elm declarations
+## Elm code block: declarations
 
     import MyModule
 
@@ -70,7 +70,7 @@ Followed by a paragraph.
         x
 
 
-## Example Elm expressions
+## Elm code block: expressions
 
     x == ()
 
@@ -78,9 +78,28 @@ Followed by a paragraph.
     y /= ()
 
 
-## Example Elm code with only a module line
+## Elm code lbock: only a module line
 
     module Foo exposing (x)
+
+
+## Elm code block: complete module
+
+    module Main exposing (x)
+
+    {-|
+
+    @docs x
+
+    -}
+
+    import String
+
+    x =
+        ()
+
+
+## Non-Elm code block
 
 ```bash
 echo "non-Elm code block"
