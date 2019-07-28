@@ -75,8 +75,7 @@ tests =
         , example "whitespace" "{ a , b }" $ at 1 1 1 10 (Record [Commented [] (LowercaseIdentifier "a") [],Commented [] (LowercaseIdentifier "b") []])
         , example "comments" "{{-A-}a{-B-},{-C-}b{-D-}}" $ at 1 1 1 26 (Record [Commented [BlockComment ["A"]] (LowercaseIdentifier "a") [BlockComment ["B"]],Commented [BlockComment ["C"]] (LowercaseIdentifier "b") [BlockComment ["D"]]])
         , example "newlines" "{\n a\n ,\n b\n }" $ at 1 1 5 3 (Record [Commented [] (LowercaseIdentifier "a") [],Commented [] (LowercaseIdentifier "b") []])
-        , testCase "must have at least one field" $
-            assertParseFailure (expr Elm_0_19) "{}"
+        , example "empty" "{}" $ at 1 1 1 3 (EmptyRecordPattern [])
         ]
 
     , testGroup "alias"
