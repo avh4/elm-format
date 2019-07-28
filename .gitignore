@@ -8,3 +8,4 @@
 /tests/elm-format
 /stack.yaml.lock
 /.shake/
+/_build/

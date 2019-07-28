@@ -423,5 +423,3 @@ checkJson good/json/ExternalReferences.elm
 
 echo
 echo "# GREAT SUCCESS!"
-
-stack "${STACK_ARGS[@]}" test --test-arguments="--hide-successes --color auto" || exit 1
