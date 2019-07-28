@@ -13,7 +13,7 @@ main = shakeArgs shakeOptions $ do
 
     phony "test" $ do
         need [ elmFormat ]
-        cmd_ "./tests/run-tests.sh"
+        cmd_ "bash tests/run-tests.sh"
 
     phony "clean" $ do
         cmd_ "stack clean"
