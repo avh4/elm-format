@@ -207,12 +207,6 @@ function checkGood() {
 	compareFiles "$INPUT" "$OUTPUT"
 }
 
-function checkGoodAllSyntax() {
-	checkGood "$1" "Elm-$1/AllSyntax/$2.elm"
-	checkGood "$1" "Elm-$1/AllSyntax/BlockComments/$2.elm"
-	checkGood "$1" "Elm-$1/AllSyntax/LineComments/$2.elm"
-}
-
 function checkBad() {
 	INPUT="tests/test-files/bad/$1"
 	EXPECTED="tests/test-files/bad/${1%.*}.output.txt"
@@ -318,12 +312,7 @@ checkTransformation 0.18 AllSyntax/0.18/Patterns.elm
 
 # checkGood 0.16 Elm-0.16/AllSyntax/PatternsRequireParens.elm
 
-checkGood 0.17 Elm-0.17/AllSyntax/Range.elm
-checkGood 0.17 Elm-0.17/AllSyntax/InfixOperators.elm
-checkGood 0.17 Elm-0.17/AllSyntax/OldKeywords.elm
 checkGood 0.17 Export.elm
-checkGoodAllSyntax 0.17 Module
-checkGoodAllSyntax 0.17 ModuleEffect
 
 checkGood 0.18 Export.elm
 checkGood 0.18 TrueFalseInIdentifiers.elm
