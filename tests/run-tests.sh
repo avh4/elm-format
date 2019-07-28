@@ -64,7 +64,7 @@ function compareFiles() {
 }
 
 function checkWaysToRun() {
-	cp "tests/test-files/good/Simple.elm" "_input.elm"
+	cp "tests/test-files/good/Elm-0.18/Simple.elm" "_input.elm"
 	cp "tests/test-files/transform/Examples.elm" "_input2.elm"
 
 	INPUT="_input.elm"
@@ -190,23 +190,6 @@ function checkWaysToRun() {
 	echo "------------------------------"
 }
 
-function checkGood() {
-	ELM_VERSION="$1"
-	INPUT="tests/test-files/good/$2"
-	OUTPUT="formatted.elm"
-
-	if [ ! -e "$INPUT" ]; then
-		echo "ERROR: $INPUT does not exist"
-		exit 1
-	fi
-
-	echo
-	echo "## good/$2"
-	time "$ELM_FORMAT" "$INPUT" --output "$OUTPUT" --elm-version "$1" 1>/dev/null
-	returnCodeShouldEqual 0
-	compareFiles "$INPUT" "$OUTPUT"
-}
-
 function checkBad() {
 	INPUT="tests/test-files/bad/$1"
 	EXPECTED="tests/test-files/bad/${1%.*}.output.txt"
@@ -304,28 +287,8 @@ checkUpgrade 0.19 Elm-0.19/ConvertHtmlAttributesStyleAltImport.elm
 checkUpgrade 0.19 Elm-0.19/ListExports.elm
 checkUpgrade 0.19 Elm-0.19/OpenExplicitConstructorImports.elm
 
-checkGood 0.18 Simple.elm
-checkGood 0.18 Comments.elm
-checkGood 0.18 ApiSketch.elm
 checkTransformation 0.18 AllSyntax/0.18/Types.elm
 checkTransformation 0.18 AllSyntax/0.18/Patterns.elm
-
-# checkGood 0.16 Elm-0.16/AllSyntax/PatternsRequireParens.elm
-
-checkGood 0.18 Export.elm
-checkGood 0.18 TrueFalseInIdentifiers.elm
-checkGood 0.18 TopLevelSpacing.elm
-checkGood 0.18 WorkaroundNegativeCasePatterns.elm
-
-checkGood 0.18 evancz/start-app/StartApp.elm
-checkGood 0.18 TheSeamau5/elm-check/Check.elm
-checkGood 0.18 rtfeldman/dreamwriter/Editor.elm
-checkGood 0.18 rtfeldman/dreamwriter/LeftSidebar.elm
-checkGood 0.18 rtfeldman/dreamwriter/RightSidebar.elm
-checkGood 0.18 rtfeldman/dreamwriter/WordGraph.elm
-checkGood 0.18 avh4/elm-fifo/Fifo.elm
-checkGood 0.19 mdgriffith/style-elements/Element.elm
-checkGood 0.19 elm/core/Basics.elm
 
 checkBad UnexpectedComma.elm
 checkBad UnexpectedEndOfInput.elm
