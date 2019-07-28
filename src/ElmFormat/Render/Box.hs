@@ -316,7 +316,7 @@ formatModuleHeader elmVersion modu =
               formatModuleLine elmVersion varsToExpose header
 
       docs =
-          fmap (formatModuleDocs elmVersion (makeImportInfo modu)) $ RA.drop $ AST.Module.docs modu
+          fmap (formatDocComment elmVersion (makeImportInfo modu)) $ RA.drop $ AST.Module.docs modu
 
       imports =
           formatImports elmVersion modu
@@ -665,8 +665,8 @@ firstOf options value =
                 Nothing -> firstOf rest value
 
 
-formatModuleDocs :: ElmVersion -> ImportInfo -> Markdown.Blocks -> Box
-formatModuleDocs elmVersion importInfo blocks =
+formatDocComment :: ElmVersion -> ImportInfo -> Markdown.Blocks -> Box
+formatDocComment elmVersion importInfo blocks =
     let
         parse :: String -> Maybe ElmCodeBlock
         parse source =
@@ -713,11 +713,11 @@ formatModuleDocs elmVersion importInfo blocks =
                 _ ->
                     block
     in
-        formatDocComment content
+    formatDocCommentString content
 
 
-formatDocComment :: String -> Box
-formatDocComment docs =
+formatDocCommentString :: String -> Box
+formatDocCommentString docs =
     case lines docs of
         [] ->
             line $ row [ punc "{-|", space, punc "-}" ]
@@ -981,7 +981,7 @@ formatTopLevelStructure :: ElmVersion -> ImportInfo -> (a -> Box) -> TopLevelStr
 formatTopLevelStructure elmVersion importInfo formatEntry topLevelStructure =
     case topLevelStructure of
         AST.Declaration.DocComment docs ->
-            formatModuleDocs elmVersion importInfo docs
+            formatDocComment elmVersion importInfo docs
 
         AST.Declaration.BodyComment c ->
             formatComment c
