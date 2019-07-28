@@ -2,6 +2,8 @@
 {-# LANGUAGE FlexibleInstances #-}
 module AST.Json where
 
+import Elm.Utils ((|>))
+
 import AST.Declaration
 import AST.Expression
 import AST.MapNamespace
@@ -14,6 +16,7 @@ import Text.JSON hiding (showJSON)
 
 import qualified Data.List as List
 import qualified Data.Map.Strict as Map
+import qualified Data.Maybe as Maybe
 import qualified ElmFormat.Version
 import qualified Reporting.Region as Region
 
@@ -24,8 +27,14 @@ pleaseReport what details =
 
 
 showModule :: Module -> JSValue
-showModule (Module _ (Header _ (Commented _ name _) _ _) _ (_, imports) body) =
+showModule (Module _ maybeHeader _ (_, imports) body) =
     let
+        header =
+            maybeHeader
+                |> Maybe.fromMaybe AST.Module.defaultHeader
+
+        (Header _ (Commented _ name _) _ _) = header
+
         getAlias :: ImportMethod -> Maybe UppercaseIdentifier
         getAlias importMethod =
             fmap (snd . snd) (alias importMethod)

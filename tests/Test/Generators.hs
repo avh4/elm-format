@@ -100,7 +100,7 @@ instance Arbitrary AST.Module.Module where
             moduleType <- fmap (\x -> if x then AST.Module.Port [] else AST.Module.Normal) arbitrary
             return $ AST.Module.Module
                 []
-                (AST.Module.Header
+                (Just $ AST.Module.Header
                   moduleType
                   (Commented [] name [])
                   Nothing
