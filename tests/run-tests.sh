@@ -312,8 +312,6 @@ checkTransformation 0.18 AllSyntax/0.18/Patterns.elm
 
 # checkGood 0.16 Elm-0.16/AllSyntax/PatternsRequireParens.elm
 
-checkGood 0.17 Export.elm
-
 checkGood 0.18 Export.elm
 checkGood 0.18 TrueFalseInIdentifiers.elm
 checkGood 0.18 TopLevelSpacing.elm
@@ -328,13 +326,6 @@ checkGood 0.18 rtfeldman/dreamwriter/WordGraph.elm
 checkGood 0.18 avh4/elm-fifo/Fifo.elm
 checkGood 0.19 mdgriffith/style-elements/Element.elm
 checkGood 0.19 elm/core/Basics.elm
-
-checkGood 0.17 elm-lang/examples/random.elm
-checkGood 0.17 elm-lang/examples/http.elm
-checkGood 0.17 elm-lang/examples/time.elm
-checkGood 0.17 elm-lang/examples/websockets.elm
-checkGood 0.17 elm-lang/examples/Spelling.elm
-checkGood 0.17 elm-lang/websocket/WebSocket.elm
 
 checkBad UnexpectedComma.elm
 checkBad UnexpectedEndOfInput.elm
