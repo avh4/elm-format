@@ -229,6 +229,7 @@ formatModuleHeader elmVersion modu =
   let
       header =
         AST.Module.header modu
+            |> Maybe.fromMaybe AST.Module.defaultHeader
 
       documentedVars :: [[AST.Variable.Ref]]
       documentedVars =
