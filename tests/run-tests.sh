@@ -24,7 +24,6 @@ fi
 # 	echo "$0: INFO: nix arguments will be passed to stack: ${STACK_ARGS[*]}"
 # fi
 
-stack "${STACK_ARGS[@]}" build || exit 1
 
 ELM_FORMAT="$(stack "${STACK_ARGS[@]}" path --local-install-root)/bin/elm-format"
 if [ ! -e "$ELM_FORMAT" ]; then

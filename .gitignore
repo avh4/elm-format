@@ -7,3 +7,4 @@
 /.stack-work/
 /tests/elm-format
 /stack.yaml.lock
+/.shake/
