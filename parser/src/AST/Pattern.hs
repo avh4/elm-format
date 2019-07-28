@@ -24,6 +24,7 @@ data Pattern'
         { first :: (Pattern, Maybe String)
         , rest :: [(Comments, Comments, Pattern, Maybe String)]
         }
+    | EmptyRecordPattern Comments
     | Record [Commented LowercaseIdentifier]
     | Alias (Pattern, Comments) (Comments, LowercaseIdentifier)
     deriving (Eq, Show)

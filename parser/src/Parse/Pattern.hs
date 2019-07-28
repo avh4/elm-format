@@ -59,8 +59,13 @@ record :: ElmVersion -> IParser P.Pattern
 record elmVersion =
   addLocation $
   do
-      v <- brackets ((\f a b _ -> f a b) <$> commaSep1 ((\x pre post -> Commented pre x post) <$> lowVar elmVersion))
-      return $ P.Record v
+      result <- surround'' '{' '}' (lowVar elmVersion)
+      return $
+          case result of
+              Left comments ->
+                  P.EmptyRecordPattern comments
+              Right fields ->
+                  P.Record fields
 
 
 tuple :: ElmVersion -> IParser P.Pattern
