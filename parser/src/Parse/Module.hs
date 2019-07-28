@@ -57,17 +57,12 @@ freshDef entry =
           return $ (map AST.Declaration.BodyComment comments) ++ [decl]
 
 
-moduleDecl :: ElmVersion -> IParser Module.Header
+moduleDecl :: ElmVersion -> IParser (Maybe Module.Header)
 moduleDecl elmVersion =
   choice
-    [ try $ moduleDecl_0_16 elmVersion
-    , moduleDecl_0_17 elmVersion
-    , return $
-        Module.Header
-          Module.Normal
-          (Commented [] [UppercaseIdentifier "Main"] [])
-          Nothing
-          (KeywordCommented [] [] $ Var.OpenListing $ Commented [] () [])
+    [ try $ Just <$> moduleDecl_0_16 elmVersion
+    , Just <$> moduleDecl_0_17 elmVersion
+    , return Nothing
     ]
 
 
