@@ -97,7 +97,7 @@ main = shakeArgs shakeOptions $ do
             , "tests/test-files/*.json"
             ]
         need testFiles
-        cmd_ "bash" script
+        cmd_ ("bash" <.> exe) script
         writeFile' out ""
 
 
@@ -141,7 +141,7 @@ main = shakeArgs shakeOptions $ do
         let script = "tests/format-json.sh"
         let source = dropDirectory1 $ out -<.> "elm"
         need [ elmFormat, script, source ]
-        cmd_ script elmFormat source out
+        cmd_ ("bash" <.> exe) script elmFormat source out
 
     "_build/tests//*.json_matches" %> \out -> do
         let actual = out -<.> "json_formatted"
