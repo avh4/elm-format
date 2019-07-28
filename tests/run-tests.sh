@@ -311,24 +311,7 @@ checkUpgrade 0.19 Elm-0.19/ListExports.elm
 checkUpgrade 0.19 Elm-0.19/OpenExplicitConstructorImports.elm
 
 checkGood 0.18 Simple.elm
-checkGood 0.18 AllSyntax/0.18/AllSyntax.elm
-checkGoodAllSyntax 0.18 Module
-checkGood 0.18 AllSyntax/0.18/ModuleMultiline.elm
-checkGood 0.18 AllSyntax/0.18/ModuleWithDocs.elm
-checkGood 0.18 AllSyntax/0.18/Declarations.elm
-checkGoodAllSyntax 0.18 Patterns
-checkGoodAllSyntax 0.18 Types
-checkGood 0.18 AllSyntax/0.18/OldKeywords.elm
-checkGood 0.18 AllSyntax/0.18/Expressions.elm
-checkGood 0.18 AllSyntax/0.18/Expressions/Unary.elm
-checkGood 0.18 AllSyntax/0.18/Expressions/BinaryOperators.elm
-checkGood 0.18 AllSyntax/0.18/DocComments.elm
-checkGood 0.18 AllSyntax/0.18/DocCommentsStartingWtihAtDocs.elm
-checkGood 0.18 AllSyntax/0.18/DeclaraionSpacing.elm
 checkGood 0.18 Comments.elm
-checkGood 0.18 AllSyntax/0.18/GLShader.elm
-checkGood 0.18 AllSyntax/0.18/Literals.elm
-checkGood 0.18 AllSyntax/0.18/Comments.elm
 checkGood 0.18 ApiSketch.elm
 checkTransformation 0.18 AllSyntax/0.18/Types.elm
 checkTransformation 0.18 AllSyntax/0.18/Patterns.elm
