@@ -12,7 +12,6 @@ import Prelude hiding (takeWhile)
 import Data.Maybe (mapMaybe)
 import Data.Text (Text)
 import qualified Data.Text as T
-import Data.Monoid
 import Data.Foldable (toList)
 import Data.Sequence ((|>), viewr, ViewR(..), singleton, Seq)
 import qualified Data.Sequence as Seq

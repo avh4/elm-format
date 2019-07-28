@@ -262,15 +262,15 @@ main'' elmFormatVersion_ experimental_ args =
 autoDetectElmVersion :: World m => m (Either String ElmVersion)
 autoDetectElmVersion =
     do
-        hasElmJson <- doesFileExist "elm.json"
-        if hasElmJson
-            then return $ Right Elm_0_19
-            else
+        hasElmPackageJson <- doesFileExist "elm-package.json"
+        if hasElmPackageJson
+            then
                 do
-                    hasElmPackageJson <- doesFileExist "elm-package.json"
-                    if hasElmPackageJson
-                        then return $ Right Elm_0_18
-                        else return $ Left "I couldn't figure out what version of Elm you are using!\n\nYou should either run elm-format from the directory containing\nyour elm.json (for Elm 0.19) or elm-package.json (for Elm 0.18),\nor tell me which version of Elm with --elm-version=0.19 or --elm-version=0.18\n\n"
+                    hasElmJson <- doesFileExist "elm.json"
+                    if hasElmJson
+                        then return $ Right Elm_0_19
+                        else return $ Right Elm_0_18
+            else return $ Right Elm_0_19
 
 
 validate :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage ()

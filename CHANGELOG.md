@@ -2,6 +2,7 @@
 
 New features:
   - Invalid `(..)` in `@docs` lines are automatically removed.
+  - When not specifying `--elm-version`, if auto-detection fails, Elm 0.19 will be assumed instead of failing with an error.
 
 Bug fixes:
   - Error messages are now correctly written to stderr.
