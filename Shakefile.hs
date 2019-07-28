@@ -7,9 +7,13 @@ import Control.Monad (forM_)
 
 main :: IO ()
 main = shakeArgs shakeOptions $ do
-    Stdout path <- liftIO $ cmd "stack path --local-install-root"
-    let stackLocalInstallRoot = takeWhile (/= '\n') path
+    Stdout p1 <- liftIO $ cmd "stack path --local-install-root"
+    let stackLocalInstallRoot = takeWhile (/= '\n') p1
+    Stdout p2 <- liftIO $ cmd "stack path --local-bin"
+    let stackLocalBin = takeWhile (/= '\n') p2
+
     let elmFormat = stackLocalInstallRoot </> "bin/elm-format" <.> exe
+    let shellcheck = stackLocalBin </> "shellcheck" <.> exe
 
     want [ "test" ]
 
@@ -152,6 +156,9 @@ main = shakeArgs shakeOptions $ do
     -- shellcheck
     --
 
+    shellcheck %> \out -> do
+        cmd_ "stack install ShellCheck"
+
     "_build/shellcheck.ok" %> \out -> do
         scriptFiles <- getDirectoryFiles ""
             [ "tests/run-tests.sh"
@@ -165,6 +172,6 @@ main = shakeArgs shakeOptions $ do
 
     "_build//*.shellcheck.ok" %> \out -> do
         let script = traceShowId $ dropDirectory1 $ dropExtension $ dropExtension out
-        need [ script ]
-        cmd_ "shellcheck" script
+        need [ shellcheck, script ]
+        cmd_ shellcheck script
         writeFile' out ""
