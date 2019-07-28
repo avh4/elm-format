@@ -11,13 +11,6 @@ command -v wc
 command -v stack
 
 
-if command -v shellcheck; then
-	shellcheck "./tests/run-tests.sh" || exit 1
-	shellcheck "./package/collect_files.sh" || exit 1
-	shellcheck "./package/mac/build-package.sh" || exit 1
-	shellcheck "./package/linux/build-package.sh" || exit 1
-fi
-
 # if command -v nix-env; then
 # 	echo "$0: INFO: Detected Nixos or Nix"
 # 	STACK_ARGS=(--nix-pure --nix-add-gc-roots)
