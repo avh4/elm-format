@@ -16,6 +16,7 @@ main = shakeArgs shakeOptions $ do
         need
             [ "_build/stack-test.ok"
             , "_build/run-tests.ok"
+            , "_build/tests/test-files/good-json.ok"
             , "_build/shellcheck.ok"
             ]
 
@@ -69,10 +70,32 @@ main = shakeArgs shakeOptions $ do
         need [ script, elmFormat ]
         testFiles <- getDirectoryFiles ""
             [ "tests/test-files//*.elm"
-            , "tests/test-files//*.json"
+            , "tests/test-files/*.json"
             ]
         need testFiles
         cmd_ "bash" script
+        writeFile' out ""
+
+    "_build/tests/test-files/good-json.ok" %> \out -> do
+        jsonFiles <- getDirectoryFiles ""
+            [ "tests/test-files/good//*.json"
+            ]
+        let oks = ["_build" </> f -<.> "json_matches" | f <- jsonFiles]
+        need oks
+        writeFile' out ""
+
+    "_build/tests//*.json_formatted" %> \out -> do
+        let script = "tests/format-json.sh"
+        need [ elmFormat, script ]
+        let source = dropDirectory1 $ out -<.> "elm"
+        need [ source ]
+        cmd_ script elmFormat source out
+
+    "_build/tests//*.json_matches" %> \out -> do
+        let actual = out -<.> "json_formatted"
+        let expected = dropDirectory1 $ out -<.> "json"
+        need [ actual, expected ]
+        cmd_ "diff" "-u" actual expected
         writeFile' out ""
 
     --
