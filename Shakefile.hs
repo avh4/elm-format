@@ -16,11 +16,16 @@ main = shakeArgs shakeOptions $ do
         need
             [ "_build/stack-test.ok"
             , "_build/run-tests.ok"
+            , "_build/shellcheck.ok"
             ]
 
     phony "clean" $ do
         cmd_ "stack clean"
         removeFilesAfter "_build" [ "//*" ]
+
+    --
+    -- build
+    --
 
     elmFormat %> \out -> do
         sourceFiles <- getDirectoryFiles ""
@@ -33,6 +38,10 @@ main = shakeArgs shakeOptions $ do
             ]
         need sourceFiles
         cmd_ "stack build"
+
+    --
+    -- Haskell tests
+    --
 
     "_build/stack-test.ok" %> \out -> do
         testFiles <- getDirectoryFiles ""
@@ -51,6 +60,10 @@ main = shakeArgs shakeOptions $ do
         cmd_ "stack test"
         writeFile' out ""
 
+    --
+    -- integration tests
+    --
+
     "_build/run-tests.ok" %> \out -> do
         let script = "tests/run-tests.sh"
         need [ script, elmFormat ]
@@ -60,4 +73,25 @@ main = shakeArgs shakeOptions $ do
             ]
         need testFiles
         cmd_ "bash" script
+        writeFile' out ""
+
+    --
+    -- shellcheck
+    --
+
+    "_build/shellcheck.ok" %> \out -> do
+        scriptFiles <- getDirectoryFiles ""
+            [ "tests/run-tests.sh"
+            , "package/collect_files.sh"
+            , "package/mac/build-package.sh"
+            , "package/linux/build-package.sh"
+            ]
+        let oks = ["_build" </> f <.> "shellcheck.ok" | f <- scriptFiles]
+        need oks
+        writeFile' out ""
+
+    "_build//*.shellcheck.ok" %> \out -> do
+        let script = traceShowId $ dropDirectory1 $ dropExtension $ dropExtension out
+        need [ script ]
+        cmd_ "shellcheck" script
         writeFile' out ""
