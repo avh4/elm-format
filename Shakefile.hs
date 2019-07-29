@@ -133,8 +133,8 @@ main = shakeArgs shakeOptions $ do
         ("_build/tests/test-files/*/Elm-" ++ elmVersion ++ "//*.elm_stderr") %> \out -> do
             let source = dropDirectory1 $ out -<.> "elm"
             need [ elmFormat, source ]
-            (Stderr stderr, Exit _) <- cmd (FileStdin source) elmFormat "--stdin" ("--elm-version=" ++ elmVersion)
-            writeFileChanged out stderr
+            (Stderr stderr, Exit _) <- cmd (FileStdin source) BinaryPipes elmFormat "--stdin" ("--elm-version=" ++ elmVersion)
+            cmd_ (FileStdout out) (Stdin stderr) BinaryPipes "tr" [ "-d", "\r" ]
 
         ("_build/tests/test-files/transform/Elm-" ++ elmVersion ++ ".ok") %> \out -> do
             elmFiles <- getDirectoryFiles ""
