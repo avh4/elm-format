@@ -7,25 +7,13 @@ command -v diff
 command -v grep
 command -v sed
 command -v tee
-command -v wc
-command -v stack
 
 
-# if command -v nix-env; then
-# 	echo "$0: INFO: Detected Nixos or Nix"
-# 	STACK_ARGS=(--nix-pure --nix-add-gc-roots)
-# 	echo "$0: INFO: nix arguments will be passed to stack: ${STACK_ARGS[*]}"
-# fi
-
-
-ELM_FORMAT="$(stack "${STACK_ARGS[@]}" path --local-install-root)/bin/elm-format"
+ELM_FORMAT="$1"
 if [ ! -e "$ELM_FORMAT" ]; then
 	echo "$0: ERROR: $ELM_FORMAT not found" >&2
 	exit 1
 fi
-echo "Testing $ELM_FORMAT"
-cp "$ELM_FORMAT" tests/elm-format
-ELM_FORMAT="tests/elm-format"
 
 if command -v md5 > /dev/null; then
 	MD5="md5"

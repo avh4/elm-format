@@ -105,7 +105,7 @@ main = shakeArgs shakeOptions $ do
             , "tests/test-files/*.json"
             ]
         need testFiles
-        cmd_ ("bash" <.> exe) script
+        cmd_ ("bash" <.> exe) script elmFormat
         writeFile' out ""
 
 
@@ -231,7 +231,7 @@ main = shakeArgs shakeOptions $ do
             ]
         let oks = ["_build" </> f <.> "shellcheck.ok" | f <- scriptFiles]
         need oks
-        writeFile' out ""
+        writeFile' out (unlines scriptFiles)
 
     "_build//*.shellcheck.ok" %> \out -> do
         let script = dropDirectory1 $ dropExtension $ dropExtension out
