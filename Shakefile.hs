@@ -89,6 +89,9 @@ main = shakeArgs shakeOptions $ do
             , "_build/tests/test-files/upgrade/Elm-0.19.ok"
             , "_build/tests/test-files/upgrade/Elm-0.18.ok"
             , "_build/tests/test-files/upgrade/Elm-0.17.ok"
+            , "_build/tests/test-files/bad/Elm-0.19.ok"
+            , "_build/tests/test-files/bad/Elm-0.18.ok"
+            , "_build/tests/test-files/bad/Elm-0.17.ok"
             ]
 
     "_build/run-tests.ok" %> \out -> do
@@ -117,7 +120,7 @@ main = shakeArgs shakeOptions $ do
                 ]
             let oks = ["_build" </> f -<.> "elm_matches" | f <- elmFiles]
             need oks
-            writeFile' out (unlines oks)
+            writeFile' out (unlines elmFiles)
 
         ("_build/tests/test-files/*/Elm-" ++ elmVersion ++ "//*.elm_formatted") %> \out -> do
             let source = dropDirectory1 $ out -<.> "elm"
@@ -128,6 +131,12 @@ main = shakeArgs shakeOptions $ do
             let source = dropDirectory1 $ out -<.> "elm"
             need [ elmFormat, source ]
             cmd_ elmFormat source "--output" out "--upgrade" ("--elm-version=" ++ elmVersion)
+
+        ("_build/tests/test-files/*/Elm-" ++ elmVersion ++ "//*.elm_stderr") %> \out -> do
+            let source = dropDirectory1 $ out -<.> "elm"
+            need [ elmFormat, source ]
+            (Stderr stderr, Exit _) <- cmd (FileStdin source) elmFormat "--stdin" ("--elm-version=" ++ elmVersion)
+            writeFile' out stderr
 
         ("_build/tests/test-files/transform/Elm-" ++ elmVersion ++ ".ok") %> \out -> do
             elmFiles <- getDirectoryFiles ""
@@ -144,6 +153,14 @@ main = shakeArgs shakeOptions $ do
             let oks = ["_build" </> f -<.> "elm_upgrade_matches" | f <- elmFiles, ( takeExtension $ dropExtension f) /= ".formatted" ]
             need oks
             writeFile' out (unlines oks)
+
+        ("_build/tests/test-files/bad/Elm-" ++ elmVersion ++ ".ok") %> \out -> do
+            elmFiles <- getDirectoryFiles ""
+                [ "tests/test-files/bad/Elm-" ++ elmVersion ++ "//*.elm"
+                ]
+            let oks = ["_build" </> f -<.> "elm_bad_matches" | f <- elmFiles ]
+            need oks
+            writeFile' out (unlines elmFiles)
 
     "_build/tests//*.elm_matches" %> \out -> do
         let actual = out -<.> "elm_formatted"
@@ -162,6 +179,13 @@ main = shakeArgs shakeOptions $ do
     "_build/tests//*.elm_upgrade_matches" %> \out -> do
         let actual = out -<.> "elm_upgraded"
         let expected = dropDirectory1 $ out -<.> "formatted.elm"
+        need [ actual, expected ]
+        cmd_ "diff" "-u" actual expected
+        writeFile' out ""
+
+    "_build/tests//*.elm_bad_matches" %> \out -> do
+        let actual = out -<.> "elm_stderr"
+        let expected = dropDirectory1 $ out -<.> "output.txt"
         need [ actual, expected ]
         cmd_ "diff" "-u" actual expected
         writeFile' out ""
