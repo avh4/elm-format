@@ -206,19 +206,6 @@ function checkBad() {
 	outputShouldRoughlyMatchPatterns "$EXPECTED" "$STDOUT"
 }
 
-function checkUpgrade() {
-	ELM_VERSION="$1"
-	INPUT="tests/test-files/upgrade/$2"
-	OUTPUT="formatted.elm"
-	EXPECTED="tests/test-files/upgrade/${2%.*}.formatted.elm"
-
-	echo
-	echo "## upgrade/$2"
-	time "$ELM_FORMAT" "$INPUT" --output "$OUTPUT" --upgrade --elm-version "$ELM_VERSION" 1>/dev/null
-	returnCodeShouldEqual 0
-	compareFiles "$EXPECTED" "$OUTPUT"
-}
-
 function checkValidationOutputFormat() {
 	if uname -s | grep -q 'MSYS\|MINGW'; then
 		# TODO: debug why checkValidationOutputFormat doesn't work on appveyor, and/or rewrite these tests in haskell
@@ -256,27 +243,8 @@ echo "# elm-format test suite"
 
 checkWaysToRun
 
-checkUpgrade 0.19 Elm-0.19/CommaFunctionsBecomeLambdas.elm
-checkUpgrade 0.19 Elm-0.19/RemoveBangOperator.elm
-checkUpgrade 0.19 Elm-0.19/NewStringEscapeSyntax.elm
-checkUpgrade 0.19 Elm-0.19/RemoveBasicsFlip.elm
-checkUpgrade 0.19 Elm-0.19/RemoveBasicsCurry.elm
-checkUpgrade 0.19 Elm-0.19/RemoveBasicsUncurry.elm
-checkUpgrade 0.19 Elm-0.19/ConvertBasicsRem.elm
-checkUpgrade 0.19 Elm-0.19/ConvertBasicsModBy.elm
-checkUpgrade 0.19 Elm-0.19/ConvertHtmlAttributesStyle.elm
-checkUpgrade 0.19 Elm-0.19/ConvertHtmlAttributesStyleAltImport.elm
-checkUpgrade 0.19 Elm-0.19/ListExports.elm
-checkUpgrade 0.19 Elm-0.19/OpenExplicitConstructorImports.elm
-
 checkBad UnexpectedComma.elm
 checkBad UnexpectedEndOfInput.elm
-
-checkUpgrade 0.18 Elm-0.18/PrimesBecomeUnderscores.elm
-checkUpgrade 0.18 Elm-0.18/RangesBecomeListRange.elm
-checkUpgrade 0.18 Elm-0.18/BackticksBecomeFunctionCalls.elm
-checkUpgrade 0.18 Elm-0.18/SpecialBackticksBecomePipelines.elm
-checkUpgrade 0.18 Elm-0.18/RenameTupleFunctions.elm
 
 checkValidationOutputFormat
 
