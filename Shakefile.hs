@@ -136,7 +136,7 @@ main = shakeArgs shakeOptions $ do
             let source = dropDirectory1 $ out -<.> "elm"
             need [ elmFormat, source ]
             (Stderr stderr, Exit _) <- cmd (FileStdin source) elmFormat "--stdin" ("--elm-version=" ++ elmVersion)
-            writeFile' out stderr
+            writeFileChanged out stderr
 
         ("_build/tests/test-files/transform/Elm-" ++ elmVersion ++ ".ok") %> \out -> do
             elmFiles <- getDirectoryFiles ""
@@ -187,7 +187,7 @@ main = shakeArgs shakeOptions $ do
         let actual = out -<.> "elm_stderr"
         let expected = dropDirectory1 $ out -<.> "output.txt"
         need [ actual, expected ]
-        cmd_ "diff" "-u" actual expected
+        cmd_ "diff" "--strip-trailing-cr" "-u" actual expected
         writeFile' out ""
 
 
@@ -199,19 +199,20 @@ main = shakeArgs shakeOptions $ do
             ]
         let oks = ["_build" </> f -<.> "json_matches" | f <- jsonFiles]
         need oks
-        writeFile' out ""
+        writeFile' out (unlines jsonFiles)
 
     "_build/tests//*.json_formatted" %> \out -> do
-        let script = "tests/format-json.sh"
         let source = dropDirectory1 $ out -<.> "elm"
-        need [ elmFormat, script, source ]
-        cmd_ ("bash" <.> exe) script elmFormat source out
+        need [ elmFormat, source ]
+        (Stdout rawJson) <- cmd (FileStdin source) elmFormat "--elm-version=0.19" "--stdin" "--json"
+        (Stdout formattedJson) <- cmd (Stdin rawJson) "python" "-mjson.tool"
+        writeFileChanged out formattedJson
 
     "_build/tests//*.json_matches" %> \out -> do
         let actual = out -<.> "json_formatted"
         let expected = dropDirectory1 $ out -<.> "json"
         need [ actual, expected ]
-        cmd_ "diff" "-u" actual expected
+        cmd_ "diff" "--strip-trailing-cr" "-u" actual expected
         writeFile' out ""
 
 
