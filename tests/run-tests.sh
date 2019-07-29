@@ -41,18 +41,6 @@ function shouldOutputTheSameIgnoringEol() {
 	diff -u --ignore-space-change <("${1//.exe/}") <("${2//.exe/}") || exit 1
 }
 
-function outputShouldRoughlyMatchPatterns() {
-	PATTERNS_FILE="$1"
-	echo "DEBUG: PATTERNS_FILE=$PATTERNS_FILE"
-	OUTPUT="$2"
-	echo "DEBUG: OUTPUT=$OUTPUT"
-
-	MATCHES=$(echo "$OUTPUT" | grep -F -f "$PATTERNS_FILE")
-	echo "DEBUG: MATCHES=$MATCHES"
-	echo "DEBUG: $(echo "$MATCHES" | wc -l)"
-	[[ "$(echo "$MATCHES" | wc -l)" == "$(wc -l < "$PATTERNS_FILE")" ]] || exit 1
-}
-
 function compareFiles() {
 	EXPECTED="$1"
 	ACTUAL="$2"
@@ -143,7 +131,7 @@ function checkWaysToRun() {
 	compareFiles "$INPUT" "$OUTPUT"
 
 	echo "## cat INPUT | elm-format --stdin INPUT"
-	STDOUT=$(cat "$INPUT" | "$ELM_FORMAT" --elm-version=0.19 --stdin "$INPUT" 2>&1)
+	cat "$INPUT" | "$ELM_FORMAT" --elm-version=0.19 --stdin "$INPUT"
 	returnCodeShouldEqual 1
 
 	echo "## cat INPUT | elm-format --stdin --output OUTPUT"
@@ -190,22 +178,6 @@ function checkWaysToRun() {
 	echo "------------------------------"
 }
 
-function checkBad() {
-	INPUT="tests/test-files/bad/$1"
-	EXPECTED="tests/test-files/bad/${1%.*}.output.txt"
-
-	echo "## bad/$1"
-	if uname -s | grep -q 'MSYS\|MINGW'; then
-		# TODO: debug why checkBad doesn't work on appveyor, and/or rewrite these tests in haskell
-		echo "Running on Windows; skipping checkBad"
-		return
-	fi
-	STDOUT=$(cat "$INPUT" | "$ELM_FORMAT" --elm-version=0.19 --stdin 2>&1)
-	returnCodeShouldEqual 1
-	echo "DEBUG: return code was 1"
-	outputShouldRoughlyMatchPatterns "$EXPECTED" "$STDOUT"
-}
-
 function checkValidationOutputFormat() {
 	if uname -s | grep -q 'MSYS\|MINGW'; then
 		# TODO: debug why checkValidationOutputFormat doesn't work on appveyor, and/or rewrite these tests in haskell
@@ -242,10 +214,6 @@ echo
 echo "# elm-format test suite"
 
 checkWaysToRun
-
-checkBad UnexpectedComma.elm
-checkBad UnexpectedEndOfInput.elm
-
 checkValidationOutputFormat
 
 echo
