@@ -190,7 +190,7 @@ addLineNumber renderer maybeSubRegion width n line =
       if n < 0 then " " else show n
 
     lineNumber =
-      replicate (width - length number) ' ' ++ number ++ "│"
+      replicate (width - length number) ' ' ++ number ++ "|"
 
     spacer (R.Region start end) =
       if R.line start <= n && n <= R.line end

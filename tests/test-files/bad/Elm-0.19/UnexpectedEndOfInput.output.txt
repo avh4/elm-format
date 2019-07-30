@@ -3,7 +3,7 @@ ERRORS
 
 [0mI ran into something unexpected when parsing your code!
 
-5│ [31m
+5| [31m
    ^[0m
 I am looking for one of the following things:
 
