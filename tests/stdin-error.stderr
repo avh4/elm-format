@@ -3,7 +3,7 @@ ERRORS
 
 I ran into something unexpected when parsing your code!
 
-1│ syntax error:True
+1| syntax error:True
                ^
 I am looking for one of the following things:
 
