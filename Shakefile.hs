@@ -6,10 +6,8 @@ import Control.Monad (forM_)
 
 main :: IO ()
 main = shakeArgs shakeOptions $ do
-    Stdout p1 <- liftIO $ cmd "stack path --local-install-root"
-    let stackLocalInstallRoot = takeWhile (/= '\n') p1
-    Stdout p2 <- liftIO $ cmd "stack path --local-bin"
-    let stackLocalBin = takeWhile (/= '\n') p2
+    StdoutTrim stackLocalInstallRoot <- liftIO $ cmd "stack path --local-install-root"
+    StdoutTrim stackLocalBin <- liftIO $ cmd "stack path --local-bin"
 
     let elmFormat = stackLocalInstallRoot </> "bin/elm-format" <.> exe
     let shellcheck = stackLocalBin </> "shellcheck" <.> exe
