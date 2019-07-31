@@ -4,8 +4,8 @@ module ElmFormat.TestWorld where
 import ElmFormat.World
 
 import Elm.Utils ((|>))
-import Test.Tasty (TestTree)
-import Test.Tasty.HUnit (Assertion, assertBool, assertEqual)
+import Test.Tasty (TestTree, testGroup)
+import Test.Tasty.HUnit (Assertion, assertBool, assertEqual, testCase)
 import Test.Tasty.Golden (goldenVsStringDiff)
 
 import Prelude hiding (putStr, readFile, writeFile)
@@ -171,6 +171,14 @@ goldenOutputStream getStream testName goldenFile state =
         (\ref new -> ["diff", "-u", ref, new])
         goldenFile
         (return $ Text.encodeUtf8 $ Text.pack $ getStream state)
+
+
+goldenExitStdout :: String -> Int -> String -> TestWorldState -> TestTree
+goldenExitStdout testName expectedExitCode goldenFile state =
+    testGroup testName
+        [ testCase "exit code" $ state |> expectExit expectedExitCode
+        , goldenStdout "stdout" goldenFile state
+        ]
 
 
 init :: TestWorld
