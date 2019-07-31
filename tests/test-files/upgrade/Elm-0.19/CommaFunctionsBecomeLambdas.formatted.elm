@@ -1,4 +1,4 @@
-module Main exposing (bad_tooManyArgs, multiline_fromComments, multiline_splitAll, multiline_splitFirst, multiline_splitSome, needsParens, notMultiline_joinFirst, tuple2, tuple2_function, tuple2_partial, tuple3, tuple3_function, tuple3_partial1, tuple3_partial2, withComments)
+module CommaFunctionsBecomeLabdas exposing (tuple2)
 
 
 tuple2 =

@@ -1,4 +1,4 @@
-port module ExplicitlyListExposedValues exposing (Foo(..), X, check, x)
+module Main exposing (Foo(..), X, check, x)
 
 
 x =

@@ -1,6 +1,3 @@
-port module ExplicitlyListExposedValues exposing (..)
-
-
 x =
     ()
 

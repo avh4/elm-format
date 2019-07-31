@@ -1,5 +1,3 @@
-module ListExports exposing (..)
-
 {-|
 
 @docs a

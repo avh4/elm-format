@@ -1,4 +1,4 @@
-module Main exposing (commented, needsParens, precommented, precommented2, range, usedInFunctionCall, variableRange)
+module RangesBecomeListRange exposing (range)
 
 
 range =

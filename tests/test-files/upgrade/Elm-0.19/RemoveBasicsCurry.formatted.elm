@@ -1,4 +1,4 @@
-module Main exposing (extraArgs, fullyApplied, fullyApplied_comments, functionOnly, functionOnly_comments, nested, partiallyApplied, partiallyApplied_comments, qualified, unapplied)
+module RemoveBasicsCurry exposing (fullyApplied)
 
 
 fullyApplied f =
