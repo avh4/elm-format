@@ -9,7 +9,6 @@ run:
   args:
   - -exc
   - |
-    apt-get update && apt-get install shellcheck
     cd elm-format
     cabal update
     cabal install --only-dependencies --enable-tests

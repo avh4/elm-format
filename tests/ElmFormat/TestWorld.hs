@@ -4,8 +4,8 @@ module ElmFormat.TestWorld where
 import ElmFormat.World
 
 import Elm.Utils ((|>))
-import Test.Tasty (TestTree)
-import Test.Tasty.HUnit (Assertion, assertBool, assertEqual)
+import Test.Tasty (TestTree, testGroup)
+import Test.Tasty.HUnit (Assertion, assertBool, assertEqual, testCase)
 import Test.Tasty.Golden (goldenVsStringDiff)
 
 import Prelude hiding (putStr, readFile, writeFile)
@@ -173,6 +173,14 @@ goldenOutputStream getStream testName goldenFile state =
         (return $ Text.encodeUtf8 $ Text.pack $ getStream state)
 
 
+goldenExitStdout :: String -> Int -> String -> TestWorldState -> TestTree
+goldenExitStdout testName expectedExitCode goldenFile state =
+    testGroup testName
+        [ testCase "exit code" $ state |> expectExit expectedExitCode
+        , goldenStdout "stdout" goldenFile state
+        ]
+
+
 init :: TestWorld
 init = testWorld []
 
@@ -180,6 +188,11 @@ init = testWorld []
 uploadFile :: String -> String -> TestWorld -> TestWorld
 uploadFile name content world =
     world { filesystem = Dict.insert name content (filesystem world) }
+
+
+downloadFile :: String -> TestWorld -> Maybe String
+downloadFile name world =
+    Dict.lookup name (filesystem world)
 
 
 installProgram :: String -> ([String] -> State.State TestWorld ()) -> TestWorld -> TestWorld
@@ -211,3 +224,13 @@ expectExit expectedExitCode testWorld =
 
         Just actualExitCode ->
             assertEqual "last exit code" expectedExitCode actualExitCode
+
+
+expectFileContents :: String -> String -> TestWorld -> Assertion
+expectFileContents filename expectedContent testWorld =
+    case downloadFile filename testWorld of
+        Nothing ->
+            fail ("Expected file " ++ show filename ++ " to have contents, but it did not exist")
+
+        Just actualContent ->
+            assertEqual ("contents of " ++ show filename) expectedContent actualContent

@@ -1,0 +1,15 @@
+ERRORS
+[36m-- SYNTAX PROBLEM ------------------------------------------------------ <STDIN>
+
+[0mI ran into something unexpected when parsing your code!
+
+4| abc,def =[31m
+      ^[0m
+I am looking for one of the following things:
+
+    =
+    a pattern
+    more letters in this name
+    whitespace
+
+
