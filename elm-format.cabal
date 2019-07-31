@@ -38,6 +38,7 @@ library
         src
         parser/src
         markdown
+        generated
 
     exposed-modules:
         ElmFormat
