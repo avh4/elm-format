@@ -45,7 +45,7 @@ main = do
     -- build
     --
 
-    let generatedSourceFiles = [ "src/Build_elm_format.hs" ]
+    let generatedSourceFiles = [ "generated/Build_elm_format.hs" ]
     let sourceFilesPattern =
           [ "src//*.hs"
           , "parser/src//*.hs"
@@ -54,7 +54,7 @@ main = do
           , "stack.yaml"
           ]
 
-    "src/Build_elm_format.hs" %> \out -> do
+    "generated/Build_elm_format.hs" %> \out -> do
         alwaysRerun
         (StdoutTrim gitDescribe) <- cmd "git" [ "describe", "--abbrev=8", "--always" ]
         writeFileChanged out $ unlines
