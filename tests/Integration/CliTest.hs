@@ -5,7 +5,7 @@ import Elm.Utils ((|>))
 import Test.Tasty
 import Test.Tasty.HUnit
 import ElmFormat.World (readFile)
-import ElmFormat.TestWorld (TestWorld, run, expectExit)
+import ElmFormat.TestWorld (TestWorld, run, expectExit, goldenExitStdout)
 import qualified ElmFormat
 import qualified ElmFormat.TestWorld as TestWorld
 
@@ -50,6 +50,10 @@ tests =
                 |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"
                 |> run "elm-format" ["test.elm", "--validate"]
                 |> expectExit 0
+            ]
+        , testGroup "ways to run"
+            [ goldenExitStdout "elm-format --help" 0 "tests/usage.stdout" $ world
+                |> run "elm-format-xxx" [ "--help" ]
             ]
         ]
 

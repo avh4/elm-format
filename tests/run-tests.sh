@@ -59,11 +59,6 @@ function checkWaysToRun() {
 
 	HELP=$(cat tests/usage.stdout)
 
-	echo "## elm-format --help"
-	LONGHELP=$("$ELM_FORMAT" --help 2>&1)
-	returnCodeShouldEqual 0
-	shouldOutputTheSameIgnoringEol "$HELP" "$LONGHELP"
-
 	echo "## elm-format -h"
 	SHORTHELP=$("$ELM_FORMAT" -h 2>&1)
 	returnCodeShouldEqual 0
