@@ -25,8 +25,8 @@ before_install:
 install:
 - stack setup
 - stack build --only-dependencies
+- stack install shake
 
 
 script:
-- stack build
-- ./tests/run-tests.sh
+- stack runhaskell Shakefile.hs

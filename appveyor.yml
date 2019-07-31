@@ -20,9 +20,9 @@ environment:
 test_script:
 - "set PATH=%PATH%;c:\\stack"
 - stack setup > nil
+- stack install shake
 - stack path
-- stack build
-- bash tests/run-tests.sh
+- stack runhaskell Shakefile.hs
 - mkdir -p dist
 - stack install --local-bin-path=dist
 
