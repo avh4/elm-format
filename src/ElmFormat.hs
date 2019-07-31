@@ -227,6 +227,7 @@ main'' elmFormatVersion_ experimental_ args =
                     case determineWhatToDoFromConfig config resolvedInputFiles of
                         Left NoInputs ->
                             (handleParseResult $ Flags.showHelpText elmFormatVersion_ experimental_)
+                                -- TODO: handleParseResult is exitSuccess, so we never get to exitFailure
                                 >> exitFailure
 
                         Left message ->

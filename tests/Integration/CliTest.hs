@@ -54,6 +54,10 @@ tests =
         , testGroup "ways to run"
             [ goldenExitStdout "elm-format --help" 0 "tests/usage.stdout" $ world
                 |> run "elm-format-xxx" [ "--help" ]
+            , goldenExitStdout "elm-format -h" 0 "tests/usage.stdout" $ world
+                |> run "elm-format-xxx" [ "-h" ]
+            , goldenExitStdout "elm-format (no args)" 1 "tests/usage.stdout" $ world
+                |> run "elm-format-xxx" []
             ]
         ]
 
