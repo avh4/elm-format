@@ -1,4 +1,4 @@
-module ListExports exposing
+module Main exposing
     ( a
     , X
     , Y(..)

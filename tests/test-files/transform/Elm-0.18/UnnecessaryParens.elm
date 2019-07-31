@@ -1,4 +1,4 @@
-module Main exposing (..)
+module UnnecessaryParens exposing (unnecessaryParens)
 
 
 unnecessaryParens =
