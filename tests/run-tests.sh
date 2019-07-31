@@ -53,20 +53,6 @@ function checkWaysToRun() {
 	echo "# WAYS TO RUN"
 	echo
 
-	echo "## elm-format INPUT --validate does not change things"
-	"$ELM_FORMAT" "$INPUT_2" --elm-version=0.19 --validate 1>/dev/null
-	compareFiles "tests/test-files/transform/Elm-0.18/Examples.elm" "$INPUT_2"
-	returnCodeShouldEqual 0
-
-	echo "## elm-format INPUT --validate with unformatted file exits 1"
-	"$ELM_FORMAT" "$INPUT_2" --elm-version=0.19 --validate 1>/dev/null
-	returnCodeShouldEqual 1
-
-	echo "## elm-format INPUT --validate with formatted file exits 0"
-	"$ELM_FORMAT" "$INPUT_2" --elm-version=0.19 --yes 1>/dev/null
-	"$ELM_FORMAT" "$INPUT_2" --elm-version=0.19 --validate 1>/dev/null
-	returnCodeShouldEqual 0
-
 	echo "## elm-format INPUT (answer = y)"
 	echo "y" | "$ELM_FORMAT" "$INPUT" --elm-version=0.19 1>/dev/null
 	returnCodeShouldEqual 0

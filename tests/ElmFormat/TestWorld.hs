@@ -190,6 +190,11 @@ uploadFile name content world =
     world { filesystem = Dict.insert name content (filesystem world) }
 
 
+downloadFile :: String -> TestWorld -> Maybe String
+downloadFile name world =
+    Dict.lookup name (filesystem world)
+
+
 installProgram :: String -> ([String] -> State.State TestWorld ()) -> TestWorld -> TestWorld
 installProgram name handler testWorld =
     testWorld { programs = Dict.insert name handler (programs testWorld) }
@@ -219,3 +224,13 @@ expectExit expectedExitCode testWorld =
 
         Just actualExitCode ->
             assertEqual "last exit code" expectedExitCode actualExitCode
+
+
+expectFileContents :: String -> String -> TestWorld -> Assertion
+expectFileContents filename expectedContent testWorld =
+    case downloadFile filename testWorld of
+        Nothing ->
+            fail ("Expected file " ++ show filename ++ " to have contents, but it did not exist")
+
+        Just actualContent ->
+            assertEqual ("contents of " ++ show filename) expectedContent actualContent
