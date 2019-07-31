@@ -64,7 +64,7 @@ main = do
             ]
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "stack build"
+        cmd_ "stack build --test --no-run-tests"
 
     --
     -- Haskell tests
