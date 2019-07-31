@@ -25,10 +25,6 @@ function returnCodeShouldEqual() {
 	[ "$?" -eq "$1" ] || exit 1
 }
 
-function shouldOutputTheSameIgnoringEol() {
-	diff -u --ignore-space-change <("${1//.exe/}") <("${2//.exe/}") || exit 1
-}
-
 function compareFiles() {
 	EXPECTED="$1"
 	ACTUAL="$2"
@@ -56,18 +52,6 @@ function checkWaysToRun() {
 	echo "------------------------------"
 	echo "# WAYS TO RUN"
 	echo
-
-	HELP=$(cat tests/usage.stdout)
-
-	echo "## elm-format -h"
-	SHORTHELP=$("$ELM_FORMAT" -h 2>&1)
-	returnCodeShouldEqual 0
-	shouldOutputTheSameIgnoringEol "$HELP" "$SHORTHELP"
-
-	echo "## elm-format"
-	NOARGS=$("$ELM_FORMAT" 2>&1)
-	returnCodeShouldEqual 0
-	shouldOutputTheSameIgnoringEol "$HELP" "$NOARGS"
 
 	echo "## elm-format INPUT --validate does not change things"
 	"$ELM_FORMAT" "$INPUT_2" --elm-version=0.19 --validate 1>/dev/null
