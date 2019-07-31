@@ -22,7 +22,6 @@ test_script:
 - stack setup > nil
 - stack install shake
 - stack path
-- stack build
 - stack runhaskell Shakefile.hs
 - mkdir -p dist
 - stack install --local-bin-path=dist

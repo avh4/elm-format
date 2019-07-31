@@ -42,16 +42,28 @@ main = do
     -- build
     --
 
+    let generatedSourceFiles = [ "src/Build_elm_format.hs" ]
+
+    "src/Build_elm_format.hs" %> \out -> do
+        alwaysRerun
+        (StdoutTrim gitDescribe) <- cmd "git" [ "describe", "--abbrev=8", "--always" ]
+        writeFileChanged out $ unlines
+            [ "module Build_elm_format where"
+            , ""
+            , "gitDescribe :: String"
+            , "gitDescribe = " ++ show (gitDescribe :: String)
+            ]
+
     elmFormat %> \out -> do
         sourceFiles <- getDirectoryFiles ""
             [ "src//*.hs"
             , "parser/src//*.hs"
             , "markdown//*.hs"
-            , "Setup.hs"
             , "elm-format.cabal"
             , "stack.yaml"
             ]
         need sourceFiles
+        need generatedSourceFiles
         cmd_ "stack build"
 
     --
@@ -67,11 +79,11 @@ main = do
             , "src//*.hs"
             , "parser/src//*.hs"
             , "markdown//*.hs"
-            , "Setup.hs"
             , "elm-format.cabal"
             , "stack.yaml"
             ]
         need testFiles
+        need generatedSourceFiles
         cmd_ "stack test"
         writeFile' out ""
 

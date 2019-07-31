@@ -19,7 +19,7 @@ Copyright:  See https://github.com/avh4/elm-format/blob/master/LICENSE
 
 Category: Build Tool
 
-build-type: Custom
+build-type: Simple
 Cabal-version: >=1.9
 
 Extra-source-files: README.md
@@ -27,15 +27,6 @@ Extra-source-files: README.md
 source-repository head
     type:     git
     location: git://github.com/avh4/elm-format.git
-
-
-custom-setup
-    setup-depends:
-        base,
-        Cabal,
-        directory,
-        filepath,
-        process
 
 
 library

@@ -7,3 +7,4 @@
 /stack.yaml.lock
 /.shake/
 /_build/
+/src/Build_elm_format.hs

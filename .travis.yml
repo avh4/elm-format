@@ -29,5 +29,4 @@ install:
 
 
 script:
-- stack build
 - stack runhaskell Shakefile.hs
