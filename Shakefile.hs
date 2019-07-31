@@ -27,6 +27,9 @@ main = do
             , "_build/shellcheck.ok"
             ]
 
+    phony "build" $ need [ elmFormat ]
+    phony "stack-test" $ need [ "_build/stack-test.ok" ]
+
     phony "clean" $ do
         cmd_ "stack clean"
         removeFilesAfter "_build" [ "//*" ]
