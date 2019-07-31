@@ -5,7 +5,13 @@ import Development.Shake.Util
 import Control.Monad (forM_)
 
 main :: IO ()
-main = shakeArgs shakeOptions $ do
+main = do
+    shakefilesHash <- getHashedShakeVersion [ "Shakefile.hs" ]
+    shakeArgs shakeOptions{
+      shakeChange = ChangeModtimeAndDigest,
+      shakeColor = True,
+      shakeVersion = shakefilesHash
+    } $ do
     StdoutTrim stackLocalInstallRoot <- liftIO $ cmd "stack path --local-install-root"
     StdoutTrim stackLocalBin <- liftIO $ cmd "stack path --local-bin"
 
