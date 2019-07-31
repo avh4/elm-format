@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2002
 
+# TODO: convert the rest of these tests to haskell in CliTest.hs
+
 uname -s
 command -v bash
 command -v diff
