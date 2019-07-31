@@ -46,6 +46,13 @@ main = do
     --
 
     let generatedSourceFiles = [ "src/Build_elm_format.hs" ]
+    let sourceFilesPattern =
+          [ "src//*.hs"
+          , "parser/src//*.hs"
+          , "markdown//*.hs"
+          , "elm-format.cabal"
+          , "stack.yaml"
+          ]
 
     "src/Build_elm_format.hs" %> \out -> do
         alwaysRerun
@@ -58,13 +65,7 @@ main = do
             ]
 
     elmFormat %> \out -> do
-        sourceFiles <- getDirectoryFiles ""
-            [ "src//*.hs"
-            , "parser/src//*.hs"
-            , "markdown//*.hs"
-            , "elm-format.cabal"
-            , "stack.yaml"
-            ]
+        sourceFiles <- getDirectoryFiles "" sourceFilesPattern
         need sourceFiles
         need generatedSourceFiles
         cmd_ "stack build --test --no-run-tests"
@@ -78,14 +79,10 @@ main = do
             [ "tests//*.hs"
             , "tests//*.stdout"
             , "tests//*.stderr"
-            -- source files
-            , "src//*.hs"
-            , "parser/src//*.hs"
-            , "markdown//*.hs"
-            , "elm-format.cabal"
-            , "stack.yaml"
             ]
         need testFiles
+        sourceFiles <- getDirectoryFiles "" sourceFilesPattern
+        need sourceFiles
         need generatedSourceFiles
         cmd_ "stack test"
         writeFile' out ""
