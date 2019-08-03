@@ -12,6 +12,11 @@ data Located a =
     deriving (Eq)
 
 
+instance Functor Located where
+    fmap f (A region a) =
+        A region (f a)
+
+
 instance (Show a) => Show (Located a) where
     showsPrec p (A r a) = showParen (p > 10) $
         showString $ String.unwords

@@ -1163,7 +1163,7 @@ formatPattern elmVersion parensRequired apattern =
                     , line $ punc "::"
                     , formatCommented
                         (formatEolCommented $ formatPattern elmVersion True)
-                        (AST.Commented postOp (term, eol) [])
+                        (AST.Commented postOp (AST.WithEol term eol) [])
                     )
             in
                 formatBinary False
@@ -1764,7 +1764,7 @@ removeBangs left ops =
                         (noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "none")))
                         innerComments
 
-                AST.Expression.ExplicitList [(extraPre, (pre', (cmd, eol)))] trailing _ ->
+                AST.Expression.ExplicitList [(extraPre, (pre', AST.WithEol cmd eol))] trailing _ ->
                     let
                         eolComment =
                             case eol of
@@ -2014,7 +2014,7 @@ formatTailCommented format (inner, post) =
 
 
 formatEolCommented :: (a -> Box) -> AST.WithEol a -> Box
-formatEolCommented format (inner, post) =
+formatEolCommented format (AST.WithEol inner post) =
   case (post, format inner) of
     (Nothing, box) -> box
     (Just eol, SingleLine result) ->
@@ -2217,8 +2217,8 @@ commaSpace =
 formatTypeConstructor :: ElmVersion -> AST.TypeConstructor -> Box
 formatTypeConstructor elmVersion ctor =
     case ctor of
-        AST.NamedConstructor name ->
-            line $ formatQualifiedUppercaseIdentifier elmVersion name
+        AST.NamedConstructor namespace name ->
+            line $ formatQualifiedUppercaseIdentifier elmVersion (namespace ++ [name])
 
         AST.TupleConstructor n ->
             line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
@@ -2241,7 +2241,7 @@ formatType' elmVersion requireParens atype =
                                   (line $ punc "->")
                                   (formatCommented
                                       (formatEolCommented $ formatType' elmVersion ForLambda)
-                                      (AST.Commented postOp (term, eol) [])
+                                      (AST.Commented postOp (AST.WithEol term eol) [])
                                   )
                               ]
                             ]
