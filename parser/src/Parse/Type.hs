@@ -27,9 +27,9 @@ tuple elmVersion =
             return $ AST.UnitType comments
         Right [] ->
             return $ AST.UnitType []
-        Right [AST.Commented [] (t, Nothing) []] ->
+        Right [AST.Commented [] (AST.WithEol t Nothing) []] ->
             return $ A.drop t
-        Right [AST.Commented pre (t, eol) post] ->
+        Right [AST.Commented pre (AST.WithEol t eol) post] ->
             return $ AST.TypeParens (AST.Commented pre t (maybeToList (fmap AST.LineComment eol) ++ post))
         Right types' ->
             return $ AST.TupleType types'
@@ -52,7 +52,10 @@ capTypeVar elmVersion =
 constructor0 :: ElmVersion -> IParser AST.TypeConstructor
 constructor0 elmVersion =
   do  name <- capTypeVar elmVersion
-      return (AST.NamedConstructor name)
+      case reverse name of
+        [] -> error "Impossible empty TypeConstructor name"
+        last:rest ->
+            return (AST.NamedConstructor (reverse rest) last)
 
 
 constructor0' :: ElmVersion -> IParser AST.Type

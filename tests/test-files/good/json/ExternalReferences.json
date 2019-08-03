@@ -1,6 +1,5 @@
 {
     "body": [
-        "TODO: Decl",
         {
             "expression": {
                 "module": "String",
@@ -18,6 +17,12 @@
                 "value": "XYZZY"
             },
             "name": "token",
+            "returnType": {
+                "arguments": [],
+                "module": null,
+                "name": "String",
+                "type": "TypeReference"
+            },
             "sourceLocation": {
                 "end": {
                     "col": 12,
@@ -30,7 +35,6 @@
             },
             "type": "Definition"
         },
-        "TODO: Decl",
         {
             "expression": {
                 "arguments": [
@@ -67,6 +71,17 @@
                 "type": "FunctionApplication"
             },
             "name": "theBestClass",
+            "returnType": {
+                "arguments": [
+                    {
+                        "name": "msg",
+                        "type": "TypeVariable"
+                    }
+                ],
+                "module": "Html.Attributes",
+                "name": "Attribute",
+                "type": "TypeReference"
+            },
             "sourceLocation": {
                 "end": {
                     "col": 21,
@@ -79,7 +94,6 @@
             },
             "type": "Definition"
         },
-        "TODO: Decl",
         {
             "expression": {
                 "identifier": "text",
@@ -97,6 +111,28 @@
                 "type": "ExternalReference"
             },
             "name": "text",
+            "returnType": {
+                "argumentTypes": [
+                    {
+                        "arguments": [],
+                        "module": null,
+                        "name": "String",
+                        "type": "TypeReference"
+                    }
+                ],
+                "returnType": {
+                    "arguments": [
+                        {
+                            "name": "msg",
+                            "type": "TypeVariable"
+                        }
+                    ],
+                    "module": null,
+                    "name": "Html",
+                    "type": "TypeReference"
+                },
+                "type": "FunctionType"
+            },
             "sourceLocation": {
                 "end": {
                     "col": 14,
@@ -109,7 +145,6 @@
             },
             "type": "Definition"
         },
-        "TODO: Decl",
         {
             "expression": {
                 "arguments": [
@@ -263,6 +298,17 @@
                 "type": "FunctionApplication"
             },
             "name": "main",
+            "returnType": {
+                "arguments": [
+                    {
+                        "name": "msg",
+                        "type": "TypeVariable"
+                    }
+                ],
+                "module": null,
+                "name": "Html",
+                "type": "TypeReference"
+            },
             "sourceLocation": {
                 "end": {
                     "col": 10,
