@@ -1,4 +1,4 @@
-module AllSyntax.WindowsEol exposing (..)
+module AllSyntax.WindowsEol exposing (string)
 
 {-| elm-format converts all CRLF line-endings to LF.
 

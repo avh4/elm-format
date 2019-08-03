@@ -1,4 +1,4 @@
-module Main exposing (Parens, Unit)
+module Types exposing (Unit)
 
 
 type alias Unit =

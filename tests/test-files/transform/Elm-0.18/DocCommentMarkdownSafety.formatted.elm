@@ -1,4 +1,4 @@
-module Main exposing (f, x)
+module DocCommentMarkdownSafety exposing (x)
 
 {-| These are examples where the input markdown is unsafe (meaning it
 is parsed differently by some popular markdown implementations).
