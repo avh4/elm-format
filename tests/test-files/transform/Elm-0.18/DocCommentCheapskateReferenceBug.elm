@@ -1,3 +1,6 @@
+module DocCommentCheapskateReferenceBug exposing (f)
+
+
 {-| docs
 
 [link1]: http://example.com

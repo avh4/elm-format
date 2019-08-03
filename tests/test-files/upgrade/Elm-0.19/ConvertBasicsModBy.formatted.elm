@@ -1,4 +1,4 @@
-module Main exposing (binop, binop_comments, extraArgs, fullyApplied, fullyApplied_comments, looserBinding, looserBinding_comments, partiallyApplied, tigherBinding, tigherBinding_comments, unapplied)
+module ConvertBasicsModBy exposing (binop)
 
 
 binop =

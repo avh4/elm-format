@@ -1,3 +1,5 @@
+module RemoveBasicsCurry exposing (fullyApplied)
+
 fullyApplied f = curry f "1" 2
 fullyApplied_comments f = curry{-A-}f{-B-}"1"{-C-}2
 partiallyApplied f = curry f "1"

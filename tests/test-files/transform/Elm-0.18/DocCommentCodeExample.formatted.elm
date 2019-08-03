@@ -1,4 +1,4 @@
-module Main exposing (f, g, h)
+module DocCommentCodeExample exposing (f)
 
 {-| -}
 

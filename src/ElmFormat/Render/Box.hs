@@ -265,10 +265,17 @@ formatModuleHeader elmVersion addDefaultHeader modu =
       AST.KeywordCommented _ _ exportsList =
           AST.Module.exports (maybeHeader |> Maybe.fromMaybe AST.Module.defaultHeader)
 
-      detailedListingToSet :: Set (AST.Commented AST.Variable.Value) -> AST.Variable.Listing AST.Module.DetailedListing -> Set (AST.Commented AST.Variable.Value)
-      detailedListingToSet allAvailable (AST.Variable.OpenListing _) = allAvailable
-      detailedListingToSet _ AST.Variable.ClosedListing = Set.empty
-      detailedListingToSet _ (AST.Variable.ExplicitListing (AST.Module.DetailedListing values operators types) _) =
+      -- this is Nothing if there is no explicit module line
+      maybeExportsList =
+          case fmap AST.Module.exports (AST.Module.header modu) of
+              Nothing -> Nothing
+              Just (AST.KeywordCommented _ _ e) -> Just e
+
+      detailedListingToSet :: Maybe (AST.Variable.Listing AST.Module.DetailedListing) -> Set (AST.Commented AST.Variable.Value)
+      detailedListingToSet Nothing = definedVars -- when there is no module line
+      detailedListingToSet (Just (AST.Variable.OpenListing _)) = Set.empty
+      detailedListingToSet (Just AST.Variable.ClosedListing) = Set.empty
+      detailedListingToSet (Just (AST.Variable.ExplicitListing (AST.Module.DetailedListing values operators types) _)) =
           Set.unions
               [ Map.assocs values |> fmap (\(name, AST.Commented pre () post) -> AST.Commented pre (AST.Variable.Value name) post) |> Set.fromList
               , Map.assocs operators |> fmap (\(name, AST.Commented pre () post) -> AST.Commented pre (AST.Variable.OpValue name) post) |> Set.fromList
@@ -282,7 +289,7 @@ formatModuleHeader elmVersion addDefaultHeader modu =
       varsToExpose =
           sortVars
               (detailedListingIsMultiline exportsList)
-              (detailedListingToSet definedVars exportsList)
+              (detailedListingToSet maybeExportsList)
               documentedVars
 
       extractVarName :: TopLevelStructure Declaration -> [AST.Variable.Value]

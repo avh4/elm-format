@@ -1,3 +1,4 @@
+module Patterns exposing (consList)
 
 consList
     ( a::b::c
