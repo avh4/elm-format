@@ -1,6 +1,6 @@
 module Main where
 
-import Test.Tasty
+import           Test.Tasty
 
 import qualified Test.Property
 import qualified BoxTest
@@ -18,21 +18,21 @@ import qualified Util.ListTest
 
 
 main :: IO ()
-main =
-    do
-        markdownTests <- CommonMarkTests.construct
-        defaultMain $ testGroup "elm-format" $
-            [ Test.Property.propertyTests
-            , BoxTest.tests
-            , ElmFormat.Render.ElmStructureTest.tests
-            , Integration.CliTest.tests
-            , Integration.LiteralTest.tests
-            , Parse.ExpressionTest.tests
-            , Parse.HelpersTest.tests
-            , Parse.LiteralTest.tests
-            , Parse.PatternTest.tests
-            , Parse.TypeTest.tests
-            , Parse.TestHelpersTest.tests
-            , Util.ListTest.tests
-            -- , markdownTests
-            ]
+main = do
+  markdownTests <- CommonMarkTests.construct
+  defaultMain
+    $ testGroup "elm-format"
+    $ [ Test.Property.propertyTests
+      , BoxTest.tests
+      , ElmFormat.Render.ElmStructureTest.tests
+      , Integration.CliTest.tests
+      , Integration.LiteralTest.tests
+      , Parse.ExpressionTest.tests
+      , Parse.HelpersTest.tests
+      , Parse.LiteralTest.tests
+      , Parse.PatternTest.tests
+      , Parse.TypeTest.tests
+      , Parse.TestHelpersTest.tests
+      , Util.ListTest.tests
+      -- , markdownTests
+      ]

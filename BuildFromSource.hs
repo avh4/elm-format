@@ -34,77 +34,82 @@ and testing interactions between projects.
 -}
 module Main where
 
-import qualified Data.List          as List
-import qualified Data.Map           as Map
-import           System.Directory   (createDirectoryIfMissing,
-                                     getCurrentDirectory, setCurrentDirectory)
-import           System.Environment (getArgs)
-import           System.Exit        (ExitCode, exitFailure)
-import           System.FilePath    ((</>))
-import           System.IO          (hPutStrLn, stderr)
-import           System.Process     (rawSystem)
+import qualified Data.List                     as List
+import qualified Data.Map                      as Map
+import           System.Directory                         ( createDirectoryIfMissing
+                                                          , getCurrentDirectory
+                                                          , setCurrentDirectory
+                                                          )
+import           System.Environment                       ( getArgs )
+import           System.Exit                              ( ExitCode
+                                                          , exitFailure
+                                                          )
+import           System.FilePath                          ( (</>) )
+import           System.IO                                ( hPutStrLn
+                                                          , stderr
+                                                          )
+import           System.Process                           ( rawSystem )
 
 
 (=:) = (,)
 
 configs :: Map.Map String [(String, (String, String))]
-configs =
-  Map.fromList
-    [
-      "build" =:
-        [ "elm-compiler" =: ("avh4", "elm-format")
-        ]
-    ]
+configs = Map.fromList ["build" =: ["elm-compiler" =: ("avh4", "elm-format")]]
 
 
 main :: IO ()
-main =
- do args <- getArgs
-    case args of
-      [version] | Map.member version configs ->
-          let artifactDirectory = "Elm-Platform" </> version
-              repos = configs Map.! version
-          in
-              makeRepos artifactDirectory version repos
+main = do
+  args <- getArgs
+  case args of
+    [version] | Map.member version configs ->
+      let artifactDirectory = "Elm-Platform" </> version
+          repos             = configs Map.! version
+      in  makeRepos artifactDirectory version repos
 
-      _ ->
-        do hPutStrLn stderr $
-               "Expecting one of the following values as an argument:\n" ++
-               "    " ++ List.intercalate ", " (Map.keys configs)
-           exitFailure
+    _ -> do
+      hPutStrLn stderr
+        $  "Expecting one of the following values as an argument:\n"
+        ++ "    "
+        ++ List.intercalate ", " (Map.keys configs)
+      exitFailure
 
 
 makeRepos :: FilePath -> String -> [(String, (String, String))] -> IO ()
-makeRepos artifactDirectory version repos =
- do createDirectoryIfMissing True artifactDirectory
-    setCurrentDirectory artifactDirectory
-    root <- getCurrentDirectory
-    mapM_ (uncurry (makeRepo root)) repos
+makeRepos artifactDirectory version repos = do
+  createDirectoryIfMissing True artifactDirectory
+  setCurrentDirectory artifactDirectory
+  root <- getCurrentDirectory
+  mapM_ (uncurry (makeRepo root)) repos
 
-    cabal [ "update" ]
+  cabal ["update"]
 
-    -- create a sandbox for installation
-    cabal [ "sandbox", "init" ]
+  -- create a sandbox for installation
+  cabal ["sandbox", "init"]
 
-    -- add each of the sub-directories as a sandbox source
-    cabal ([ "sandbox", "add-source" ] ++ map fst repos)
+  -- add each of the sub-directories as a sandbox source
+  cabal (["sandbox", "add-source"] ++ map fst repos)
 
-    -- install all of the packages together in order to resolve transitive dependencies robustly
-    -- (install the dependencies a bit more quietly than the elm packages)
-    cabal ([ "install", "-j", "--only-dependencies", "--ghc-options=\"-w\"" ] ++ map fst repos)
-    cabal ([ "install", "-j", "--ghc-options=\"-XFlexibleContexts\"" ] ++ filter (/= "elm-reactor") (map fst repos))
+  -- install all of the packages together in order to resolve transitive dependencies robustly
+  -- (install the dependencies a bit more quietly than the elm packages)
+  cabal
+    (  ["install", "-j", "--only-dependencies", "--ghc-options=\"-w\""]
+    ++ map fst repos
+    )
+  cabal
+    (  ["install", "-j", "--ghc-options=\"-XFlexibleContexts\""]
+    ++ filter (/= "elm-reactor") (map fst repos)
+    )
 
-    return ()
+  return ()
 
 makeRepo :: FilePath -> String -> (String, String) -> IO ()
-makeRepo root projectName (user,version) =
-  do  -- get the right version of the repo
-    git [ "clone", "https://github.com/" ++ user ++ "/" ++ projectName ++ ".git" ]
-    setCurrentDirectory projectName
-    git [ "checkout", version, "--quiet" ]
+makeRepo root projectName (user, version) = do  -- get the right version of the repo
+  git ["clone", "https://github.com/" ++ user ++ "/" ++ projectName ++ ".git"]
+  setCurrentDirectory projectName
+  git ["checkout", version, "--quiet"]
 
-    -- move back into the root
-    setCurrentDirectory root
+  -- move back into the root
+  setCurrentDirectory root
 
 
 -- HELPER FUNCTIONS

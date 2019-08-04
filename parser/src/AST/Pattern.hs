@@ -1,12 +1,11 @@
 {-# OPTIONS_GHC -Wall #-}
 module AST.Pattern where
 
-import AST.V0_16
-import qualified Reporting.Annotation as A
+import           AST.V0_16
+import qualified Reporting.Annotation          as A
 
 
-type Pattern =
-    A.Located Pattern'
+type Pattern = A.Located Pattern'
 
 
 data Pattern'

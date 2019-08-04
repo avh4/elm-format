@@ -1,8 +1,8 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 module AST.V0_16 where
 
-import qualified Reporting.Annotation as A
-import Data.Int (Int64)
+import qualified Reporting.Annotation          as A
+import           Data.Int                                 ( Int64 )
 
 
 type List a = [a]
@@ -46,8 +46,7 @@ data Commented a =
 
 
 instance Functor Commented where
-  fmap f (Commented pre a post) =
-    Commented pre (f a) post
+  fmap f (Commented pre a post) = Commented pre (f a) post
 
 
 data KeywordCommented a =
@@ -70,8 +69,7 @@ Currently, the first item will never have leading comments.
 However, if Elm ever changes to allow optional leading delimiters, then
 comments before the first delimiter will go there.
 -}
-type Sequence a =
-    List ( Comments, PreCommented (WithEol a) )
+type Sequence a = List (Comments, PreCommented (WithEol a))
 
 
 {-| This represents a list of things between clear start and end delimiters.
@@ -122,13 +120,11 @@ data OpenCommentedList a
     deriving (Eq, Show)
 
 exposedToOpen :: Comments -> ExposedCommentedList a -> OpenCommentedList a
-exposedToOpen pre exposed =
-    case exposed of
-        Single item ->
-            OpenCommentedList [] (pre, item)
+exposedToOpen pre exposed = case exposed of
+  Single item -> OpenCommentedList [] (pre, item)
 
-        Multiple (first', postFirst) rest' lst ->
-            OpenCommentedList (Commented pre first' postFirst : rest') lst
+  Multiple (first', postFirst) rest' lst ->
+    OpenCommentedList (Commented pre first' postFirst : rest') lst
 
 
 {-| Represents a delimiter-separated pair.
@@ -156,7 +152,7 @@ data Multiline
 
 
 isMultiline :: Multiline -> Bool
-isMultiline JoinAll = False
+isMultiline JoinAll  = False
 isMultiline SplitAll = True
 
 
@@ -213,5 +209,4 @@ data Type'
     deriving (Eq, Show)
 
 
-type Type =
-    A.Located Type'
+type Type = A.Located Type'

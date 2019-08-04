@@ -10,20 +10,17 @@ newtype Reversed a = Reversed [a]
 
 
 empty :: Reversed a
-empty =
-    Reversed []
+empty = Reversed []
 
 
 push :: a -> Reversed a -> Reversed a
-push a (Reversed list) =
-    Reversed (a : list)
+push a (Reversed list) = Reversed (a : list)
 
 
 isEmpty :: Reversed a -> Bool
 isEmpty (Reversed []) = True
-isEmpty _ = False
+isEmpty _             = False
 
 
 toList :: Reversed a -> [a]
-toList (Reversed list) =
-    reverse list
+toList (Reversed list) = reverse list

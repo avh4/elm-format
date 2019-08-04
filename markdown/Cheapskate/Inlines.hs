@@ -1,48 +1,56 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Cheapskate.Inlines (
-        parseInlines
-      , pHtmlTag
-      , pReference
-      , pLinkLabel)
+module Cheapskate.Inlines
+  ( parseInlines
+  , pHtmlTag
+  , pReference
+  , pLinkLabel
+  )
 where
-import Cheapskate.ParserCombinators
-import Cheapskate.Util
-import Cheapskate.Types
-import Data.Char hiding (Space)
-import qualified Data.Sequence as Seq
-import Data.Sequence (singleton, (<|), viewl, ViewL(..))
-import Prelude hiding (takeWhile)
-import Control.Applicative
-import Control.Monad
-import Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Set as Set
+import           Cheapskate.ParserCombinators
+import           Cheapskate.Util
+import           Cheapskate.Types
+import           Data.Char                         hiding ( Space )
+import qualified Data.Sequence                 as Seq
+import           Data.Sequence                            ( singleton
+                                                          , (<|)
+                                                          , viewl
+                                                          , ViewL(..)
+                                                          )
+import           Prelude                           hiding ( takeWhile )
+import           Control.Applicative
+import           Control.Monad
+import           Data.Text                                ( Text )
+import qualified Data.Text                     as T
+import qualified Data.Set                      as Set
 
 -- Returns tag type and whole tag.
 pHtmlTag :: Parser (HtmlTagType, Text)
 pHtmlTag = do
-  _ <- char '<'
+  _       <- char '<'
   -- do not end the tag with a > character in a quoted attribute.
   closing <- (char '/' >> return True) <|> return False
   tagname <- takeWhile1 (\c -> isAsciiAlphaNum c || c == '?' || c == '!')
   let tagname' = T.toLower tagname
-  let attr = do ss <- takeWhile isSpace
-                x <- satisfy isLetter
-                xs <- takeWhile (\c -> isAsciiAlphaNum c || c == ':')
-                skip (=='=')
-                v <- pQuoted '"' <|> pQuoted '\'' <|> takeWhile1 isAlphaNum
-                      <|> return ""
-                return $ ss <> T.singleton x <> xs <> "=" <> v
+  let
+    attr = do
+      ss <- takeWhile isSpace
+      x  <- satisfy isLetter
+      xs <- takeWhile (\c -> isAsciiAlphaNum c || c == ':')
+      skip (== '=')
+      v <- pQuoted '"' <|> pQuoted '\'' <|> takeWhile1 isAlphaNum <|> return ""
+      return $ ss <> T.singleton x <> xs <> "=" <> v
   attrs <- T.concat <$> many attr
   final <- takeWhile (\c -> isSpace c || c == '/')
-  _ <- char '>'
+  _     <- char '>'
   let tagtype = if closing
-                   then Closing tagname'
-                   else case T.stripSuffix "/" final of
-                         Just _  -> SelfClosing tagname'
-                         Nothing -> Opening tagname'
-  return (tagtype,
-          T.pack ('<' : ['/' | closing]) <> tagname <> attrs <> final <> ">")
+        then Closing tagname'
+        else case T.stripSuffix "/" final of
+          Just _  -> SelfClosing tagname'
+          Nothing -> Opening tagname'
+  return
+    ( tagtype
+    , T.pack ('<' : [ '/' | closing ]) <> tagname <> attrs <> final <> ">"
+    )
 
 -- Parses a quoted attribute value.
 pQuoted :: Char -> Parser Text
@@ -56,7 +64,7 @@ pQuoted c = do
 -- do for now.
 pHtmlComment :: Parser Text
 pHtmlComment = do
-  _ <- string "<!--"
+  _    <- string "<!--"
   rest <- manyTill anyChar (string "-->")
   return $ "<!--" <> T.pack rest <> "-->"
 
@@ -67,12 +75,18 @@ pHtmlComment = do
 -- 1. [a link `with a ](/url)` character
 -- 2. [a link *with emphasized ](/url) text*
 pLinkLabel :: Parser Text
-pLinkLabel = char '[' *> (T.concat <$>
-  (manyTill (regChunk <|> pEscaped <|> bracketed <|> codeChunk) (char ']')))
-  where regChunk = takeWhile1 (\c -> c /='`' && c /='[' && c /=']' && c /='\\')
-        codeChunk = snd <$> pCode'
-        bracketed = inBrackets <$> pLinkLabel
-        inBrackets t = "[" <> t <> "]"
+pLinkLabel =
+  char '['
+    *> (   T.concat
+       <$> (manyTill (regChunk <|> pEscaped <|> bracketed <|> codeChunk)
+                     (char ']')
+           )
+       )
+ where
+  regChunk  = takeWhile1 (\c -> c /= '`' && c /= '[' && c /= ']' && c /= '\\')
+  codeChunk = snd <$> pCode'
+  bracketed = inBrackets <$> pLinkLabel
+  inBrackets t = "[" <> t <> "]"
 
 -- A URL in a link or reference.  This may optionally be contained
 -- in `<..>`; otherwise whitespace and unbalanced right parentheses
@@ -81,13 +95,16 @@ pLinkUrl :: Parser Text
 pLinkUrl = do
   inPointy <- (char '<' >> return True) <|> return False
   if inPointy
-     then T.pack <$> manyTill
-           (pSatisfy (\c -> c /='\r' && c /='\n')) (char '>')
-     else T.concat <$> many (regChunk <|> parenChunk)
-    where regChunk = takeWhile1 (notInClass " \n()\\") <|> pEscaped
-          parenChunk = parenthesize . T.concat <$> (char '(' *>
-                         manyTill (regChunk <|> parenChunk) (char ')'))
-          parenthesize x = "(" <> x <> ")"
+    then T.pack
+      <$> manyTill (pSatisfy (\c -> c /= '\r' && c /= '\n')) (char '>')
+    else T.concat <$> many (regChunk <|> parenChunk)
+ where
+  regChunk = takeWhile1 (notInClass " \n()\\") <|> pEscaped
+  parenChunk =
+    parenthesize
+      .   T.concat
+      <$> (char '(' *> manyTill (regChunk <|> parenChunk) (char ')'))
+  parenthesize x = "(" <> x <> ")"
 
 -- A link title, single or double quoted or in parentheses.
 -- Note that Markdown.pl doesn't allow the parenthesized form in
@@ -95,19 +112,18 @@ pLinkUrl = do
 -- arbitrary, so we remove it here.
 pLinkTitle :: Parser Text
 pLinkTitle = do
-  c <- satisfy (\c -> c == '"' || c == '\'' || c == '(')
+  c    <- satisfy (\c -> c == '"' || c == '\'' || c == '(')
   next <- peekChar
   case next of
-       Nothing                 -> mzero
-       Just x
-         | isWhitespace x      -> mzero
-         | x == ')'            -> mzero
-         | otherwise           -> return ()
-  let ender = if c == '(' then ')' else c
-  let pEnder = char ender <* nfb (skip isAlphaNum)
+    Nothing -> mzero
+    Just x | isWhitespace x -> mzero
+           | x == ')'       -> mzero
+           | otherwise      -> return ()
+  let ender    = if c == '(' then ')' else c
+  let pEnder   = char ender <* nfb (skip isAlphaNum)
   let regChunk = takeWhile1 (\x -> x /= ender && x /= '\\') <|> pEscaped
-  let nestedChunk = (\x -> T.singleton c <> x <> T.singleton ender)
-                      <$> pLinkTitle
+  let nestedChunk =
+        (\x -> T.singleton c <> x <> T.singleton ender) <$> pLinkTitle
   T.concat <$> manyTill (regChunk <|> nestedChunk) pEnder
 
 -- A link reference is a square-bracketed link label, a colon,
@@ -117,7 +133,7 @@ pLinkTitle = do
 pReference :: Parser (Text, Text, Text)
 pReference = do
   lab <- pLinkLabel
-  _ <- char ':'
+  _   <- char ':'
   scanSpnl
   url <- pLinkUrl
   tit <- option T.empty $ scanSpnl >> pLinkTitle
@@ -126,35 +142,35 @@ pReference = do
 
 -- Parses an escaped character and returns a Text.
 pEscaped :: Parser Text
-pEscaped = T.singleton <$> (skip (=='\\') *> satisfy isEscapable)
+pEscaped = T.singleton <$> (skip (== '\\') *> satisfy isEscapable)
 
 -- Parses a (possibly escaped) character satisfying the predicate.
 pSatisfy :: (Char -> Bool) -> Parser Char
 pSatisfy p =
   satisfy (\c -> c /= '\\' && p c)
-   <|> (char '\\' *> satisfy (\c -> isEscapable c && p c))
+    <|> (char '\\' *> satisfy (\c -> isEscapable c && p c))
 
 -- Parse a text into inlines, resolving reference links
 -- using the reference map.
 parseInlines :: ReferenceMap -> Text -> Inlines
 parseInlines refmap t =
   case parse (msum <$> many (pInline refmap) <* endOfInput) t of
-       Left e   -> error ("parseInlines: " ++ show e) -- should not happen
-       Right r  -> r
+    Left  e -> error ("parseInlines: " ++ show e) -- should not happen
+    Right r -> r
 
 pInline :: ReferenceMap -> Parser Inlines
 pInline refmap =
-           pAsciiStr
-       <|> pSpace
-       <|> pEnclosure '*' refmap  -- strong/emph
-       <|> (notAfter isAlphaNum *> pEnclosure '_' refmap)
-       <|> pCode
-       <|> pLink refmap
-       <|> pImage refmap
-       <|> pRawHtml
-       <|> pAutolink
-       <|> pEntity
-       <|> pSym
+  pAsciiStr
+    <|> pSpace
+    <|> pEnclosure '*' refmap  -- strong/emph
+    <|> (notAfter isAlphaNum *> pEnclosure '_' refmap)
+    <|> pCode
+    <|> pLink refmap
+    <|> pImage refmap
+    <|> pRawHtml
+    <|> pAutolink
+    <|> pEntity
+    <|> pSym
 
 -- Parse spaces or newlines, and determine whether
 -- we have a regular space, a line break (two spaces before
@@ -163,28 +179,22 @@ pInline refmap =
 pSpace :: Parser Inlines
 pSpace = do
   ss <- takeWhile1 isWhitespace
-  return $ singleton
-         $ if T.any (=='\n') ss
-              then if "  " `T.isPrefixOf` ss
-                   then LineBreak
-                   else SoftBreak
-              else Space
+  return $ singleton $ if T.any (== '\n') ss
+    then if "  " `T.isPrefixOf` ss then LineBreak else SoftBreak
+    else Space
 
 isAsciiAlphaNum :: Char -> Bool
 isAsciiAlphaNum c =
-  (c >= 'a' && c <= 'z') ||
-  (c >= 'A' && c <= 'Z') ||
-  (c >= '0' && c <= '9')
+  (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
 
 pAsciiStr :: Parser Inlines
 pAsciiStr = do
-  t <- takeWhile1 isAsciiAlphaNum
+  t   <- takeWhile1 isAsciiAlphaNum
   mbc <- peekChar
   case mbc of
-       Just ':' -> if t `Set.member` schemeSet
-                      then pUri t
-                      else return $ singleton $ Str t
-       _        -> return $ singleton $ Str t
+    Just ':' ->
+      if t `Set.member` schemeSet then pUri t else return $ singleton $ Str t
+    _ -> return $ singleton $ Str t
 
 -- Catch all -- parse an escaped character, an escaped
 -- newline, or any remaining symbol character.
@@ -193,43 +203,186 @@ pSym = do
   c <- anyChar
   let ch = singleton . Str . T.singleton
   if c == '\\'
-     then ch <$> satisfy isEscapable
-          <|> singleton LineBreak <$ satisfy (=='\n')
-          <|> return (ch '\\')
-     else return (ch c)
+    then
+      ch
+      <$> satisfy isEscapable
+      <|> singleton LineBreak
+      <$  satisfy (== '\n')
+      <|> return (ch '\\')
+    else return (ch c)
 
 -- http://www.iana.org/assignments/uri-schemes.html plus
 -- the unofficial schemes coap, doi, javascript.
 schemes :: [Text]
-schemes = [ -- unofficial
-            "coap","doi","javascript"
+schemes =
+  [ -- unofficial
+    "coap"
+  , "doi"
+  , "javascript"
            -- official
-           ,"aaa","aaas","about","acap"
-           ,"cap","cid","crid","data","dav","dict","dns","file","ftp"
-           ,"geo","go","gopher","h323","http","https","iax","icap","im"
-           ,"imap","info","ipp","iris","iris.beep","iris.xpc","iris.xpcs"
-           ,"iris.lwz","ldap","mailto","mid","msrp","msrps","mtqp"
-           ,"mupdate","news","nfs","ni","nih","nntp","opaquelocktoken","pop"
-           ,"pres","rtsp","service","session","shttp","sieve","sip","sips"
-           ,"sms","snmp","soap.beep","soap.beeps","tag","tel","telnet","tftp"
-           ,"thismessage","tn3270","tip","tv","urn","vemmi","ws","wss"
-           ,"xcon","xcon-userid","xmlrpc.beep","xmlrpc.beeps","xmpp","z39.50r"
-           ,"z39.50s"
+  , "aaa"
+  , "aaas"
+  , "about"
+  , "acap"
+  , "cap"
+  , "cid"
+  , "crid"
+  , "data"
+  , "dav"
+  , "dict"
+  , "dns"
+  , "file"
+  , "ftp"
+  , "geo"
+  , "go"
+  , "gopher"
+  , "h323"
+  , "http"
+  , "https"
+  , "iax"
+  , "icap"
+  , "im"
+  , "imap"
+  , "info"
+  , "ipp"
+  , "iris"
+  , "iris.beep"
+  , "iris.xpc"
+  , "iris.xpcs"
+  , "iris.lwz"
+  , "ldap"
+  , "mailto"
+  , "mid"
+  , "msrp"
+  , "msrps"
+  , "mtqp"
+  , "mupdate"
+  , "news"
+  , "nfs"
+  , "ni"
+  , "nih"
+  , "nntp"
+  , "opaquelocktoken"
+  , "pop"
+  , "pres"
+  , "rtsp"
+  , "service"
+  , "session"
+  , "shttp"
+  , "sieve"
+  , "sip"
+  , "sips"
+  , "sms"
+  , "snmp"
+  , "soap.beep"
+  , "soap.beeps"
+  , "tag"
+  , "tel"
+  , "telnet"
+  , "tftp"
+  , "thismessage"
+  , "tn3270"
+  , "tip"
+  , "tv"
+  , "urn"
+  , "vemmi"
+  , "ws"
+  , "wss"
+  , "xcon"
+  , "xcon-userid"
+  , "xmlrpc.beep"
+  , "xmlrpc.beeps"
+  , "xmpp"
+  , "z39.50r"
+  , "z39.50s"
            -- provisional
-           ,"adiumxtra","afp","afs","aim","apt","attachment","aw"
-           ,"beshare","bitcoin","bolo","callto","chrome","chrome-extension"
-           ,"com-eventbrite-attendee","content","cvs","dlna-playsingle"
-           ,"dlna-playcontainer","dtn","dvb","ed2k","facetime","feed"
-           ,"finger","fish","gg","git","gizmoproject","gtalk"
-           ,"hcp","icon","ipn","irc","irc6","ircs","itms","jar"
-           ,"jms","keyparc","lastfm","ldaps","magnet","maps","market"
-           ,"message","mms","ms-help","msnim","mumble","mvn","notes"
-           ,"oid","palm","paparazzi","platform","proxy","psyc","query"
-           ,"res","resource","rmi","rsync","rtmp","secondlife","sftp"
-           ,"sgn","skype","smb","soldat","spotify","ssh","steam","svn"
-           ,"teamspeak","things","udp","unreal","ut2004","ventrilo"
-           ,"view-source","webcal","wtai","wyciwyg","xfire","xri"
-           ,"ymsgr" ]
+  , "adiumxtra"
+  , "afp"
+  , "afs"
+  , "aim"
+  , "apt"
+  , "attachment"
+  , "aw"
+  , "beshare"
+  , "bitcoin"
+  , "bolo"
+  , "callto"
+  , "chrome"
+  , "chrome-extension"
+  , "com-eventbrite-attendee"
+  , "content"
+  , "cvs"
+  , "dlna-playsingle"
+  , "dlna-playcontainer"
+  , "dtn"
+  , "dvb"
+  , "ed2k"
+  , "facetime"
+  , "feed"
+  , "finger"
+  , "fish"
+  , "gg"
+  , "git"
+  , "gizmoproject"
+  , "gtalk"
+  , "hcp"
+  , "icon"
+  , "ipn"
+  , "irc"
+  , "irc6"
+  , "ircs"
+  , "itms"
+  , "jar"
+  , "jms"
+  , "keyparc"
+  , "lastfm"
+  , "ldaps"
+  , "magnet"
+  , "maps"
+  , "market"
+  , "message"
+  , "mms"
+  , "ms-help"
+  , "msnim"
+  , "mumble"
+  , "mvn"
+  , "notes"
+  , "oid"
+  , "palm"
+  , "paparazzi"
+  , "platform"
+  , "proxy"
+  , "psyc"
+  , "query"
+  , "res"
+  , "resource"
+  , "rmi"
+  , "rsync"
+  , "rtmp"
+  , "secondlife"
+  , "sftp"
+  , "sgn"
+  , "skype"
+  , "smb"
+  , "soldat"
+  , "spotify"
+  , "ssh"
+  , "steam"
+  , "svn"
+  , "teamspeak"
+  , "things"
+  , "udp"
+  , "unreal"
+  , "ut2004"
+  , "ventrilo"
+  , "view-source"
+  , "webcal"
+  , "wtai"
+  , "wyciwyg"
+  , "xfire"
+  , "xri"
+  , "ymsgr"
+  ]
 
 -- Make them a set for more efficient lookup.
 schemeSet :: Set.Set Text
@@ -241,11 +394,10 @@ pUri scheme = do
   _ <- char ':'
   x <- scan (OpenParens 0) uriScanner
   guard $ not $ T.null x
-  let (rawuri, endingpunct) =
-        case T.last x of
-             c | c `elem` (".;?!:," :: String) ->
-               (scheme <> ":" <> T.init x, singleton (Str (T.singleton c)))
-             _ -> (scheme <> ":" <> x, mempty)
+  let (rawuri, endingpunct) = case T.last x of
+        c | c `elem` (".;?!:," :: String) ->
+          (scheme <> ":" <> T.init x, singleton (Str (T.singleton c)))
+        _ -> (scheme <> ":" <> x, mempty)
   return $ autoLink rawuri <> endingpunct
 
 -- Scan non-ascii characters and ascii characters allowed in a URI.
@@ -260,42 +412,40 @@ pUri scheme = do
 data OpenParens = OpenParens Int
 
 uriScanner :: OpenParens -> Char -> Maybe OpenParens
-uriScanner _ ' '  = Nothing
-uriScanner _ '\n' = Nothing
-uriScanner (OpenParens n) '(' = Just (OpenParens (n + 1))
-uriScanner (OpenParens n) ')'
-  | n > 0 = Just (OpenParens (n - 1))
-  | otherwise = Nothing
-uriScanner st '+' = Just st
-uriScanner st '/' = Just st
+uriScanner _              ' '  = Nothing
+uriScanner _              '\n' = Nothing
+uriScanner (OpenParens n) '('  = Just (OpenParens (n + 1))
+uriScanner (OpenParens n) ')' | n > 0     = Just (OpenParens (n - 1))
+                              | otherwise = Nothing
+uriScanner st '+'          = Just st
+uriScanner st '/'          = Just st
 uriScanner _ c | isSpace c = Nothing
-uriScanner st _ = Just st
+uriScanner st _            = Just st
 
 -- Parses material enclosed in *s, **s, _s, or __s.
 -- Designed to avoid backtracking.
 pEnclosure :: Char -> ReferenceMap -> Parser Inlines
 pEnclosure c refmap = do
   cs <- takeWhile1 (== c)
-  (Str cs <|) <$> pSpace
-   <|> case T.length cs of
-            3  -> pThree c refmap
-            2  -> pTwo c refmap mempty
-            1  -> pOne c refmap mempty
-            _  -> return (singleton $ Str cs)
+  (Str cs <|) <$> pSpace <|> case T.length cs of
+    3 -> pThree c refmap
+    2 -> pTwo c refmap mempty
+    1 -> pOne c refmap mempty
+    _ -> return (singleton $ Str cs)
 
 -- singleton sequence or empty if contents are empty
 single :: (Inlines -> Inline) -> Inlines -> Inlines
-single constructor ils = if Seq.null ils
-                            then mempty
-                            else singleton (constructor ils)
+single constructor ils =
+  if Seq.null ils then mempty else singleton (constructor ils)
 
 -- parse inlines til you hit a c, and emit Emph.
 -- if you never hit a c, emit '*' + inlines parsed.
 pOne :: Char -> ReferenceMap -> Inlines -> Parser Inlines
 pOne c refmap prefix = do
-  contents <- msum <$> many ( (nfbChar c >> pInline refmap)
-                             <|> (string (T.pack [c,c]) >>
-                                  nfbChar c >> pTwo c refmap mempty) )
+  contents <- msum <$> many
+    (   (nfbChar c >> pInline refmap)
+    <|> (string (T.pack [c, c]) >> nfbChar c >> pTwo c refmap mempty)
+    )
   (char c >> return (single Emph $ prefix <> contents))
     <|> return (singleton (Str (T.singleton c)) <> (prefix <> contents))
 
@@ -303,10 +453,10 @@ pOne c refmap prefix = do
 -- if you never do hit two c's, emit '**' plus + inlines parsed.
 pTwo :: Char -> ReferenceMap -> Inlines -> Parser Inlines
 pTwo c refmap prefix = do
-  let ender = string $ T.pack [c,c]
+  let ender = string $ T.pack [c, c]
   contents <- msum <$> many (nfb ender >> pInline refmap)
   (ender >> return (single Strong $ prefix <> contents))
-    <|> return (singleton (Str $ T.pack [c,c]) <> (prefix <> contents))
+    <|> return (singleton (Str $ T.pack [c, c]) <> (prefix <> contents))
 
 -- parse inlines til you hit one c or a sequence of two c's.
 -- If one c, emit Emph and then parse pTwo.
@@ -314,9 +464,9 @@ pTwo c refmap prefix = do
 pThree :: Char -> ReferenceMap -> Parser Inlines
 pThree c refmap = do
   contents <- msum <$> (many (nfbChar c >> pInline refmap))
-  (string (T.pack [c,c]) >> (pOne c refmap (single Strong contents)))
-   <|> (char c >> (pTwo c refmap (single Emph contents)))
-   <|> return (singleton (Str $ T.pack [c,c,c]) <> contents)
+  (string (T.pack [c, c]) >> (pOne c refmap (single Strong contents)))
+    <|> (char c >> (pTwo c refmap (single Emph contents)))
+    <|> return (singleton (Str $ T.pack [c, c, c]) <> contents)
 
 -- Inline code span.
 pCode :: Parser Inlines
@@ -326,9 +476,9 @@ pCode = fst <$> pCode'
 pCode' :: Parser (Inlines, Text)
 pCode' = do
   ticks <- takeWhile1 (== '`')
-  let end = string ticks >> nfb (char '`')
+  let end             = string ticks >> nfb (char '`')
   let nonBacktickSpan = takeWhile1 (/= '`')
-  let backtickSpan = takeWhile1 (== '`')
+  let backtickSpan    = takeWhile1 (== '`')
   contents <- T.concat <$> manyTill (nonBacktickSpan <|> backtickSpan) end
   return (singleton . Code . T.strip $ contents, ticks <> contents <> ticks)
 
@@ -336,7 +486,8 @@ pLink :: ReferenceMap -> Parser Inlines
 pLink refmap = do
   lab <- pLinkLabel
   let lab' = parseInlines refmap lab
-  pInlineLink lab' <|> pReferenceLink refmap lab lab'
+  pInlineLink lab'
+    <|> pReferenceLink refmap lab lab'
     -- fallback without backtracking if it's not a link:
     <|> return (singleton (Str "[") <> lab' <> singleton (Str "]"))
 
@@ -347,7 +498,7 @@ pInlineLink lab = do
   scanSpaces
   url <- pLinkUrl
   tit <- option "" $ scanSpnl *> pLinkTitle <* scanSpaces
-  _ <- char ')'
+  _   <- char ')'
   return $ singleton $ Link lab (Url url) tit
 
 -- A reference link: [label], [foo][label], or [label][].
@@ -364,11 +515,9 @@ pImage refmap = do
   (linkToImage <$> pLink refmap) <|> return (singleton (Str "!"))
 
 linkToImage :: Inlines -> Inlines
-linkToImage ils =
-  case viewl ils of
-        (Link lab (Url url) tit :< x)
-          | Seq.null x -> singleton (Image lab url tit)
-        _ -> singleton (Str "!") <> ils
+linkToImage ils = case viewl ils of
+  (Link lab (Url url) tit :< x) | Seq.null x -> singleton (Image lab url tit)
+  _ -> singleton (Str "!") <> ils
 
 -- An entity.  We store these in a special inline element.
 -- This ensures that entities in the input come out as
@@ -376,9 +525,9 @@ linkToImage ils =
 -- convert them to characters and store them as Str inlines.
 pEntity :: Parser Inlines
 pEntity = do
-  _ <- char '&'
+  _   <- char '&'
   res <- pCharEntity <|> pDecEntity <|> pHexEntity
-  _ <- char ';'
+  _   <- char ';'
   return $ singleton $ Entity $ "&" <> res <> ";"
 
 pCharEntity :: Parser Text
@@ -386,14 +535,14 @@ pCharEntity = takeWhile1 (\c -> isAscii c && isLetter c)
 
 pDecEntity :: Parser Text
 pDecEntity = do
-  _ <- char '#'
+  _   <- char '#'
   res <- takeWhile1 isDigit
   return $ "#" <> res
 
 pHexEntity :: Parser Text
 pHexEntity = do
-  _ <- char '#'
-  x <- char 'X' <|> char 'x'
+  _   <- char '#'
+  x   <- char 'X' <|> char 'x'
   res <- takeWhile1 isHexDigit
   return $ "#" <> T.singleton x <> res
 
@@ -405,25 +554,27 @@ pRawHtml = singleton . RawHtml <$> (snd <$> pHtmlTag <|> pHtmlComment)
 -- Markdown.pl does email obfuscation; we don't bother with that here.
 pAutolink :: Parser Inlines
 pAutolink = do
-  skip (=='<')
-  s <- takeWhile1 (\c -> c /= ':' && c /= '@')
-  rest <- takeWhile1 (\c -> c /='>' && c /= ' ')
-  skip (=='>')
+  skip (== '<')
+  s    <- takeWhile1 (\c -> c /= ':' && c /= '@')
+  rest <- takeWhile1 (\c -> c /= '>' && c /= ' ')
+  skip (== '>')
   case True of
-       _ | "@" `T.isPrefixOf` rest -> return $ emailLink (s <> rest)
-         | s `Set.member` schemeSet -> return $ autoLink (s <> rest)
-         | otherwise   -> fail "Unknown contents of <>"
+    _ | "@" `T.isPrefixOf` rest  -> return $ emailLink (s <> rest)
+      | s `Set.member` schemeSet -> return $ autoLink (s <> rest)
+      | otherwise                -> fail "Unknown contents of <>"
 
 autoLink :: Text -> Inlines
 autoLink t = singleton $ Link (toInlines t) (Url t) (T.empty)
-  where toInlines t' = case parse pToInlines t' of
-                         Right r   -> r
-                         Left e    -> error $ "autolink: " ++ show e
-        pToInlines = mconcat <$> many strOrEntity
-        strOrEntity = ((singleton . Str) <$> takeWhile1 (/='&'))
-                   <|> pEntity
-                   <|> ((singleton . Str) <$> string "&")
+ where
+  toInlines t' = case parse pToInlines t' of
+    Right r -> r
+    Left  e -> error $ "autolink: " ++ show e
+  pToInlines = mconcat <$> many strOrEntity
+  strOrEntity =
+    ((singleton . Str) <$> takeWhile1 (/= '&'))
+      <|> pEntity
+      <|> ((singleton . Str) <$> string "&")
 
 emailLink :: Text -> Inlines
-emailLink t = singleton $ Link (singleton $ Str t)
-                               (Url $ "mailto:" <> t) (T.empty)
+emailLink t =
+  singleton $ Link (singleton $ Str t) (Url $ "mailto:" <> t) (T.empty)

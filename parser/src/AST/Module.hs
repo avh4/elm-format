@@ -1,16 +1,22 @@
 module AST.Module
-    ( Module(..), Header(..), SourceTag(..)
-    , UserImport, ImportMethod(..)
-    , DetailedListing(..)
-    , defaultHeader
-    ) where
+  ( Module(..)
+  , Header(..)
+  , SourceTag(..)
+  , UserImport
+  , ImportMethod(..)
+  , DetailedListing(..)
+  , defaultHeader
+  )
+where
 
-import AST.Declaration (TopLevelStructure, Declaration)
-import qualified AST.Variable as Var
-import qualified Cheapskate.Types as Markdown
-import Data.Map.Strict (Map)
-import qualified Reporting.Annotation as A
-import AST.V0_16
+import           AST.Declaration                          ( TopLevelStructure
+                                                          , Declaration
+                                                          )
+import qualified AST.Variable                  as Var
+import qualified Cheapskate.Types              as Markdown
+import           Data.Map.Strict                          ( Map )
+import qualified Reporting.Annotation          as A
+import           AST.V0_16
 
 
 -- MODULES
@@ -27,14 +33,12 @@ data Module = Module
 
 
 instance A.Strippable Module where
-  stripRegion m =
-    Module
-    { initialComments = initialComments m
-    , header = header m
-    , docs = A.stripRegion $ docs m
-    , imports = imports m
-    , body = map A.stripRegion $ body m
-    }
+  stripRegion m = Module { initialComments = initialComments m
+                         , header          = header m
+                         , docs            = A.stripRegion $ docs m
+                         , imports         = imports m
+                         , body            = map A.stripRegion $ body m
+                         }
 
 
 -- HEADERS
@@ -57,12 +61,11 @@ data Header = Header
 
 
 defaultHeader :: Header
-defaultHeader =
-    Header
-        Normal
-        (Commented [] [UppercaseIdentifier "Main"] [])
-        Nothing
-        (KeywordCommented [] [] $ Var.OpenListing $ Commented [] () [])
+defaultHeader = Header
+  Normal
+  (Commented [] [UppercaseIdentifier "Main"] [])
+  Nothing
+  (KeywordCommented [] [] $ Var.OpenListing $ Commented [] () [])
 
 
 data DetailedListing = DetailedListing
@@ -73,13 +76,12 @@ data DetailedListing = DetailedListing
     deriving (Eq, Show)
 
 
-type SourceSettings =
-  [(Commented LowercaseIdentifier, Commented UppercaseIdentifier)]
+type SourceSettings
+  = [(Commented LowercaseIdentifier, Commented UppercaseIdentifier)]
 
 -- IMPORTs
 
-type UserImport
-    = (PreCommented [UppercaseIdentifier], ImportMethod)
+type UserImport = (PreCommented [UppercaseIdentifier], ImportMethod)
 
 
 data ImportMethod = ImportMethod

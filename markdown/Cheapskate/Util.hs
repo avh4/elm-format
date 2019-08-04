@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Cheapskate.Util (
-    joinLines
+module Cheapskate.Util
+  ( joinLines
   , tabFilter
   , isWhitespace
   , isEscapable
@@ -16,13 +16,14 @@ module Cheapskate.Util (
   , nfb
   , nfbChar
   , upToCountChars
-  ) where
+  )
+where
 
-import Data.Text (Text)
-import qualified Data.Text as T
-import Data.Char
-import Control.Applicative ()
-import Cheapskate.ParserCombinators
+import           Data.Text                                ( Text )
+import qualified Data.Text                     as T
+import           Data.Char
+import           Control.Applicative                      ( )
+import           Cheapskate.ParserCombinators
 
 -- Utility functions.
 
@@ -34,11 +35,13 @@ joinLines = T.intercalate "\n"
 -- Convert tabs to spaces using a 4-space tab stop.
 tabFilter :: Text -> Text
 tabFilter = T.concat . pad . T.split (== '\t')
-  where pad []  = []
-        pad [t] = [t]
-        pad (t:ts) = let tl = T.length t
-                         n  = tl + 4 - (tl `mod` 4)
-                         in  T.justifyLeft n ' ' t : pad ts
+ where
+  pad []  = []
+  pad [t] = [t]
+  pad (t : ts) =
+    let tl = T.length t
+        n  = tl + 4 - (tl `mod` 4)
+    in  T.justifyLeft n ' ' t : pad ts
 
 -- These are the whitespace characters that are significant in
 -- parsing markdown. We can treat \160 (nonbreaking space) etc.
@@ -75,18 +78,18 @@ type Scanner = Parser ()
 
 -- Scan four spaces.
 scanIndentSpace :: Scanner
-scanIndentSpace = () <$ count 4 (skip (==' '))
+scanIndentSpace = () <$ count 4 (skip (== ' '))
 
 scanSpacesToColumn :: Int -> Scanner
 scanSpacesToColumn col = do
   currentCol <- column <$> getPosition
   case col - currentCol of
-       n | n >= 1 -> () <$ (count n (skip (==' ')))
-         | otherwise -> return ()
+    n | n >= 1    -> () <$ (count n (skip (== ' ')))
+      | otherwise -> return ()
 
 -- Scan 0-3 spaces.
 scanNonindentSpace :: Scanner
-scanNonindentSpace = () <$ upToCountChars 3 (==' ')
+scanNonindentSpace = () <$ upToCountChars 3 (== ' ')
 
 -- Scan a specified character.
 scanChar :: Char -> Scanner
@@ -98,7 +101,7 @@ scanBlankline = scanSpaces *> endOfInput
 
 -- Scan 0 or more spaces
 scanSpaces :: Scanner
-scanSpaces = skipWhile (==' ')
+scanSpaces = skipWhile (== ' ')
 
 -- Scan 0 or more spaces, and optionally a newline
 -- and more spaces.
@@ -112,8 +115,8 @@ nfb = notFollowedBy
 
 -- Succeed if not followed by a character. Consumes no input.
 nfbChar :: Char -> Scanner
-nfbChar c = nfb (skip (==c))
+nfbChar c = nfb (skip (== c))
 
 upToCountChars :: Int -> (Char -> Bool) -> Parser Text
 upToCountChars cnt f =
-  scan 0 (\n c -> if n < cnt && f c then Just (n+1) else Nothing)
+  scan 0 (\n c -> if n < cnt && f c then Just (n + 1) else Nothing)

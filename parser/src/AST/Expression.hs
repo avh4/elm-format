@@ -1,10 +1,10 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 module AST.Expression where
 
-import AST.V0_16
-import qualified AST.Pattern as Pattern
-import qualified AST.Variable as Var
-import qualified Reporting.Annotation as A
+import           AST.V0_16
+import qualified AST.Pattern                   as Pattern
+import qualified AST.Variable                  as Var
+import qualified Reporting.Annotation          as A
 
 
 ---- GENERAL AST ----
@@ -21,12 +21,10 @@ data LetDeclaration
   deriving (Eq, Show)
 
 
-type Expr =
-    A.Located Expr'
+type Expr = A.Located Expr'
 
 
-type IfClause =
-  (Commented Expr, Commented Expr)
+type IfClause = (Commented Expr, Commented Expr)
 
 
 data Expr'
@@ -69,17 +67,11 @@ data Expr'
 
 
 instance A.Strippable Expr' where
-  stripRegion d =
-    case d of
-      App e0 es b ->
-        App
-          (A.stripRegion $ A.map A.stripRegion e0)
-          (map (fmap (A.stripRegion . A.map A.stripRegion)) es)
-          b
+  stripRegion d = case d of
+    App e0 es b -> App (A.stripRegion $ A.map A.stripRegion e0)
+                       (map (fmap (A.stripRegion . A.map A.stripRegion)) es)
+                       b
 
-      Tuple es b ->
-        Tuple
-          (map (fmap (A.stripRegion . A.map A.stripRegion)) es)
-          b
+    Tuple es b -> Tuple (map (fmap (A.stripRegion . A.map A.stripRegion)) es) b
 
-      _ -> d
+    _          -> d

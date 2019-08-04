@@ -2,14 +2,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Reporting.Error where
 
-import Data.Aeson ((.=))
-import qualified Data.Aeson as Json
-import Prelude hiding (print)
+import           Data.Aeson                               ( (.=) )
+import qualified Data.Aeson                    as Json
+import           Prelude                           hiding ( print )
 
-import qualified Reporting.Annotation as A
-import qualified Reporting.Error.Docs as Docs
-import qualified Reporting.Error.Syntax as Syntax
-import qualified Reporting.Report as Report
+import qualified Reporting.Annotation          as A
+import qualified Reporting.Error.Docs          as Docs
+import qualified Reporting.Error.Syntax        as Syntax
+import qualified Reporting.Report              as Report
 
 
 -- ALL POSSIBLE ERRORS
@@ -23,13 +23,10 @@ data Error
 -- TO REPORT
 
 toReport :: Error -> Report.Report
-toReport err =
-  case err of
-    Syntax syntaxError ->
-        Syntax.toReport syntaxError
+toReport err = case err of
+  Syntax syntaxError -> Syntax.toReport syntaxError
 
-    Docs docsError ->
-        Docs.toReport docsError
+  Docs   docsError   -> Docs.toReport docsError
 
 
 -- TO STRING
@@ -48,19 +45,14 @@ print location source (A.A region err) =
 
 toJson :: FilePath -> A.Located Error -> Json.Value
 toJson filePath (A.A region err) =
-  let
-    (maybeRegion, additionalFields) =
-        case err of
-          Syntax syntaxError ->
-              Report.toJson [] (Syntax.toReport syntaxError)
+  let (maybeRegion, additionalFields) = case err of
+        Syntax syntaxError -> Report.toJson [] (Syntax.toReport syntaxError)
 
-          Docs docsError ->
-              Report.toJson [] (Docs.toReport docsError)
-  in
-      Json.object $
-        [ "file" .= filePath
-        , "region" .= region
-        , "subregion" .= maybeRegion
-        , "type" .= ("error" :: String)
-        ]
+        Docs   docsError   -> Report.toJson [] (Docs.toReport docsError)
+  in  Json.object
+        $  [ "file" .= filePath
+           , "region" .= region
+           , "subregion" .= maybeRegion
+           , "type" .= ("error" :: String)
+           ]
         ++ additionalFields

@@ -1,9 +1,9 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 module Cheapskate.Types where
-import Data.Sequence (Seq)
-import Data.Text (Text)
-import qualified Data.Map as M
-import Data.Data
+import           Data.Sequence                            ( Seq )
+import           Data.Text                                ( Text )
+import qualified Data.Map                      as M
+import           Data.Data
 
 -- | Structured representation of a document.  The 'Options' affect
 -- how the document is rendered by `toHtml`.

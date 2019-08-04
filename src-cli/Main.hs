@@ -5,5 +5,4 @@ import qualified ElmFormat
 
 
 main :: IO ()
-main =
-    ElmFormat.main
+main = ElmFormat.main

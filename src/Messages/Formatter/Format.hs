@@ -1,7 +1,13 @@
-module Messages.Formatter.Format (InfoFormatter, InfoFormatterF(..), onInfo, approve) where
+module Messages.Formatter.Format
+  ( InfoFormatter
+  , InfoFormatterF(..)
+  , onInfo
+  , approve
+  )
+where
 
-import Control.Monad.Free
-import Messages.Types
+import           Control.Monad.Free
+import           Messages.Types
 
 
 class Functor f => InfoFormatter f where
@@ -15,15 +21,15 @@ data InfoFormatterF a
 
 
 instance InfoFormatter InfoFormatterF where
-    onInfo info = OnInfo info ()
-    approve prompt = Approve prompt id
+  onInfo info = OnInfo info ()
+  approve prompt = Approve prompt id
 
 
 instance Functor InfoFormatterF where
-    fmap f (OnInfo info a) = OnInfo info (f a)
-    fmap f (Approve prompt a) = Approve prompt (f . a)
+  fmap f (OnInfo  info   a) = OnInfo info (f a)
+  fmap f (Approve prompt a) = Approve prompt (f . a)
 
 
 instance InfoFormatter f => InfoFormatter (Free f) where
-    onInfo info = liftF (onInfo info)
-    approve prompt = liftF (approve prompt)
+  onInfo info = liftF (onInfo info)
+  approve prompt = liftF (approve prompt)

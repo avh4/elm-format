@@ -1,7 +1,7 @@
 module AST.Variable where
 
-import AST.V0_16
-import Data.Map.Strict
+import           AST.V0_16
+import           Data.Map.Strict
 
 
 data Ref
@@ -21,8 +21,7 @@ data Listing a
     deriving (Eq, Ord, Show)
 
 
-type CommentedMap k v =
-    Map k (Commented v)
+type CommentedMap k v = Map k (Commented v)
 
 
 -- | A value that can be imported or exported

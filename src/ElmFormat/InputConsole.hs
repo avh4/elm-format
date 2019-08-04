@@ -1,8 +1,14 @@
-module ElmFormat.InputConsole (InputConsole, InputConsoleF(..), readStdin, execute) where
+module ElmFormat.InputConsole
+  ( InputConsole
+  , InputConsoleF(..)
+  , readStdin
+  , execute
+  )
+where
 
-import Control.Monad.Free
-import Data.Text (Text)
-import ElmFormat.World
+import           Control.Monad.Free
+import           Data.Text                                ( Text )
+import           ElmFormat.World
 
 
 class Functor f => InputConsole f where
@@ -14,19 +20,17 @@ data InputConsoleF a
 
 
 instance Functor InputConsoleF where
-    fmap f (ReadStdin a) = ReadStdin (f . a)
+  fmap f (ReadStdin a) = ReadStdin (f . a)
 
 
 instance InputConsole InputConsoleF where
-    readStdin = ReadStdin id
+  readStdin = ReadStdin id
 
 
 instance InputConsole f => InputConsole (Free f) where
-    readStdin = liftF readStdin
+  readStdin = liftF readStdin
 
 
 execute :: World m => InputConsoleF a -> m a
-execute operation =
-    case operation of
-        ReadStdin next ->
-            next <$> getStdin
+execute operation = case operation of
+  ReadStdin next -> next <$> getStdin
