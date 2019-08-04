@@ -262,12 +262,16 @@ formatModuleHeader elmVersion addDefaultHeader modu =
               |> fmap (\x -> AST.Commented [] x [])
               |> Set.fromList
 
-      AST.KeywordCommented _ _ exportsList =
-          AST.Module.exports (maybeHeader |> Maybe.fromMaybe AST.Module.defaultHeader)
+      exportsList =
+          case
+              AST.Module.exports (maybeHeader |> Maybe.fromMaybe AST.Module.defaultHeader)
+          of
+              Just (AST.KeywordCommented _ _ e) -> e
+              Nothing -> AST.Variable.ClosedListing
 
       -- this is Nothing if there is no explicit module line
       maybeExportsList =
-          case fmap AST.Module.exports (AST.Module.header modu) of
+          case AST.Module.exports =<< (AST.Module.header modu) of
               Nothing -> Nothing
               Just (AST.KeywordCommented _ _ e) -> Just e
 
@@ -304,7 +308,13 @@ formatModuleHeader elmVersion addDefaultHeader modu =
               AST.Declaration.Entry (RA.A _ (AST.Declaration.TypeAlias _ (AST.Commented _ (UppercaseIdentifier name, _) _) _)) -> [ AST.Variable.Union (UppercaseIdentifier name, []) AST.Variable.ClosedListing ]
               AST.Declaration.Entry (RA.A _ _) -> []
 
-      formatModuleLine' header@(AST.Module.Header srcTag name moduleSettings (AST.KeywordCommented preExposing postExposing _)) =
+      formatModuleLine' header@(AST.Module.Header srcTag name moduleSettings exports) =
+        let
+            (preExposing, postExposing) =
+                case exports of
+                    Nothing -> ([], [])
+                    Just (AST.KeywordCommented pre post _) -> (pre, post)
+        in
         case elmVersion of
           Elm_0_16 ->
             formatModuleLine_0_16 header
@@ -361,19 +371,25 @@ formatModuleLine_0_16 header =
   let
     elmVersion = Elm_0_16
 
+    exports =
+        case AST.Module.exports header of
+            Just (AST.KeywordCommented _ _ value) -> value
+            Nothing -> AST.Variable.OpenListing (AST.Commented [] () [])
+
     formatExports =
-      case AST.Module.exports header of
-        AST.KeywordCommented _ _ value ->
-          case formatListing (formatDetailedListing elmVersion) value of
+        case formatListing (formatDetailedListing elmVersion) exports of
             Just listing ->
-              listing
+                listing
             _ ->
                 pleaseReport "UNEXPECTED MODULE DECLARATION" "empty listing"
 
+    (preWhere, postWhere) =
+        case AST.Module.exports header of
+            Nothing -> ([], [])
+            Just (AST.KeywordCommented pre post _) -> (pre, post)
+
     whereClause =
-      case AST.Module.exports header of
-        AST.KeywordCommented pre post _ ->
-          formatCommented (line . keyword) (AST.Commented pre "where" post)
+        formatCommented (line . keyword) (AST.Commented preWhere "where" postWhere)
   in
     case
       ( formatCommented (line . formatQualifiedUppercaseIdentifier elmVersion) $ AST.Module.name header
