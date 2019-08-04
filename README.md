@@ -131,7 +131,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   </tr>
   <tr>
     <td rowspan=1>JetBrains (WebStorm, etc)</td>
-    <td>:trophy: <a href="https://durkiewicz.github.io/elm-plugin/">Elm Language Plugin</a></td>
+    <td>:trophy: <a href="https://klazuka.github.io/intellij-elm/">intellij-elm</a></td>
     <td>:warning: <a href="#jetbrains-installation">4 steps</a></td>
     <td>❔ TBD</td>
     <td>:white_check_mark:</td>
@@ -272,12 +272,13 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 
 ### JetBrains installation
 
-This is for WebStorm and other JetBrains IDEs.
+This is for WebStorm and other JetBrains IDEs like IntelliJ and PyCharm.
 
 1. Install elm-format
-1. Install the [Elm Language Plugin](https://durkiewicz.github.io/elm-plugin/) package.
-1. Install the File Watchers plugin (available in the plugin repository)
-1. Add a file watcher for .elm files with the settings as [shown here](img/JetBrains%20setup.png).
+1. Install the [Elm](https://github.com/klazuka/intellij-elm) plugin.
+1. In IntelliJ, open Settings -> Languages & Frameworks -> Elm
+1. Specify the path to elm-format
+
 
 
 ## Development info
