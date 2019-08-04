@@ -232,6 +232,10 @@ formatModuleHeader elmVersion addDefaultHeader modu =
       refName (AST.Variable.TagRef _ (UppercaseIdentifier name)) = name
       refName (AST.Variable.OpRef (SymbolIdentifier name)) = name
 
+      varName (AST.Commented _ (AST.Variable.Value (LowercaseIdentifier name)) _) = name
+      varName (AST.Commented _ (AST.Variable.OpValue (SymbolIdentifier name)) _) = name
+      varName (AST.Commented _ (AST.Variable.Union (UppercaseIdentifier name, _) _) _) = name
+
       documentedVars :: [[String]]
       documentedVars =
           AST.Module.docs modu
@@ -239,6 +243,9 @@ formatModuleHeader elmVersion addDefaultHeader modu =
               |> fmap Foldable.toList
               |> Maybe.fromMaybe []
               |> concatMap extractDocs
+
+      documentedVarsSet :: Set String
+      documentedVarsSet = Set.fromList $ concat documentedVars
 
       extractDocs block =
           case block of
@@ -269,17 +276,10 @@ formatModuleHeader elmVersion addDefaultHeader modu =
               Just (AST.KeywordCommented _ _ e) -> e
               Nothing -> AST.Variable.ClosedListing
 
-      -- this is Nothing if there is no explicit module line
-      maybeExportsList =
-          case AST.Module.exports =<< (AST.Module.header modu) of
-              Nothing -> Nothing
-              Just (AST.KeywordCommented _ _ e) -> Just e
-
-      detailedListingToSet :: Maybe (AST.Variable.Listing AST.Module.DetailedListing) -> Set (AST.Commented AST.Variable.Value)
-      detailedListingToSet Nothing = definedVars -- when there is no module line
-      detailedListingToSet (Just (AST.Variable.OpenListing _)) = Set.empty
-      detailedListingToSet (Just AST.Variable.ClosedListing) = Set.empty
-      detailedListingToSet (Just (AST.Variable.ExplicitListing (AST.Module.DetailedListing values operators types) _)) =
+      detailedListingToSet :: AST.Variable.Listing AST.Module.DetailedListing -> Set (AST.Commented AST.Variable.Value)
+      detailedListingToSet (AST.Variable.OpenListing _) = Set.empty
+      detailedListingToSet AST.Variable.ClosedListing = Set.empty
+      detailedListingToSet (AST.Variable.ExplicitListing (AST.Module.DetailedListing values operators types) _) =
           Set.unions
               [ Map.assocs values |> fmap (\(name, AST.Commented pre () post) -> AST.Commented pre (AST.Variable.Value name) post) |> Set.fromList
               , Map.assocs operators |> fmap (\(name, AST.Commented pre () post) -> AST.Commented pre (AST.Variable.OpValue name) post) |> Set.fromList
@@ -291,9 +291,17 @@ formatModuleHeader elmVersion addDefaultHeader modu =
       detailedListingIsMultiline _ = False
 
       varsToExpose =
+          case AST.Module.exports =<< maybeHeader of
+              Nothing ->
+                  if null $ concat documentedVars
+                      then definedVars
+                      else definedVars |> Set.filter (\v -> Set.member (varName v) documentedVarsSet)
+              Just (AST.KeywordCommented _ _ e) -> detailedListingToSet e
+
+      sortedExports =
           sortVars
               (detailedListingIsMultiline exportsList)
-              (detailedListingToSet maybeExportsList)
+              varsToExpose
               documentedVars
 
       extractVarName :: TopLevelStructure Declaration -> [AST.Variable.Value]
@@ -320,19 +328,19 @@ formatModuleHeader elmVersion addDefaultHeader modu =
             formatModuleLine_0_16 header
 
           Elm_0_17 ->
-            formatModuleLine elmVersion varsToExpose srcTag name moduleSettings preExposing postExposing
+            formatModuleLine elmVersion sortedExports srcTag name moduleSettings preExposing postExposing
 
           Elm_0_18 ->
-            formatModuleLine elmVersion varsToExpose srcTag name moduleSettings preExposing postExposing
+            formatModuleLine elmVersion sortedExports srcTag name moduleSettings preExposing postExposing
 
           Elm_0_18_Upgrade ->
-              formatModuleLine elmVersion varsToExpose srcTag name moduleSettings preExposing postExposing
+              formatModuleLine elmVersion sortedExports srcTag name moduleSettings preExposing postExposing
 
           Elm_0_19 ->
-              formatModuleLine elmVersion varsToExpose srcTag name moduleSettings preExposing postExposing
+              formatModuleLine elmVersion sortedExports srcTag name moduleSettings preExposing postExposing
 
           Elm_0_19_Upgrade ->
-              formatModuleLine elmVersion varsToExpose srcTag name moduleSettings preExposing postExposing
+              formatModuleLine elmVersion sortedExports srcTag name moduleSettings preExposing postExposing
 
       docs =
           fmap (formatDocComment elmVersion (makeImportInfo modu)) $ RA.drop $ AST.Module.docs modu

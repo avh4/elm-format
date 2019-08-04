@@ -1,3 +1,5 @@
+module ListDocumentedExportsNoExposing
+
 {-|
 
 @docs a
