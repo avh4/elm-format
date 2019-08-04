@@ -1,23 +1,4 @@
-module Main exposing
-    ( a
-    , X
-    , Y(..)
-    , b, c
-    , p, q
-    )
-
-{-|
-
-@docs a
-
-
-# Heading
-
-@docs X
-@docs Y
-@docs b, c
-
--}
+module Main exposing (X, Y(..), a, b, c, p, q)
 
 
 type alias X =
