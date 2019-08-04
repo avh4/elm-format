@@ -167,13 +167,9 @@ removeDuplicates input =
                 else (ReversedList.push next acc, Set.insert next seen)
 
 
-sortVars :: Bool -> Set (AST.Commented AST.Variable.Value) -> [[AST.Variable.Ref]] -> ([[AST.Commented AST.Variable.Value]], AST.Comments)
+sortVars :: Bool -> Set (AST.Commented AST.Variable.Value) -> [[String]] -> ([[AST.Commented AST.Variable.Value]], AST.Comments)
 sortVars forceMultiline fromExposing fromDocs =
     let
-        refName (AST.Variable.VarRef _ (LowercaseIdentifier name)) = name
-        refName (AST.Variable.TagRef _ (UppercaseIdentifier name)) = name
-        refName (AST.Variable.OpRef (SymbolIdentifier name)) = name
-
         varOrder :: AST.Commented AST.Variable.Value -> (Int, String)
         varOrder (AST.Commented _ (AST.Variable.OpValue (SymbolIdentifier name)) _) = (1, name)
         varOrder (AST.Commented _ (AST.Variable.Union (UppercaseIdentifier name, _) _) _) = (2, name)
@@ -181,7 +177,7 @@ sortVars forceMultiline fromExposing fromDocs =
 
         listedInDocs =
             fromDocs
-                |> fmap (Maybe.mapMaybe (\v -> Map.lookup (refName v) allowedInDocs))
+                |> fmap (Maybe.mapMaybe (\v -> Map.lookup v allowedInDocs))
                 |> filter (not . List.null)
                 |> fmap (fmap (\v -> AST.Commented [] v []))
                 |> removeDuplicates
@@ -232,7 +228,11 @@ formatModuleHeader elmVersion addDefaultHeader modu =
             then Just (AST.Module.header modu |> Maybe.fromMaybe AST.Module.defaultHeader)
             else AST.Module.header modu
 
-      documentedVars :: [[AST.Variable.Ref]]
+      refName (AST.Variable.VarRef _ (LowercaseIdentifier name)) = name
+      refName (AST.Variable.TagRef _ (UppercaseIdentifier name)) = name
+      refName (AST.Variable.OpRef (SymbolIdentifier name)) = name
+
+      documentedVars :: [[String]]
       documentedVars =
           AST.Module.docs modu
               |> RA.drop
@@ -243,7 +243,7 @@ formatModuleHeader elmVersion addDefaultHeader modu =
       extractDocs block =
           case block of
               Markdown.ElmDocs vars ->
-                  fmap (fmap textToRef) vars
+                  fmap (fmap (refName . textToRef)) vars
               _ -> []
 
       textToRef :: Text -> AST.Variable.Ref
