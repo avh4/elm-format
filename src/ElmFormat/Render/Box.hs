@@ -304,25 +304,25 @@ formatModuleHeader elmVersion addDefaultHeader modu =
               AST.Declaration.Entry (RA.A _ (AST.Declaration.TypeAlias _ (AST.Commented _ (UppercaseIdentifier name, _) _) _)) -> [ AST.Variable.Union (UppercaseIdentifier name, []) AST.Variable.ClosedListing ]
               AST.Declaration.Entry (RA.A _ _) -> []
 
-      formatModuleLine' header =
+      formatModuleLine' header@(AST.Module.Header srcTag name moduleSettings (AST.KeywordCommented preExposing postExposing _)) =
         case elmVersion of
           Elm_0_16 ->
             formatModuleLine_0_16 header
 
           Elm_0_17 ->
-            formatModuleLine elmVersion varsToExpose header
+            formatModuleLine elmVersion varsToExpose srcTag name moduleSettings preExposing postExposing
 
           Elm_0_18 ->
-            formatModuleLine elmVersion varsToExpose header
+            formatModuleLine elmVersion varsToExpose srcTag name moduleSettings preExposing postExposing
 
           Elm_0_18_Upgrade ->
-              formatModuleLine elmVersion varsToExpose header
+              formatModuleLine elmVersion varsToExpose srcTag name moduleSettings preExposing postExposing
 
           Elm_0_19 ->
-              formatModuleLine elmVersion varsToExpose header
+              formatModuleLine elmVersion varsToExpose srcTag name moduleSettings preExposing postExposing
 
           Elm_0_19_Upgrade ->
-              formatModuleLine elmVersion varsToExpose header
+              formatModuleLine elmVersion varsToExpose srcTag name moduleSettings preExposing postExposing
 
       docs =
           fmap (formatDocComment elmVersion (makeImportInfo modu)) $ RA.drop $ AST.Module.docs modu
@@ -399,11 +399,19 @@ formatModuleLine_0_16 header =
           ]
 
 
-formatModuleLine :: ElmVersion -> ([[AST.Commented AST.Variable.Value]], AST.Comments) -> AST.Module.Header -> Box
-formatModuleLine elmVersion (varsToExpose, extraComments) header =
+formatModuleLine ::
+    ElmVersion
+    -> ([[AST.Commented AST.Variable.Value]], AST.Comments)
+    -> AST.Module.SourceTag
+    -> AST.Commented [UppercaseIdentifier]
+    -> Maybe (AST.KeywordCommented AST.Module.SourceSettings)
+    -> AST.Comments
+    -> AST.Comments
+    -> Box
+formatModuleLine elmVersion (varsToExpose, extraComments) srcTag name moduleSettings preExposing postExposing =
   let
     tag =
-      case AST.Module.srcTag header of
+      case srcTag of
         AST.Module.Normal ->
           line $ keyword "module"
 
@@ -437,18 +445,15 @@ formatModuleLine elmVersion (varsToExpose, extraComments) header =
         |> ElmStructure.group True "{" "," "}" False
 
     whereClause =
-      AST.Module.moduleSettings header
+      moduleSettings
         |> fmap (formatKeywordCommented "where" formatSettings)
         |> fmap (\x -> [x])
         |> Maybe.fromMaybe []
 
-    AST.KeywordCommented preExposing postExposing _ =
-        AST.Module.exports header
-
     nameClause =
       case
         ( tag
-        , formatCommented (line . formatQualifiedUppercaseIdentifier elmVersion) $ AST.Module.name header
+        , formatCommented (line . formatQualifiedUppercaseIdentifier elmVersion) name
         )
       of
         (SingleLine tag', SingleLine name') ->
