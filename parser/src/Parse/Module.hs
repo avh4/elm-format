@@ -81,7 +81,7 @@ moduleDecl_0_16 elmVersion =
           Module.Normal
           (Commented preName names postName)
           Nothing
-          (KeywordCommented preWhere [] exports)
+          (Just $ KeywordCommented preWhere [] exports)
 
 
 moduleDecl_0_17 :: ElmVersion -> IParser Module.Header
@@ -104,6 +104,7 @@ moduleDecl_0_17 elmVersion =
             brackets $ (\f pre post _ -> f pre post) <$> commaSep1 (keyValue equals (lowVar elmVersion) (capVar elmVersion))
 
       exports <-
+        optionMaybe $
         commentedKeyword elmVersion "exposing" $
           listing $ detailedListing elmVersion
 

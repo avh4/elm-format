@@ -104,7 +104,7 @@ instance Arbitrary AST.Module.Module where
                   moduleType
                   (Commented [] name [])
                   Nothing
-                  (KeywordCommented [] [] listing)
+                  (Just $ KeywordCommented [] [] listing)
                 )
                 (located Nothing)
                 ([], empty)
