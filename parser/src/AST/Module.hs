@@ -1,5 +1,5 @@
 module AST.Module
-    ( Module(..), Header(..), SourceTag(..)
+    ( Module(..), Header(..), SourceTag(..), SourceSettings
     , UserImport, ImportMethod(..)
     , DetailedListing(..)
     , defaultHeader
