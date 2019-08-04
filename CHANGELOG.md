@@ -3,6 +3,7 @@
 New features:
   - Invalid `(..)` in `@docs` lines are automatically removed.
   - When not specifying `--elm-version`, if auto-detection fails, Elm 0.19 will be assumed instead of failing with an error.
+  - `module` lines with no `exposing` clause will have the clause automatically generated.
   
 Feature changes:
   - `exposing (..)` in `module` lines is no longer expanded.
