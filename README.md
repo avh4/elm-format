@@ -275,7 +275,7 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 This is for WebStorm and other JetBrains IDEs like IntelliJ and PyCharm.
 
 1. Install elm-format
-1. Install the [Elm](https://github.com/klazuka/intellij-elm) plugin.
+1. Install the [intellij-elm plugin](https://klazuka.github.io/intellij-elm/)
 1. In IntelliJ, open Settings -> Languages & Frameworks -> Elm
 1. Specify the path to elm-format
 
