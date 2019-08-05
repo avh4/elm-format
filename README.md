@@ -131,7 +131,7 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   </tr>
   <tr>
     <td rowspan=1>JetBrains (WebStorm, etc)</td>
-    <td>:trophy: <a href="https://durkiewicz.github.io/elm-plugin/">Elm Language Plugin</a></td>
+    <td>:trophy: <a href="https://klazuka.github.io/intellij-elm/">intellij-elm</a></td>
     <td>:warning: <a href="#jetbrains-installation">4 steps</a></td>
     <td>❔ TBD</td>
     <td>:white_check_mark:</td>
@@ -251,18 +251,13 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 > Note: If you previously installed a VSCode extension called "elm-format", uninstall it (it is deprecated, and the "elm" extension now provides elm-format integration).
 
 1. Install elm-format
-1. Install [Elm Language Support](https://marketplace.visualstudio.com/items?itemName=sbrink.elm) for VSCode
-
-    ```bash
-    ext install elm
-    ```
-
+1. Install the extension [Elm Language Support](https://marketplace.visualstudio.com/items?itemName=sbrink.elm) for VSCode, which includes syntax and error highlighting
 1. Configure the extension to format on save:
 
-    1. Go to `Preferences -> Settings` in the menu
-    1. In your User Settings, update the following value:
-    
-    ```
+    1. Find your `settings.json` file ([instructions](https://code.visualstudio.com/docs/getstarted/settings#_settings-file-locations)).
+    1. Add the following key-value pair to your `settings.json`:
+
+    ```json
     "[elm]": {
         "editor.formatOnSave": true
     },
@@ -277,12 +272,13 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 
 ### JetBrains installation
 
-This is for WebStorm and other JetBrains IDEs.
+This is for WebStorm and other JetBrains IDEs like IntelliJ and PyCharm.
 
 1. Install elm-format
-1. Install the [Elm Language Plugin](https://durkiewicz.github.io/elm-plugin/) package.
-1. Install the File Watchers plugin (available in the plugin repository)
-1. Add a file watcher for .elm files with the settings as [shown here](img/JetBrains%20setup.png).
+1. Install the [intellij-elm plugin](https://klazuka.github.io/intellij-elm/)
+1. In IntelliJ, open Settings -> Languages & Frameworks -> Elm
+1. Specify the path to elm-format
+
 
 
 ## Development info
