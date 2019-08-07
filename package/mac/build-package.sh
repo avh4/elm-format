@@ -13,7 +13,7 @@ stack runhaskell Shakefile.hs -- -j4 --lint
 
 ## Build binaries
 
-stack clean
+rm -Rf .stack-work
 stack build --ghc-options='-O2'
 
 function build-flavor() {
