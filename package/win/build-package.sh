@@ -8,13 +8,14 @@ BINEXT=".exe"
 
 ## Run tests
 
-stack clean
-./tests/run-tests.sh
+stack runhaskell Shakefile.hs -- clean
+stack runhaskell Shakefile.hs -- -j4 --lint
 
 
 ## Build binaries
 
-stack build
+stack clean
+stack build --ghc-options='-O2'
 
 function build-flavor() {
     BUILD="elm-format-${VERSION}-${PLATFORM}"
