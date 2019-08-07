@@ -243,8 +243,11 @@ main = do
         scriptFiles <- getDirectoryFiles ""
             [ "tests/run-tests.sh"
             , "package/collect_files.sh"
-            , "package/mac/build-package.sh"
+            , "package/linux/build-in-docker.sh"
             , "package/linux/build-package.sh"
+            , "package/mac/build-package.sh"
+            , "package/nix/build.sh"
+            , "package/win/build-package.sh"
             ]
         let oks = ["_build" </> f <.> "shellcheck.ok" | f <- scriptFiles]
         need oks
