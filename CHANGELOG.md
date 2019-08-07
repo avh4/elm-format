@@ -1,4 +1,4 @@
-## master
+## 0.8.2
 
 New features:
   - Invalid `(..)` in `@docs` lines are automatically removed.
