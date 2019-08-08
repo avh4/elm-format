@@ -22,6 +22,7 @@ RUN mkdir -p /root/.local/bin && \
 COPY stack.yaml ./
 COPY elm-format.cabal ./
 RUN stack setup
+RUN stack install shake
 
 RUN stack build --only-snapshot
 RUN stack build --only-dependencies
