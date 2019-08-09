@@ -11,16 +11,17 @@ fi
 
 pushd nixpkgs
 git fetch origin master
+git reset --hard
 if git branch | grep " ${BRANCH}$"; then
   git checkout "$BRANCH"
   git reset --hard origin/master
 else
   git checkout -b "$BRANCH" origin/master
+  git reset --hard
 fi
 popd
 
 cabal2nix --no-check cabal://indents-0.3.3 > nixpkgs/pkgs/development/compilers/elm/packages/indents.nix
-cabal2nix --no-check cabal://tasty-quickcheck-0.9.2 > nixpkgs/pkgs/development/compilers/elm/packages/tasty-quickcheck.nix
 ./generate_derivation.sh > nixpkgs/pkgs/development/compilers/elm/packages/elm-format.nix
 
 pushd nixpkgs
