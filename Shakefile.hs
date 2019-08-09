@@ -22,7 +22,7 @@ main = do
 
     phony "test" $ do
         need
-            [ "_build/stack-test.ok"
+            [ "stack-test"
             , "integration-tests"
             , "_build/shellcheck.ok"
             ]
@@ -221,7 +221,7 @@ main = do
         let source = dropDirectory1 $ out -<.> "elm"
         need [ elmFormat, source ]
         (Stdout rawJson) <- cmd (FileStdin source) elmFormat "--elm-version=0.19" "--stdin" "--json"
-        (Stdout formattedJson) <- cmd (Stdin rawJson) "python" "-mjson.tool"
+        (Stdout formattedJson) <- cmd (Stdin rawJson) "python3" "-mjson.tool" "--sort-keys"
         writeFileChanged out formattedJson
 
     "_build/tests//*.json_matches" %> \out -> do
@@ -243,8 +243,11 @@ main = do
         scriptFiles <- getDirectoryFiles ""
             [ "tests/run-tests.sh"
             , "package/collect_files.sh"
-            , "package/mac/build-package.sh"
+            , "package/linux/build-in-docker.sh"
             , "package/linux/build-package.sh"
+            , "package/mac/build-package.sh"
+            , "package/nix/build.sh"
+            , "package/win/build-package.sh"
             ]
         let oks = ["_build" </> f <.> "shellcheck.ok" | f <- scriptFiles]
         need oks

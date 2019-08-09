@@ -1,19 +1,20 @@
 #!/bin/bash
 
-set -ex
+set -euxo pipefail
 
 VERSION="$(git describe --abbrev=8)"
 PLATFORM="mac-x64"
 
 ## Run tests
 
-stack clean
-./tests/run-tests.sh
+stack runhaskell Shakefile.hs -- clean
+stack runhaskell Shakefile.hs -- -j4 --lint
 
 
 ## Build binaries
 
-stack build
+rm -Rf .stack-work
+stack build --ghc-options='-O2'
 
 function build-flavor() {
     BUILD="elm-format-${VERSION}-${PLATFORM}"

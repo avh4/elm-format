@@ -1,6 +1,6 @@
 {
   "name": "elm-format",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Install elm-format",
   "preferGlobal": true,
   "main": "index.js",
@@ -31,7 +31,7 @@
     "elm-format": "bin/elm-format"
   },
   "dependencies": {
-    "binwrap": "^0.2.0"
+    "binwrap": "^0.2.2"
   },
   "devDependencies": {
     "eslint": "^3.18.0"

@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
-[![latest version: 0.8.1](https://img.shields.io/badge/version-0.8.1-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.1)
+[![latest version: 0.8.2](https://img.shields.io/badge/version-0.8.2-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.2)
 
 # elm-format
 
@@ -7,7 +7,7 @@
 >
 > **The format produced by elm-format may change significantly before the 1.0.0 release.**  If this will cause problems for you, please refrain from using elm-format during the beta-test period.
 
-`elm-format` formats [Elm](http://elm-lang.org) source code according to a standard set of rules based on [the official Elm Style Guide](http://elm-lang.org/docs/style-guide). It is inspired by the popular [gofmt](https://blog.golang.org/go-fmt-your-code).
+`elm-format` formats [Elm](https://elm-lang.org) source code according to a standard set of rules based on [the official Elm Style Guide](https://elm-lang.org/docs/style-guide). It is inspired by the popular [gofmt](https://blog.golang.org/go-fmt-your-code).
 
 The benefits of `elm-format`:
  - It makes code **easier to write**, because you never have to worry about minor formatting concerns while powering out new code.
@@ -29,7 +29,7 @@ elm-format --help  # See other command line options
 ```
 
 
-## Installation [![(latest version: 0.8.1)](https://img.shields.io/badge/version-0.8.1-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.1)
+## Installation [![(latest version: 0.8.2)](https://img.shields.io/badge/version-0.8.2-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.2)
 
 > `elm-format` is still in beta.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
 >
@@ -41,7 +41,7 @@ To install `elm-format`:
 npm install -g elm-format
 ```
 
-or download the version appropriate for your OS from the [release page](https://github.com/avh4/elm-format/releases/tag/0.8.1),
+or download the version appropriate for your OS from the [release page](https://github.com/avh4/elm-format/releases/tag/0.8.2),
 unzip it,
 and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.
 
@@ -288,13 +288,20 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 ### Building from source
 
 ```bash
+# check out the repo
 brew install haskell-stack
 git clone https://github.com/avh4/elm-format.git
 cd elm-format
+
+# initial setup
 stack setup
-stack build
-stack install
-~/.local/bin/elm-format --help
+stack install shake
+
+# build
+stack runhaskell Shakefile.hs -- build
+
+# run the built elm-format
+"$(stack path --local-install-root)"/bin/elm-format
 ```
 
 ### Running tests

@@ -1,7 +1,7 @@
 # stack installation from https://github.com/samdoshi/docker-haskell-stack
 FROM buildpack-deps:latest
 
-ENV STACK_VERSION 1.7.1
+ENV STACK_VERSION 2.1.3
 
 ENV STACK_DOWNLOAD_URL https://github.com/commercialhaskell/stack/releases/download/v$STACK_VERSION/stack-$STACK_VERSION-linux-x86_64.tar.gz
 ENV DEBIAN_FRONTEND noninteractive
@@ -20,9 +20,10 @@ RUN mkdir -p /root/.local/bin && \
 
 # Install elm-format dependencies
 COPY stack.yaml ./
-RUN stack setup
-
 COPY elm-format.cabal ./
+RUN stack setup
+RUN stack install shake
+
 RUN stack build --only-snapshot
 RUN stack build --only-dependencies
 RUN stack build --test --only-dependencies

@@ -223,14 +223,14 @@ spaceySepBy1'' sep parser =
     do
         result <- spaceySepBy1 sep parser
         case result of
-            Single (item, eol) ->
+            Single (WithEol item eol) ->
                 return $ \pre post -> [item pre (combine eol post)]
 
-            Multiple ((first, firstEol), postFirst) rest (preLast, (last, eol)) ->
+            Multiple (WithEol first firstEol, postFirst) rest (preLast, WithEol last eol) ->
                 return $ \preFirst postLast ->
                     concat
                         [ [first preFirst $ combine firstEol postFirst]
-                        , fmap (\(Commented pre (item, eol) post) -> item pre $ combine eol post) rest
+                        , fmap (\(Commented pre (WithEol item eol) post) -> item pre $ combine eol post) rest
                         , [last preLast $ combine eol postLast ]
                         ]
 
@@ -290,7 +290,7 @@ keyValue parseSep parseKey parseVal =
       )
 
 
-separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (e,Maybe String), [(Comments, Comments, e, Maybe String)], Bool))
+separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (WithEol e), [(Comments, Comments, e, Maybe String)], Bool))
 separated sep expr' =
   let
     subparser =
@@ -305,10 +305,10 @@ separated sep expr' =
                     t2 <- separated sep expr'
                     end <- getMyPosition
                     case t2 of
-                        Right (_, (t2',eolT2), ts, _) ->
+                        Right (_, WithEol t2' eolT2, ts, _) ->
                           return $ \multiline -> Right
                             ( R.Region start end
-                            , (t1, eolT1)
+                            , WithEol t1 eolT1
                             , (preArrow, postArrow, t2', eolT2):ts
                             , multiline
                             )
@@ -317,7 +317,7 @@ separated sep expr' =
                             eol <- restOfLine
                             return $ \multiline -> Right
                               ( R.Region start end
-                              , (t1, eolT1)
+                              , WithEol t1 eolT1
                               , [(preArrow, postArrow, t2', eol)]
                               , multiline)
   in

@@ -1,4 +1,4 @@
-module Main exposing (x)
+module Sorting exposing (x)
 
 import ConstructorTagsAreDeduplicated exposing (A(X))
 import ConstructorTagsAreMerged exposing (A(C, D, X, Y), B(..), C(..))
