@@ -22,7 +22,7 @@ main = do
 
     phony "test" $ do
         need
-            [ "_build/stack-test.ok"
+            [ "stack-test"
             , "integration-tests"
             , "_build/shellcheck.ok"
             ]
