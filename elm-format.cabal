@@ -1,3 +1,5 @@
+cabal-version: 2.4
+
 Name: elm-format
 version: 0.8.2
 
@@ -10,7 +12,7 @@ Description:
 Homepage:
     https://elm-lang.org
 
-License: BSD3
+License: BSD-3-Clause
 License-file: LICENSE
 
 Author:     Aaron VonderHaar
@@ -20,7 +22,6 @@ Copyright:  See https://github.com/avh4/elm-format/blob/master/LICENSE
 Category: Build Tool
 
 build-type: Simple
-Cabal-version: >=1.9
 
 Extra-source-files: README.md
 
