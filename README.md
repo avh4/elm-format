@@ -288,13 +288,20 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 ### Building from source
 
 ```bash
+# check out the repo
 brew install haskell-stack
 git clone https://github.com/avh4/elm-format.git
 cd elm-format
+
+# initial setup
 stack setup
-stack build
-stack install
-~/.local/bin/elm-format --help
+stack install shake
+
+# build
+stack runhaskell Shakefile.hs -- build
+
+# run the built elm-format
+"$(stack path --local-install-root)"/bin/elm-format
 ```
 
 ### Running tests
