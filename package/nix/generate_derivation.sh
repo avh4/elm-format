@@ -21,13 +21,18 @@ SHA="$(nix-prefetch-git --url "$ROOTDIR" --rev "$REV" --quiet --no-deepClone | j
 
 PATCH=$(cat <<END
   src = fetchgit {
-    url = "http://github.com/avh4/elm-format";
+    url = "https://github.com/avh4/elm-format";
     sha256 = "$SHA";
     rev = "$REV";
   };
   postPatch = ''
-    sed -i "s|desc <-.*||" ./Setup.hs
-    sed -i "s|gitDescribe = .*|gitDescribe = \\\\\\\\\"$VERSION\\\\\\\\\"\"|" ./Setup.hs
+    mkdir -p ./generated
+    cat <<EOHS > ./generated/Build_elm_format.hs
+    module Build_elm_format where
+
+    gitDescribe :: String
+    gitDescribe = "$VERSION"
+    EOHS
   '';
 END
 )
@@ -40,4 +45,5 @@ quoteSubst() {
 
 cabal2nix --no-haddock "$ROOTDIR" |
   sed "s#^{ mkDerivation#{ mkDerivation, fetchgit#" |
+  sed "s#isLibrary = true#isLibrary = false#" |
   sed "s#\\s*src = .*;#$(quoteSubst "$PATCH")#"
