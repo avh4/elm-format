@@ -1,4 +1,4 @@
-module {- A -} Main {- A -} exposing (foo)
+module {- A -} Main {- A -} exposing (..)
 
 
 foo =

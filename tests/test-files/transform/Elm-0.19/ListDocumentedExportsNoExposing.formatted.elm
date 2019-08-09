@@ -1,9 +1,8 @@
-module ListExports exposing
+module ListDocumentedExportsNoExposing exposing
     ( a
     , X
     , Y(..)
     , b, c
-    , p, q
     )
 
 {-|

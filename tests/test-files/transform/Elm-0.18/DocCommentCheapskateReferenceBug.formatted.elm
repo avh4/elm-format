@@ -1,4 +1,4 @@
-module Main exposing (f)
+module DocCommentCheapskateReferenceBug exposing (f)
 
 {-| docs
 

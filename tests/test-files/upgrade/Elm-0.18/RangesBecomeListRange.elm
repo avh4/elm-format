@@ -1,3 +1,5 @@
+module RangesBecomeListRange exposing (range)
+
 range = [1..9]
 variableRange x y = [x.min..y]
 precommented = [{-A-}1..{-B-}2]

@@ -26,5 +26,5 @@ withEol a =
     do
         (result, multiline) <- trackNewline a
         case multiline of
-            SplitAll -> return (result, Nothing)
-            JoinAll -> (,) result <$> restOfLine
+            SplitAll -> return $ WithEol result Nothing
+            JoinAll -> WithEol result <$> restOfLine

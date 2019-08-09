@@ -1,5 +1,5 @@
 module AST.Module
-    ( Module(..), Header(..), SourceTag(..)
+    ( Module(..), Header(..), SourceTag(..), SourceSettings
     , UserImport, ImportMethod(..)
     , DetailedListing(..)
     , defaultHeader
@@ -51,7 +51,7 @@ data Header = Header
     { srcTag :: SourceTag
     , name :: Commented [UppercaseIdentifier]
     , moduleSettings :: Maybe (KeywordCommented SourceSettings)
-    , exports :: KeywordCommented (Var.Listing DetailedListing)
+    , exports :: Maybe (KeywordCommented (Var.Listing DetailedListing))
     }
     deriving (Eq, Show)
 
@@ -62,7 +62,7 @@ defaultHeader =
         Normal
         (Commented [] [UppercaseIdentifier "Main"] [])
         Nothing
-        (KeywordCommented [] [] $ Var.OpenListing $ Commented [] () [])
+        Nothing
 
 
 data DetailedListing = DetailedListing

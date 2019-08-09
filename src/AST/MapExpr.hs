@@ -25,7 +25,7 @@ instance MapExpr a => MapExpr (PreCommented a) where
 
 
 instance MapExpr a => MapExpr (WithEol a) where
-    mapExpr f (a, eol) = (mapExpr f a, eol)
+    mapExpr f = fmap (mapExpr f)
 
 
 instance MapExpr a => MapExpr [a] where
