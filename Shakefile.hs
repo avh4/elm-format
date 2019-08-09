@@ -221,7 +221,7 @@ main = do
         let source = dropDirectory1 $ out -<.> "elm"
         need [ elmFormat, source ]
         (Stdout rawJson) <- cmd (FileStdin source) elmFormat "--elm-version=0.19" "--stdin" "--json"
-        (Stdout formattedJson) <- cmd (Stdin rawJson) "python" "-mjson.tool"
+        (Stdout formattedJson) <- cmd (Stdin rawJson) "python3" "-mjson.tool" "--sort-keys"
         writeFileChanged out formattedJson
 
     "_build/tests//*.json_matches" %> \out -> do
