@@ -17,17 +17,6 @@ vagrant winrm -c "dir"
   - Start Git Bash (Right click on Windows Desktop -> "Git Bash Here")
 
 
-## Provisioning (first time only)
-
-  - Download and install Haskell Stack (32-bit)
-  - `stack setup`
-  - `choco install devbox-common`
-  - `choco install poshgit`
-  <!-- - #choco install sourcetree -->
-  <!-- - #choco install tortoisegit -->
-  - Restart shell
-
-
 ## Build Windows binary
 
 From the host computer:
@@ -48,5 +37,4 @@ From the Windows VM:
 ## back to host computer
 # cd ./package/win/
 # vagrant halt
-
-# on mac:  zip elm-format-0.1-alpha-2-win-x64.zip elm-format.exe
+# cp elm-format/elm-format-0.0.0-win-i386.zip ../..
