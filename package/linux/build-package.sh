@@ -8,7 +8,9 @@ PLATFORM="linux-x64"
 ## Run tests
 
 stack runhaskell Shakefile.hs -- clean
-stack runhaskell Shakefile.hs -- -j4 --lint
+stack runhaskell Shakefile.hs -- build
+stack runhaskell Shakefile.hs -- stack-test
+stack runhaskell Shakefile.hs -- integration-tests
 
 
 ## Build binaries
