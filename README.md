@@ -45,6 +45,8 @@ or download the version appropriate for your OS from the [release page](https://
 unzip it,
 and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.
 
+On FreeBSD you can `pkg install hs-elm-format` or use [devel/elm-format](https://www.freshports.org/devel/elm-format/), then execute `elm-format` normally.
+
 You must run `elm-format` from the directory that contains your `elm.json` (for Elm 0.19) or `elm-package.json` (for Elm 0.18),
 or else you must pass the appropriate `--elm-version=0.19`/`--elm-version=0.18` command line argument.
 
