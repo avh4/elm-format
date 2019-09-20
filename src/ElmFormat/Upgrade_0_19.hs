@@ -26,17 +26,17 @@ import qualified ReversedList
 
 upgradeDefinition :: Text.Text
 upgradeDefinition = Text.pack $ unlines
-    [ "upgrade_flip ="
-    , "    \\f b a -> f a b"
+    [ "upgrade_flip f b a ="
+    , "    f a b"
     , ""
-    , "upgrade_curry ="
-    , "    \\f a b -> f (a, b)"
+    , "upgrade_curry f a b ="
+    , "    f (a, b)"
     , ""
-    , "upgrade_uncurry ="
-    , "    \\f (a, b) -> f a b"
+    , "upgrade_uncurry f (a, b) ="
+    , "    f a b"
     , ""
-    , "upgrade_rem ="
-    , "    \\dividend divisor -> remainderBy divisor dividend"
+    , "upgrade_rem dividend divisor ="
+    , "    remainderBy divisor dividend"
     ]
 
 
@@ -50,9 +50,19 @@ transform =
             let
                 toUpgradeDef def =
                     case def of
-                        Entry (A _ (Definition (A _ (VarPattern (LowercaseIdentifier name))) _args _ (A _ upgradeBody))) ->
+                        Entry (A _ (Definition (A _ (VarPattern (LowercaseIdentifier name))) [] _ (A _ upgradeBody))) ->
                             case List.stripPrefix "upgrade_" name of
                                 Just functionName -> Just (functionName, upgradeBody)
+                                Nothing -> Nothing
+
+                        Entry (A _ (Definition (A _ (VarPattern (LowercaseIdentifier name))) args comments upgradeBody)) ->
+                            case List.stripPrefix "upgrade_" name of
+                                Just functionName ->
+                                    Just
+                                        ( functionName
+                                        , Lambda args comments upgradeBody False
+                                        )
+
                                 Nothing -> Nothing
 
                         _ ->
