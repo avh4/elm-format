@@ -99,13 +99,60 @@ transformModule definition mod =
         transformTopLevelStructure structure =
             case structure of
                 Entry (A region (Definition name args comments expr)) ->
-                    Entry (A region (Definition name args comments $ transform' definition exposed importAliases expr))
+                    Entry (A region (Definition name args comments $ visitExprs (transform' definition exposed importAliases) expr))
 
                 _ -> structure
     in
     case mod of
         Module a b c d body ->
             Module a b c d (fmap transformTopLevelStructure body)
+
+
+visitLetDeclaration :: (Expr -> Expr) -> LetDeclaration -> LetDeclaration
+visitLetDeclaration f d =
+    case d of
+        LetDefinition name args pre body -> LetDefinition name args pre (visitExprs f body)
+        _ -> d
+
+
+visitExprs :: (Expr -> Expr) -> Expr -> Expr
+visitExprs f original@(A region _) =
+    let expr = f original
+    in
+    case RA.drop expr of
+        Unit _ -> expr
+        AST.Expression.Literal _ -> expr
+        VarExpr _ -> expr
+
+        App f' args multiline ->
+            A region $ App (visitExprs f f') (fmap (fmap $ visitExprs f) args) multiline
+        Unary op e ->
+            A region $ Unary op (visitExprs f e)
+        Binops left restOps multiline ->
+            A region $ Binops (visitExprs f left) (fmap (\(a,b,c,d) -> (a, b, c, visitExprs f d)) restOps) multiline
+        Parens e ->
+            A region $ Parens (fmap (visitExprs f) e)
+        ExplicitList terms' post multiline ->
+            A region $ ExplicitList (fmap (fmap $ fmap $ fmap $ visitExprs f) terms') post multiline
+        Range e1 e2 multiline ->
+            A region $ Range (fmap (visitExprs f) e1) (fmap (visitExprs f) e2) multiline
+        AST.Expression.Tuple es multiline ->
+            A region $ AST.Expression.Tuple (fmap (fmap $ visitExprs f) es) multiline
+        TupleFunction _ -> expr
+        AST.Expression.Record b fs post multiline ->
+            A region $ AST.Expression.Record b (fmap (fmap $ fmap $ fmap $ fmap $ visitExprs f) fs) post multiline
+        Access e field' ->
+            A region $ Access (visitExprs f e) field'
+        AccessFunction _ -> expr
+        Lambda params pre body multi ->
+            A region $ Lambda params pre (visitExprs f body) multi
+        If (c, b) elseIfs els ->
+            A region $ If (fmap (visitExprs f) c, fmap (visitExprs f) b) (fmap (fmap (\(c', b') -> (fmap (visitExprs f) c', fmap (visitExprs f) b'))) elseIfs) (fmap (visitExprs f) els)
+        Let decls pre body ->
+            A region $ Let (fmap (visitLetDeclaration f) decls) pre body
+        Case (e, b) branches ->
+            A region $ Case (fmap (visitExprs f) e, b) (fmap (fmap $ fmap $ visitExprs f) branches)
+        GLShader _ -> expr
 
 
 transform' ::

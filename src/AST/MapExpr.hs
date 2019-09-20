@@ -52,6 +52,7 @@ instance MapExpr a => MapExpr (Pair key a) where
     mapExpr f (Pair key value multi) = Pair key (mapExpr f value) multi
 
 
+{-| NOTE: the function will never get applied to the parent Expr'; only on the first level of children -}
 instance MapExpr Expr' where
   mapExpr f expr =
     case expr of
