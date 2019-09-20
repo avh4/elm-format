@@ -3,39 +3,65 @@
 module ElmFormat.Upgrade_0_19 (transform) where
 
 import AST.V0_16
+import AST.Declaration (Declaration(..), TopLevelStructure(..))
 import AST.Expression
 import AST.MapExpr
+import AST.Module (Module(Module))
 import AST.Pattern
 import AST.Variable
+import ElmVersion
 import Reporting.Annotation (Located(A))
 
+import qualified Data.List as List
 import qualified Data.Map.Strict as Dict
 import qualified Data.Maybe as Maybe
+import qualified Data.Text as Text
+import qualified ElmFormat.Parse
 import qualified ElmFormat.Version
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Region as Region
+import qualified Reporting.Result as Result
 import qualified ReversedList
+
+
+upgradeDefinition :: Text.Text
+upgradeDefinition = Text.pack "upgrade_flip =\n    \\f b a -> f a b"
 
 
 transform ::
     Dict.Map LowercaseIdentifier [UppercaseIdentifier]
     -> Dict.Map [UppercaseIdentifier] UppercaseIdentifier
     -> Expr -> Expr
-transform exposed importAliases expr =
+transform =
+    case ElmFormat.Parse.parse Elm_0_19 upgradeDefinition of
+        Result.Result _ (Result.Ok (Module _ _ _ _ body)) ->
+            let
+                toUpgradeDef def =
+                    case def of
+                        Entry (A _ (Definition (A _ (VarPattern (LowercaseIdentifier name))) _args _ (A _ upgradeBody))) ->
+                            case List.stripPrefix "upgrade_" name of
+                                Just functionName -> Just (functionName, upgradeBody)
+                                Nothing -> Nothing
+
+                        _ ->
+                            Nothing
+            in
+            transform' $ Maybe.mapMaybe toUpgradeDef body
+
+        Result.Result _ (Result.Err _) ->
+            transform' []
+
+
+transform' ::
+    [(String, Expr')]
+    -> Dict.Map LowercaseIdentifier [UppercaseIdentifier]
+    -> Dict.Map [UppercaseIdentifier] UppercaseIdentifier
+    -> Expr -> Expr
+transform' replacements exposed importAliases expr =
     let
         basicsReplacements =
-            Dict.fromList
-              [ ( "flip"
-                , Lambda
-                    [makeArg "f", makeArg "b", makeArg "a"] []
-                    (noRegion $ App
-                        (makeVarRef "f")
-                        [([], makeVarRef "a"), ([], makeVarRef "b")]
-                        (FAJoinFirst JoinAll)
-                    )
-                    False
-                )
-              , ( "curry"
+            Dict.fromList (replacements ++ 
+              [ ( "curry"
                 , Lambda
                     [makeArg "f", makeArg "a", makeArg "b"] []
                     (noRegion $ App
@@ -73,7 +99,7 @@ transform exposed importAliases expr =
                     )
                     False
                 )
-              ]
+              ])
 
         replace var =
             case var of
