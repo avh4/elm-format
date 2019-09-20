@@ -2,6 +2,8 @@
 {-# LANGUAGE FlexibleInstances #-}
 module ElmFormat.Upgrade_0_19 (transform, parseUpgradeDefinition, transformModule) where
 
+import Elm.Utils ((|>))
+
 import AST.V0_16
 import AST.Declaration (Declaration(..), TopLevelStructure(..))
 import AST.Expression
@@ -343,6 +345,25 @@ applyLambda lambda args appMultiline =
                         [ (nameA, Parens $ Commented (preVar ++ preArg) (noRegion $ Parens $ Commented (preA ++ preAe) eA (postAe ++ postA)) [])
                         , (nameB, Parens $ Commented (preB ++ preBe) eB (postBe ++ postB))
                         ]
+
+                ( (preVar, A _ (AST.Pattern.Record varFields))
+                  , (preArg, A _ (AST.Expression.Record _ argFields _ _))
+                  ) ->
+                    let
+                        args :: Dict.Map LowercaseIdentifier Expr'
+                        args =
+                            argFields
+                                |> fmap snd
+                                |> fmap snd
+                                |> fmap (\(WithEol a _) -> a)
+                                |> fmap (\(Pair (k, _) v _) -> (k, RA.drop $ snd v))
+                                |> Dict.fromList
+
+                        fieldMapping :: Commented LowercaseIdentifier -> Maybe (LowercaseIdentifier, Expr')
+                        fieldMapping (Commented _ var _) =
+                            (,) var <$> Dict.lookup var args
+                    in
+                    sequence $ fmap fieldMapping varFields
 
                 _ ->
                     Nothing
