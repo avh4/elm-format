@@ -39,12 +39,13 @@ upgradeDefinition = Text.pack $ unlines
     , "    remainderBy divisor dividend"
     ]
 
+data UpgradeDefinition =
+    UpgradeDefinition
+        { replacements :: Dict.Map String Expr'
+        }
 
-transform ::
-    Dict.Map LowercaseIdentifier [UppercaseIdentifier]
-    -> Dict.Map [UppercaseIdentifier] UppercaseIdentifier
-    -> Expr -> Expr
-transform =
+parseUpgradeDefinition :: Text.Text -> Either () UpgradeDefinition
+parseUpgradeDefinition definitionText =
     case ElmFormat.Parse.parse Elm_0_19 upgradeDefinition of
         Result.Result _ (Result.Ok (Module _ _ _ _ body)) ->
             let
@@ -68,22 +69,33 @@ transform =
                         _ ->
                             Nothing
             in
-            transform' $ Maybe.mapMaybe toUpgradeDef body
+            Right $ UpgradeDefinition
+                { replacements = Dict.fromList $ Maybe.mapMaybe toUpgradeDef body
+                }
 
         Result.Result _ (Result.Err _) ->
-            transform' []
+            Left ()
+
+transform ::
+    Dict.Map LowercaseIdentifier [UppercaseIdentifier]
+    -> Dict.Map [UppercaseIdentifier] UppercaseIdentifier
+    -> Expr -> Expr
+transform =
+    case parseUpgradeDefinition upgradeDefinition of
+        Right replacements ->
+            transform' replacements
+
+        Left () ->
+            error "Couldn't parse upgrade definition"
 
 
 transform' ::
-    [(String, Expr')]
+    UpgradeDefinition
     -> Dict.Map LowercaseIdentifier [UppercaseIdentifier]
     -> Dict.Map [UppercaseIdentifier] UppercaseIdentifier
     -> Expr -> Expr
-transform' replacements exposed importAliases expr =
+transform' (UpgradeDefinition basicsReplacements) exposed importAliases expr =
     let
-        basicsReplacements =
-            Dict.fromList replacements
-
         replace var =
             case var of
                 VarRef [] (LowercaseIdentifier name) ->
