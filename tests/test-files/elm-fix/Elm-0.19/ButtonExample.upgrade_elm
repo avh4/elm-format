@@ -1,0 +1,42 @@
+module Main exposing (upgrade_Button_buttonDeprecated)
+
+import ElmFix
+import Nri.Ui.Button.V9 as Button
+
+
+upgrade_buttonDeprecated { size, width, onClick, icon, disabled, label, style } =
+    Button.button label
+        [ case size of
+            Button.Large ->
+                Button.large
+
+            _ ->
+                ElmFix.todo "handle upgrading other sizes"
+        , case width of
+            Just w ->
+                Button.exactWidth w
+
+            Nothing ->
+                ElmFix.remove
+        , Button.onClick onClick
+        , case style of
+            Button.Premium ->
+                Button.premium
+
+            Button.Normal ->
+                ElmFix.remove
+
+            _ ->
+                ElmFix.todo "Handle other styles"
+        , case icon of
+            Nothing ->
+                ElmFix.remove
+
+            Just i ->
+                Button.icon i
+        , if disabled then
+            Button.disabled
+
+          else
+            ElmFix.remove
+        ]

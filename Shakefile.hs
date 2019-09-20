@@ -16,6 +16,7 @@ main = do
     StdoutTrim stackLocalBin <- liftIO $ cmd "stack path --local-bin"
 
     let elmFormat = stackLocalInstallRoot </> "bin/elm-format" <.> exe
+    let elmFix = stackLocalInstallRoot </> "bin/elm-fix" <.> exe
     let shellcheck = stackLocalBin </> "shellcheck" <.> exe
 
     want [ "test" ]
@@ -27,7 +28,7 @@ main = do
             , "_build/shellcheck.ok"
             ]
 
-    phony "build" $ need [ elmFormat ]
+    phony "build" $ need [ elmFormat, elmFix ]
     phony "stack-test" $ need [ "_build/stack-test.ok" ]
 
     phony "clean" $ do
@@ -70,6 +71,12 @@ main = do
         need generatedSourceFiles
         cmd_ "stack build --test --no-run-tests"
 
+    elmFix %> \out -> do
+        sourceFiles <- getDirectoryFiles "" sourceFilesPattern
+        need sourceFiles
+        need generatedSourceFiles
+        cmd_ "stack build --test --no-run-tests elm-format:exe:elm-fix"
+
     --
     -- Haskell tests
     --
@@ -108,6 +115,7 @@ main = do
             , "_build/tests/test-files/bad/Elm-0.19.ok"
             , "_build/tests/test-files/bad/Elm-0.18.ok"
             , "_build/tests/test-files/bad/Elm-0.17.ok"
+            , "_build/tests/test-files/elm-fix/Elm-0.19.ok"
             ]
 
     "_build/run-tests.ok" %> \out -> do
@@ -178,6 +186,14 @@ main = do
             need oks
             writeFile' out (unlines elmFiles)
 
+        ("_build/tests/test-files/elm-fix/Elm-" ++ elmVersion ++ ".ok") %> \out -> do
+            upgradeFiles <- getDirectoryFiles ""
+                [ "tests/test-files/elm-fix/Elm-" ++ elmVersion ++ "//*.upgrade_elm"
+                ]
+            let oks = ["_build" </> f -<.> "elm_fix_matches" | f <- upgradeFiles ]
+            need oks
+            writeFile' out (unlines upgradeFiles)
+
     "_build/tests//*.elm_matches" %> \out -> do
         let actual = out -<.> "elm_formatted"
         let expected = dropDirectory1 $ out -<.> "elm"
@@ -202,6 +218,20 @@ main = do
     "_build/tests//*.elm_bad_matches" %> \out -> do
         let actual = out -<.> "elm_stderr"
         let expected = dropDirectory1 $ out -<.> "output.txt"
+        need [ actual, expected ]
+        cmd_ "diff" "--strip-trailing-cr" "-u" actual expected
+        writeFile' out ""
+
+    "_build/tests/test-files/elm-fix/Elm-0.19//*.elm_fix_upgraded" %> \out -> do
+        let source = dropDirectory1 $ out -<.> "elm"
+        let upgradeDefinition = dropDirectory1 $ out -<.> "upgrade_elm"
+        need [ elmFix, source, upgradeDefinition ]
+        cmd_ "cp" source out
+        cmd_ elmFix upgradeDefinition out
+
+    "_build/tests//*.elm_fix_matches" %> \out -> do
+        let actual = out -<.> "elm_fix_upgraded"
+        let expected = dropDirectory1 $ out -<.> "output.elm"
         need [ actual, expected ]
         cmd_ "diff" "--strip-trailing-cr" "-u" actual expected
         writeFile' out ""
