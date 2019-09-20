@@ -59,6 +59,7 @@ library
         ElmFormat.Render.ElmStructure
         ElmFormat.Render.Markdown
         ElmFormat.Render.Text
+        ElmFormat.Upgrade_0_19
         ElmFormat.World
         Parse.Expression
         Parse.Helpers
@@ -70,6 +71,7 @@ library
         Reporting.Annotation
         Reporting.Error.Syntax
         Reporting.Region
+        Reporting.Result
         Util.List
 
     other-modules:
@@ -90,7 +92,6 @@ library
         ElmFormat.InputConsole
         ElmFormat.Operation
         ElmFormat.OutputConsole
-        ElmFormat.Upgrade_0_19
         ElmFormat.Version
         Flags
         Messages.Formatter.Format
@@ -108,7 +109,6 @@ library
         Parse.State
         Parse.Whitespace
         Reporting.Report
-        Reporting.Result
         ReversedList
 
     build-depends:
@@ -144,6 +144,23 @@ executable elm-format
 
     build-depends:
         base >= 4.12.0.0 && < 5,
+        elm-format
+
+
+executable elm-fix
+
+    ghc-options:
+        -threaded -O2 -Wall -Wno-name-shadowing
+
+    hs-source-dirs:
+        src-cli
+
+    main-is:
+        ElmFix/Main.hs
+
+    build-depends:
+        base >= 4.12.0.0 && < 5,
+        text >= 1.2.3.1 && < 2,
         elm-format
 
 

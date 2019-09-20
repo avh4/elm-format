@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE FlexibleInstances #-}
-module ElmFormat.Upgrade_0_19 (transform) where
+module ElmFormat.Upgrade_0_19 (transform, parseUpgradeDefinition, transformModule) where
 
 import AST.V0_16
 import AST.Declaration (Declaration(..), TopLevelStructure(..))
@@ -43,10 +43,11 @@ data UpgradeDefinition =
     UpgradeDefinition
         { replacements :: Dict.Map String Expr'
         }
+    deriving Show
 
 parseUpgradeDefinition :: Text.Text -> Either () UpgradeDefinition
 parseUpgradeDefinition definitionText =
-    case ElmFormat.Parse.parse Elm_0_19 upgradeDefinition of
+    case ElmFormat.Parse.parse Elm_0_19 definitionText of
         Result.Result _ (Result.Ok (Module _ _ _ _ body)) ->
             let
                 toUpgradeDef def =
@@ -87,6 +88,24 @@ transform =
 
         Left () ->
             error "Couldn't parse upgrade definition"
+
+
+transformModule :: UpgradeDefinition -> Module -> Module
+transformModule definition mod =
+    let
+        exposed = Dict.empty
+        importAliases = Dict.empty
+
+        transformTopLevelStructure structure =
+            case structure of
+                Entry (A region (Definition name args comments expr)) ->
+                    Entry (A region (Definition name args comments $ transform' definition exposed importAliases expr))
+
+                _ -> structure
+    in
+    case mod of
+        Module a b c d body ->
+            Module a b c d (fmap transformTopLevelStructure body)
 
 
 transform' ::
