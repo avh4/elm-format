@@ -25,7 +25,19 @@ import qualified ReversedList
 
 
 upgradeDefinition :: Text.Text
-upgradeDefinition = Text.pack "upgrade_flip =\n    \\f b a -> f a b"
+upgradeDefinition = Text.pack $ unlines
+    [ "upgrade_flip ="
+    , "    \\f b a -> f a b"
+    , ""
+    , "upgrade_curry ="
+    , "    \\f a b -> f (a, b)"
+    , ""
+    , "upgrade_uncurry ="
+    , "    \\f (a, b) -> f a b"
+    , ""
+    , "upgrade_rem ="
+    , "    \\dividend divisor -> remainderBy divisor dividend"
+    ]
 
 
 transform ::
@@ -60,46 +72,7 @@ transform' ::
 transform' replacements exposed importAliases expr =
     let
         basicsReplacements =
-            Dict.fromList (replacements ++ 
-              [ ( "curry"
-                , Lambda
-                    [makeArg "f", makeArg "a", makeArg "b"] []
-                    (noRegion $ App
-                        (makeVarRef "f")
-                        [([], noRegion $ AST.Expression.Tuple
-                            [ Commented [] (makeVarRef "a") []
-                            , Commented [] (makeVarRef "b") []
-                            ] False
-                        )]
-                        (FAJoinFirst JoinAll)
-                    )
-                    False
-                )
-              , ( "uncurry"
-                , Lambda
-                    [makeArg "f", ([], noRegion $ AST.Pattern.Tuple [makeArg' "a", makeArg' "b"]) ] []
-                    (noRegion $ App
-                        (makeVarRef "f")
-                        [ ([], makeVarRef "a")
-                        , ([], makeVarRef "b")
-                        ]
-                        (FAJoinFirst JoinAll)
-                    )
-                    False
-                )
-              , ( "rem"
-                , Lambda
-                    [makeArg "dividend", makeArg "divisor"] []
-                    (noRegion $ App
-                        (makeVarRef "remainderBy")
-                        [ ([], makeVarRef "divisor")
-                        , ([], makeVarRef "dividend")
-                        ]
-                        (FAJoinFirst JoinAll)
-                    )
-                    False
-                )
-              ])
+            Dict.fromList replacements
 
         replace var =
             case var of
