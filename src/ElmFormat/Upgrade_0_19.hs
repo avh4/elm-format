@@ -325,28 +325,41 @@ inlineVar' name insertMultiline value expr =
 
         -- TODO: handle expanding multiline in contexts other than tuples
 
-        AST.Expression.Case (Commented pre (A tRegion term) post, _) branches@((Commented prePattern p1 postPattern, (_, A _ b1)):_) ->
-            -- TODO: handle matching branches besides the first
+        AST.Expression.Case (Commented pre (A tRegion term) post, _) branches ->
             case inlineVar' name insertMultiline value term of
                 Nothing -> Nothing
                 Just term' ->
-                    case destructure (prePattern, p1) (pre, A tRegion term') of
-                        Just mappings ->
-                            Just $ RA.drop $ applyMappings False mappings $ noRegion b1
-
-                        Nothing ->
-                            Just $ AST.Expression.Case (Commented pre (noRegion term') post, False) branches
+                    let
+                        makeBranch (Commented prePattern p1 postPattern, (_, b1)) =
+                            ((prePattern, p1), b1)
+                    in
+                    -- TODO: matching branches besides the first is not tested
+                    Just $ destructureFirstMatch (pre, A tRegion term')
+                        (fmap makeBranch branches)
+                        (AST.Expression.Case (Commented pre (noRegion term') post, False) branches)
 
         AST.Expression.If (Commented preCond (A _ cond) postCond, Commented preIf ifBody postIf) [] (preElse, elseBody) ->
             case inlineVar' name insertMultiline value cond of
                 Nothing -> Nothing
                 Just cond' ->
-                    case destructure ([], noRegion $ AST.Pattern.Literal $ Boolean False) (preCond, noRegion cond') of
-                        Just mappings ->
-                            Just $ RA.drop $ applyMappings False mappings elseBody
-                        Nothing -> Just $ AST.Expression.If (Commented preCond (noRegion cond') postCond, Commented preIf ifBody postIf) [] (preElse, elseBody)
+                    Just $ destructureFirstMatch (preCond, noRegion cond')
+                        [ (([], noRegion $ AST.Pattern.Literal $ Boolean True), ifBody) -- TODO: not tested
+                        , (([], noRegion $ AST.Pattern.Literal $ Boolean False), elseBody)
+                        ]
+                        (AST.Expression.If (Commented preCond (noRegion cond') postCond, Commented preIf ifBody postIf) [] (preElse, elseBody))
 
         _ -> Just $ mapExpr (inlineVar name insertMultiline value) expr
+
+
+destructureFirstMatch :: PreCommented Expr -> [ (PreCommented Pattern, Expr) ] -> Expr' -> Expr'
+destructureFirstMatch _ [] fallback = fallback
+destructureFirstMatch value ((pat, body):rest) fallback =
+    case destructure pat value of
+        Just mappings ->
+            RA.drop $ applyMappings False mappings body
+
+        Nothing ->
+            destructureFirstMatch value rest fallback
 
 
 {-| Returns `Nothing` if the pattern doesn't match, or `Just` with a list of bound variables if the pattern does match. -}
