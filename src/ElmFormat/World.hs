@@ -14,7 +14,6 @@ import qualified System.Exit
 
 class Monad m => World m where
     readUtf8File :: FilePath -> m Text
-    writeFile :: FilePath -> String -> m ()
     writeUtf8File :: FilePath -> Text -> m ()
 
     doesFileExist :: FilePath -> m Bool
@@ -39,7 +38,6 @@ class Monad m => World m where
 
 instance World IO where
     readUtf8File path = Text.decodeUtf8 <$> ByteString.readFile path
-    writeFile = Prelude.writeFile
     writeUtf8File path content = ByteString.writeFile path $ Text.encodeUtf8 content
 
     doesFileExist = Dir.doesFileExist

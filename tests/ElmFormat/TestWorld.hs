@@ -63,9 +63,6 @@ instance World (State.State TestWorldState) where
                 Just content ->
                     return content
 
-    writeFile path content =
-        writeUtf8File path (StrictText.pack content)
-
     writeUtf8File path content =
         do
             state <- State.get
