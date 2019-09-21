@@ -25,6 +25,8 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Text (Text)
 import qualified Data.Text as Text
+import ElmFormat.ImportInfo (ImportInfo)
+import qualified ElmFormat.ImportInfo as ImportInfo
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified ElmFormat.Render.Markdown
 import qualified ElmFormat.Upgrade_0_19 as Upgrade_0_19
@@ -343,7 +345,7 @@ formatModuleHeader elmVersion addDefaultHeader modu =
               formatModuleLine elmVersion sortedExports srcTag name moduleSettings preExposing postExposing
 
       docs =
-          fmap (formatDocComment elmVersion (makeImportInfo modu)) $ RA.drop $ AST.Module.docs modu
+          fmap (formatDocComment elmVersion (ImportInfo.fromModule modu)) $ RA.drop $ AST.Module.docs modu
 
       imports =
           formatImports elmVersion modu
@@ -523,69 +525,8 @@ formatModule elmVersion addDefaultHeader spacing modu =
               [ initialComments'
               , formatModuleHeader elmVersion addDefaultHeader modu
               , List.replicate spaceBeforeBody blankLine
-              , maybeToList $ formatModuleBody spacing elmVersion (makeImportInfo modu) (AST.Module.body modu)
+              , maybeToList $ formatModuleBody spacing elmVersion (ImportInfo.fromModule modu) (AST.Module.body modu)
               ]
-
-
-data ImportInfo =
-    ImportInfo
-        { _exposed :: Map.Map LowercaseIdentifier [UppercaseIdentifier]
-        , _aliases :: Map.Map [UppercaseIdentifier] UppercaseIdentifier
-        }
-
-
-makeImportInfo :: AST.Module.Module -> ImportInfo
-makeImportInfo modu =
-    let
-        -- these are things we know will get exposed for certain modules when we see "exposing (..)"
-        -- only things that are currently useful for Elm 0.19 upgrade are included
-        knownModuleContents :: Map.Map [UppercaseIdentifier] [LowercaseIdentifier]
-        knownModuleContents =
-            Map.fromList $
-                fmap (\(a,b) -> (fmap UppercaseIdentifier a, fmap LowercaseIdentifier b))
-                [ (["Html", "Attributes"], ["style"])
-                ]
-
-        exposed =
-            -- currently this only checks for Html.Attributes (needed for Elm 0.19 upgrade)
-            let
-                importName = (fmap UppercaseIdentifier ["Html", "Attributes"])
-            in
-            case Map.lookup importName (snd $ AST.Module.imports modu) of
-                Nothing -> mempty
-                Just (_, importMethod) ->
-                    case AST.Module.exposedVars importMethod of
-                        (_, (_, AST.Variable.OpenListing _)) ->
-                            -- import Html.Attributes [as ...] exposing (..)
-                            Map.lookup importName knownModuleContents
-                                |> Maybe.fromMaybe []
-                                |> fmap (\n -> (n, importName))
-                                |> Map.fromList
-
-                        (_, (_, AST.Variable.ExplicitListing details _)) ->
-                            -- import Html.Attributes [as ...] exposing (some, stuff)
-                            AST.Module.values details
-                                |> Map.keys
-                                |> fmap (\n -> (n, importName))
-                                |> Map.fromList
-
-                        _ -> mempty
-
-        aliases =
-            -- currently this only checks for Html.Attributes (needed for Elm 0.19 upgrade)
-            let
-                importName = (fmap UppercaseIdentifier ["Html", "Attributes"])
-            in
-            case Map.lookup importName (snd $ AST.Module.imports modu) of
-                Nothing -> mempty
-                Just (_, importMethod) ->
-                    case AST.Module.alias importMethod of
-                        Just (_, (_, alias)) ->
-                            Map.singleton importName alias
-
-                        Nothing -> mempty
-    in
-    ImportInfo exposed aliases
 
 
 formatModuleBody :: Int -> ElmVersion -> ImportInfo -> [TopLevelStructure Declaration] -> Maybe Box
@@ -1314,7 +1255,7 @@ expressionParens inner outer =
 formatExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.Expression.Expr -> Box
 formatExpression elmVersion importInfo context aexpr =
     case elmVersion of
-        Elm_0_19_Upgrade -> formatExpression' elmVersion importInfo context (Upgrade_0_19.transform (_exposed importInfo) (_aliases importInfo) aexpr)
+        Elm_0_19_Upgrade -> formatExpression' elmVersion importInfo context (Upgrade_0_19.transform importInfo aexpr)
         _ -> formatExpression' elmVersion importInfo context aexpr
 
 

@@ -1,5 +1,7 @@
 module Main exposing (banner)
 
+import Nri.DEPRECATED.Button as Button
+
 
 banner : Html Msg
 banner =
@@ -12,7 +14,7 @@ banner =
             [ div [ class [ BannerContent ] ]
                 [ h1 [ class [ BannerHeader ] ] [ Html.text "Unleash the writer within." ]
                 , p [ class [ BannerText ] ] [ Html.text "NoRedInk builds stronger writers through interest-based curriculum, adaptive exercises, and actionable data." ]
-                , buttonDeprecated
+                , Button.buttonDeprecated
                     { label = "Sign up for FREE!"
                     , icon = Nothing
                     , size = Button.Large

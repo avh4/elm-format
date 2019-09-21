@@ -1,0 +1,14 @@
+upgrade_Qualified_value = ()
+upgrade_Qualified_function a b = always () (a + b)
+upgrade_Qualified_curriedFunction = always ()
+
+upgrade_Qualified_Deep_value = ()
+upgrade_Qualified_Deep_function a b = always () (a + b)
+upgrade_Qualified_Deep_curriedFunction = always ()
+
+upgrade_Aliased_value = ()
+upgrade_Aliased_function a b = always () (a + b)
+upgrade_Aliased_curriedFunction = always ()
+
+-- TODO: this should be an error when parsing the upgrade definition
+upgrade_noModuleName = ()

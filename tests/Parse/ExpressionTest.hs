@@ -9,12 +9,14 @@ import AST.Expression
 import AST.Pattern (Pattern'(Anything))
 import qualified AST.Pattern as P
 import AST.Variable
+import qualified Box
+import qualified Data.Bimap as Bimap
+import qualified Data.Text as Text
 import qualified Data.Map.Strict as Map
 import Text.Parsec.Char (string)
+import ElmFormat.ImportInfo (ImportInfo(..))
+import ElmFormat.Render.Box (formatExpression, ExpressionContext(..))
 import ElmVersion
-import ElmFormat.Render.Box (formatExpression, ExpressionContext(..), ImportInfo(..))
-import qualified Box
-import qualified Data.Text as Text
 import Parse.TestHelpers
 
 
@@ -30,7 +32,7 @@ example name input expected =
 
 importInfo :: ImportInfo
 importInfo =
-    ImportInfo Map.empty Map.empty
+    ImportInfo Map.empty Bimap.empty
 
 
 example' :: String -> String -> String -> TestTree

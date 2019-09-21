@@ -12,13 +12,16 @@ import AST.Module (Module(Module))
 import AST.Pattern
 import AST.Variable
 import Control.Monad (zipWithM)
+import ElmFormat.ImportInfo (ImportInfo)
 import ElmVersion
 import Reporting.Annotation (Located(A))
 
+import qualified Data.Bimap as Bimap
 import qualified Data.List as List
 import qualified Data.Map.Strict as Dict
 import qualified Data.Maybe as Maybe
 import qualified Data.Text as Text
+import qualified ElmFormat.ImportInfo as ImportInfo
 import qualified ElmFormat.Parse
 import qualified ElmFormat.Version
 import qualified Reporting.Annotation as RA
@@ -29,22 +32,22 @@ import qualified ReversedList
 
 upgradeDefinition :: Text.Text
 upgradeDefinition = Text.pack $ unlines
-    [ "upgrade_flip f b a ="
+    [ "upgrade_Basics_flip f b a ="
     , "    f a b"
     , ""
-    , "upgrade_curry f a b ="
+    , "upgrade_Basics_curry f a b ="
     , "    f (a, b)"
     , ""
-    , "upgrade_uncurry f (a, b) ="
+    , "upgrade_Basics_uncurry f (a, b) ="
     , "    f a b"
     , ""
-    , "upgrade_rem dividend divisor ="
+    , "upgrade_Basics_rem dividend divisor ="
     , "    remainderBy divisor dividend"
     ]
 
 data UpgradeDefinition =
     UpgradeDefinition
-        { replacements :: Dict.Map String Expr'
+        { replacements :: Dict.Map ([UppercaseIdentifier], LowercaseIdentifier) Expr'
         }
     deriving Show
 
@@ -53,15 +56,20 @@ parseUpgradeDefinition definitionText =
     case ElmFormat.Parse.parse Elm_0_19 definitionText of
         Result.Result _ (Result.Ok (Module _ _ _ _ body)) ->
             let
+                makeName :: String -> Maybe ([UppercaseIdentifier], LowercaseIdentifier)
+                makeName name =
+                    (\rev -> (UppercaseIdentifier <$> reverse (tail rev), LowercaseIdentifier $ head rev))
+                        <$> reverse <$> splitOn '_' <$> List.stripPrefix "upgrade_" name
+
                 toUpgradeDef def =
                     case def of
                         Entry (A _ (Definition (A _ (VarPattern (LowercaseIdentifier name))) [] _ (A _ upgradeBody))) ->
-                            case List.stripPrefix "upgrade_" name of
+                            case makeName name of
                                 Just functionName -> Just (functionName, upgradeBody)
                                 Nothing -> Nothing
 
                         Entry (A _ (Definition (A _ (VarPattern (LowercaseIdentifier name))) args comments upgradeBody)) ->
-                            case List.stripPrefix "upgrade_" name of
+                            case makeName name of
                                 Just functionName ->
                                     Just
                                         ( functionName
@@ -80,9 +88,20 @@ parseUpgradeDefinition definitionText =
         Result.Result _ (Result.Err _) ->
             Left ()
 
+
+splitOn :: Eq a => a -> [a] -> [[a]]
+splitOn c s =
+    case dropWhile ((==) c) s of
+        [] -> []
+        s' ->
+            w : splitOn c s''
+            where
+                (w, s'') =
+                    break ((==) c) s'
+
+
 transform ::
-    Dict.Map LowercaseIdentifier [UppercaseIdentifier]
-    -> Dict.Map [UppercaseIdentifier] UppercaseIdentifier
+    ImportInfo
     -> Expr -> Expr
 transform =
     case parseUpgradeDefinition upgradeDefinition of
@@ -94,19 +113,18 @@ transform =
 
 
 transformModule :: UpgradeDefinition -> Module -> Module
-transformModule definition mod =
+transformModule definition modu =
     let
-        exposed = Dict.empty
-        importAliases = Dict.empty
+        importInfo = ImportInfo.fromModule modu
 
         transformTopLevelStructure structure =
             case structure of
                 Entry (A region (Definition name args comments expr)) ->
-                    Entry (A region (Definition name args comments $ visitExprs (transform' definition exposed importAliases) expr))
+                    Entry (A region (Definition name args comments $ visitExprs (transform' definition importInfo) expr))
 
                 _ -> structure
     in
-    case mod of
+    case modu of
         Module a b c d body ->
             Module a b c d (fmap transformTopLevelStructure body)
 
@@ -160,18 +178,27 @@ visitExprs f original@(A region _) =
 
 transform' ::
     UpgradeDefinition
-    -> Dict.Map LowercaseIdentifier [UppercaseIdentifier]
-    -> Dict.Map [UppercaseIdentifier] UppercaseIdentifier
+    -> ImportInfo
     -> Expr -> Expr
-transform' (UpgradeDefinition basicsReplacements) exposed importAliases expr =
+transform' (UpgradeDefinition basicsReplacements) importInfo expr =
     let
+        exposed = ImportInfo._exposed importInfo
+        importAliases = ImportInfo._aliases importInfo
+
         replace var =
             case var of
-                VarRef [] (LowercaseIdentifier name) ->
-                    Dict.lookup name basicsReplacements
+                VarRef [] name ->
+                    Dict.lookup ([UppercaseIdentifier "Basics"], name) basicsReplacements
 
-                VarRef [(UppercaseIdentifier "Basics")] (LowercaseIdentifier name) ->
-                    Dict.lookup name basicsReplacements
+                VarRef ns name ->
+                    let
+                        resolvedNs =
+                            Maybe.fromMaybe ns $
+                            case ns of
+                                [single] -> Bimap.lookupR single importAliases
+                                _ -> Nothing
+                    in
+                    Dict.lookup (resolvedNs, name) basicsReplacements
 
                 OpRef (SymbolIdentifier "!") ->
                     Just $
@@ -229,7 +256,7 @@ transform' (UpgradeDefinition basicsReplacements) exposed importAliases expr =
             let
                 ha = (fmap UppercaseIdentifier ["Html", "Attributes"])
                 styleExposed = Dict.lookup (LowercaseIdentifier "style") exposed == Just ha
-                haAlias = Dict.lookup ha importAliases
+                haAlias = Bimap.lookup ha importAliases
             in
             noRegion $ ExplicitList (concat $ fmap (expandHtmlStyle styleExposed haAlias) $ terms') trailing multiline
 

@@ -1,5 +1,7 @@
 module Main exposing (banner)
 
+import Nri.DEPRECATED.Button as Button
+
 
 banner : Html Msg
 banner =
