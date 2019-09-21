@@ -9,9 +9,6 @@ upgrade_buttonDeprecated { size, width, onClick, icon, disabled, label, style } 
         [ case size of
             Button.Large ->
                 Button.large
-
-            _ ->
-                ElmFix.todo "handle upgrading other sizes"
         , case width of
             Just w ->
                 Button.exactWidth w
@@ -25,9 +22,6 @@ upgrade_buttonDeprecated { size, width, onClick, icon, disabled, label, style } 
 
             Button.Normal ->
                 ElmFix.remove
-
-            _ ->
-                ElmFix.todo "Handle other styles"
         , case icon of
             Nothing ->
                 ElmFix.remove
