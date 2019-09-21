@@ -324,68 +324,83 @@ inlineVar' name insertMultiline value expr =
 
         -- TODO: handle expanding multiline in contexts other than tuples
 
-        AST.Expression.Case (Commented pre (A _ term) post, _) branches@((Commented _ (A _ p1) _, (_, A _ b1)):_) ->
-            let
-                literalMatch pat exp =
-                    case (pat, exp) of
-                        (Anything, _) -> True -- TODO: not tested
-                        (Data name [], VarExpr (TagRef ns tag)) | name == (ns ++ [tag]) -> True
-                        _ -> False
-            in
+        AST.Expression.Case (Commented pre (A tRegion term) post, _) branches@((Commented prePattern p1 postPattern, (_, A _ b1)):_) ->
             case inlineVar' name insertMultiline value term of
                 Nothing -> Nothing
                 Just term' ->
-                    if literalMatch p1 term'
-                        then Just b1
-                        else Just $ AST.Expression.Case (Commented pre (noRegion term') post, False) branches
+                    case destructure (prePattern, p1) (pre, A tRegion term') of
+                        Just mappings ->
+                            -- TODO: use mappings
+                            Just b1
+
+                        Nothing ->
+                            Just $ AST.Expression.Case (Commented pre (noRegion term') post, False) branches
 
         _ -> Just $ mapExpr (inlineVar name insertMultiline value) expr
 
 
+{-| Returns `Nothing` if the pattern doesn't match, or `Just` with a list of bound variables if the pattern does match. -}
+destructure :: PreCommented Pattern -> PreCommented Expr -> Maybe [(LowercaseIdentifier, Expr')]
+destructure pat arg =
+    case (pat, arg) of
+        -- Wildcard `_` pattern
+        ( (_, A _ Anything), _ ) -> Just [] -- TODO: not tested
+
+        -- Custom type variants with no arguments
+        ( (preVar, A _ (Data name []))
+          , (preArg, A _ (VarExpr (TagRef ns tag)))
+          ) ->
+            if name == (ns ++ [tag])
+                then Just []
+                else Nothing
+
+        -- TODO: custom types with parameters, and create the mappings for the variables
+
+        -- Named variable pattern
+        ( (preVar, A _ (VarPattern name))
+          , (preArg, arg')
+          ) ->
+            Just [(name, Parens $ Commented (preVar ++ preArg) arg' [])]
+
+        -- Tuple with two elements (TODO: generalize this for all tuples)
+        ( (preVar, A _ (AST.Pattern.Tuple [Commented preA (A _ (VarPattern nameA)) postA, Commented preB (A _ (VarPattern nameB)) postB]))
+          , (preArg, A _ (AST.Expression.Tuple [Commented preAe eA postAe, Commented preBe eB postBe] _))
+          ) ->
+            Just
+                [ (nameA, Parens $ Commented (preVar ++ preArg) (noRegion $ Parens $ Commented (preA ++ preAe) eA (postAe ++ postA)) [])
+                , (nameB, Parens $ Commented (preB ++ preBe) eB (postBe ++ postB))
+                ]
+
+        -- Record destructuring
+        ( (preVar, A _ (AST.Pattern.Record varFields))
+          , (preArg, A _ (AST.Expression.Record _ argFields _ _))
+          ) ->
+            let
+                args :: Dict.Map LowercaseIdentifier Expr'
+                args =
+                    argFields
+                        |> fmap snd
+                        |> fmap snd
+                        |> fmap (\(WithEol a _) -> a)
+                        |> fmap (\(Pair (k, _) v _) -> (k, RA.drop $ snd v))
+                        |> Dict.fromList
+
+                fieldMapping :: Commented LowercaseIdentifier -> Maybe (LowercaseIdentifier, Expr')
+                fieldMapping (Commented _ var _) =
+                    (,) var <$> Dict.lookup var args
+            in
+            sequence $ fmap fieldMapping varFields
+
+        -- TODO: handle other patterns
+
+        _ ->
+            Nothing
+
 applyLambda :: Expr -> [PreCommented Expr] -> FunctionApplicationMultiline -> Expr
 applyLambda lambda args appMultiline =
-    let
-        getMapping :: PreCommented Pattern -> PreCommented Expr -> Maybe [(LowercaseIdentifier, Expr')]
-        getMapping pat arg =
-            case (pat, arg) of
-                ( (preVar, A _ (VarPattern name))
-                 , (preArg, arg')
-                 ) ->
-                    Just [(name, Parens $ Commented (preVar ++ preArg) arg' [])]
-
-                ( (preVar, A _ (AST.Pattern.Tuple [Commented preA (A _ (VarPattern nameA)) postA, Commented preB (A _ (VarPattern nameB)) postB]))
-                 , (preArg, A _ (AST.Expression.Tuple [Commented preAe eA postAe, Commented preBe eB postBe] _))
-                 ) ->
-                    Just
-                        [ (nameA, Parens $ Commented (preVar ++ preArg) (noRegion $ Parens $ Commented (preA ++ preAe) eA (postAe ++ postA)) [])
-                        , (nameB, Parens $ Commented (preB ++ preBe) eB (postBe ++ postB))
-                        ]
-
-                ( (preVar, A _ (AST.Pattern.Record varFields))
-                  , (preArg, A _ (AST.Expression.Record _ argFields _ _))
-                  ) ->
-                    let
-                        args :: Dict.Map LowercaseIdentifier Expr'
-                        args =
-                            argFields
-                                |> fmap snd
-                                |> fmap snd
-                                |> fmap (\(WithEol a _) -> a)
-                                |> fmap (\(Pair (k, _) v _) -> (k, RA.drop $ snd v))
-                                |> Dict.fromList
-
-                        fieldMapping :: Commented LowercaseIdentifier -> Maybe (LowercaseIdentifier, Expr')
-                        fieldMapping (Commented _ var _) =
-                            (,) var <$> Dict.lookup var args
-                    in
-                    sequence $ fmap fieldMapping varFields
-
-                _ ->
-                    Nothing
-    in
     case (RA.drop lambda, args) of
         (Lambda (pat:restVar) preBody body multiline, arg:restArgs) ->
-            case getMapping pat arg of
+            case destructure pat arg of
                 Nothing ->
                     -- failed to destructure the next argument, so stop
                     noRegion $ App lambda args appMultiline
