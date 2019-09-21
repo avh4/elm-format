@@ -18,7 +18,7 @@ import qualified Data.Text as StrictText
 
 data TestWorldState =
     TestWorldState
-        { filesystem :: Dict.Map String String
+        { filesystem :: Dict.Map FilePath StrictText.Text
         , queuedStdin :: String
         , stdout :: [String]
         , stderr :: [String]
@@ -53,7 +53,7 @@ instance World (State.State TestWorldState) where
     doesDirectoryExist _path =
         return False
 
-    readFile path =
+    readUtf8File path =
         do
             state <- State.get
             case Dict.lookup path (filesystem state) of
@@ -63,18 +63,13 @@ instance World (State.State TestWorldState) where
                 Just content ->
                     return content
 
-    readUtf8File path =
-        do
-            content <- readFile path
-            return $ StrictText.pack content
-
     writeFile path content =
+        writeUtf8File path (StrictText.pack content)
+
+    writeUtf8File path content =
         do
             state <- State.get
             State.put $ state { filesystem = Dict.insert path content (filesystem state) }
-
-    writeUtf8File path content =
-        writeFile path (StrictText.unpack content)
 
     getStdin =
         do
@@ -126,7 +121,7 @@ instance World (State.State TestWorldState) where
 testWorld :: [(String, String)] -> TestWorldState
 testWorld files =
       TestWorldState
-          { filesystem = Dict.fromList files
+          { filesystem = Dict.fromList (fmap (fmap StrictText.pack) files)
           , queuedStdin = ""
           , stdout = []
           , stderr = []
@@ -152,7 +147,7 @@ assertOutput :: [(String, String)] -> TestWorldState -> Assertion
 assertOutput expectedFiles context =
     assertBool
         ("Expected filesystem to contain: " ++ show expectedFiles ++ "\nActual: " ++ show (filesystem context))
-        (all (\(k,v) -> Dict.lookup k (filesystem context) == Just v) expectedFiles)
+        (all (\(k,v) -> Dict.lookup k (filesystem context) == Just (StrictText.pack v)) expectedFiles)
 
 
 goldenStdout :: String -> FilePath -> TestWorldState -> TestTree
@@ -187,12 +182,12 @@ init = testWorld []
 
 uploadFile :: String -> String -> TestWorld -> TestWorld
 uploadFile name content world =
-    world { filesystem = Dict.insert name content (filesystem world) }
+    world { filesystem = Dict.insert name (StrictText.pack content) (filesystem world) }
 
 
 downloadFile :: String -> TestWorld -> Maybe String
 downloadFile name world =
-    Dict.lookup name (filesystem world)
+    fmap StrictText.unpack $ Dict.lookup name (filesystem world)
 
 
 installProgram :: String -> ([String] -> State.State TestWorld ()) -> TestWorld -> TestWorld

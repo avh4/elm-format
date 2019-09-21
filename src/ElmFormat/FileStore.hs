@@ -3,7 +3,7 @@ module ElmFormat.FileStore (FileStore, FileStoreF(..), FileType(..), readFile, s
 import Prelude hiding (readFile, writeFile)
 import Control.Monad.Free
 import Data.Text (Text)
-import ElmFormat.World hiding (readFile, listDirectory)
+import ElmFormat.World hiding (listDirectory)
 import qualified ElmFormat.World as World
 
 

@@ -1,13 +1,13 @@
 module Integration.CliTest (tests) where
 
-import Prelude hiding (readFile)
 import Elm.Utils ((|>))
 import Test.Tasty
 import Test.Tasty.HUnit
-import ElmFormat.World (readFile)
+import ElmFormat.World (readUtf8File)
 import ElmFormat.TestWorld (TestWorld, run, expectExit, goldenExitStdout, expectFileContents)
 import qualified ElmFormat
 import qualified ElmFormat.TestWorld as TestWorld
+import qualified Data.Text as Text
 
 
 tests :: TestTree
@@ -24,7 +24,7 @@ tests =
         , testCase "simple file" $ world
             |> TestWorld.uploadFile "test.elm" "module Main exposing (..)\nf = 1"
             |> run "elm-format" ["test.elm", "--output", "out.elm", "--elm-version=0.19"]
-            |> TestWorld.eval (readFile "out.elm")
+            |> TestWorld.eval (readUtf8File "out.elm")
             |> assertPrefix "module Main"
         , world
             |> TestWorld.queueStdin "syntax error:True"
@@ -94,9 +94,9 @@ formatted_elm =
         , "    ()"
         ]
 
-assertPrefix :: String -> String -> Assertion
+assertPrefix :: String -> Text.Text -> Assertion
 assertPrefix prefix str =
-    assertEqual ("should start with " ++ prefix) prefix (take (length prefix) str)
+    assertEqual ("should start with " ++ prefix) prefix (take (length prefix) (Text.unpack str))
 
 
 world :: TestWorld
