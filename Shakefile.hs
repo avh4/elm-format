@@ -28,7 +28,9 @@ main = do
             , "_build/shellcheck.ok"
             ]
 
-    phony "build" $ need [ elmFormat, elmFix ]
+    phony "build" $ need [ "elm-format", "elm-fix" ]
+    phony "elm-format" $ need [ elmFormat ]
+    phony "elm-fix" $ need [ elmFix ]
     phony "stack-test" $ need [ "_build/stack-test.ok" ]
 
     phony "clean" $ do
@@ -66,13 +68,17 @@ main = do
             ]
 
     elmFormat %> \out -> do
-        sourceFiles <- getDirectoryFiles "" sourceFilesPattern
+        libFiles <- getDirectoryFiles "" sourceFilesPattern
+        sourceFiles <- getDirectoryFiles "" [ "src-cli//*.hs" ]
+        need libFiles
         need sourceFiles
         need generatedSourceFiles
         cmd_ "stack build --test --no-run-tests"
 
     elmFix %> \out -> do
-        sourceFiles <- getDirectoryFiles "" sourceFilesPattern
+        libFiles <- getDirectoryFiles "" sourceFilesPattern
+        sourceFiles <- getDirectoryFiles "" [ "src-elm-fix//*.hs" ]
+        need libFiles
         need sourceFiles
         need generatedSourceFiles
         cmd_ "stack build --test --no-run-tests elm-format:exe:elm-fix"

@@ -153,10 +153,13 @@ executable elm-fix
         -threaded -O2 -Wall -Wno-name-shadowing
 
     hs-source-dirs:
-        src-cli
+        src-elm-fix
 
     main-is:
-        ElmFix/Main.hs
+        Main.hs
+
+    other-modules:
+        ElmFix.Cli
 
     build-depends:
         base >= 4.12.0.0 && < 5,

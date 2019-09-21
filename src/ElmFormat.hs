@@ -1,10 +1,9 @@
 {-# OPTIONS_GHC -Wall #-}
-module ElmFormat where
+module ElmFormat (main, main') where
 
 import Prelude hiding (putStr, putStrLn)
 
 import System.Exit (ExitCode(..))
-import System.Environment (getArgs)
 import Messages.Types
 import Messages.Formatter.Format
 import Control.Monad.Free
@@ -202,19 +201,12 @@ handleParseResult (Opt.CompletionInvoked _) = do
       error "Shell completion not yet implemented"
 
 
-main :: IO ()
-main =
-    do
-        args <- getArgs
-        main' args
+main :: World m => [String] -> m ()
+main args =
+    main' elmFormatVersion experimental args
 
-
-main' :: World m => [String] -> m ()
-main' args =
-    main'' elmFormatVersion experimental args
-
-main'' :: World m => String -> Maybe String -> [String] -> m ()
-main'' elmFormatVersion_ experimental_ args =
+main' :: World m => String -> Maybe String -> [String] -> m ()
+main' elmFormatVersion_ experimental_ args =
     do
         c <- handleParseResult $ Flags.parse elmFormatVersion_ experimental_ args
         case c of

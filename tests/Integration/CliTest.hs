@@ -102,5 +102,5 @@ assertPrefix prefix str =
 world :: TestWorld
 world =
     TestWorld.init
-        |> TestWorld.installProgram "elm-format" ElmFormat.main'
-        |> TestWorld.installProgram "elm-format-xxx" (ElmFormat.main'' "x.x.x" Nothing)
+        |> TestWorld.installProgram "elm-format" ElmFormat.main
+        |> TestWorld.installProgram "elm-format-xxx" (ElmFormat.main' "x.x.x" Nothing)

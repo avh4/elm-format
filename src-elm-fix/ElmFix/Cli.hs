@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 
-module Main where
+module ElmFix.Cli (main) where
 
 import Prelude hiding (readFile, writeFile)
 import ElmFormat.Upgrade_0_19 (parseUpgradeDefinition, transformModule)
@@ -10,19 +10,12 @@ import ElmVersion
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified Reporting.Result as Result
-import qualified System.Environment
 
 -- elm-fix <upgrade-definition> [FILES...]
 
 
-main :: IO ()
-main =
-    do
-        args <- System.Environment.getArgs
-        main' args
-
-main' :: World m => [String] -> m ()
-main' args =
+main :: World m => [String] -> m ()
+main args =
     do
         case args of
             [ definitionFile, sourceFile ] ->
