@@ -13,12 +13,7 @@ banner =
                 [ h1 [ class [ BannerHeader ] ] [ Html.text "Unleash the writer within." ]
                 , p [ class [ BannerText ] ] [ Html.text "NoRedInk builds stronger writers through interest-based curriculum, adaptive exercises, and actionable data." ]
                 , Button.button "Sign up for FREE!"
-                    [ case Button.Large of
-                        Button.Large ->
-                            Button.large
-
-                        _ ->
-                            ElmFix.todo "handle upgrading other sizes"
+                    [ Button.large
                     , case Just 280 of
                         Just w ->
                             Button.exactWidth w
@@ -26,21 +21,8 @@ banner =
                         Nothing ->
                             ElmFix.remove
                     , Button.onClick (DropDownBanner.RecordSignupClick DropDownBanner.Home)
-                    , case Button.Premium of
-                        Button.Premium ->
-                            Button.premium
-
-                        Button.Normal ->
-                            ElmFix.remove
-
-                        _ ->
-                            ElmFix.todo "Handle other styles"
-                    , case Nothing of
-                        Nothing ->
-                            ElmFix.remove
-
-                        Just i ->
-                            Button.icon i
+                    , Button.premium
+                    , ElmFix.remove
                     , if False then
                         Button.disabled
 

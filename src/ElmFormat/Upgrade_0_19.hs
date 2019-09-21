@@ -324,6 +324,21 @@ inlineVar' name insertMultiline value expr =
 
         -- TODO: handle expanding multiline in contexts other than tuples
 
+        AST.Expression.Case (Commented pre (A _ term) post, _) branches@((Commented _ (A _ p1) _, (_, A _ b1)):_) ->
+            let
+                literalMatch pat exp =
+                    case (pat, exp) of
+                        (Anything, _) -> True -- TODO: not tested
+                        (Data name [], VarExpr (TagRef ns tag)) | name == (ns ++ [tag]) -> True
+                        _ -> False
+            in
+            case inlineVar' name insertMultiline value term of
+                Nothing -> Nothing
+                Just term' ->
+                    if literalMatch p1 term'
+                        then Just b1
+                        else Just $ AST.Expression.Case (Commented pre (noRegion term') post, False) branches
+
         _ -> Just $ mapExpr (inlineVar name insertMultiline value) expr
 
 
