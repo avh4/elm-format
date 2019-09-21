@@ -326,6 +326,7 @@ inlineVar' name insertMultiline value expr =
         -- TODO: handle expanding multiline in contexts other than tuples
 
         AST.Expression.Case (Commented pre (A tRegion term) post, _) branches@((Commented prePattern p1 postPattern, (_, A _ b1)):_) ->
+            -- TODO: handle matching branches besides the first
             case inlineVar' name insertMultiline value term of
                 Nothing -> Nothing
                 Just term' ->
@@ -336,6 +337,15 @@ inlineVar' name insertMultiline value expr =
                         Nothing ->
                             Just $ AST.Expression.Case (Commented pre (noRegion term') post, False) branches
 
+        AST.Expression.If (Commented preCond (A _ cond) postCond, Commented preIf ifBody postIf) [] (preElse, elseBody) ->
+            case inlineVar' name insertMultiline value cond of
+                Nothing -> Nothing
+                Just cond' ->
+                    case destructure ([], noRegion $ AST.Pattern.Literal $ Boolean False) (preCond, noRegion cond') of
+                        Just mappings ->
+                            Just $ RA.drop $ applyMappings False mappings elseBody
+                        Nothing -> Just $ AST.Expression.If (Commented preCond (noRegion cond') postCond, Commented preIf ifBody postIf) [] (preElse, elseBody)
+
         _ -> Just $ mapExpr (inlineVar name insertMultiline value) expr
 
 
@@ -345,6 +355,14 @@ destructure pat arg =
     case (pat, arg) of
         -- Wildcard `_` pattern
         ( (_, A _ Anything), _ ) -> Just [] -- TODO: not tested
+
+        -- Literals
+        ( (preVar, A _ (AST.Pattern.Literal pat))
+          , (preArg, A _ (AST.Expression.Literal val))
+          )
+          | pat == val
+          ->
+            Just []
 
         -- Custom type variants with no arguments
         ( (preVar, A _ (Data name []))

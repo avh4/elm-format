@@ -18,11 +18,7 @@ banner =
                     , Button.onClick (DropDownBanner.RecordSignupClick DropDownBanner.Home)
                     , Button.premium
                     , ElmFix.remove
-                    , if False then
-                        Button.disabled
-
-                      else
-                        ElmFix.remove
+                    , ElmFix.remove
                     ]
                 ]
             , p [ class [ PremiumUpsellMessage ] ]
