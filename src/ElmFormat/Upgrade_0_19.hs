@@ -11,6 +11,7 @@ import AST.MapExpr
 import AST.Module (Module(Module))
 import AST.Pattern
 import AST.Variable
+import Control.Monad (zipWithM)
 import ElmVersion
 import Reporting.Annotation (Located(A))
 
@@ -330,8 +331,7 @@ inlineVar' name insertMultiline value expr =
                 Just term' ->
                     case destructure (prePattern, p1) (pre, A tRegion term') of
                         Just mappings ->
-                            -- TODO: use mappings
-                            Just b1
+                            Just $ RA.drop $ applyMappings False mappings $ noRegion b1
 
                         Nothing ->
                             Just $ AST.Expression.Case (Commented pre (noRegion term') post, False) branches
@@ -349,12 +349,17 @@ destructure pat arg =
         -- Custom type variants with no arguments
         ( (preVar, A _ (Data name []))
           , (preArg, A _ (VarExpr (TagRef ns tag)))
-          ) ->
-            if name == (ns ++ [tag])
-                then Just []
-                else Nothing
+          )
+          | name == (ns ++ [tag])
+          ->
+            Just []
 
-        -- TODO: custom types with parameters, and create the mappings for the variables
+        ( (preVar, A _ (Data name argVars))
+          , (preArg, A _ (App (A _ (VarExpr (TagRef ns tag))) argValues _))
+          )
+          | name == (ns ++ [tag])
+          ->
+            concat <$> zipWithM destructure argVars argValues
 
         -- Named variable pattern
         ( (preVar, A _ (VarPattern name))
@@ -396,6 +401,12 @@ destructure pat arg =
         _ ->
             Nothing
 
+
+applyMappings :: Bool -> [(LowercaseIdentifier, Expr')] -> Expr -> Expr
+applyMappings insertMultiline mappings body =
+    foldl (\e (name, value) -> mapExpr (inlineVar name insertMultiline value) e) body mappings
+
+
 applyLambda :: Expr -> [PreCommented Expr] -> FunctionApplicationMultiline -> Expr
 applyLambda lambda args appMultiline =
     case (RA.drop lambda, args) of
@@ -407,7 +418,8 @@ applyLambda lambda args appMultiline =
 
                 Just mappings ->
                     let
-                        newBody = foldl (\e (name, value) -> mapExpr (inlineVar name (appMultiline == FASplitFirst) value) e) body mappings
+                        newBody = applyMappings (appMultiline == FASplitFirst) mappings body
+
                         newMultiline =
                             case appMultiline of
                                 FASplitFirst -> FASplitFirst

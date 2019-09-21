@@ -14,12 +14,7 @@ banner =
                 , p [ class [ BannerText ] ] [ Html.text "NoRedInk builds stronger writers through interest-based curriculum, adaptive exercises, and actionable data." ]
                 , Button.button "Sign up for FREE!"
                     [ Button.large
-                    , case Just 280 of
-                        Just w ->
-                            Button.exactWidth w
-
-                        Nothing ->
-                            ElmFix.remove
+                    , Button.exactWidth 280
                     , Button.onClick (DropDownBanner.RecordSignupClick DropDownBanner.Home)
                     , Button.premium
                     , ElmFix.remove
