@@ -1,0 +1,3 @@
+import NewQualified
+
+upgrade_Qualified_value = NewQualified.value

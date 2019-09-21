@@ -8,7 +8,7 @@ import AST.V0_16
 import AST.Declaration (Declaration(..), TopLevelStructure(..))
 import AST.Expression
 import AST.MapExpr
-import AST.Module (Module(Module))
+import AST.Module (Module(Module), ImportMethod)
 import AST.Pattern
 import AST.Variable
 import Control.Monad (zipWithM)
@@ -45,16 +45,19 @@ upgradeDefinition = Text.pack $ unlines
     , "    remainderBy divisor dividend"
     ]
 
+
 data UpgradeDefinition =
     UpgradeDefinition
-        { replacements :: Dict.Map ([UppercaseIdentifier], LowercaseIdentifier) Expr'
+        { _replacements :: Dict.Map ([UppercaseIdentifier], LowercaseIdentifier) Expr'
+        , _imports :: (Dict.Map [UppercaseIdentifier] (Comments, ImportMethod))
         }
     deriving Show
+
 
 parseUpgradeDefinition :: Text.Text -> Either () UpgradeDefinition
 parseUpgradeDefinition definitionText =
     case ElmFormat.Parse.parse Elm_0_19 definitionText of
-        Result.Result _ (Result.Ok (Module _ _ _ _ body)) ->
+        Result.Result _ (Result.Ok (Module _ _ _ (_, imports) body)) ->
             let
                 makeName :: String -> Maybe ([UppercaseIdentifier], LowercaseIdentifier)
                 makeName name =
@@ -82,7 +85,8 @@ parseUpgradeDefinition definitionText =
                             Nothing
             in
             Right $ UpgradeDefinition
-                { replacements = Dict.fromList $ Maybe.mapMaybe toUpgradeDef body
+                { _replacements = Dict.fromList $ Maybe.mapMaybe toUpgradeDef body
+                , _imports = imports
                 }
 
         Result.Result _ (Result.Err _) ->
@@ -113,9 +117,16 @@ transform =
 
 
 transformModule :: UpgradeDefinition -> Module -> Module
-transformModule definition modu =
+transformModule definition modu@(Module a b c (preImports, imports) body) =
     let
-        importInfo = ImportInfo.fromModule modu
+        importInfo =
+            -- Note: this is the info used for matching references in the
+            -- source file being transformed, and should NOT include
+            -- the imports merged in from the upgrade definition
+            ImportInfo.fromModule modu
+
+        mergedImports =
+            Dict.union imports (_imports definition)
 
         transformTopLevelStructure structure =
             case structure of
@@ -124,9 +135,7 @@ transformModule definition modu =
 
                 _ -> structure
     in
-    case modu of
-        Module a b c d body ->
-            Module a b c d (fmap transformTopLevelStructure body)
+    Module a b c (preImports, mergedImports) (fmap transformTopLevelStructure body)
 
 
 visitLetDeclaration :: (Expr -> Expr) -> LetDeclaration -> LetDeclaration
@@ -180,7 +189,7 @@ transform' ::
     UpgradeDefinition
     -> ImportInfo
     -> Expr -> Expr
-transform' (UpgradeDefinition basicsReplacements) importInfo expr =
+transform' (UpgradeDefinition basicsReplacements _) importInfo expr =
     let
         exposed = ImportInfo._exposed importInfo
         importAliases = ImportInfo._aliases importInfo
