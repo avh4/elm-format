@@ -86,6 +86,7 @@ library
         Cheapskate.Types
         Cheapskate.Util
         CommandLine.Helpers
+        CommandLine.TransformFiles
         ElmFormat.Execute
         ElmFormat.Filesystem
         ElmFormat.FileStore

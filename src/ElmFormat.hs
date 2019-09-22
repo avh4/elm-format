@@ -6,8 +6,8 @@ import Prelude hiding (putStr, putStrLn)
 import System.Exit (ExitCode(..))
 import Messages.Types
 import Messages.Formatter.Format
+import CommandLine.TransformFiles (TransformMode(..))
 import Control.Monad.Free
-import qualified CommandLine.Helpers as Helpers
 import ElmVersion
 import ElmFormat.FileStore (FileStore)
 import ElmFormat.FileWriter (FileWriter)
@@ -17,16 +17,15 @@ import ElmFormat.World
 
 import qualified AST.Json
 import qualified AST.Module
+import qualified CommandLine.Helpers as Helpers
+import qualified CommandLine.TransformFiles as TransformFiles
 import qualified Flags
 import qualified Data.Text as Text
 import qualified ElmFormat.Execute as Execute
-import qualified ElmFormat.InputConsole as InputConsole
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.FileStore as FileStore
-import qualified ElmFormat.FileWriter as FileWriter
 import qualified ElmFormat.Filesystem as FS
-import qualified ElmFormat.OutputConsole as OutputConsole
 import qualified ElmFormat.Version
 import qualified Options.Applicative as Opt
 import qualified Reporting.Result as Result
@@ -287,9 +286,8 @@ validate elmVersion (inputFile, inputText) =
             Left $ ParseError inputFile (Text.unpack inputText) errs
 
 
-data FormatResult
-    = NoChange FilePath Text.Text
-    | Changed FilePath Text.Text
+type FormatResult =
+    TransformFiles.Result Text.Text
 
 
 parseModule :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage AST.Module.Module
@@ -302,47 +300,15 @@ parseModule elmVersion (inputFile, inputText) =
             Left $ ParseError inputFile (Text.unpack inputText) errs
 
 
-checkChange :: (FilePath, Text.Text) -> Text.Text -> FormatResult
-checkChange (inputFile, inputText) outputText =
-    if inputText == outputText
-        then NoChange inputFile outputText
-        else Changed inputFile outputText
-
-
 format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage FormatResult
 format elmVersion input =
-    checkChange input <$> Render.render elmVersion <$> parseModule elmVersion input
+    TransformFiles.checkChange input <$> Render.render elmVersion <$> parseModule elmVersion input
 
 
 toJson :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage FormatResult
 toJson elmVersion (inputFile, inputText) =
-    Changed inputFile . Text.pack . Text.JSON.encode . AST.Json.showModule
+    TransformFiles.Changed inputFile . Text.pack . Text.JSON.encode . AST.Json.showModule
     <$> parseModule elmVersion (inputFile, inputText)
-
-
-readStdin :: InputConsole f => Free f (FilePath, Text.Text)
-readStdin =
-    (,) "<STDIN>" <$> InputConsole.readStdin
-
-
-readFile :: (FileStore f, InfoFormatter f) => FilePath -> Free f (FilePath, Text.Text)
-readFile filePath =
-    onInfo (ProcessingFile filePath)
-        *> ((,) filePath <$> FileStore.readFile filePath)
-
-
-getOutputText :: FormatResult -> Text.Text
-getOutputText result =
-    case result of
-        NoChange _ text -> text
-        Changed _ text -> text
-
-
-updateFile :: FileWriter f => FormatResult -> Free f ()
-updateFile result =
-    case result of
-        NoChange _ _ -> return ()
-        Changed outputFile outputText -> FileWriter.overwriteFile outputFile outputText
 
 
 logError :: InfoFormatter f => Either InfoMessage () -> Free f Bool
@@ -355,62 +321,18 @@ logError result =
             return True
 
 
-logErrorOr :: InfoFormatter f => (a -> Free f ()) -> Either InfoMessage a -> Free f Bool
-logErrorOr fn result =
-    case result of
-        Left message ->
-            onInfo message *> return False
-
-        Right value ->
-            fn value *> return True
-
-
-data TransformMode
-    = StdinToStdout
-    | StdinToFile FilePath
-    | FileToStdout FilePath
-    | FileToFile FilePath FilePath
-    | FilesInPlace FilePath [FilePath]
-
-
-applyTransformation :: (InputConsole f, OutputConsole f, InfoFormatter f, FileStore f, FileWriter f) => ((FilePath, Text.Text) -> Either InfoMessage FormatResult) -> TransformMode -> Free f Bool
-applyTransformation transform mode =
-    case mode of
-        StdinToStdout ->
-            (fmap getOutputText <$> transform <$> readStdin) >>= logErrorOr OutputConsole.writeStdout
-
-        StdinToFile outputFile ->
-            (fmap getOutputText <$> transform <$> readStdin) >>= logErrorOr (FileWriter.overwriteFile outputFile)
-
-        -- TODO: this prints "Processing such-and-such-a-file.elm" which makes the stdout invalid
-        -- FileToStdout inputFile ->
-        --     (fmap getOutputText <$> transform <$> ElmFormat.readFile inputFile) >>= logErrorOr OutputConsole.writeStdout
-
-        FileToFile inputFile outputFile ->
-            (fmap getOutputText <$> transform <$> ElmFormat.readFile inputFile) >>= logErrorOr (FileWriter.overwriteFile outputFile)
-
-        FilesInPlace first rest ->
-            do
-                canOverwrite <- approve $ FilesWillBeOverwritten (first:rest)
-                if canOverwrite
-                    then all id <$> mapM formatFile (first:rest)
-                    else return True
-            where
-                formatFile file = (transform <$> ElmFormat.readFile file) >>= logErrorOr ElmFormat.updateFile
-
-
 doIt :: (InputConsole f, OutputConsole f, InfoFormatter f, FileStore f, FileWriter f) => ElmVersion -> WhatToDo -> Free f Bool
 doIt elmVersion whatToDo =
     case whatToDo of
         ValidateStdin ->
-            (validate elmVersion <$> readStdin) >>= logError
+            (validate elmVersion <$> TransformFiles.readStdin) >>= logError
 
         ValidateFiles first rest ->
             all id <$> mapM validateFile (first:rest)
-            where validateFile file = (validate elmVersion <$> ElmFormat.readFile file) >>= logError
+            where validateFile file = (validate elmVersion <$> TransformFiles.readFromFile file) >>= logError
 
         Format transformMode ->
-            applyTransformation (format elmVersion) transformMode
+            TransformFiles.applyTransformation (format elmVersion) transformMode
 
         ConvertToJson transformMode ->
-            applyTransformation (toJson elmVersion) transformMode
+            TransformFiles.applyTransformation (toJson elmVersion) transformMode
