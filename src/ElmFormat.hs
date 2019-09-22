@@ -310,6 +310,15 @@ format elmVersion (inputFile, inputText) =
             Left message
 
 
+toJson :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage FormatResult
+toJson elmVersion (inputFile, inputText) =
+    case parseModule elmVersion (inputFile, inputText) of
+        Right modu ->
+            Right $ Changed inputFile $ Text.pack $ Text.JSON.encode $ AST.Json.showModule modu
+        Left message ->
+            Left message
+
+
 readStdin :: InputConsole f => Free f (FilePath, Text.Text)
 readStdin =
     (,) "<STDIN>" <$> InputConsole.readStdin
@@ -355,6 +364,35 @@ logErrorOr fn result =
             fn value *> return True
 
 
+data TransformMode
+    = TransformStdinToStdout
+    | TransformStdinToFile FilePath
+    | TransformFileToFile FilePath FilePath
+    | TransformFilesInPlace FilePath [FilePath]
+
+
+applyTransformation :: (InputConsole f, OutputConsole f, InfoFormatter f, FileStore f, FileWriter f) => ((FilePath, Text.Text) -> Either InfoMessage FormatResult) -> TransformMode -> Free f Bool
+applyTransformation transform mode =
+    case mode of
+        TransformStdinToStdout ->
+            (fmap getOutputText <$> transform <$> readStdin) >>= logErrorOr OutputConsole.writeStdout
+
+        TransformStdinToFile outputFile ->
+            (fmap getOutputText <$> transform <$> readStdin) >>= logErrorOr (FileWriter.overwriteFile outputFile)
+
+        TransformFileToFile inputFile outputFile ->
+            (fmap getOutputText <$> transform <$> ElmFormat.readFile inputFile) >>= logErrorOr (FileWriter.overwriteFile outputFile)
+
+        TransformFilesInPlace first rest ->
+            do
+                canOverwrite <- approve $ FilesWillBeOverwritten (first:rest)
+                if canOverwrite
+                    then all id <$> mapM formatFile (first:rest)
+                    else return True
+            where
+                formatFile file = (transform <$> ElmFormat.readFile file) >>= logErrorOr ElmFormat.updateFile
+
+
 doIt :: (InputConsole f, OutputConsole f, InfoFormatter f, FileStore f, FileWriter f) => ElmVersion -> WhatToDo -> Free f Bool
 doIt elmVersion whatToDo =
     case whatToDo of
@@ -366,25 +404,19 @@ doIt elmVersion whatToDo =
             where validateFile file = (validate elmVersion <$> ElmFormat.readFile file) >>= logError
 
         StdinToStdout ->
-            (fmap getOutputText <$> format elmVersion <$> readStdin) >>= logErrorOr OutputConsole.writeStdout
+            applyTransformation (format elmVersion) TransformStdinToStdout
 
         StdinToFile outputFile ->
-            (fmap getOutputText <$> format elmVersion <$> readStdin) >>= logErrorOr (FileWriter.overwriteFile outputFile)
+            applyTransformation (format elmVersion) (TransformStdinToFile outputFile)
 
         FormatToFile inputFile outputFile ->
-            (fmap getOutputText <$> format elmVersion <$> ElmFormat.readFile inputFile) >>= logErrorOr (FileWriter.overwriteFile outputFile)
+            applyTransformation (format elmVersion) (TransformFileToFile inputFile outputFile)
 
         FormatInPlace first rest ->
-            do
-                canOverwrite <- approve $ FilesWillBeOverwritten (first:rest)
-                if canOverwrite
-                    then all id <$> mapM formatFile (first:rest)
-                    else return True
-            where
-                formatFile file = (format elmVersion <$> ElmFormat.readFile file) >>= logErrorOr ElmFormat.updateFile
+            applyTransformation (format elmVersion) (TransformFilesInPlace first rest)
 
         StdinToJson ->
-            (fmap (Text.pack . Text.JSON.encode . AST.Json.showModule) <$> parseModule elmVersion <$> readStdin) >>= logErrorOr OutputConsole.writeStdout
+            applyTransformation (toJson elmVersion) TransformStdinToStdout
 
         -- TODO: this prints "Processing such-and-such-a-file.elm" which makes the JSON output invalid
         -- FileToJson inputFile ->
