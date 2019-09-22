@@ -1,7 +1,9 @@
 import NewQualified
+import NewQualified.Aliased as NQA
 import NotNeeded
 import NotNeeded.Aliased as NNA
 
 upgrade_Qualified_value = NewQualified.value
+upgrade_Qualified_value2 = NQA.value
 upgrade_Qualified_neverUsed = NotNeeded.value
 upgrade_Qualified_neverUsed2 = NNA.value

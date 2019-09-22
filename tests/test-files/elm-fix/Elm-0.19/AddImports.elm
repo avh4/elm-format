@@ -4,7 +4,9 @@ import Qualified
 
 
 x =
-    Qualified.value
+    [ Qualified.value
+    , Qualified.value2
+    ]
 
 
 y =
