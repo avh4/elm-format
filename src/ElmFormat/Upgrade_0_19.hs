@@ -8,6 +8,7 @@ import AST.V0_16
 import AST.Declaration (Declaration(..), TopLevelStructure(..))
 import AST.Expression
 import AST.MapExpr
+import AST.MapNamespace
 import AST.Module (Module(Module), ImportMethod(ImportMethod))
 import AST.Pattern
 import AST.Variable
@@ -17,6 +18,7 @@ import ElmFormat.ImportInfo (ImportInfo)
 import ElmVersion
 import Reporting.Annotation (Located(A))
 
+import qualified AST.Module
 import qualified Data.Bimap as Bimap
 import qualified Data.List as List
 import qualified Data.Map.Strict as Dict
@@ -51,7 +53,8 @@ upgradeDefinition = Text.pack $ unlines
 data UpgradeDefinition =
     UpgradeDefinition
         { _replacements :: Dict.Map ([UppercaseIdentifier], LowercaseIdentifier) Expr'
-        , _imports :: (Dict.Map [UppercaseIdentifier] (Comments, ImportMethod))
+        , _imports :: Dict.Map [UppercaseIdentifier] (Comments, ImportMethod)
+        , _preferredAliases :: [(UppercaseIdentifier, [UppercaseIdentifier])]
         }
     deriving Show
 
@@ -59,8 +62,10 @@ data UpgradeDefinition =
 parseUpgradeDefinition :: Text.Text -> Either () UpgradeDefinition
 parseUpgradeDefinition definitionText =
     case ElmFormat.Parse.parse Elm_0_19 definitionText of
-        Result.Result _ (Result.Ok (Module _ _ _ (_, imports) body)) ->
+        Result.Result _ (Result.Ok modu@(Module _ _ _ (_, imports) body)) ->
             let
+                importInfo = ImportInfo.fromModule modu
+
                 makeName :: String -> Maybe ([UppercaseIdentifier], LowercaseIdentifier)
                 makeName name =
                     (\rev -> (UppercaseIdentifier <$> reverse (tail rev), LowercaseIdentifier $ head rev))
@@ -85,10 +90,26 @@ parseUpgradeDefinition definitionText =
 
                         _ ->
                             Nothing
+
+                applyAliases ns =
+                    Maybe.fromMaybe ns $
+                    case ns of
+                        [single] -> Bimap.lookupR single (ImportInfo._aliases importInfo)
+                        _ -> Nothing
+
+                removeAlias :: ImportMethod -> ImportMethod
+                removeAlias i =
+                    i { AST.Module.alias = Nothing }
+
+                getAlias (ns, (_, ImportMethod alias _)) =
+                    case alias of
+                        Nothing -> Nothing
+                        Just (_, (_, a)) -> Just (a, ns)
             in
             Right $ UpgradeDefinition
-                { _replacements = Dict.fromList $ Maybe.mapMaybe toUpgradeDef body
-                , _imports = imports
+                { _replacements = fmap (mapNamespace applyAliases) $ Dict.fromList $ Maybe.mapMaybe toUpgradeDef body
+                , _imports = fmap (fmap removeAlias) imports
+                , _preferredAliases = Maybe.mapMaybe getAlias $ Dict.toList imports
                 }
 
         Result.Result _ (Result.Err _) ->
@@ -119,7 +140,7 @@ transform =
 
 
 transformModule :: UpgradeDefinition -> Module -> Module
-transformModule upgradeDefinition modu@(Module a b c (preImports, originalImports) body) =
+transformModule upgradeDefinition modu@(Module a b c (preImports, originalImports) originalBody) =
     let
         importInfo =
             -- Note: this is the info used for matching references in the
@@ -134,7 +155,7 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
 
                 _ -> structure
 
-        upgradedBody = fmap transformTopLevelStructure body
+        upgradedBody = fmap transformTopLevelStructure originalBody
 
         expressionFromTopLevelStructure structure =
             case structure of
@@ -150,6 +171,9 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
         namespacesWithReplacements =
               Set.fromList $ fmap fst $ Dict.keys $ _replacements upgradeDefinition
 
+        remainingUsages ns =
+            Dict.foldr (+) 0 $ Maybe.fromMaybe Dict.empty $ Dict.lookup ns usagesAfterUpgrade
+
         cleanImports ns (_, importMethod) =
             let
                 nameToCheck =
@@ -157,18 +181,33 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
                         ImportMethod (Just (_, (_, alias))) _ -> [alias]
                         _ -> ns
                 wasReplaced = Set.member ns namespacesWithReplacements
-                remainingUsages = (Dict.foldr (+) 0 $ Maybe.fromMaybe Dict.empty $ Dict.lookup nameToCheck usagesAfterUpgrade)
             in
-            if wasReplaced && remainingUsages <= 0
+            if wasReplaced && remainingUsages nameToCheck <= 0
                 then False
                 else True
+
+        additionalAliases =
+            _preferredAliases upgradeDefinition
+                |> filter (\(alias, _) -> remainingUsages [alias] <= 0)
 
         newImports =
             Dict.union
                 (Dict.filterWithKey cleanImports originalImports)
                 (_imports upgradeDefinition)
+                -- |> Dict.mapWithKeys addAlias
+
+        applyAlias (imports, body) (alias, ns) =
+            if remainingUsages [alias] <= 0
+                then
+                    ( Dict.update (\(pre, im) -> Just $ (pre, im { AST.Module.alias = Just ([], ([], alias)) }) ) ns imports
+                    , mapNamespace (\n -> if n == ns then [alias] else n) body
+                    )
+                else (imports, body)
+
+        (finalImports, finalBody) =
+            List.foldl' applyAlias (newImports, upgradedBody) additionalAliases
     in
-    Module a b c (preImports, newImports) upgradedBody
+    Module a b c (preImports, finalImports) finalBody
 
 
 visitLetDeclaration :: (Expr -> Expr) -> LetDeclaration Expr -> LetDeclaration Expr
@@ -225,7 +264,7 @@ transform' ::
     UpgradeDefinition
     -> ImportInfo
     -> Expr -> Expr
-transform' (UpgradeDefinition basicsReplacements _) importInfo (Fix (LocatedExpression expr)) =
+transform' (UpgradeDefinition basicsReplacements _ _) importInfo (Fix (LocatedExpression expr)) =
     let
         exposed = ImportInfo._exposed importInfo
         importAliases = ImportInfo._aliases importInfo
