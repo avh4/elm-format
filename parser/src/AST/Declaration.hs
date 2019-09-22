@@ -2,6 +2,7 @@
 module AST.Declaration where
 
 import AST.V0_16
+
 import qualified AST.Expression as Expression
 import qualified AST.Pattern as Pattern
 import qualified AST.Variable as Var

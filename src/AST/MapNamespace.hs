@@ -1,5 +1,6 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
+
 module AST.MapNamespace where
 
 import AST.Declaration
@@ -7,13 +8,19 @@ import AST.Expression
 import AST.MapExpr
 import AST.Variable
 import AST.V0_16
+import Data.Fix
 
 
 class MapNamespace a where
     mapNamespace :: ([UppercaseIdentifier] -> [UppercaseIdentifier]) -> a -> a
 
 
-instance MapNamespace Expr' where
+instance MapNamespace Expr where
+    mapNamespace f (Fix (LocatedExpression e)) =
+        Fix $ LocatedExpression $ mapNamespace f e
+
+
+instance MapNamespace (Expression Expr) where
     mapNamespace f expr =
         case expr of
             VarExpr var ->
@@ -93,5 +100,5 @@ instance MapNamespace Ref where
             OpRef name -> OpRef name
 
 
-instance (MapNamespace a, Functor f) => MapNamespace (f a) where
+instance {-# OVERLAPPABLE #-} (MapNamespace a, Functor f) => MapNamespace (f a) where
     mapNamespace f = fmap (mapNamespace f)

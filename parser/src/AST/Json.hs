@@ -11,6 +11,7 @@ import AST.Module
 import AST.Pattern
 import AST.Variable
 import AST.V0_16
+import Data.Fix
 import Data.Maybe (mapMaybe)
 import Reporting.Annotation hiding (map)
 import Text.JSON hiding (showJSON)
@@ -194,7 +195,7 @@ instance ToJSON MergedTopLevelStructure where
 
 
 instance ToJSON Expr where
-  showJSON (A region expr) =
+  showJSON (Fix (LocatedExpression (A region expr))) =
       case expr of
           Unit _ ->
               makeObj [ type_ "UnitLiteral" ]
@@ -279,9 +280,9 @@ instance ToJSON Expr where
                   , ("first", showJSON first)
                   , ("operations"
                     , JSArray $ map
-                        (\(_, op, _, expr) ->
+                        (\(BinopsClause _ op _ expr) ->
                            makeObj
-                               [ ("operator", showJSON $ noRegion $ VarExpr op)
+                               [ ("operator", showJSON $ Fix $ LocatedExpression $ noRegion $ VarExpr op)
                                , ("term", showJSON expr)
                                ]
                         )
@@ -373,9 +374,9 @@ instance ToJSON Expr where
                   , ("body", showJSON body)
                   ]
 
-          If (Commented _ cond' _, Commented _ thenBody' _) rest' (_, elseBody) ->
+          If (IfClause (Commented _ cond' _) (Commented _ thenBody' _)) rest' (_, elseBody) ->
               let
-                  ifThenElse :: Expr -> Expr -> [(Comments, IfClause)] -> JSValue
+                  ifThenElse :: Expr -> Expr -> [(Comments, IfClause Expr)] -> JSValue
                   ifThenElse cond thenBody rest =
                       makeObj
                           [ type_ "IfExpression"
@@ -386,7 +387,7 @@ instance ToJSON Expr where
                                 [] ->
                                     showJSON elseBody
 
-                                (_, (Commented _ nextCond _, Commented _ nextBody _)) : nextRest ->
+                                (_, IfClause (Commented _ nextCond _) (Commented _ nextBody _)) : nextRest ->
                                     ifThenElse nextCond nextBody nextRest
                             )
                           ]
@@ -440,7 +441,7 @@ sourceLocation region =
     ( "sourceLocation", showJSON region )
 
 
-instance ToJSON LetDeclaration where
+instance (ToJSON e, Show e) => ToJSON (LetDeclaration e) where
   showJSON letDeclaration =
       case letDeclaration of
           LetDefinition (A _ (VarPattern (LowercaseIdentifier var))) [] _ expr ->

@@ -3,6 +3,7 @@ module Parse.Helpers where
 
 import Prelude hiding (until)
 import Control.Monad (guard)
+import Data.Fix
 import Data.Map.Strict hiding (foldl)
 import qualified Data.Maybe as Maybe
 import Text.Parsec hiding (newline, spaces, State)
@@ -484,7 +485,7 @@ accessible :: ElmVersion -> IParser AST.Expression.Expr -> IParser AST.Expressio
 accessible elmVersion exprParser =
   do  start <- getMyPosition
 
-      annotatedRootExpr@(A.A _ _rootExpr) <- exprParser
+      annotatedRootExpr@(Fix (AST.Expression.LocatedExpression (A.A _ _rootExpr))) <- exprParser
 
       access <- optionMaybe (try dot <?> "a field access like .name")
 
@@ -496,7 +497,7 @@ accessible elmVersion exprParser =
           accessible elmVersion $
             do  v <- lowVar elmVersion
                 end <- getMyPosition
-                return . A.at start end $
+                return . Fix . AST.Expression.LocatedExpression . A.at start end $
                     -- case rootExpr of
                     --   AST.Expression.VarExpr (AST.Variable.VarRef name@(c:_))
                     --     | Char.isUpper c ->

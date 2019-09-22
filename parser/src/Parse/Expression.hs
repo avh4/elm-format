@@ -1,5 +1,6 @@
 module Parse.Expression (term, typeAnnotation, definition, expr) where
 
+import Data.Fix
 import Data.Maybe (fromMaybe)
 import Text.Parsec hiding (newline, spaces)
 import Text.Parsec.Indent (block, withPos, checkIndent)
@@ -83,6 +84,7 @@ listTerm elmVersion =
 
 parensTerm :: ElmVersion -> IParser E.Expr
 parensTerm elmVersion =
+  (Fix . E.LocatedExpression) <$>
   choice
     [ try (addLocation $ parens' opFn )
     , try (addLocation $ parens' tupleFn)
@@ -114,6 +116,7 @@ parensTerm elmVersion =
 
 recordTerm :: ElmVersion -> IParser E.Expr
 recordTerm elmVersion =
+    fmap (Fix . E.LocatedExpression) .
     addLocation $ brackets' $ checkMultiline $
         do
             base <- optionMaybe $ try (commented (lowVar elmVersion) <* string "|")
@@ -123,8 +126,8 @@ recordTerm elmVersion =
 
 term :: ElmVersion -> IParser E.Expr
 term elmVersion =
-  addLocation (choice [ E.Literal <$> Literal.literal, listTerm elmVersion, accessor elmVersion, negative elmVersion ])
-    <|> accessible elmVersion (addLocation (varTerm elmVersion) <|> parensTerm elmVersion <|> recordTerm elmVersion)
+  (fmap (Fix . E.LocatedExpression) . addLocation) (choice [ E.Literal <$> Literal.literal, listTerm elmVersion, accessor elmVersion, negative elmVersion ])
+    <|> accessible elmVersion ((fmap (Fix . E.LocatedExpression) . addLocation) (varTerm elmVersion) <|> parensTerm elmVersion <|> recordTerm elmVersion)
     <?> "an expression"
 
 
@@ -160,14 +163,14 @@ appExpr elmVersion =
                             (JoinAll, JoinAll, False) -> FAJoinFirst JoinAll
                             (JoinAll, SplitAll, _) -> FASplitFirst
                 in
-                    A.at start end $ E.App t (fmap fst ts) multiline
+                    Fix $ E.LocatedExpression $ A.at start end $ E.App t (fmap fst ts) multiline
 
 
 --------  Normal Expressions  --------
 
 expr :: ElmVersion -> IParser E.Expr
 expr elmVersion =
-  addLocation (choice [ letExpr elmVersion, caseExpr elmVersion, ifExpr elmVersion ])
+  (fmap (Fix . E.LocatedExpression) . addLocation) (choice [ letExpr elmVersion, caseExpr elmVersion, ifExpr elmVersion ])
     <|> lambdaExpr elmVersion
     <|> binaryExpr elmVersion
     <?> "an expression"
@@ -178,7 +181,7 @@ binaryExpr elmVersion =
     Binop.binops (appExpr elmVersion) lastExpr (anyOp elmVersion)
   where
     lastExpr =
-        addLocation (choice [ letExpr elmVersion, caseExpr elmVersion, ifExpr elmVersion ])
+        (fmap (Fix . E.LocatedExpression) . addLocation) (choice [ letExpr elmVersion, caseExpr elmVersion, ifExpr elmVersion ])
         <|> lambdaExpr elmVersion
         <?> "an expression"
 
@@ -198,7 +201,7 @@ ifExpr elmVersion =
       return $ E.If first rest final
 
 
-ifClause :: ElmVersion -> IParser E.IfClause
+ifClause :: ElmVersion -> IParser (E.IfClause E.Expr)
 ifClause elmVersion =
   do
     try (reserved elmVersion "if")
@@ -207,10 +210,9 @@ ifClause elmVersion =
     (postCondition, _, bodyComments) <- padded (reserved elmVersion "then")
     thenBranch <- expr elmVersion
     preElse <- whitespace <?> "an 'else' branch"
-    return
-      ( Commented preCondition condition postCondition
-      , Commented bodyComments thenBranch preElse
-      )
+    return $ E.IfClause
+      (Commented preCondition condition postCondition)
+      (Commented bodyComments thenBranch preElse)
 
 
 lambdaExpr :: ElmVersion -> IParser E.Expr
@@ -223,7 +225,7 @@ lambdaExpr elmVersion =
       body <- expr elmVersion
       return (args, preArrowComments, bodyComments, body)
   in
-    addLocation $
+    (fmap (Fix . E.LocatedExpression) . addLocation) $
         do  ((args, preArrowComments, bodyComments, body), multiline) <- trackNewline subparser
             return $ E.Lambda args (preArrowComments ++ bodyComments) body $ multilineToBool multiline
 

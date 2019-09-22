@@ -12,6 +12,7 @@ import AST.Module (Module(Module), ImportMethod)
 import AST.Pattern
 import AST.Variable
 import Control.Monad (zipWithM)
+import Data.Fix
 import ElmFormat.ImportInfo (ImportInfo)
 import ElmVersion
 import Reporting.Annotation (Located(A))
@@ -66,7 +67,7 @@ parseUpgradeDefinition definitionText =
 
                 toUpgradeDef def =
                     case def of
-                        Entry (A _ (Definition (A _ (VarPattern (LowercaseIdentifier name))) [] _ (A _ upgradeBody))) ->
+                        Entry (A _ (Definition (A _ (VarPattern (LowercaseIdentifier name))) [] _ (Fix (LocatedExpression (A _ upgradeBody))))) ->
                             case makeName name of
                                 Just functionName -> Just (functionName, upgradeBody)
                                 Nothing -> Nothing
@@ -138,7 +139,7 @@ transformModule definition modu@(Module a b c (preImports, imports) body) =
     Module a b c (preImports, mergedImports) (fmap transformTopLevelStructure body)
 
 
-visitLetDeclaration :: (Expr -> Expr) -> LetDeclaration -> LetDeclaration
+visitLetDeclaration :: (Expr -> Expr) -> LetDeclaration Expr -> LetDeclaration Expr
 visitLetDeclaration f d =
     case d of
         LetDefinition name args pre body -> LetDefinition name args pre (visitExprs f body)
@@ -146,42 +147,45 @@ visitLetDeclaration f d =
 
 
 visitExprs :: (Expr -> Expr) -> Expr -> Expr
-visitExprs f original@(A region _) =
+visitExprs f original@(Fix (LocatedExpression (A region _))) =
     let expr = f original
     in
-    case RA.drop expr of
+    case RA.drop $ (\(Fix (LocatedExpression e)) -> e) expr of
         Unit _ -> expr
         AST.Expression.Literal _ -> expr
         VarExpr _ -> expr
 
         App f' args multiline ->
-            A region $ App (visitExprs f f') (fmap (fmap $ visitExprs f) args) multiline
+            Fix $ LocatedExpression $ A region $ App (visitExprs f f') (fmap (fmap $ visitExprs f) args) multiline
         Unary op e ->
-            A region $ Unary op (visitExprs f e)
+            Fix $ LocatedExpression $ A region $ Unary op (visitExprs f e)
         Binops left restOps multiline ->
-            A region $ Binops (visitExprs f left) (fmap (\(a,b,c,d) -> (a, b, c, visitExprs f d)) restOps) multiline
+            Fix $ LocatedExpression $ A region $ Binops (visitExprs f left) (fmap (\(BinopsClause a b c d) -> BinopsClause a b c (visitExprs f d)) restOps) multiline
         Parens e ->
-            A region $ Parens (fmap (visitExprs f) e)
+            Fix $ LocatedExpression $ A region $ Parens (fmap (visitExprs f) e)
         ExplicitList terms' post multiline ->
-            A region $ ExplicitList (fmap (fmap $ fmap $ fmap $ visitExprs f) terms') post multiline
+            Fix $ LocatedExpression $ A region $ ExplicitList (fmap (fmap $ fmap $ fmap $ visitExprs f) terms') post multiline
         Range e1 e2 multiline ->
-            A region $ Range (fmap (visitExprs f) e1) (fmap (visitExprs f) e2) multiline
+            Fix $ LocatedExpression $ A region $ Range (fmap (visitExprs f) e1) (fmap (visitExprs f) e2) multiline
         AST.Expression.Tuple es multiline ->
-            A region $ AST.Expression.Tuple (fmap (fmap $ visitExprs f) es) multiline
+            Fix $ LocatedExpression $ A region $ AST.Expression.Tuple (fmap (fmap $ visitExprs f) es) multiline
         TupleFunction _ -> expr
         AST.Expression.Record b fs post multiline ->
-            A region $ AST.Expression.Record b (fmap (fmap $ fmap $ fmap $ fmap $ visitExprs f) fs) post multiline
+            Fix $ LocatedExpression $ A region $ AST.Expression.Record b (fmap (fmap $ fmap $ fmap $ fmap $ visitExprs f) fs) post multiline
         Access e field' ->
-            A region $ Access (visitExprs f e) field'
+            Fix $ LocatedExpression $ A region $ Access (visitExprs f e) field'
         AccessFunction _ -> expr
         Lambda params pre body multi ->
-            A region $ Lambda params pre (visitExprs f body) multi
-        If (c, b) elseIfs els ->
-            A region $ If (fmap (visitExprs f) c, fmap (visitExprs f) b) (fmap (fmap (\(c', b') -> (fmap (visitExprs f) c', fmap (visitExprs f) b'))) elseIfs) (fmap (visitExprs f) els)
+            Fix $ LocatedExpression $ A region $ Lambda params pre (visitExprs f body) multi
+        If (IfClause c b) elseIfs els ->
+            Fix $ LocatedExpression $ A region $ If
+                (IfClause (fmap (visitExprs f) c) (fmap (visitExprs f) b))
+                (fmap (fmap (\(IfClause c' b') -> IfClause (fmap (visitExprs f) c') (fmap (visitExprs f) b'))) elseIfs)
+                (fmap (visitExprs f) els)
         Let decls pre body ->
-            A region $ Let (fmap (visitLetDeclaration f) decls) pre body
+            Fix $ LocatedExpression $ A region $ Let (fmap (visitLetDeclaration f) decls) pre body
         Case (e, b) branches ->
-            A region $ Case (fmap (visitExprs f) e, b) (fmap (fmap $ fmap $ visitExprs f) branches)
+            Fix $ LocatedExpression $ A region $ Case (fmap (visitExprs f) e, b) (fmap (fmap $ fmap $ visitExprs f) branches)
         GLShader _ -> expr
 
 
@@ -189,7 +193,7 @@ transform' ::
     UpgradeDefinition
     -> ImportInfo
     -> Expr -> Expr
-transform' (UpgradeDefinition basicsReplacements _) importInfo expr =
+transform' (UpgradeDefinition basicsReplacements _) importInfo (Fix (LocatedExpression expr)) =
     let
         exposed = ImportInfo._exposed importInfo
         importAliases = ImportInfo._aliases importInfo
@@ -213,9 +217,9 @@ transform' (UpgradeDefinition basicsReplacements _) importInfo expr =
                     Just $
                     Lambda
                       [makeArg "model", makeArg "cmds"] []
-                      (noRegion $ Binops
+                      (Fix $ LocatedExpression $ noRegion $ Binops
                           (makeVarRef "model")
-                          [([], var, [], makeVarRef "cmds")]
+                          [BinopsClause [] var [] (makeVarRef "cmds")]
                           False
                       )
                       False
@@ -224,7 +228,7 @@ transform' (UpgradeDefinition basicsReplacements _) importInfo expr =
                     Just $
                     Lambda
                       [makeArg "dividend", makeArg "modulus"] []
-                      (noRegion $ App
+                      (Fix $ LocatedExpression $ noRegion $ App
                           (makeVarRef "modBy")
                           [ ([], makeVarRef "modulus")
                           , ([], makeVarRef "dividend")
@@ -245,21 +249,23 @@ transform' (UpgradeDefinition basicsReplacements _) importInfo expr =
                 Lambda
                     (fmap makeArg vars)
                     []
-                    (noRegion $ AST.Expression.Tuple (fmap (\v -> Commented [] (makeVarRef v) []) vars) False)
+                    (Fix $ LocatedExpression $ noRegion $ AST.Expression.Tuple (fmap (\v -> Commented [] (makeVarRef v) []) vars) False)
                     False
     in
     case RA.drop expr of
         VarExpr var ->
+            Fix $ LocatedExpression $
             Maybe.fromMaybe expr $ fmap noRegion $ replace var
 
-        App (A _ (VarExpr var)) args multiline ->
-            Maybe.fromMaybe expr $ fmap (\new -> applyLambda (noRegion new) args multiline) $ replace var
+        App (Fix (LocatedExpression (A _ (VarExpr var)))) args multiline ->
+            Maybe.fromMaybe (Fix $ LocatedExpression expr) $ fmap (\new -> applyLambda (Fix $ LocatedExpression $ noRegion new) args multiline) $ replace var
 
         TupleFunction n ->
+            Fix $ LocatedExpression $
             noRegion $ makeTuple n
 
-        App (A _ (TupleFunction n)) args multiline ->
-            applyLambda (noRegion $ makeTuple n) args multiline
+        App (Fix (LocatedExpression (A _ (TupleFunction n)))) args multiline ->
+            applyLambda (Fix $ LocatedExpression $ noRegion $ makeTuple n) args multiline
 
         ExplicitList terms' trailing multiline ->
             let
@@ -267,9 +273,11 @@ transform' (UpgradeDefinition basicsReplacements _) importInfo expr =
                 styleExposed = Dict.lookup (LowercaseIdentifier "style") exposed == Just ha
                 haAlias = Bimap.lookup ha importAliases
             in
+            Fix $ LocatedExpression $
             noRegion $ ExplicitList (concat $ fmap (expandHtmlStyle styleExposed haAlias) $ terms') trailing multiline
 
         _ ->
+            Fix $ LocatedExpression $
             expr
 
 
@@ -279,8 +287,8 @@ expandHtmlStyle styleExposed importAlias (preComma, (pre, WithEol term eol)) =
         lambda fRef =
             Lambda
                 [([], noRegion $ AST.Pattern.Tuple [makeArg' "a", makeArg' "b"]) ] []
-                (noRegion $ App
-                    (noRegion $ VarExpr $ fRef)
+                (Fix $ LocatedExpression $ noRegion $ App
+                    (Fix $ LocatedExpression $ noRegion $ VarExpr $ fRef)
                     [ ([], makeVarRef "a")
                     , ([], makeVarRef "b")
                     ]
@@ -295,9 +303,9 @@ expandHtmlStyle styleExposed importAlias (preComma, (pre, WithEol term eol)) =
                 VarRef [] (LowercaseIdentifier "style") -> styleExposed
                 _ -> False
     in
-    case RA.drop term of
-        App (A _ (VarExpr var)) [(preStyle, A _ (ExplicitList styles trailing _))] _ | isHtmlAttributesStyle var ->
-            fmap (\(preComma', (pre', WithEol style eol')) -> (preComma ++ preComma', (pre ++ preStyle ++ pre' ++ trailing ++ (Maybe.maybeToList $ fmap LineComment eol), WithEol (applyLambda (noRegion $ lambda var) [([], style)] (FAJoinFirst JoinAll)) eol'))) styles
+    case RA.drop $ (\(Fix (LocatedExpression e)) -> e) term of
+        App (Fix (LocatedExpression (A _ (VarExpr var)))) [(preStyle, Fix (LocatedExpression (A _ (ExplicitList styles trailing _))))] _ | isHtmlAttributesStyle var ->
+            fmap (\(preComma', (pre', WithEol style eol')) -> (preComma ++ preComma', (pre ++ preStyle ++ pre' ++ trailing ++ (Maybe.maybeToList $ fmap LineComment eol), WithEol (applyLambda (Fix $ LocatedExpression $ noRegion $ lambda var) [([], style)] (FAJoinFirst JoinAll)) eol'))) styles
 
         _ ->
             [(preComma, (pre, WithEol term eol))]
@@ -335,7 +343,7 @@ makeArg' varName =
 
 makeVarRef :: String -> Expr
 makeVarRef varName =
-    noRegion $ VarExpr $ VarRef [] $ LowercaseIdentifier varName
+    Fix $ LocatedExpression $ noRegion $ VarExpr $ VarRef [] $ LowercaseIdentifier varName
 
 
 inlineVar :: LowercaseIdentifier -> Bool -> Expr' -> Expr' -> Expr'
@@ -350,10 +358,10 @@ inlineVar' name insertMultiline value expr =
 
         AST.Expression.Tuple terms' multiline ->
             let
-                step (acc, expand) t@(Commented pre (A _ term) post) =
+                step (acc, expand) t@(Commented pre (Fix (LocatedExpression (A _ term))) post) =
                     case inlineVar' name insertMultiline value term of
                         Nothing -> (ReversedList.push t acc, expand)
-                        Just term' -> (ReversedList.push (Commented pre (noRegion term') post) acc, insertMultiline || expand)
+                        Just term' -> (ReversedList.push (Commented pre (Fix $ LocatedExpression $ noRegion term') post) acc, insertMultiline || expand)
 
                 (terms'', multiline'') = foldl step (ReversedList.empty, multiline) terms'
             in
@@ -361,7 +369,7 @@ inlineVar' name insertMultiline value expr =
 
         -- TODO: handle expanding multiline in contexts other than tuples
 
-        AST.Expression.Case (Commented pre (A tRegion term) post, _) branches ->
+        AST.Expression.Case (Commented pre (Fix (LocatedExpression (A tRegion term))) post, _) branches ->
             case inlineVar' name insertMultiline value term of
                 Nothing -> Nothing
                 Just term' ->
@@ -370,19 +378,19 @@ inlineVar' name insertMultiline value expr =
                             ((prePattern, p1), b1)
                     in
                     -- TODO: matching branches besides the first is not tested
-                    Just $ destructureFirstMatch (pre, A tRegion term')
+                    Just $ destructureFirstMatch (pre, Fix $ LocatedExpression $ A tRegion term')
                         (fmap makeBranch branches)
-                        (AST.Expression.Case (Commented pre (noRegion term') post, False) branches)
+                        (AST.Expression.Case (Commented pre (Fix $ LocatedExpression $ noRegion term') post, False) branches)
 
-        AST.Expression.If (Commented preCond (A _ cond) postCond, Commented preIf ifBody postIf) [] (preElse, elseBody) ->
+        AST.Expression.If (IfClause (Commented preCond (Fix (LocatedExpression (A _ cond))) postCond) (Commented preIf ifBody postIf)) [] (preElse, elseBody) ->
             case inlineVar' name insertMultiline value cond of
                 Nothing -> Nothing
                 Just cond' ->
-                    Just $ destructureFirstMatch (preCond, noRegion cond')
+                    Just $ destructureFirstMatch (preCond, Fix $ LocatedExpression $ noRegion cond')
                         [ (([], noRegion $ AST.Pattern.Literal $ Boolean True), ifBody) -- TODO: not tested
                         , (([], noRegion $ AST.Pattern.Literal $ Boolean False), elseBody)
                         ]
-                        (AST.Expression.If (Commented preCond (noRegion cond') postCond, Commented preIf ifBody postIf) [] (preElse, elseBody))
+                        (AST.Expression.If (IfClause (Commented preCond (Fix $ LocatedExpression $ noRegion cond') postCond) (Commented preIf ifBody postIf)) [] (preElse, elseBody))
 
         _ -> Just $ mapExpr (inlineVar name insertMultiline value) expr
 
@@ -392,7 +400,7 @@ destructureFirstMatch _ [] fallback = fallback
 destructureFirstMatch value ((pat, body):rest) fallback =
     case destructure pat value of
         Just mappings ->
-            RA.drop $ applyMappings False mappings body
+            RA.drop $ (\(Fix (LocatedExpression e)) -> e) $ applyMappings False mappings body
 
         Nothing ->
             destructureFirstMatch value rest fallback
@@ -401,7 +409,7 @@ destructureFirstMatch value ((pat, body):rest) fallback =
 {-| Returns `Nothing` if the pattern doesn't match, or `Just` with a list of bound variables if the pattern does match. -}
 destructure :: PreCommented Pattern -> PreCommented Expr -> Maybe [(LowercaseIdentifier, Expr')]
 destructure pat arg =
-    case (pat, arg) of
+    case (pat, fmap (\(Fix (LocatedExpression e)) -> e) arg) of
         -- Wildcard `_` pattern
         ( (_, A _ Anything), _ ) -> Just [] -- TODO: not tested
 
@@ -422,7 +430,7 @@ destructure pat arg =
             Just []
 
         ( (preVar, A _ (Data name argVars))
-          , (preArg, A _ (App (A _ (VarExpr (TagRef ns tag))) argValues _))
+          , (preArg, A _ (App (Fix (LocatedExpression (A _ (VarExpr (TagRef ns tag))))) argValues _))
           )
           | name == (ns ++ [tag])
           ->
@@ -432,14 +440,14 @@ destructure pat arg =
         ( (preVar, A _ (VarPattern name))
           , (preArg, arg')
           ) ->
-            Just [(name, Parens $ Commented (preVar ++ preArg) arg' [])]
+            Just [(name, Parens $ Commented (preVar ++ preArg) (Fix $ LocatedExpression arg') [])]
 
         -- Tuple with two elements (TODO: generalize this for all tuples)
         ( (preVar, A _ (AST.Pattern.Tuple [Commented preA (A _ (VarPattern nameA)) postA, Commented preB (A _ (VarPattern nameB)) postB]))
           , (preArg, A _ (AST.Expression.Tuple [Commented preAe eA postAe, Commented preBe eB postBe] _))
           ) ->
             Just
-                [ (nameA, Parens $ Commented (preVar ++ preArg) (noRegion $ Parens $ Commented (preA ++ preAe) eA (postAe ++ postA)) [])
+                [ (nameA, Parens $ Commented (preVar ++ preArg) (Fix $ LocatedExpression $ noRegion $ Parens $ Commented (preA ++ preAe) eA (postAe ++ postA)) [])
                 , (nameB, Parens $ Commented (preB ++ preBe) eB (postBe ++ postB))
                 ]
 
@@ -454,7 +462,7 @@ destructure pat arg =
                         |> fmap snd
                         |> fmap snd
                         |> fmap (\(WithEol a _) -> a)
-                        |> fmap (\(Pair (k, _) v _) -> (k, RA.drop $ snd v))
+                        |> fmap (\(Pair (k, _) (_, (Fix (LocatedExpression (A _ v)))) _) -> (k, v))
                         |> Dict.fromList
 
                 fieldMapping :: Commented LowercaseIdentifier -> Maybe (LowercaseIdentifier, Expr')
@@ -476,12 +484,12 @@ applyMappings insertMultiline mappings body =
 
 applyLambda :: Expr -> [PreCommented Expr] -> FunctionApplicationMultiline -> Expr
 applyLambda lambda args appMultiline =
-    case (RA.drop lambda, args) of
+    case (RA.drop $ (\(Fix (LocatedExpression e)) -> e) lambda, args) of
         (Lambda (pat:restVar) preBody body multiline, arg:restArgs) ->
             case destructure pat arg of
                 Nothing ->
                     -- failed to destructure the next argument, so stop
-                    noRegion $ App lambda args appMultiline
+                    Fix $ LocatedExpression $ noRegion $ App lambda args appMultiline
 
                 Just mappings ->
                     let
@@ -496,11 +504,15 @@ applyLambda lambda args appMultiline =
                     case restVar of
                         [] ->
                             -- we applied the argument and none are left, so remove the lambda
-                            noRegion $ App (noRegion $ Parens $ Commented preBody newBody []) restArgs newMultiline
+                            Fix $ LocatedExpression $ noRegion $ App
+                                (Fix $ LocatedExpression $ noRegion $ Parens $ Commented preBody newBody [])
+                                restArgs
+                                newMultiline
+
                         _:_ ->
                             -- we applied this argument; try to apply the next argument
-                            applyLambda (noRegion $ Lambda restVar preBody newBody multiline) restArgs newMultiline
+                            applyLambda (Fix $ LocatedExpression $ noRegion $ Lambda restVar preBody newBody multiline) restArgs newMultiline
 
         (_, []) -> lambda
 
-        _ -> noRegion $ App lambda args appMultiline
+        _ -> Fix $ LocatedExpression $ noRegion $ App lambda args appMultiline

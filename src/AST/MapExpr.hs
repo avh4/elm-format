@@ -1,10 +1,17 @@
 {-# LANGUAGE FlexibleInstances #-}
+
 module AST.MapExpr where
+
+-- NOTE: it's confusing about how this is meant to work:
+-- is it meant to transform nodes and then recurse into them,
+-- or to recurse into nodes and then transform them?
+-- Try to avoid using this and use Functors / Data.Fix instead
+-- (and hopefully remove this in the future).
 
 import AST.V0_16
 import AST.Expression
 import AST.Pattern
-import AST.Variable
+import Data.Fix
 import Reporting.Annotation
 
 
@@ -12,12 +19,16 @@ class MapExpr a where
     mapExpr :: (Expr' -> Expr') -> a -> a
 
 
+instance MapExpr Expr where
+    mapExpr f (Fix (LocatedExpression e)) = Fix $ LocatedExpression $ mapExpr f e
+
+
 instance MapExpr (Located Expr') where
     mapExpr f (A region a) = A region (f a)
 
 
-instance MapExpr IfClause where
-    mapExpr f (cond, body) = (mapExpr f cond, mapExpr f body)
+instance MapExpr e => MapExpr (IfClause e) where
+    mapExpr f (IfClause cond body) = IfClause (mapExpr f cond) (mapExpr f body)
 
 
 instance MapExpr a => MapExpr (PreCommented a) where
@@ -40,8 +51,8 @@ instance MapExpr a => MapExpr (Commented Pattern, a) where
     mapExpr f (x, a) = (x, mapExpr f a)
 
 
-instance MapExpr a => MapExpr (Comments, Ref, Comments, a) where
-    mapExpr f (pre, op, post, a) = (pre, op, post, mapExpr f a)
+instance MapExpr a => MapExpr (BinopsClause a) where
+    mapExpr f (BinopsClause pre op post a) = BinopsClause pre op post (mapExpr f a)
 
 
 instance MapExpr a => MapExpr (Commented a) where
@@ -53,7 +64,7 @@ instance MapExpr a => MapExpr (Pair key a) where
 
 
 {-| NOTE: the function will never get applied to the parent Expr'; only on the first level of children -}
-instance MapExpr Expr' where
+instance MapExpr e => MapExpr (Expression e) where
   mapExpr f expr =
     case expr of
         Unit _ -> expr
@@ -91,7 +102,7 @@ instance MapExpr Expr' where
         GLShader _ -> expr
 
 
-instance MapExpr LetDeclaration where
+instance MapExpr e => MapExpr (LetDeclaration e) where
     mapExpr f d =
         case d of
             LetDefinition name args pre body -> LetDefinition name args pre (mapExpr f body)

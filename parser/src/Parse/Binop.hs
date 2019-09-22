@@ -1,5 +1,6 @@
 module Parse.Binop (binops) where
 
+import Data.Fix
 import Text.Parsec ((<|>), choice, try)
 
 import qualified AST.Expression as E
@@ -16,12 +17,12 @@ binops
     -> IParser Var.Ref
     -> IParser E.Expr
 binops term last anyOp =
-  addLocation $
-  do  ((e, ops), multiline) <- trackNewline ((,) <$> term <*> nextOps)
+  (fmap (Fix . E.LocatedExpression) . addLocation) $
+  do  ((e@(Fix (E.LocatedExpression e')), ops), multiline) <- trackNewline ((,) <$> term <*> nextOps)
       return $
         case ops of
           [] ->
-            A.drop e
+            A.drop e'
           _ ->
             E.Binops e ops $ multilineToBool multiline
   where
@@ -33,7 +34,7 @@ binops term last anyOp =
                 preExpressionComments <- whitespace
                 expr <- Left <$> try term <|> Right <$> last
                 case expr of
-                  Left t -> (:) (preOpComments, op, preExpressionComments, t) <$> nextOps
-                  Right e -> return [(preOpComments, op, preExpressionComments, e)]
+                  Left t -> (:) (E.BinopsClause preOpComments op preExpressionComments t) <$> nextOps
+                  Right e -> return [E.BinopsClause preOpComments op preExpressionComments e]
         , return []
         ]

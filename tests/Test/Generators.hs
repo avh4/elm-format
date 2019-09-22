@@ -5,10 +5,12 @@ import Test.QuickCheck
 
 import AST.V0_16
 import qualified AST.Declaration
+import AST.Expression (LocatedExpression(..))
 import qualified AST.Expression
 import qualified AST.Module
 import qualified AST.Pattern
 import qualified AST.Variable
+import Data.Fix
 import qualified Reporting.Annotation
 import qualified Reporting.Region
 
@@ -108,4 +110,4 @@ instance Arbitrary AST.Module.Module where
                 )
                 (located Nothing)
                 ([], empty)
-                [ AST.Declaration.Entry $ located $ AST.Declaration.Definition (located $ AST.Pattern.Anything) [] [] (located $ AST.Expression.TupleFunction 2)]
+                [ AST.Declaration.Entry $ located $ AST.Declaration.Definition (located $ AST.Pattern.Anything) [] [] (Fix $ LocatedExpression $ located $ AST.Expression.TupleFunction 2)]

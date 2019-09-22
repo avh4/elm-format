@@ -1,6 +1,7 @@
 module Reporting.Annotation where
 
 import Prelude hiding (map)
+
 import qualified Reporting.Region as R
 import qualified Data.String as String
 
