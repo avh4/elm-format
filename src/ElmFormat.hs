@@ -302,29 +302,22 @@ parseModule elmVersion (inputFile, inputText) =
             Left $ ParseError inputFile (Text.unpack inputText) errs
 
 
-format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage FormatResult
-format elmVersion (inputFile, inputText) =
-    case parseModule elmVersion (inputFile, inputText) of
-        Right modu ->
-            let
-                outputText = Render.render elmVersion modu
-            in
-            Right $
-                if inputText == outputText
-                    then NoChange inputFile outputText
-                    else Changed inputFile outputText
+checkChange :: (FilePath, Text.Text) -> Text.Text -> FormatResult
+checkChange (inputFile, inputText) outputText =
+    if inputText == outputText
+        then NoChange inputFile outputText
+        else Changed inputFile outputText
 
-        Left message ->
-            Left message
+
+format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage FormatResult
+format elmVersion input =
+    checkChange input <$> Render.render elmVersion <$> parseModule elmVersion input
 
 
 toJson :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage FormatResult
 toJson elmVersion (inputFile, inputText) =
-    case parseModule elmVersion (inputFile, inputText) of
-        Right modu ->
-            Right $ Changed inputFile $ Text.pack $ Text.JSON.encode $ AST.Json.showModule modu
-        Left message ->
-            Left message
+    Changed inputFile . Text.pack . Text.JSON.encode . AST.Json.showModule
+    <$> parseModule elmVersion (inputFile, inputText)
 
 
 readStdin :: InputConsole f => Free f (FilePath, Text.Text)
