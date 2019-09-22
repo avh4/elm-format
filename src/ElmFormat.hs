@@ -86,14 +86,10 @@ resolveFiles inputFiles =
 
 
 data WhatToDo
-    = FormatToFile FilePath FilePath
-    | StdinToFile FilePath
-    | FormatInPlace FilePath [FilePath]
-    | StdinToStdout
+    = Format TransformMode
+    | ConvertToJson TransformMode
     | ValidateStdin
     | ValidateFiles FilePath [FilePath]
-    | FileToJson FilePath
-    | StdinToJson
 
 
 data Source
@@ -134,13 +130,13 @@ determineWhatToDo source destination =
     case ( source, destination ) of
         ( Stdin, ValidateOnly ) -> Right $ ValidateStdin
         ( FromFiles first rest, ValidateOnly) -> Right $ ValidateFiles first rest
-        ( Stdin, UpdateInPlace ) -> Right StdinToStdout
-        ( Stdin, ToJson ) -> Right StdinToJson
-        ( Stdin, ToFile output ) -> Right $ StdinToFile output
-        ( FromFiles first [], ToFile output ) -> Right $ FormatToFile first output
-        ( FromFiles first rest, UpdateInPlace ) -> Right $ FormatInPlace first rest
+        ( Stdin, UpdateInPlace ) -> Right $ Format StdinToStdout
+        ( Stdin, ToJson ) -> Right $ ConvertToJson StdinToStdout
+        ( Stdin, ToFile output ) -> Right $ Format (StdinToFile output)
+        ( FromFiles first [], ToFile output ) -> Right $ Format (FileToFile first output)
+        ( FromFiles first rest, UpdateInPlace ) -> Right $ Format (FilesInPlace first rest)
         ( FromFiles _ _, ToFile _ ) -> Left SingleOutputWithMultipleInputs
-        ( FromFiles first [], ToJson ) -> Right $ FileToJson first
+        ( FromFiles first [], ToJson ) -> Right $ ConvertToJson (FileToStdout first)
         ( FromFiles _ _, ToJson ) -> Left SingleOutputWithMultipleInputs
 
 
@@ -365,25 +361,30 @@ logErrorOr fn result =
 
 
 data TransformMode
-    = TransformStdinToStdout
-    | TransformStdinToFile FilePath
-    | TransformFileToFile FilePath FilePath
-    | TransformFilesInPlace FilePath [FilePath]
+    = StdinToStdout
+    | StdinToFile FilePath
+    | FileToStdout FilePath
+    | FileToFile FilePath FilePath
+    | FilesInPlace FilePath [FilePath]
 
 
 applyTransformation :: (InputConsole f, OutputConsole f, InfoFormatter f, FileStore f, FileWriter f) => ((FilePath, Text.Text) -> Either InfoMessage FormatResult) -> TransformMode -> Free f Bool
 applyTransformation transform mode =
     case mode of
-        TransformStdinToStdout ->
+        StdinToStdout ->
             (fmap getOutputText <$> transform <$> readStdin) >>= logErrorOr OutputConsole.writeStdout
 
-        TransformStdinToFile outputFile ->
+        StdinToFile outputFile ->
             (fmap getOutputText <$> transform <$> readStdin) >>= logErrorOr (FileWriter.overwriteFile outputFile)
 
-        TransformFileToFile inputFile outputFile ->
+        -- TODO: this prints "Processing such-and-such-a-file.elm" which makes the stdout invalid
+        -- FileToStdout inputFile ->
+        --     (fmap getOutputText <$> transform <$> ElmFormat.readFile inputFile) >>= logErrorOr OutputConsole.writeStdout
+
+        FileToFile inputFile outputFile ->
             (fmap getOutputText <$> transform <$> ElmFormat.readFile inputFile) >>= logErrorOr (FileWriter.overwriteFile outputFile)
 
-        TransformFilesInPlace first rest ->
+        FilesInPlace first rest ->
             do
                 canOverwrite <- approve $ FilesWillBeOverwritten (first:rest)
                 if canOverwrite
@@ -403,21 +404,8 @@ doIt elmVersion whatToDo =
             all id <$> mapM validateFile (first:rest)
             where validateFile file = (validate elmVersion <$> ElmFormat.readFile file) >>= logError
 
-        StdinToStdout ->
-            applyTransformation (format elmVersion) TransformStdinToStdout
+        Format transformMode ->
+            applyTransformation (format elmVersion) transformMode
 
-        StdinToFile outputFile ->
-            applyTransformation (format elmVersion) (TransformStdinToFile outputFile)
-
-        FormatToFile inputFile outputFile ->
-            applyTransformation (format elmVersion) (TransformFileToFile inputFile outputFile)
-
-        FormatInPlace first rest ->
-            applyTransformation (format elmVersion) (TransformFilesInPlace first rest)
-
-        StdinToJson ->
-            applyTransformation (toJson elmVersion) TransformStdinToStdout
-
-        -- TODO: this prints "Processing such-and-such-a-file.elm" which makes the JSON output invalid
-        -- FileToJson inputFile ->
-        --     (fmap (Text.pack . Text.JSON.encode . AST.Json.showJSON) <$> parseModule <$> ElmFormat.readFile inputFile) >>= logErrorOr OutputConsole.writeStdout
+        ConvertToJson transformMode ->
+            applyTransformation (toJson elmVersion) transformMode
