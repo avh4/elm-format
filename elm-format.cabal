@@ -53,8 +53,14 @@ library
         AST.V0_16
         AST.Variable
         Box
+        CommandLine.TransformFiles
         Elm.Utils
+        ElmFormat.Execute
+        ElmFormat.FileStore
+        ElmFormat.FileWriter
         ElmFormat.ImportInfo
+        ElmFormat.InputConsole
+        ElmFormat.OutputConsole
         ElmFormat.Parse
         ElmFormat.Render.Box
         ElmFormat.Render.ElmStructure
@@ -62,6 +68,8 @@ library
         ElmFormat.Render.Text
         ElmFormat.Upgrade_0_19
         ElmFormat.World
+        Messages.Formatter.Format
+        Messages.Types
         Parse.Expression
         Parse.Helpers
         Parse.IParser
@@ -86,21 +94,13 @@ library
         Cheapskate.Types
         Cheapskate.Util
         CommandLine.Helpers
-        CommandLine.TransformFiles
-        ElmFormat.Execute
         ElmFormat.Filesystem
-        ElmFormat.FileStore
-        ElmFormat.FileWriter
-        ElmFormat.InputConsole
         ElmFormat.Operation
-        ElmFormat.OutputConsole
         ElmFormat.Version
         Flags
-        Messages.Formatter.Format
         Messages.Formatter.HumanReadable
         Messages.Formatter.Json
         Messages.Strings
-        Messages.Types
         Paths_elm_format
         Parse.Binop
         Parse.Common
@@ -167,6 +167,7 @@ executable elm-fix
 
     build-depends:
         base >= 4.12.0.0 && < 5,
+        free >= 5.1.1 && < 6,
         text >= 1.2.3.1 && < 2,
         elm-format
 

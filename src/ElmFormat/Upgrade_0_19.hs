@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE FlexibleInstances #-}
-module ElmFormat.Upgrade_0_19 (transform, parseUpgradeDefinition, transformModule) where
+module ElmFormat.Upgrade_0_19 (UpgradeDefinition, transform, parseUpgradeDefinition, transformModule) where
 
 import Elm.Utils ((|>))
 

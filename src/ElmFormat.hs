@@ -253,7 +253,7 @@ main' elmFormatVersion_ experimental_ args =
                                                 let run = case (Flags._validate config) of
                                                         True -> Execute.run $ Execute.forMachine elmVersion True
                                                         False -> Execute.run $ Execute.forHuman autoYes
-                                                result <-  run $ doIt elmVersion whatToDo
+                                                result <- run $ doIt elmVersion whatToDo
                                                 if result
                                                     then exitSuccess
                                                     else exitFailure
@@ -284,10 +284,6 @@ validate elmVersion (inputFile, inputText) =
 
         Result.Result _ (Result.Err errs) ->
             Left $ ParseError inputFile (Text.unpack inputText) errs
-
-
-type FormatResult =
-    TransformFiles.Result Text.Text
 
 
 parseModule :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage AST.Module.Module
