@@ -4,7 +4,7 @@ import ElmFix
 import Nri.Ui.Button.V9 as Button
 
 
-upgrade_Nri_DEPRECATED_Button_buttonDeprecated { size, width, onClick, icon, disabled, label, style } =
+upgrade_Nri_DEPRECATED_Button_buttonDeprecated ({ size, width, onClick, icon, disabled, label, style } as config) =
     Button.button label
         [ case size of
             Button.Large ->

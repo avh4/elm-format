@@ -194,7 +194,6 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
             Dict.union
                 (Dict.filterWithKey cleanImports originalImports)
                 (_imports upgradeDefinition)
-                -- |> Dict.mapWithKeys addAlias
 
         applyAlias (imports, body) (alias, ns) =
             if remainingUsages [alias] <= 0
@@ -541,6 +540,15 @@ destructure pat arg =
                     (,) var <$> Dict.lookup var args
             in
             sequence $ fmap fieldMapping varFields
+
+        -- `as`
+        ( (preVar, A _ (AST.Pattern.Alias (p, _) (_, varName)))
+          , _
+          ) ->
+            fmap concat $ sequence
+                [ destructure (preVar, noRegion $ VarPattern varName) arg
+                , destructure ([], p) arg
+                ]
 
         -- TODO: handle other patterns
 
