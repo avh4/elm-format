@@ -98,10 +98,14 @@ data Source
 
 
 data Destination
-    = ValidateOnly
-    | UpdateInPlace
+    = InPlace
     | ToFile FilePath
-    | ToJson
+
+
+data Mode
+    = FormatMode
+    | JsonMode
+    | ValidateMode
 
 
 determineSource :: Bool -> Either [InputFileMessage] [FilePath] -> Either ErrorMessage Source
@@ -114,38 +118,46 @@ determineSource stdin inputFiles =
         ( True, Right (_:_) ) -> Left TooManyInputs
 
 
-determineDestination :: Maybe FilePath -> Bool -> Bool -> Either ErrorMessage Destination
-determineDestination output doValidate json =
-    case ( output, doValidate, json ) of
-        ( _, True, True ) -> Left OutputAndValidate
-        ( Nothing, True, False ) -> Right ValidateOnly
-        ( Nothing, False, False ) -> Right UpdateInPlace
-        ( Just path, False, False ) -> Right $ ToFile path
-        ( Just _, True, _ ) -> Left OutputAndValidate
-        ( _, False, True ) -> Right ToJson
+determineDestination :: Maybe FilePath -> Either ErrorMessage Destination
+determineDestination output =
+    case output of
+        Nothing -> Right InPlace
+        Just path -> Right $ ToFile path
 
 
-determineWhatToDo :: Source -> Destination -> Either ErrorMessage WhatToDo
-determineWhatToDo source destination =
-    case ( source, destination ) of
-        ( Stdin, ValidateOnly ) -> Right $ ValidateStdin
-        ( FromFiles first rest, ValidateOnly) -> Right $ ValidateFiles first rest
-        ( Stdin, UpdateInPlace ) -> Right $ Format StdinToStdout
-        ( Stdin, ToJson ) -> Right $ ConvertToJson StdinToStdout
-        ( Stdin, ToFile output ) -> Right $ Format (StdinToFile output)
-        ( FromFiles first [], ToFile output ) -> Right $ Format (FileToFile first output)
-        ( FromFiles first rest, UpdateInPlace ) -> Right $ Format (FilesInPlace first rest)
-        ( FromFiles _ _, ToFile _ ) -> Left SingleOutputWithMultipleInputs
-        ( FromFiles first [], ToJson ) -> Right $ ConvertToJson (FileToStdout first)
-        ( FromFiles _ _, ToJson ) -> Left SingleOutputWithMultipleInputs
+determineMode :: Bool -> Bool -> Either ErrorMessage Mode
+determineMode doValidate json =
+    case ( doValidate, json ) of
+        ( False, False ) -> Right FormatMode
+        ( True, False ) -> Right ValidateMode
+        ( False, True ) -> Right JsonMode
+        _ -> Left OutputAndValidate
+
+
+determineWhatToDo :: Source -> Destination -> Mode -> Either ErrorMessage WhatToDo
+determineWhatToDo source destination mode =
+    case ( mode, source, destination ) of
+        ( ValidateMode, _, ToFile _) -> Left OutputAndValidate
+        ( ValidateMode, Stdin, _ ) -> Right $ ValidateStdin
+        ( ValidateMode, FromFiles first rest, _) -> Right $ ValidateFiles first rest
+        ( FormatMode, Stdin, InPlace ) -> Right $ Format StdinToStdout
+        ( FormatMode, Stdin, ToFile output ) -> Right $ Format (StdinToFile output)
+        ( FormatMode, FromFiles first [], ToFile output ) -> Right $ Format (FileToFile first output)
+        ( FormatMode, FromFiles first rest, InPlace ) -> Right $ Format (FilesInPlace first rest)
+        ( JsonMode, Stdin, InPlace ) -> Right $ ConvertToJson StdinToStdout
+        ( JsonMode, Stdin, ToFile output ) -> Right $ ConvertToJson (StdinToFile output)
+        ( JsonMode, FromFiles first [], InPlace ) -> Right $ ConvertToJson (FileToStdout first)
+        ( JsonMode, FromFiles _ (_:_), _ ) -> error "TODO: --json with multiple files is not supported"
+        ( _, FromFiles _ _, ToFile _ ) -> Left SingleOutputWithMultipleInputs
 
 
 determineWhatToDoFromConfig :: Flags.Config -> Either [InputFileMessage] [FilePath] -> Either ErrorMessage WhatToDo
 determineWhatToDoFromConfig config resolvedInputFiles =
     do
         source <- determineSource (Flags._stdin config) resolvedInputFiles
-        destination <- determineDestination (Flags._output config) (Flags._validate config) (Flags._json config)
-        determineWhatToDo source destination
+        destination <- determineDestination (Flags._output config)
+        mode <- determineMode (Flags._validate config) (Flags._json config)
+        determineWhatToDo source destination mode
 
 
 exitWithError :: World m => ErrorMessage -> m ()
