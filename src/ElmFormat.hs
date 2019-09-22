@@ -300,14 +300,14 @@ parseModule elmVersion (inputFile, inputText) =
             Left $ ParseError inputFile (Text.unpack inputText) errs
 
 
-format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage FormatResult
+format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
 format elmVersion input =
-    TransformFiles.checkChange input <$> Render.render elmVersion <$> parseModule elmVersion input
+    Render.render elmVersion <$> parseModule elmVersion input
 
 
-toJson :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage FormatResult
+toJson :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
 toJson elmVersion (inputFile, inputText) =
-    TransformFiles.Changed inputFile . Text.pack . Text.JSON.encode . AST.Json.showModule
+    Text.pack . Text.JSON.encode . AST.Json.showModule
     <$> parseModule elmVersion (inputFile, inputText)
 
 

@@ -1,4 +1,4 @@
-module CommandLine.TransformFiles (Result(..), TransformMode(..), applyTransformation, checkChange, readFromFile, readStdin) where
+module CommandLine.TransformFiles (Result, TransformMode(..), applyTransformation, readFromFile, readStdin) where
 
 -- This module provides reusable functions for command line tools that
 -- transform files.
@@ -30,13 +30,6 @@ checkChange (inputFile, inputText) outputText =
         else Changed inputFile outputText
 
 
-fromResult :: Result a -> a
-fromResult result =
-    case result of
-        NoChange _ text -> text
-        Changed _ text -> text
-
-
 updateFile :: FileWriter f => Result Text -> Free f ()
 updateFile result =
     case result of
@@ -63,21 +56,21 @@ data TransformMode
     | FilesInPlace FilePath [FilePath]
 
 
-applyTransformation :: (InputConsole f, OutputConsole f, InfoFormatter f, FileStore f, FileWriter f) => ((FilePath, Text) -> Either InfoMessage (Result Text)) -> TransformMode -> Free f Bool
+applyTransformation :: (InputConsole f, OutputConsole f, InfoFormatter f, FileStore f, FileWriter f) => ((FilePath, Text) -> Either InfoMessage Text) -> TransformMode -> Free f Bool
 applyTransformation transform mode =
     case mode of
         StdinToStdout ->
-            (fmap fromResult <$> transform <$> readStdin) >>= logErrorOr OutputConsole.writeStdout
+            (transform <$> readStdin) >>= logErrorOr OutputConsole.writeStdout
 
         StdinToFile outputFile ->
-            (fmap fromResult <$> transform <$> readStdin) >>= logErrorOr (FileWriter.overwriteFile outputFile)
+            (transform <$> readStdin) >>= logErrorOr (FileWriter.overwriteFile outputFile)
 
         -- TODO: this prints "Processing such-and-such-a-file.elm" which makes the stdout invalid
         -- FileToStdout inputFile ->
         --     (fmap fromResult <$> transform <$> ElmFormat.readFile inputFile) >>= logErrorOr OutputConsole.writeStdout
 
         FileToFile inputFile outputFile ->
-            (fmap fromResult <$> transform <$> readFromFile inputFile) >>= logErrorOr (FileWriter.overwriteFile outputFile)
+            (transform <$> readFromFile inputFile) >>= logErrorOr (FileWriter.overwriteFile outputFile)
 
         FilesInPlace first rest ->
             do
@@ -86,7 +79,7 @@ applyTransformation transform mode =
                     then all id <$> mapM formatFile (first:rest)
                     else return True
             where
-                formatFile file = (transform <$> readFromFile file) >>= logErrorOr updateFile
+                formatFile file = ((\i -> checkChange i <$> transform i) <$> readFromFile file) >>= logErrorOr updateFile
 
 
 logErrorOr :: InfoFormatter f => (a -> Free f ()) -> Either InfoMessage a -> Free f Bool
