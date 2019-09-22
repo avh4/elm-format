@@ -31,13 +31,6 @@ data Declaration
     deriving (Eq, Show)
 
 
-instance A.Strippable Declaration where
-  stripRegion d =
-    case d of
-        Definition a b c e ->
-            Definition (A.stripRegion a) b c (A.stripRegion $ A.map A.stripRegion e)
-        _ -> d
-
 -- INFIX STUFF
 
 data Assoc = L | N | R
@@ -66,11 +59,3 @@ instance Functor TopLevelStructure where
     fmap f (Entry a) = Entry (fmap f a)
     fmap _ (DocComment blocks) = DocComment blocks
     fmap _ (BodyComment comment) = BodyComment comment
-
-
-instance A.Strippable a => A.Strippable (TopLevelStructure a) where
-  stripRegion d =
-    case d of
-        Entry d' ->
-            Entry $ A.stripRegion $ A.map A.stripRegion d'
-        _ -> d

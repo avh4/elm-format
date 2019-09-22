@@ -26,17 +26,6 @@ data Module = Module
     deriving (Eq, Show)
 
 
-instance A.Strippable Module where
-  stripRegion m =
-    Module
-    { initialComments = initialComments m
-    , header = header m
-    , docs = A.stripRegion $ docs m
-    , imports = imports m
-    , body = map A.stripRegion $ body m
-    }
-
-
 -- HEADERS
 
 data SourceTag
