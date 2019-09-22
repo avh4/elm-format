@@ -1,0 +1,15 @@
+upgrade_A_value = ()
+upgrade_A_lambda = \a b -> a + b
+upgrade_A_function a b = a + b
+
+upgrade_A_caseExhaustive a =
+    case a of
+        () -> 0
+upgrade_A_caseWithPattern a =
+    case a of
+        Just x -> x
+        Nothing -> 0
+upgrade_A_caseWithWildcard a =
+    case a of
+        Nothing -> 0
+        _ -> 99

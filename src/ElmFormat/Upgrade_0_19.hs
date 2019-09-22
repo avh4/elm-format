@@ -497,8 +497,30 @@ withComments pre e post = Parens $ Commented pre e post
 destructure :: PreCommented Pattern -> PreCommented Expr -> Maybe [(LowercaseIdentifier, Expr')]
 destructure pat arg =
     case (pat, fmap (\(Fix (LocatedExpression e)) -> e) arg) of
+        -- Parens in expression
+        ( _
+          , (preArg, A _ (AST.Expression.Parens (Commented pre inner post)))
+          )
+          ->
+            destructure pat (preArg ++ pre ++ post, inner)
+
+        -- Parens in pattern
+        ( (preVar, A _ (PatternParens (Commented pre inner post)))
+          , _
+          )
+          ->
+            destructure (preVar ++ pre ++ post, inner) arg
+
         -- Wildcard `_` pattern
-        ( (_, A _ Anything), _ ) -> Just [] -- TODO: not tested
+        ( (_, A _ Anything), _ ) -> Just []
+
+
+        -- Unit
+        ( (preVar, A _ (UnitPattern _))
+          , (preArg, A _ (AST.Expression.Unit _))
+          )
+          ->
+            Just []
 
         -- Literals
         ( (preVar, A _ (AST.Pattern.Literal pat))
