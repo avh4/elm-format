@@ -193,7 +193,7 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
         newImports =
             Dict.union
                 (Dict.filterWithKey cleanImports originalImports)
-                (_imports upgradeDefinition)
+                (Dict.filterWithKey (\k _ -> remainingUsages k > 0) $ _imports upgradeDefinition)
 
         applyAlias (imports, body) (alias, ns) =
             if remainingUsages [alias] <= 0
