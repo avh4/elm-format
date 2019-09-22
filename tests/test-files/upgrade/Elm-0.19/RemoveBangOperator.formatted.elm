@@ -109,7 +109,7 @@ doesntMessUpOtherBinops f g h =
 
 bangFunction model =
     ( model
-    , Cmd.batch []
+    , Cmd.none
     )
 
 
@@ -129,7 +129,7 @@ bangFunction_partiallyApplied model =
 
 bangFunction_extraArgs model =
     (( model
-     , Cmd.batch []
+     , Cmd.none
      )
     )
         ()

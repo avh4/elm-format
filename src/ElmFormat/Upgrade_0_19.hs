@@ -439,6 +439,18 @@ inlineVar' name insertMultiline value expr =
 
         -- TODO: handle expanding multiline in contexts other than tuples
 
+        AST.Expression.Access (Fix (LocatedExpression (A _ e))) field ->
+            case inlineVar' name insertMultiline value e of
+                Nothing -> Nothing
+                Just e'@(AST.Expression.Record _ fields _ _) ->
+                    case List.find (\(_, (_, WithEol (Pair (f, _) _ _) _)) -> f == field) fields of
+                        Nothing ->
+                            Just (AST.Expression.Access (Fix $ LocatedExpression $ noRegion e') field)
+                        Just (_, (_, WithEol (Pair _ (_, (Fix (LocatedExpression (A _ fieldValue)))) _) _)) ->
+                            Just fieldValue
+                Just e' ->
+                    Just (AST.Expression.Access (Fix $ LocatedExpression $ noRegion e') field)
+
         AST.Expression.Case (Commented pre (Fix (LocatedExpression (A tRegion term))) post, _) branches ->
             case inlineVar' name insertMultiline value term of
                 Nothing -> Nothing
@@ -476,6 +488,11 @@ destructureFirstMatch value ((pat, body):rest) fallback =
             destructureFirstMatch value rest fallback
 
 
+withComments :: Comments -> Expr -> Comments -> Expr'
+withComments [] (Fix (LocatedExpression (A _ e))) [] = e
+withComments pre e post = Parens $ Commented pre e post
+
+
 {-| Returns `Nothing` if the pattern doesn't match, or `Just` with a list of bound variables if the pattern does match. -}
 destructure :: PreCommented Pattern -> PreCommented Expr -> Maybe [(LowercaseIdentifier, Expr')]
 destructure pat arg =
@@ -510,15 +527,15 @@ destructure pat arg =
         ( (preVar, A _ (VarPattern name))
           , (preArg, arg')
           ) ->
-            Just [(name, Parens $ Commented (preVar ++ preArg) (Fix $ LocatedExpression arg') [])]
+            Just [(name, withComments (preVar ++ preArg) (Fix $ LocatedExpression arg') [])]
 
         -- Tuple with two elements (TODO: generalize this for all tuples)
         ( (preVar, A _ (AST.Pattern.Tuple [Commented preA (A _ (VarPattern nameA)) postA, Commented preB (A _ (VarPattern nameB)) postB]))
           , (preArg, A _ (AST.Expression.Tuple [Commented preAe eA postAe, Commented preBe eB postBe] _))
           ) ->
             Just
-                [ (nameA, Parens $ Commented (preVar ++ preArg) (Fix $ LocatedExpression $ noRegion $ Parens $ Commented (preA ++ preAe) eA (postAe ++ postA)) [])
-                , (nameB, Parens $ Commented (preB ++ preBe) eB (postBe ++ postB))
+                [ (nameA, withComments (preVar ++ preArg) (Fix $ LocatedExpression $ noRegion $ withComments (preA ++ preAe) eA (postAe ++ postA)) [])
+                , (nameB, withComments (preB ++ preBe) eB (postBe ++ postB))
                 ]
 
         -- Record destructuring
@@ -584,7 +601,7 @@ applyLambda lambda args appMultiline =
                         [] ->
                             -- we applied the argument and none are left, so remove the lambda
                             Fix $ LocatedExpression $ noRegion $ App
-                                (Fix $ LocatedExpression $ noRegion $ Parens $ Commented preBody newBody [])
+                                (Fix $ LocatedExpression $ noRegion $ withComments preBody newBody [])
                                 restArgs
                                 newMultiline
 

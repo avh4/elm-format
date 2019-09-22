@@ -4,31 +4,31 @@ import ElmFix
 import Nri.Ui.Button.V9 as Button
 
 
-upgrade_Nri_DEPRECATED_Button_buttonDeprecated ({ size, width, onClick, icon, disabled, label, style } as config) =
+upgrade_Nri_DEPRECATED_Button_buttonDeprecated ({ label, style } as config) =
     Button.button label
-        [ case size of
+        [ case config.size of
             Button.Large ->
                 Button.large
-        , case width of
+        , case config.width of
             Just w ->
                 Button.exactWidth w
 
             Nothing ->
                 ElmFix.remove
-        , Button.onClick onClick
+        , Button.onClick config.onClick
         , case style of
             Button.Premium ->
                 Button.premium
 
             Button.Normal ->
                 ElmFix.remove
-        , case icon of
+        , case config.icon of
             Nothing ->
                 ElmFix.remove
 
             Just i ->
                 Button.icon i
-        , if disabled then
+        , if config.disabled then
             Button.disabled
 
           else
