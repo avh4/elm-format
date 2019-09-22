@@ -40,3 +40,11 @@ aliased =
 noModuleName_doesNotMatch =
     [ noModuleName
     ]
+
+
+keepFromRemoval =
+    -- (removing imports is tested separately)
+    [ Ali.notUpgraded
+    , Qualified.notUpgraded
+    , Qualified.Deep.notUpgraded
+    ]

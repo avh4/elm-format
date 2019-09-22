@@ -8,7 +8,7 @@ import AST.V0_16
 import AST.Declaration (Declaration(..), TopLevelStructure(..))
 import AST.Expression
 import AST.MapExpr
-import AST.Module (Module(Module), ImportMethod)
+import AST.Module (Module(Module), ImportMethod(ImportMethod))
 import AST.Pattern
 import AST.Variable
 import Control.Monad (zipWithM)
@@ -21,6 +21,7 @@ import qualified Data.Bimap as Bimap
 import qualified Data.List as List
 import qualified Data.Map.Strict as Dict
 import qualified Data.Maybe as Maybe
+import qualified Data.Set as Set
 import qualified Data.Text as Text
 import qualified ElmFormat.ImportInfo as ImportInfo
 import qualified ElmFormat.Parse
@@ -118,7 +119,7 @@ transform =
 
 
 transformModule :: UpgradeDefinition -> Module -> Module
-transformModule definition modu@(Module a b c (preImports, imports) body) =
+transformModule upgradeDefinition modu@(Module a b c (preImports, originalImports) body) =
     let
         importInfo =
             -- Note: this is the info used for matching references in the
@@ -126,17 +127,48 @@ transformModule definition modu@(Module a b c (preImports, imports) body) =
             -- the imports merged in from the upgrade definition
             ImportInfo.fromModule modu
 
-        mergedImports =
-            Dict.union imports (_imports definition)
-
         transformTopLevelStructure structure =
             case structure of
                 Entry (A region (Definition name args comments expr)) ->
-                    Entry (A region (Definition name args comments $ visitExprs (transform' definition importInfo) expr))
+                    Entry (A region (Definition name args comments $ visitExprs (transform' upgradeDefinition importInfo) expr))
 
                 _ -> structure
+
+        upgradedBody = fmap transformTopLevelStructure body
+
+        expressionFromTopLevelStructure structure =
+            case structure of
+                Entry (A _ (Definition _ _ _ expr)) -> Just expr
+                _ -> Nothing
+
+        collectExprs = Maybe.mapMaybe expressionFromTopLevelStructure upgradedBody
+
+        usagesAfterUpgrade =
+            Dict.unionsWith (Dict.unionWith (+)) $
+            fmap (cata countUsages . stripRegion) collectExprs
+
+        namespacesWithReplacements =
+              Set.fromList $ fmap fst $ Dict.keys $ _replacements upgradeDefinition
+
+        cleanImports ns (_, importMethod) =
+            let
+                nameToCheck =
+                    case importMethod of
+                        ImportMethod (Just (_, (_, alias))) _ -> [alias]
+                        _ -> ns
+                wasReplaced = Set.member ns namespacesWithReplacements
+                remainingUsages = (Dict.foldr (+) 0 $ Maybe.fromMaybe Dict.empty $ Dict.lookup nameToCheck usagesAfterUpgrade)
+            in
+            if wasReplaced && remainingUsages <= 0
+                then False
+                else True
+
+        newImports =
+            Dict.union
+                (Dict.filterWithKey cleanImports originalImports)
+                (_imports upgradeDefinition)
     in
-    Module a b c (preImports, mergedImports) (fmap transformTopLevelStructure body)
+    Module a b c (preImports, newImports) upgradedBody
 
 
 visitLetDeclaration :: (Expr -> Expr) -> LetDeclaration Expr -> LetDeclaration Expr

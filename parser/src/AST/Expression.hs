@@ -9,6 +9,8 @@ import Data.Fix
 
 import qualified AST.Pattern as Pattern
 import qualified AST.Variable as Var
+import qualified Data.Map.Strict as Dict
+import qualified Data.Maybe as Maybe
 import qualified Reporting.Annotation as A
 
 
@@ -62,6 +64,10 @@ newtype LocatedExpression e =
 
 instance Functor LocatedExpression where
     fmap f (LocatedExpression e) = LocatedExpression $ fmap (fmap f) e
+
+
+stripRegion :: Expr -> Fix Expression
+stripRegion (Fix (LocatedExpression (A.A _ e))) = Fix $ fmap stripRegion e
 
 
 data Expression e
@@ -123,3 +129,43 @@ instance Functor Expression where
     fmap f (Let defs c e) = Let (fmap (fmap f) defs) c (f e)
     fmap f (Case (e, m) bs) = Case (fmap f e, m) (fmap (fmap $ fmap f) bs)
     fmap _ (GLShader s) = GLShader s
+
+
+type UsageCount = Dict.Map [UppercaseIdentifier] (Dict.Map String Int)
+
+
+countUsages :: Expression UsageCount -> UsageCount
+countUsages e' =
+    let
+        mergeUsage = Dict.unionsWith (Dict.unionWith (+))
+        _sequence = fmap (\(_, (_, WithEol t _)) -> t)
+        _pair (Pair (k, _) (_, v) _) = (k, v)
+        _c (Commented _ e _) = e
+        _letDeclaration l =
+            case l of
+                LetDefinition _ _ _ e -> Just e
+                _ -> Nothing
+        countIfClause (IfClause a b) = mergeUsage [_c a, _c b]
+    in
+    case e' of
+        Unit _ -> Dict.empty
+        Literal _ -> Dict.empty
+        VarExpr (Var.VarRef ns (LowercaseIdentifier n)) -> Dict.singleton ns (Dict.singleton n 1)
+        VarExpr (Var.TagRef ns (UppercaseIdentifier n)) -> Dict.singleton ns (Dict.singleton n 1)
+        VarExpr (Var.OpRef _) -> Dict.empty
+        App e args _ -> mergeUsage (e : fmap snd args)
+        Unary _ e -> e
+        Binops e ops _ -> mergeUsage (e : fmap (\(BinopsClause _ _ _ t) -> t) ops)
+        Parens e -> _c e
+        ExplicitList terms _ _ -> mergeUsage (_sequence terms)
+        Range a b _ -> mergeUsage [_c a, _c b]
+        Tuple terms _ -> mergeUsage (fmap _c terms)
+        TupleFunction _ -> Dict.empty
+        Record _ fields _ _ -> mergeUsage (fmap (snd . _pair) $ _sequence fields)
+        Access e _ -> e
+        AccessFunction _ -> Dict.empty
+        Lambda _ _ e _ -> e
+        If a rest (_, e) -> mergeUsage (countIfClause a : e : fmap (countIfClause . snd) rest)
+        Let defs _ e -> mergeUsage (e : Maybe.mapMaybe _letDeclaration defs)
+        Case (e, _) branches -> mergeUsage (_c e : fmap (snd . snd) branches)
+        GLShader _ -> Dict.empty
