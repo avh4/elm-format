@@ -1,6 +1,5 @@
 module Main exposing (banner)
 
-import ElmFix
 import Nri.Ui.Button.V9 as Button
 
 
@@ -20,8 +19,6 @@ banner =
                     , Button.exactWidth 280
                     , Button.onClick (DropDownBanner.RecordSignupClick DropDownBanner.Home)
                     , Button.premium
-                    , ElmFix.remove
-                    , ElmFix.remove
                     ]
                 ]
             , p [ class [ PremiumUpsellMessage ] ]

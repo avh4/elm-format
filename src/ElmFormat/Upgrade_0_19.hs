@@ -322,6 +322,7 @@ transform' (UpgradeDefinition basicsReplacements _ _) importInfo (Fix (LocatedEx
                     (Fix $ LocatedExpression $ noRegion $ AST.Expression.Tuple (fmap (\v -> Commented [] (makeVarRef v) []) vars) False)
                     False
     in
+    mapExpr removeElmFixRemove $
     case RA.drop expr of
         VarExpr var ->
             Fix $ LocatedExpression $
@@ -349,6 +350,22 @@ transform' (UpgradeDefinition basicsReplacements _ _) importInfo (Fix (LocatedEx
         _ ->
             Fix $ LocatedExpression $
             expr
+
+
+removeElmFixRemove :: Expr' -> Expr'
+removeElmFixRemove e =
+    let
+        isElmFixRemove (_, (_, WithEol (Fix (LocatedExpression (A _ (VarExpr (VarRef [UppercaseIdentifier "ElmFix"] (LowercaseIdentifier "remove")))))) _))= True
+        isElmFixRemove _ = False
+    in
+    case e of
+        ExplicitList terms' trailing multiline ->
+            ExplicitList
+                (filter (not . isElmFixRemove) terms')
+                trailing
+                multiline
+
+        _ -> e
 
 
 expandHtmlStyle :: Bool -> Maybe UppercaseIdentifier -> (Comments, PreCommented (WithEol Expr)) -> [(Comments, PreCommented (WithEol Expr))]
