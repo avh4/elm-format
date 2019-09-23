@@ -19,5 +19,11 @@ cases =
     , 0
     , 13
     , 0
-    , 99
+    , case Just () of
+        Nothing ->
+            0
+
+        _ ->
+            99
+    , "style1"
     ]

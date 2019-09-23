@@ -511,10 +511,6 @@ destructure pat arg =
           ->
             destructure (preVar ++ pre ++ post, inner) arg
 
-        -- Wildcard `_` pattern
-        ( (_, A _ Anything), _ ) -> Just []
-
-
         -- Unit
         ( (preVar, A _ (UnitPattern _))
           , (preArg, A _ (AST.Expression.Unit _))

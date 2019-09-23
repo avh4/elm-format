@@ -22,4 +22,5 @@ cases =
     , A.caseWithPattern (Just 13)
     , A.caseWithWildcard Nothing
     , A.caseWithWildcard (Just ())
+    , A.caseWithAsMatch { style = A.Style1 }
     ]

@@ -13,3 +13,9 @@ upgrade_A_caseWithWildcard a =
     case a of
         Nothing -> 0
         _ -> 99
+upgrade_A_caseWithAsMatch ({ style } as config) =
+    case style of
+        A.Style1 ->
+            "style1"
+        _ ->
+            ElmFix.todo style
