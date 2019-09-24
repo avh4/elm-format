@@ -9,7 +9,7 @@ import qualified AST.V0_16 as AST
 import AST.V0_16 (UppercaseIdentifier(..), LowercaseIdentifier(..), SymbolIdentifier(..), WithEol)
 import AST.Declaration (TopLevelStructure, Declaration)
 import qualified AST.Declaration
-import AST.Expression (LocatedExpression(..))
+import AST.Expression (Expression)
 import qualified AST.Expression
 import qualified AST.Module
 import qualified AST.Pattern
@@ -670,7 +670,7 @@ formatDocComment elmVersion importInfo blocks =
                         entryType _ = BodyUnnamed
                     in
                     expressions
-                        |> formatTopLevelBody 1 elmVersion importInfo entryType (formatEolCommented $ formatExpression elmVersion importInfo SyntaxSeparated)
+                        |> formatTopLevelBody 1 elmVersion importInfo entryType (formatEolCommented $ formatExpression elmVersion importInfo SyntaxSeparated . AST.Expression.stripAnnotation)
                         |> fmap (Text.unpack . Box.render)
                         |> fromMaybe ""
 
@@ -970,7 +970,7 @@ formatDeclaration :: ElmVersion -> ImportInfo -> Declaration -> Box
 formatDeclaration elmVersion importInfo decl =
     case decl of
         AST.Declaration.Definition name args comments expr ->
-            formatDefinition elmVersion importInfo name args comments expr
+            formatDefinition elmVersion importInfo name args comments $ AST.Expression.stripAnnotation expr
 
         AST.Declaration.TypeAnnotation name typ ->
             formatTypeAnnotation elmVersion name typ
@@ -1036,7 +1036,7 @@ formatDeclaration elmVersion importInfo decl =
             ElmStructure.definition "=" True
             (line $ keyword "port")
             [formatCommented (line . formatLowercaseIdentifier elmVersion []) name]
-            (formatCommented' bodyComments (formatExpression elmVersion importInfo SyntaxSeparated) expr)
+            (formatCommented' bodyComments (formatExpression elmVersion importInfo SyntaxSeparated) $ AST.Expression.stripAnnotation expr)
 
         AST.Declaration.Fixity assoc precedenceComments precedence nameComments name ->
             case
@@ -1092,7 +1092,7 @@ formatDefinition :: ElmVersion
     -> AST.Pattern.Pattern
     -> [(AST.Comments, AST.Pattern.Pattern)]
     -> [AST.Comment]
-    -> AST.Expression.Expr
+    -> Fix Expression
     -> Box
 formatDefinition elmVersion importInfo name args comments expr =
   let
@@ -1254,16 +1254,16 @@ expressionParens inner outer =
         _ -> id
 
 
-formatExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.Expression.Expr -> Box
+formatExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> Fix Expression -> Box
 formatExpression elmVersion importInfo context aexpr =
     case elmVersion of
         Elm_0_19_Upgrade -> formatExpression' elmVersion importInfo context (Upgrade_0_19.transform importInfo aexpr)
         _ -> formatExpression' elmVersion importInfo context aexpr
 
 
-formatExpression' :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.Expression.Expr -> Box
-formatExpression' elmVersion importInfo context (Fix (LocatedExpression aexpr)) =
-    case RA.drop aexpr of
+formatExpression' :: ElmVersion -> ImportInfo -> ExpressionContext -> Fix Expression -> Box
+formatExpression' elmVersion importInfo context aexpr =
+    case unFix aexpr of
         AST.Expression.Literal lit ->
             formatLiteral elmVersion lit
 
@@ -1538,26 +1538,26 @@ formatExpression' elmVersion importInfo context (Fix (LocatedExpression aexpr)) 
             ]
 
 
-formatCommentedExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.Commented AST.Expression.Expr -> Box
-formatCommentedExpression elmVersion importInfo context (AST.Commented pre (Fix (LocatedExpression e)) post) =
+formatCommentedExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.Commented (Fix Expression) -> Box
+formatCommentedExpression elmVersion importInfo context (AST.Commented pre e post) =
     let
         commented' =
-            case RA.drop e of
+            case unFix e of
                 AST.Expression.Parens (AST.Commented pre'' e'' post'') ->
                     AST.Commented (pre ++ pre'') e'' (post'' ++ post)
-                _ -> AST.Commented pre (Fix $ LocatedExpression e) post
+                _ -> AST.Commented pre e post
     in
     formatCommented (formatExpression elmVersion importInfo context) commented'
 
 
-formatPreCommentedExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.PreCommented AST.Expression.Expr -> Box
-formatPreCommentedExpression elmVersion importInfo context (pre, Fix (LocatedExpression e)) =
+formatPreCommentedExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.PreCommented (Fix Expression) -> Box
+formatPreCommentedExpression elmVersion importInfo context (pre, e) =
     let
         (pre', e') =
-            case RA.drop e of
+            case unFix e of
                 AST.Expression.Parens (AST.Commented pre'' e'' []) ->
                     (pre ++ pre'', e'')
-                _ -> (pre, Fix $ LocatedExpression e)
+                _ -> (pre, e)
     in
     formatCommented' pre' (formatExpression elmVersion importInfo context) e'
 
@@ -1615,8 +1615,8 @@ mapIsLast f (next:rest) = f False next : mapIsLast f rest
 formatBinops_0_17 ::
     ElmVersion
     -> ImportInfo
-    -> AST.Expression.Expr
-    -> [AST.Expression.BinopsClause AST.Expression.Expr]
+    -> Fix Expression
+    -> [AST.Expression.BinopsClause (Fix Expression)]
     -> Bool
     -> Box
 formatBinops_0_17 elmVersion importInfo left ops multiline =
@@ -1626,8 +1626,8 @@ formatBinops_0_17 elmVersion importInfo left ops multiline =
 formatBinops_0_18 ::
     ElmVersion
     -> ImportInfo
-    -> AST.Expression.Expr
-    -> [AST.Expression.BinopsClause AST.Expression.Expr]
+    -> Fix Expression
+    -> [AST.Expression.BinopsClause (Fix Expression)]
     -> Bool
     -> Box
 formatBinops_0_18 elmVersion importInfo left ops multiline =
@@ -1637,8 +1637,8 @@ formatBinops_0_18 elmVersion importInfo left ops multiline =
 formatBinops_0_19_upgrade ::
     ElmVersion
     -> ImportInfo
-    -> AST.Expression.Expr
-    -> [AST.Expression.BinopsClause AST.Expression.Expr]
+    -> Fix Expression
+    -> [AST.Expression.BinopsClause (Fix Expression)]
     -> Bool
     -> Box
 formatBinops_0_19_upgrade elmVersion importInfo left ops multiline =
@@ -1649,16 +1649,16 @@ formatBinops_0_19_upgrade elmVersion importInfo left ops multiline =
 
 
 formatBinops_common ::
-    (AST.Expression.Expr
-        -> [AST.Expression.BinopsClause AST.Expression.Expr]
-        -> ( AST.Expression.Expr
-           , [AST.Expression.BinopsClause AST.Expression.Expr]
+    (Fix Expression
+        -> [AST.Expression.BinopsClause (Fix Expression)]
+        -> ( Fix Expression
+           , [AST.Expression.BinopsClause (Fix Expression)]
            )
     )
     -> ElmVersion
     -> ImportInfo
-    -> AST.Expression.Expr
-    -> [AST.Expression.BinopsClause AST.Expression.Expr]
+    -> Fix Expression
+    -> [AST.Expression.BinopsClause (Fix Expression)]
     -> Bool
     -> Box
 formatBinops_common transform elmVersion importInfo left ops multiline =
@@ -1688,9 +1688,9 @@ formatBinops_common transform elmVersion importInfo left ops multiline =
 
 
 removeBackticks ::
-    AST.Expression.Expr
-    -> [AST.Expression.BinopsClause AST.Expression.Expr]
-    -> (AST.Expression.Expr, [AST.Expression.BinopsClause AST.Expression.Expr])
+    Fix Expression
+    -> [AST.Expression.BinopsClause (Fix Expression)]
+    -> (Fix Expression, [AST.Expression.BinopsClause (Fix Expression)])
 removeBackticks left ops =
     case ops of
         [] -> (left, ops)
@@ -1699,8 +1699,8 @@ removeBackticks left ops =
           ->
             -- Convert `andThen` to |> andThen
             let
-                e' = Fix $ LocatedExpression $ noRegion $ AST.Expression.App
-                    (Fix $ LocatedExpression $ noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef v' v)
+                e' = Fix $ AST.Expression.App
+                    (Fix $ AST.Expression.VarExpr $ AST.Variable.VarRef v' v)
                     [ (post, e)
                     ]
                     (AST.FAJoinFirst AST.JoinAll)
@@ -1712,8 +1712,8 @@ removeBackticks left ops =
         (AST.Expression.BinopsClause pre (AST.Variable.VarRef v' v) post e):rest ->
             -- Convert other backtick operators to normal function application
             removeBackticks
-                (Fix $ LocatedExpression $ noRegion $ AST.Expression.App
-                    (Fix $ LocatedExpression $ noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef v' v)
+                (Fix $ AST.Expression.App
+                    (Fix $ AST.Expression.VarExpr $ AST.Variable.VarRef v' v)
                     [ (pre, left)
                     , (post, e)
                     ]
@@ -1730,17 +1730,17 @@ removeBackticks left ops =
 
 
 removeBangs ::
-    AST.Expression.Expr
-    -> [AST.Expression.BinopsClause AST.Expression.Expr]
-    -> (AST.Expression.Expr, [AST.Expression.BinopsClause AST.Expression.Expr])
+    Fix Expression
+    -> [AST.Expression.BinopsClause (Fix Expression)]
+    -> (Fix Expression, [AST.Expression.BinopsClause (Fix Expression)])
 removeBangs left ops =
     let
         cmds' post cmds =
-            case RA.drop $ (\(Fix (LocatedExpression e)) -> e) cmds of
+            case unFix cmds of
                 AST.Expression.ExplicitList [] innerComments _ ->
                     AST.Commented
                         post
-                        (Fix $ LocatedExpression $ noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "none")))
+                        (Fix $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "none")))
                         innerComments
 
                 AST.Expression.ExplicitList [(extraPre, (pre', AST.WithEol cmd eol))] trailing _ ->
@@ -1753,15 +1753,15 @@ removeBangs left ops =
                     AST.Commented (post ++ extraPre ++ pre') cmd (eolComment ++ trailing)
 
                 _ ->
-                    AST.Commented [] (Fix $ LocatedExpression $ noRegion $ AST.Expression.App
-                        (Fix $ LocatedExpression $ noRegion $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "batch")))
+                    AST.Commented [] (Fix $ AST.Expression.App
+                        (Fix $ AST.Expression.VarExpr (AST.Variable.VarRef [AST.UppercaseIdentifier "Cmd"] (AST.LowercaseIdentifier "batch")))
                         [(post, cmds)]
                         (AST.FAJoinFirst AST.JoinAll)
                       )
                       []
 
         tuple left' pre post cmds =
-            Fix $ LocatedExpression $ noRegion $ AST.Expression.Tuple
+            Fix $ AST.Expression.Tuple
                 [ AST.Commented [] left' pre
                 , cmds' post cmds
                 ]
@@ -1776,14 +1776,14 @@ removeBangs left ops =
 
 
 removeMod ::
-    AST.Expression.Expr
-    -> [AST.Expression.BinopsClause AST.Expression.Expr]
-    -> (AST.Expression.Expr, [AST.Expression.BinopsClause AST.Expression.Expr])
+    Fix Expression
+    -> [AST.Expression.BinopsClause (Fix Expression)]
+    -> (Fix Expression, [AST.Expression.BinopsClause (Fix Expression)])
 removeMod left ops =
     let
         tuple left' pre post right' =
-            Fix $ LocatedExpression $ noRegion $ AST.Expression.App
-                (Fix $ LocatedExpression $ noRegion $ AST.Expression.VarExpr $ AST.Variable.OpRef (SymbolIdentifier "%"))
+            Fix $ AST.Expression.App
+                (Fix $ AST.Expression.VarExpr $ AST.Variable.OpRef (SymbolIdentifier "%"))
                 [ (pre, left')
                 , (post, right')
                 ]
@@ -1821,11 +1821,11 @@ collectLeftFold NeverFold = False
 binopToFunction ::
     SymbolIdentifier
     -> (String -> ShouldFold)
-    -> (AST.Expression.Expr -> AST.Comments -> AST.Comments -> AST.Expression.Expr -> AST.Expression.Expr)
-    -> AST.Expression.Expr
-    -> Reversed (AST.Expression.BinopsClause AST.Expression.Expr)
-    -> [AST.Expression.BinopsClause AST.Expression.Expr]
-    -> (AST.Expression.Expr, [AST.Expression.BinopsClause AST.Expression.Expr])
+    -> (Fix Expression -> AST.Comments -> AST.Comments -> Fix Expression -> Fix Expression)
+    -> Fix Expression
+    -> Reversed (AST.Expression.BinopsClause (Fix Expression))
+    -> [AST.Expression.BinopsClause (Fix Expression)]
+    -> (Fix Expression, [AST.Expression.BinopsClause (Fix Expression)])
 binopToFunction target shouldFold applyFn left preBang remaining =
     case remaining of
         [] ->
@@ -1836,7 +1836,7 @@ binopToFunction target shouldFold applyFn left preBang remaining =
                 left' =
                     case ReversedList.isEmpty preBang of
                         True -> left
-                        False -> ( Fix $ LocatedExpression $ noRegion $ AST.Expression.Binops left (ReversedList.toList preBang) False)
+                        False -> Fix $ AST.Expression.Binops left (ReversedList.toList preBang) False
 
                 (right', rest') =
                     collectRight (collectRightFold . shouldFold) cmds ReversedList.empty rest
@@ -1857,10 +1857,10 @@ binopToFunction target shouldFold applyFn left preBang remaining =
 
 collectRight ::
     (String -> Bool)
-    -> AST.Expression.Expr
-    -> Reversed (AST.Expression.BinopsClause AST.Expression.Expr)
-    -> [AST.Expression.BinopsClause AST.Expression.Expr]
-    -> (AST.Expression.Expr, [AST.Expression.BinopsClause AST.Expression.Expr])
+    -> Fix Expression
+    -> Reversed (AST.Expression.BinopsClause (Fix Expression))
+    -> [AST.Expression.BinopsClause (Fix Expression)]
+    -> (Fix Expression, [AST.Expression.BinopsClause (Fix Expression)])
 collectRight shouldFold leftMost collectedLeft rest =
     case rest of
         (AST.Expression.BinopsClause pre (op@(AST.Variable.OpRef (SymbolIdentifier opi))) post e):rest' | shouldFold opi ->
@@ -1870,11 +1870,11 @@ collectRight shouldFold leftMost collectedLeft rest =
             -- terminate if either rest is empty, or the next op fails the shouldFold test
             ( case ReversedList.isEmpty collectedLeft of
                 True -> leftMost
-                False -> Fix $ LocatedExpression $ noRegion $ AST.Expression.Binops leftMost (ReversedList.toList collectedLeft) False
+                False -> Fix $ AST.Expression.Binops leftMost (ReversedList.toList collectedLeft) False
             , rest
             )
 
-formatRange_0_17 :: ElmVersion -> ImportInfo -> AST.Commented AST.Expression.Expr -> AST.Commented AST.Expression.Expr -> Bool -> Box
+formatRange_0_17 :: ElmVersion -> ImportInfo -> AST.Commented (Fix Expression) -> AST.Commented (Fix Expression) -> Bool -> Box
 formatRange_0_17 elmVersion importInfo left right multiline =
     case
         ( multiline
@@ -1908,28 +1908,27 @@ noRegion :: a -> RA.Located a
 noRegion =
     RA.at nowhere nowhere
 
-formatRange_0_18 :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.Commented AST.Expression.Expr -> AST.Commented AST.Expression.Expr -> Box
+formatRange_0_18 :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.Commented (Fix Expression) -> AST.Commented (Fix Expression) -> Box
 formatRange_0_18 elmVersion importInfo context left right =
     case (left, right) of
         (AST.Commented preLeft left' [], AST.Commented preRight right' []) ->
             AST.Expression.App
-                (Fix $ LocatedExpression $ noRegion $ AST.Expression.VarExpr $ AST.Variable.VarRef [AST.UppercaseIdentifier "List"] $ AST.LowercaseIdentifier "range")
+                (Fix $ AST.Expression.VarExpr $ AST.Variable.VarRef [AST.UppercaseIdentifier "List"] $ AST.LowercaseIdentifier "range")
                 [ (preLeft, left')
                 , (preRight, right')
                 ]
                 (AST.FAJoinFirst AST.JoinAll)
-                |> (Fix . LocatedExpression . noRegion)
+                |> Fix
                 |> formatExpression elmVersion importInfo context
 
         _ ->
             AST.Expression.App
-                (AST.Expression.VarExpr $ AST.Variable.VarRef [AST.UppercaseIdentifier "List"] $ AST.LowercaseIdentifier "range")
-                [ ([], AST.Expression.Parens left)
-                , ([], AST.Expression.Parens right)
+                (Fix $ AST.Expression.VarExpr $ AST.Variable.VarRef [AST.UppercaseIdentifier "List"] $ AST.LowercaseIdentifier "range")
+                [ ([], Fix $ AST.Expression.Parens left)
+                , ([], Fix $ AST.Expression.Parens right)
                 ]
                 (AST.FAJoinFirst AST.JoinAll)
-                |> fmap (Fix . LocatedExpression . noRegion)
-                |> (Fix . LocatedExpression . noRegion)
+                |> Fix
                 |> formatExpression elmVersion importInfo context
 
 

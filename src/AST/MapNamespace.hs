@@ -5,7 +5,6 @@ module AST.MapNamespace where
 
 import AST.Declaration
 import AST.Expression
-import AST.MapExpr
 import AST.Variable
 import AST.V0_16
 import Data.Fix
@@ -15,21 +14,53 @@ class MapNamespace a where
     mapNamespace :: ([UppercaseIdentifier] -> [UppercaseIdentifier]) -> a -> a
 
 
-instance MapNamespace Expr where
-    mapNamespace f (Fix (LocatedExpression e)) =
-        Fix $ LocatedExpression $ mapNamespace f e
+instance MapNamespace (Fix (AnnotatedExpression ann)) where
+    mapNamespace f (Fix (AE e)) =
+        Fix $ AE $ mapNamespace f e
 
 
-instance MapNamespace (Expression Expr) where
+instance MapNamespace e => MapNamespace (Expression e) where
     mapNamespace f expr =
+        -- TODO: map references in patterns
         case expr of
-            VarExpr var ->
-                VarExpr (mapNamespace f var)
+            Unit _ -> expr
+            AST.Expression.Literal _ -> expr
+            VarExpr var -> VarExpr (mapNamespace f var)
 
-            -- TODO: map references in patterns
+            App f' args multiline ->
+                App (mapNamespace f f') (mapNamespace f args) multiline
+            Unary op e ->
+                Unary op (mapNamespace f e)
+            Binops left restOps multiline ->
+                Binops (mapNamespace f left) (mapNamespace f restOps) multiline
+            Parens e ->
+                Parens (mapNamespace f e)
+            ExplicitList terms' post multiline ->
+                ExplicitList (mapNamespace f terms') post multiline
+            Range e1 e2 multiline ->
+                Range (mapNamespace f e1) (mapNamespace f e2) multiline
+            AST.Expression.Tuple es multiline ->
+                AST.Expression.Tuple (mapNamespace f es) multiline
+            TupleFunction _ -> expr
+            AST.Expression.Record b fs post multiline ->
+                AST.Expression.Record b (mapNamespace f fs) post multiline
+            Access e field' ->
+                Access (mapNamespace f e) field'
+            AccessFunction _ -> expr
+            Lambda params pre body multi ->
+                Lambda params pre (mapNamespace f body) multi
+            If c1 elseIfs els ->
+                If (mapNamespace f c1) (mapNamespace f elseIfs) (mapNamespace f els)
+            Let decls pre body ->
+                Let (mapNamespace f decls) pre body
+            Case (cond, m) branches ->
+                Case (mapNamespace f cond, m) (mapNamespace f branches)
+            GLShader _ -> expr
 
-            _ ->
-                mapExpr (mapNamespace f) expr
+
+instance MapNamespace (Fix Expression) where
+    mapNamespace f (Fix e) =
+        Fix $ mapNamespace f e
 
 
 instance MapNamespace Type' where

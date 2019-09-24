@@ -1,3 +1,6 @@
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module Test.Generators where
 
 import Data.Map.Strict
@@ -5,7 +8,7 @@ import Test.QuickCheck
 
 import AST.V0_16
 import qualified AST.Declaration
-import AST.Expression (LocatedExpression(..))
+import AST.Expression (AnnotatedExpression(AE))
 import qualified AST.Expression
 import qualified AST.Module
 import qualified AST.Pattern
@@ -110,4 +113,4 @@ instance Arbitrary AST.Module.Module where
                 )
                 (located Nothing)
                 ([], empty)
-                [ AST.Declaration.Entry $ located $ AST.Declaration.Definition (located $ AST.Pattern.Anything) [] [] (Fix $ LocatedExpression $ located $ AST.Expression.TupleFunction 2)]
+                [ AST.Declaration.Entry $ located $ AST.Declaration.Definition (located $ AST.Pattern.Anything) [] [] (Fix $ AE $ located $ AST.Expression.TupleFunction 2)]

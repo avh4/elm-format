@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module AST.MapExpr where
 
@@ -12,59 +13,58 @@ import AST.V0_16
 import AST.Expression
 import AST.Pattern
 import Data.Fix
-import Reporting.Annotation
 
 
-class MapExpr a where
-    mapExpr :: (Expr' -> Expr') -> a -> a
+class MapExpr ann a where
+    mapExpr :: (Fix (AnnotatedExpression ann) -> Fix (AnnotatedExpression ann)) -> a -> a
 
 
-instance MapExpr Expr where
-    mapExpr f (Fix (LocatedExpression e)) = Fix $ LocatedExpression $ mapExpr f e
+instance MapExpr ann (Fix (AnnotatedExpression ann)) where
+    mapExpr f = cata (f . Fix)
 
 
-instance MapExpr (Located Expr') where
-    mapExpr f (A region a) = A region (f a)
+instance MapExpr () (Fix Expression) where
+    mapExpr f = stripAnnotation . cata (f . Fix) . addAnnotation ()
 
 
-instance MapExpr e => MapExpr (IfClause e) where
+instance MapExpr ann e => MapExpr ann (IfClause e) where
     mapExpr f (IfClause cond body) = IfClause (mapExpr f cond) (mapExpr f body)
 
 
-instance MapExpr a => MapExpr (PreCommented a) where
+instance MapExpr ann a => MapExpr ann (PreCommented a) where
     mapExpr f (pre, a) = (pre, mapExpr f a)
 
 
-instance MapExpr a => MapExpr (WithEol a) where
+instance MapExpr ann a => MapExpr ann (WithEol a) where
     mapExpr f = fmap (mapExpr f)
 
 
-instance MapExpr a => MapExpr [a] where
+instance MapExpr ann a => MapExpr ann [a] where
     mapExpr f list = fmap (mapExpr f) list
 
 
-instance MapExpr a => MapExpr (a, Bool) where
+instance MapExpr ann a => MapExpr ann (a, Bool) where
     mapExpr f (a, b) = (mapExpr f a, b)
 
 
-instance MapExpr a => MapExpr (Commented Pattern, a) where
+instance MapExpr ann a => MapExpr ann (Commented Pattern, a) where
     mapExpr f (x, a) = (x, mapExpr f a)
 
 
-instance MapExpr a => MapExpr (BinopsClause a) where
+instance MapExpr ann a => MapExpr ann (BinopsClause a) where
     mapExpr f (BinopsClause pre op post a) = BinopsClause pre op post (mapExpr f a)
 
 
-instance MapExpr a => MapExpr (Commented a) where
+instance MapExpr ann a => MapExpr ann (Commented a) where
     mapExpr f (Commented pre e post) = Commented pre (mapExpr f e) post
 
 
-instance MapExpr a => MapExpr (Pair key a) where
+instance MapExpr ann a => MapExpr ann (Pair key a) where
     mapExpr f (Pair key value multi) = Pair key (mapExpr f value) multi
 
 
 {-| NOTE: the function will never get applied to the parent Expr'; only on the first level of children -}
-instance MapExpr e => MapExpr (Expression e) where
+instance MapExpr ann e => MapExpr ann (Expression e) where
   mapExpr f expr =
     case expr of
         Unit _ -> expr
@@ -102,7 +102,7 @@ instance MapExpr e => MapExpr (Expression e) where
         GLShader _ -> expr
 
 
-instance MapExpr e => MapExpr (LetDeclaration e) where
+instance MapExpr ann e => MapExpr ann (LetDeclaration e) where
     mapExpr f d =
         case d of
             LetDefinition name args pre body -> LetDefinition name args pre (mapExpr f body)

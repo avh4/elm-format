@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Reporting.Region where
 
+import qualified Data.String as String
 import qualified Text.Parsec.Pos as Parsec
 
 
@@ -8,7 +9,18 @@ data Region = Region
     { start :: Position
     , end :: Position
     }
-    deriving (Eq, Show)
+    deriving (Eq)
+
+
+instance Show Region where
+    showsPrec p r = showParen (p > 10) $
+        showString $ String.unwords
+            [ "at"
+            , show (line $ start r)
+            , show (column $ start r)
+            , show (line $ end r)
+            , show (column $ end r) 
+            ]
 
 
 data Position = Position

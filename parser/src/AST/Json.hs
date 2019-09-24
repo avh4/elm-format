@@ -195,7 +195,7 @@ instance ToJSON MergedTopLevelStructure where
 
 
 instance ToJSON Expr where
-  showJSON (Fix (LocatedExpression (A region expr))) =
+  showJSON (Fix (AE (A region expr))) =
       case expr of
           Unit _ ->
               makeObj [ type_ "UnitLiteral" ]
@@ -282,7 +282,7 @@ instance ToJSON Expr where
                     , JSArray $ map
                         (\(BinopsClause _ op _ expr) ->
                            makeObj
-                               [ ("operator", showJSON $ Fix $ LocatedExpression $ noRegion $ VarExpr op)
+                               [ ("operator", showJSON $ Fix $ AE $ noRegion $ VarExpr op)
                                , ("term", showJSON expr)
                                ]
                         )

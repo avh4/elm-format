@@ -12,6 +12,7 @@ import qualified AST.Variable as Var
 import qualified Data.Map.Strict as Dict
 import qualified Data.Maybe as Maybe
 import qualified Reporting.Annotation as A
+import qualified Reporting.Region as R
 
 
 ---- GENERAL AST ----
@@ -35,7 +36,7 @@ instance Functor LetDeclaration where
 
 
 type Expr =
-    Fix LocatedExpression
+    Fix (AnnotatedExpression R.Region)
 
 data IfClause e =
     IfClause (Commented e) (Commented e)
@@ -56,18 +57,29 @@ instance Functor BinopsClause where
 type Expr' =
     Expression Expr
 
-
-newtype LocatedExpression e =
-    LocatedExpression (A.Located (Expression e))
+newtype AnnotatedExpression ann e =
+    AE (A.Annotated ann (Expression e))
     deriving (Eq, Show)
 
 
-instance Functor LocatedExpression where
-    fmap f (LocatedExpression e) = LocatedExpression $ fmap (fmap f) e
+instance Functor (AnnotatedExpression ann) where
+    fmap f (AE e) = AE $ fmap (fmap f) e
 
 
-stripRegion :: Expr -> Fix Expression
-stripRegion (Fix (LocatedExpression (A.A _ e))) = Fix $ fmap stripRegion e
+stripAnnotation :: Fix (AnnotatedExpression ann) -> Fix Expression
+stripAnnotation (Fix (AE (A.A _ e))) = Fix $ fmap stripAnnotation e
+
+
+dropAnnotation :: Fix (AnnotatedExpression ann) -> Expression (Fix (AnnotatedExpression ann))
+dropAnnotation (Fix (AE (A.A _ e))) = e
+
+
+mapAnnotation :: (a -> b) -> Fix (AnnotatedExpression a) -> Fix (AnnotatedExpression b)
+mapAnnotation f (Fix (AE (A.A a e))) = Fix $ AE $ A.A (f a) $ fmap (mapAnnotation f) e
+
+
+addAnnotation :: ann -> Fix Expression -> Fix (AnnotatedExpression ann)
+addAnnotation ann (Fix e) = Fix $ AE $ A.A ann $ fmap (addAnnotation ann) e
 
 
 data Expression e

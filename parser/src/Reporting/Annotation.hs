@@ -1,3 +1,6 @@
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module Reporting.Annotation where
 
 import Prelude hiding (map)
@@ -8,24 +11,24 @@ import qualified Data.String as String
 
 -- ANNOTATION
 
-data Located a =
-    A R.Region a
+type Located a =
+    Annotated R.Region a
+
+
+data Annotated ann a =
+    A ann a
     deriving (Eq)
 
 
-instance Functor Located where
+instance Functor (Annotated ann) where
     fmap f (A region a) =
         A region (f a)
 
 
-instance (Show a) => Show (Located a) where
-    showsPrec p (A r a) = showParen (p > 10) $
+instance (Show a, Show ann) => Show (Annotated ann a) where
+    showsPrec p (A ann a) = showParen (p > 10) $
         showString $ String.unwords
-            [ "at"
-            , show (R.line $ R.start r)
-            , show (R.column $ R.start r)
-            , show (R.line $ R.end r)
-            , show (R.column $ R.end r)
+            [ show ann
             , showsPrec 99 a ""
             ]
 

@@ -1,0 +1,26 @@
+upgrade_A_cs a =
+    case a of
+        A.A -> 1
+        A.B -> 2
+
+
+upgrade_A_varInCase a b c =
+    case a of
+       A.First -> b
+       A.Second -> c
+
+
+{-| The naming of the variables can cause them to processed in a different order compared to `upgrade_A_varInCase` -}
+upgrade_A_varInCase2 z b1 c1 =
+    case z of
+       A.First -> b1
+       A.Second -> c1
+
+
+upgrade_A_nestedCase z1 z2 x y z =
+   case z1 of
+      A.First ->
+         case z2 of
+            A.First -> x
+            A.Second -> y
+      A.Second -> z

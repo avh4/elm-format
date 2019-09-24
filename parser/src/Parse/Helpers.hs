@@ -485,7 +485,7 @@ accessible :: ElmVersion -> IParser AST.Expression.Expr -> IParser AST.Expressio
 accessible elmVersion exprParser =
   do  start <- getMyPosition
 
-      annotatedRootExpr@(Fix (AST.Expression.LocatedExpression (A.A _ _rootExpr))) <- exprParser
+      annotatedRootExpr@(Fix (AST.Expression.AE (A.A _ _rootExpr))) <- exprParser
 
       access <- optionMaybe (try dot <?> "a field access like .name")
 
@@ -497,7 +497,7 @@ accessible elmVersion exprParser =
           accessible elmVersion $
             do  v <- lowVar elmVersion
                 end <- getMyPosition
-                return . Fix . AST.Expression.LocatedExpression . A.at start end $
+                return . Fix . AST.Expression.AE . A.at start end $
                     -- case rootExpr of
                     --   AST.Expression.VarExpr (AST.Variable.VarRef name@(c:_))
                     --     | Char.isUpper c ->

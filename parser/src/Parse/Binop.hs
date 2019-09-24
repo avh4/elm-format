@@ -17,8 +17,8 @@ binops
     -> IParser Var.Ref
     -> IParser E.Expr
 binops term last anyOp =
-  (fmap (Fix . E.LocatedExpression) . addLocation) $
-  do  ((e@(Fix (E.LocatedExpression e')), ops), multiline) <- trackNewline ((,) <$> term <*> nextOps)
+  (fmap (Fix . E.AE) . addLocation) $
+  do  ((e@(Fix (E.AE e')), ops), multiline) <- trackNewline ((,) <$> term <*> nextOps)
       return $
         case ops of
           [] ->

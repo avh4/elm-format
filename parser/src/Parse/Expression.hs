@@ -84,7 +84,7 @@ listTerm elmVersion =
 
 parensTerm :: ElmVersion -> IParser E.Expr
 parensTerm elmVersion =
-  (Fix . E.LocatedExpression) <$>
+  (Fix . E.AE) <$>
   choice
     [ try (addLocation $ parens' opFn )
     , try (addLocation $ parens' tupleFn)
@@ -116,7 +116,7 @@ parensTerm elmVersion =
 
 recordTerm :: ElmVersion -> IParser E.Expr
 recordTerm elmVersion =
-    fmap (Fix . E.LocatedExpression) .
+    fmap (Fix . E.AE) .
     addLocation $ brackets' $ checkMultiline $
         do
             base <- optionMaybe $ try (commented (lowVar elmVersion) <* string "|")
@@ -126,8 +126,8 @@ recordTerm elmVersion =
 
 term :: ElmVersion -> IParser E.Expr
 term elmVersion =
-  (fmap (Fix . E.LocatedExpression) . addLocation) (choice [ E.Literal <$> Literal.literal, listTerm elmVersion, accessor elmVersion, negative elmVersion ])
-    <|> accessible elmVersion ((fmap (Fix . E.LocatedExpression) . addLocation) (varTerm elmVersion) <|> parensTerm elmVersion <|> recordTerm elmVersion)
+  (fmap (Fix . E.AE) . addLocation) (choice [ E.Literal <$> Literal.literal, listTerm elmVersion, accessor elmVersion, negative elmVersion ])
+    <|> accessible elmVersion ((fmap (Fix . E.AE) . addLocation) (varTerm elmVersion) <|> parensTerm elmVersion <|> recordTerm elmVersion)
     <?> "an expression"
 
 
@@ -163,14 +163,14 @@ appExpr elmVersion =
                             (JoinAll, JoinAll, False) -> FAJoinFirst JoinAll
                             (JoinAll, SplitAll, _) -> FASplitFirst
                 in
-                    Fix $ E.LocatedExpression $ A.at start end $ E.App t (fmap fst ts) multiline
+                    Fix $ E.AE $ A.at start end $ E.App t (fmap fst ts) multiline
 
 
 --------  Normal Expressions  --------
 
 expr :: ElmVersion -> IParser E.Expr
 expr elmVersion =
-  (fmap (Fix . E.LocatedExpression) . addLocation) (choice [ letExpr elmVersion, caseExpr elmVersion, ifExpr elmVersion ])
+  (fmap (Fix . E.AE) . addLocation) (choice [ letExpr elmVersion, caseExpr elmVersion, ifExpr elmVersion ])
     <|> lambdaExpr elmVersion
     <|> binaryExpr elmVersion
     <?> "an expression"
@@ -181,7 +181,7 @@ binaryExpr elmVersion =
     Binop.binops (appExpr elmVersion) lastExpr (anyOp elmVersion)
   where
     lastExpr =
-        (fmap (Fix . E.LocatedExpression) . addLocation) (choice [ letExpr elmVersion, caseExpr elmVersion, ifExpr elmVersion ])
+        (fmap (Fix . E.AE) . addLocation) (choice [ letExpr elmVersion, caseExpr elmVersion, ifExpr elmVersion ])
         <|> lambdaExpr elmVersion
         <?> "an expression"
 
@@ -225,7 +225,7 @@ lambdaExpr elmVersion =
       body <- expr elmVersion
       return (args, preArrowComments, bodyComments, body)
   in
-    (fmap (Fix . E.LocatedExpression) . addLocation) $
+    (fmap (Fix . E.AE) . addLocation) $
         do  ((args, preArrowComments, bodyComments, body), multiline) <- trackNewline subparser
             return $ E.Lambda args (preArrowComments ++ bodyComments) body $ multilineToBool multiline
 
