@@ -52,7 +52,7 @@ instance MapNamespace e => MapNamespace (Expression e) where
             If c1 elseIfs els ->
                 If (mapNamespace f c1) (mapNamespace f elseIfs) (mapNamespace f els)
             Let decls pre body ->
-                Let (mapNamespace f decls) pre body
+                Let (mapNamespace f decls) pre (mapNamespace f body)
             Case (cond, m) branches ->
                 Case (mapNamespace f cond, m) (mapNamespace f branches)
             GLShader _ -> expr

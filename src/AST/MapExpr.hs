@@ -96,7 +96,7 @@ instance MapExpr ann e => MapExpr ann (Expression e) where
         If c1 elseIfs els ->
             If (mapExpr f c1) (mapExpr f elseIfs) (mapExpr f els)
         Let decls pre body ->
-            Let (mapExpr f decls) pre body
+            Let (mapExpr f decls) pre (mapExpr f body)
         Case cond branches ->
             Case (mapExpr f cond) (mapExpr f branches)
         GLShader _ -> expr
