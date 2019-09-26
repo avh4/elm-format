@@ -2,6 +2,9 @@ upgrade_A_value = ()
 upgrade_A_lambda = \a b -> a + b
 upgrade_A_function a b = a + b
 
+upgrade_A_Tag = ()
+upgrade_A_Tag2 a b = a + b
+
 upgrade_A_caseExhaustive a =
     case a of
         () -> 0

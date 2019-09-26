@@ -4,6 +4,10 @@ import A
 
 
 x =
+    ()
+
+
+values =
     [ A.value
     , A.lambda
     , A.lambda 1
@@ -13,6 +17,15 @@ x =
     , A.function 7
     , A.function 8 9
     , A.function 10 11 12
+    ]
+
+
+tags =
+    [ A.Tag
+    , A.Tag2
+    , A.Tag2 100
+    , A.Tag2 101 102
+    , A.Tag2 103 104 105
     ]
 
 

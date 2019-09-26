@@ -2,6 +2,10 @@ module UpgradDefinitionSyntax exposing (x)
 
 
 x =
+    ()
+
+
+values =
     [ ()
     , \a b -> a + b
     , \b -> 1 + b
@@ -11,6 +15,15 @@ x =
     , \b -> 7 + b
     , 8 + 9
     , (10 + 11) 12
+    ]
+
+
+tags =
+    [ ()
+    , \a b -> a + b
+    , \b -> 100 + b
+    , 101 + 102
+    , (103 + 104) 105
     ]
 
 

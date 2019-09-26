@@ -52,7 +52,7 @@ elm0_19upgrade = Text.pack $ unlines
 
 data UpgradeDefinition =
     UpgradeDefinition
-        { _replacements :: Dict.Map ([UppercaseIdentifier], LowercaseIdentifier) (Fix Expression)
+        { _replacements :: Dict.Map ([UppercaseIdentifier], String) (Fix Expression)
         , _imports :: Dict.Map [UppercaseIdentifier] (Comments, ImportMethod)
         , _preferredAliases :: [(UppercaseIdentifier, [UppercaseIdentifier])]
         }
@@ -66,9 +66,9 @@ parseUpgradeDefinition definitionText =
             let
                 importInfo = ImportInfo.fromModule modu
 
-                makeName :: String -> Maybe ([UppercaseIdentifier], LowercaseIdentifier)
+                makeName :: String -> Maybe ([UppercaseIdentifier], String)
                 makeName name =
-                    (\rev -> (UppercaseIdentifier <$> reverse (tail rev), LowercaseIdentifier $ head rev))
+                    (\rev -> (UppercaseIdentifier <$> reverse (tail rev), head rev))
                         <$> reverse <$> splitOn '_' <$> List.stripPrefix "upgrade_" name
 
                 toUpgradeDef def =
@@ -235,10 +235,20 @@ applyUpgrades upgradeDefinition importInfo expr =
         replace :: AST.Variable.Ref -> Maybe (Fix Expression)
         replace var =
             case var of
-                VarRef [] name ->
+                VarRef [] (LowercaseIdentifier name) ->
                     Dict.lookup ([UppercaseIdentifier "Basics"], name) replacements
 
-                VarRef ns name ->
+                VarRef ns (LowercaseIdentifier name) ->
+                    let
+                        resolvedNs =
+                            Maybe.fromMaybe ns $
+                            case ns of
+                                [single] -> Bimap.lookupR single importAliases
+                                _ -> Nothing
+                    in
+                    Dict.lookup (resolvedNs, name) replacements
+
+                TagRef ns (UppercaseIdentifier name) ->
                     let
                         resolvedNs =
                             Maybe.fromMaybe ns $
