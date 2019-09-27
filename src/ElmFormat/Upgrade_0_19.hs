@@ -100,20 +100,26 @@ parseUpgradeDefinition definitionText =
                 removeAlias :: ImportMethod -> ImportMethod
                 removeAlias i =
                     i { AST.Module.alias = Nothing }
-
-                getAlias (ns, (_, ImportMethod alias _)) =
-                    case alias of
-                        Nothing -> Nothing
-                        Just (_, (_, a)) -> Just (a, ns)
             in
             Right $ UpgradeDefinition
                 { _replacements = fmap (mapNamespace applyAliases) $ Dict.fromList $ Maybe.mapMaybe toUpgradeDef body
                 , _imports = fmap (fmap removeAlias) imports
-                , _preferredAliases = Maybe.mapMaybe getAlias $ Dict.toList imports
+                , _preferredAliases = getAliases imports
                 }
 
         Result.Result _ (Result.Err _) ->
             Left ()
+
+
+getAliases :: Dict.Map b (a, ImportMethod) -> [(UppercaseIdentifier, b)]
+getAliases imports =
+    let
+        getAlias (ns, (_, ImportMethod alias _)) =
+            case alias of
+                Nothing -> Nothing
+                Just (_, (_, a)) -> Just (a, ns)
+    in
+    Maybe.mapMaybe getAlias $ Dict.toList imports
 
 
 splitOn :: Eq a => a -> [a] -> [[a]]
@@ -160,19 +166,25 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
                 Entry (A _ (Definition _ _ _ expr)) -> Just expr
                 _ -> Nothing
 
-        collectExprs = Maybe.mapMaybe expressionFromTopLevelStructure upgradedBody
-
-        usagesAfterUpgrade =
-            Dict.unionsWith (Dict.unionWith (+)) $
-            fmap (cata countUsages . stripAnnotation) collectExprs
-
         namespacesWithReplacements =
               Set.fromList $ fmap fst $ Dict.keys $ _replacements upgradeDefinition
 
-        remainingUsages ns =
-            Dict.foldr (+) 0 $ Maybe.fromMaybe Dict.empty $ Dict.lookup ns usagesAfterUpgrade
+        remainingUsages body ns =
+            let
+                collectExprs = Maybe.mapMaybe expressionFromTopLevelStructure body
 
-        cleanImports ns (_, importMethod) =
+                usages =
+                    Dict.unionsWith (Dict.unionWith (+)) $
+                    fmap (cata countUsages . stripAnnotation) collectExprs
+            in
+            Dict.foldr (+) 0 $ Maybe.fromMaybe Dict.empty $ Dict.lookup ns usages
+
+        cleanImports (imports, body) =
+            ( Dict.filterWithKey (cleanImport body) imports
+            , body
+            )
+
+        cleanImport body ns (_, importMethod) =
             let
                 nameToCheck =
                     case importMethod of
@@ -180,31 +192,45 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
                         _ -> ns
                 wasReplaced = Set.member ns namespacesWithReplacements
             in
-            if wasReplaced && remainingUsages nameToCheck <= 0
+            if wasReplaced && remainingUsages body nameToCheck <= 0
                 then False
                 else True
 
-        additionalAliases =
-            _preferredAliases upgradeDefinition
-                |> filter (\(alias, _) -> remainingUsages [alias] <= 0)
-
-        newImports =
+        startingImports =
             Dict.union
-                (Dict.filterWithKey cleanImports originalImports)
-                (Dict.filterWithKey (\k _ -> remainingUsages k > 0) $ _imports upgradeDefinition)
+                originalImports
+                (Dict.filterWithKey (\k _ -> remainingUsages upgradedBody k > 0)
+                    $ fmap (fmap (\(ImportMethod _ e) -> ImportMethod Nothing e))
+                    $ _imports upgradeDefinition
+                )
 
-        applyAlias (imports, body) (alias, ns) =
-            if remainingUsages [alias] <= 0
-                then
-                    ( Dict.update (\(pre, im) -> Just $ (pre, im { AST.Module.alias = Just ([], ([], alias)) }) ) ns imports
-                    , mapNamespace (\n -> if n == ns then [alias] else n) body
-                    )
-                else (imports, body)
+        tryAlias (imports, body) (alias, ns) =
+            -- if alias is already used for something else, do nothing (or maybe should try a new name?)
+            if Maybe.fromMaybe False $ fmap ((/=) ns) $ Dict.lookup alias $ Dict.fromList $ getAliases imports
+                then (imports, body)
 
-        (finalImports, finalBody) =
-            List.foldl' applyAlias (newImports, upgradedBody) additionalAliases
+            -- if ns is already aliased to something else, then skip
+            else if Maybe.fromMaybe False $ fmap ((/=) alias) $ fmap (snd . snd) $ (fmap snd $ Dict.lookup ns imports) >>= AST.Module.alias
+                then (imports, body)
+
+            -- if ns isn't referenced, then skip
+            else if remainingUsages body ns <= 0
+                then (imports, body)
+
+            -- apply it
+            else
+                ( Dict.update (\(pre, im) -> Just $ (pre, im { AST.Module.alias = Just ([], ([], alias)) }) ) ns imports
+                , mapNamespace (\n -> if n == ns then [alias] else n) body
+                )
+
+        tryAliases =
+            flip (List.foldl' tryAlias)
+
     in
-    Module a b c (preImports, finalImports) finalBody
+    (startingImports, upgradedBody)
+        |> cleanImports
+        |> tryAliases (getAliases originalImports ++ _preferredAliases upgradeDefinition)
+        |> (\(i, bo) -> Module a b c (preImports, i) bo)
 
 
 data Source

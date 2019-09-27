@@ -1,0 +1,13 @@
+import AliasedInUpgradeDefinition as AIUD
+import AliasedInSource
+import AliasedDifferently as ADIUD
+
+upgrade_A_toAliased =
+    AIUD.value
+
+
+upgrade_A_toAliasedInSource =
+    AliasedInSource.value
+
+upgrade_A_toAliasedDifferentlyInBoth =
+    ADIUD.value
