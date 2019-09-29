@@ -97,7 +97,7 @@ main = do
         sourceFiles <- getDirectoryFiles "" sourceFilesPattern
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "stack test"
+        cmd_ "stack test --test-arguments=--hide-successes"
         writeFile' out ""
 
 

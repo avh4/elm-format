@@ -4,6 +4,7 @@ module Parse.Declaration where
 import Text.Parsec ( (<|>), (<?>), choice, digit, optionMaybe, string, try )
 
 import AST.Declaration
+import AST.Expression (Expr)
 import ElmVersion
 import Parse.Comments
 import qualified Parse.Expression as Expr
@@ -14,7 +15,7 @@ import Parse.IParser
 import Parse.Whitespace
 
 
-declaration :: ElmVersion -> IParser Declaration
+declaration :: ElmVersion -> IParser (Declaration [UppercaseIdentifier] Expr)
 declaration elmVersion =
     typeDecl elmVersion <|> infixDecl elmVersion <|> port elmVersion <|> definition elmVersion
 
@@ -30,7 +31,7 @@ topLevelStructure entry =
 
 -- TYPE ANNOTATIONS and DEFINITIONS
 
-definition :: ElmVersion -> IParser AST.Declaration.Declaration
+definition :: ElmVersion -> IParser (Declaration [UppercaseIdentifier] Expr)
 definition elmVersion =
     (Expr.typeAnnotation elmVersion TypeAnnotation <|> Expr.definition elmVersion Definition)
     <?> "a value definition"
@@ -38,7 +39,7 @@ definition elmVersion =
 
 -- TYPE ALIAS and UNION TYPES
 
-typeDecl :: ElmVersion -> IParser AST.Declaration.Declaration
+typeDecl :: ElmVersion -> IParser (Declaration [UppercaseIdentifier] e)
 typeDecl elmVersion =
   do  try (reserved elmVersion "type") <?> "a type declaration"
       postType <- forcedWS
@@ -70,7 +71,7 @@ typeDecl elmVersion =
 -- INFIX
 
 
-infixDecl :: ElmVersion -> IParser AST.Declaration.Declaration
+infixDecl :: ElmVersion -> IParser (Declaration [UppercaseIdentifier] e)
 infixDecl elmVersion =
     expecting "an infix declaration" $
     choice
@@ -79,7 +80,7 @@ infixDecl elmVersion =
         ]
 
 
-infixDecl_0_19 :: ElmVersion -> IParser AST.Declaration.Declaration
+infixDecl_0_19 :: ElmVersion -> IParser (Declaration ns e)
 infixDecl_0_19 elmVersion =
     let
         assoc =
@@ -96,7 +97,7 @@ infixDecl_0_19 elmVersion =
         <*> (equals *> preCommented (lowVar elmVersion))
 
 
-infixDecl_0_16 :: ElmVersion -> IParser AST.Declaration.Declaration
+infixDecl_0_16 :: ElmVersion -> IParser (Declaration [UppercaseIdentifier] e)
 infixDecl_0_16 elmVersion =
   do  assoc <-
           choice
@@ -112,7 +113,7 @@ infixDecl_0_16 elmVersion =
 
 -- PORT
 
-port :: ElmVersion -> IParser AST.Declaration.Declaration
+port :: ElmVersion -> IParser (Declaration [UppercaseIdentifier] Expr)
 port elmVersion =
   expecting "a port declaration" $
   do  try (reserved elmVersion "port")

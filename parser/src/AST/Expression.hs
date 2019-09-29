@@ -1,13 +1,15 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module AST.Expression where
 
 import AST.V0_16
 import Data.Fix
+import ElmFormat.Mapping
 
-import qualified AST.Pattern as Pattern
+import AST.Pattern (Pattern)
 import qualified AST.Variable as Var
 import qualified Data.Map.Strict as Dict
 import qualified Data.Maybe as Maybe
@@ -22,74 +24,84 @@ data UnaryOperator =
     deriving (Eq, Show)
 
 
-data LetDeclaration e
-  = LetDefinition Pattern.Pattern [(Comments, Pattern.Pattern)] Comments e
-  | LetAnnotation (Var.Ref, Comments) (Comments, Type)
+data LetDeclaration ns e
+  = LetDefinition (Pattern ns) [(Comments, (Pattern ns))] Comments e
+  | LetAnnotation (Var.Ref (), Comments) (Comments, Type ns)
   | LetComment Comment
-  deriving (Eq, Show)
+  deriving (Eq, Show, Functor)
 
-
-instance Functor LetDeclaration where
-    fmap f (LetDefinition n args c e) = LetDefinition n args c (f e)
-    fmap _ (LetAnnotation n t) = LetAnnotation n t
-    fmap _ (LetComment c) = LetComment c
+instance MapNamespace a b (LetDeclaration a e) (LetDeclaration b e) where
+    mapNamespace f ld =
+        case ld of
+            LetDefinition first rest comments body -> LetDefinition (fmap (fmap f) first) (fmap (fmap $ fmap $ fmap f) rest) comments body
+            LetAnnotation name typ -> LetAnnotation name (fmap (fmap $ fmap f) typ)
+            LetComment comment -> LetComment comment
 
 
 type Expr =
-    Fix (AnnotatedExpression R.Region)
+    Fix (AnnotatedExpression [UppercaseIdentifier] R.Region)
 
 data IfClause e =
     IfClause (Commented e) (Commented e)
-    deriving (Eq, Show)
-
-instance Functor IfClause where
-    fmap f (IfClause a b) = IfClause (fmap f a) (fmap f b)
+    deriving (Eq, Show, Functor)
 
 
-data BinopsClause e =
-    BinopsClause Comments Var.Ref Comments e
-    deriving (Eq, Show)
+data BinopsClause ns e =
+    BinopsClause Comments (Var.Ref ns) Comments e
+    deriving (Eq, Show, Functor)
 
-instance Functor BinopsClause where
-    fmap f (BinopsClause a b c e) = BinopsClause a b c (f e)
+
+instance MapNamespace a b (BinopsClause a e) (BinopsClause b e) where
+    mapNamespace f (BinopsClause pre op post e) =
+        BinopsClause pre (fmap f op) post e
 
 
 type Expr' =
-    Expression Expr
-
-newtype AnnotatedExpression ann e =
-    AE (A.Annotated ann (Expression e))
-    deriving (Eq, Show)
+    Expression [UppercaseIdentifier] Expr
 
 
-instance Functor (AnnotatedExpression ann) where
-    fmap f (AE e) = AE $ fmap (fmap f) e
+newtype AnnotatedExpression ns ann e =
+    AE (A.Annotated ann (Expression ns e))
+    deriving (Eq, Show, Functor)
 
 
-stripAnnotation :: Fix (AnnotatedExpression ann) -> Fix Expression
+instance MapNamespace a b (AnnotatedExpression a ann e) (AnnotatedExpression b ann e)
+  where
+    mapNamespace f (AE (A.A ann e)) = AE $ A.A ann $ mapNamespace f e
+
+
+instance MapNamespace a b (Fix (AnnotatedExpression a ann)) (Fix (AnnotatedExpression b ann)) where
+    mapNamespace f = cata (Fix . mapNamespace f)
+
+
+stripAnnotation :: Fix (AnnotatedExpression ns ann) -> Fix (Expression ns)
 stripAnnotation (Fix (AE (A.A _ e))) = Fix $ fmap stripAnnotation e
 
 
-dropAnnotation :: Fix (AnnotatedExpression ann) -> Expression (Fix (AnnotatedExpression ann))
+dropAnnotation :: Fix (AnnotatedExpression ns ann) -> Expression ns (Fix (AnnotatedExpression ns ann))
 dropAnnotation (Fix (AE (A.A _ e))) = e
 
 
-mapAnnotation :: (a -> b) -> Fix (AnnotatedExpression a) -> Fix (AnnotatedExpression b)
+mapAnnotation :: (a -> b) -> Fix (AnnotatedExpression ns a) -> Fix (AnnotatedExpression ns b)
 mapAnnotation f (Fix (AE (A.A a e))) = Fix $ AE $ A.A (f a) $ fmap (mapAnnotation f) e
 
 
-addAnnotation :: ann -> Fix Expression -> Fix (AnnotatedExpression ann)
+addAnnotation :: ann -> Fix (Expression ns) -> Fix (AnnotatedExpression ns ann)
 addAnnotation ann (Fix e) = Fix $ AE $ A.A ann $ fmap (addAnnotation ann) e
 
 
-data Expression e
+instance MapNamespace a b (Fix (Expression a)) (Fix (Expression b)) where
+    mapNamespace f = cata (Fix . mapNamespace f)
+
+
+data Expression ns e
     = Unit Comments
     | Literal Literal
-    | VarExpr Var.Ref
+    | VarExpr (Var.Ref ns)
 
     | App e [(Comments, e)] FunctionApplicationMultiline
     | Unary UnaryOperator e
-    | Binops e [BinopsClause e] Bool
+    | Binops e [BinopsClause ns e] Bool
     | Parens (Commented e)
 
     | ExplicitList
@@ -111,42 +123,69 @@ data Expression e
     | Access e LowercaseIdentifier
     | AccessFunction LowercaseIdentifier
 
-    | Lambda [(Comments, Pattern.Pattern)] Comments e Bool
+    | Lambda [(Comments, Pattern ns)] Comments e Bool
     | If (IfClause e) [(Comments, IfClause e)] (Comments, e)
-    | Let [LetDeclaration e] Comments e
-    | Case (Commented e, Bool) [(Commented Pattern.Pattern, (Comments, e))]
+    | Let [LetDeclaration ns e] Comments e
+    | Case (Commented e, Bool) [(Commented (Pattern ns), (Comments, e))]
 
     -- for type checking and code gen only
     | GLShader String
-    deriving (Eq, Show)
+    deriving (Eq, Show, Functor)
 
 
-instance Functor Expression where
-    fmap _ (Unit c) = Unit c
-    fmap _ (Literal l) = Literal l
-    fmap _ (VarExpr v) = VarExpr v
-    fmap f (App e args m) = App (f e) (fmap (fmap f) args) m
-    fmap f (Unary op e) = Unary op (f e)
-    fmap f (Binops e rest b) = Binops (f e) (fmap (fmap f) rest) b
-    fmap f (Parens e) = Parens (fmap f e)
-    fmap f (ExplicitList terms c m) = ExplicitList (fmap (fmap $ fmap $ fmap f) terms) c m
-    fmap f (Range a b m) = Range (fmap f a) (fmap f b) m
-    fmap f (Tuple es m) = Tuple (fmap (fmap f) es) m
-    fmap _ (TupleFunction n) = TupleFunction n
-    fmap f (Record base fields c m) = Record base (fmap (fmap $ fmap $ fmap $ fmap f) fields) c m
-    fmap f (Access e n) = Access (f e) n
-    fmap _ (AccessFunction n) = AccessFunction n
-    fmap f (Lambda args c e m) = Lambda args c (f e) m
-    fmap f (If first rest els) = If (fmap f first) (fmap (fmap $ fmap f) rest) (fmap f els)
-    fmap f (Let defs c e) = Let (fmap (fmap f) defs) c (f e)
-    fmap f (Case (e, m) bs) = Case (fmap f e, m) (fmap (fmap $ fmap f) bs)
-    fmap _ (GLShader s) = GLShader s
+instance MapNamespace a b (Expression a e) (Expression b e) where
+    mapNamespace f expr =
+        case expr of
+            VarExpr var -> VarExpr (fmap f var)
+            Binops left restOps multiline ->
+                Binops left (fmap (mapNamespace f) restOps) multiline
+            Let decls pre body ->
+                Let (fmap (mapNamespace f) decls) pre body
+
+            Unit c ->
+                Unit c
+            AST.Expression.Literal l ->
+                AST.Expression.Literal l
+            App f' args multiline ->
+                App f' args multiline
+            Unary op e ->
+                Unary op e
+            Parens e ->
+                Parens e
+            ExplicitList terms' post multiline ->
+                ExplicitList terms' post multiline
+            Range e1 e2 multiline ->
+                Range e1 e2 multiline
+            AST.Expression.Tuple es multiline ->
+                AST.Expression.Tuple es multiline
+            TupleFunction n ->
+                TupleFunction n
+            AST.Expression.Record b fs post multiline ->
+                AST.Expression.Record b fs post multiline
+            Access e field' ->
+                Access e field'
+            AccessFunction n ->
+                AccessFunction n
+            Lambda params pre body multi ->
+                Lambda (fmap (fmap $ fmap $ fmap f) params) pre body multi
+            If c1 elseIfs els ->
+                If c1 elseIfs els
+            Case (cond, m) branches ->
+                Case (cond, m) (fmap (mapFst $ fmap $ fmap $ fmap f) branches)
+            GLShader s ->
+                GLShader s
+        where
+            mapFst f (a, x) = (f a, x)
 
 
-type UsageCount = Dict.Map [UppercaseIdentifier] (Dict.Map String Int)
+bottomUp :: Functor f => (Fix f -> Fix f) -> Fix f -> Fix f
+bottomUp f = cata (f . Fix)
 
 
-countUsages :: Expression UsageCount -> UsageCount
+type UsageCount ns = Dict.Map ns (Dict.Map String Int)
+
+
+countUsages :: Ord ns => Expression ns (UsageCount ns) -> UsageCount ns
 countUsages e' =
     let
         mergeUsage = Dict.unionsWith (Dict.unionWith (+))

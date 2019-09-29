@@ -1,9 +1,15 @@
 import AliasedInUpgradeDefinition as AIUD
+import AliasedInUpgradeDefinition2 as AIUD2
 import AliasedInSource
 import AliasedDifferently as ADIUD
 
+
 upgrade_A_toAliased =
     AIUD.value
+
+
+upgrade_A_toAliased2 =
+    AIUD2.value
 
 
 upgrade_A_toAliasedInSource =

@@ -12,6 +12,7 @@ import Text.Parsec.Indent (indented, runIndent)
 import AST.V0_16
 import qualified AST.Expression
 import qualified AST.Helpers as Help
+import AST.Variable (Ref)
 import qualified AST.Variable
 import ElmVersion
 import qualified Parse.State as State
@@ -55,7 +56,7 @@ iParseWithState sourceName state aParser input =
 
 -- VARIABLES
 
-var :: ElmVersion -> IParser AST.Variable.Ref
+var :: ElmVersion -> IParser (Ref [UppercaseIdentifier])
 var elmVersion =
   try (qualifiedVar elmVersion) <|> qualifiedTag elmVersion <?> "a name"
 
@@ -70,14 +71,14 @@ capVar elmVersion =
   UppercaseIdentifier <$> makeVar elmVersion upper <?> "an upper case name"
 
 
-qualifiedVar :: ElmVersion -> IParser AST.Variable.Ref
+qualifiedVar :: ElmVersion -> IParser (Ref [UppercaseIdentifier])
 qualifiedVar elmVersion =
     AST.Variable.VarRef
         <$> many (const <$> capVar elmVersion <*> string ".")
         <*> lowVar elmVersion
 
 
-qualifiedTag :: ElmVersion -> IParser AST.Variable.Ref
+qualifiedTag :: ElmVersion -> IParser (Ref [UppercaseIdentifier])
 qualifiedTag elmVersion =
     AST.Variable.TagRef
         <$> many (try $ const <$> capVar elmVersion <*> string ".")
@@ -113,7 +114,7 @@ reserved elmVersion word =
 
 -- INFIX OPERATORS
 
-anyOp :: ElmVersion -> IParser AST.Variable.Ref
+anyOp :: ElmVersion -> IParser (Ref [UppercaseIdentifier])
 anyOp elmVersion =
   (betwixt '`' '`' (qualifiedVar elmVersion) <?> "an infix operator like `andThen`")
   <|> (AST.Variable.OpRef <$> symOp)

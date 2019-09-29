@@ -1,4 +1,4 @@
-module ElmFormat.ImportInfo (ImportInfo(..), fromModule) where
+module ElmFormat.ImportInfo (ImportInfo(..), fromModule, fromImports) where
 
 import AST.V0_16
 import Elm.Utils ((|>))
@@ -8,17 +8,25 @@ import qualified AST.Variable
 import qualified Data.Bimap as Bimap
 import qualified Data.Map.Strict as Dict
 import qualified Data.Maybe as Maybe
+import qualified Data.Set as Set
 
 data ImportInfo =
     ImportInfo
         { _exposed :: Dict.Map LowercaseIdentifier [UppercaseIdentifier]
-        , _aliases :: Bimap.Bimap [UppercaseIdentifier] UppercaseIdentifier
+        , _aliases :: Bimap.Bimap UppercaseIdentifier [UppercaseIdentifier]
+        , _directImports :: Set.Set [UppercaseIdentifier]
+        , _ambiguous :: Dict.Map UppercaseIdentifier [[UppercaseIdentifier]]
         }
     deriving Show
 
 
 fromModule :: AST.Module.Module -> ImportInfo
 fromModule modu =
+    fromImports (fmap snd $ snd $ AST.Module.imports modu)
+
+
+fromImports :: Dict.Map [UppercaseIdentifier] AST.Module.ImportMethod -> ImportInfo
+fromImports imports =
     let
         -- these are things we know will get exposed for certain modules when we see "exposing (..)"
         -- only things that are currently useful for Elm 0.19 upgrade are included
@@ -34,9 +42,9 @@ fromModule modu =
             let
                 importName = (fmap UppercaseIdentifier ["Html", "Attributes"])
             in
-            case Dict.lookup importName (snd $ AST.Module.imports modu) of
+            case Dict.lookup importName imports of
                 Nothing -> mempty
-                Just (_, importMethod) ->
+                Just importMethod ->
                     case AST.Module.exposedVars importMethod of
                         (_, (_, AST.Variable.OpenListing _)) ->
                             -- import Html.Attributes [as ...] exposing (..)
@@ -56,7 +64,7 @@ fromModule modu =
 
         aliases =
             let
-                getAlias (_, importMethod) =
+                getAlias importMethod =
                     case AST.Module.alias importMethod of
                         Just (_, (_, alias)) ->
                             Just alias
@@ -67,10 +75,22 @@ fromModule modu =
                 liftMaybe (_, Nothing) = Nothing
                 liftMaybe (a, Just b) = Just (a, b)
             in
-            snd (AST.Module.imports modu)
-                |> Dict.toList
+            Dict.toList imports
                 |> fmap (fmap getAlias)
                 |> Maybe.mapMaybe liftMaybe
+                |> fmap (\(a, b) -> (b, a))
                 |> Bimap.fromList
+
+        noAlias importMethod =
+            case AST.Module.alias importMethod of
+                Just _ -> False
+                Nothing -> True
+
+        directs =
+            Set.union
+                (Set.singleton [UppercaseIdentifier "Basics"])
+                (Dict.keysSet $ Dict.filter noAlias imports)
+
+        ambiguous = Dict.empty
     in
-    ImportInfo exposed aliases
+    ImportInfo exposed aliases directs ambiguous

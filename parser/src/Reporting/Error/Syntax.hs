@@ -12,7 +12,7 @@ import qualified Reporting.Report as Report
 
 data Error
     = Parse [Parsec.Message]
-    | InfixDuplicate Var.Ref
+    | InfixDuplicate (Var.Ref [UppercaseIdentifier])
     | TypeWithoutDefinition String
     | PortWithoutAnnotation String
     | UnexpectedPort

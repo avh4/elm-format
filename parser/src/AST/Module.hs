@@ -6,6 +6,7 @@ module AST.Module
     ) where
 
 import AST.Declaration (TopLevelStructure, Declaration)
+import AST.Expression (Expr)
 import qualified AST.Variable as Var
 import qualified Cheapskate.Types as Markdown
 import Data.Map.Strict (Map)
@@ -21,7 +22,7 @@ data Module = Module
     , header :: Maybe Header
     , docs :: A.Located (Maybe Markdown.Blocks)
     , imports :: PreCommented (Map [UppercaseIdentifier] (Comments, ImportMethod))
-    , body :: [TopLevelStructure Declaration]
+    , body :: [TopLevelStructure (Declaration [UppercaseIdentifier] Expr)]
     }
     deriving (Eq, Show)
 

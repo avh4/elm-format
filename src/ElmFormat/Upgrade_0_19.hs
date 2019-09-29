@@ -1,24 +1,26 @@
-{-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE FlexibleInstances #-}
-module ElmFormat.Upgrade_0_19 (UpgradeDefinition, transform, parseUpgradeDefinition, transformModule) where
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
+module ElmFormat.Upgrade_0_19 (UpgradeDefinition, transform, parseUpgradeDefinition, transformModule, mergeUpgradeImports, MatchedNamespace(..)) where
 
 import Elm.Utils ((|>))
 
+import AST.Annotated (updateNamespace)
 import AST.V0_16
 import AST.Declaration (Declaration(..), TopLevelStructure(..))
 import AST.Expression
-import AST.MapExpr
-import AST.MapNamespace
-import AST.Module (Module(Module), ImportMethod(ImportMethod))
+import AST.Module (Module(Module), ImportMethod)
 import AST.Pattern
 import AST.Variable
+import Control.Applicative ((<|>))
 import Control.Monad (zipWithM)
 import Data.Fix
 import ElmFormat.ImportInfo (ImportInfo)
+import ElmFormat.Mapping
 import ElmVersion
 import Reporting.Annotation (Annotated(A))
 
-import qualified AST.Module
 import qualified Data.Bimap as Bimap
 import qualified Data.List as List
 import qualified Data.Map.Strict as Dict
@@ -31,7 +33,6 @@ import qualified ElmFormat.Version
 import qualified Reporting.Annotation as RA
 import qualified Reporting.Region as Region
 import qualified Reporting.Result as Result
-import qualified ReversedList
 
 
 elm0_19upgrade :: Text.Text
@@ -52,9 +53,8 @@ elm0_19upgrade = Text.pack $ unlines
 
 data UpgradeDefinition =
     UpgradeDefinition
-        { _replacements :: Dict.Map ([UppercaseIdentifier], String) (Fix Expression)
+        { _replacements :: Dict.Map ([UppercaseIdentifier], String) (Fix (Expression (MatchedNamespace [UppercaseIdentifier])))
         , _imports :: Dict.Map [UppercaseIdentifier] (Comments, ImportMethod)
-        , _preferredAliases :: [(UppercaseIdentifier, [UppercaseIdentifier])]
         }
     deriving Show
 
@@ -90,36 +90,14 @@ parseUpgradeDefinition definitionText =
 
                         _ ->
                             Nothing
-
-                applyAliases ns =
-                    Maybe.fromMaybe ns $
-                    case ns of
-                        [single] -> Bimap.lookupR single (ImportInfo._aliases importInfo)
-                        _ -> Nothing
-
-                removeAlias :: ImportMethod -> ImportMethod
-                removeAlias i =
-                    i { AST.Module.alias = Nothing }
             in
             Right $ UpgradeDefinition
-                { _replacements = fmap (mapNamespace applyAliases) $ Dict.fromList $ Maybe.mapMaybe toUpgradeDef body
-                , _imports = fmap (fmap removeAlias) imports
-                , _preferredAliases = getAliases imports
+                { _replacements = fmap (mapNamespace $ matchReferences (Bimap.toMap $ ImportInfo._aliases importInfo) (ImportInfo._directImports importInfo)) $ Dict.fromList $ Maybe.mapMaybe toUpgradeDef body
+                , _imports = imports
                 }
 
         Result.Result _ (Result.Err _) ->
             Left ()
-
-
-getAliases :: Dict.Map b (a, ImportMethod) -> [(UppercaseIdentifier, b)]
-getAliases imports =
-    let
-        getAlias (ns, (_, ImportMethod alias _)) =
-            case alias of
-                Nothing -> Nothing
-                Just (_, (_, a)) -> Just (a, ns)
-    in
-    Maybe.mapMaybe getAlias $ Dict.toList imports
 
 
 splitOn :: Eq a => a -> [a] -> [[a]]
@@ -133,18 +111,21 @@ splitOn c s =
                     break ((==) c) s'
 
 
-transform :: ImportInfo -> Fix Expression -> Fix Expression
+transform :: ImportInfo -> Fix (Expression [UppercaseIdentifier]) -> Fix (Expression [UppercaseIdentifier])
 transform importInfo =
     case parseUpgradeDefinition elm0_19upgrade of
         Right replacements ->
-            transform' replacements importInfo
+            mapNamespace (applyReferences (Bimap.toMapR $ ImportInfo._aliases importInfo))
+                . transform' replacements importInfo
+                . mapNamespace (matchReferences (Bimap.toMap $ ImportInfo._aliases importInfo) (ImportInfo._directImports importInfo))
+
 
         Left () ->
             error "Couldn't parse upgrade definition"
 
 
 transformModule :: UpgradeDefinition -> Module -> Module
-transformModule upgradeDefinition modu@(Module a b c (preImports, originalImports) originalBody) =
+transformModule upgradeDefinition modu@(Module a b c (preImports, originalImports) originalBody') =
     let
         importInfo =
             -- Note: this is the info used for matching references in the
@@ -159,8 +140,6 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
 
                 _ -> structure
 
-        upgradedBody = fmap transformTopLevelStructure originalBody
-
         expressionFromTopLevelStructure structure =
             case structure of
                 Entry (A _ (Definition _ _ _ expr)) -> Just expr
@@ -169,68 +148,99 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
         namespacesWithReplacements =
               Set.fromList $ fmap fst $ Dict.keys $ _replacements upgradeDefinition
 
-        remainingUsages body ns =
+        usages body =
             let
                 collectExprs = Maybe.mapMaybe expressionFromTopLevelStructure body
 
-                usages =
+                usages' =
                     Dict.unionsWith (Dict.unionWith (+)) $
                     fmap (cata countUsages . stripAnnotation) collectExprs
             in
-            Dict.foldr (+) 0 $ Maybe.fromMaybe Dict.empty $ Dict.lookup ns usages
+            fmap (Dict.foldr (+) 0) usages'
 
-        cleanImports (imports, body) =
-            ( Dict.filterWithKey (cleanImport body) imports
-            , body
-            )
+        originalBody =
+            originalBody'
+                |> fmap (updateNamespace (matchReferences (Bimap.toMap $ ImportInfo._aliases importInfo) (ImportInfo._directImports importInfo)))
 
-        cleanImport body ns (_, importMethod) =
-            let
-                nameToCheck =
-                    case importMethod of
-                        ImportMethod (Just (_, (_, alias))) _ -> [alias]
-                        _ -> ns
-                wasReplaced = Set.member ns namespacesWithReplacements
-            in
-            if wasReplaced && remainingUsages body nameToCheck <= 0
-                then False
-                else True
+        finalBody =
+            fmap transformTopLevelStructure originalBody
 
-        startingImports =
-            Dict.union
+        finalImports =
+            mergeUpgradeImports
                 originalImports
-                (Dict.filterWithKey (\k _ -> remainingUsages upgradedBody k > 0)
-                    $ fmap (fmap (\(ImportMethod _ e) -> ImportMethod Nothing e))
-                    $ _imports upgradeDefinition
-                )
+                (_imports upgradeDefinition)
+                namespacesWithReplacements
+                (usages finalBody)
 
-        tryAlias (imports, body) (alias, ns) =
-            -- if alias is already used for something else, do nothing (or maybe should try a new name?)
-            if Maybe.fromMaybe False $ fmap ((/=) ns) $ Dict.lookup alias $ Dict.fromList $ getAliases imports
-                then (imports, body)
-
-            -- if ns is already aliased to something else, then skip
-            else if Maybe.fromMaybe False $ fmap ((/=) alias) $ fmap (snd . snd) $ (fmap snd $ Dict.lookup ns imports) >>= AST.Module.alias
-                then (imports, body)
-
-            -- if ns isn't referenced, then skip
-            else if remainingUsages body ns <= 0
-                then (imports, body)
-
-            -- apply it
-            else
-                ( Dict.update (\(pre, im) -> Just $ (pre, im { AST.Module.alias = Just ([], ([], alias)) }) ) ns imports
-                , mapNamespace (\n -> if n == ns then [alias] else n) body
-                )
-
-        tryAliases =
-            flip (List.foldl' tryAlias)
-
+        finalImportInfo =
+            ImportInfo.fromImports $ fmap snd finalImports
     in
-    (startingImports, upgradedBody)
-        |> cleanImports
-        |> tryAliases (getAliases originalImports ++ _preferredAliases upgradeDefinition)
-        |> (\(i, bo) -> Module a b c (preImports, i) bo)
+    finalBody
+        |> fmap (updateNamespace (applyReferences (Bimap.toMapR $ ImportInfo._aliases finalImportInfo)))
+        |> Module a b c (preImports, finalImports)
+
+
+mergeUpgradeImports ::
+    Dict.Map [UppercaseIdentifier] (Comments, ImportMethod)
+    -> Dict.Map [UppercaseIdentifier] (Comments, ImportMethod)
+    -> Set.Set [UppercaseIdentifier]
+    -> Dict.Map (MatchedNamespace [UppercaseIdentifier]) Int
+    -> Dict.Map [UppercaseIdentifier] (Comments, ImportMethod)
+mergeUpgradeImports originalImports upgradeImports upgradesAttempted usagesAfter =
+    let
+        -- uBefore ns = Maybe.fromMaybe 0 $ Dict.lookup (MatchedImport ns) usagesBefore
+        uAfter ns = Maybe.fromMaybe 0 $ Dict.lookup (MatchedImport ns) usagesAfter
+    in
+    Dict.union
+        (Dict.filterWithKey (\k _ -> uAfter k > 0 || not (Set.member k upgradesAttempted)) originalImports)
+        (Dict.filterWithKey (\k _ -> uAfter k > 0) upgradeImports)
+
+
+data MatchedNamespace t
+    = NoNamespace
+    | MatchedImport t
+    | Unmatched t
+    deriving (Eq, Ord, Show)
+
+
+matchReferences ::
+    Ord t =>
+    Dict.Map t [t]
+    -> Set.Set [t]
+    -> [t]
+    -> MatchedNamespace [t]
+matchReferences aliases imports ns =
+    case ns of
+        [] -> NoNamespace
+        _ ->
+            let
+                self =
+                    if Set.member ns imports then
+                        Just ns
+                    else
+                        Nothing
+
+                fromAlias =
+                    case ns of
+                        [single] ->
+                            Dict.lookup single aliases
+                        _ ->
+                            Nothing
+
+                resolved =
+                    fromAlias <|> self
+            in
+            case resolved of
+                Nothing -> Unmatched ns
+                Just single -> MatchedImport single
+
+
+applyReferences :: Ord t => Dict.Map [t] t -> MatchedNamespace [t] -> [t]
+applyReferences aliases ns' =
+    case ns' of
+        NoNamespace -> []
+        MatchedImport ns -> Maybe.fromMaybe ns $ fmap pure $ Dict.lookup ns aliases
+        Unmatched name -> name
 
 
 data Source
@@ -239,50 +249,34 @@ data Source
 
 
 {- An expression annotated with a Source -- this type is used throughout the upgrade transformation. -}
-type UExpr = Fix (AnnotatedExpression Source)
+type UExpr = Fix (AnnotatedExpression (MatchedNamespace [UppercaseIdentifier]) Source)
 
 
 transform' ::
     UpgradeDefinition
     -> ImportInfo
-    -> Fix Expression -> Fix Expression
+    -> Fix (Expression (MatchedNamespace [UppercaseIdentifier])) -> Fix (Expression (MatchedNamespace [UppercaseIdentifier]))
 transform' upgradeDefinition importInfo =
-    stripAnnotation . mapExpr (simplify . applyUpgrades upgradeDefinition importInfo) . addAnnotation FromSource
+    stripAnnotation . bottomUp (simplify . applyUpgrades upgradeDefinition importInfo) . addAnnotation FromSource
 
 
 applyUpgrades :: UpgradeDefinition -> ImportInfo -> UExpr -> UExpr
 applyUpgrades upgradeDefinition importInfo expr =
     let
         exposed = ImportInfo._exposed importInfo
-        importAliases = ImportInfo._aliases importInfo
-
         replacements = _replacements upgradeDefinition
 
-        replace :: AST.Variable.Ref -> Maybe (Fix Expression)
+        replace :: Ref (MatchedNamespace [UppercaseIdentifier]) -> Maybe (Fix (Expression (MatchedNamespace [UppercaseIdentifier])))
         replace var =
             case var of
-                VarRef [] (LowercaseIdentifier name) ->
+                VarRef NoNamespace (LowercaseIdentifier name) ->
                     Dict.lookup ([UppercaseIdentifier "Basics"], name) replacements
 
-                VarRef ns (LowercaseIdentifier name) ->
-                    let
-                        resolvedNs =
-                            Maybe.fromMaybe ns $
-                            case ns of
-                                [single] -> Bimap.lookupR single importAliases
-                                _ -> Nothing
-                    in
-                    Dict.lookup (resolvedNs, name) replacements
+                VarRef (MatchedImport ns) (LowercaseIdentifier name) ->
+                    Dict.lookup (ns, name) replacements
 
-                TagRef ns (UppercaseIdentifier name) ->
-                    let
-                        resolvedNs =
-                            Maybe.fromMaybe ns $
-                            case ns of
-                                [single] -> Bimap.lookupR single importAliases
-                                _ -> Nothing
-                    in
-                    Dict.lookup (resolvedNs, name) replacements
+                TagRef (MatchedImport ns) (UppercaseIdentifier name) ->
+                    Dict.lookup (ns, name) replacements
 
                 OpRef (SymbolIdentifier "!") ->
                     Just $ Fix $
@@ -310,7 +304,7 @@ applyUpgrades upgradeDefinition importInfo expr =
 
                 _ -> Nothing
 
-        makeTuple :: Int -> Fix Expression
+        makeTuple :: Int -> Fix (Expression (MatchedNamespace ns))
         makeTuple n =
             let
                 vars =
@@ -335,9 +329,8 @@ applyUpgrades upgradeDefinition importInfo expr =
             let
                 ha = (fmap UppercaseIdentifier ["Html", "Attributes"])
                 styleExposed = Dict.lookup (LowercaseIdentifier "style") exposed == Just ha
-                haAlias = Bimap.lookup ha importAliases
             in
-            Fix $ AE $ A ann $ ExplicitList (concat $ fmap (expandHtmlStyle styleExposed haAlias) $ terms') trailing multiline
+            Fix $ AE $ A ann $ ExplicitList (concat $ fmap (expandHtmlStyle styleExposed) $ terms') trailing multiline
 
         _ ->
             expr
@@ -346,7 +339,8 @@ applyUpgrades upgradeDefinition importInfo expr =
 simplify :: UExpr -> UExpr
 simplify expr =
     let
-        isElmFixRemove (_, (_, WithEol (Fix (AE (A FromUpgradeDefinition (VarExpr (VarRef [UppercaseIdentifier "ElmFix"] (LowercaseIdentifier "remove")))))) _))= True
+        isElmFixRemove (_, (_, WithEol (Fix (AE (A FromUpgradeDefinition (VarExpr (VarRef (MatchedImport [UppercaseIdentifier "ElmFix"]) (LowercaseIdentifier "remove")))))) _))= True
+        isElmFixRemove (_, (_, WithEol (Fix (AE (A FromUpgradeDefinition (VarExpr (VarRef (Unmatched [UppercaseIdentifier "ElmFix"]) (LowercaseIdentifier "remove")))))) _))= True
         isElmFixRemove _ = False
     in
     case unFix expr of
@@ -395,8 +389,8 @@ simplify expr =
             expr
 
 
-expandHtmlStyle :: Bool -> Maybe UppercaseIdentifier -> (Comments, PreCommented (WithEol UExpr)) -> [(Comments, PreCommented (WithEol UExpr))]
-expandHtmlStyle styleExposed importAlias (preComma, (pre, WithEol term eol)) =
+expandHtmlStyle :: Bool -> (Comments, PreCommented (WithEol UExpr)) -> [(Comments, PreCommented (WithEol UExpr))]
+expandHtmlStyle styleExposed (preComma, (pre, WithEol term eol)) =
     let
         lambda fRef =
             addAnnotation FromUpgradeDefinition $ Fix $
@@ -413,9 +407,8 @@ expandHtmlStyle styleExposed importAlias (preComma, (pre, WithEol term eol)) =
 
         isHtmlAttributesStyle var =
             case var of
-                VarRef [UppercaseIdentifier "Html", UppercaseIdentifier "Attributes"] (LowercaseIdentifier "style") -> True
-                VarRef [alias] (LowercaseIdentifier "style") | Just alias == importAlias -> True
-                VarRef [] (LowercaseIdentifier "style") -> styleExposed
+                VarRef (MatchedImport [UppercaseIdentifier "Html", UppercaseIdentifier "Attributes"]) (LowercaseIdentifier "style") -> True
+                VarRef NoNamespace (LowercaseIdentifier "style") -> styleExposed
                 _ -> False
     in
     case dropAnnotation term of
@@ -461,37 +454,38 @@ noRegion =
     RA.at nowhere nowhere
 
 
-makeArg :: String -> (Comments, Pattern)
+makeArg :: String -> (Comments, Pattern ns)
 makeArg varName =
     ([], noRegion $ VarPattern $ LowercaseIdentifier varName)
 
 
-makeArg' :: String -> Commented Pattern
+makeArg' :: String -> Commented (Pattern ns)
 makeArg' varName =
     Commented [] (noRegion $ VarPattern $ LowercaseIdentifier varName) []
 
 
-makeVarRef :: String -> Fix Expression
+makeVarRef :: String -> Fix (Expression (MatchedNamespace any))
 makeVarRef varName =
-    Fix $ VarExpr $ VarRef [] $ LowercaseIdentifier varName
+    Fix $ VarExpr $ VarRef NoNamespace $ LowercaseIdentifier varName
 
 
 applyMappings :: Bool -> Dict.Map LowercaseIdentifier UExpr -> UExpr -> UExpr
 applyMappings insertMultiline mappings =
-    mapExpr simplify
+    bottomUp simplify
         . mapAnnotation snd
-        . mapExpr (inlineVars insertMultiline mappings)
+        . bottomUp (inlineVars ((==) NoNamespace) insertMultiline mappings)
         . mapAnnotation ((,) False)
 
 
 inlineVars ::
-    Bool
-    -> Dict.Map LowercaseIdentifier (Fix (AnnotatedExpression ann))
-    -> Fix (AnnotatedExpression (Bool, ann))
-    -> Fix (AnnotatedExpression (Bool, ann))
-inlineVars insertMultiline mappings expr =
+    (ns -> Bool)
+    -> Bool
+    -> Dict.Map LowercaseIdentifier (Fix (AnnotatedExpression ns ann))
+    -> Fix (AnnotatedExpression ns (Bool, ann))
+    -> Fix (AnnotatedExpression ns (Bool, ann))
+inlineVars isLocal insertMultiline mappings expr =
     case unFix expr of
-        AE (A _ (VarExpr (VarRef [] n))) ->
+        AE (A _ (VarExpr (VarRef ns n))) | isLocal ns->
             case Dict.lookup n mappings of
                 Just (Fix (AE (A ann e))) ->
                     Fix $ AE $ A (insertMultiline, ann) $
@@ -512,7 +506,7 @@ inlineVars insertMultiline mappings expr =
         _ -> expr
 
 
-destructureFirstMatch :: PreCommented UExpr -> [ (PreCommented Pattern, UExpr) ] -> UExpr -> UExpr
+destructureFirstMatch :: PreCommented UExpr -> [ (PreCommented (Pattern (MatchedNamespace [UppercaseIdentifier])), UExpr) ] -> UExpr -> UExpr
 destructureFirstMatch _ [] fallback = fallback
 destructureFirstMatch value ((pat, body):rest) fallback =
     case destructure pat value of
@@ -529,8 +523,14 @@ withComments pre e post = Fix $ AE $ A FromUpgradeDefinition $ Parens $ Commente
 
 
 {-| Returns `Nothing` if the pattern doesn't match, or `Just` with a list of bound variables if the pattern does match. -}
-destructure :: PreCommented Pattern -> PreCommented UExpr -> Maybe (Dict.Map LowercaseIdentifier UExpr)
+destructure :: PreCommented (Pattern (MatchedNamespace [UppercaseIdentifier])) -> PreCommented UExpr -> Maybe (Dict.Map LowercaseIdentifier UExpr)
 destructure pat arg =
+    let
+        namespaceMatch nsd ns =
+            case (nsd, ns) of
+                (Unmatched nsd', MatchedImport ns') -> nsd' == ns'
+                _ -> nsd == ns
+    in
     case (pat, fmap dropAnnotation arg) of
         -- Parens in expression
         ( _
@@ -562,17 +562,17 @@ destructure pat arg =
             Just Dict.empty
 
         -- Custom type variants with no arguments
-        ( (preVar, A _ (Data name []))
+        ( (preVar, A _ (Data nsd name []))
           , (preArg, VarExpr (TagRef ns tag))
           )
-          | name == (ns ++ [tag])
+          | name == tag && namespaceMatch nsd ns
           ->
             Just Dict.empty
 
-        ( (preVar, A _ (Data name argVars))
+        ( (preVar, A _ (Data nsd name argVars))
           , (preArg, App (Fix (AE (A _ (VarExpr (TagRef ns tag))))) argValues _)
           )
-          | name == (ns ++ [tag])
+          | name == tag && namespaceMatch nsd ns
           ->
             Dict.unions <$> zipWithM destructure argVars argValues
 

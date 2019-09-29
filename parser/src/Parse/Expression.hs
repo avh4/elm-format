@@ -17,6 +17,7 @@ import Parse.Whitespace
 
 import AST.V0_16
 import qualified AST.Expression as E
+import AST.Pattern (Pattern)
 import qualified AST.Pattern as P
 import qualified AST.Variable as Var
 import ElmVersion
@@ -282,19 +283,19 @@ letExpr elmVersion =
 
 -- TYPE ANNOTATION
 
-typeAnnotation :: ElmVersion -> ((Var.Ref, Comments) -> (Comments, Type) -> a) -> IParser a
+typeAnnotation :: ElmVersion -> ((Var.Ref (), Comments) -> (Comments, Type [UppercaseIdentifier]) -> a) -> IParser a
 typeAnnotation elmVersion fn =
     (\(v, pre, post) e -> fn (v, pre) (post, e)) <$> try start <*> Type.expr elmVersion
   where
     start =
-      do  v <- (Var.VarRef [] <$> lowVar elmVersion) <|> (Var.OpRef <$> symOpInParens)
+      do  v <- (Var.VarRef () <$> lowVar elmVersion) <|> (Var.OpRef <$> symOpInParens)
           (preColon, _, postColon) <- padded hasType
           return (v, preColon, postColon)
 
 
 -- DEFINITION
 
-definition :: ElmVersion -> (P.Pattern -> [(Comments, P.Pattern)] -> Comments -> E.Expr -> a) -> IParser a
+definition :: ElmVersion -> (Pattern [UppercaseIdentifier] -> [(Comments, Pattern [UppercaseIdentifier])] -> Comments -> E.Expr -> a) -> IParser a
 definition elmVersion fn =
   withPos $
     do
@@ -304,7 +305,7 @@ definition elmVersion fn =
         return $ fn name args (preEqualsComments ++ postEqualsComments) body
 
 
-defStart :: ElmVersion -> IParser (P.Pattern, [(Comments, P.Pattern)])
+defStart :: ElmVersion -> IParser (Pattern [UppercaseIdentifier], [(Comments, Pattern [UppercaseIdentifier])])
 defStart elmVersion =
     choice
       [ do  pattern <- try $ Pattern.term elmVersion

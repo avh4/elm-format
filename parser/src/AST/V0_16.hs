@@ -42,12 +42,7 @@ type Comments = [Comment]
 
 data Commented a =
     Commented Comments a Comments
-    deriving (Eq, Ord, Show)
-
-
-instance Functor Commented where
-  fmap f (Commented pre a post) =
-    Commented pre (f a) post
+    deriving (Eq, Ord, Show, Functor)
 
 
 data KeywordCommented a =
@@ -62,11 +57,7 @@ type PostCommented a = (a, Comments)
 
 
 data WithEol a = WithEol a (Maybe String)
-    deriving (Eq, Show)
-
-
-instance Functor WithEol where
-    fmap f (WithEol a eol) = WithEol (f a) eol
+    deriving (Eq, Show, Functor)
 
 
 {-| This represents a list of things separated by comments.
@@ -124,12 +115,7 @@ TODO: this should be replaced with (Sequence a)
 -}
 data OpenCommentedList a
     = OpenCommentedList [Commented (WithEol a)] (PreCommented (WithEol a))
-    deriving (Eq, Show)
-
-
-instance Functor OpenCommentedList where
-    fmap f (OpenCommentedList rest (pre, last)) =
-        OpenCommentedList (fmap (fmap $ fmap f) rest) (pre, fmap f last)
+    deriving (Eq, Show, Functor)
 
 
 exposedToOpen :: Comments -> ExposedCommentedList a -> OpenCommentedList a
@@ -157,12 +143,7 @@ data Pair key value =
         , _value :: PreCommented value
         , forceMultiline :: ForceMultiline
         }
-    deriving (Show, Eq)
-
-
-instance Functor (Pair key) where
-    fmap f (Pair key (pre, value) forceMultiline) =
-        Pair key (pre, f value) forceMultiline
+    deriving (Show, Eq, Functor)
 
 
 data Multiline
@@ -203,31 +184,31 @@ data Literal
     deriving (Eq, Show)
 
 
-data TypeConstructor
-    = NamedConstructor [UppercaseIdentifier] UppercaseIdentifier
+data TypeConstructor ns
+    = NamedConstructor ns UppercaseIdentifier
     | TupleConstructor Int -- will be 2 or greater, indicating the number of elements in the tuple
-    deriving (Eq, Show)
+    deriving (Eq, Show, Functor)
 
 
-data Type'
+data Type' ns
     = UnitType Comments
     | TypeVariable LowercaseIdentifier
-    | TypeConstruction TypeConstructor [(Comments, Type)]
-    | TypeParens (Commented Type)
-    | TupleType [Commented (WithEol Type)]
+    | TypeConstruction (TypeConstructor ns) [(Comments, Type ns)]
+    | TypeParens (Commented (Type ns))
+    | TupleType [Commented (WithEol (Type ns))]
     | RecordType
         { base :: Maybe (Commented LowercaseIdentifier)
-        , fields :: Sequence (Pair LowercaseIdentifier Type)
+        , fields :: Sequence (Pair LowercaseIdentifier (Type ns))
         , trailingComments :: Comments
         , forceMultiline :: ForceMultiline
         }
     | FunctionType
-        { first :: WithEol Type
-        , rest :: [(Comments, Comments, Type, Maybe String)]
+        { first :: WithEol (Type ns)
+        , rest :: [(Comments, Comments, Type ns, Maybe String)]
         , forceMultiline :: ForceMultiline
         }
-    deriving (Eq, Show)
+    deriving (Eq, Show, Functor)
 
 
-type Type =
-    A.Located Type'
+type Type ns =
+    A.Located (Type' ns)

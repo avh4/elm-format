@@ -4,11 +4,11 @@ import AST.V0_16
 import Data.Map.Strict
 
 
-data Ref
-    = VarRef [UppercaseIdentifier] LowercaseIdentifier
-    | TagRef [UppercaseIdentifier] UppercaseIdentifier
+data Ref ns
+    = VarRef ns LowercaseIdentifier
+    | TagRef ns UppercaseIdentifier
     | OpRef SymbolIdentifier
-    deriving (Eq, Ord, Show)
+    deriving (Eq, Ord, Show, Functor)
 
 
 -- LISTINGS

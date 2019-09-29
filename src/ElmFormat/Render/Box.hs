@@ -6,13 +6,15 @@ import Box
 import ElmVersion (ElmVersion(..))
 
 import qualified AST.V0_16 as AST
-import AST.V0_16 (UppercaseIdentifier(..), LowercaseIdentifier(..), SymbolIdentifier(..), WithEol)
+import AST.V0_16 (UppercaseIdentifier(..), LowercaseIdentifier(..), SymbolIdentifier(..), WithEol, Comments, Comment)
 import AST.Declaration (TopLevelStructure, Declaration)
 import qualified AST.Declaration
-import AST.Expression (Expression)
+import AST.Expression (Expr, Expression)
 import qualified AST.Expression
 import qualified AST.Module
+import AST.Pattern (Pattern)
 import qualified AST.Pattern
+import AST.Variable (Ref)
 import qualified AST.Variable
 import qualified Cheapskate.Types as Markdown
 import qualified Control.Monad as Monad
@@ -80,7 +82,7 @@ parens :: Box -> Box
 parens = surround '(' ')'
 
 
-formatBinary :: Bool -> Box -> [ ( Bool, AST.Comments, Box, Box ) ] -> Box
+formatBinary :: Bool -> Box -> [ ( Bool, Comments, Box, Box ) ] -> Box
 formatBinary multiline left ops =
     case ops of
         [] ->
@@ -126,7 +128,7 @@ data DeclarationType
   = DComment
   | DStarter
   | DCloser
-  | DDefinition (Maybe AST.Variable.Ref)
+  | DDefinition (Maybe (AST.Variable.Ref ()))
   | DFixity
   | DDocComment
   deriving (Show)
@@ -171,7 +173,7 @@ removeDuplicates input =
                 else (ReversedList.push next acc, Set.insert next seen)
 
 
-sortVars :: Bool -> Set (AST.Commented AST.Variable.Value) -> [[String]] -> ([[AST.Commented AST.Variable.Value]], AST.Comments)
+sortVars :: Bool -> Set (AST.Commented AST.Variable.Value) -> [[String]] -> ([[AST.Commented AST.Variable.Value]], Comments)
 sortVars forceMultiline fromExposing fromDocs =
     let
         varOrder :: AST.Commented AST.Variable.Value -> (Int, String)
@@ -257,7 +259,7 @@ formatModuleHeader elmVersion addDefaultHeader modu =
                   fmap (fmap (refName . textToRef)) vars
               _ -> []
 
-      textToRef :: Text -> AST.Variable.Ref
+      textToRef :: Text -> Ref [UppercaseIdentifier]
       textToRef text =
           case Text.unpack text of
               s@(c:_) | Char.isUpper c -> AST.Variable.TagRef [] (UppercaseIdentifier s)
@@ -308,7 +310,7 @@ formatModuleHeader elmVersion addDefaultHeader modu =
               varsToExpose
               documentedVars
 
-      extractVarName :: TopLevelStructure Declaration -> [AST.Variable.Value]
+      extractVarName :: TopLevelStructure (Declaration ns e) -> [AST.Variable.Value]
       extractVarName decl =
           case decl of
               AST.Declaration.DocComment _ -> []
@@ -429,12 +431,12 @@ formatModuleLine_0_16 header =
 
 formatModuleLine ::
     ElmVersion
-    -> ([[AST.Commented AST.Variable.Value]], AST.Comments)
+    -> ([[AST.Commented AST.Variable.Value]], Comments)
     -> AST.Module.SourceTag
     -> AST.Commented [UppercaseIdentifier]
     -> Maybe (AST.KeywordCommented AST.Module.SourceSettings)
-    -> AST.Comments
-    -> AST.Comments
+    -> Comments
+    -> Comments
     -> Box
 formatModuleLine elmVersion (varsToExpose, extraComments) srcTag name moduleSettings preExposing postExposing =
   let
@@ -531,7 +533,7 @@ formatModule elmVersion addDefaultHeader spacing modu =
               ]
 
 
-formatModuleBody :: Int -> ElmVersion -> ImportInfo -> [TopLevelStructure Declaration] -> Maybe Box
+formatModuleBody :: Int -> ElmVersion -> ImportInfo -> [TopLevelStructure (Declaration [UppercaseIdentifier] Expr)] -> Maybe Box
 formatModuleBody linesBetween elmVersion importInfo body =
     let
         entryType adecl =
@@ -539,7 +541,7 @@ formatModuleBody linesBetween elmVersion importInfo body =
                 AST.Declaration.Definition pat _ _ _ ->
                     case RA.drop pat of
                         AST.Pattern.VarPattern name ->
-                            BodyNamed $ AST.Variable.VarRef [] name
+                            BodyNamed $ AST.Variable.VarRef () name
 
                         AST.Pattern.OpPattern name ->
                             BodyNamed $ AST.Variable.OpRef name
@@ -548,19 +550,19 @@ formatModuleBody linesBetween elmVersion importInfo body =
                             BodyUnnamed
 
                 AST.Declaration.Datatype (AST.Commented _ (name, _) _) _ ->
-                    BodyNamed $ AST.Variable.TagRef [] name
+                    BodyNamed $ AST.Variable.TagRef () name
 
                 AST.Declaration.TypeAlias _ (AST.Commented _ (name, _) _) _ ->
-                    BodyNamed $ AST.Variable.TagRef [] name
+                    BodyNamed $ AST.Variable.TagRef () name
 
                 AST.Declaration.PortDefinition (AST.Commented _ name _) _ _ ->
-                    BodyNamed $ AST.Variable.VarRef [] name
+                    BodyNamed $ AST.Variable.VarRef () name
 
                 AST.Declaration.TypeAnnotation (name, _) _ ->
                     BodyNamed name
 
                 AST.Declaration.PortAnnotation (AST.Commented _ name _) _ _ ->
-                    BodyNamed $ AST.Variable.VarRef [] name
+                    BodyNamed $ AST.Variable.VarRef () name
 
                 AST.Declaration.Fixity _ _ _ _ _ ->
                     BodyFixity
@@ -572,7 +574,7 @@ formatModuleBody linesBetween elmVersion importInfo body =
 
 
 data BodyEntryType
-    = BodyNamed AST.Variable.Ref
+    = BodyNamed (AST.Variable.Ref ())
     | BodyUnnamed
     | BodyFixity
 
@@ -624,8 +626,8 @@ formatTopLevelBody linesBetween elmVersion importInfo entryType formatEntry body
 
 
 data ElmCodeBlock
-    = DeclarationsCode [TopLevelStructure Declaration]
-    | ExpressionsCode [TopLevelStructure (WithEol AST.Expression.Expr)]
+    = DeclarationsCode [TopLevelStructure (Declaration [UppercaseIdentifier] Expr)]
+    | ExpressionsCode [TopLevelStructure (WithEol Expr)]
     | ModuleCode AST.Module.Module
     deriving (Show)
 
@@ -727,7 +729,7 @@ formatImport elmVersion (name, method) =
             "exposing"
             (exposingPreKeyword, exposingPostKeywordAndListing)
 
-        formatImportClause :: (a -> Maybe Box) -> String -> (AST.Comments, (AST.Comments, a)) -> Maybe Box
+        formatImportClause :: (a -> Maybe Box) -> String -> (Comments, (AST.Comments, a)) -> Maybe Box
         formatImportClause format keyw input =
           case
             fmap (fmap format) $ input
@@ -966,7 +968,7 @@ formatTopLevelStructure elmVersion importInfo formatEntry topLevelStructure =
             formatEntry (RA.drop entry)
 
 
-formatDeclaration :: ElmVersion -> ImportInfo -> Declaration -> Box
+formatDeclaration :: ElmVersion -> ImportInfo -> Declaration [UppercaseIdentifier] Expr -> Box
 formatDeclaration elmVersion importInfo decl =
     case decl of
         AST.Declaration.Definition name args comments expr ->
@@ -1076,7 +1078,7 @@ formatDeclaration elmVersion importInfo decl =
                 ]
 
 
-formatNameWithArgs :: ElmVersion -> (AST.UppercaseIdentifier, [(AST.Comments, AST.LowercaseIdentifier)]) -> Box
+formatNameWithArgs :: ElmVersion -> (AST.UppercaseIdentifier, [(Comments, AST.LowercaseIdentifier)]) -> Box
 formatNameWithArgs elmVersion (name, args) =
   case allSingles $ map (formatHeadCommented (line . formatLowercaseIdentifier elmVersion [])) args of
     Right args' ->
@@ -1089,10 +1091,10 @@ formatNameWithArgs elmVersion (name, args) =
 
 formatDefinition :: ElmVersion
     -> ImportInfo
-    -> AST.Pattern.Pattern
-    -> [(AST.Comments, AST.Pattern.Pattern)]
-    -> [AST.Comment]
-    -> Fix Expression
+    -> Pattern [UppercaseIdentifier]
+    -> [(Comments, Pattern [UppercaseIdentifier])]
+    -> Comments
+    -> Fix (Expression [UppercaseIdentifier])
     -> Box
 formatDefinition elmVersion importInfo name args comments expr =
   let
@@ -1108,15 +1110,15 @@ formatDefinition elmVersion importInfo name args comments expr =
       body
 
 
-formatTypeAnnotation :: ElmVersion -> (AST.Variable.Ref, AST.Comments) -> (AST.Comments, AST.Type) -> Box
+formatTypeAnnotation :: ElmVersion -> (Ref (), Comments) -> (Comments, AST.Type [UppercaseIdentifier]) -> Box
 formatTypeAnnotation elmVersion name typ =
   ElmStructure.definition ":" False
-    (formatTailCommented (line . formatVar elmVersion) name)
+    (formatTailCommented (line . formatVar elmVersion . fmap (\() -> [])) name)
     []
     (formatHeadCommented (formatType elmVersion) typ)
 
 
-formatPattern :: ElmVersion -> Bool -> AST.Pattern.Pattern -> Box
+formatPattern :: ElmVersion -> Bool -> Pattern [UppercaseIdentifier] -> Box
 formatPattern elmVersion parensRequired apattern =
     case RA.drop apattern of
         AST.Pattern.Anything ->
@@ -1150,7 +1152,10 @@ formatPattern elmVersion parensRequired apattern =
                     (map formatRight rest)
                 |> if parensRequired then parens else id
 
-        AST.Pattern.Data ctor [] ->
+        AST.Pattern.Data ns tag [] ->
+            let
+                ctor = ns ++ [tag]
+            in
             line (formatQualifiedUppercaseIdentifier elmVersion ctor)
                 |>
                     case (elmVersion, ctor) of
@@ -1161,7 +1166,10 @@ formatPattern elmVersion parensRequired apattern =
                         _ ->
                             id
 
-        AST.Pattern.Data ctor patterns ->
+        AST.Pattern.Data ns tag patterns ->
+            let
+                ctor = ns ++ [tag]
+            in
             ElmStructure.application
                 (AST.FAJoinFirst AST.JoinAll)
                 (line $ formatQualifiedUppercaseIdentifier elmVersion ctor)
@@ -1227,7 +1235,7 @@ formatPair formatA delim formatB (AST.Pair a b (AST.ForceMultiline forceMultilin
         (formatHeadCommented formatB b)
 
 
-negativeCasePatternWorkaround :: AST.Commented AST.Pattern.Pattern -> Box -> Box
+negativeCasePatternWorkaround :: AST.Commented (Pattern [UppercaseIdentifier]) -> Box -> Box
 negativeCasePatternWorkaround (AST.Commented _ (RA.A _ pattern) _) =
     case pattern of
         AST.Pattern.Literal (AST.IntNum i _) | i < 0 -> parens
@@ -1254,14 +1262,14 @@ expressionParens inner outer =
         _ -> id
 
 
-formatExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> Fix Expression -> Box
+formatExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> Fix (Expression [UppercaseIdentifier]) -> Box
 formatExpression elmVersion importInfo context aexpr =
     case elmVersion of
         Elm_0_19_Upgrade -> formatExpression' elmVersion importInfo context (Upgrade_0_19.transform importInfo aexpr)
         _ -> formatExpression' elmVersion importInfo context aexpr
 
 
-formatExpression' :: ElmVersion -> ImportInfo -> ExpressionContext -> Fix Expression -> Box
+formatExpression' :: ElmVersion -> ImportInfo -> ExpressionContext -> Fix (Expression [UppercaseIdentifier]) -> Box
 formatExpression' elmVersion importInfo context aexpr =
     case unFix aexpr of
         AST.Expression.Literal lit ->
@@ -1538,7 +1546,7 @@ formatExpression' elmVersion importInfo context aexpr =
             ]
 
 
-formatCommentedExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.Commented (Fix Expression) -> Box
+formatCommentedExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.Commented (Fix (Expression [UppercaseIdentifier])) -> Box
 formatCommentedExpression elmVersion importInfo context (AST.Commented pre e post) =
     let
         commented' =
@@ -1550,7 +1558,7 @@ formatCommentedExpression elmVersion importInfo context (AST.Commented pre e pos
     formatCommented (formatExpression elmVersion importInfo context) commented'
 
 
-formatPreCommentedExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.PreCommented (Fix Expression) -> Box
+formatPreCommentedExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.PreCommented (Fix (Expression [UppercaseIdentifier])) -> Box
 formatPreCommentedExpression elmVersion importInfo context (pre, e) =
     let
         (pre', e') =
@@ -1564,7 +1572,7 @@ formatPreCommentedExpression elmVersion importInfo context (pre, e) =
 
 formatRecordLike ::
     (base -> Box) -> (key -> Line) -> String -> (value -> Box)
-    -> Maybe (AST.Commented base) -> AST.Sequence (AST.Pair key value)-> AST.Comments -> AST.ForceMultiline
+    -> Maybe (AST.Commented base) -> AST.Sequence (AST.Pair key value)-> Comments -> AST.ForceMultiline
     -> Box
 formatRecordLike formatBase formatKey fieldSep formatValue base' fields trailing multiline =
     case (base', fields) of
@@ -1586,7 +1594,7 @@ formatRecordLike formatBase formatKey fieldSep formatValue base' fields trailing
               pairs'
 
 
-formatSequence :: Char -> Char -> Maybe Char -> (a -> Box) -> AST.ForceMultiline -> AST.Comments -> AST.Sequence a -> Box
+formatSequence :: Char -> Char -> Maybe Char -> (a -> Box) -> AST.ForceMultiline -> Comments -> AST.Sequence a -> Box
 formatSequence left delim right formatA (AST.ForceMultiline multiline) trailing (first:rest) =
     let
         formatItem delim_ (pre, item) =
@@ -1615,8 +1623,8 @@ mapIsLast f (next:rest) = f False next : mapIsLast f rest
 formatBinops_0_17 ::
     ElmVersion
     -> ImportInfo
-    -> Fix Expression
-    -> [AST.Expression.BinopsClause (Fix Expression)]
+    -> Fix (Expression [UppercaseIdentifier])
+    -> [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))]
     -> Bool
     -> Box
 formatBinops_0_17 elmVersion importInfo left ops multiline =
@@ -1626,8 +1634,8 @@ formatBinops_0_17 elmVersion importInfo left ops multiline =
 formatBinops_0_18 ::
     ElmVersion
     -> ImportInfo
-    -> Fix Expression
-    -> [AST.Expression.BinopsClause (Fix Expression)]
+    -> Fix (Expression [UppercaseIdentifier])
+    -> [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))]
     -> Bool
     -> Box
 formatBinops_0_18 elmVersion importInfo left ops multiline =
@@ -1637,8 +1645,8 @@ formatBinops_0_18 elmVersion importInfo left ops multiline =
 formatBinops_0_19_upgrade ::
     ElmVersion
     -> ImportInfo
-    -> Fix Expression
-    -> [AST.Expression.BinopsClause (Fix Expression)]
+    -> Fix (Expression [UppercaseIdentifier])
+    -> [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))]
     -> Bool
     -> Box
 formatBinops_0_19_upgrade elmVersion importInfo left ops multiline =
@@ -1649,16 +1657,16 @@ formatBinops_0_19_upgrade elmVersion importInfo left ops multiline =
 
 
 formatBinops_common ::
-    (Fix Expression
-        -> [AST.Expression.BinopsClause (Fix Expression)]
-        -> ( Fix Expression
-           , [AST.Expression.BinopsClause (Fix Expression)]
+    (Fix (Expression [UppercaseIdentifier])
+        -> [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))]
+        -> ( Fix (Expression [UppercaseIdentifier])
+           , [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))]
            )
     )
     -> ElmVersion
     -> ImportInfo
-    -> Fix Expression
-    -> [AST.Expression.BinopsClause (Fix Expression)]
+    -> Fix (Expression [UppercaseIdentifier])
+    -> [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))]
     -> Bool
     -> Box
 formatBinops_common transform elmVersion importInfo left ops multiline =
@@ -1688,9 +1696,9 @@ formatBinops_common transform elmVersion importInfo left ops multiline =
 
 
 removeBackticks ::
-    Fix Expression
-    -> [AST.Expression.BinopsClause (Fix Expression)]
-    -> (Fix Expression, [AST.Expression.BinopsClause (Fix Expression)])
+    Fix (Expression [UppercaseIdentifier])
+    -> [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))]
+    -> (Fix (Expression [UppercaseIdentifier]), [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))])
 removeBackticks left ops =
     case ops of
         [] -> (left, ops)
@@ -1730,9 +1738,9 @@ removeBackticks left ops =
 
 
 removeBangs ::
-    Fix Expression
-    -> [AST.Expression.BinopsClause (Fix Expression)]
-    -> (Fix Expression, [AST.Expression.BinopsClause (Fix Expression)])
+    Fix (Expression [UppercaseIdentifier])
+    -> [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))]
+    -> (Fix (Expression [UppercaseIdentifier]), [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))])
 removeBangs left ops =
     let
         cmds' post cmds =
@@ -1776,9 +1784,9 @@ removeBangs left ops =
 
 
 removeMod ::
-    Fix Expression
-    -> [AST.Expression.BinopsClause (Fix Expression)]
-    -> (Fix Expression, [AST.Expression.BinopsClause (Fix Expression)])
+    Fix (Expression [UppercaseIdentifier])
+    -> [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))]
+    -> (Fix (Expression [UppercaseIdentifier]), [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))])
 removeMod left ops =
     let
         tuple left' pre post right' =
@@ -1821,11 +1829,11 @@ collectLeftFold NeverFold = False
 binopToFunction ::
     SymbolIdentifier
     -> (String -> ShouldFold)
-    -> (Fix Expression -> AST.Comments -> AST.Comments -> Fix Expression -> Fix Expression)
-    -> Fix Expression
-    -> Reversed (AST.Expression.BinopsClause (Fix Expression))
-    -> [AST.Expression.BinopsClause (Fix Expression)]
-    -> (Fix Expression, [AST.Expression.BinopsClause (Fix Expression)])
+    -> (Fix (Expression [UppercaseIdentifier]) -> Comments -> Comments -> Fix (Expression [UppercaseIdentifier]) -> Fix (Expression [UppercaseIdentifier]))
+    -> Fix (Expression [UppercaseIdentifier])
+    -> Reversed (AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier])))
+    -> [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))]
+    -> (Fix (Expression [UppercaseIdentifier]), [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))])
 binopToFunction target shouldFold applyFn left preBang remaining =
     case remaining of
         [] ->
@@ -1857,10 +1865,10 @@ binopToFunction target shouldFold applyFn left preBang remaining =
 
 collectRight ::
     (String -> Bool)
-    -> Fix Expression
-    -> Reversed (AST.Expression.BinopsClause (Fix Expression))
-    -> [AST.Expression.BinopsClause (Fix Expression)]
-    -> (Fix Expression, [AST.Expression.BinopsClause (Fix Expression)])
+    -> Fix (Expression [UppercaseIdentifier])
+    -> Reversed (AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier])))
+    -> [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))]
+    -> (Fix (Expression [UppercaseIdentifier]), [AST.Expression.BinopsClause [UppercaseIdentifier] (Fix (Expression [UppercaseIdentifier]))])
 collectRight shouldFold leftMost collectedLeft rest =
     case rest of
         (AST.Expression.BinopsClause pre (op@(AST.Variable.OpRef (SymbolIdentifier opi))) post e):rest' | shouldFold opi ->
@@ -1874,7 +1882,7 @@ collectRight shouldFold leftMost collectedLeft rest =
             , rest
             )
 
-formatRange_0_17 :: ElmVersion -> ImportInfo -> AST.Commented (Fix Expression) -> AST.Commented (Fix Expression) -> Bool -> Box
+formatRange_0_17 :: ElmVersion -> ImportInfo -> AST.Commented (Fix (Expression [UppercaseIdentifier])) -> AST.Commented (Fix (Expression [UppercaseIdentifier])) -> Bool -> Box
 formatRange_0_17 elmVersion importInfo left right multiline =
     case
         ( multiline
@@ -1908,7 +1916,7 @@ noRegion :: a -> RA.Located a
 noRegion =
     RA.at nowhere nowhere
 
-formatRange_0_18 :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.Commented (Fix Expression) -> AST.Commented (Fix Expression) -> Box
+formatRange_0_18 :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.Commented (Fix (Expression [UppercaseIdentifier])) -> AST.Commented (Fix (Expression [UppercaseIdentifier])) -> Box
 formatRange_0_18 elmVersion importInfo context left right =
     case (left, right) of
         (AST.Commented preLeft left' [], AST.Commented preRight right' []) ->
@@ -1932,7 +1940,7 @@ formatRange_0_18 elmVersion importInfo context left right =
                 |> formatExpression elmVersion importInfo context
 
 
-formatUnit :: Char -> Char -> AST.Comments -> Box
+formatUnit :: Char -> Char -> Comments -> Box
 formatUnit left right comments =
   case (left, comments) of
     (_, []) ->
@@ -1951,7 +1959,7 @@ formatUnit left right comments =
             stack1 comments'
 
 
-formatComments :: AST.Comments -> Maybe Box
+formatComments :: Comments -> Maybe Box
 formatComments comments =
     case fmap formatComment comments of
         [] ->
@@ -1977,17 +1985,17 @@ formatCommented =
 
 
 -- TODO: rename to formatPreCommented
-formatHeadCommented :: (a -> Box) -> (AST.Comments, a) -> Box
+formatHeadCommented :: (a -> Box) -> (Comments, a) -> Box
 formatHeadCommented format (pre, inner) =
     formatCommented' pre format inner
 
 
-formatCommented' :: AST.Comments -> (a -> Box) -> a -> Box
+formatCommented' :: Comments -> (a -> Box) -> a -> Box
 formatCommented' pre format inner =
     formatCommented format (AST.Commented pre inner [])
 
 
-formatTailCommented :: (a -> Box) -> (a, AST.Comments) -> Box
+formatTailCommented :: (a -> Box) -> (a, Comments) -> Box
 formatTailCommented format (inner, post) =
   formatCommented format (AST.Commented [] inner post)
 
@@ -2010,7 +2018,7 @@ formatCommentedStack format (AST.Commented pre inner post) =
       ++ (map formatComment post)
 
 
-formatHeadCommentedStack :: (a -> Box) -> (AST.Comments, a) -> Box
+formatHeadCommentedStack :: (a -> Box) -> (Comments, a) -> Box
 formatHeadCommentedStack format (pre, inner) =
   formatCommentedStack format (AST.Commented pre inner [])
 
@@ -2028,7 +2036,7 @@ formatOpenCommentedList format (AST.OpenCommentedList rest (preLst, lst)) =
         ++ [formatCommented (formatEolCommented format) $ AST.Commented preLst lst []]
 
 
-formatComment :: AST.Comment -> Box
+formatComment :: Comment -> Box
 formatComment comment =
     case comment of
         AST.BlockComment c ->
@@ -2180,7 +2188,7 @@ data TypeParensRequired
     deriving (Eq)
 
 
-formatType :: ElmVersion -> AST.Type -> Box
+formatType :: ElmVersion -> AST.Type [UppercaseIdentifier] -> Box
 formatType elmVersion =
     formatType' elmVersion NotRequired
 
@@ -2193,7 +2201,7 @@ commaSpace =
         ]
 
 
-formatTypeConstructor :: ElmVersion -> AST.TypeConstructor -> Box
+formatTypeConstructor :: ElmVersion -> AST.TypeConstructor [UppercaseIdentifier] -> Box
 formatTypeConstructor elmVersion ctor =
     case ctor of
         AST.NamedConstructor namespace name ->
@@ -2203,7 +2211,7 @@ formatTypeConstructor elmVersion ctor =
             line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
 
 
-formatType' :: ElmVersion -> TypeParensRequired -> AST.Type -> Box
+formatType' :: ElmVersion -> TypeParensRequired -> AST.Type [UppercaseIdentifier] -> Box
 formatType' elmVersion requireParens atype =
     case RA.drop atype of
         AST.UnitType comments ->
@@ -2256,7 +2264,7 @@ formatType' elmVersion requireParens atype =
                 base fields trailing multiline
 
 
-formatVar :: ElmVersion -> AST.Variable.Ref -> Line
+formatVar :: ElmVersion -> AST.Variable.Ref [UppercaseIdentifier] -> Line
 formatVar elmVersion var =
     case var of
         AST.Variable.VarRef namespace name ->
@@ -2281,7 +2289,7 @@ formatSymbolIdentifierInParens (SymbolIdentifier name) =
     identifier $ "(" ++ name ++ ")"
 
 
-formatInfixVar :: ElmVersion -> AST.Variable.Ref -> Line
+formatInfixVar :: ElmVersion -> AST.Variable.Ref [UppercaseIdentifier] -> Line
 formatInfixVar elmVersion var =
     case var of
         AST.Variable.VarRef _ _ ->

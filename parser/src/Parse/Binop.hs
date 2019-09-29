@@ -1,10 +1,12 @@
 module Parse.Binop (binops) where
 
+import AST.V0_16
 import Data.Fix
 import Text.Parsec ((<|>), choice, try)
 
+import AST.Expression (Expr, AnnotatedExpression(AE))
 import qualified AST.Expression as E
-import qualified AST.Variable as Var
+import AST.Variable (Ref)
 import Parse.Helpers (commitIf, addLocation, multilineToBool)
 import Parse.IParser
 import Parse.Whitespace
@@ -12,13 +14,13 @@ import qualified Reporting.Annotation as A
 
 
 binops
-    :: IParser E.Expr
-    -> IParser E.Expr
-    -> IParser Var.Ref
-    -> IParser E.Expr
+    :: IParser Expr
+    -> IParser Expr
+    -> IParser (Ref [UppercaseIdentifier])
+    -> IParser Expr
 binops term last anyOp =
-  (fmap (Fix . E.AE) . addLocation) $
-  do  ((e@(Fix (E.AE e')), ops), multiline) <- trackNewline ((,) <$> term <*> nextOps)
+  (fmap (Fix . AE) . addLocation) $
+  do  ((e@(Fix (AE e')), ops), multiline) <- trackNewline ((,) <$> term <*> nextOps)
       return $
         case ops of
           [] ->

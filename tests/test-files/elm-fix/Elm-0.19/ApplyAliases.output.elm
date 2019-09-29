@@ -3,6 +3,7 @@ module Main exposing (x)
 import AliasedDifferently as ADIS
 import AliasedInSource as AIS
 import AliasedInUpgradeDefinition as AIUD
+import AliasedInUpgradeDefinition2
 
 
 x =
@@ -11,6 +12,11 @@ x =
 
 fromUpgradeDefinition =
     [ AIUD.value
+    ]
+
+
+doesNotApplyNewAliasesToExisitngCode =
+    [ AliasedInUpgradeDefinition2.notUpgraded
     ]
 
 

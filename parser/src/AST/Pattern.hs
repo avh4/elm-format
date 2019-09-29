@@ -1,30 +1,29 @@
-{-# OPTIONS_GHC -Wall #-}
 module AST.Pattern where
 
 import AST.V0_16
 import qualified Reporting.Annotation as A
 
 
-type Pattern =
-    A.Located Pattern'
+type Pattern ns =
+    A.Located (Pattern' ns)
 
 
-data Pattern'
+data Pattern' ns
     = Anything
     | UnitPattern Comments
     | Literal Literal
     | VarPattern LowercaseIdentifier
     | OpPattern SymbolIdentifier
-    | Data [UppercaseIdentifier] [(Comments, Pattern)]
-    | PatternParens (Commented Pattern)
-    | Tuple [Commented Pattern]
+    | Data ns UppercaseIdentifier [(Comments, Pattern ns)]
+    | PatternParens (Commented (Pattern ns))
+    | Tuple [Commented (Pattern ns)]
     | EmptyListPattern Comments
-    | List [Commented Pattern]
+    | List [Commented (Pattern ns)]
     | ConsPattern
-        { first :: WithEol Pattern
-        , rest :: [(Comments, Comments, Pattern, Maybe String)]
+        { first :: WithEol (Pattern ns)
+        , rest :: [(Comments, Comments, Pattern ns, Maybe String)]
         }
     | EmptyRecordPattern Comments
     | Record [Commented LowercaseIdentifier]
-    | Alias (Pattern, Comments) (Comments, LowercaseIdentifier)
-    deriving (Eq, Show)
+    | Alias (Pattern ns, Comments) (Comments, LowercaseIdentifier)
+    deriving (Eq, Show, Functor)

@@ -7,7 +7,7 @@ import Nri.Ui.Button.V9 as Button
 upgrade_Nri_DEPRECATED_Button_buttonDeprecated ({ label, style } as config) =
     Button.button label
         [ case config.size of
-            Button.Large ->
+            Nri.DEPRECATED.Button.Large ->
                 Button.large
         , case config.width of
             Just w ->
@@ -17,10 +17,10 @@ upgrade_Nri_DEPRECATED_Button_buttonDeprecated ({ label, style } as config) =
                 ElmFix.remove
         , Button.onClick config.onClick
         , case style of
-            Button.Premium ->
+            Nri.DEPRECATED.Button.Premium ->
                 Button.premium
 
-            Button.Normal ->
+            Nri.DEPRECATED.Button.Normal ->
                 ElmFix.remove
         , case config.icon of
             Nothing ->

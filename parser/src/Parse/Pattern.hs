@@ -3,6 +3,7 @@ module Parse.Pattern (term, expr) where
 import Text.Parsec ((<|>), (<?>), char, choice, optionMaybe, try)
 
 import AST.V0_16
+import AST.Pattern (Pattern)
 import qualified AST.Pattern as P
 import ElmVersion
 import Parse.Helpers
@@ -12,7 +13,7 @@ import Parse.IParser
 import Parse.Whitespace
 
 
-basic :: ElmVersion -> IParser P.Pattern
+basic :: ElmVersion -> IParser (Pattern [UppercaseIdentifier])
 basic elmVersion =
   addLocation $
     choice
@@ -23,18 +24,18 @@ basic elmVersion =
       ]
   where
     chunksToPattern chunks =
-        case chunks of
+        case reverse chunks of
           [UppercaseIdentifier "True"] ->
               P.Literal (Boolean True)
 
           [UppercaseIdentifier "False"] ->
               P.Literal (Boolean False)
 
-          name ->
-              P.Data name []
+          (last:rest) ->
+              P.Data (reverse rest) last []
 
 
-asPattern :: ElmVersion -> IParser P.Pattern -> IParser P.Pattern
+asPattern :: ElmVersion -> IParser (Pattern [UppercaseIdentifier]) -> IParser (Pattern [UppercaseIdentifier])
 asPattern elmVersion patternParser =
   do  (start, pattern, _) <- located patternParser
 
@@ -55,7 +56,7 @@ asPattern elmVersion patternParser =
           return (preAs, (postAs, var))
 
 
-record :: ElmVersion -> IParser P.Pattern
+record :: ElmVersion -> IParser (Pattern [UppercaseIdentifier])
 record elmVersion =
   addLocation $
   do
@@ -68,7 +69,7 @@ record elmVersion =
                   P.Record fields
 
 
-tuple :: ElmVersion -> IParser P.Pattern
+tuple :: ElmVersion -> IParser (Pattern [UppercaseIdentifier])
 tuple elmVersion =
   do  (start, patterns, end) <- located $ parens'' (expr elmVersion)
 
@@ -90,7 +91,7 @@ tuple elmVersion =
             A.at start end $ P.Tuple patterns
 
 
-list :: ElmVersion -> IParser P.Pattern
+list :: ElmVersion -> IParser (Pattern [UppercaseIdentifier])
 list elmVersion =
   addLocation $
   do
@@ -103,23 +104,23 @@ list elmVersion =
           P.List patterns
 
 
-term :: ElmVersion -> IParser P.Pattern
+term :: ElmVersion -> IParser (Pattern [UppercaseIdentifier])
 term elmVersion =
   choice [ record elmVersion, tuple elmVersion, list elmVersion, basic elmVersion ]
     <?> "a pattern"
 
 
-patternConstructor :: ElmVersion -> IParser P.Pattern
+patternConstructor :: ElmVersion -> IParser (Pattern [UppercaseIdentifier])
 patternConstructor elmVersion =
   addLocation $
     do  v <- dotSep1 (capVar elmVersion)
-        case v of
+        case reverse v of
           [UppercaseIdentifier "True"]  -> return $ P.Literal (Boolean True)
           [UppercaseIdentifier "False"] -> return $ P.Literal (Boolean False)
-          _       -> P.Data v <$> spacePrefix (term elmVersion)
+          (last:rest) -> P.Data (reverse rest) last <$> spacePrefix (term elmVersion)
 
 
-expr :: ElmVersion -> IParser P.Pattern
+expr :: ElmVersion -> IParser (Pattern [UppercaseIdentifier])
 expr elmVersion =
     asPattern elmVersion subPattern <?> "a pattern"
   where

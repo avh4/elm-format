@@ -4,9 +4,9 @@ module AST.Json where
 
 import Elm.Utils ((|>))
 
+import AST.Annotated (updateNamespace)
 import AST.Declaration
 import AST.Expression
-import AST.MapNamespace
 import AST.Module
 import AST.Pattern
 import AST.Variable
@@ -46,6 +46,7 @@ showModule (Module _ maybeHeader _ (_, imports) body) =
         importAliases =
             Map.fromList $ map (\(k, v) -> (v, k)) $ Map.toList $ Map.mapMaybe (getAlias . snd) imports
 
+        normalizeNamespace :: [UppercaseIdentifier] -> [UppercaseIdentifier]
         normalizeNamespace namespace =
             case namespace of
                 [alias] ->
@@ -68,32 +69,32 @@ showModule (Module _ maybeHeader _ (_, imports) body) =
     makeObj
         [ ( "moduleName", showJSON name )
         , ( "imports", makeObj $ fmap importJson $ Map.toList imports )
-        , ( "body" , JSArray $ fmap showJSON $ mergeDeclarations $ mapNamespace normalizeNamespace body )
+        , ( "body" , JSArray $ fmap showJSON $ mergeDeclarations $ (fmap (updateNamespace normalizeNamespace) body :: List (TopLevelStructure (Declaration [UppercaseIdentifier] (Fix (AnnotatedExpression [UppercaseIdentifier] Region.Region))))) )
         ]
 
 
-data MergedTopLevelStructure
+data MergedTopLevelStructure ns e
     = MergedDefinition
         { _definitionLocation :: Region.Region
         , _name :: LowercaseIdentifier
-        , _args :: List (PreCommented Pattern)
+        , _args :: List (PreCommented (Pattern ns))
         , _preEquals :: Comments
-        , _expression :: Expr
+        , _expression :: e
         , _doc :: Maybe Comment
-        , _annotation :: Maybe (Comments, Comments, Type)
+        , _annotation :: Maybe (Comments, Comments, Type ns)
         }
     | TodoTopLevelStructure String
 
 
-mergeDeclarations :: List (TopLevelStructure Declaration) -> List MergedTopLevelStructure
+mergeDeclarations :: Show e => List (TopLevelStructure (Declaration [UppercaseIdentifier] e)) -> List (MergedTopLevelStructure [UppercaseIdentifier] e)
 mergeDeclarations decls =
     let
         collectAnnotation decl =
             case decl of
-                Entry (A _ (TypeAnnotation (VarRef [] name, preColon) (postColon, typ))) -> Just (name, (preColon, postColon, typ))
+                Entry (A _ (TypeAnnotation (VarRef () name, preColon) (postColon, typ))) -> Just (name, (preColon, postColon, typ))
                 _ -> Nothing
 
-        annotations :: Map.Map LowercaseIdentifier (Comments, Comments, Type)
+        annotations :: Map.Map LowercaseIdentifier (Comments, Comments, Type [UppercaseIdentifier])
         annotations =
             Map.fromList $ mapMaybe collectAnnotation decls
 
@@ -170,7 +171,7 @@ instance ToJSON DetailedListing where
             ]
 
 
-instance ToJSON MergedTopLevelStructure where
+instance ToJSON e => ToJSON (MergedTopLevelStructure [UppercaseIdentifier] e) where
     showJSON (TodoTopLevelStructure what) =
         JSString $ toJSString ("TODO: " ++ what)
     showJSON (MergedDefinition region (LowercaseIdentifier name) args _ expression doc annotation) =
@@ -441,7 +442,7 @@ sourceLocation region =
     ( "sourceLocation", showJSON region )
 
 
-instance (ToJSON e, Show e) => ToJSON (LetDeclaration e) where
+instance (ToJSON e, Show e, Show ns) => ToJSON (LetDeclaration [ns] e) where
   showJSON letDeclaration =
       case letDeclaration of
           LetDefinition (A _ (VarPattern (LowercaseIdentifier var))) [] _ expr ->
@@ -465,12 +466,12 @@ instance ToJSON FloatRepresentation where
     showJSON ExponentFloat = JSString $ toJSString "ExponentFloat"
 
 
-instance ToJSON Pattern' where
+instance ToJSON (Pattern' [UppercaseIdentifier]) where
   showJSON pattern' =
       JSString $ toJSString $ "TODO: Pattern (" ++ show pattern' ++ ")"
 
 
-instance ToJSON Type where
+instance ToJSON (Type [UppercaseIdentifier]) where
     showJSON (A _ type') =
         case type' of
             TypeConstruction (NamedConstructor namespace name) args ->

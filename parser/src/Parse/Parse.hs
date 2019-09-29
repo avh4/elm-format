@@ -3,9 +3,9 @@ module Parse.Parse (parse, parseModule, parseDeclarations, parseExpressions) whe
 
 import qualified Text.Parsec.Error as Parsec
 
-import AST.V0_16 (WithEol)
+import AST.V0_16
 import AST.Declaration (TopLevelStructure, Declaration)
-import qualified AST.Expression
+import AST.Expression (Expr)
 import qualified AST.Module
 import ElmVersion hiding (parse)
 import Parse.Comments (withEol)
@@ -25,12 +25,12 @@ parseModule elmVersion src =
     parse src (Parse.Module.elmModule elmVersion)
 
 
-parseDeclarations :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure Declaration]
+parseDeclarations :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure (Declaration [UppercaseIdentifier] Expr)]
 parseDeclarations elmVersion src =
     parse src (Parse.Module.topLevel (Parse.Declaration.declaration elmVersion) <* eof)
 
 
-parseExpressions :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure (WithEol AST.Expression.Expr)]
+parseExpressions :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure (WithEol Expr)]
 parseExpressions elmVersion src =
     parse src (Parse.Module.topLevel (withEol $ Parse.Expression.expr elmVersion) <* eof)
 
