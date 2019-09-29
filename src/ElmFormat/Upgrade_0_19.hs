@@ -546,6 +546,13 @@ destructure pat arg =
           ->
             destructure (preVar ++ pre ++ post, inner) arg
 
+        -- `<|` which could be parens in expression
+        ( _
+          , (preArg, AST.Expression.Binops e [BinopsClause pre (OpRef (SymbolIdentifier "<|")) post arg1] _)
+          )
+          ->
+            destructure pat (preArg, Fix $ AE $ A FromUpgradeDefinition $ App e [(pre ++ post, arg1)] (FAJoinFirst JoinAll))
+
         -- Unit
         ( (preVar, A _ (UnitPattern _))
           , (preArg, AST.Expression.Unit _)

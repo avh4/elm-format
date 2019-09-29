@@ -33,6 +33,7 @@ cases =
     [ A.caseExhaustive ()
     , A.caseWithPattern Nothing
     , A.caseWithPattern (Just 13)
+    , A.caseWithPattern (Just <| (+) 14 15)
     , A.caseWithWildcard Nothing
     , A.caseWithWildcard (Just ())
     , A.caseWithAsMatch { style = A.Style1 }

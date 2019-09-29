@@ -31,6 +31,7 @@ cases =
     [ 0
     , 0
     , 13
+    , (+) 14 15
     , 0
     , case Just () of
         Nothing ->
