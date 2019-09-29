@@ -34,6 +34,8 @@ cases =
     , A.caseWithPattern Nothing
     , A.caseWithPattern (Just 13)
     , A.caseWithPattern (Just <| (+) 14 15)
+    , A.caseWithPattern (Just <| 16 + 17)
+    , A.caseWithPattern (Just <| identity <| 18 + 19)
     , A.caseWithWildcard Nothing
     , A.caseWithWildcard (Just ())
     , A.caseWithAsMatch { style = A.Style1 }

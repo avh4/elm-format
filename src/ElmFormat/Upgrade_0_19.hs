@@ -546,13 +546,6 @@ destructure pat arg =
           ->
             destructure (preVar ++ pre ++ post, inner) arg
 
-        -- `<|` which could be parens in expression
-        ( _
-          , (preArg, AST.Expression.Binops e [BinopsClause pre (OpRef (SymbolIdentifier "<|")) post arg1] _)
-          )
-          ->
-            destructure pat (preArg, Fix $ AE $ A FromUpgradeDefinition $ App e [(pre ++ post, arg1)] (FAJoinFirst JoinAll))
-
         -- Unit
         ( (preVar, A _ (UnitPattern _))
           , (preArg, AST.Expression.Unit _)
@@ -588,6 +581,13 @@ destructure pat arg =
           , (preArg, arg')
           ) ->
             Just $ Dict.singleton name (withComments (preVar ++ preArg) (snd arg) [])
+
+        -- `<|` which could be parens in expression
+        ( _
+          , (preArg, AST.Expression.Binops e (BinopsClause pre (OpRef (SymbolIdentifier "<|")) post arg1 : rest) ml)
+          )
+          ->
+            destructure pat (preArg, Fix $ AE $ A FromSource $ App e [(pre ++ post, Fix $ AE $ A FromSource $ Binops arg1 rest ml)] (FAJoinFirst JoinAll))
 
         -- Tuple with two elements (TODO: generalize this for all tuples)
         ( (preVar, A _ (AST.Pattern.Tuple [Commented preA (A _ (VarPattern nameA)) postA, Commented preB (A _ (VarPattern nameB)) postB]))

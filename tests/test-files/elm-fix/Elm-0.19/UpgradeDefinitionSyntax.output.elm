@@ -32,6 +32,8 @@ cases =
     , 0
     , 13
     , (+) 14 15
+    , 16 + 17
+    , identity <| 18 + 19
     , 0
     , case Just () of
         Nothing ->
