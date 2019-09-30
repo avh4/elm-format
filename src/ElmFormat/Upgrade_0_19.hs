@@ -511,15 +511,18 @@ destructureFirstMatch value choices fallback =
     -- If we find an option that Matches, use the first one we find.
     -- Otherwise, keep track of which ones *could* match -- if there is only one remaining, we can use that
     let
-        destructureFirstMatch' [] [] = fallback
-        destructureFirstMatch' [] _ = fallback -- TODO: could simply indicate which options to keep
+        resolve [] = fallback
+        resolve [body] = body
+        resolve _ = fallback -- TODO: could instead indicate which options the caller should keep
+
+        destructureFirstMatch' [] othersPossible = resolve othersPossible
         destructureFirstMatch' ((pat, body):rest) othersPossible =
             case destructure pat value of
                 Matches mappings ->
-                    applyMappings False mappings body
+                    resolve (applyMappings False mappings body : othersPossible)
 
                 CouldMatch ->
-                    destructureFirstMatch' rest ((pat, body):othersPossible)
+                    destructureFirstMatch' rest (body:othersPossible)
 
                 DoesntMatch ->
                     destructureFirstMatch' rest othersPossible
@@ -594,9 +597,12 @@ destructure pat arg =
         ( (preVar, A _ (AST.Pattern.Literal pat))
           , (preArg, AST.Expression.Literal val)
           )
-          | pat == val
           ->
-            Matches Dict.empty
+            -- TODO: handle ints/strings that are equal but have different representations
+            if pat == val then
+                Matches Dict.empty
+            else
+                DoesntMatch
 
         -- Custom type variants with no arguments
         ( (preVar, A _ (Data nsd name []))
@@ -608,6 +614,7 @@ destructure pat arg =
             else
                 DoesntMatch
 
+        -- Custom type variants with arguments
         ( (preVar, A _ (Data nsd name argVars))
           , (preArg, App (Fix (AE (A _ (VarExpr (TagRef ns tag))))) argValues _)
           )
@@ -616,6 +623,10 @@ destructure pat arg =
                 Dict.unions <$> zipWithM destructure argVars argValues
             else
                 DoesntMatch
+
+        -- Custom type variants where pattern and value don't match in having args
+        ( (_, A _ (Data _ _ (_:_))), (_, VarExpr (TagRef _ _)) ) -> DoesntMatch
+        ( (_, A _ (Data _ _ [])), (_, App (Fix (AE (A _ (VarExpr (TagRef _ _))))) _ _) ) -> DoesntMatch
 
         -- Named variable pattern
         ( (preVar, A _ (VarPattern name))

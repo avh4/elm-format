@@ -27,7 +27,7 @@ tags =
     ]
 
 
-cases =
+cases s =
     [ 0
     , 0
     , 13
@@ -38,4 +38,10 @@ cases =
     , 99
     , "style1"
     , ElmFix.todo UnknownStyle
+    , case s of
+        A.Style1 ->
+            "style1"
+
+        _ ->
+            ElmFix.todo s
     ]

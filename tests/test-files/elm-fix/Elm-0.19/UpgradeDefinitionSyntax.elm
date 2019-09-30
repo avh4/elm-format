@@ -29,7 +29,7 @@ tags =
     ]
 
 
-cases =
+cases s =
     [ A.caseExhaustive ()
     , A.caseWithPattern Nothing
     , A.caseWithPattern (Just 13)
@@ -40,4 +40,5 @@ cases =
     , A.caseWithWildcard (Just ())
     , A.caseWithAsMatch { style = A.Style1 }
     , A.caseWithAsMatch { style = UnknownStyle }
+    , A.caseWithAsMatch { style = s }
     ]
