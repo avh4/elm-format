@@ -39,4 +39,5 @@ cases =
     , A.caseWithWildcard Nothing
     , A.caseWithWildcard (Just ())
     , A.caseWithAsMatch { style = A.Style1 }
+    , A.caseWithAsMatch { style = UnknownStyle }
     ]

@@ -13,7 +13,7 @@ import AST.Expression
 import AST.Module (Module(Module), ImportMethod)
 import AST.Pattern
 import AST.Variable
-import Control.Applicative ((<|>))
+import Control.Applicative ((<|>), liftA2)
 import Control.Monad (zipWithM)
 import Data.Fix
 import ElmFormat.ImportInfo (ImportInfo)
@@ -507,14 +507,24 @@ inlineVars isLocal insertMultiline mappings expr =
 
 
 destructureFirstMatch :: PreCommented UExpr -> [ (PreCommented (Pattern (MatchedNamespace [UppercaseIdentifier])), UExpr) ] -> UExpr -> UExpr
-destructureFirstMatch _ [] fallback = fallback
-destructureFirstMatch value ((pat, body):rest) fallback =
-    case destructure pat value of
-        Just mappings ->
-            applyMappings False mappings body
+destructureFirstMatch value choices fallback =
+    -- If we find an option that Matches, use the first one we find.
+    -- Otherwise, keep track of which ones *could* match -- if there is only one remaining, we can use that
+    let
+        destructureFirstMatch' [] [] = fallback
+        destructureFirstMatch' [] _ = fallback -- TODO: could simply indicate which options to keep
+        destructureFirstMatch' ((pat, body):rest) othersPossible =
+            case destructure pat value of
+                Matches mappings ->
+                    applyMappings False mappings body
 
-        Nothing ->
-            destructureFirstMatch value rest fallback
+                CouldMatch ->
+                    destructureFirstMatch' rest ((pat, body):othersPossible)
+
+                DoesntMatch ->
+                    destructureFirstMatch' rest othersPossible
+    in
+    destructureFirstMatch' choices []
 
 
 withComments :: Comments -> UExpr -> Comments -> UExpr
@@ -522,8 +532,32 @@ withComments [] e [] = e
 withComments pre e post = Fix $ AE $ A FromUpgradeDefinition $ Parens $ Commented pre e post
 
 
+data DestructureResult a
+    = Matches a
+    | CouldMatch
+    | DoesntMatch
+    deriving (Functor, Show)
+
+
+instance Applicative DestructureResult where
+    pure a = Matches a
+
+    liftA2 f (Matches a) (Matches b) = Matches (f a b)
+    liftA2 _ (Matches _) CouldMatch = CouldMatch
+    liftA2 _ CouldMatch (Matches _) = CouldMatch
+    liftA2 _ CouldMatch CouldMatch = CouldMatch
+    liftA2 _ _ DoesntMatch = DoesntMatch
+    liftA2 _ DoesntMatch _ = DoesntMatch
+
+
+instance Monad DestructureResult where
+    (Matches a) >>= f = f a
+    CouldMatch >>= _ = CouldMatch
+    DoesntMatch >>= _ = DoesntMatch
+
+
 {-| Returns `Nothing` if the pattern doesn't match, or `Just` with a list of bound variables if the pattern does match. -}
-destructure :: PreCommented (Pattern (MatchedNamespace [UppercaseIdentifier])) -> PreCommented UExpr -> Maybe (Dict.Map LowercaseIdentifier UExpr)
+destructure :: PreCommented (Pattern (MatchedNamespace [UppercaseIdentifier])) -> PreCommented UExpr -> DestructureResult (Dict.Map LowercaseIdentifier UExpr)
 destructure pat arg =
     let
         namespaceMatch nsd ns =
@@ -546,12 +580,15 @@ destructure pat arg =
           ->
             destructure (preVar ++ pre ++ post, inner) arg
 
+        -- Wildcard `_` pattern
+        ( (_, A _ Anything), _ ) -> Matches Dict.empty
+
         -- Unit
         ( (preVar, A _ (UnitPattern _))
           , (preArg, AST.Expression.Unit _)
           )
           ->
-            Just Dict.empty
+            Matches Dict.empty
 
         -- Literals
         ( (preVar, A _ (AST.Pattern.Literal pat))
@@ -559,28 +596,32 @@ destructure pat arg =
           )
           | pat == val
           ->
-            Just Dict.empty
+            Matches Dict.empty
 
         -- Custom type variants with no arguments
         ( (preVar, A _ (Data nsd name []))
           , (preArg, VarExpr (TagRef ns tag))
           )
-          | name == tag && namespaceMatch nsd ns
           ->
-            Just Dict.empty
+            if name == tag && namespaceMatch nsd ns then
+                Matches Dict.empty
+            else
+                DoesntMatch
 
         ( (preVar, A _ (Data nsd name argVars))
           , (preArg, App (Fix (AE (A _ (VarExpr (TagRef ns tag))))) argValues _)
           )
-          | name == tag && namespaceMatch nsd ns
           ->
-            Dict.unions <$> zipWithM destructure argVars argValues
+            if name == tag && namespaceMatch nsd ns then
+                Dict.unions <$> zipWithM destructure argVars argValues
+            else
+                DoesntMatch
 
         -- Named variable pattern
         ( (preVar, A _ (VarPattern name))
           , (preArg, arg')
           ) ->
-            Just $ Dict.singleton name (withComments (preVar ++ preArg) (snd arg) [])
+            Matches $ Dict.singleton name (withComments (preVar ++ preArg) (snd arg) [])
 
         -- `<|` which could be parens in expression
         ( _
@@ -593,7 +634,7 @@ destructure pat arg =
         ( (preVar, A _ (AST.Pattern.Tuple [Commented preA (A _ (VarPattern nameA)) postA, Commented preB (A _ (VarPattern nameB)) postB]))
           , (preArg, AST.Expression.Tuple [Commented preAe eA postAe, Commented preBe eB postBe] _)
           ) ->
-            Just $ Dict.fromList
+            Matches $ Dict.fromList
                 [ (nameA, withComments (preVar ++ preArg) (withComments (preA ++ preAe) eA (postAe ++ postA)) [])
                 , (nameB, withComments (preB ++ preBe) eB (postBe ++ postB))
                 ]
@@ -616,7 +657,7 @@ destructure pat arg =
                 fieldMapping (Commented _ var _) =
                     (,) var <$> Dict.lookup var args
             in
-            fmap Dict.fromList $ sequence $ fmap fieldMapping varFields
+            Maybe.fromMaybe DoesntMatch $ fmap (Matches . Dict.fromList) $ sequence $ fmap fieldMapping varFields
 
         -- `as`
         ( (preVar, A _ (AST.Pattern.Alias (p, _) (_, varName)))
@@ -630,7 +671,7 @@ destructure pat arg =
         -- TODO: handle other patterns
 
         _ ->
-            Nothing
+            CouldMatch
 
 
 simplifyFunctionApplication :: Source -> UExpr -> [PreCommented (UExpr)] -> FunctionApplicationMultiline -> UExpr
@@ -638,11 +679,7 @@ simplifyFunctionApplication appSource fn args appMultiline =
     case (unFix fn, args) of
         (AE (A lambdaSource (Lambda (pat:restVar) preBody body multiline)), arg:restArgs) ->
             case destructure pat arg of
-                Nothing ->
-                    -- failed to destructure the next argument, so stop
-                    Fix $ AE $ A appSource $ App fn args appMultiline
-
-                Just mappings ->
+                Matches mappings ->
                     let
                         newBody = applyMappings (appMultiline == FASplitFirst) mappings body
 
@@ -663,6 +700,10 @@ simplifyFunctionApplication appSource fn args appMultiline =
                         _:_ ->
                             -- we applied this argument; try to apply the next argument
                             simplifyFunctionApplication appSource (Fix $ AE $ A lambdaSource $ Lambda restVar preBody newBody multiline) restArgs newMultiline
+                _ ->
+                    -- failed to destructure the next argument, so stop
+                    Fix $ AE $ A appSource $ App fn args appMultiline
+
 
         (_, []) -> fn
 

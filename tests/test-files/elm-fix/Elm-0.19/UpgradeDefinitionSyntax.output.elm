@@ -35,11 +35,7 @@ cases =
     , 16 + 17
     , identity <| 18 + 19
     , 0
-    , case Just () of
-        Nothing ->
-            0
-
-        _ ->
-            99
+    , 99
     , "style1"
+    , ElmFix.todo UnknownStyle
     ]
