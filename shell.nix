@@ -8,5 +8,5 @@ let
 in with nixpkgs;
 stdenv.mkDerivation {
   name = "elm-format";
-  buildInputs = [ niv.niv stack libiconv ];
+  buildInputs = [ niv.niv stack libiconv git python3 ];
 }
