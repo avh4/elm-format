@@ -8,5 +8,14 @@ let
 in with nixpkgs;
 stdenv.mkDerivation {
   name = "elm-format";
-  buildInputs = [ niv.niv stack libiconv git python3 ];
+  buildInputs = [
+    # Tools required to build elm-format
+    stack git python3
+
+    # Tools for updating nix config
+    niv.niv
+
+    # Tools needed by stack
+    libiconv gcc perl
+  ];
 }
