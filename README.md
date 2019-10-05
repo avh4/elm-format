@@ -297,10 +297,9 @@ cd elm-format
 
 # initial setup
 stack setup
-stack install shake
 
 # build
-stack runhaskell Shakefile.hs -- build
+./build.sh build
 
 # run the built elm-format
 "$(stack path --local-install-root)"/bin/elm-format
@@ -309,6 +308,5 @@ stack runhaskell Shakefile.hs -- build
 ### Running tests
 
 ```bash
-stack install shake
-stack runhaskell Shakefile.hs
+./build.sh
 ```

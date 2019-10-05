@@ -277,7 +277,8 @@ main = do
 
     "_build/shellcheck.ok" %> \out -> do
         scriptFiles <- getDirectoryFiles ""
-            [ "tests/run-tests.sh"
+            [ "build.sh"
+            , "tests/run-tests.sh"
             , "package/collect_files.sh"
             , "package/linux/build-in-docker.sh"
             , "package/linux/build-package.sh"

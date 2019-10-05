@@ -23,9 +23,9 @@ environment:
 test_script:
 - "set PATH=%PATH%;c:\\stack"
 - stack setup > nil
-- stack install shake
 - stack path
-- stack runhaskell Shakefile.hs
+- ./build.sh dependencies
+- ./build.sh
 - mkdir -p dist
 - stack install --local-bin-path=dist
 
