@@ -4,6 +4,9 @@ import Development.Shake.FilePath
 import Development.Shake.Util
 import Control.Monad (forM_)
 
+import qualified Shakefiles.Shellcheck
+
+
 main :: IO ()
 main = do
     shakefilesHash <- getHashedShakeVersion [ "Shakefile.hs" ]
@@ -25,7 +28,7 @@ main = do
         need
             [ "stack-test"
             , "integration-tests"
-            , "_build/shellcheck.ok"
+            , "shellcheck"
             ]
 
     phony "build" $ need [ "elm-format", "elm-fix" ]
@@ -268,30 +271,7 @@ main = do
         writeFile' out ""
 
 
-    --
-    -- shellcheck
-    --
-
     shellcheck %> \out -> do
         cmd_ "stack install ShellCheck"
 
-    "_build/shellcheck.ok" %> \out -> do
-        scriptFiles <- getDirectoryFiles ""
-            [ "build.sh"
-            , "tests/run-tests.sh"
-            , "package/collect_files.sh"
-            , "package/linux/build-in-docker.sh"
-            , "package/linux/build-package.sh"
-            , "package/mac/build-package.sh"
-            , "package/nix/build.sh"
-            , "package/win/build-package.sh"
-            ]
-        let oks = ["_build" </> f <.> "shellcheck.ok" | f <- scriptFiles]
-        need oks
-        writeFile' out (unlines scriptFiles)
-
-    "_build//*.shellcheck.ok" %> \out -> do
-        let script = dropDirectory1 $ dropExtension $ dropExtension out
-        need [ shellcheck, script ]
-        cmd_ shellcheck script
-        writeFile' out ""
+    Shakefiles.Shellcheck.rules shellcheck

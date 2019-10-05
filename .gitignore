@@ -6,5 +6,6 @@
 /.stack-work/
 /stack.yaml.lock
 /.shake/
+/.shake.cache/
 /_build/
 /generated/
