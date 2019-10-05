@@ -5,6 +5,7 @@ import Development.Shake.Util
 import Control.Monad (forM_)
 
 import qualified Shakefiles.Shellcheck
+import qualified Shakefiles.Dependencies
 
 
 main :: IO ()
@@ -16,11 +17,11 @@ main = do
       shakeVersion = shakefilesHash
     } $ do
     StdoutTrim stackLocalInstallRoot <- liftIO $ cmd "stack path --local-install-root"
-    StdoutTrim stackLocalBin <- liftIO $ cmd "stack path --local-bin"
 
     let elmFormat = stackLocalInstallRoot </> "bin/elm-format" <.> exe
     let elmFix = stackLocalInstallRoot </> "bin/elm-fix" <.> exe
-    let shellcheck = stackLocalBin </> "shellcheck" <.> exe
+
+    shellcheck <- Shakefiles.Dependencies.rules
 
     want [ "test" ]
 
@@ -270,8 +271,5 @@ main = do
         cmd_ "diff" "--strip-trailing-cr" "-u" actual expected
         writeFile' out ""
 
-
-    shellcheck %> \out -> do
-        cmd_ "stack install ShellCheck"
 
     Shakefiles.Shellcheck.rules shellcheck
