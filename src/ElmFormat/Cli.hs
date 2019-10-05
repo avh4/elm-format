@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -Wall #-}
-module ElmFormat (main, main') where
+module ElmFormat.Cli (main, main') where
 
 import Prelude hiding (putStr, putStrLn)
 
