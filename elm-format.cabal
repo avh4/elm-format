@@ -166,6 +166,9 @@ executable elm-fix
 
     default-language: Haskell2010
 
+    default-extensions:
+        OverloadedStrings
+
     hs-source-dirs:
         src-elm-fix
 
@@ -174,10 +177,12 @@ executable elm-fix
 
     other-modules:
         ElmFix.Cli
+        Prelude
 
     build-depends:
-        base >= 4.12.0.0 && < 5,
+        base-noprelude >= 4.12.0.0 && < 5,
         free >= 5.1.1 && < 6,
+        relude >= 0.4.0 && < 0.5,
         text >= 1.2.3.1 && < 2,
         elm-format
 

@@ -2,7 +2,6 @@
 
 module ElmFix.Cli (main) where
 
-import Prelude hiding (readFile, writeFile)
 import Elm.Utils ((|>))
 
 import CommandLine.TransformFiles (TransformMode(..))
@@ -47,21 +46,20 @@ main' ::
   (InputConsole f, OutputConsole f, InfoFormatter f, FileStore f, FileWriter f) =>
   [String] -> Free f Bool
 main' args =
-    do
-        case args of
-            definitionFile : first : rest ->
-                do
-                    definition <- parseUpgradeDefinition . snd <$> TransformFiles.readFromFile definitionFile
+    case args of
+        definitionFile : first : rest ->
+            do
+                definition <- parseUpgradeDefinition . snd <$> TransformFiles.readFromFile definitionFile
 
-                    case definition of
-                        Right def ->
-                            TransformFiles.applyTransformation (upgrade def) (FilesInPlace first rest)
+                case definition of
+                    Right def ->
+                        TransformFiles.applyTransformation (upgrade def) (FilesInPlace first rest)
 
-                        Left _ ->
-                            error "TODO: couldn't parse upgrade definition"
+                    Left _ ->
+                        error "TODO: couldn't parse upgrade definition"
 
-            _ ->
-                error "TODO: usage info"
+        _ ->
+            error "TODO: usage info"
 
 
 
