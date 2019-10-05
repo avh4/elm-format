@@ -1,6 +1,7 @@
 module ElmFormat.Cli (main, main') where
 
-import Prelude hiding (putStr, putStrLn)
+import Prelude ()
+import Relude hiding (exitFailure, exitSuccess, putStr, putStrLn)
 
 import System.Exit (ExitCode(..))
 import Messages.Types
@@ -68,7 +69,7 @@ collectErrors list =
                 (Right _, Left ls) ->
                     Left ls
     in
-        foldl step (Right []) list
+        foldl' step (Right []) list
 
 
 resolveFiles :: FileStore f => [FilePath] -> Free f (Either [InputFileMessage] [FilePath])
@@ -136,7 +137,7 @@ determineWhatToDo :: Source -> Destination -> Mode -> Either ErrorMessage WhatTo
 determineWhatToDo source destination mode =
     case ( mode, source, destination ) of
         ( ValidateMode, _, ToFile _) -> Left OutputAndValidate
-        ( ValidateMode, Stdin, _ ) -> Right $ ValidateStdin
+        ( ValidateMode, Stdin, _ ) -> Right ValidateStdin
         ( ValidateMode, FromFiles first rest, _) -> Right $ ValidateFiles first rest
         ( FormatMode, Stdin, InPlace ) -> Right $ Format StdinToStdout
         ( FormatMode, Stdin, ToFile output ) -> Right $ Format (StdinToFile output)
@@ -160,7 +161,7 @@ determineWhatToDoFromConfig config resolvedInputFiles =
 
 exitWithError :: World m => ErrorMessage -> m ()
 exitWithError message =
-    (putStrLnStderr $ Helpers.r $ message)
+    (putStrLnStderr $ Helpers.r message)
         >> exitFailure
 
 
@@ -194,17 +195,18 @@ experimental =
 handleParseResult :: World m => Opt.ParserResult a -> m (Maybe a)
 handleParseResult (Opt.Success a) = return (Just a)
 handleParseResult (Opt.Failure failure) = do
-      progn <- getProgName
-      let (msg, exit) = Opt.renderFailure failure progn
-      case exit of
+    progn <- getProgName
+    let (msg, exit) = Opt.renderFailure failure progn
+    case exit of
         ExitSuccess -> putStrLn msg *> exitSuccess *> return Nothing
         _           -> putStrLnStderr msg *> exitFailure *> return Nothing
-handleParseResult (Opt.CompletionInvoked _) = do
-      -- progn <- getProgName
-      -- msg <- Opt.execCompletion compl progn
-      -- putStr msg
-      -- const undefined <$> exitSuccess
-      error "Shell completion not yet implemented"
+handleParseResult (Opt.CompletionInvoked _) =
+    -- do
+    --     progn <- getProgName
+    --     msg <- Opt.execCompletion compl progn
+    --     putStr msg
+    --     const undefined <$> exitSuccess
+    error "Shell completion not yet implemented"
 
 
 main :: World m => [String] -> m ()
@@ -249,7 +251,7 @@ main' elmFormatVersion_ experimental_ args =
 
                                         Right elmVersion ->
                                             do
-                                                let run = case (Flags._validate config) of
+                                                let run = case Flags._validate config of
                                                         True -> Execute.run $ Execute.forMachine elmVersion True
                                                         False -> Execute.run $ Execute.forHuman autoYes
                                                 result <- run $ doIt elmVersion whatToDo
@@ -282,7 +284,7 @@ validate elmVersion (inputFile, inputText) =
                 Right ()
 
         Result.Result _ (Result.Err errs) ->
-            Left $ ParseError inputFile (Text.unpack inputText) errs
+            Left $ ParseError inputFile (toString inputText) errs
 
 
 parseModule :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage AST.Module.Module
@@ -292,7 +294,7 @@ parseModule elmVersion (inputFile, inputText) =
             Right modu
 
         Result.Result _ (Result.Err errs) ->
-            Left $ ParseError inputFile (Text.unpack inputText) errs
+            Left $ ParseError inputFile (toString inputText) errs
 
 
 format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
@@ -302,7 +304,7 @@ format elmVersion input =
 
 toJson :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
 toJson elmVersion (inputFile, inputText) =
-    Text.pack . Text.JSON.encode . AST.Json.showModule
+    toText . Text.JSON.encode . AST.Json.showModule
     <$> parseModule elmVersion (inputFile, inputText)
 
 
@@ -323,7 +325,7 @@ doIt elmVersion whatToDo =
             (validate elmVersion <$> TransformFiles.readStdin) >>= logError
 
         ValidateFiles first rest ->
-            all id <$> mapM validateFile (first:rest)
+            and <$> mapM validateFile (first:rest)
             where validateFile file = (validate elmVersion <$> TransformFiles.readFromFile file) >>= logError
 
         Format transformMode ->

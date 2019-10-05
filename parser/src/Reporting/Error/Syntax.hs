@@ -126,7 +126,7 @@ keyword kwd =
 unkeyword :: String -> Maybe String
 unkeyword message =
   if List.isPrefixOf "KEYWORD=" message
-    then Just (drop (length "KEYWORD=") message)
+    then Just (drop (length ("KEYWORD=" :: String)) message)
     else Nothing
 
 

@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wall #-}
 module AST.Helpers where
 
 import qualified Data.Char as Char
@@ -11,4 +10,4 @@ isOp name =
 
 isSymbol :: Char -> Bool
 isSymbol c =
-  Char.isSymbol c || elem c "+-/*=.$<>:&|^?%#@~!"
+  Char.isSymbol c || elem c ("+-/*=.$<>:&|^?%#@~!" :: String)

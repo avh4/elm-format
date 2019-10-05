@@ -40,6 +40,7 @@ library
     default-extensions:
         DeriveFunctor
         MultiParamTypeClasses
+        OverloadedStrings
 
     hs-source-dirs:
         src
@@ -137,6 +138,7 @@ library
         optparse-applicative >= 0.14.3.0 && < 0.15,
         parsec >= 3.1.13.0 && < 4,
         process >= 1.6.5.0 && < 2,
+        relude >= 0.4.0 && < 0.5,
         split >= 0.2.3.3 && < 0.3,
         text >= 1.2.3.1 && < 2
 

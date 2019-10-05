@@ -23,8 +23,8 @@ num =
 toLiteral :: String -> Literal
 toLiteral n
   | 'x' `elem` n         = IntNum (read n) HexadecimalInt
-  | any (`elem` "eE") n  = FloatNum (read n) ExponentFloat
-  | any (`elem` ".") n   = FloatNum (read n) DecimalFloat
+  | any (`elem` ("eE" :: String)) n = FloatNum (read n) ExponentFloat
+  | any (`elem` ("." :: String)) n = FloatNum (read n) DecimalFloat
   | otherwise            = IntNum (read n) DecimalInt
 
 
