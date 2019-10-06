@@ -139,7 +139,7 @@ main args =
 
 main' :: World m => String -> Maybe String -> [String] -> m ()
 main' elmFormatVersion_ experimental_ args =
-    Program.run (Flags.parse elmFormatVersion_ experimental_) Helpers.r run' args
+    Program.run (Flags.parser elmFormatVersion_ experimental_) Helpers.r run' args
     where
         run' :: World m => Flags.Config -> ProgramIO m ErrorMessage ()
         run' flags =

@@ -79,12 +79,19 @@ liftME m = ProgramIO (m >>= ((\(ProgramIO z) -> z) . liftEither))
 
 run ::
     World m =>
-    ([String] -> OptParse.ParserResult flags)
+    OptParse.ParserInfo flags
     -> (err -> String)
     -> (flags -> ProgramIO m err ())
     -> [String]
     -> m ()
-run parseFlags formatError run' args =
+run flagsParser formatError run' args =
+    let
+        parsePreferences =
+            OptParse.prefs (mempty <> OptParse.showHelpOnError)
+
+        parseFlags =
+            OptParse.execParserPure parsePreferences flagsParser
+    in
     do
         flags <- handleParseResult $ parseFlags args
         case flags of

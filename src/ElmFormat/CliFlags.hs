@@ -1,9 +1,8 @@
-module ElmFormat.CliFlags (Config(..), parse) where
+module ElmFormat.CliFlags (Config(..), parser) where
 
 import Prelude ()
 import Relude hiding (stdin)
 
-import Data.Monoid ((<>))
 import ElmVersion (ElmVersion(..))
 
 import qualified ElmVersion
@@ -22,20 +21,6 @@ data Config = Config
     , _upgrade :: Bool
     , _json :: Bool
     }
-
-
-
--- PARSE ARGUMENTS
-
-
-parse :: String -> Maybe String -> [String] -> Opt.ParserResult Config
-parse elmFormatVersion experimental args =
-    Opt.execParserPure preferences (parser elmFormatVersion experimental) args
-
-
-preferences :: Opt.ParserPrefs
-preferences =
-    Opt.prefs (mempty <> Opt.showHelpOnError)
 
 
 parser :: String -> Maybe String -> Opt.ParserInfo Config
