@@ -1,9 +1,13 @@
 module ElmFormat.CliFlags (Config(..), parse, showHelpText) where
 
+import Prelude ()
+import Relude hiding (stdin)
+
 import Data.Monoid ((<>))
 import ElmVersion (ElmVersion(..))
 
 import qualified ElmVersion
+import qualified Data.String as String
 import qualified Options.Applicative as Opt
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
 
@@ -84,7 +88,7 @@ helpInfo elmFormatVersion experimental =
                   Just surveyUrl ->
                       [ (PP.<$>) (PP.text "") $
                         PP.indent 4 $ PP.bold $
-                        PP.fillSep $ map PP.text $ words $
+                        PP.fillSep $ map PP.text $ String.words $
                           "This version of elm-format contains features " ++
                           "that may or may not appear in future releases. " ++
                           "You can provide feedback about experimental features " ++
