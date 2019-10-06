@@ -21,8 +21,8 @@ import qualified AST.Module
 import qualified CommandLine.Helpers as Helpers
 import qualified CommandLine.ResolveFiles as ResolveFiles
 import qualified CommandLine.TransformFiles as TransformFiles
-import qualified Flags
 import qualified Data.Text as Text
+import qualified ElmFormat.CliFlags as Flags
 import qualified ElmFormat.Execute as Execute
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render

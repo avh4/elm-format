@@ -103,10 +103,10 @@ library
         Cheapskate.Types
         Cheapskate.Util
         CommandLine.Helpers
+        ElmFormat.CliFlags
         ElmFormat.Filesystem
         ElmFormat.Operation
         ElmFormat.Version
-        Flags
         Messages.Formatter.HumanReadable
         Messages.Formatter.Json
         Messages.Strings

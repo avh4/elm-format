@@ -1,4 +1,4 @@
-module Flags where
+module ElmFormat.CliFlags (Config(..), parse, showHelpText) where
 
 import Data.Monoid ((<>))
 import ElmVersion (ElmVersion(..))
@@ -27,14 +27,6 @@ data Config = Config
 parse :: String -> Maybe String -> [String] -> Opt.ParserResult Config
 parse elmFormatVersion experimental args =
     Opt.execParserPure preferences (parser elmFormatVersion experimental) args
-
-
-usage :: String -> String -> Maybe String -> String
-usage progName version experimental =
-    fst $
-    Opt.renderFailure
-        (Opt.parserFailure preferences (parser version experimental) Opt.ShowHelpText mempty)
-        progName
 
 
 preferences :: Opt.ParserPrefs
@@ -131,14 +123,6 @@ validate =
         mconcat
         [ Opt.long "validate"
         , Opt.help "Check if files are formatted without changing them."
-        ]
-
-dependencies :: Opt.Parser Bool
-dependencies =
-    Opt.switch $
-        mconcat
-        [ Opt.long "dependencies"
-        , Opt.help "Also format this file's imported dependencies."
         ]
 
 
