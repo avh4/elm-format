@@ -51,7 +51,7 @@ library
     exposed-modules:
         ElmFormat.Cli
         ElmVersion
-        -- exposed for elm-fix
+        -- exposed for elm-refactor
         CommandLine.ResolveFiles
         CommandLine.TransformFiles
         ElmFormat.Upgrade_0_19
@@ -164,7 +164,7 @@ executable elm-format
         elm-format
 
 
-executable elm-fix
+executable elm-refactor
 
     ghc-options:
         -threaded -O2 -Wall -Wno-name-shadowing
@@ -175,13 +175,13 @@ executable elm-fix
         OverloadedStrings
 
     hs-source-dirs:
-        src-elm-fix
+        src-elm-refactor
 
     main-is:
         Main.hs
 
     other-modules:
-        ElmFix.Cli
+        ElmRefactor.Cli
         Prelude
 
     build-depends:

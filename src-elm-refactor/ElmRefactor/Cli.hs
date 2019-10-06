@@ -1,6 +1,4 @@
-{-# OPTIONS_GHC -Wall #-}
-
-module ElmFix.Cli (main) where
+module ElmRefactor.Cli (main) where
 
 import Elm.Utils ((|>))
 

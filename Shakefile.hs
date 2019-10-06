@@ -19,7 +19,7 @@ main = do
     StdoutTrim stackLocalInstallRoot <- liftIO $ cmd "stack path --local-install-root"
 
     let elmFormat = stackLocalInstallRoot </> "bin/elm-format" <.> exe
-    let elmFix = stackLocalInstallRoot </> "bin/elm-fix" <.> exe
+    let elmRefactor = stackLocalInstallRoot </> "bin/elm-refactor" <.> exe
 
     shellcheck <- Shakefiles.Dependencies.rules
 
@@ -32,9 +32,9 @@ main = do
             , "shellcheck"
             ]
 
-    phony "build" $ need [ "elm-format", "elm-fix" ]
+    phony "build" $ need [ "elm-format", "elm-refactor" ]
     phony "elm-format" $ need [ elmFormat ]
-    phony "elm-fix" $ need [ elmFix ]
+    phony "elm-refactor" $ need [ elmRefactor ]
     phony "stack-test" $ need [ "_build/stack-test.ok" ]
 
     phony "clean" $ do
@@ -79,13 +79,13 @@ main = do
         need generatedSourceFiles
         cmd_ "stack build --test --no-run-tests"
 
-    elmFix %> \out -> do
+    elmRefactor %> \out -> do
         libFiles <- getDirectoryFiles "" sourceFilesPattern
-        sourceFiles <- getDirectoryFiles "" [ "src-elm-fix//*.hs" ]
+        sourceFiles <- getDirectoryFiles "" [ "src-elm-refactor//*.hs" ]
         need libFiles
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "stack build --test --no-run-tests elm-format:exe:elm-fix"
+        cmd_ "stack build --test --no-run-tests elm-format:exe:elm-refactor"
 
     --
     -- Haskell tests
@@ -125,7 +125,7 @@ main = do
             , "_build/tests/test-files/bad/Elm-0.19.ok"
             , "_build/tests/test-files/bad/Elm-0.18.ok"
             , "_build/tests/test-files/bad/Elm-0.17.ok"
-            , "_build/tests/test-files/elm-fix/Elm-0.19.ok"
+            , "_build/tests/test-files/elm-refactor/Elm-0.19.ok"
             ]
 
     "_build/run-tests.ok" %> \out -> do
@@ -196,11 +196,11 @@ main = do
             need oks
             writeFile' out (unlines elmFiles)
 
-        ("_build/tests/test-files/elm-fix/Elm-" ++ elmVersion ++ ".ok") %> \out -> do
+        ("_build/tests/test-files/elm-refactor/Elm-" ++ elmVersion ++ ".ok") %> \out -> do
             upgradeFiles <- getDirectoryFiles ""
-                [ "tests/test-files/elm-fix/Elm-" ++ elmVersion ++ "//*.upgrade_elm"
+                [ "tests/test-files/elm-refactor/Elm-" ++ elmVersion ++ "//*.upgrade_elm"
                 ]
-            let oks = ["_build" </> f -<.> "elm_fix_matches" | f <- upgradeFiles ]
+            let oks = ["_build" </> f -<.> "elm_refactor_matches" | f <- upgradeFiles ]
             need oks
             writeFile' out (unlines upgradeFiles)
 
@@ -232,15 +232,15 @@ main = do
         cmd_ "diff" "--strip-trailing-cr" "-u" actual expected
         writeFile' out ""
 
-    "_build/tests/test-files/elm-fix/Elm-0.19//*.elm_fix_upgraded" %> \out -> do
+    "_build/tests/test-files/elm-refactor/Elm-0.19//*.elm_refactor_upgraded" %> \out -> do
         let source = dropDirectory1 $ out -<.> "elm"
         let upgradeDefinition = dropDirectory1 $ out -<.> "upgrade_elm"
-        need [ elmFix, source, upgradeDefinition ]
+        need [ elmRefactor, source, upgradeDefinition ]
         cmd_ "cp" source out
-        cmd_ elmFix upgradeDefinition out
+        cmd_ elmRefactor upgradeDefinition out
 
-    "_build/tests//*.elm_fix_matches" %> \out -> do
-        let actual = out -<.> "elm_fix_upgraded"
+    "_build/tests//*.elm_refactor_matches" %> \out -> do
+        let actual = out -<.> "elm_refactor_upgraded"
         let expected = dropDirectory1 $ out -<.> "output.elm"
         need [ actual, expected ]
         cmd_ "diff" "--strip-trailing-cr" "-u" actual expected
