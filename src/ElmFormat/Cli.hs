@@ -6,6 +6,7 @@ import Relude hiding (exitFailure, exitSuccess, putStr, putStrLn)
 import System.Exit (ExitCode(..))
 import Messages.Types
 import Messages.Formatter.Format
+import CommandLine.ResolveFiles (ResolveFileError)
 import CommandLine.TransformFiles (TransformMode(..))
 import Control.Monad.Free
 import ElmVersion
@@ -18,70 +19,17 @@ import ElmFormat.World
 import qualified AST.Json
 import qualified AST.Module
 import qualified CommandLine.Helpers as Helpers
+import qualified CommandLine.ResolveFiles as ResolveFiles
 import qualified CommandLine.TransformFiles as TransformFiles
 import qualified Flags
 import qualified Data.Text as Text
 import qualified ElmFormat.Execute as Execute
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
-import qualified ElmFormat.FileStore as FileStore
-import qualified ElmFormat.Filesystem as FS
 import qualified ElmFormat.Version
 import qualified Options.Applicative as Opt
 import qualified Reporting.Result as Result
 import qualified Text.JSON
-
-
-resolveFile :: FileStore f => FilePath -> Free f (Either InputFileMessage [FilePath])
-resolveFile path =
-    do
-        fileType <- FileStore.stat path
-
-        case fileType of
-            FileStore.IsFile ->
-                return $ Right [path]
-
-            FileStore.IsDirectory ->
-                do
-                    elmFiles <- FS.findAllElmFiles path
-                    case elmFiles of
-                        [] -> return $ Left $ NoElmFiles path
-                        _ -> return $ Right elmFiles
-
-            FileStore.DoesNotExist ->
-                return $ Left $ FileDoesNotExist path
-
-
-collectErrors :: [Either l r] -> Either [l] [r]
-collectErrors list =
-    let
-        step acc next =
-            case (next, acc) of
-                (Left l, Right _) ->
-                    Left [l]
-
-                (Left l, Left ls) ->
-                    Left (l : ls)
-
-                (Right r, Right rs) ->
-                    Right (r : rs)
-
-                (Right _, Left ls) ->
-                    Left ls
-    in
-        foldl' step (Right []) list
-
-
-resolveFiles :: FileStore f => [FilePath] -> Free f (Either [InputFileMessage] [FilePath])
-resolveFiles inputFiles =
-    do
-        result <- collectErrors <$> mapM resolveFile inputFiles
-        case result of
-            Left ls ->
-                return $ Left ls
-
-            Right files ->
-                return $ Right $ concat files
 
 
 data WhatToDo
@@ -107,7 +55,7 @@ data Mode
     | ValidateMode
 
 
-determineSource :: Bool -> Either [InputFileMessage] [FilePath] -> Either ErrorMessage Source
+determineSource :: Bool -> Either [ResolveFileError] [FilePath] -> Either ErrorMessage Source
 determineSource stdin inputFiles =
     case ( stdin, inputFiles ) of
         ( _, Left fileErrors ) -> Left $ BadInputFiles fileErrors
@@ -150,7 +98,7 @@ determineWhatToDo source destination mode =
         ( _, FromFiles _ _, ToFile _ ) -> Left SingleOutputWithMultipleInputs
 
 
-determineWhatToDoFromConfig :: Flags.Config -> Either [InputFileMessage] [FilePath] -> Either ErrorMessage WhatToDo
+determineWhatToDoFromConfig :: Flags.Config -> Either [ResolveFileError] [FilePath] -> Either ErrorMessage WhatToDo
 determineWhatToDoFromConfig config resolvedInputFiles =
     do
         source <- determineSource (Flags._stdin config) resolvedInputFiles
@@ -222,7 +170,7 @@ main' elmFormatVersion_ experimental_ args =
             Just config ->
                 do
                     let autoYes = Flags._yes config
-                    resolvedInputFiles <- Execute.run (Execute.forHuman autoYes) $ resolveFiles (Flags._input config)
+                    resolvedInputFiles <- Execute.run (Execute.forHuman autoYes) $ ResolveFiles.resolveElmFiles (Flags._input config)
 
                     case determineWhatToDoFromConfig config resolvedInputFiles of
                         Left NoInputs ->

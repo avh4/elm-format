@@ -51,6 +51,11 @@ library
     exposed-modules:
         ElmFormat.Cli
         ElmVersion
+        -- exposed for elm-fix
+        CommandLine.ResolveFiles
+        CommandLine.TransformFiles
+        ElmFormat.Upgrade_0_19
+        ElmFormat.World
         -- exposed for tests
         AST.Declaration
         AST.Expression
@@ -60,7 +65,6 @@ library
         AST.V0_16
         AST.Variable
         Box
-        CommandLine.TransformFiles
         Elm.Utils
         ElmFormat.Execute
         ElmFormat.FileStore
@@ -74,8 +78,6 @@ library
         ElmFormat.Render.ElmStructure
         ElmFormat.Render.Markdown
         ElmFormat.Render.Text
-        ElmFormat.Upgrade_0_19
-        ElmFormat.World
         Messages.Formatter.Format
         Messages.Types
         Parse.Expression

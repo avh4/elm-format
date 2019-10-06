@@ -1,5 +1,6 @@
 module Messages.Types where
 
+import CommandLine.ResolveFiles (ResolveFileError)
 import ElmVersion
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
@@ -20,14 +21,9 @@ data PromptMessage
 data ErrorMessage
   = ErrorsHeading
 
-  | BadInputFiles [InputFileMessage]
+  | BadInputFiles [ResolveFileError]
   | NoInputs
   | SingleOutputWithMultipleInputs
   | TooManyInputs
   | OutputAndValidate
   | MustSpecifyVersionWithUpgrade ElmVersion
-
-
-data InputFileMessage
-    = FileDoesNotExist FilePath
-    | NoElmFiles FilePath

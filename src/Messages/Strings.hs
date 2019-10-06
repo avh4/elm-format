@@ -1,6 +1,6 @@
-{-# OPTIONS_GHC -Wall #-}
 module Messages.Strings where
 
+import CommandLine.ResolveFiles (ResolveFileError(..))
 import Messages.Types
 
 
@@ -52,10 +52,9 @@ showErrorMessage (MustSpecifyVersionWithUpgrade elmVersion) =
 showErrorMessage NoInputs =
     error "Error case NoInputs should be handled elsewhere.  Please report this issue at https://github.com/avh4/elm-format/issues"
 
-showInputMessage :: InputFileMessage -> String
 
+showInputMessage :: ResolveFileError -> String
 showInputMessage (FileDoesNotExist path) =
     path ++ ": No such file or directory"
-
 showInputMessage (NoElmFiles path) =
     path ++ ": Directory does not contain any *.elm files"
