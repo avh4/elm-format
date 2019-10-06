@@ -3,7 +3,10 @@
 
 module Reporting.Annotation where
 
-import Prelude hiding (map)
+import Prelude ()
+import Relude
+
+import Text.Show (showParen, showString, showsPrec)
 
 import qualified Reporting.Region as R
 import qualified Data.String as String

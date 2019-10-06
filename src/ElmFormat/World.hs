@@ -1,15 +1,16 @@
 module ElmFormat.World where
 
+import Prelude ()
+import Relude
+
 import Data.Text (Text)
 import System.Console.ANSI (SGR, hSetSGR)
-import System.IO (hFlush, hPutStr, hPutStrLn, stdout, stderr)
-import qualified Data.ByteString as ByteString
-import qualified Data.ByteString.Char8 as Char8
+import System.IO (hFlush, hPutStr, hPutStrLn)
 import qualified Data.ByteString.Lazy as Lazy
-import qualified Data.Text.Encoding as Text
 import qualified System.Directory as Dir
 import qualified System.Environment
 import qualified System.Exit
+import qualified System.IO
 
 
 class Monad m => World m where
@@ -37,8 +38,8 @@ class Monad m => World m where
 
 
 instance World IO where
-    readUtf8File path = Text.decodeUtf8 <$> ByteString.readFile path
-    writeUtf8File path content = ByteString.writeFile path $ Text.encodeUtf8 content
+    readUtf8File path = decodeUtf8 <$> readFileBS path
+    writeUtf8File path content = writeFileBS path $ encodeUtf8 content
 
     doesFileExist = Dir.doesFileExist
     doesDirectoryExist = Dir.doesDirectoryExist
@@ -46,11 +47,11 @@ instance World IO where
 
     getProgName = System.Environment.getProgName
 
-    getStdin = Text.decodeUtf8 <$> Lazy.toStrict <$> Lazy.getContents
-    getLine = Prelude.getLine
-    putStr = Prelude.putStr
-    putStrLn = Prelude.putStrLn
-    writeStdout content = Char8.putStr $ Text.encodeUtf8 content
+    getStdin = decodeUtf8 <$> toStrict <$> Lazy.getContents
+    getLine = System.IO.getLine
+    putStr = System.IO.putStr
+    putStrLn = System.IO.putStrLn
+    writeStdout content = putBS $ encodeUtf8 content
     flushStdout = hFlush stdout
     putStrStderr = hPutStr stderr
     putStrLnStderr = hPutStrLn stderr

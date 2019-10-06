@@ -1,5 +1,9 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Reporting.Region where
+
+import Prelude ()
+import Relude
+
+import Text.Show (showParen, showString, showsPrec)
 
 import qualified Data.String as String
 import qualified Text.Parsec.Pos as Parsec

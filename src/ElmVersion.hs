@@ -1,5 +1,9 @@
-{-# OPTIONS_GHC -Wall #-}
 module ElmVersion where
+
+import Prelude ()
+import Relude
+
+import qualified Text.Show
 
 
 data ElmVersion
