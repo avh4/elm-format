@@ -2,26 +2,21 @@ module ElmRefactor.Cli (main) where
 
 import Elm.Utils ((|>))
 
+import CommandLine.Program (ProgramIO)
 import CommandLine.TransformFiles (TransformMode(..))
-import Control.Monad.Free
 import Data.Text (Text)
-import ElmFormat.FileStore (FileStore)
-import ElmFormat.FileWriter (FileWriter)
-import ElmFormat.InputConsole (InputConsole)
-import ElmFormat.OutputConsole (OutputConsole)
 import ElmFormat.Upgrade_0_19 (UpgradeDefinition, parseUpgradeDefinition, transformModule)
 import ElmFormat.World
+import ElmRefactor.CliFlags as Flags
 import ElmVersion
-import Messages.Formatter.Format
 import Messages.Types
 
+import qualified CommandLine.Program as Program
 import qualified CommandLine.TransformFiles as TransformFiles
 import qualified ElmFormat.Execute as Execute
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified Reporting.Result as Result
-
--- elm-fix <upgrade-definition> [FILES...]
 
 
 upgrade :: UpgradeDefinition -> (FilePath, Text) -> Either InfoMessage Text
@@ -40,35 +35,25 @@ upgrade upgradeDefinition (_, inputText) =
             error "TODO: couldn't parse source file"
 
 
-main' ::
-  (InputConsole f, OutputConsole f, InfoFormatter f, FileStore f, FileWriter f) =>
-  [String] -> Free f Bool
-main' args =
-    case args of
-        definitionFile : first : rest ->
-            do
-                definition <- parseUpgradeDefinition . snd <$> TransformFiles.readFromFile definitionFile
+main' :: World m => Flags.Flags -> ProgramIO m String ()
+main' flags =
+    do
+        let autoYes = True
+        let run = Execute.run $ Execute.forHuman autoYes
 
-                case definition of
-                    Right def ->
-                        TransformFiles.applyTransformation (upgrade def) (FilesInPlace first rest)
+        mode <- case Flags._input flags of
+            [] -> Program.showUsage
+            first:rest -> return $ FilesInPlace first rest
 
-                    Left _ ->
-                        error "TODO: couldn't parse upgrade definition"
+        let definitionFile = Flags._upgradeDefinition flags
+        definition <- Program.liftME $ fmap (first (\() -> "Failed to parse upgrade definition")) $ parseUpgradeDefinition . snd <$> run (TransformFiles.readFromFile definitionFile)
 
-        _ ->
-            error "TODO: usage info"
-
-
+        result <- Program.liftM $ run $ TransformFiles.applyTransformation (upgrade definition) mode
+        if result
+            then return ()
+            else Program.failed
 
 
 main :: World m => [String] -> m ()
 main args =
-    do
-        let autoYes = True
-        let run = Execute.run $ Execute.forHuman autoYes
-        result <- run $ main' args
-        if result
-            then exitSuccess
-            else exitFailure
-
+    Program.run (Flags.parser "dev") id main' args

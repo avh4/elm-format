@@ -52,6 +52,7 @@ library
         ElmFormat.Cli
         ElmVersion
         -- exposed for elm-refactor
+        CommandLine.Program
         CommandLine.ResolveFiles
         CommandLine.TransformFiles
         ElmFormat.Upgrade_0_19
@@ -103,7 +104,6 @@ library
         Cheapskate.Types
         Cheapskate.Util
         CommandLine.Helpers
-        CommandLine.Program
         ElmFormat.CliFlags
         ElmFormat.Filesystem
         ElmFormat.Operation
@@ -182,11 +182,14 @@ executable elm-refactor
 
     other-modules:
         ElmRefactor.Cli
+        ElmRefactor.CliFlags
         Prelude
 
     build-depends:
+        ansi-wl-pprint >= 0.6.8.2 && < 0.7,
         base-noprelude >= 4.12.0.0 && < 5,
         free >= 5.1.1 && < 6,
+        optparse-applicative >= 0.14.3.0 && < 0.15,
         relude >= 0.4.0 && < 0.5,
         text >= 1.2.3.1 && < 2,
         elm-format

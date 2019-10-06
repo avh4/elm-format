@@ -77,7 +77,7 @@ main = do
         need libFiles
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "stack build --test --no-run-tests"
+        cmd_ "stack build elm-format:exe:elm-format --test --no-run-tests"
 
     elmRefactor %> \out -> do
         libFiles <- getDirectoryFiles "" sourceFilesPattern
@@ -85,7 +85,7 @@ main = do
         need libFiles
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "stack build --test --no-run-tests elm-format:exe:elm-refactor"
+        cmd_ "stack build elm-format:exe:elm-refactor --test --no-run-tests"
 
     --
     -- Haskell tests
