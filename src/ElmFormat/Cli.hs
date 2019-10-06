@@ -123,23 +123,15 @@ determineVersion elmVersion upgrade =
             Right elmVersion
 
 
-elmFormatVersion :: String
-elmFormatVersion =
-    ElmFormat.Version.asString
-
-
-experimental :: Maybe String
-experimental =
-    ElmFormat.Version.experimental
-
-
 main :: World m => [String] -> m ()
-main args =
-    main' elmFormatVersion experimental args
+main =
+    main'
+        ElmFormat.Version.asString
+        ElmFormat.Version.experimental
 
 main' :: World m => String -> Maybe String -> [String] -> m ()
-main' elmFormatVersion_ experimental_ args =
-    Program.run (Flags.parser elmFormatVersion_ experimental_) Helpers.r run' args
+main' elmFormatVersion experimental args =
+    Program.run (Flags.parser elmFormatVersion experimental) Helpers.r run' args
     where
         run' :: World m => Flags.Config -> ProgramIO m ErrorMessage ()
         run' flags =
