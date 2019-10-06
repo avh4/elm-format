@@ -103,6 +103,7 @@ library
         Cheapskate.Types
         Cheapskate.Util
         CommandLine.Helpers
+        CommandLine.Program
         ElmFormat.CliFlags
         ElmFormat.Filesystem
         ElmFormat.Operation

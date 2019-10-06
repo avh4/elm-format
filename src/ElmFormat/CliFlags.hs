@@ -1,4 +1,4 @@
-module ElmFormat.CliFlags (Config(..), parse, showHelpText) where
+module ElmFormat.CliFlags (Config(..), parse) where
 
 import Prelude ()
 import Relude hiding (stdin)
@@ -43,15 +43,6 @@ parser elmFormatVersion experimental =
     Opt.info
         (Opt.helper <*> flags)
         (helpInfo elmFormatVersion experimental)
-
-
-showHelpText :: String -> Maybe String -> Opt.ParserResult never
-showHelpText elmFormatVersion experimental = Opt.Failure $
-    Opt.parserFailure
-        preferences
-        (parser elmFormatVersion experimental)
-        Opt.ShowHelpText
-        mempty
 
 
 

@@ -3,9 +3,9 @@ module ElmFormat.Cli (main, main') where
 import Prelude ()
 import Relude hiding (exitFailure, exitSuccess, putStr, putStrLn)
 
-import System.Exit (ExitCode(..))
 import Messages.Types
 import Messages.Formatter.Format
+import CommandLine.Program (ProgramIO)
 import CommandLine.ResolveFiles (ResolveFileError)
 import CommandLine.TransformFiles (TransformMode(..))
 import Control.Monad.Free
@@ -19,6 +19,7 @@ import ElmFormat.World
 import qualified AST.Json
 import qualified AST.Module
 import qualified CommandLine.Helpers as Helpers
+import qualified CommandLine.Program as Program
 import qualified CommandLine.ResolveFiles as ResolveFiles
 import qualified CommandLine.TransformFiles as TransformFiles
 import qualified Data.Text as Text
@@ -27,7 +28,6 @@ import qualified ElmFormat.Execute as Execute
 import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.Version
-import qualified Options.Applicative as Opt
 import qualified Reporting.Result as Result
 import qualified Text.JSON
 
@@ -107,12 +107,6 @@ determineWhatToDoFromConfig config resolvedInputFiles =
         determineWhatToDo source destination mode
 
 
-exitWithError :: World m => ErrorMessage -> m ()
-exitWithError message =
-    (putStrLnStderr $ Helpers.r message)
-        >> exitFailure
-
-
 determineVersion :: ElmVersion -> Bool -> Either ErrorMessage ElmVersion
 determineVersion elmVersion upgrade =
     case (elmVersion, upgrade) of
@@ -139,76 +133,41 @@ experimental =
     ElmFormat.Version.experimental
 
 
-{-| copied from Options.Applicative -}
-handleParseResult :: World m => Opt.ParserResult a -> m (Maybe a)
-handleParseResult (Opt.Success a) = return (Just a)
-handleParseResult (Opt.Failure failure) = do
-    progn <- getProgName
-    let (msg, exit) = Opt.renderFailure failure progn
-    case exit of
-        ExitSuccess -> putStrLn msg *> exitSuccess *> return Nothing
-        _           -> putStrLnStderr msg *> exitFailure *> return Nothing
-handleParseResult (Opt.CompletionInvoked _) =
-    -- do
-    --     progn <- getProgName
-    --     msg <- Opt.execCompletion compl progn
-    --     putStr msg
-    --     const undefined <$> exitSuccess
-    error "Shell completion not yet implemented"
-
-
 main :: World m => [String] -> m ()
 main args =
     main' elmFormatVersion experimental args
 
 main' :: World m => String -> Maybe String -> [String] -> m ()
 main' elmFormatVersion_ experimental_ args =
-    do
-        c <- handleParseResult $ Flags.parse elmFormatVersion_ experimental_ args
-        case c of
-            Nothing -> return ()
-            Just config ->
-                do
-                    let autoYes = Flags._yes config
-                    resolvedInputFiles <- Execute.run (Execute.forHuman autoYes) $ ResolveFiles.resolveElmFiles (Flags._input config)
+    Program.run (Flags.parse elmFormatVersion_ experimental_) Helpers.r run' args
+    where
+        run' :: World m => Flags.Config -> ProgramIO m ErrorMessage ()
+        run' flags =
+            do
+                let autoYes = Flags._yes flags
+                resolvedInputFiles <- Program.liftM $ Execute.run (Execute.forHuman autoYes) $ ResolveFiles.resolveElmFiles (Flags._input flags)
 
-                    case determineWhatToDoFromConfig config resolvedInputFiles of
-                        Left NoInputs ->
-                            (handleParseResult $ Flags.showHelpText elmFormatVersion_ experimental_)
-                                -- TODO: handleParseResult is exitSuccess, so we never get to exitFailure
-                                >> exitFailure
+                whatToDo <- case determineWhatToDoFromConfig flags resolvedInputFiles of
+                    Left NoInputs -> Program.showUsage
+                    Left err -> Program.error err
+                    Right a -> return a
 
-                        Left message ->
-                            exitWithError message
+                elmVersionChoice <- case Flags._elmVersion flags of
+                    Just v -> return v
+                    Nothing -> Program.liftME autoDetectElmVersion
 
-                        Right whatToDo -> do
-                            elmVersionChoice <- case Flags._elmVersion config of
-                                Just v -> return $ Right v
-                                Nothing -> autoDetectElmVersion
+                elmVersion <- Program.liftEither $ determineVersion elmVersionChoice (Flags._upgrade flags)
 
-                            case elmVersionChoice of
-                                Left message ->
-                                    putStr message *> exitFailure
-
-                                Right elmVersionChoice' -> do
-                                    let elmVersionResult = determineVersion elmVersionChoice' (Flags._upgrade config)
-
-                                    case elmVersionResult of
-                                        Left message ->
-                                            exitWithError message
-
-                                        Right elmVersion ->
-                                            do
-                                                let run = case Flags._validate config of
-                                                        True -> Execute.run $ Execute.forMachine elmVersion True
-                                                        False -> Execute.run $ Execute.forHuman autoYes
-                                                result <- run $ doIt elmVersion whatToDo
-                                                if result
-                                                    then exitSuccess
-                                                    else exitFailure
+                let run = case Flags._validate flags of
+                        True -> Execute.run $ Execute.forMachine elmVersion True
+                        False -> Execute.run $ Execute.forHuman autoYes
+                result <- Program.liftM $ run $ doIt elmVersion whatToDo
+                if result
+                    then return ()
+                    else Program.failed
 
 
-autoDetectElmVersion :: World m => m (Either String ElmVersion)
+autoDetectElmVersion :: World m => m (Either x ElmVersion)
 autoDetectElmVersion =
     do
         hasElmPackageJson <- doesFileExist "elm-package.json"
