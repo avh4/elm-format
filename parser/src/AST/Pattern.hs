@@ -1,6 +1,10 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module AST.Pattern where
 
 import AST.V0_16
+import ElmFormat.Mapping
+
 import qualified Reporting.Annotation as A
 
 
@@ -27,3 +31,7 @@ data Pattern' ns
     | Record [Commented LowercaseIdentifier]
     | Alias (Pattern ns, Comments) (Comments, LowercaseIdentifier)
     deriving (Eq, Show, Functor)
+
+
+instance MapNamespace a b (Pattern' a) (Pattern' b) where
+    mapNamespace = fmap

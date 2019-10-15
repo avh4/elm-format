@@ -25,15 +25,15 @@ data UnaryOperator =
 
 
 data LetDeclaration ns e
-  = LetDefinition (Pattern ns) [(Comments, (Pattern ns))] Comments e
-  | LetAnnotation (Var.Ref (), Comments) (Comments, Type ns)
+  = LetDefinition (Pattern ns) [PreCommented (Pattern ns)] Comments e
+  | LetAnnotation (PostCommented (Var.Ref ())) (PreCommented (Type ns))
   | LetComment Comment
   deriving (Eq, Show, Functor)
 
 instance MapNamespace a b (LetDeclaration a e) (LetDeclaration b e) where
     mapNamespace f ld =
         case ld of
-            LetDefinition first rest comments body -> LetDefinition (fmap (fmap f) first) (fmap (fmap $ fmap $ fmap f) rest) comments body
+            LetDefinition first rest comments body -> LetDefinition (fmap (fmap f) first) (mapNamespace f rest) comments body
             LetAnnotation name typ -> LetAnnotation name (fmap (fmap $ fmap f) typ)
             LetComment comment -> LetComment comment
 
@@ -99,7 +99,7 @@ data Expression ns e
     | Literal Literal
     | VarExpr (Var.Ref ns)
 
-    | App e [(Comments, e)] FunctionApplicationMultiline
+    | App e [PreCommented e] FunctionApplicationMultiline
     | Unary UnaryOperator e
     | Binops e [BinopsClause ns e] Bool
     | Parens (Commented e)
@@ -123,10 +123,10 @@ data Expression ns e
     | Access e LowercaseIdentifier
     | AccessFunction LowercaseIdentifier
 
-    | Lambda [(Comments, Pattern ns)] Comments e Bool
-    | If (IfClause e) [(Comments, IfClause e)] (Comments, e)
+    | Lambda [PreCommented (Pattern ns)] Comments e Bool
+    | If (IfClause e) [PreCommented (IfClause e)] (PreCommented e)
     | Let [LetDeclaration ns e] Comments e
-    | Case (Commented e, Bool) [(Commented (Pattern ns), (Comments, e))]
+    | Case (Commented e, Bool) [(Commented (Pattern ns), (PreCommented e))]
 
     -- for type checking and code gen only
     | GLShader String
@@ -140,7 +140,7 @@ instance MapNamespace a b (Expression a e) (Expression b e) where
             Binops left restOps multiline ->
                 Binops left (fmap (mapNamespace f) restOps) multiline
             Let decls pre body ->
-                Let (fmap (mapNamespace f) decls) pre body
+                Let (mapNamespace f decls) pre body
 
             Unit c ->
                 Unit c
@@ -167,11 +167,11 @@ instance MapNamespace a b (Expression a e) (Expression b e) where
             AccessFunction n ->
                 AccessFunction n
             Lambda params pre body multi ->
-                Lambda (fmap (fmap $ fmap $ fmap f) params) pre body multi
+                Lambda (mapNamespace f params) pre body multi
             If c1 elseIfs els ->
                 If c1 elseIfs els
             Case (cond, m) branches ->
-                Case (cond, m) (fmap (mapFst $ fmap $ fmap $ fmap f) branches)
+                Case (cond, m) (fmap (mapFst $ mapNamespace f) branches)
             GLShader s ->
                 GLShader s
         where
