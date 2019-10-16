@@ -204,7 +204,7 @@ data Type' ns
         }
     | FunctionType
         { first :: WithEol (Type ns)
-        , rest :: [(Comments, Comments, Type ns, Maybe String)]
+        , rest :: Sequence (Type ns)
         , forceMultiline :: ForceMultiline
         }
     deriving (Eq, Show, Functor)

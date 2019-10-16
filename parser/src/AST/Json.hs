@@ -500,12 +500,12 @@ instance ToJSON (Type [UppercaseIdentifier]) where
             _ ->
                 JSString $ toJSString $ "TODO: Type (" ++ show type' ++ ")"
         where
-            firstRestToRestLast :: WithEol x -> List (a, b, x, Maybe String) -> (List (WithEol x, a, b), WithEol x)
+            firstRestToRestLast :: WithEol x -> List (a, (b, (WithEol x))) -> (List (WithEol x, a, b), WithEol x)
             firstRestToRestLast first rest =
                 done $ foldl (flip step) (ReversedList.empty, first) rest
                 where
-                    step :: (a, b, x, Maybe String) -> (Reversed (WithEol x, a, b), WithEol x) -> (Reversed (WithEol x, a, b), WithEol x)
-                    step (a, b, next, dn) (acc, last) =
+                    step :: (a, (b, WithEol x)) -> (Reversed (WithEol x, a, b), WithEol x) -> (Reversed (WithEol x, a, b), WithEol x)
+                    step (a, (b, WithEol next dn)) (acc, last) =
                         (ReversedList.push (last, a, b) acc, WithEol next dn)
 
                     done :: (Reversed (WithEol x, a, b), WithEol x) -> (List (WithEol x, a, b), WithEol x)

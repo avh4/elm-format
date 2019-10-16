@@ -25,7 +25,7 @@ data Pattern' ns
     | List [Commented (Pattern ns)]
     | ConsPattern
         { first :: WithEol (Pattern ns)
-        , rest :: [(Comments, Comments, Pattern ns, Maybe String)]
+        , rest :: Sequence (Pattern ns)
         }
     | EmptyRecordPattern Comments
     | Record [Commented LowercaseIdentifier]

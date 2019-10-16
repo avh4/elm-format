@@ -316,9 +316,7 @@ transformType' upgradeDefinition typ = case typ of
                         inlineTypeVars inlines $ noRegion newTyp
 
                     rest' =
-                        fmap
-                            (\(preA, postA, t, eol') -> (preA, postA, transformType upgradeDefinition t, eol'))
-                            rest
+                        fmap (fmap $ fmap $ fmap $ transformType upgradeDefinition) rest
                 in
                 A region $ FunctionType (WithEol first' eol) rest' ml
 
@@ -606,7 +604,7 @@ bottomUpType f (A region typ) =
         TypeParens t -> A region $ TypeParens (fmap (bottomUpType f) t)
         TupleType ts -> A region $ TupleType (fmap (fmap $ fmap $ bottomUpType f) ts)
         RecordType base fields cs ml -> A region $ RecordType base (fmap (fmap $ fmap $ fmap $ fmap $ bottomUpType f) fields) cs ml
-        FunctionType first rest ml -> A region $ FunctionType (fmap (bottomUpType f) first) (fmap (\(a, b, t, e) -> (a, b, bottomUpType f t, e)) rest) ml
+        FunctionType first rest ml -> A region $ FunctionType (fmap (bottomUpType f) first) (fmap (fmap $ fmap $ fmap $ bottomUpType f) rest) ml
 
 
 destructureFirstMatch :: PreCommented UExpr -> [ (PreCommented (Pattern (MatchedNamespace [UppercaseIdentifier])), UExpr) ] -> UExpr -> UExpr

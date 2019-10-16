@@ -292,7 +292,7 @@ keyValue parseSep parseKey parseVal =
       )
 
 
-separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (WithEol e), [(Comments, Comments, e, Maybe String)], Bool))
+separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, (WithEol e), Sequence e, Bool))
 separated sep expr' =
   let
     subparser =
@@ -311,7 +311,7 @@ separated sep expr' =
                           return $ \multiline -> Right
                             ( R.Region start end
                             , WithEol t1 eolT1
-                            , (preArrow, postArrow, t2', eolT2):ts
+                            , (preArrow, (postArrow, WithEol t2' eolT2)):ts
                             , multiline
                             )
                         Left t2' ->
@@ -320,7 +320,7 @@ separated sep expr' =
                             return $ \multiline -> Right
                               ( R.Region start end
                               , WithEol t1 eolT1
-                              , [(preArrow, postArrow, t2', eol)]
+                              , [(preArrow, (postArrow, WithEol t2' eol))]
                               , multiline)
   in
     (\(f, multiline) -> f $ multilineToBool multiline) <$> trackNewline subparser

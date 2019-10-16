@@ -1138,7 +1138,7 @@ formatPattern elmVersion parensRequired apattern =
 
         AST.Pattern.ConsPattern first rest ->
             let
-                formatRight (preOp, postOp, term, eol) =
+                formatRight (preOp, (postOp, AST.WithEol term eol)) =
                     ( False
                     , preOp
                     , line $ punc "::"
@@ -2219,7 +2219,7 @@ formatType' elmVersion requireParens atype =
 
         AST.FunctionType first rest (AST.ForceMultiline forceMultiline) ->
             let
-                formatRight (preOp, postOp, term, eol) =
+                formatRight (preOp, (postOp, AST.WithEol term eol)) =
                     ElmStructure.forceableSpaceSepOrStack1
                         False
                         $ concat
