@@ -7,7 +7,7 @@ module ElmFormat.Upgrade_0_19 (UpgradeDefinition, transform, parseUpgradeDefinit
 
 import Elm.Utils ((|>))
 
-import AST.Annotated (updateNamespace)
+import AST.Annotated ()
 import AST.V0_16
 import AST.Declaration (Declaration(..), TopLevelStructure(..))
 import AST.Expression
@@ -192,7 +192,7 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
 
         originalBody =
             originalBody'
-                |> fmap (updateNamespace (matchReferences (Bimap.toMap $ ImportInfo._aliases importInfo) (ImportInfo._directImports importInfo)))
+                |> fmap (mapNamespace (matchReferences (Bimap.toMap $ ImportInfo._aliases importInfo) (ImportInfo._directImports importInfo)))
 
         finalBody =
             fmap transformTopLevelStructure originalBody
@@ -208,7 +208,7 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
             ImportInfo.fromImports $ fmap snd finalImports
     in
     finalBody
-        |> fmap (updateNamespace (applyReferences (Bimap.toMapR $ ImportInfo._aliases finalImportInfo)))
+        |> fmap (mapNamespace (applyReferences (Bimap.toMapR $ ImportInfo._aliases finalImportInfo)))
         |> Module a b c (preImports, finalImports)
 
 

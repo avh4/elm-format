@@ -4,7 +4,7 @@ module AST.Json where
 
 import Elm.Utils ((|>))
 
-import AST.Annotated (updateNamespace)
+import AST.Annotated ()
 import AST.Declaration
 import AST.Expression
 import AST.Module
@@ -13,6 +13,7 @@ import AST.Variable
 import AST.V0_16
 import Data.Fix
 import Data.Maybe (mapMaybe)
+import ElmFormat.Mapping
 import Reporting.Annotation hiding (map)
 import Text.JSON hiding (showJSON)
 
@@ -69,7 +70,7 @@ showModule (Module _ maybeHeader _ (_, imports) body) =
     makeObj
         [ ( "moduleName", showJSON name )
         , ( "imports", makeObj $ fmap importJson $ Map.toList imports )
-        , ( "body" , JSArray $ fmap showJSON $ mergeDeclarations $ (fmap (updateNamespace normalizeNamespace) body :: List (TopLevelStructure (Declaration [UppercaseIdentifier] (Fix (AnnotatedExpression [UppercaseIdentifier] Region.Region))))) )
+        , ( "body" , JSArray $ fmap showJSON $ mergeDeclarations $ (fmap (mapNamespace normalizeNamespace) body :: List (TopLevelStructure (Declaration [UppercaseIdentifier] (Fix (AnnotatedExpression [UppercaseIdentifier] Region.Region))))) )
         ]
 
 
