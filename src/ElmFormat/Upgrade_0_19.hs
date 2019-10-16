@@ -113,14 +113,14 @@ parseUpgradeDefinition definitionText =
                     Entry (A _ (TypeAlias comments (Commented _ (name, args) _) (_, A _ typ))) ->
                         case makeTypeName name of
                             Just typeName ->
-                                Just (typeName, (fmap snd args, fmap matchReferences' typ))
+                                Just (typeName, (fmap snd args, mapReferences' matchReferences' typ))
 
                             Nothing -> Nothing
 
                     _ -> Nothing
             in
             Right $ UpgradeDefinition
-                { _replacements = fmap (mapNamespace matchReferences') $ Dict.fromList $ Maybe.mapMaybe getExpressionReplacement body
+                { _replacements = fmap (mapReferences' matchReferences') $ Dict.fromList $ Maybe.mapMaybe getExpressionReplacement body
                 , _typeReplacements = Dict.fromList $ Maybe.mapMaybe getTypeReplacement body
                 , _imports = imports
                 }
@@ -146,7 +146,7 @@ transform importInfo =
         Right replacements ->
             mapNamespace (applyReferences (Bimap.toMapR $ ImportInfo._aliases importInfo))
                 . transform' replacements importInfo
-                . mapNamespace (matchReferences (Bimap.toMap $ ImportInfo._aliases importInfo) (ImportInfo._directImports importInfo))
+                . mapReferences' (matchReferences (Bimap.toMap $ ImportInfo._aliases importInfo) (ImportInfo._directImports importInfo))
 
 
         Left () ->
@@ -192,7 +192,7 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
 
         originalBody =
             originalBody'
-                |> fmap (mapNamespace (matchReferences (Bimap.toMap $ ImportInfo._aliases importInfo) (ImportInfo._directImports importInfo)))
+                |> fmap (mapReferences' (matchReferences (Bimap.toMap $ ImportInfo._aliases importInfo) (ImportInfo._directImports importInfo)))
 
         finalBody =
             fmap transformTopLevelStructure originalBody
@@ -239,32 +239,39 @@ matchReferences ::
     Ord t =>
     Dict.Map t [t]
     -> Set.Set [t]
-    -> [t]
-    -> MatchedNamespace [t]
-matchReferences aliases imports ns =
-    case ns of
-        [] -> NoNamespace
-        _ ->
-            let
-                self =
-                    if Set.member ns imports then
-                        Just ns
-                    else
-                        Nothing
+    -> ( ([t], UppercaseIdentifier) -> (MatchedNamespace [t], UppercaseIdentifier)
+       , ([t], LowercaseIdentifier) -> (MatchedNamespace [t], LowercaseIdentifier)
+       )
+matchReferences aliases imports =
+    let
+        f ns =
+            case ns of
+                [] -> NoNamespace
+                _ ->
+                    let
+                        self =
+                            if Set.member ns imports then
+                                Just ns
+                            else
+                                Nothing
 
-                fromAlias =
-                    case ns of
-                        [single] ->
-                            Dict.lookup single aliases
-                        _ ->
-                            Nothing
+                        fromAlias =
+                            case ns of
+                                [single] ->
+                                    Dict.lookup single aliases
+                                _ ->
+                                    Nothing
 
-                resolved =
-                    fromAlias <|> self
-            in
-            case resolved of
-                Nothing -> Unmatched ns
-                Just single -> MatchedImport single
+                        resolved =
+                            fromAlias <|> self
+                    in
+                    case resolved of
+                        Nothing -> Unmatched ns
+                        Just single -> MatchedImport single
+    in
+    ( \(ns, u) -> (f ns, u)
+    , \(ns, l) -> (f ns, l)
+    )
 
 
 applyReferences :: Ord t => Dict.Map [t] t -> MatchedNamespace [t] -> [t]

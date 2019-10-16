@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE LambdaCase #-}
 
 module AST.Declaration where
 
@@ -34,17 +35,27 @@ data Declaration ns expr
 
 
 instance MapNamespace a b (Declaration a e) (Declaration b e) where
-    mapNamespace f decl =
-        case decl of
-            Definition first rest comments e -> Definition (fmap (fmap f) first) (fmap (fmap $ fmap $ fmap f) rest) comments e
-            TypeAnnotation name typ -> TypeAnnotation name (fmap (fmap $ fmap f) typ)
-            Datatype nameWithArgs tags -> Datatype nameWithArgs (fmap (fmap $ fmap $ fmap $ fmap $ fmap f) tags)
-            TypeAlias comments name typ -> TypeAlias comments name (fmap (fmap $ fmap f) typ)
-            PortAnnotation name comments typ -> PortAnnotation name comments (fmap (fmap f) typ)
-            PortDefinition name comments expr -> PortDefinition name comments expr
-            Fixity a pre n post op -> Fixity a pre n post (fmap f op)
-            Fixity_0_19 a n op fn -> Fixity_0_19 a n op fn
+    mapNamespace f = \case
+        Definition first rest comments e -> Definition (fmap (fmap f) first) (fmap (fmap $ fmap $ fmap f) rest) comments e
+        TypeAnnotation name typ -> TypeAnnotation name (fmap (fmap $ fmap f) typ)
+        Datatype nameWithArgs tags -> Datatype nameWithArgs (fmap (fmap $ fmap $ fmap $ fmap $ fmap f) tags)
+        TypeAlias comments name typ -> TypeAlias comments name (fmap (fmap $ fmap f) typ)
+        PortAnnotation name comments typ -> PortAnnotation name comments (fmap (fmap f) typ)
+        PortDefinition name comments expr -> PortDefinition name comments expr
+        Fixity a pre n post op -> Fixity a pre n post (fmap f op)
+        Fixity_0_19 a n op fn -> Fixity_0_19 a n op fn
 
+
+instance MapReferences a b (Declaration a e) (Declaration b e) where
+    mapReferences fu fl = \case
+        Definition first rest comments e -> Definition (mapReferences fu fl first) (mapReferences fu fl rest) comments e
+        TypeAnnotation name typ -> TypeAnnotation name (mapReferences fu fl typ)
+        Datatype nameWithArgs tags -> Datatype nameWithArgs (fmap (fmap $ fmap $ fmap $ mapReferences fu fl) tags)
+        TypeAlias comments name typ -> TypeAlias comments name (mapReferences fu fl typ)
+        PortAnnotation name comments typ -> PortAnnotation name comments (mapReferences fu fl typ)
+        PortDefinition name comments expr -> PortDefinition name comments expr
+        Fixity a pre n post op -> Fixity a pre n post (mapReferences fu fl op)
+        Fixity_0_19 a n op fn -> Fixity_0_19 a n op fn
 
 
 -- INFIX STUFF

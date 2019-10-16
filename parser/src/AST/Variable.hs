@@ -1,7 +1,11 @@
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module AST.Variable where
 
 import AST.V0_16
 import Data.Map.Strict
+import ElmFormat.Mapping
 
 
 data Ref ns
@@ -9,6 +13,18 @@ data Ref ns
     | TagRef ns UppercaseIdentifier
     | OpRef SymbolIdentifier
     deriving (Eq, Ord, Show, Functor)
+
+
+instance MapNamespace a b (Ref a) (Ref b) where
+    mapNamespace = fmap
+
+
+instance MapReferences a b (Ref a) (Ref b) where
+    mapReferences fu fl = \case
+        VarRef ns l -> uncurry VarRef $ fl (ns, l)
+        TagRef ns u -> uncurry TagRef $ fu (ns, u)
+        OpRef o -> OpRef o
+
 
 
 -- LISTINGS

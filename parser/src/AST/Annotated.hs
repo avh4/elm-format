@@ -33,3 +33,18 @@ instance MapNamespace a b (TopLevelStructure a ann) (TopLevelStructure b ann) wh
                   d'' = mapNamespace f d'
         in
         fmap x
+
+
+instance MapReferences a b (TopLevelStructure a ann) (TopLevelStructure b ann) where
+    mapReferences fu fl =
+        let
+            x d =
+              d''
+              where
+                  d' :: Declaration a (Fix (AnnotatedExpression b ann))
+                  d' = fmap (mapReferences fu fl) d
+
+                  d'' :: Declaration b (Fix (AnnotatedExpression b ann))
+                  d'' = mapReferences fu fl d'
+        in
+        fmap x

@@ -2,6 +2,7 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase #-}
 
 module AST.Expression where
 
@@ -37,6 +38,12 @@ instance MapNamespace a b (LetDeclaration a e) (LetDeclaration b e) where
             LetAnnotation name typ -> LetAnnotation name (fmap (fmap $ fmap f) typ)
             LetComment comment -> LetComment comment
 
+instance MapReferences a b (LetDeclaration a e) (LetDeclaration b e) where
+    mapReferences fu fl = \case
+        LetDefinition name args c e -> LetDefinition (mapReferences fu fl name) (mapReferences fu fl args) c e
+        LetAnnotation name typ -> LetAnnotation name (mapReferences fu fl typ)
+        LetComment c -> LetComment c
+
 
 type Expr =
     Fix (AnnotatedExpression [UppercaseIdentifier] R.Region)
@@ -50,10 +57,13 @@ data BinopsClause ns e =
     BinopsClause Comments (Var.Ref ns) Comments e
     deriving (Eq, Show, Functor)
 
-
 instance MapNamespace a b (BinopsClause a e) (BinopsClause b e) where
     mapNamespace f (BinopsClause pre op post e) =
-        BinopsClause pre (fmap f op) post e
+        BinopsClause pre (mapNamespace f op) post e
+
+instance MapReferences a b (BinopsClause a e) (BinopsClause b e) where
+    mapReferences fu fl (BinopsClause pre op post e) =
+        BinopsClause pre (mapReferences fu fl op) post e
 
 
 type Expr' =
@@ -65,13 +75,17 @@ newtype AnnotatedExpression ns ann e =
     deriving (Eq, Show, Functor)
 
 
-instance MapNamespace a b (AnnotatedExpression a ann e) (AnnotatedExpression b ann e)
-  where
+instance MapNamespace a b (AnnotatedExpression a ann e) (AnnotatedExpression b ann e) where
     mapNamespace f (AE (A.A ann e)) = AE $ A.A ann $ mapNamespace f e
-
 
 instance MapNamespace a b (Fix (AnnotatedExpression a ann)) (Fix (AnnotatedExpression b ann)) where
     mapNamespace f = cata (Fix . mapNamespace f)
+
+instance MapReferences a b (AnnotatedExpression a ann e) (AnnotatedExpression b ann e) where
+    mapReferences fu fl (AE (A.A ann e)) = AE $ A.A ann $ mapReferences fu fl e
+
+instance MapReferences a b (Fix (AnnotatedExpression a ann)) (Fix (AnnotatedExpression b ann)) where
+    mapReferences fu fl = cata (Fix . mapReferences fu fl)
 
 
 stripAnnotation :: Fix (AnnotatedExpression ns ann) -> Fix (Expression ns)
@@ -92,6 +106,9 @@ addAnnotation ann (Fix e) = Fix $ AE $ A.A ann $ fmap (addAnnotation ann) e
 
 instance MapNamespace a b (Fix (Expression a)) (Fix (Expression b)) where
     mapNamespace f = cata (Fix . mapNamespace f)
+
+instance MapReferences a b (Fix (Expression a)) (Fix (Expression b)) where
+    mapReferences fu fl = cata (Fix . mapReferences fu fl)
 
 
 data Expression ns e
@@ -136,44 +153,53 @@ data Expression ns e
 instance MapNamespace a b (Expression a e) (Expression b e) where
     mapNamespace f expr =
         case expr of
-            VarExpr var -> VarExpr (fmap f var)
-            Binops left restOps multiline ->
-                Binops left (fmap (mapNamespace f) restOps) multiline
-            Let decls pre body ->
-                Let (mapNamespace f decls) pre body
+            VarExpr var -> VarExpr (mapNamespace f var)
+            Binops left restOps multiline -> Binops left (mapNamespace f restOps) multiline
+            Let decls pre body -> Let (mapNamespace f decls) pre body
 
-            Unit c ->
-                Unit c
-            AST.Expression.Literal l ->
-                AST.Expression.Literal l
-            App f' args multiline ->
-                App f' args multiline
-            Unary op e ->
-                Unary op e
-            Parens e ->
-                Parens e
-            ExplicitList terms' post multiline ->
-                ExplicitList terms' post multiline
-            Range e1 e2 multiline ->
-                Range e1 e2 multiline
-            AST.Expression.Tuple es multiline ->
-                AST.Expression.Tuple es multiline
-            TupleFunction n ->
-                TupleFunction n
-            AST.Expression.Record b fs post multiline ->
-                AST.Expression.Record b fs post multiline
-            Access e field' ->
-                Access e field'
-            AccessFunction n ->
-                AccessFunction n
-            Lambda params pre body multi ->
-                Lambda (mapNamespace f params) pre body multi
-            If c1 elseIfs els ->
-                If c1 elseIfs els
-            Case (cond, m) branches ->
-                Case (cond, m) (fmap (mapFst $ mapNamespace f) branches)
-            GLShader s ->
-                GLShader s
+            Unit c -> Unit c
+            AST.Expression.Literal l -> AST.Expression.Literal l
+            App f' args multiline -> App f' args multiline
+            Unary op e -> Unary op e
+            Parens e -> Parens e
+            ExplicitList terms' post multiline -> ExplicitList terms' post multiline
+            Range e1 e2 multiline -> Range e1 e2 multiline
+            AST.Expression.Tuple es multiline -> AST.Expression.Tuple es multiline
+            TupleFunction n -> TupleFunction n
+            AST.Expression.Record b fs post multiline -> AST.Expression.Record b fs post multiline
+            Access e field' -> Access e field'
+            AccessFunction n -> AccessFunction n
+            Lambda params pre body multi -> Lambda (mapNamespace f params) pre body multi
+            If c1 elseIfs els -> If c1 elseIfs els
+            Case (cond, m) branches -> Case (cond, m) (fmap (mapFst $ mapNamespace f) branches)
+            GLShader s -> GLShader s
+        where
+            mapFst f (a, x) = (f a, x)
+
+
+instance MapReferences a b (Expression a e) (Expression b e) where
+    mapReferences fu fl expr =
+        case expr of
+            VarExpr var -> VarExpr (mapReferences fu fl var)
+            Binops left restOps multiline -> Binops left (mapReferences fu fl restOps) multiline
+            Let decls pre body -> Let (mapReferences fu fl decls) pre body
+
+            Unit c -> Unit c
+            AST.Expression.Literal l -> AST.Expression.Literal l
+            App f' args multiline -> App f' args multiline
+            Unary op e -> Unary op e
+            Parens e -> Parens e
+            ExplicitList terms' post multiline -> ExplicitList terms' post multiline
+            Range e1 e2 multiline -> Range e1 e2 multiline
+            AST.Expression.Tuple es multiline -> AST.Expression.Tuple es multiline
+            TupleFunction n -> TupleFunction n
+            AST.Expression.Record b fs post multiline -> AST.Expression.Record b fs post multiline
+            Access e field' -> Access e field'
+            AccessFunction n -> AccessFunction n
+            Lambda params pre body multi -> Lambda (mapReferences fu fl params) pre body multi
+            If c1 elseIfs els -> If c1 elseIfs els
+            Case (cond, m) branches -> Case (cond, m) (fmap (mapFst $ mapReferences fu fl) branches)
+            GLShader s -> GLShader s
         where
             mapFst f (a, x) = (f a, x)
 
