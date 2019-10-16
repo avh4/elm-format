@@ -2204,7 +2204,7 @@ commaSpace =
 formatTypeConstructor :: ElmVersion -> AST.TypeConstructor [UppercaseIdentifier] -> Box
 formatTypeConstructor elmVersion ctor =
     case ctor of
-        AST.NamedConstructor namespace name ->
+        AST.NamedConstructor (namespace, name) ->
             line $ formatQualifiedUppercaseIdentifier elmVersion (namespace ++ [name])
 
         AST.TupleConstructor n ->

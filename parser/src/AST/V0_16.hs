@@ -185,7 +185,7 @@ data Literal
 
 
 data TypeConstructor ns
-    = NamedConstructor ns UppercaseIdentifier
+    = NamedConstructor (ns, UppercaseIdentifier)
     | TupleConstructor Int -- will be 2 or greater, indicating the number of elements in the tuple
     deriving (Eq, Show, Functor)
 

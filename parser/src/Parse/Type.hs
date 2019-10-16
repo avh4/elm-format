@@ -55,7 +55,7 @@ constructor0 elmVersion =
       case reverse name of
         [] -> error "Impossible empty TypeConstructor name"
         last:rest ->
-            return (NamedConstructor (reverse rest) last)
+            return (NamedConstructor (reverse rest, last))
 
 
 constructor0' :: ElmVersion -> IParser (Type [UppercaseIdentifier])

@@ -305,7 +305,7 @@ transformType' ::
     -> Type (MatchedNamespace [UppercaseIdentifier])
     -> Type (MatchedNamespace [UppercaseIdentifier])
 transformType' upgradeDefinition typ = case typ of
-    A region (FunctionType (WithEol (A firstRegion (TypeConstruction (NamedConstructor (MatchedImport ctorNs) ctorName) args)) eol) rest ml) ->
+    A region (FunctionType (WithEol (A firstRegion (TypeConstruction (NamedConstructor (MatchedImport ctorNs, ctorName)) args)) eol) rest ml) ->
         case Dict.lookup (ctorNs, ctorName) (_typeReplacements upgradeDefinition) of
             Just (argOrder, newTyp) ->
                 let

@@ -474,7 +474,7 @@ instance ToJSON (Pattern' [UppercaseIdentifier]) where
 instance ToJSON (Type [UppercaseIdentifier]) where
     showJSON (A _ type') =
         case type' of
-            TypeConstruction (NamedConstructor namespace name) args ->
+            TypeConstruction (NamedConstructor (namespace, name)) args ->
                 makeObj
                     [ type_ "TypeReference"
                     , ( "name", showJSON name )
