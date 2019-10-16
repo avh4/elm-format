@@ -22,3 +22,6 @@ upgrade_A_caseWithAsMatch ({ style } as config) =
             "style1"
         _ ->
             ElmFix.todo style
+
+type alias Upgrade_A_Type i o =
+    A.NewType o i

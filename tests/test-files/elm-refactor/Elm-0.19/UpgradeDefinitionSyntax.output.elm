@@ -45,3 +45,8 @@ cases s =
         _ ->
             ElmFix.todo s
     ]
+
+
+typeChange : A.NewType String Int -> ()
+typeChange _ =
+    ()

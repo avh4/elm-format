@@ -42,3 +42,8 @@ cases s =
     , A.caseWithAsMatch { style = UnknownStyle }
     , A.caseWithAsMatch { style = s }
     ]
+
+
+typeChange : A.Type Int String -> ()
+typeChange _ =
+    ()

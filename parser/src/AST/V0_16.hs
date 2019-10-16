@@ -193,7 +193,7 @@ data TypeConstructor ns
 data Type' ns
     = UnitType Comments
     | TypeVariable LowercaseIdentifier
-    | TypeConstruction (TypeConstructor ns) [(Comments, Type ns)]
+    | TypeConstruction (TypeConstructor ns) [PreCommented (Type ns)]
     | TypeParens (Commented (Type ns))
     | TupleType [Commented (WithEol (Type ns))]
     | RecordType

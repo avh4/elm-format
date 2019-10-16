@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE LambdaCase #-}
 
 module ElmFormat.Upgrade_0_19 (UpgradeDefinition, transform, parseUpgradeDefinition, transformModule, mergeUpgradeImports, MatchedNamespace(..)) where
 
@@ -53,7 +54,14 @@ elm0_19upgrade = Text.pack $ unlines
 
 data UpgradeDefinition =
     UpgradeDefinition
-        { _replacements :: Dict.Map ([UppercaseIdentifier], String) (Fix (Expression (MatchedNamespace [UppercaseIdentifier])))
+        { _replacements ::
+            Dict.Map
+                ([UppercaseIdentifier], String)
+                (Fix (Expression (MatchedNamespace [UppercaseIdentifier])))
+        , _typeReplacements ::
+            Dict.Map
+                ([UppercaseIdentifier], UppercaseIdentifier)
+                ([LowercaseIdentifier], Type' (MatchedNamespace [UppercaseIdentifier]))
         , _imports :: Dict.Map [UppercaseIdentifier] (Comments, ImportMethod)
         }
     deriving Show
@@ -71,7 +79,12 @@ parseUpgradeDefinition definitionText =
                     (\rev -> (UppercaseIdentifier <$> reverse (tail rev), head rev))
                         <$> reverse <$> splitOn '_' <$> List.stripPrefix "upgrade_" name
 
-                toUpgradeDef def =
+                makeTypeName :: UppercaseIdentifier -> Maybe ([UppercaseIdentifier], UppercaseIdentifier)
+                makeTypeName (UppercaseIdentifier name) =
+                    (\rev -> (UppercaseIdentifier <$> reverse (tail rev), UppercaseIdentifier $ head rev))
+                        <$> reverse <$> splitOn '_' <$> List.stripPrefix "Upgrade_" name
+
+                getExpressionReplacement def =
                     case def of
                         Entry (A _ (Definition (A _ (VarPattern (LowercaseIdentifier name))) [] _ upgradeBody)) ->
                             case makeName name of
@@ -90,9 +103,25 @@ parseUpgradeDefinition definitionText =
 
                         _ ->
                             Nothing
+
+                matchReferences' =
+                    matchReferences
+                        (Bimap.toMap $ ImportInfo._aliases importInfo)
+                        (ImportInfo._directImports importInfo)
+
+                getTypeReplacement = \case
+                    Entry (A _ (TypeAlias comments (Commented _ (name, args) _) (_, A _ typ))) ->
+                        case makeTypeName name of
+                            Just typeName ->
+                                Just (typeName, (fmap snd args, fmap matchReferences' typ))
+
+                            Nothing -> Nothing
+
+                    _ -> Nothing
             in
             Right $ UpgradeDefinition
-                { _replacements = fmap (mapNamespace $ matchReferences (Bimap.toMap $ ImportInfo._aliases importInfo) (ImportInfo._directImports importInfo)) $ Dict.fromList $ Maybe.mapMaybe toUpgradeDef body
+                { _replacements = fmap (mapNamespace matchReferences') $ Dict.fromList $ Maybe.mapMaybe getExpressionReplacement body
+                , _typeReplacements = Dict.fromList $ Maybe.mapMaybe getTypeReplacement body
                 , _imports = imports
                 }
 
@@ -137,6 +166,9 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
             case structure of
                 Entry (A region (Definition name args comments expr)) ->
                     Entry (A region (Definition name args comments $ addAnnotation noRegion' $ transform' upgradeDefinition importInfo $ stripAnnotation expr))
+
+                Entry (A region (TypeAnnotation name (pre, typ))) ->
+                    Entry (A region (TypeAnnotation name (pre, transformType upgradeDefinition typ)))
 
                 _ -> structure
 
@@ -258,6 +290,41 @@ transform' ::
     -> Fix (Expression (MatchedNamespace [UppercaseIdentifier])) -> Fix (Expression (MatchedNamespace [UppercaseIdentifier]))
 transform' upgradeDefinition importInfo =
     stripAnnotation . bottomUp (simplify . applyUpgrades upgradeDefinition importInfo) . addAnnotation FromSource
+
+
+transformType ::
+    UpgradeDefinition
+    -> Type (MatchedNamespace [UppercaseIdentifier])
+    -> Type (MatchedNamespace [UppercaseIdentifier])
+transformType upgradeDefinition =
+    bottomUpType (transformType' upgradeDefinition)
+
+
+transformType' ::
+    UpgradeDefinition
+    -> Type (MatchedNamespace [UppercaseIdentifier])
+    -> Type (MatchedNamespace [UppercaseIdentifier])
+transformType' upgradeDefinition typ = case typ of
+    A region (FunctionType (WithEol (A firstRegion (TypeConstruction (NamedConstructor (MatchedImport ctorNs) ctorName) args)) eol) rest ml) ->
+        case Dict.lookup (ctorNs, ctorName) (_typeReplacements upgradeDefinition) of
+            Just (argOrder, newTyp) ->
+                let
+                    inlines =
+                        Dict.fromList $ zip argOrder (fmap snd args)
+
+                    first' =
+                        inlineTypeVars inlines $ noRegion newTyp
+
+                    rest' =
+                        fmap
+                            (\(preA, postA, t, eol') -> (preA, postA, transformType upgradeDefinition t, eol'))
+                            rest
+                in
+                A region $ FunctionType (WithEol first' eol) rest' ml
+
+            Nothing -> typ
+
+    _ -> typ
 
 
 applyUpgrades :: UpgradeDefinition -> ImportInfo -> UExpr -> UExpr
@@ -504,6 +571,42 @@ inlineVars isLocal insertMultiline mappings expr =
         -- TODO: handle expanding multiline in contexts other than tuples
 
         _ -> expr
+
+
+inlineTypeVars ::
+    Dict.Map LowercaseIdentifier (Type ns)
+    -> Type ns
+    -> Type ns
+inlineTypeVars mappings =
+    bottomUpType (inlineTypeVars' mappings)
+
+
+inlineTypeVars' ::
+    Dict.Map LowercaseIdentifier (Type ns)
+    -> Type ns
+    -> Type ns
+inlineTypeVars' mappings (A region typ) =
+    case typ of
+        TypeVariable ref ->
+            case Dict.lookup ref mappings of
+                Just replacement -> replacement
+                Nothing -> A region typ
+
+        _ -> A region typ
+
+
+{- Applies a transformation function to a Type from the bottom up. -}
+bottomUpType :: (Type ns -> Type ns) -> Type ns -> Type ns
+bottomUpType f (A region typ) =
+    f $
+    case typ of
+        UnitType _ -> A region typ
+        TypeVariable _ -> A region typ
+        TypeConstruction ctor args -> A region $ TypeConstruction ctor (fmap (fmap $ bottomUpType f) args)
+        TypeParens t -> A region $ TypeParens (fmap (bottomUpType f) t)
+        TupleType ts -> A region $ TupleType (fmap (fmap $ fmap $ bottomUpType f) ts)
+        RecordType base fields cs ml -> A region $ RecordType base (fmap (fmap $ fmap $ fmap $ fmap $ bottomUpType f) fields) cs ml
+        FunctionType first rest ml -> A region $ FunctionType (fmap (bottomUpType f) first) (fmap (\(a, b, t, e) -> (a, b, bottomUpType f t, e)) rest) ml
 
 
 destructureFirstMatch :: PreCommented UExpr -> [ (PreCommented (Pattern (MatchedNamespace [UppercaseIdentifier])), UExpr) ] -> UExpr -> UExpr
