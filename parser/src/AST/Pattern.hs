@@ -18,7 +18,7 @@ data Pattern' ns
     | Literal Literal
     | VarPattern LowercaseIdentifier
     | OpPattern SymbolIdentifier
-    | Data ns UppercaseIdentifier [(Comments, Pattern ns)]
+    | Data (ns, UppercaseIdentifier) [(Comments, Pattern ns)]
     | PatternParens (Commented (Pattern ns))
     | Tuple [Commented (Pattern ns)]
     | EmptyListPattern Comments

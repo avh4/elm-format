@@ -32,7 +32,7 @@ basic elmVersion =
               P.Literal (Boolean False)
 
           (last:rest) ->
-              P.Data (reverse rest) last []
+              P.Data (reverse rest, last) []
 
 
 asPattern :: ElmVersion -> IParser (Pattern [UppercaseIdentifier]) -> IParser (Pattern [UppercaseIdentifier])
@@ -117,7 +117,7 @@ patternConstructor elmVersion =
         case reverse v of
           [UppercaseIdentifier "True"]  -> return $ P.Literal (Boolean True)
           [UppercaseIdentifier "False"] -> return $ P.Literal (Boolean False)
-          (last:rest) -> P.Data (reverse rest) last <$> spacePrefix (term elmVersion)
+          (last:rest) -> P.Data (reverse rest, last) <$> spacePrefix (term elmVersion)
 
 
 expr :: ElmVersion -> IParser (Pattern [UppercaseIdentifier])

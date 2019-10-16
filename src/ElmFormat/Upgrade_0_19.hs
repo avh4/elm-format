@@ -706,7 +706,7 @@ destructure pat arg =
                 DoesntMatch
 
         -- Custom type variants with no arguments
-        ( (preVar, A _ (Data nsd name []))
+        ( (preVar, A _ (Data (nsd, name) []))
           , (preArg, VarExpr (TagRef ns tag))
           )
           ->
@@ -716,7 +716,7 @@ destructure pat arg =
                 DoesntMatch
 
         -- Custom type variants with arguments
-        ( (preVar, A _ (Data nsd name argVars))
+        ( (preVar, A _ (Data (nsd, name) argVars))
           , (preArg, App (Fix (AE (A _ (VarExpr (TagRef ns tag))))) argValues _)
           )
           ->
@@ -726,8 +726,8 @@ destructure pat arg =
                 DoesntMatch
 
         -- Custom type variants where pattern and value don't match in having args
-        ( (_, A _ (Data _ _ (_:_))), (_, VarExpr (TagRef _ _)) ) -> DoesntMatch
-        ( (_, A _ (Data _ _ [])), (_, App (Fix (AE (A _ (VarExpr (TagRef _ _))))) _ _) ) -> DoesntMatch
+        ( (_, A _ (Data _ (_:_))), (_, VarExpr (TagRef _ _)) ) -> DoesntMatch
+        ( (_, A _ (Data _ [])), (_, App (Fix (AE (A _ (VarExpr (TagRef _ _))))) _ _) ) -> DoesntMatch
 
         -- Named variable pattern
         ( (preVar, A _ (VarPattern name))

@@ -1152,7 +1152,7 @@ formatPattern elmVersion parensRequired apattern =
                     (map formatRight rest)
                 |> if parensRequired then parens else id
 
-        AST.Pattern.Data ns tag [] ->
+        AST.Pattern.Data (ns, tag) [] ->
             let
                 ctor = ns ++ [tag]
             in
@@ -1166,7 +1166,7 @@ formatPattern elmVersion parensRequired apattern =
                         _ ->
                             id
 
-        AST.Pattern.Data ns tag patterns ->
+        AST.Pattern.Data (ns, tag) patterns ->
             let
                 ctor = ns ++ [tag]
             in

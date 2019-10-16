@@ -27,10 +27,10 @@ tests =
     , example "variable" "a" $ at 1 1 1 2 (VarPattern (LowercaseIdentifier "a"))
 
     , testGroup "data"
-        [ example "" "Just x y" $ at 1 1 1 9 $ Data [] (UppercaseIdentifier "Just") [([], at 1 6 1 7 $ VarPattern (LowercaseIdentifier "x")),([],at 1 8 1 9 (VarPattern (LowercaseIdentifier "y")))]
-        , example "single parameter" "Just x" $ at 1 1 1 7 $ Data [] (UppercaseIdentifier "Just") [([],at 1 6 1 7 (VarPattern (LowercaseIdentifier "x")))]
-        , example "comments" "Just{-A-}x{-B-}y" $ at 1 1 1 17 $ Data [] (UppercaseIdentifier "Just") [([BlockComment ["A"]],at 1 10 1 11 (VarPattern (LowercaseIdentifier "x"))),([BlockComment ["B"]],at 1 16 1 17 (VarPattern (LowercaseIdentifier "y")))]
-        , example "newlines" "Just\n x\n y" $ at 1 1 3 3 $ Data [] (UppercaseIdentifier "Just") [([],at 2 2 2 3 (VarPattern (LowercaseIdentifier "x"))),([],at 3 2 3 3 (VarPattern (LowercaseIdentifier "y")))]
+        [ example "" "Just x y" $ at 1 1 1 9 $ Data ([], UppercaseIdentifier "Just") [([], at 1 6 1 7 $ VarPattern (LowercaseIdentifier "x")),([],at 1 8 1 9 (VarPattern (LowercaseIdentifier "y")))]
+        , example "single parameter" "Just x" $ at 1 1 1 7 $ Data ([], UppercaseIdentifier "Just") [([],at 1 6 1 7 (VarPattern (LowercaseIdentifier "x")))]
+        , example "comments" "Just{-A-}x{-B-}y" $ at 1 1 1 17 $ Data ([], UppercaseIdentifier "Just") [([BlockComment ["A"]],at 1 10 1 11 (VarPattern (LowercaseIdentifier "x"))),([BlockComment ["B"]],at 1 16 1 17 (VarPattern (LowercaseIdentifier "y")))]
+        , example "newlines" "Just\n x\n y" $ at 1 1 3 3 $ Data ([], UppercaseIdentifier "Just") [([],at 2 2 2 3 (VarPattern (LowercaseIdentifier "x"))),([],at 3 2 3 3 (VarPattern (LowercaseIdentifier "y")))]
         ]
 
     , testGroup "unit"
@@ -80,8 +80,8 @@ tests =
 
     , testGroup "alias"
         [ example "" "_ as x" $ at 1 1 1 7 (Alias (at 1 1 1 2 Anything,[]) ([],LowercaseIdentifier "x"))
-        , example "left side has whitespace" "A b as x" $ at 1 1 1 9 $ Alias (at 1 1 1 4 $ Data [] (UppercaseIdentifier "A") [([], at 1 3 1 4 (VarPattern (LowercaseIdentifier "b")))],[]) ([],LowercaseIdentifier "x")
-        , example "left side ctor without whitespace" "A as x" $ at 1 1 1 7 $ Alias (at 1 1 1 2 $ Data [] (UppercaseIdentifier "A") [],[]) ([],LowercaseIdentifier "x")
+        , example "left side has whitespace" "A b as x" $ at 1 1 1 9 $ Alias (at 1 1 1 4 $ Data ([], UppercaseIdentifier "A") [([], at 1 3 1 4 (VarPattern (LowercaseIdentifier "b")))],[]) ([],LowercaseIdentifier "x")
+        , example "left side ctor without whitespace" "A as x" $ at 1 1 1 7 $ Alias (at 1 1 1 2 $ Data ([], UppercaseIdentifier "A") [],[]) ([],LowercaseIdentifier "x")
         , example "comments" "_{-A-}as{-B-}x" $ at 1 1 1 15 (Alias (at 1 1 1 2 Anything,[BlockComment ["A"]]) ([BlockComment ["B"]],LowercaseIdentifier "x"))
         , example "newlines" "_\n as\n x" $ at 1 1 3 3 (Alias (at 1 1 1 2 Anything,[]) ([],LowercaseIdentifier "x"))
         , example "nested" "(_ as x)as y" $ at 1 1 1 13 (Alias (at 1 2 1 8 (Alias (at 1 2 1 3 Anything,[]) ([],LowercaseIdentifier "x")),[]) ([],LowercaseIdentifier "y"))

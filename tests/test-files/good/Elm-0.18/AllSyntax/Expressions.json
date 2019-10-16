@@ -2070,7 +2070,7 @@
                                         },
                                         "type": "VariableReference"
                                     },
-                                    "pattern": "TODO: Pattern (Data [] (UppercaseIdentifier \"Just\") [([],at 336 22 336 23 (VarPattern (LowercaseIdentifier \"x\")))])"
+                                    "pattern": "TODO: Pattern (Data ([],UppercaseIdentifier \"Just\") [([],at 336 22 336 23 (VarPattern (LowercaseIdentifier \"x\")))])"
                                 },
                                 {
                                     "body": {
@@ -2132,7 +2132,7 @@
                                         },
                                         "type": "VariableReference"
                                     },
-                                    "pattern": "TODO: Pattern (Data [] (UppercaseIdentifier \"Just\") [([],at 345 22 345 23 (VarPattern (LowercaseIdentifier \"x\")))])"
+                                    "pattern": "TODO: Pattern (Data ([],UppercaseIdentifier \"Just\") [([],at 345 22 345 23 (VarPattern (LowercaseIdentifier \"x\")))])"
                                 },
                                 {
                                     "body": {
@@ -2194,7 +2194,7 @@
                                         },
                                         "type": "VariableReference"
                                     },
-                                    "pattern": "TODO: Pattern (Data [] (UppercaseIdentifier \"Just\") [([],at 365 22 365 23 (VarPattern (LowercaseIdentifier \"x\")))])"
+                                    "pattern": "TODO: Pattern (Data ([],UppercaseIdentifier \"Just\") [([],at 365 22 365 23 (VarPattern (LowercaseIdentifier \"x\")))])"
                                 },
                                 {
                                     "body": {
