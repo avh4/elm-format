@@ -1,5 +1,7 @@
 module UpgradDefinitionSyntax exposing (x)
 
+import B exposing (OldType)
+
 
 x =
     ()
@@ -47,6 +49,9 @@ cases s =
     ]
 
 
-typeChange : A.NewType String Int -> ()
-typeChange _ =
+typeChange :
+    A.NewType String Int
+    -> B.NewType ( {}, Never, Never )
+    -> ()
+typeChange _ _ =
     ()

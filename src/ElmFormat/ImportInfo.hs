@@ -13,6 +13,7 @@ import qualified Data.Set as Set
 data ImportInfo =
     ImportInfo
         { _exposed :: Dict.Map LowercaseIdentifier [UppercaseIdentifier]
+        , _exposedTypes :: Dict.Map UppercaseIdentifier [UppercaseIdentifier]
         , _aliases :: Bimap.Bimap UppercaseIdentifier [UppercaseIdentifier]
         , _directImports :: Set.Set [UppercaseIdentifier]
         , _ambiguous :: Dict.Map UppercaseIdentifier [[UppercaseIdentifier]]
@@ -62,6 +63,18 @@ fromImports imports =
 
                         _ -> mempty
 
+        exposedTypes =
+            let
+                step dict moduleName (AST.Module.ImportMethod _ (_, (_, listing))) =
+                    case listing of
+                        AST.Variable.ExplicitListing (AST.Module.DetailedListing _ _ exposedTypes) _ ->
+                            Dict.union dict
+                                (Dict.fromList $ fmap (\typeName -> (typeName, moduleName)) $ Dict.keys exposedTypes)
+                        AST.Variable.OpenListing _ -> dict
+                        AST.Variable.ClosedListing -> dict
+            in
+            Dict.foldlWithKey step mempty imports
+
         aliases =
             let
                 getAlias importMethod =
@@ -93,4 +106,4 @@ fromImports imports =
 
         ambiguous = Dict.empty
     in
-    ImportInfo exposed aliases directs ambiguous
+    ImportInfo exposed exposedTypes aliases directs ambiguous

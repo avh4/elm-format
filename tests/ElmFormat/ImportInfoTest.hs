@@ -3,7 +3,7 @@ module ElmFormat.ImportInfoTest where
 import Elm.Utils ((|>))
 
 import AST.V0_16
-import AST.Module (ImportMethod(..))
+import AST.Module (ImportMethod(..), DetailedListing(..))
 import AST.Variable (Listing(..))
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -14,7 +14,14 @@ import qualified ElmFormat.ImportInfo as ImportInfo
 
 tests :: TestTree
 tests =
-    testGroup "ElmFormat.ImportInfo"
+    testGroup "ElmFormat.ImportInfo" $
+    let
+        buildImportInfo i =
+            i
+                |> fmap (\(a, b, c) -> (fmap UppercaseIdentifier a, ImportMethod (fmap (\x -> ([], ([], UppercaseIdentifier x))) b) ([], ([], c))))
+                |> Dict.fromList
+                |> ImportInfo.fromImports
+    in
     [ testGroup "_directImports" $
         let
             assertIncludes = assert "include" True
@@ -23,10 +30,7 @@ tests =
             assert what expected name i =
                 let
                     set =
-                        i
-                            |> fmap (\(a, b, c) -> (fmap UppercaseIdentifier a, ImportMethod (fmap (\x -> ([], ([], UppercaseIdentifier x))) b) ([], ([], c))))
-                            |> Dict.fromList
-                            |> ImportInfo.fromImports
+                        buildImportInfo i
                             |> ImportInfo._directImports
                 in
                 Set.member (fmap UppercaseIdentifier name) set
@@ -46,5 +50,12 @@ tests =
             |> assertExcludes ["A"]
 
         -- TODO: what if the alias is the same as the import name?
+        ]
+    , testGroup "_exposedTypes" $
+        [ testCase "includes an exposed type" $
+            buildImportInfo [(["B"], Nothing, ExplicitListing (DetailedListing mempty mempty (Dict.singleton (UppercaseIdentifier "OldType") (Commented [] ([], ClosedListing) []))) False )]
+                |> ImportInfo._exposedTypes
+                |> Dict.lookup (UppercaseIdentifier "OldType")
+                |> assertEqual "contains OldType" (Just [UppercaseIdentifier "B"])
         ]
     ]

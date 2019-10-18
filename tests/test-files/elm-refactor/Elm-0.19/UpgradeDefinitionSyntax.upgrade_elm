@@ -25,3 +25,6 @@ upgrade_A_caseWithAsMatch ({ style } as config) =
 
 type alias Upgrade_A_Type i o =
     A.NewType o i
+
+type alias Upgrade_B_OldType a b =
+    B.NewType (a, b, b)

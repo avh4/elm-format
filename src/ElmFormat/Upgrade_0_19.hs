@@ -104,10 +104,7 @@ parseUpgradeDefinition definitionText =
                         _ ->
                             Nothing
 
-                matchReferences' =
-                    matchReferences
-                        (Bimap.toMap $ ImportInfo._aliases importInfo)
-                        (ImportInfo._directImports importInfo)
+                matchReferences' = matchReferences importInfo
 
                 getTypeReplacement = \case
                     Entry (A _ (TypeAlias comments (Commented _ (name, args) _) (_, A _ typ))) ->
@@ -146,8 +143,7 @@ transform importInfo =
         Right replacements ->
             mapNamespace (applyReferences (Bimap.toMapR $ ImportInfo._aliases importInfo))
                 . transform' replacements importInfo
-                . mapReferences' (matchReferences (Bimap.toMap $ ImportInfo._aliases importInfo) (ImportInfo._directImports importInfo))
-
+                . mapReferences' (matchReferences importInfo)
 
         Left () ->
             error "Couldn't parse upgrade definition"
@@ -191,8 +187,7 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
             fmap (Dict.foldr (+) 0) usages'
 
         originalBody =
-            originalBody'
-                |> fmap (mapReferences' (matchReferences (Bimap.toMap $ ImportInfo._aliases importInfo) (ImportInfo._directImports importInfo)))
+            mapReferences' (matchReferences importInfo) <$> originalBody'
 
         finalBody =
             fmap transformTopLevelStructure originalBody
@@ -236,17 +231,23 @@ data MatchedNamespace t
 
 
 matchReferences ::
-    Ord t =>
-    Dict.Map t [t]
-    -> Set.Set [t]
-    -> ( ([t], UppercaseIdentifier) -> (MatchedNamespace [t], UppercaseIdentifier)
-       , ([t], LowercaseIdentifier) -> (MatchedNamespace [t], LowercaseIdentifier)
+    ImportInfo
+    -> ( ([UppercaseIdentifier], UppercaseIdentifier) -> (MatchedNamespace [UppercaseIdentifier], UppercaseIdentifier)
+       , ([UppercaseIdentifier], LowercaseIdentifier) -> (MatchedNamespace [UppercaseIdentifier], LowercaseIdentifier)
        )
-matchReferences aliases imports =
+matchReferences importInfo =
     let
-        f ns =
+        aliases = Bimap.toMap $ ImportInfo._aliases importInfo
+        imports = ImportInfo._directImports importInfo
+        exposed = ImportInfo._exposedTypes importInfo
+
+        f ns identifier =
             case ns of
-                [] -> NoNamespace
+                [] ->
+                    case flip Dict.lookup exposed =<< identifier of
+                        Nothing -> NoNamespace
+                        Just exposedFrom -> MatchedImport exposedFrom
+
                 _ ->
                     let
                         self =
@@ -269,8 +270,8 @@ matchReferences aliases imports =
                         Nothing -> Unmatched ns
                         Just single -> MatchedImport single
     in
-    ( \(ns, u) -> (f ns, u)
-    , \(ns, l) -> (f ns, l)
+    ( \(ns, u) -> (f ns (Just u), u)
+    , \(ns, l) -> (f ns Nothing, l)
     )
 
 
@@ -312,20 +313,14 @@ transformType' ::
     -> Type (MatchedNamespace [UppercaseIdentifier])
     -> Type (MatchedNamespace [UppercaseIdentifier])
 transformType' upgradeDefinition typ = case typ of
-    A region (FunctionType (WithEol (A firstRegion (TypeConstruction (NamedConstructor (MatchedImport ctorNs, ctorName)) args)) eol) rest ml) ->
+    A firstRegion (TypeConstruction (NamedConstructor (MatchedImport ctorNs, ctorName)) args) ->
         case Dict.lookup (ctorNs, ctorName) (_typeReplacements upgradeDefinition) of
             Just (argOrder, newTyp) ->
                 let
                     inlines =
                         Dict.fromList $ zip argOrder (fmap snd args)
-
-                    first' =
-                        inlineTypeVars inlines $ noRegion newTyp
-
-                    rest' =
-                        fmap (fmap $ fmap $ fmap $ transformType upgradeDefinition) rest
                 in
-                A region $ FunctionType (WithEol first' eol) rest' ml
+                inlineTypeVars inlines $ noRegion newTyp
 
             Nothing -> typ
 
