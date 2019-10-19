@@ -24,8 +24,8 @@ test_script:
 - "set PATH=%PATH%;c:\\stack"
 - stack setup > nil
 - stack path
-- ./build.sh dependencies
-- ./build.sh
+- bash build.sh dependencies
+- bash build.sh
 - mkdir -p dist
 - stack install --local-bin-path=dist
 
