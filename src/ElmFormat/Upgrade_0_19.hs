@@ -143,7 +143,7 @@ transform :: ImportInfo -> Fix (Expression [UppercaseIdentifier]) -> Fix (Expres
 transform importInfo =
     case parseUpgradeDefinition elm0_19upgrade of
         Right replacements ->
-            mapNamespace (applyReferences (Bimap.toMapR $ ImportInfo._aliases importInfo))
+            mapNamespace (applyReferences importInfo)
                 . transform' replacements importInfo
                 . mapReferences' (matchReferences importInfo)
 
@@ -225,7 +225,7 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
             ImportInfo.fromImports $ fmap snd finalImports
     in
     finalBody
-        |> fmap (mapNamespace (applyReferences (Bimap.toMapR $ ImportInfo._aliases finalImportInfo)))
+        |> fmap (mapNamespace (applyReferences finalImportInfo))
         |> Module a b c (preImports, finalImports)
 
 
@@ -297,8 +297,11 @@ matchReferences importInfo =
     )
 
 
-applyReferences :: Ord t => Dict.Map [t] t -> MatchedNamespace [t] -> [t]
-applyReferences aliases ns' =
+applyReferences :: ImportInfo -> MatchedNamespace [UppercaseIdentifier] -> [UppercaseIdentifier]
+applyReferences importInfo ns' =
+    let
+        aliases = Bimap.toMapR $ ImportInfo._aliases importInfo
+    in
     case ns' of
         NoNamespace -> []
         MatchedImport ns -> Maybe.fromMaybe ns $ fmap pure $ Dict.lookup ns aliases
