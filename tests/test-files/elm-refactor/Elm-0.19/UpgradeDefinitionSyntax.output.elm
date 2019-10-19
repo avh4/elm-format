@@ -1,6 +1,6 @@
 module UpgradDefinitionSyntax exposing (x)
 
-import B exposing (OldType)
+import B
 
 
 x =

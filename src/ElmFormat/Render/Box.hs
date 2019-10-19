@@ -873,7 +873,9 @@ formatListing format listing =
             Just $ parens $ formatCommented (line . keyword) $ fmap (const "..") comments
 
         AST.Variable.ExplicitListing vars multiline ->
-            Just $ ElmStructure.group False "(" "," ")" multiline $ format vars
+            case format vars of
+                [] -> Nothing
+                vars' -> Just $ ElmStructure.group False "(" "," ")" multiline vars'
 
 
 formatDetailedListing :: ElmVersion -> AST.Module.DetailedListing -> [Box]

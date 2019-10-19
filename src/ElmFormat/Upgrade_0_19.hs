@@ -11,12 +11,14 @@ import AST.Annotated ()
 import AST.V0_16
 import AST.Declaration (Declaration(..), TopLevelStructure(..))
 import AST.Expression
-import AST.Module (Module(Module), ImportMethod)
+import AST.Module (Module(Module), ImportMethod(..), DetailedListing(..))
 import AST.Pattern
 import AST.Variable
 import Control.Applicative ((<|>), liftA2)
 import Control.Monad (zipWithM)
 import Data.Fix
+import Data.Maybe (fromMaybe)
+import Data.Set (Set)
 import ElmFormat.ImportInfo (ImportInfo)
 import ElmFormat.Mapping
 import ElmVersion
@@ -186,6 +188,26 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
             in
             fmap (Dict.foldr (+) 0) usages'
 
+        typeReplacementsByModule :: Dict.Map [UppercaseIdentifier] (Set UppercaseIdentifier)
+        typeReplacementsByModule =
+            Dict.fromListWith Set.union $ fmap (fmap Set.singleton) $ Dict.keys $ _typeReplacements upgradeDefinition
+
+        removeTypes rem listing =
+            case listing of
+                OpenListing c -> OpenListing c
+                ClosedListing -> ClosedListing
+                ExplicitListing (DetailedListing vars ops typs) ml ->
+                    let
+                        typs' = Dict.withoutKeys typs rem
+                    in
+                    -- Note: The formatter will handle converting to a closed listing if nothing is left
+                    ExplicitListing (DetailedListing vars ops typs') ml
+
+        removeUpgradedExposings ns (pre, ImportMethod alias exposing) =
+            ( pre
+            , ImportMethod alias (fmap (fmap $ removeTypes $ fromMaybe Set.empty $ Dict.lookup ns typeReplacementsByModule) exposing)
+            )
+
         originalBody =
             mapReferences' (matchReferences importInfo) <$> originalBody'
 
@@ -194,7 +216,7 @@ transformModule upgradeDefinition modu@(Module a b c (preImports, originalImport
 
         finalImports =
             mergeUpgradeImports
-                originalImports
+                (Dict.mapWithKey removeUpgradedExposings originalImports)
                 (_imports upgradeDefinition)
                 namespacesWithReplacements
                 (usages finalBody)
