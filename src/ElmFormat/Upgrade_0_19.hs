@@ -261,12 +261,15 @@ matchReferences importInfo =
     let
         aliases = Bimap.toMap $ ImportInfo._aliases importInfo
         imports = ImportInfo._directImports importInfo
-        exposed = ImportInfo._exposedTypes importInfo
+        exposed =
+            Dict.union
+                (Dict.mapKeys Left $ ImportInfo._exposed importInfo)
+                (Dict.mapKeys Right $ ImportInfo._exposedTypes importInfo)
 
         f ns identifier =
             case ns of
                 [] ->
-                    case flip Dict.lookup exposed =<< identifier of
+                    case Dict.lookup identifier exposed of
                         Nothing -> NoNamespace
                         Just exposedFrom -> MatchedImport exposedFrom
 
@@ -292,8 +295,8 @@ matchReferences importInfo =
                         Nothing -> Unmatched ns
                         Just single -> MatchedImport single
     in
-    ( \(ns, u) -> (f ns (Just u), u)
-    , \(ns, l) -> (f ns Nothing, l)
+    ( \(ns, u) -> (f ns (Right u), u)
+    , \(ns, l) -> (f ns (Left l), l)
     )
 
 
@@ -305,15 +308,22 @@ applyReferences ::
 applyReferences importInfo =
     let
         aliases = Bimap.toMapR $ ImportInfo._aliases importInfo
+        exposed =
+            Dict.union
+                (Dict.mapKeys Left $ ImportInfo._exposed importInfo)
+                (Dict.mapKeys Right $ ImportInfo._exposedTypes importInfo)
 
-        f ns' =
+        f ns' identifier =
             case ns' of
                 NoNamespace -> []
-                MatchedImport ns -> Maybe.fromMaybe ns $ fmap pure $ Dict.lookup ns aliases
+                MatchedImport ns ->
+                    case Dict.lookup identifier exposed of
+                        Just exposedFrom | exposedFrom == ns -> []
+                        _ -> Maybe.fromMaybe ns $ fmap pure $ Dict.lookup ns aliases
                 Unmatched name -> name
     in
-    ( \(ns, u) -> (f ns, u)
-    , \(ns, l) -> (f ns, l)
+    ( \(ns, u) -> (f ns (Right u), u)
+    , \(ns, l) -> (f ns (Left l), l)
     )
 
 

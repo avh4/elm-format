@@ -5,7 +5,7 @@ import Html.Attributes exposing (style)
 
 
 convertsStyle =
-    Html.div [ Html.Attributes.style "a" "1" ] []
+    Html.div [ style "a" "1" ] []
 
 
 convertsExposedStyle =

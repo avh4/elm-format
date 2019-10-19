@@ -1,4 +1,5 @@
 upgrade_A_value = ()
+upgrade_A2_a2value = ()
 upgrade_A_lambda = \a b -> a + b
 upgrade_A_function a b = a + b
 

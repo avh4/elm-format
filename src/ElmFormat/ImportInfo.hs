@@ -1,10 +1,11 @@
 module ElmFormat.ImportInfo (ImportInfo(..), fromModule, fromImports) where
 
 import AST.V0_16
+import AST.Variable (Listing(..))
+import Data.Maybe (fromMaybe)
 import Elm.Utils ((|>))
 
 import qualified AST.Module
-import qualified AST.Variable
 import qualified Data.Bimap as Bimap
 import qualified Data.Map.Strict as Dict
 import qualified Data.Maybe as Maybe
@@ -31,47 +32,39 @@ fromImports imports =
     let
         -- these are things we know will get exposed for certain modules when we see "exposing (..)"
         -- only things that are currently useful for Elm 0.19 upgrade are included
-        knownModuleContents :: Dict.Map [UppercaseIdentifier] [LowercaseIdentifier]
-        knownModuleContents =
-            Dict.fromList $
-                fmap (\(a,b) -> (fmap UppercaseIdentifier a, fmap LowercaseIdentifier b))
-                [ (["Html", "Attributes"], ["style"])
-                ]
+        knownModuleContents :: [UppercaseIdentifier] -> Maybe AST.Module.DetailedListing
+        knownModuleContents moduleName =
+            case (\(UppercaseIdentifier x) -> x) <$> moduleName of
+                ["Html", "Attributes"] ->
+                    Just $ AST.Module.DetailedListing
+                        (Dict.fromList $ fmap (\x -> (LowercaseIdentifier x, Commented [] () [])) $
+                            [ "style"
+                            ]
+                        )
+                        mempty
+                        mempty
+                _ -> Nothing
+
+        getExposedValues moduleName (AST.Module.ImportMethod _ (_, (_, listing))) =
+            Dict.fromList $ fmap (flip (,) moduleName) $
+            case listing of
+                ClosedListing -> []
+                OpenListing _ -> fromMaybe [] $ Dict.keys . AST.Module.values <$> knownModuleContents moduleName
+                ExplicitListing details _ -> Dict.keys $ AST.Module.values details
 
         exposed =
-            -- currently this only checks for Html.Attributes (needed for Elm 0.19 upgrade)
-            let
-                importName = (fmap UppercaseIdentifier ["Html", "Attributes"])
-            in
-            case Dict.lookup importName imports of
-                Nothing -> mempty
-                Just importMethod ->
-                    case AST.Module.exposedVars importMethod of
-                        (_, (_, AST.Variable.OpenListing _)) ->
-                            -- import Html.Attributes [as ...] exposing (..)
-                            Dict.lookup importName knownModuleContents
-                                |> Maybe.fromMaybe []
-                                |> fmap (\n -> (n, importName))
-                                |> Dict.fromList
-
-                        (_, (_, AST.Variable.ExplicitListing details _)) ->
-                            -- import Html.Attributes [as ...] exposing (some, stuff)
-                            AST.Module.values details
-                                |> Dict.keys
-                                |> fmap (\n -> (n, importName))
-                                |> Dict.fromList
-
-                        _ -> mempty
+            -- TODO: mark ambiguous names if multiple modules expose them
+            Dict.foldlWithKey (\a k v -> Dict.union a $ getExposedValues k v) mempty imports
 
         exposedTypes =
             let
                 step dict moduleName (AST.Module.ImportMethod _ (_, (_, listing))) =
                     case listing of
-                        AST.Variable.ExplicitListing (AST.Module.DetailedListing _ _ exposedTypes) _ ->
+                        ExplicitListing (AST.Module.DetailedListing _ _ exposedTypes) _ ->
                             Dict.union dict
                                 (Dict.fromList $ fmap (\typeName -> (typeName, moduleName)) $ Dict.keys exposedTypes)
-                        AST.Variable.OpenListing _ -> dict
-                        AST.Variable.ClosedListing -> dict
+                        OpenListing _ -> dict
+                        ClosedListing -> dict
             in
             Dict.foldlWithKey step mempty imports
 

@@ -1,6 +1,7 @@
 module UpgradDefinitionSyntax exposing (x)
 
 import A
+import A2 exposing (a2value)
 import B exposing (OldType)
 
 
@@ -18,6 +19,7 @@ values =
     , A.function 7
     , A.function 8 9
     , A.function 10 11 12
+    , a2value
     ]
 
 

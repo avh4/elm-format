@@ -51,8 +51,20 @@ tests =
 
         -- TODO: what if the alias is the same as the import name?
         ]
+    , testGroup "_exposed" $
+        [ testCase "includes exposed values" $
+            buildImportInfo [(["B"], Nothing, ExplicitListing (DetailedListing (Dict.singleton (LowercaseIdentifier "oldValue") (Commented [] () [])) mempty mempty) False )]
+                |> ImportInfo._exposed
+                |> Dict.lookup (LowercaseIdentifier "oldValue")
+                |> assertEqual "contains oldValue" (Just [UppercaseIdentifier "B"])
+        , testCase "includes Html.Attributes.style" $
+            buildImportInfo [(["Html", "Attributes"], Nothing, OpenListing (Commented [] () []))]
+                |> ImportInfo._exposed
+                |> Dict.lookup (LowercaseIdentifier "style")
+                |> assertEqual "contains style" (Just [UppercaseIdentifier "Html", UppercaseIdentifier "Attributes"])
+        ]
     , testGroup "_exposedTypes" $
-        [ testCase "includes an exposed type" $
+        [ testCase "includes exposed types" $
             buildImportInfo [(["B"], Nothing, ExplicitListing (DetailedListing mempty mempty (Dict.singleton (UppercaseIdentifier "OldType") (Commented [] ([], ClosedListing) []))) False )]
                 |> ImportInfo._exposedTypes
                 |> Dict.lookup (UppercaseIdentifier "OldType")
