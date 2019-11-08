@@ -119,7 +119,7 @@ stack1 children =
         [first] ->
             first
         boxes ->
-            foldl1 stack' boxes
+            foldr1 stack' boxes
 
 
 mapLines :: (Line -> Line) -> Box -> Box
