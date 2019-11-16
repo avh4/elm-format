@@ -273,6 +273,16 @@ lambdaWithMultilinePattern =
 ifStatement =
     let
         a =
+            if True then 1 else 2
+
+        b =
+            if True then
+                1
+
+            else
+                2
+
+        c =
             if True then
                 1
 
@@ -282,7 +292,10 @@ ifStatement =
             else
                 3
 
-        b =
+        d =
+            if {- A -} True {- B -} then {- C -} 1 {- D -} else {- E -} 2
+
+        e =
             if {- C -} True {- D -} then
                 {- E -}
                 1
@@ -297,7 +310,7 @@ ifStatement =
                 {- L -}
                 3
 
-        c =
+        f =
             if
                 --C
                 True

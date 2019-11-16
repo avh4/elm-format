@@ -191,11 +191,14 @@ ifExpr elmVersion =
         >> whitespace
   in
     do
-      first <- ifClause elmVersion
-      rest <- many (try $ (,) <$> elseKeyword <*> ifClause elmVersion)
-      final <- (,) <$> elseKeyword <*> expr elmVersion
+      (first, firstMultiline) <- trackNewline $ ifClause elmVersion
+      (rest, restMultiline) <- trackNewline $ many (try $ (,) <$> elseKeyword <*> ifClause elmVersion)
+      (final, finalMultiline) <- trackNewline $ (,) <$> elseKeyword <*> expr elmVersion
 
-      return $ E.If first rest final
+      return $ E.If first rest final $
+          case (firstMultiline, restMultiline, finalMultiline) of
+              (JoinAll, JoinAll, JoinAll) -> JoinAll
+              _ -> SplitAll
 
 
 ifClause :: ElmVersion -> IParser E.IfClause
