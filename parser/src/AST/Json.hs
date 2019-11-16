@@ -406,7 +406,7 @@ instance ToJSON Expr where
                   , ( "subject", showJSON subject )
                   , ( "branches"
                     , JSArray $ map
-                        (\(Commented _ (A _ pat) _, (_, body)) ->
+                        (\(Commented _ (A _ pat) _, (_, body), _) ->
                            makeObj
                                [ ("pattern", showJSON pat)
                                , ("body", showJSON body)

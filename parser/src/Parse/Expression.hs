@@ -234,21 +234,23 @@ caseExpr elmVersion =
       (e, multilineSubject) <- trackNewline $ (\(pre, e, post) -> Commented pre e post) <$> padded (expr elmVersion)
       reserved elmVersion "of"
       firstPatternComments <- whitespace
-      result <- cases firstPatternComments
-      return $ E.Case (e, multilineToBool multilineSubject) result
+      branches <- cases firstPatternComments
+      return $ E.Case (e, multilineSubject) branches
   where
     case_ preComments =
       do
-          (patternComments, p, (preArrowComments, _, bodyComments)) <-
-              try ((,,)
+          (patternComments, (p, multi), ((preArrowComments, _, bodyComments), multi')) <-
+              try $ (,,)
                   <$> whitespace
-                  <*> (checkIndent >> Pattern.expr elmVersion)
-                  <*> padded rightArrow
-                  )
-          result <- expr elmVersion
+                  <*> trackNewline (checkIndent >> Pattern.expr elmVersion)
+                  <*> trackNewline (padded rightArrow)
+          (result, multi'') <- trackNewline $ expr elmVersion
           return
             ( Commented (preComments ++ patternComments) p preArrowComments
             , (bodyComments, result)
+            , case (multi, multi', multi'') of
+                  (JoinAll, JoinAll, JoinAll) -> JoinAll
+                  _ -> SplitAll
             )
 
     cases preComments =

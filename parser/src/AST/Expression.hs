@@ -61,7 +61,7 @@ data Expr'
     | Lambda [(Comments, Pattern.Pattern)] Comments Expr Bool
     | If IfClause [(Comments, IfClause)] (Comments, Expr)
     | Let [LetDeclaration] Comments Expr
-    | Case (Commented Expr, Bool) [(Commented Pattern.Pattern, (Comments, Expr))]
+    | Case (Commented Expr, Multiline) [(Commented Pattern.Pattern, (Comments, Expr), Multiline)]
 
     -- for type checking and code gen only
     | GLShader String

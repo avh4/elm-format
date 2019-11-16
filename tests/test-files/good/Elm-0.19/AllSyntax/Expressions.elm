@@ -340,13 +340,23 @@ caseStatement =
     let
         a =
             case Just 1 of
+                Just x -> x
+                _ -> 2
+
+        b =
+            case {- A -} Just 1 {- B -} of
+                Just x {- C -} -> {- D -} x
+                _ {- E -} -> {- F -} 2
+
+        c =
+            case Just 1 of
                 Just x ->
                     x
 
                 _ ->
                     2
 
-        b =
+        d =
             case {- M -} Just 1 {- N -} of
                 {- O -}
                 Just x
@@ -362,7 +372,7 @@ caseStatement =
                     {- T -}
                     2
 
-        c =
+        e =
             case
                 --M
                 Just 1
