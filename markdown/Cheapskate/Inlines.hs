@@ -415,15 +415,14 @@ pAutolink = do
          | otherwise   -> fail "Unknown contents of <>"
 
 autoLink :: Text -> Inlines
-autoLink t = singleton $ Link (toInlines t) (Url t) (T.empty)
-  where toInlines t' = case parse pToInlines t' of
-                         Right r   -> r
-                         Left e    -> error $ "autolink: " ++ show e
-        pToInlines = mconcat <$> many strOrEntity
+autoLink t =
+  case parse pToInlines t of
+      Right _ -> singleton $ Autolink t
+      Left e  -> error $ "autolink: " ++ show e
+  where pToInlines = mconcat <$> many strOrEntity
         strOrEntity = ((singleton . Str) <$> takeWhile1 (/='&'))
                    <|> pEntity
                    <|> ((singleton . Str) <$> string "&")
 
 emailLink :: Text -> Inlines
-emailLink t = singleton $ Link (singleton $ Str t)
-                               (Url $ "mailto:" <> t) (T.empty)
+emailLink t = singleton $ Autolink ("mailto:" <> t)

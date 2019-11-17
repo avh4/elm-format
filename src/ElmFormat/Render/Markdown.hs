@@ -170,6 +170,14 @@ formatMarkdownInline fixSpecialChars inline =
         Code text ->
             "`" ++ Text.unpack text ++ "`" -- TODO: escape backticks
 
+        Autolink url ->
+            let
+                url' = Text.unpack url
+            in
+                if fixSpecialChars
+                    then "<" ++ url' ++ ">"
+                    else url'
+
         Link inlines (Url url) title ->
             let
                 text = fold $ fmap (formatMarkdownInline False) $ inlines
@@ -177,16 +185,10 @@ formatMarkdownInline fixSpecialChars inline =
                 title' = Text.unpack title
                 url' = Text.unpack url
             in
-                if text == url' && title' == ""
-                    then
-                        if fixSpecialChars
-                            then "<" ++ url' ++ ">"
-                            else url'
-                    else
-                        "[" ++ text
-                            ++ "](" ++ Text.unpack url
-                            ++ (if title' == "" then "" else " \"" ++ title' ++ "\"")
-                            ++ ")"
+                "[" ++ text
+                ++ "](" ++ Text.unpack url
+                ++ (if title' == "" then "" else " \"" ++ title' ++ "\"")
+                ++ ")"
 
         Link inlines (Ref ref) _ ->
             let

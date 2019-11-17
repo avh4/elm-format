@@ -46,6 +46,7 @@ data Inline = Str Text
             | Strong Inlines
             | Code Text
             | Link Inlines LinkTarget {- URL -} Text {- title -}
+            | Autolink Text
             | Image Inlines Text {- URL -} Text {- title -}
             | Entity Text
             | RawHtml Text
