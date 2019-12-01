@@ -7,15 +7,14 @@ import Prelude hiding (init, putStr, putStrLn)
 import Control.Monad.State
 import Messages.Formatter.Format
 import Messages.Types
-import ElmVersion (ElmVersion)
 import ElmFormat.World
 
 
-format :: World m => ElmVersion -> Bool -> InfoFormatterF a -> StateT Bool m a
-format elmVersion autoYes infoFormatter =
+format :: World m => Bool -> InfoFormatterF a -> StateT Bool m a
+format autoYes infoFormatter =
     case infoFormatter of
         OnInfo info next ->
-            showInfo elmVersion info next
+            showInfo info next
 
         Approve _prompt next ->
             case autoYes of
@@ -33,17 +32,17 @@ done =
     putStrLn "]"
 
 
-showInfo :: World m => ElmVersion -> InfoMessage -> a -> StateT Bool m a
+showInfo :: World m => InfoMessage -> a -> StateT Bool m a
 
-showInfo _ (ProcessingFile _) next =
+showInfo (ProcessingFile _) next =
     return next
 
-showInfo elmVersion (FileWouldChange file) next =
+showInfo (FileWouldChange file fileVersion) next =
     json next file $
         "File is not formatted with elm-format-" ++ ElmFormat.Version.asString
-        ++ " --elm-version=" ++ show elmVersion
+        ++ " --elm-version=" ++ show fileVersion
 
-showInfo _ (ParseError inputFile _ _) next =
+showInfo (ParseError inputFile _ _) next =
     json next inputFile "Error parsing the file"
 
 

@@ -41,8 +41,8 @@ renderInfo :: World m => InfoMessage -> m ()
 renderInfo (ProcessingFile file) =
     putStrLn $ "Processing file " ++ file
 
-renderInfo (FileWouldChange file) =
-    putStrLn $ "File would be changed " ++ file
+renderInfo (FileWouldChange file version) =
+    putStrLn $ "File would be changed " ++ file ++ " (" ++ show version ++ ")"
 
 renderInfo (ParseError inputFile inputText errs) =
     showErrors inputFile inputText errs

@@ -11,7 +11,6 @@ import Control.Monad.State
 import Control.Monad.Free
 import ElmFormat.Operation
 import ElmFormat.World
-import ElmVersion
 
 import qualified ElmFormat.FileStore as FileStore
 import qualified ElmFormat.FileWriter as FileWriter
@@ -59,14 +58,14 @@ forHuman autoYes =
 
 
 {-| Execute Operations in a fashion appropriate for use by automated scripts. -}
-forMachine :: World m => ElmVersion -> Bool -> Program m OperationF Bool
-forMachine elmVersion autoYes =
+forMachine :: World m => Bool -> Program m OperationF Bool
+forMachine autoYes =
     Program
         { init = Json.init
         , step = \operation ->
             case operation of
                 InFileStore op -> lift $ FileStore.execute op
-                InInfoFormatter op -> Json.format elmVersion autoYes op
+                InInfoFormatter op -> Json.format autoYes op
                 InInputConsole op -> lift $ InputConsole.execute op
                 InOutputConsole op -> lift $ OutputConsole.execute op
                 InFileWriter op -> lift $ FileWriter.execute op

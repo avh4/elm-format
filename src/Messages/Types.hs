@@ -9,7 +9,7 @@ import qualified Reporting.Error.Syntax as Syntax
 
 data InfoMessage
   = ProcessingFile FilePath
-  | FileWouldChange FilePath
+  | FileWouldChange FilePath ElmVersion
   | ParseError FilePath String [A.Located Syntax.Error]
 
 

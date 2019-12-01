@@ -27,6 +27,7 @@ instance FileStore OperationF where
     readFile path = InFileStore $ readFile path
     stat path = InFileStore $ stat path
     listDirectory path = InFileStore $ listDirectory path
+    makeAbsolute path = InFileStore $ makeAbsolute path
 
 
 instance InfoFormatter OperationF where
