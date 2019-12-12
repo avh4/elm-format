@@ -122,6 +122,7 @@ yes =
     Opt.switch $
         mconcat
         [ Opt.long "yes"
+        , Opt.short 'y'
         , Opt.help "Reply 'yes' to all automated prompts."
         ]
 
@@ -147,6 +148,7 @@ output =
     Opt.optional $ Opt.strOption $
         mconcat
         [ Opt.long "output"
+        , Opt.short 'o'
         , Opt.metavar "FILE"
         , Opt.help "Write output to FILE instead of overwriting the given source file."
         ]
