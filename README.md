@@ -97,16 +97,16 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   <tr>
     <td rowspan=1>Vim</td>
     <td>:trophy: <a href="https://github.com/ElmCast/elm-vim">elm-vim</a></td>
-    <td>:x: <a href="#elm-vim-installation">6 steps</a></td>
+    <td>:disappointed: <a href="#elm-vim-installation">6 steps</a></td>
     <td>:white_check_mark:</td>
     <td>⚠️ requires configuration</td>
     <td>:white_check_mark:</td>
-    <td>:x: no error message</td>
+    <td>:disappointed: no error message</td>
   </tr>
   <tr>
     <td rowspan=1>Emacs</td>
     <td>:trophy: <a href="https://github.com/jcollard/elm-mode">elm-mode</a></td>
-    <td>:x: <a href="#elm-mode-installation">4 steps</a></td>
+    <td>:disappointed: <a href="#elm-mode-installation">4 steps</a></td>
     <td>:white_check_mark:</td>
     <td>:warning: requires configuration</td>
     <td>:white_check_mark:</td>
