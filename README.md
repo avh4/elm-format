@@ -308,7 +308,8 @@ stack runhaskell Shakefile.hs -- build
 
 ### Running tests
 
+First follow steps under `Building from source`. Then run `Shakefile.hs` without arguments, as this will run all tests:
+
 ```bash
-stack install shake
 stack runhaskell Shakefile.hs
 ```
