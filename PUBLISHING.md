@@ -17,15 +17,16 @@ brew cask install virtualbox
 
 ## Preparation
 
+1. Start a new branch from `origin/master` named `release/<new version>`
 1. Edit `CHANGELOG.md` to set the correct version number.
-1. Create `Release Notes/<version>.md` to draft the release notes.
+1. Create `Release Notes/<new version>.md` to draft the release notes.
 1. Update the version number in `elm-format.cabal`.
 1. If this is a stable release, update references to the version in `README.md`.
 1. Update `ElmFormat.Version.experimental` to `Just <survey URL>` for experimental versions and `Nothing` otherwise.
 1. `(cd package/npm && npm version "<new version>")`
-1. Commit the changes "Bump version to *new version*"
-1. Create a signed tag for the new version. `git tag -s <version> -m <version>`
-1. Push the tag. `git push origin <version>`
+1. Commit the changes "Bump version to <new version>"
+1. Create a signed tag for the new version. `git tag -s <new version> -m <new version>`
+1. Push the tag. `git push origin <new version>`
 1. Wait for CI to successfully build the tag.
 
 
@@ -47,9 +48,9 @@ brew cask install virtualbox
 
 ## Publishing
 
-1. Run `package/collect_files.sh`
+1. Run `./package/collect_files.sh`
 1. Go to the release page for the new tag on github.
-1. Enter the contents of `Release Notes/<version>.md` as the release notes.
+1. Enter the contents of `Release Notes/<new version>.md` as the release notes.
 1. Upload the zip, tgz and asc files.
 1. Publish the release.
 1. Update `README.md`
@@ -76,4 +77,10 @@ cd package/nix
 ./build.sh
 ```
 
-Then `cd nixpkgs`, push the resulting branch, and make a PR to https://github.com/NixOS/nixpkgs with the title "elm-format: [old version] -> [new version]"
+Then `cd nixpkgs`, push the resulting branch, and make a PR to <https://github.com/NixOS/nixpkgs> with the title "`elm-format: <old version> -> <new version>`"
+
+
+## Cleanup
+
+1. Create and merge a PR for the `release/<new version>` branch
+1. Delete the `release/<new version>` branch
