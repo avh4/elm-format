@@ -43,17 +43,20 @@ brew cask install virtualbox
 
 ## Windows
 
-1. See `package/win/setup.md`
+1. Pushing the tag should have triggered a build at <https://github.com/avh4/elm-format/actions?query=workflow%3A%22Build+Windows+release%22>
+1. Download the zip file artifact from the successful build (github will wrap this in another zip file)
+1. Unzip the outer zip file to get the inner zip file
+1. Rename the inner zip file to `elm-format-<new version>-win-i386.zip`
+1. Check that the SHA1 hash of the zip file matches what was printed in the "Run Get-FileHash -Algorithm SHA1 elm-format.zip" step of the successful build
 
 
 ## Publishing
 
-1. Run `./package/collect_files.sh`
+1. Run `./package/sign_files.sh`
 1. Go to the release page for the new tag on github.
 1. Enter the contents of `Release Notes/<new version>.md` as the release notes.
 1. Upload the zip, tgz and asc files.
 1. Publish the release.
-1. Update `README.md`
 
 
 ## NPM
@@ -64,9 +67,10 @@ npm install
 # for experimental releases
 # npm publish --tag exp
 npm publish
-npm dist-tag add elm-format@<new version> elm0.18.0
-npm dist-tag add elm-format@<new version> elm0.19.0
 npm dist-tag add elm-format@<new version> exp
+npm dist-tag add elm-format@<new version> latest-0.18.0
+npm dist-tag add elm-format@<new version> latest-0.19.0
+npm dist-tag add elm-format@<new version> latest-0.19.1
 ```
 
 
