@@ -1,14 +1,14 @@
 elm-format x.x.x
 
-Usage: elm-format [INPUT] [--output FILE] [--yes] [--validate] [--stdin]
+Usage: elm-format [INPUT] [-o|--output FILE] [-y|--yes] [--validate] [--stdin]
                   [--elm-version VERSION] [--upgrade]
   Format Elm source files.
 
 Available options:
   -h,--help                Show this help text
-  --output FILE            Write output to FILE instead of overwriting the given
+  -o,--output FILE         Write output to FILE instead of overwriting the given
                            source file.
-  --yes                    Reply 'yes' to all automated prompts.
+  -y,--yes                 Reply 'yes' to all automated prompts.
   --validate               Check if files are formatted without changing them.
   --stdin                  Read from stdin, output to stdout.
   --elm-version VERSION    The Elm version of the source files being formatted.
