@@ -1,17 +1,17 @@
 module AllSyntax.ModuleMultiline exposing
-    ( a
-    , b
-    , c
-    )
+  ( a
+  , b
+  , c
+  )
 
 
 a =
-    1
+  1
 
 
 b =
-    2
+  2
 
 
 c =
-    3
+  3

@@ -11,4 +11,4 @@ import OtherImport exposing (A(X, Y), b, z)
 
 
 x =
-    ()
+  ()

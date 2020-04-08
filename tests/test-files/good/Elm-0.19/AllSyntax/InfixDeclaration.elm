@@ -13,15 +13,15 @@ infix left  9 (<<) = composeL
 
 
 apL f x =
-    f x
+  f x
 
 
 eq _ _ =
-    True
+  True
 
 
 composeL g f x =
-    g (f x)
+  g (f x)
 
 
 
@@ -29,12 +29,12 @@ composeL g f x =
 
 
 infi =
-    ()
+  ()
 
 
 infiz =
-    ()
+  ()
 
 
 infixy right =
-    right
+  right

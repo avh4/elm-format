@@ -2,24 +2,24 @@ module ConvertBasicsRem exposing (fullyApplied)
 
 
 fullyApplied =
-    remainderBy 4 -1
+  remainderBy 4 -1
 
 
 fullyApplied_comments =
-    remainderBy {- B -} 4 {- A -} -1
+  remainderBy {- B -} 4 {- A -} -1
 
 
 partiallyApplied =
-    \divisor -> remainderBy divisor 1
+  \divisor -> remainderBy divisor 1
 
 
 unapplied =
-    \dividend divisor -> remainderBy divisor dividend
+  \dividend divisor -> remainderBy divisor dividend
 
 
 qualified =
-    remainderBy 4 11
+  remainderBy 4 11
 
 
 extraArgs =
-    remainderBy 2 1 3 4
+  remainderBy 2 1 3 4

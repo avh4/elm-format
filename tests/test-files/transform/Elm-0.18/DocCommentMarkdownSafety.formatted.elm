@@ -16,12 +16,12 @@ across parsers.
 
 ```
 myValue =
-    f 20
+  f 20
 ```
 
 -}
 f x =
-    x * x
+  x * x
 
 
 {-| Test
@@ -35,4 +35,4 @@ Code ...
 
 -}
 x =
-    ()
+  ()

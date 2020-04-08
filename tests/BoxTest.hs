@@ -67,12 +67,12 @@ tests =
                 , word "bar"
                 ]
     , testCase "indent" $
-        assertOutput "    a\n    b\n" $
+        assertOutput "  a\n  b\n" $
             indent $ stack1
                 [ word "a"
                 , word "b"
                 ]
     , testCase "indent (with leading spaces)" $
-        assertOutput "    a\n" $
+        assertOutput "  a\n" $
             prefix space $ indent $ line $ identifier "a"
     ]

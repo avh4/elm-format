@@ -4,4 +4,4 @@ import Result exposing (Result(..))
 
 
 x =
-    ()
+  ()

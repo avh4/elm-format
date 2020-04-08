@@ -10,23 +10,23 @@ import {- M -} Maybe {- N -} exposing {- O -} ({- S -} Maybe {- W -} ({- X -} Ju
 import Signal exposing ({- AB -} .. {- AC -})
 import {- L -} String
 import Task
-    exposing
-        ( andMap
-        , andThen
-        , fail {- AE -}
-        , fromMaybe
-        , fromResult
-        , map
-        , map2
-        , map3
-        , map4
-        , map5
-        , mapError
-        , onError
-        , succeed {- AD -}
-        , toMaybe
-        , toResult
-        )
+  exposing
+    ( andMap
+    , andThen
+    , fail {- AE -}
+    , fromMaybe
+    , fromResult
+    , map
+    , map2
+    , map3
+    , map4
+    , map5
+    , mapError
+    , onError
+    , succeed {- AD -}
+    , toMaybe
+    , toResult
+    )
 
 
 
@@ -34,12 +34,12 @@ import Task
 
 
 a =
-    1
+  1
 
 
 b =
-    2
+  2
 
 
 c =
-    3
+  3

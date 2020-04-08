@@ -2,106 +2,106 @@ module AllSyntax.Patterns exposing (Foo(..), asAlias, complexCons, consList, dat
 
 
 type Foo
-    = Foo () ()
+  = Foo () ()
 
 
 wildcard _ =
-    ()
+  ()
 
 
 literal 1 2.0 "string" 'c' =
-    ()
+  ()
 
 
 variable v =
-    ()
+  ()
 
 
 data (Foo x y) =
-    ()
+  ()
 
 
 unit () =
-    ()
+  ()
 
 
 parens v =
-    ()
+  ()
 
 
 tuple ( a, b ) =
-    ()
+  ()
 
 
 emptyList [] =
-    ()
+  ()
 
 
 list [ a, b ] =
-    ()
+  ()
 
 
 consList
-    ( a :: b :: c
-    , a {- 1 -} :: {- 2 -} b {- 3 -} :: {- 4 -} c
-    , --0
-      d --1
-        :: --2
-           e
-        --3
-        :: --4
-           f
-      --5
-    , d
-        --E
-        :: e
-        --F
-        :: f
-    , d --D
-        :: e --E
-        :: f --F
-    )
-    =
-    ()
+  ( a :: b :: c
+  , a {- 1 -} :: {- 2 -} b {- 3 -} :: {- 4 -} c
+  , --0
+    d --1
+      :: --2
+         e
+      --3
+      :: --4
+         f
+    --5
+  , d
+      --E
+      :: e
+      --F
+      :: f
+  , d --D
+      :: e --E
+      :: f --F
+  )
+  =
+  ()
 
 
 complexCons (a :: (x :: []) :: ((b :: _) as blah)) =
-    ()
+  ()
 
 
 record { a, b } =
-    ()
+  ()
 
 
 asAlias (() as x) =
-    ()
+  ()
 
 
 patternWithQualifiedConstructorAsCosntructorArgument m =
-    case m of
-        Maybe.Just Maybe.Nothing ->
-            ()
+  case m of
+    Maybe.Just Maybe.Nothing ->
+      ()
 
-        Maybe.Just _ ->
-            ()
+    Maybe.Just _ ->
+      ()
 
-        Maybe.Nothing ->
-            ()
+    Maybe.Nothing ->
+      ()
 
 
 patternWithUnqualifiedConstructorAsCosntructorArgument m =
-    case m of
-        Maybe.Just Nothing ->
-            ()
+  case m of
+    Maybe.Just Nothing ->
+      ()
 
-        (Just _) as x ->
-            ()
+    (Just _) as x ->
+      ()
 
-        Nothing as x ->
-            ()
+    Nothing as x ->
+      ()
 
-        (Maybe.Nothing as y) as x ->
-            ()
+    (Maybe.Nothing as y) as x ->
+      ()
 
-        _ ->
-            ()
+    _ ->
+      ()

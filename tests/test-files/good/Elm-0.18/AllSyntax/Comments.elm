@@ -2,26 +2,26 @@ module AllSyntax.Comments exposing (blockComment, indentedMultilineBlockComment,
 
 
 blockComment =
-    {- A -}
-    ()
+  {- A -}
+  ()
 
 
 nestedBlockComment =
-    {- A {- {- C -} B {- D -} -} {- E -} -}
-    ()
+  {- A {- {- C -} B {- D -} -} {- E -} -}
+  ()
 
 
 indentedMultilineBlockComment =
-    {- A
-       B
-       C
-    -}
-    ()
+  {- A
+     B
+     C
+  -}
+  ()
 
 
 {--}
 multilineCommentTrickDisabled =
-    ()
+  ()
 --}
 
 

@@ -84,20 +84,20 @@ tests =
         , example "comments"
             "{{-A-}a{-B-}|{-C-}x{-D-}:{-E-}m{-F-},{-G-}y{-H-}:{-I-}n{-J-}}"
             "{ {- A -} a {- B -}\n\
-            \    | {- C -} x {- D -} : {- E -} m\n\
+            \  | {- C -} x {- D -} : {- E -} m\n\
             \\n\
-            \    {- F -}\n\
-            \    , {- G -} y {- H -} : {- I -} n\n\
+            \  {- F -}\n\
+            \  , {- G -} y {- H -} : {- I -} n\n\
             \\n\
-            \    {- J -}\n\
+            \  {- J -}\n\
             \}\n"
         , example "newlines"
             "{\n a\n |\n x\n :\n m\n ,\n y\n :\n n\n }"
             "{ a\n\
-            \    | x :\n\
-            \        m\n\
-            \    , y :\n\
-            \        n\n\
+            \  | x :\n\
+            \      m\n\
+            \  , y :\n\
+            \      n\n\
             \}\n"
         , testCase "only allows simple base" $
             assertParseFailure (expr Elm_0_19) "{()|x:m}"

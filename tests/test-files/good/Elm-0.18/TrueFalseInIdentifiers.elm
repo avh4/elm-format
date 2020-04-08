@@ -2,31 +2,31 @@ module Test exposing (ExpressionType(..), expressionTypes, typename)
 
 
 type ExpressionType
-    = TrueType
-    | FalseType
-    | NotType
-    | AndType
-    | OrType
+  = TrueType
+  | FalseType
+  | NotType
+  | AndType
+  | OrType
 
 
 expressionTypes =
-    [ TrueType, FalseType, NotType, AndType, OrType ]
+  [ TrueType, FalseType, NotType, AndType, OrType ]
 
 
 typename : ExpressionType -> String
 typename expressionType =
-    case expressionType of
-        TrueType ->
-            "True"
+  case expressionType of
+    TrueType ->
+      "True"
 
-        FalseType ->
-            "False"
+    FalseType ->
+      "False"
 
-        NotType ->
-            "Not"
+    NotType ->
+      "Not"
 
-        AndType ->
-            "And"
+    AndType ->
+      "And"
 
-        OrType ->
-            "Or"
+    OrType ->
+      "Or"

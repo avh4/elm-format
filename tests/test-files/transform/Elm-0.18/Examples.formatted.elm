@@ -2,13 +2,13 @@ module Main exposing (bar, multilineList, ratio)
 
 
 ratio =
-    graphHeight
-        / (if range == 0 then
-            0.1
+  graphHeight
+    / (if range == 0 then
+        0.1
 
-           else
-            toFloat range
-          )
+       else
+        toFloat range
+      )
 
 
 
@@ -16,21 +16,21 @@ ratio =
 
 
 bar =
-    if
-        if a then
-            True
-
-        else
-            False
-    then
-        "a"
+  if
+    if a then
+      True
 
     else
-        "b"
+      False
+  then
+    "a"
+
+  else
+    "b"
 
 
 multilineList =
-    [ 1
-    , 2
-    , 3
-    ]
+  [ 1
+  , 2
+  , 3
+  ]

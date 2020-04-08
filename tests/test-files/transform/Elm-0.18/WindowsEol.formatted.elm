@@ -10,17 +10,17 @@ Escaped CRs will be retained.
 
 
 multilineString =
-    """
+  """
 """
 
 
 string =
-    "\n"
+  "\n"
 
 
 rawCR =
-    "\x0D"
+  "\x0D"
 
 
 escapedCR =
-    "\x0D"
+  "\x0D"

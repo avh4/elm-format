@@ -2,4 +2,4 @@ module AllSyntax.Expressions exposing (range)
 
 
 range =
-    [1..2]
+  List.range 1 2

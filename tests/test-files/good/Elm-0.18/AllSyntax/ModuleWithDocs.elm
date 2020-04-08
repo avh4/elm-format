@@ -1,7 +1,7 @@
 module AllSyntax.ModuleWithDocs exposing
-    ( CustomType(TagA), a
-    , b, c
-    )
+  ( CustomType(TagA), a
+  , b, c
+  )
 
 {-|
 
@@ -10,48 +10,48 @@ module AllSyntax.ModuleWithDocs exposing
 -}
 
 import Dict as D
-    exposing
-        ( Dict
-        , empty
-        , fromList
-        )
+  exposing
+    ( Dict
+    , empty
+    , fromList
+    )
 import Json.Decode as Json
 import Maybe exposing (Maybe(Just, Nothing), map)
 import Result exposing (Result(..))
 import Signal exposing (..)
 import String
 import Task
-    exposing
-        ( andMap
-        , andThen
-        , fail
-        , fromMaybe
-        , fromResult
-        , map
-        , map2
-        , map3
-        , map4
-        , map5
-        , mapError
-        , onError
-        , succeed
-        , toMaybe
-        , toResult
-        )
+  exposing
+    ( andMap
+    , andThen
+    , fail
+    , fromMaybe
+    , fromResult
+    , map
+    , map2
+    , map3
+    , map4
+    , map5
+    , mapError
+    , onError
+    , succeed
+    , toMaybe
+    , toResult
+    )
 
 
 type CustomType
-    = TagA
-    | TagB
+  = TagA
+  | TagB
 
 
 a =
-    1
+  1
 
 
 b =
-    2
+  2
 
 
 c =
-    3
+  3

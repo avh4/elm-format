@@ -1,9 +1,9 @@
 module DocCommentAtDocs exposing
-    ( x
-    , y
-    , z
-    , T(..)
-    )
+  ( x
+  , y
+  , z
+  , T(..)
+  )
 
 {-|
 
@@ -27,18 +27,18 @@ Paragraph
 -}
 x : ()
 x =
-    ()
+  ()
 
 
 {-| Y
 -}
 y : ()
 y =
-    ()
+  ()
 
 
 {-| Z
 -}
 z : ()
 z =
-    ()
+  ()

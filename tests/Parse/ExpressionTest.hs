@@ -222,10 +222,10 @@ tests =
             "{ a | x = 7, y = 8 }\n"
         , example' "comments"
             "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}"
-            "{ {- A -} a {- B -}\n    | {- C -} x {- D -} = {- E -} 7\n\n    {- F -}\n    , {- G -} y {- H -} = {- I -} 8\n\n    {- J -}\n}\n"
+            "{ {- A -} a {- B -}\n  | {- C -} x {- D -} = {- E -} 7\n\n  {- F -}\n  , {- G -} y {- H -} = {- I -} 8\n\n  {- J -}\n}\n"
         , example' "newlines"
             "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }"
-            "{ a\n    | x =\n        7\n    , y =\n        8\n}\n"
+            "{ a\n  | x =\n      7\n  , y =\n      8\n}\n"
         , testCase "only allows simple base" $
             assertParseFailure (expr Elm_0_19) "{9|x=7}"
         , testCase "only allows simple base" $

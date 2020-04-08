@@ -7,12 +7,12 @@ import Random
 
 
 main =
-    Html.program
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
+  Html.program
+    { init = init
+    , view = view
+    , update = update
+    , subscriptions = subscriptions
+    }
 
 
 
@@ -20,13 +20,13 @@ main =
 
 
 type alias Model =
-    { dieFace : Int
-    }
+  { dieFace : Int
+  }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model 1, Cmd.none )
+  ( Model 1, Cmd.none )
 
 
 
@@ -34,18 +34,18 @@ init =
 
 
 type Msg
-    = Roll
-    | NewFace Int
+  = Roll
+  | NewFace Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        Roll ->
-            ( model, Random.generate NewFace (Random.int 1 6) )
+  case msg of
+    Roll ->
+      ( model, Random.generate NewFace (Random.int 1 6) )
 
-        NewFace newFace ->
-            ( Model newFace, Cmd.none )
+    NewFace newFace ->
+      ( Model newFace, Cmd.none )
 
 
 
@@ -54,7 +54,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+  Sub.none
 
 
 
@@ -63,7 +63,7 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ h1 [] [ text (toString model.dieFace) ]
-        , button [ onClick Roll ] [ text "Roll" ]
-        ]
+  div []
+    [ h1 [] [ text (toString model.dieFace) ]
+    , button [ onClick Roll ] [ text "Roll" ]
+    ]

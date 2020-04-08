@@ -1,9 +1,9 @@
 module ListDocumentedExportsNoExposing exposing
-    ( a
-    , X
-    , Y(..)
-    , b, c
-    )
+  ( a
+  , X
+  , Y(..)
+  , b, c
+  )
 
 {-|
 
@@ -20,29 +20,29 @@ module ListDocumentedExportsNoExposing exposing
 
 
 type alias X =
-    ()
+  ()
 
 
 type Y
-    = Y1
-    | Y2
+  = Y1
+  | Y2
 
 
 q =
-    4
+  4
 
 
 a =
-    1
+  1
 
 
 b =
-    2
+  2
 
 
 c =
-    3
+  3
 
 
 p =
-    5
+  5

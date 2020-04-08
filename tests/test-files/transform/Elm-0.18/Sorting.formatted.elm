@@ -13,4 +13,4 @@ import ImportsWithConflictingAs2 as Correct
 
 
 x =
-    ()
+  ()

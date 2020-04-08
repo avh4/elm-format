@@ -2,8 +2,8 @@ module Main exposing (a, b)
 
 
 a =
-    String.fromChar '!'
+  String.fromChar '!'
 
 
 b =
-    identity (String.fromChar '!')
+  identity (String.fromChar '!')

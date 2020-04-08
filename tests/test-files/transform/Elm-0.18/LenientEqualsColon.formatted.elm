@@ -2,10 +2,10 @@ module Main exposing (Foo, foo)
 
 
 type alias Foo =
-    { x : Int
-    , y : ()
-    }
+  { x : Int
+  , y : ()
+  }
 
 
 foo =
-    { x = Int, y = Int }
+  { x = Int, y = Int }

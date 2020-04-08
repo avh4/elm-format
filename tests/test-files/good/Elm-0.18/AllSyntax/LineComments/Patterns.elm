@@ -2,113 +2,113 @@ module AllSyntax.LineComments.Patterns exposing (Foo(..), asAlias, complexCons, 
 
 
 type Foo
-    = Foo () ()
+  = Foo () ()
 
 
 wildcard _ =
-    ()
+  ()
 
 
 literal 1 2.0 "string" 'c' =
-    ()
+  ()
 
 
 variable v =
-    ()
+  ()
 
 
 data
-    (Foo
-        --Q
-        x
-        --R
-        y
-    )
-    =
-    ()
+  (Foo
+    --Q
+    x
+    --R
+    y
+  )
+  =
+  ()
 
 
 unit
-    (--A
-    )
-    =
-    ()
+  (--A
+  )
+  =
+  ()
 
 
 parens
-    (--W
-     v
-     --X
-    )
-    =
-    ()
+  (--W
+   v
+   --X
+  )
+  =
+  ()
 
 
 tuple
-    ( --B
-      a
-      --C
-    , --D
-      b
-      --E
-    )
-    =
-    ()
+  ( --B
+    a
+    --C
+  , --D
+    b
+    --E
+  )
+  =
+  ()
 
 
 emptyList
-    [--F
-    ]
-    =
-    ()
+  [--F
+  ]
+  =
+  ()
 
 
 list
-    [ --G
-      a
-      --H
-    , --I
-      b
-      --J
-    ]
-    =
-    ()
+  [ --G
+    a
+    --H
+  , --I
+    b
+    --J
+  ]
+  =
+  ()
 
 
 consList
-    (a --T
-        :: --U
-           b
-        --V
-        :: --W
-           c
-    )
-    =
-    ()
+  (a --T
+    :: --U
+       b
+    --V
+    :: --W
+       c
+  )
+  =
+  ()
 
 
 record
-    { --K
-      a
-      --L
-    , --M
-      b
-      --N
-    }
-    =
-    ()
+  { --K
+    a
+    --L
+  , --M
+    b
+    --N
+  }
+  =
+  ()
 
 
 asAlias
-    (()
-     --O
-     as
-        --P
-        x
-    )
-    =
-    ()
+  (()
+   --O
+   as
+    --P
+    x
+  )
+  =
+  ()
 
 
 complexCons (a :: (x :: []) :: ((b :: _) as blah)) =
-    ()
+  ()

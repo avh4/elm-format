@@ -2,29 +2,29 @@
 
 
 module
-    --B
-    AllSyntax.LineComments.Module
-    --C
-    exposing
-    --D
-    (  --K
-       D
-       --L
+  --B
+  AllSyntax.LineComments.Module
+  --C
+  exposing
+  --D
+  (  --K
+     D
+     --L
 
-    ,  --E
-       a
-       --F
+  ,  --E
+     a
+     --F
 
-    ,  --G
-       b
-       --H
+  ,  --G
+     b
+     --H
 
-    ,  --I
-       c
-       --J
+  ,  --I
+     c
+     --J
 
-    )
+  )
 
 
 a =
-    1
+  1

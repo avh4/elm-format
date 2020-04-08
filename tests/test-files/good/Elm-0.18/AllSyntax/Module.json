@@ -1,6 +1,6 @@
 {
     "body": [
-        "TODO: Entry (at 34 1 36 11 (Datatype {nameWithArgs = Commented [] (UppercaseIdentifier \"CustomType\",[]) [], tags = OpenCommentedList [Commented [] (WithEol (UppercaseIdentifier \"TagA\",[]) Nothing) []] ([],WithEol (UppercaseIdentifier \"TagB\",[]) Nothing)}))",
+        "TODO: Entry (at 34 1 36 9 (Datatype {nameWithArgs = Commented [] (UppercaseIdentifier \"CustomType\",[]) [], tags = OpenCommentedList [Commented [] (WithEol (UppercaseIdentifier \"TagA\",[]) Nothing) []] ([],WithEol (UppercaseIdentifier \"TagB\",[]) Nothing)}))",
         {
             "expression": {
                 "display": {
@@ -13,7 +13,7 @@
             "returnType": null,
             "sourceLocation": {
                 "end": {
-                    "col": 6,
+                    "col": 4,
                     "line": 40
                 },
                 "start": {
@@ -35,7 +35,7 @@
             "returnType": null,
             "sourceLocation": {
                 "end": {
-                    "col": 6,
+                    "col": 4,
                     "line": 44
                 },
                 "start": {
@@ -57,7 +57,7 @@
             "returnType": null,
             "sourceLocation": {
                 "end": {
-                    "col": 6,
+                    "col": 4,
                     "line": 48
                 },
                 "start": {

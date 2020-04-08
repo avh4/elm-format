@@ -1,7 +1,7 @@
 module Main exposing
-    ( x
-    , increment, escapedCharacters
-    )
+  ( x
+  , increment, escapedCharacters
+  )
 
 {-| Example of markdown in doc comments.
 
@@ -67,7 +67,7 @@ Followed by a paragraph.
     import MyModule
 
     myResult =
-        x
+      x
 
 
 ## Elm code block: expressions
@@ -96,7 +96,7 @@ Followed by a paragraph.
     import String
 
     x =
-        ()
+      ()
 
 
 ## Non-Elm code block
@@ -159,11 +159,11 @@ Nested with loose items
     -- Compiles to the CSS "display: none"
     invisible : Style
     invisible =
-        display none
+      display none
 
 -}
 x =
-    ()
+  ()
 
 
 {-| Top-level comments in an Elm code example are retained.
@@ -172,11 +172,11 @@ x =
     -}
     invisible : Style
     invisible =
-        display none
+      display none
 
 -}
 y =
-    ()
+  ()
 
 
 {-| Code block following a list. In this case we fallback to a fenced code block
@@ -192,13 +192,13 @@ Increment a number.
 
 ```
 increment x =
-    x + 1
+  x + 1
 ```
 
 -}
 increment : Int -> Int
 increment x =
-    x + 1
+  x + 1
 
 
 {-| Escaped characters should not be changed ¯\\\_(ツ)\_/¯
@@ -208,4 +208,4 @@ increment x =
 
 -}
 escapedCharacters =
-    ()
+  ()

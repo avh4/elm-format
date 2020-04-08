@@ -1,18 +1,18 @@
 module
-    --A
-    Main
-    {- A -} exposing
-    ( a
-    ,  b
-       --A
+  --A
+  Main
+  {- A -} exposing
+  ( a
+  ,  b
+     --A
 
-    ,  --A
-       c
+  ,  --A
+     c
 
-    )
+  )
 
 
 foo =
-    {- A -}
-    {- B -}
-    "ABC" ({- A -} {- B -}) {- A -} {- B -} "ABC" () 1
+  {- A -}
+  {- B -}
+  "ABC" ({- A -} {- B -}) {- A -} {- B -} "ABC" () 1

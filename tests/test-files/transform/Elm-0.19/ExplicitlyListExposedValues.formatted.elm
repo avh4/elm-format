@@ -2,17 +2,17 @@ module Main exposing (Foo(..), X, check, x)
 
 
 x =
-    ()
+  ()
 
 
 type alias X =
-    String
+  String
 
 
 type Foo
-    = A
-    | B
-    | C
+  = A
+  | B
+  | C
 
 
 port check : String -> Cmd msg

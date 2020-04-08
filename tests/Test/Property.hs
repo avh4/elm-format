@@ -95,9 +95,9 @@ propertyTests =
         ]
 
     , testCase "simple round trip" $
-        assertStringToString "module Main exposing (foo)\n\n\nfoo =\n    8\n"
+        assertStringToString "module Main exposing (foo)\n\n\nfoo =\n  8\n"
     , testCase "simple round trip with comments" $
-        assertStringToString "module Main exposing (foo)\n\n\nfoo =\n    ( {- A -} 3 {- B -}, {- C -} 4 {- D -} )\n"
+        assertStringToString "module Main exposing (foo)\n\n\nfoo =\n  ( {- A -} 3 {- B -}, {- C -} 4 {- D -} )\n"
     , testCase "simple round trip with comments" $
-        assertStringToString "module Main exposing (commentedLiterals)\n\n\ncommentedLiterals =\n    ( {- int -} 1, {- float -} 0.1, {- char -} \'c\', {- string -} \"str\", {- boolean -} True )\n"
+        assertStringToString "module Main exposing (commentedLiterals)\n\n\ncommentedLiterals =\n  ( {- int -} 1, {- float -} 0.1, {- char -} \'c\', {- string -} \"str\", {- boolean -} True )\n"
     ]

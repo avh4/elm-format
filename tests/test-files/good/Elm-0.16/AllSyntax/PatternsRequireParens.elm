@@ -1,31 +1,31 @@
-module Main (..) where
+module Main exposing (..)
 
 
 patternWithQualifiedConstructorAsCosntructorArgument m =
-    case m of
-        Maybe.Just (Maybe.Nothing) ->
-            ()
+  case m of
+    Maybe.Just Maybe.Nothing ->
+      ()
 
-        Maybe.Just _ ->
-            ()
+    Maybe.Just _ ->
+      ()
 
-        Maybe.Nothing ->
-            ()
+    Maybe.Nothing ->
+      ()
 
 
 patternWithUnqualifiedConstructorAsCosntructorArgument m =
-    case m of
-        Maybe.Just Nothing ->
-            ()
+  case m of
+    Maybe.Just Nothing ->
+      ()
 
-        (Just _) as x ->
-            ()
+    (Just _) as x ->
+      ()
 
-        Nothing as x ->
-            ()
+    Nothing as x ->
+      ()
 
-        ((Maybe.Nothing) as y) as x ->
-            ()
+    (Maybe.Nothing as y) as x ->
+      ()
 
-        _ ->
-            ()
+    _ ->
+      ()

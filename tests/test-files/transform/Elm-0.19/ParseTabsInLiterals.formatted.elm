@@ -2,12 +2,12 @@ module Main exposing (char, multilineString, string)
 
 
 string =
-    "\t.\t"
+  "\t.\t"
 
 
 char =
-    '\t'
+  '\t'
 
 
 multilineString =
-    """\t.\t"""
+  """\t.\t"""

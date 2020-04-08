@@ -60,9 +60,9 @@ tests =
             ( unlines
                 [ "aa"
                 , "aa"
-                , "    bb"
-                , "    bb"
-                , "    c"
+                , "  bb"
+                , "  bb"
+                , "  c"
                 ]
             ) $
             application (FAJoinFirst JoinAll)

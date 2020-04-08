@@ -3,48 +3,48 @@
 
 effect
 --T
-    module
-    -- A
-    AllSyntax.BlockComments.ModuleEffect
-    -- B
-    where
-    -- C
-        { --D
-          command
-          --E
-            =
-            -- F
-            MyCmd
-            -- G
-        , -- H
-          subscription
-          -- I
-            =
-            -- J
-            MySub
-            -- K
-        }
-    -- L
-    exposing
-    -- M
-    (  -- N
-       a
-       -- O
+  module
+  -- A
+  AllSyntax.BlockComments.ModuleEffect
+  -- B
+  where
+  -- C
+    { --D
+      command
+      --E
+        =
+        -- F
+        MyCmd
+        -- G
+    , -- H
+      subscription
+      -- I
+        =
+        -- J
+        MySub
+        -- K
+    }
+  -- L
+  exposing
+  -- M
+  (  -- N
+     a
+     -- O
 
-    ,  -- P
-       b
-       -- Q
+  ,  -- P
+     b
+     -- Q
 
-    ,  -- R
-       c
-       -- S
+  ,  -- R
+     c
+     -- S
 
-    )
+  )
 
 
 type MyCmd msg
-    = MyCmd msg
+  = MyCmd msg
 
 
 type MySub msg
-    = MySub msg
+  = MySub msg

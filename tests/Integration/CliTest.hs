@@ -32,22 +32,22 @@ tests =
             |> TestWorld.goldenStderr "using --stdin writes errors to stderr" "tests/stdin-error.stderr"
         , testGroup "auto-detects Elm version"
             [ testCase "for Elm 0.19 applications" $ world
-                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"
+                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n  '\\u{2000}'\n"
                 |> TestWorld.uploadFile "elm.json" "{\"elm-version\": \"0.19.0\"}"
                 |> run "elm-format" ["test.elm", "--validate"]
                 |> expectExit 0
             , testCase "for Elm 0.19 packages" $ world
-                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"
+                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n  '\\u{2000}'\n"
                 |> TestWorld.uploadFile "elm.json" "{\"elm-version\": \"0.19.0 <= v < 0.20.0\"}"
                 |> run "elm-format" ["test.elm", "--validate"]
                 |> expectExit 0
             , testCase "for Elm 0.18" $ world
-                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\x2000'\n"
+                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n  '\\x2000'\n"
                 |> TestWorld.uploadFile "elm-package.json" "{\"elm-version\": \"0.18.0 <= v < 0.19.0\"}"
                 |> run "elm-format" ["test.elm", "--validate"]
                 |> expectExit 0
             , testCase "default to Elm 0.19" $ world
-                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"
+                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n  '\\u{2000}'\n"
                 |> run "elm-format" ["test.elm", "--validate"]
                 |> expectExit 0
             ]
@@ -91,7 +91,7 @@ formatted_elm =
         , ""
         , ""
         , "x ="
-        , "    ()"
+        , "  ()"
         ]
 
 assertPrefix :: String -> String -> Assertion

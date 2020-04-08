@@ -1,17 +1,17 @@
 module Basics exposing
-    ( Int, Float, (+), (-), (*), (/), (//), (^)
-    , toFloat, round, floor, ceiling, truncate
-    , (==), (/=)
-    , (<), (>), (<=), (>=), max, min, compare, Order(..)
-    , Bool(..), not, (&&), (||), xor
-    , (++)
-    , modBy, remainderBy, negate, abs, clamp, sqrt, logBase, e
-    , degrees, radians, turns
-    , pi, cos, sin, tan, acos, asin, atan, atan2
-    , toPolar, fromPolar
-    , isNaN, isInfinite
-    , identity, always, (<|), (|>), (<<), (>>), Never, never
-    )
+  ( Int, Float, (+), (-), (*), (/), (//), (^)
+  , toFloat, round, floor, ceiling, truncate
+  , (==), (/=)
+  , (<), (>), (<=), (>=), max, min, compare, Order(..)
+  , Bool(..), not, (&&), (||), xor
+  , (++)
+  , modBy, remainderBy, negate, abs, clamp, sqrt, logBase, e
+  , degrees, radians, turns
+  , pi, cos, sin, tan, acos, asin, atan, atan2
+  , toPolar, fromPolar
+  , isNaN, isInfinite
+  , identity, always, (<|), (|>), (<<), (>>), Never, never
+  )
 
 {-| Tons of useful functions that get imported by default.
 
@@ -146,7 +146,7 @@ this abbreviation.
 
 -}
 type Int
-    = Int -- NOTE: The compiler provides the real implementation.
+  = Int -- NOTE: The compiler provides the real implementation.
 
 
 {-| A `Float` is a [floating-point number][fp]. Valid syntax for floats includes:
@@ -171,7 +171,7 @@ compatible with any widely-used assembly language.
 
 -}
 type Float
-    = Float -- NOTE: The compiler provides the real implementation.
+  = Float -- NOTE: The compiler provides the real implementation.
 
 
 {-| Add two numbers. The `number` type variable means this operation can be
@@ -200,7 +200,7 @@ design that makes all conversions explicit.
 -}
 add : number -> number -> number
 add =
-    Elm.Kernel.Basics.add
+  Elm.Kernel.Basics.add
 
 
 {-| Subtract numbers like `4 - 3 == 1`.
@@ -210,7 +210,7 @@ See [`(+)`](#+) for docs on the `number` type variable.
 -}
 sub : number -> number -> number
 sub =
-    Elm.Kernel.Basics.sub
+  Elm.Kernel.Basics.sub
 
 
 {-| Multiply numbers like `2 * 3 == 6`.
@@ -220,7 +220,7 @@ See [`(+)`](#+) for docs on the `number` type variable.
 -}
 mul : number -> number -> number
 mul =
-    Elm.Kernel.Basics.mul
+  Elm.Kernel.Basics.mul
 
 
 {-| Floating-point division:
@@ -230,7 +230,7 @@ mul =
 -}
 fdiv : Float -> Float -> Float
 fdiv =
-    Elm.Kernel.Basics.fdiv
+  Elm.Kernel.Basics.fdiv
 
 
 {-| Integer division:
@@ -242,7 +242,7 @@ Notice that the remainder is discarded.
 -}
 idiv : Int -> Int -> Int
 idiv =
-    Elm.Kernel.Basics.idiv
+  Elm.Kernel.Basics.idiv
 
 
 {-| Exponentiation
@@ -254,7 +254,7 @@ idiv =
 -}
 pow : number -> number -> number
 pow =
-    Elm.Kernel.Basics.pow
+  Elm.Kernel.Basics.pow
 
 
 
@@ -266,12 +266,12 @@ values like this:
 
     halfOf : Int -> Float
     halfOf number =
-        toFloat number / 2
+      toFloat number / 2
 
 -}
 toFloat : Int -> Float
 toFloat =
-    Elm.Kernel.Basics.toFloat
+  Elm.Kernel.Basics.toFloat
 
 
 {-| Round a number to the nearest integer.
@@ -293,7 +293,7 @@ toFloat =
 -}
 round : Float -> Int
 round =
-    Elm.Kernel.Basics.round
+  Elm.Kernel.Basics.round
 
 
 {-| Floor function, rounding down.
@@ -315,7 +315,7 @@ round =
 -}
 floor : Float -> Int
 floor =
-    Elm.Kernel.Basics.floor
+  Elm.Kernel.Basics.floor
 
 
 {-| Ceiling function, rounding up.
@@ -337,7 +337,7 @@ floor =
 -}
 ceiling : Float -> Int
 ceiling =
-    Elm.Kernel.Basics.ceiling
+  Elm.Kernel.Basics.ceiling
 
 
 {-| Truncate a number, rounding towards zero.
@@ -359,7 +359,7 @@ ceiling =
 -}
 truncate : Float -> Int
 truncate =
-    Elm.Kernel.Basics.truncate
+  Elm.Kernel.Basics.truncate
 
 
 
@@ -388,7 +388,7 @@ if passed through a port.
 -}
 eq : a -> a -> Bool
 eq =
-    Elm.Kernel.Utils.equal
+  Elm.Kernel.Utils.equal
 
 
 {-| Check if values are not &ldquo;the same&rdquo;.
@@ -398,7 +398,7 @@ So `(a /= b)` is the same as `(not (a == b))`.
 -}
 neq : a -> a -> Bool
 neq =
-    Elm.Kernel.Utils.notEqual
+  Elm.Kernel.Utils.notEqual
 
 
 
@@ -408,25 +408,25 @@ neq =
 {-| -}
 lt : comparable -> comparable -> Bool
 lt =
-    Elm.Kernel.Utils.lt
+  Elm.Kernel.Utils.lt
 
 
 {-| -}
 gt : comparable -> comparable -> Bool
 gt =
-    Elm.Kernel.Utils.gt
+  Elm.Kernel.Utils.gt
 
 
 {-| -}
 le : comparable -> comparable -> Bool
 le =
-    Elm.Kernel.Utils.le
+  Elm.Kernel.Utils.le
 
 
 {-| -}
 ge : comparable -> comparable -> Bool
 ge =
-    Elm.Kernel.Utils.ge
+  Elm.Kernel.Utils.ge
 
 
 {-| Find the smaller of two comparables.
@@ -438,11 +438,11 @@ ge =
 -}
 min : comparable -> comparable -> comparable
 min x y =
-    if lt x y then
-        x
+  if lt x y then
+    x
 
-    else
-        y
+  else
+    y
 
 
 {-| Find the larger of two comparables.
@@ -454,11 +454,11 @@ min x y =
 -}
 max : comparable -> comparable -> comparable
 max x y =
-    if gt x y then
-        x
+  if gt x y then
+    x
 
-    else
-        y
+  else
+    y
 
 
 {-| Compare any two comparable values. Comparable values include `String`,
@@ -474,16 +474,16 @@ are also the only values that work as `Dict` keys or `Set` members.
 -}
 compare : comparable -> comparable -> Order
 compare =
-    Elm.Kernel.Utils.compare
+  Elm.Kernel.Utils.compare
 
 
 {-| Represents the relative ordering of two things.
 The relations are less than, equal to, and greater than.
 -}
 type Order
-    = LT
-    | EQ
-    | GT
+  = LT
+  | EQ
+  | GT
 
 
 
@@ -503,8 +503,8 @@ from Richard [here][rt].
 
 -}
 type Bool
-    = True
-    | False
+  = True
+  | False
 
 
 {-| Negate a boolean value.
@@ -516,7 +516,7 @@ type Bool
 -}
 not : Bool -> Bool
 not =
-    Elm.Kernel.Basics.not
+  Elm.Kernel.Basics.not
 
 
 {-| The logical AND operator. `True` if both inputs are `True`.
@@ -536,7 +536,7 @@ and just return `False` overall.
 -}
 and : Bool -> Bool -> Bool
 and =
-    Elm.Kernel.Basics.and
+  Elm.Kernel.Basics.and
 
 
 {-| The logical OR operator. `True` if one or both inputs are `True`.
@@ -556,7 +556,7 @@ and just return `True` overall.
 -}
 or : Bool -> Bool -> Bool
 or =
-    Elm.Kernel.Basics.or
+  Elm.Kernel.Basics.or
 
 
 {-| The exclusive-or operator. `True` if exactly one input is `True`.
@@ -572,7 +572,7 @@ or =
 -}
 xor : Bool -> Bool -> Bool
 xor =
-    Elm.Kernel.Basics.xor
+  Elm.Kernel.Basics.xor
 
 
 
@@ -588,7 +588,7 @@ xor =
 -}
 append : appendable -> appendable -> appendable
 append =
-    Elm.Kernel.Utils.append
+  Elm.Kernel.Utils.append
 
 
 
@@ -621,7 +621,7 @@ information.
 -}
 modBy : Int -> Int -> Int
 modBy =
-    Elm.Kernel.Basics.modBy
+  Elm.Kernel.Basics.modBy
 
 
 {-| Get the remainder after division. Here are bunch of examples of dividing by four:
@@ -638,7 +638,7 @@ information.
 -}
 remainderBy : Int -> Int -> Int
 remainderBy =
-    Elm.Kernel.Basics.remainderBy
+  Elm.Kernel.Basics.remainderBy
 
 
 {-| Negate a number.
@@ -652,7 +652,7 @@ remainderBy =
 -}
 negate : number -> number
 negate n =
-    -n
+  -n
 
 
 {-| Get the [absolute value][abs] of a number.
@@ -670,11 +670,11 @@ negate n =
 -}
 abs : number -> number
 abs n =
-    if lt n 0 then
-        -n
+  if lt n 0 then
+    -n
 
-    else
-        n
+  else
+    n
 
 
 {-| Clamps a number within a given range. With the expression
@@ -687,14 +687,14 @@ abs n =
 -}
 clamp : number -> number -> number -> number
 clamp low high number =
-    if lt number low then
-        low
+  if lt number low then
+    low
 
-    else if gt number high then
-        high
+  else if gt number high then
+    high
 
-    else
-        number
+  else
+    number
 
 
 {-| Take the square root of a number.
@@ -710,7 +710,7 @@ clamp low high number =
 -}
 sqrt : Float -> Float
 sqrt =
-    Elm.Kernel.Basics.sqrt
+  Elm.Kernel.Basics.sqrt
 
 
 {-| Calculate the logarithm of a number with a given base.
@@ -722,16 +722,16 @@ sqrt =
 -}
 logBase : Float -> Float -> Float
 logBase base number =
-    fdiv
-        (Elm.Kernel.Basics.log number)
-        (Elm.Kernel.Basics.log base)
+  fdiv
+    (Elm.Kernel.Basics.log number)
+    (Elm.Kernel.Basics.log base)
 
 
 {-| An approximation of e.
 -}
 e : Float
 e =
-    Elm.Kernel.Basics.e
+  Elm.Kernel.Basics.e
 
 
 
@@ -745,7 +745,7 @@ e =
 -}
 radians : Float -> Float
 radians angleInRadians =
-    angleInRadians
+  angleInRadians
 
 
 {-| Convert degrees to standard Elm angles (radians).
@@ -755,7 +755,7 @@ radians angleInRadians =
 -}
 degrees : Float -> Float
 degrees angleInDegrees =
-    fdiv (mul angleInDegrees pi) 180
+  fdiv (mul angleInDegrees pi) 180
 
 
 {-| Convert turns to standard Elm angles (radians). One turn is equal to 360°.
@@ -765,7 +765,7 @@ degrees angleInDegrees =
 -}
 turns : Float -> Float
 turns angleInTurns =
-    mul (mul 2 pi) angleInTurns
+  mul (mul 2 pi) angleInTurns
 
 
 
@@ -776,7 +776,7 @@ turns angleInTurns =
 -}
 pi : Float
 pi =
-    Elm.Kernel.Basics.pi
+  Elm.Kernel.Basics.pi
 
 
 {-| Figure out the cosine given an angle in radians.
@@ -792,7 +792,7 @@ pi =
 -}
 cos : Float -> Float
 cos =
-    Elm.Kernel.Basics.cos
+  Elm.Kernel.Basics.cos
 
 
 {-| Figure out the sine given an angle in radians.
@@ -808,7 +808,7 @@ cos =
 -}
 sin : Float -> Float
 sin =
-    Elm.Kernel.Basics.sin
+  Elm.Kernel.Basics.sin
 
 
 {-| Figure out the tangent given an angle in radians.
@@ -824,7 +824,7 @@ sin =
 -}
 tan : Float -> Float
 tan =
-    Elm.Kernel.Basics.tan
+  Elm.Kernel.Basics.tan
 
 
 {-| Figure out the arccosine for `adjacent / hypotenuse` in radians:
@@ -834,7 +834,7 @@ tan =
 -}
 acos : Float -> Float
 acos =
-    Elm.Kernel.Basics.acos
+  Elm.Kernel.Basics.acos
 
 
 {-| Figure out the arcsine for `opposite / hypotenuse` in radians:
@@ -844,7 +844,7 @@ acos =
 -}
 asin : Float -> Float
 asin =
-    Elm.Kernel.Basics.asin
+  Elm.Kernel.Basics.asin
 
 
 {-| This helps you find the angle (in radians) to an `(x,y)` coordinate, but
@@ -871,7 +871,7 @@ for figuring out angles in any sort of visualization, so again, check out
 -}
 atan : Float -> Float
 atan =
-    Elm.Kernel.Basics.atan
+  Elm.Kernel.Basics.atan
 
 
 {-| This helps you find the angle (in radians) to an `(x,y)` coordinate.
@@ -889,7 +889,7 @@ range of angles:
 -}
 atan2 : Float -> Float -> Float
 atan2 =
-    Elm.Kernel.Basics.atan2
+  Elm.Kernel.Basics.atan2
 
 
 
@@ -903,9 +903,9 @@ atan2 =
 -}
 fromPolar : ( Float, Float ) -> ( Float, Float )
 fromPolar ( radius, theta ) =
-    ( mul radius (cos theta)
-    , mul radius (sin theta)
-    )
+  ( mul radius (cos theta)
+  , mul radius (sin theta)
+  )
 
 
 {-| Convert Cartesian coordinates (x,y) to polar coordinates (r,&theta;).
@@ -917,9 +917,9 @@ fromPolar ( radius, theta ) =
 -}
 toPolar : ( Float, Float ) -> ( Float, Float )
 toPolar ( x, y ) =
-    ( sqrt (add (mul x x) (mul y y))
-    , atan2 y x
-    )
+  ( sqrt (add (mul x x) (mul y y))
+  , atan2 y x
+  )
 
 
 
@@ -941,7 +941,7 @@ numbers](https://en.wikipedia.org/wiki/NaN).
 -}
 isNaN : Float -> Bool
 isNaN =
-    Elm.Kernel.Basics.isNaN
+  Elm.Kernel.Basics.isNaN
 
 
 {-| Determine whether a float is positive or negative infinity.
@@ -960,7 +960,7 @@ Notice that NaN is not infinite! For float `n` to be finite implies that
 -}
 isInfinite : Float -> Bool
 isInfinite =
-    Elm.Kernel.Basics.isInfinite
+  Elm.Kernel.Basics.isInfinite
 
 
 
@@ -983,7 +983,7 @@ So our example expands out to something like this:
 -}
 composeL : (b -> c) -> (a -> b) -> (a -> c)
 composeL g f x =
-    g (f x)
+  g (f x)
 
 
 {-| Function composition, passing results along in the suggested direction. For
@@ -994,7 +994,7 @@ example, the following code checks if the square root of a number is odd:
 -}
 composeR : (a -> b) -> (b -> c) -> (a -> c)
 composeR f g x =
-    g (f x)
+  g (f x)
 
 
 {-| Saying `x |> f` is exactly the same as `f x`.
@@ -1030,7 +1030,7 @@ has no runtime overhead.
 -}
 apR : a -> (a -> b) -> b
 apR x f =
-    f x
+  f x
 
 
 {-| Saying `f <| x` is exactly the same as `f x`.
@@ -1049,7 +1049,7 @@ has no runtime overhead.
 -}
 apL : (a -> b) -> a -> b
 apL f x =
-    f x
+  f x
 
 
 {-| Given a value, returns exactly the same value. This is called
@@ -1057,7 +1057,7 @@ apL f x =
 -}
 identity : a -> a
 identity x =
-    x
+  x
 
 
 {-| Create a function that _always_ returns the same value. Useful with
@@ -1071,7 +1071,7 @@ functions like `map`:
 -}
 always : a -> b -> a
 always a _ =
-    a
+  a
 
 
 {-| A value that can never happen! For context:
@@ -1094,7 +1094,7 @@ do not want `Never` in your return types though.
 
 -}
 type Never
-    = JustOneMore Never
+  = JustOneMore Never
 
 
 {-| A function that can never be called. Seems extremely pointless, but it
@@ -1106,10 +1106,10 @@ messages. You could say:
 
     embedHtml : Html Never -> Html msg
     embedHtml staticStuff =
-        div []
-            [ text "hello"
-            , Html.map never staticStuff
-            ]
+      div []
+        [ text "hello"
+        , Html.map never staticStuff
+        ]
 
 So the `never` function is basically telling the type system, make sure no one
 ever calls me!
@@ -1117,4 +1117,4 @@ ever calls me!
 -}
 never : Never -> a
 never (JustOneMore nvr) =
-    never nvr
+  never nvr
