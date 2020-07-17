@@ -2301,8 +2301,8 @@ formatType' elmVersion requireParens atype =
         AST.TypeParens type' ->
           parens $ formatCommented (formatType elmVersion) type'
 
-        AST.TupleType types ->
-          ElmStructure.group True "(" "," ")" False (map (formatCommented (formatEolCommented $ formatType elmVersion)) types)
+        AST.TupleType types (AST.ForceMultiline forceMultiline) ->
+            ElmStructure.group True "(" "," ")" forceMultiline (map (formatCommented (formatEolCommented $ formatType elmVersion)) types)
 
         AST.RecordType base fields trailing multiline ->
             formatRecordLike

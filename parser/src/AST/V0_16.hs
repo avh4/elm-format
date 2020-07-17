@@ -214,7 +214,7 @@ data Type'
     | TypeVariable LowercaseIdentifier
     | TypeConstruction TypeConstructor [(Comments, Type)]
     | TypeParens (Commented Type)
-    | TupleType [Commented (WithEol Type)]
+    | TupleType [Commented (WithEol Type)] ForceMultiline 
     | RecordType
         { base :: Maybe (Commented LowercaseIdentifier)
         , fields :: Sequence (Pair LowercaseIdentifier Type)

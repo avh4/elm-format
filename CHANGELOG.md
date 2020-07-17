@@ -1,3 +1,9 @@
+## main
+
+New features:
+  - newlines in tuple types are now preserved
+
+
 ## 0.8.3
 
 Bug fixes:
