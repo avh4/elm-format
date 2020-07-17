@@ -60,7 +60,7 @@ constructor0 elmVersion =
 
 constructor0' :: ElmVersion -> IParser AST.Type
 constructor0' elmVersion =
-    addLocation $
+    addLocation $ checkMultiline $
     do  ctor <- constructor0 elmVersion
         return (AST.TypeConstruction ctor [])
 
@@ -78,7 +78,7 @@ tupleCtor =
 
 app :: ElmVersion -> IParser AST.Type
 app elmVersion =
-  addLocation $
+  addLocation $ checkMultiline $
   do  f <- constructor0 elmVersion <|> try tupleCtor <?> "a type constructor"
       args <- spacePrefix (term elmVersion)
       return $ AST.TypeConstruction f args
