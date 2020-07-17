@@ -48,6 +48,9 @@ type alias Constructor =
     ( Bool
     , Dict String Int
     , Dict.Dict String Int
+    , Dict.Dict
+        String
+        Int
     , Dict.Dict {- A -} String {- B -} Int
     , Dict.Dict
         -- A

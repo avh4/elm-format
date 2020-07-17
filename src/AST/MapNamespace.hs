@@ -34,8 +34,8 @@ instance MapNamespace Type' where
             TypeVariable name ->
                 TypeVariable name
 
-            TypeConstruction ctor args ->
-                TypeConstruction (mapNamespace f ctor) (mapNamespace f args)
+            TypeConstruction ctor args forceMultiline ->
+                TypeConstruction (mapNamespace f ctor) (mapNamespace f args) forceMultiline
 
             TypeParens nested ->
                 TypeParens (mapNamespace f nested)

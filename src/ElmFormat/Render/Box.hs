@@ -2291,9 +2291,15 @@ formatType' elmVersion requireParens atype =
         AST.TypeVariable var ->
             line $ identifier $ formatVarName elmVersion var
 
-        AST.TypeConstruction ctor args ->
+        AST.TypeConstruction ctor args forceMultiline ->
+            let
+                join = 
+                    case forceMultiline of
+                        AST.ForceMultiline True -> AST.FASplitFirst
+                        AST.ForceMultiline False -> AST.FAJoinFirst AST.JoinAll
+            in
             ElmStructure.application
-                (AST.FAJoinFirst AST.JoinAll)
+                join
                 (formatTypeConstructor elmVersion ctor)
                 (map (formatHeadCommented $ formatType' elmVersion ForCtor) args)
                 |> (if args /= [] && requireParens == ForCtor then parens else id)

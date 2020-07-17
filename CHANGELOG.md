@@ -2,6 +2,7 @@
 
 New features:
   - newlines in tuple types are now preserved
+  - newlines in type constructor application are now preserved
 
 
 ## 0.8.3
