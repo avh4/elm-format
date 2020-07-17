@@ -105,6 +105,12 @@ type alias TupleWithCommentedOutTerms =
     )
 
 
+type alias TupleMultilineWithSingleLineChildren =
+    ( Int -> Int -> Int
+    , String -> String -> String
+    )
+
+
 emptyRecord : {} -> ()
 emptyRecord _ =
     ()
