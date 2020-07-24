@@ -1,3 +1,9 @@
+## main
+
+Bug fixes:
+  - special characters in link text in doc comments are now handled more correctly
+
+
 ## 0.8.3
 
 Bug fixes:
