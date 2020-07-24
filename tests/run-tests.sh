@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2002
 
+set -x
+
 # TODO: convert the rest of these tests to haskell in CliTest.hs
 
 uname -s
@@ -78,7 +80,7 @@ function checkWaysToRun() {
 	echo "## elm-format INPUT --output OUTPUT"
 	"$ELM_FORMAT" "$INPUT" --elm-version=0.19 --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 0
-	compareFiles "$INPUT" "$OUTPUT" 1>/dev/null
+	compareFiles "$INPUT" "$OUTPUT"
 
 	echo "## cat INPUT | elm-format --stdin"
 	cat "$INPUT" | "$ELM_FORMAT" --elm-version=0.19 --stdin > "$OUTPUT"
@@ -92,7 +94,7 @@ function checkWaysToRun() {
 	echo "## cat INPUT | elm-format --stdin --output OUTPUT"
 	cat "$INPUT" | "$ELM_FORMAT" --elm-version=0.19 --stdin --output "$OUTPUT" 1>/dev/null
 	returnCodeShouldEqual 0
-	compareFiles "$INPUT" "$OUTPUT" 1>/dev/null
+	compareFiles "$INPUT" "$OUTPUT"
 
 	echo "## cat INPUT | elm-format INPUT --stdin --output OUTPUT"
 	cat "$INPUT" | "$ELM_FORMAT" "$INPUT" --elm-version=0.19 --stdin --output "$OUTPUT" 1>/dev/null
