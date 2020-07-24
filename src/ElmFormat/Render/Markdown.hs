@@ -172,12 +172,13 @@ formatMarkdownInline fixSpecialChars inline =
 
         Link inlines (Url url) title ->
             let
-                text = fold $ fmap (formatMarkdownInline False) $ inlines
+                text = fold $ fmap (formatMarkdownInline fixSpecialChars) $ inlines
+                textRaw = fold $ fmap (formatMarkdownInline False) $ inlines
 
                 title' = Text.unpack title
                 url' = Text.unpack url
             in
-                if text == url' && title' == ""
+                if textRaw == url' && title' == ""
                     then
                         if fixSpecialChars
                             then "<" ++ url' ++ ">"
@@ -190,7 +191,7 @@ formatMarkdownInline fixSpecialChars inline =
 
         Link inlines (Ref ref) _ ->
             let
-                text = fold $ fmap (formatMarkdownInline False) $ inlines
+                text = fold $ fmap (formatMarkdownInline fixSpecialChars) $ inlines
 
                 ref' = Text.unpack ref
             in
@@ -199,7 +200,7 @@ formatMarkdownInline fixSpecialChars inline =
                     else "[" ++ text ++ "][" ++ ref' ++ "]"
 
         Image inlines url title ->
-            "![" ++ (fold $ fmap (formatMarkdownInline False) $ inlines)
+            "![" ++ (fold $ fmap (formatMarkdownInline fixSpecialChars) $ inlines)
                 ++ "](" ++ Text.unpack url
                 ++ (if Text.unpack title == "" then "" else " \"" ++ Text.unpack title ++ "\"")
                 ++ ")"
