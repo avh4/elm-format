@@ -33,6 +33,9 @@ function compareFiles() {
 	EXPECTED="$1"
 	ACTUAL="$2"
 
+    diff --help
+    ls -l "$ACTUAL"
+	ls -l "$EXPECTED"
 	diff -u "$ACTUAL" "$EXPECTED"
 	returnCodeShouldEqual 0
 	echo -n "Checksum: "
