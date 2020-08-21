@@ -472,7 +472,7 @@ instance ToJSON Pattern' where
 instance ToJSON Type where
     showJSON (A _ type') =
         case type' of
-            TypeConstruction (NamedConstructor namespace name) args ->
+            TypeConstruction (NamedConstructor namespace name) args forceMultine ->
                 makeObj
                     [ type_ "TypeReference"
                     , ( "name", showJSON name )
