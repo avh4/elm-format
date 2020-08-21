@@ -1,5 +1,9 @@
 ## main
 
+New features:
+  - newlines in tuple types are now preserved
+  - newlines in type constructor application are now preserved
+
 Bug fixes:
   - special characters in link text in doc comments are now handled more correctly
 

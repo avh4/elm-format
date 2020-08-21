@@ -212,9 +212,9 @@ data TypeConstructor
 data Type'
     = UnitType Comments
     | TypeVariable LowercaseIdentifier
-    | TypeConstruction TypeConstructor [(Comments, Type)]
+    | TypeConstruction TypeConstructor [(Comments, Type)] ForceMultiline
     | TypeParens (Commented Type)
-    | TupleType [Commented (WithEol Type)]
+    | TupleType [Commented (WithEol Type)] ForceMultiline 
     | RecordType
         { base :: Maybe (Commented LowercaseIdentifier)
         , fields :: Sequence (Pair LowercaseIdentifier Type)
