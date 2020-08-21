@@ -20,17 +20,17 @@ tvar elmVersion =
 
 tuple :: ElmVersion -> IParser AST.Type
 tuple elmVersion =
-  addLocation $
+  addLocation $ checkMultiline $
   do  types <- parens'' (withEol $ expr elmVersion)
       case types of
         Left comments ->
-            return $ AST.UnitType comments
+            return $ \_ -> AST.UnitType comments
         Right [] ->
-            return $ AST.UnitType []
+            return $ \_ -> AST.UnitType []
         Right [AST.Commented [] (AST.WithEol t Nothing) []] ->
-            return $ A.drop t
+            return $ \_ -> A.drop t
         Right [AST.Commented pre (AST.WithEol t eol) post] ->
-            return $ AST.TypeParens (AST.Commented pre t (maybeToList (fmap AST.LineComment eol) ++ post))
+            return $ \_ -> AST.TypeParens (AST.Commented pre t (maybeToList (fmap AST.LineComment eol) ++ post))
         Right types' ->
             return $ AST.TupleType types'
 
@@ -60,7 +60,7 @@ constructor0 elmVersion =
 
 constructor0' :: ElmVersion -> IParser AST.Type
 constructor0' elmVersion =
-    addLocation $
+    addLocation $ checkMultiline $
     do  ctor <- constructor0 elmVersion
         return (AST.TypeConstruction ctor [])
 
@@ -78,7 +78,7 @@ tupleCtor =
 
 app :: ElmVersion -> IParser AST.Type
 app elmVersion =
-  addLocation $
+  addLocation $ checkMultiline $
   do  f <- constructor0 elmVersion <|> try tupleCtor <?> "a type constructor"
       args <- spacePrefix (term elmVersion)
       return $ AST.TypeConstruction f args
