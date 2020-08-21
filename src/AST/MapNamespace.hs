@@ -34,14 +34,14 @@ instance MapNamespace Type' where
             TypeVariable name ->
                 TypeVariable name
 
-            TypeConstruction ctor args ->
-                TypeConstruction (mapNamespace f ctor) (mapNamespace f args)
+            TypeConstruction ctor args forceMultiline ->
+                TypeConstruction (mapNamespace f ctor) (mapNamespace f args) forceMultiline
 
             TypeParens nested ->
                 TypeParens (mapNamespace f nested)
 
-            TupleType entries ->
-                TupleType (mapNamespace f entries)
+            TupleType entries forceMultiline ->
+                TupleType (mapNamespace f entries) forceMultiline
 
             RecordType base fields trailingComments forceMultiline ->
                 RecordType base (mapNamespace f fields) trailingComments forceMultiline
