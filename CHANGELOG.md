@@ -4,6 +4,9 @@ New features:
   - newlines in tuple types are now preserved
   - newlines in type constructor application are now preserved
 
+Bug fixes:
+  - in doc comments, non-Elm code blocks are no longer elm-formatted
+
 
 ## 0.8.3
 
