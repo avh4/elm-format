@@ -151,6 +151,9 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   </tr>
 </table>
 
+Alternatively, you can utilize elm-format via a [Prettier plugin](https://github.com/gicentre/prettier-plugin-elm) that wraps it.
+This can be convenient if your project contains files in other languages like JavaScript, Markdown, etc.
+[Prettier](https://prettier.io/) has its own integrations into editors and can also be used from a command line (including CI pipelines).
 
 ## Detailed instructions
 
