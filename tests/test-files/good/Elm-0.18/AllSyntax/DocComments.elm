@@ -78,7 +78,7 @@ Followed by a paragraph.
     y /= ()
 
 
-## Elm code lbock: only a module line
+## Elm code block: only a module line
 
     module Foo exposing (x)
 
@@ -103,6 +103,10 @@ Followed by a paragraph.
 
 ```bash
 echo "non-Elm code block"
+```
+
+```sh
+elm-review --template jfmengels/elm-review-noop/preview --rules NoNoOpMsg
 ```
 
 ---
