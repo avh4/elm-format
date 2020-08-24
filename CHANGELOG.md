@@ -6,6 +6,7 @@ New features:
 
 Bug fixes:
   - special characters in link text in doc comments are now handled more correctly
+  - in doc comments, non-Elm code blocks are no longer elm-formatted
 
 
 ## 0.8.3
