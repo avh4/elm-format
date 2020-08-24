@@ -5,6 +5,7 @@ New features:
   - newlines in type constructor application are now preserved
 
 Bug fixes:
+  - special characters in link text in doc comments are now handled more correctly
   - in doc comments, non-Elm code blocks are no longer elm-formatted
 
 
