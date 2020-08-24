@@ -90,8 +90,14 @@ formatMardownBlock formatCode context block =
 
         CodeBlock (CodeAttr lang _info) code ->
             let
+                isElm =
+                    lang' == "elm" || lang' == ""
+
                 formatted =
-                    fromMaybe (Text.unpack $ ensureNewline code) $ formatCode $ Text.unpack code
+                    fromMaybe (Text.unpack $ ensureNewline code) $
+                        if isElm
+                            then formatCode $ Text.unpack code
+                            else Nothing
 
                 ensureNewline text =
                     if Text.last text == '\n'
@@ -100,9 +106,6 @@ formatMardownBlock formatCode context block =
 
                 lang' =
                     Text.unpack lang
-
-                isElm =
-                    lang' == "elm" || lang' == ""
 
                 canIndent =
                     case context of
