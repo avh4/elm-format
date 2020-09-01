@@ -5,6 +5,7 @@ import Test.Tasty
 import qualified Test.Property
 import qualified BoxTest
 import qualified CommonMarkTests
+import qualified Data.Text.ExtraTest
 import qualified ElmFormat.Render.ElmStructureTest
 import qualified Integration.CliTest
 import qualified Integration.LiteralTest
@@ -24,6 +25,7 @@ main =
         defaultMain $ testGroup "elm-format" $
             [ Test.Property.propertyTests
             , BoxTest.tests
+            , Data.Text.ExtraTest.tests
             , ElmFormat.Render.ElmStructureTest.tests
             , Integration.CliTest.tests
             , Integration.LiteralTest.tests

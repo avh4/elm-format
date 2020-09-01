@@ -51,6 +51,15 @@ Link with special characters: [Media\_features](https://developer.mozilla.org/en
 3.  Third
 
 
+# Code inlines
+
+Normal code inline: `word`
+
+Requires backtick escaping: `` `0` ``
+
+Requires multiple backticks for escaping: ``` code with `` ```
+
+
 # HTML blocks
 
 <strong>some HTML</strong>

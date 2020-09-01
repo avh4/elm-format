@@ -53,6 +53,7 @@ library
         AST.V0_16
         AST.Variable
         Box
+        Data.Text.Extra
         Elm.Utils
         ElmFormat.Parse
         ElmFormat.Render.Box
@@ -163,6 +164,7 @@ test-Suite elm-format-tests
     other-modules:
         BoxTest
         CommonMarkTests
+        Data.Text.ExtraTest
         ElmFormat.Render.ElmStructureTest
         ElmFormat.TestWorld
         Integration.CliTest
