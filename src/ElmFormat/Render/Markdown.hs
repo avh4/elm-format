@@ -6,6 +6,7 @@ import qualified Data.List as List
 import Data.Maybe (fromMaybe)
 import qualified Data.Text as Text
 import Data.Text (Text)
+import Data.Text.Extra (longestSpanOf, LongestSpanResult(..))
 import Elm.Utils ((|>))
 
 
@@ -171,7 +172,13 @@ formatMarkdownInline fixSpecialChars inline =
         Strong inlines ->
             "**" ++ (fold $ fmap (formatMarkdownInline True) $ inlines) ++ "**" -- TODO: escaping
         Code text ->
-            "`" ++ Text.unpack text ++ "`" -- TODO: escape backticks
+            case longestSpanOf '`' text of
+                NoSpan -> "`" ++ Text.unpack text ++ "`"
+                Span n ->
+                    let
+                        delimiter = replicate (n + 1) '`'
+                    in
+                    delimiter ++ " " ++ Text.unpack text ++ " " ++ delimiter
 
         Link inlines (Url url) title ->
             let
