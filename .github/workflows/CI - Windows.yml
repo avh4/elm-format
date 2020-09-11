@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install Windows Subsystem for Linux (I don't understand why this is needed)
       run: |
-        choco install wsl-ubuntu-1804
+        choco install wsl-ubuntu-2004
     - name: Install jq
       run: |
         mkdir -p ~/jq-install
