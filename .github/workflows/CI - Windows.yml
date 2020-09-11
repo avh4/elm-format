@@ -14,6 +14,8 @@ jobs:
     - name: Configure environment
       run: |
         git config --global core.autocrlf false
+        echo "::add-path::C:\Program Files\Git\bin"
+        bash -c "echo hi"
     - uses: actions/checkout@v2
     - name: Install jq
       run: |
