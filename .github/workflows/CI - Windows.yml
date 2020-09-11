@@ -17,6 +17,9 @@ jobs:
         echo "::add-path::C:\Program Files\Git\bin"
         bash -c "echo hi"
     - uses: actions/checkout@v2
+    - name: Install Windows Subsystem for Linux (I don't understand why this is needed)
+      run: |
+        choco install wsl-ubuntu-1804
     - name: Install jq
       run: |
         mkdir -p ~/jq-install
