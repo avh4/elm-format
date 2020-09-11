@@ -15,10 +15,12 @@ jobs:
       run: |
         git config --global core.autocrlf false
     - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
+    - name: Install jq
+      run: |
+        mkdir -p ~/jq-install
+        cd ~/jq-install
+        Invoke-WebRequest -OutFile ~/jq-install/jq.exe https://github.com/stedolan/jq/releases/download/jq-1.6/jq-win64.exe
+        echo "::add-path::$HOME/jq-install"
     - name: Install stack
       shell: powershell
       run: |
