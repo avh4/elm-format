@@ -14,18 +14,7 @@ jobs:
     - name: Configure environment
       run: |
         git config --global core.autocrlf false
-        echo "::add-path::C:\Program Files\Git\bin"
-        bash -c "echo hi"
     - uses: actions/checkout@v2
-    - name: Install Windows Subsystem for Linux (I don't understand why this is needed)
-      run: |
-        choco install wsl-ubuntu-2004
-    - name: Install jq
-      run: |
-        mkdir -p ~/jq-install
-        cd ~/jq-install
-        Invoke-WebRequest -OutFile ~/jq-install/jq.exe https://github.com/stedolan/jq/releases/download/jq-1.6/jq-win64.exe
-        echo "::add-path::$HOME/jq-install"
     - name: Install stack
       shell: powershell
       run: |
@@ -45,4 +34,6 @@ jobs:
     - name: Build
       run: stack runhaskell Shakefile.hs -- build
     - name: Tests
-      run: stack runhaskell Shakefile.hs
+      run: |
+        stack runhaskell Shakefile.hs -- _build/stack-test.ok
+        echo "WARNING: integration tests are currently disabled on Windows CI"
