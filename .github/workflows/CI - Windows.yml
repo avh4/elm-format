@@ -20,7 +20,7 @@ jobs:
       run: |
         mkdir -p ~/stack-install
         cd ~/stack-install
-        Invoke-WebRequest -OutFile ~/stack-install/stack.zip https://get.haskellstack.org/stable/windows-i386.zip
+        Invoke-WebRequest -OutFile ~/stack-install/stack.zip https://get.haskellstack.org/stable/windows-x86_64.zip
         7z x stack.zip stack.exe
         echo "::add-path::$HOME/stack-install"
     - uses: actions/cache@v1
