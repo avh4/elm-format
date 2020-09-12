@@ -30,7 +30,7 @@ jobs:
         stack-version: latest
     - uses: actions/cache@v2
       name: Cache stack-root
-      if: runner.os != 'Windows'
+      if: false
       with:
         path: |
           ~/.stack
