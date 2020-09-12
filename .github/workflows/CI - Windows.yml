@@ -28,11 +28,12 @@ jobs:
     - uses: actions/cache@v2
       name: Cache ~/.stack
       with:
-        path: ~/.stack
-        key: ${{ runner.os }}-dot-stack
+        path: C:\sr
+        key: ${{ runner.os }}-stack-build
     - name: Configure Haskell Stack
       run: |
         stack config set system-ghc --global true
+    - run: stack path
     - run: stack build --only-dependencies
     - run: stack install shake
     - name: Build
