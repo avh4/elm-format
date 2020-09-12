@@ -29,16 +29,16 @@ jobs:
         enable-stack: true
         stack-version: latest
     - uses: actions/cache@v2
-      name: Cache stack-root (for Windows)
-      if: runner.os == 'Windows'
-      with:
-        path: C:\sr
-        key: ${{ runner.os }}-stack-root
-    - uses: actions/cache@v2
       name: Cache stack-root
       if: runner.os != 'Windows'
       with:
         path: ~/.stack
+        key: ${{ runner.os }}-stack-root
+    - uses: actions/cache@v2
+      name: Cache stack-root (for Windows)
+      if: runner.os == 'Windows'
+      with:
+        path: C:\sr
         key: ${{ runner.os }}-stack-root
     - uses: actions/cache@v2
       name: Cache stack-work
@@ -53,12 +53,12 @@ jobs:
     - run: stack install shake
     - name: Build
       run: stack runhaskell Shakefile.hs -- build
+    - name: Tests
+      if: matrix.os != 'windows-latest'
+      run: |
+        stack runhaskell Shakefile.hs
     - name: Tests (for Windows)
       if: matrix.os == 'windows-latest'
       run: |
         stack runhaskell Shakefile.hs -- _build/stack-test.ok
         echo "##[warning]integration tests are currently disabled on Windows CI"
-    - name: Tests
-      if: matrix.os != 'windows-latest'
-      run: |
-        stack runhaskell Shakefile.hs
