@@ -32,10 +32,11 @@ jobs:
       name: Cache stack-root
       if: runner.os != 'Windows'
       with:
+        # NOTE: the "/*" below is required otherwise the exclude line doesn't work.  See https://github.com/actions/cache/issues/364#issuecomment-678118231
         path: |
-          ~/.stack
+          ~/.stack/*
           !~/.stack/setup-exe-cache
-        key: ${{ runner.os }}-stack-root-v2
+        key: ${{ runner.os }}-stack-root-v3
     - uses: actions/cache@v2
       name: Cache stack-root (for Windows)
       if: runner.os == 'Windows'
