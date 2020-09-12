@@ -52,15 +52,9 @@ jobs:
       run: |
         stack config set system-ghc --global true
     - run: stack update
+    - run: stack path
     - run: stack build --only-dependencies
     - run: stack install shake
-    - if: runner.os == 'macOS'
-      name: DEBUG (for Mac)
-      run: |
-        stack path
-        ls -lR ~/.stack/setup-exe-cache
-        shasum /Users/runner/.stack/setup-exe-cache/x86_64-osx/Cabal-simple_mPHDZzAJ_2.4.0.1_ghc-8.6.5
-        file /Users/runner/.stack/setup-exe-cache/x86_64-osx/Cabal-simple_mPHDZzAJ_2.4.0.1_ghc-8.6.5
     - name: Build
       run: stack runhaskell Shakefile.hs -- build
     - name: Tests
