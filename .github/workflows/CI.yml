@@ -32,8 +32,10 @@ jobs:
       name: Cache stack-root
       if: runner.os != 'Windows'
       with:
-        path: ~/.stack
-        key: ${{ runner.os }}-stack-root
+        path: |
+          ~/.stack
+          !~/.stack/setup-exe-cache
+        key: ${{ runner.os }}-stack-root-v2
     - uses: actions/cache@v2
       name: Cache stack-root (for Windows)
       if: runner.os == 'Windows'
