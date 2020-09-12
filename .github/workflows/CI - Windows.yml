@@ -40,4 +40,4 @@ jobs:
     - name: Tests
       run: |
         stack runhaskell Shakefile.hs -- _build/stack-test.ok
-        echo "WARNING: integration tests are currently disabled on Windows CI"
+        echo "##[warning]integration tests are currently disabled on Windows CI"
