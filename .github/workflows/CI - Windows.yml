@@ -22,18 +22,19 @@ jobs:
         enable-stack: true
         stack-version: latest
     - uses: actions/cache@v2
-      with:
-        path: ~\AppData\Roaming\stack
-        key: ${{ runner.os }}-stack
-    - uses: actions/cache@v2
-      name: Cache ~/.stack
+      name: Cache stack-root
       with:
         path: C:\sr
-        key: ${{ runner.os }}-stack-build
+        key: ${{ runner.os }}-stack-root
+    - uses: actions/cache@v2
+      name: Cache stack-work
+      with:
+        path: .stack-work
+        key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml') }}
     - name: Configure Haskell Stack
       run: |
         stack config set system-ghc --global true
-    - run: stack path
+    - run: stack update
     - run: stack build --only-dependencies
     - run: stack install shake
     - name: Build
