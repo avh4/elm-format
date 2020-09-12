@@ -25,7 +25,6 @@ jobs:
       with:
         path: ~\AppData\Roaming\stack
         key: ${{ runner.os }}-stack
-    - run: stack --version
     - run: stack setup
     - run: stack build --only-dependencies
     - run: stack install shake
