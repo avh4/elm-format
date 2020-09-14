@@ -8,6 +8,7 @@ Bug fixes:
   - special characters in link text in doc comments are now handled more correctly
   - in doc comments, non-Elm code blocks are no longer elm-formatted
   - in doc comments, inline code containing backticks is now escaped correctly
+  - negative hex int literals are now handled correctly
 
 Other changes:
   - dropped support for 32-bit Windows (Windows CI platforms are no longer supporting it)
