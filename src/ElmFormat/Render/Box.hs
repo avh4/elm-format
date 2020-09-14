@@ -2128,7 +2128,15 @@ formatLiteral elmVersion lit =
             line $ literal $ show i
         AST.IntNum i AST.HexadecimalInt ->
             line $ literal $
-              if i <= 0xFF then
+              if i < -0xFFFFFFFF then
+                printf "-0x%016X" (-i)
+              else if i < -0xFFFF then
+                printf "-0x%08X" (-i)
+              else if i < -0xFF then
+                printf "-0x%04X" (-i)
+              else if i < 0 then
+                printf "-0x%02X" (-i)
+              else if i <= 0xFF then
                 printf "0x%02X" i
               else if i <= 0xFFFF then
                 printf "0x%04X" i
