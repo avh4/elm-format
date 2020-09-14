@@ -101,13 +101,6 @@
                     },
                     {
                         "display": {
-                            "representation": "HexadecimalInt"
-                        },
-                        "type": "IntLiteral",
-                        "value": -9223372036854776000
-                    },
-                    {
-                        "display": {
                             "representation": "DecimalInt"
                         },
                         "type": "IntLiteral",
@@ -121,7 +114,7 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 21
+                    "line": 20
                 },
                 "start": {
                     "col": 1,
@@ -148,11 +141,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 26
+                    "line": 25
                 },
                 "start": {
                     "col": 1,
-                    "line": 24
+                    "line": 23
                 }
             },
             "type": "Definition"
@@ -163,11 +156,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 13,
-                        "line": 30
+                        "line": 29
                     },
                     "start": {
                         "col": 5,
-                        "line": 30
+                        "line": 29
                     }
                 },
                 "type": "StringLiteral",
@@ -178,11 +171,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 13,
-                    "line": 30
+                    "line": 29
                 },
                 "start": {
                     "col": 1,
-                    "line": 29
+                    "line": 28
                 }
             },
             "type": "Definition"
@@ -193,11 +186,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 22,
-                        "line": 34
+                        "line": 33
                     },
                     "start": {
                         "col": 5,
-                        "line": 34
+                        "line": 33
                     }
                 },
                 "type": "StringLiteral",
@@ -208,11 +201,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 22,
-                    "line": 34
+                    "line": 33
                 },
                 "start": {
                     "col": 1,
-                    "line": 33
+                    "line": 32
                 }
             },
             "type": "Definition"
@@ -223,11 +216,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 15,
-                        "line": 38
+                        "line": 37
                     },
                     "start": {
                         "col": 5,
-                        "line": 38
+                        "line": 37
                     }
                 },
                 "type": "StringLiteral",
@@ -238,11 +231,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 15,
-                    "line": 38
+                    "line": 37
                 },
                 "start": {
                     "col": 1,
-                    "line": 37
+                    "line": 36
                 }
             },
             "type": "Definition"
@@ -253,11 +246,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 15,
-                        "line": 42
+                        "line": 41
                     },
                     "start": {
                         "col": 5,
-                        "line": 42
+                        "line": 41
                     }
                 },
                 "type": "StringLiteral",
@@ -268,11 +261,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 15,
-                    "line": 42
+                    "line": 41
                 },
                 "start": {
                     "col": 1,
-                    "line": 41
+                    "line": 40
                 }
             },
             "type": "Definition"
@@ -285,11 +278,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 65,
-                                "line": 46
+                                "line": 45
                             },
                             "start": {
                                 "col": 7,
-                                "line": 46
+                                "line": 45
                             }
                         },
                         "type": "StringLiteral",
@@ -300,11 +293,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 73,
-                                "line": 47
+                                "line": 46
                             },
                             "start": {
                                 "col": 7,
-                                "line": 47
+                                "line": 46
                             }
                         },
                         "type": "StringLiteral",
@@ -315,11 +308,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 13,
-                                "line": 48
+                                "line": 47
                             },
                             "start": {
                                 "col": 7,
-                                "line": 48
+                                "line": 47
                             }
                         },
                         "type": "StringLiteral",
@@ -333,11 +326,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 49
+                    "line": 48
                 },
                 "start": {
                     "col": 1,
-                    "line": 45
+                    "line": 44
                 }
             },
             "type": "Definition"
@@ -348,11 +341,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 8,
-                        "line": 54
+                        "line": 53
                     },
                     "start": {
                         "col": 5,
-                        "line": 54
+                        "line": 53
                     }
                 },
                 "type": "StringLiteral",
@@ -363,11 +356,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 8,
-                    "line": 54
+                    "line": 53
                 },
                 "start": {
                     "col": 1,
-                    "line": 52
+                    "line": 51
                 }
             },
             "type": "Definition"
@@ -378,11 +371,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 33,
-                        "line": 58
+                        "line": 57
                     },
                     "start": {
                         "col": 5,
-                        "line": 58
+                        "line": 57
                     }
                 },
                 "type": "StringLiteral",
@@ -393,11 +386,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 33,
-                    "line": 58
+                    "line": 57
                 },
                 "start": {
                     "col": 1,
-                    "line": 57
+                    "line": 56
                 }
             },
             "type": "Definition"
@@ -408,11 +401,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 20,
-                        "line": 62
+                        "line": 61
                     },
                     "start": {
                         "col": 5,
-                        "line": 62
+                        "line": 61
                     }
                 },
                 "type": "StringLiteral",
@@ -423,11 +416,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 20,
-                    "line": 62
+                    "line": 61
                 },
                 "start": {
                     "col": 1,
-                    "line": 61
+                    "line": 60
                 }
             },
             "type": "Definition"
@@ -438,11 +431,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 8,
-                        "line": 66
+                        "line": 65
                     },
                     "start": {
                         "col": 5,
-                        "line": 66
+                        "line": 65
                     }
                 },
                 "type": "CharLiteral",
@@ -453,11 +446,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 8,
-                    "line": 66
+                    "line": 65
                 },
                 "start": {
                     "col": 1,
-                    "line": 65
+                    "line": 64
                 }
             },
             "type": "Definition"
@@ -470,11 +463,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 10,
-                                "line": 70
+                                "line": 69
                             },
                             "start": {
                                 "col": 7,
-                                "line": 70
+                                "line": 69
                             }
                         },
                         "type": "CharLiteral",
@@ -485,11 +478,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 70
+                                "line": 69
                             },
                             "start": {
                                 "col": 12,
-                                "line": 70
+                                "line": 69
                             }
                         },
                         "type": "CharLiteral",
@@ -500,11 +493,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 20,
-                                "line": 70
+                                "line": 69
                             },
                             "start": {
                                 "col": 17,
-                                "line": 70
+                                "line": 69
                             }
                         },
                         "type": "CharLiteral",
@@ -515,11 +508,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 25,
-                                "line": 70
+                                "line": 69
                             },
                             "start": {
                                 "col": 22,
-                                "line": 70
+                                "line": 69
                             }
                         },
                         "type": "CharLiteral",
@@ -530,11 +523,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 30,
-                                "line": 70
+                                "line": 69
                             },
                             "start": {
                                 "col": 27,
-                                "line": 70
+                                "line": 69
                             }
                         },
                         "type": "CharLiteral",
@@ -545,11 +538,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 35,
-                                "line": 70
+                                "line": 69
                             },
                             "start": {
                                 "col": 32,
-                                "line": 70
+                                "line": 69
                             }
                         },
                         "type": "CharLiteral",
@@ -560,11 +553,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 40,
-                                "line": 70
+                                "line": 69
                             },
                             "start": {
                                 "col": 37,
-                                "line": 70
+                                "line": 69
                             }
                         },
                         "type": "CharLiteral",
@@ -575,11 +568,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 45,
-                                "line": 70
+                                "line": 69
                             },
                             "start": {
                                 "col": 42,
-                                "line": 70
+                                "line": 69
                             }
                         },
                         "type": "CharLiteral",
@@ -590,11 +583,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 50,
-                                "line": 70
+                                "line": 69
                             },
                             "start": {
                                 "col": 47,
-                                "line": 70
+                                "line": 69
                             }
                         },
                         "type": "CharLiteral",
@@ -608,11 +601,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 52,
-                    "line": 70
+                    "line": 69
                 },
                 "start": {
                     "col": 1,
-                    "line": 69
+                    "line": 68
                 }
             },
             "type": "Definition"
@@ -625,11 +618,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 11,
-                                "line": 74
+                                "line": 73
                             },
                             "start": {
                                 "col": 7,
-                                "line": 74
+                                "line": 73
                             }
                         },
                         "type": "CharLiteral",
@@ -640,11 +633,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 17,
-                                "line": 74
+                                "line": 73
                             },
                             "start": {
                                 "col": 13,
-                                "line": 74
+                                "line": 73
                             }
                         },
                         "type": "CharLiteral",
@@ -655,11 +648,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 23,
-                                "line": 74
+                                "line": 73
                             },
                             "start": {
                                 "col": 19,
-                                "line": 74
+                                "line": 73
                             }
                         },
                         "type": "CharLiteral",
@@ -670,11 +663,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 29,
-                                "line": 74
+                                "line": 73
                             },
                             "start": {
                                 "col": 25,
-                                "line": 74
+                                "line": 73
                             }
                         },
                         "type": "CharLiteral",
@@ -688,11 +681,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 31,
-                    "line": 74
+                    "line": 73
                 },
                 "start": {
                     "col": 1,
-                    "line": 73
+                    "line": 72
                 }
             },
             "type": "Definition"
@@ -705,11 +698,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 13,
-                                "line": 78
+                                "line": 77
                             },
                             "start": {
                                 "col": 7,
-                                "line": 78
+                                "line": 77
                             }
                         },
                         "type": "CharLiteral",
@@ -720,11 +713,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 21,
-                                "line": 78
+                                "line": 77
                             },
                             "start": {
                                 "col": 15,
-                                "line": 78
+                                "line": 77
                             }
                         },
                         "type": "CharLiteral",
@@ -735,11 +728,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 29,
-                                "line": 78
+                                "line": 77
                             },
                             "start": {
                                 "col": 23,
-                                "line": 78
+                                "line": 77
                             }
                         },
                         "type": "CharLiteral",
@@ -753,11 +746,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 31,
-                    "line": 78
+                    "line": 77
                 },
                 "start": {
                     "col": 1,
-                    "line": 77
+                    "line": 76
                 }
             },
             "type": "Definition"
@@ -770,11 +763,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 82
+                                "line": 81
                             },
                             "start": {
                                 "col": 7,
-                                "line": 82
+                                "line": 81
                             }
                         },
                         "type": "CharLiteral",
@@ -785,11 +778,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 25,
-                                "line": 82
+                                "line": 81
                             },
                             "start": {
                                 "col": 17,
-                                "line": 82
+                                "line": 81
                             }
                         },
                         "type": "CharLiteral",
@@ -800,11 +793,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 36,
-                                "line": 82
+                                "line": 81
                             },
                             "start": {
                                 "col": 27,
-                                "line": 82
+                                "line": 81
                             }
                         },
                         "type": "CharLiteral",
@@ -815,11 +808,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 47,
-                                "line": 82
+                                "line": 81
                             },
                             "start": {
                                 "col": 38,
-                                "line": 82
+                                "line": 81
                             }
                         },
                         "type": "CharLiteral",
@@ -833,11 +826,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 49,
-                    "line": 82
+                    "line": 81
                 },
                 "start": {
                     "col": 1,
-                    "line": 81
+                    "line": 80
                 }
             },
             "type": "Definition"
@@ -850,11 +843,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 10,
-                                "line": 86
+                                "line": 85
                             },
                             "start": {
                                 "col": 7,
-                                "line": 86
+                                "line": 85
                             }
                         },
                         "type": "CharLiteral",
@@ -865,11 +858,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 20,
-                                "line": 86
+                                "line": 85
                             },
                             "start": {
                                 "col": 12,
-                                "line": 86
+                                "line": 85
                             }
                         },
                         "type": "CharLiteral",
@@ -880,11 +873,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 30,
-                                "line": 86
+                                "line": 85
                             },
                             "start": {
                                 "col": 22,
-                                "line": 86
+                                "line": 85
                             }
                         },
                         "type": "CharLiteral",
@@ -898,11 +891,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 32,
-                    "line": 86
+                    "line": 85
                 },
                 "start": {
                     "col": 1,
-                    "line": 85
+                    "line": 84
                 }
             },
             "type": "Definition"
@@ -913,11 +906,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 4,
-                        "line": 100
+                        "line": 99
                     },
                     "start": {
                         "col": 5,
-                        "line": 90
+                        "line": 89
                     }
                 },
                 "type": "StringLiteral",
@@ -928,11 +921,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 4,
-                    "line": 100
+                    "line": 99
                 },
                 "start": {
                     "col": 1,
-                    "line": 89
+                    "line": 88
                 }
             },
             "type": "Definition"
@@ -945,11 +938,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 36,
-                                "line": 104
+                                "line": 103
                             },
                             "start": {
                                 "col": 7,
-                                "line": 104
+                                "line": 103
                             }
                         },
                         "type": "StringLiteral",
@@ -960,11 +953,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 40,
-                                "line": 105
+                                "line": 104
                             },
                             "start": {
                                 "col": 7,
-                                "line": 105
+                                "line": 104
                             }
                         },
                         "type": "StringLiteral",
@@ -975,11 +968,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 42,
-                                "line": 106
+                                "line": 105
                             },
                             "start": {
                                 "col": 7,
-                                "line": 106
+                                "line": 105
                             }
                         },
                         "type": "StringLiteral",
@@ -990,11 +983,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 44,
-                                "line": 107
+                                "line": 106
                             },
                             "start": {
                                 "col": 7,
-                                "line": 107
+                                "line": 106
                             }
                         },
                         "type": "StringLiteral",
@@ -1005,11 +998,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 51,
-                                "line": 108
+                                "line": 107
                             },
                             "start": {
                                 "col": 7,
-                                "line": 108
+                                "line": 107
                             }
                         },
                         "type": "StringLiteral",
@@ -1020,11 +1013,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 62,
-                                "line": 109
+                                "line": 108
                             },
                             "start": {
                                 "col": 7,
-                                "line": 109
+                                "line": 108
                             }
                         },
                         "type": "StringLiteral",
@@ -1035,11 +1028,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 37,
-                                "line": 110
+                                "line": 109
                             },
                             "start": {
                                 "col": 7,
-                                "line": 110
+                                "line": 109
                             }
                         },
                         "type": "StringLiteral",
@@ -1050,11 +1043,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 42,
-                                "line": 111
+                                "line": 110
                             },
                             "start": {
                                 "col": 7,
-                                "line": 111
+                                "line": 110
                             }
                         },
                         "type": "StringLiteral",
@@ -1065,11 +1058,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 44,
-                                "line": 112
+                                "line": 111
                             },
                             "start": {
                                 "col": 7,
-                                "line": 112
+                                "line": 111
                             }
                         },
                         "type": "StringLiteral",
@@ -1083,11 +1076,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 113
+                    "line": 112
                 },
                 "start": {
                     "col": 1,
-                    "line": 103
+                    "line": 102
                 }
             },
             "type": "Definition"
