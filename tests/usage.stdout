@@ -1,6 +1,6 @@
 elm-format x.x.x
 
-Usage: elm-format [INPUT] [--output FILE] [--yes] [--validate] [--stdin]
+Usage: elm-format [INPUT] [--output FILE] [--yes] [--validate] [--stdin] 
                   [--elm-version VERSION] [--upgrade]
   Format Elm source files.
 
