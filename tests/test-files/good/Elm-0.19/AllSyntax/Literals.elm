@@ -11,6 +11,28 @@ boolean =
     )
 
 
+integer =
+    [ 1
+    , 0x09
+    , -0x09
+    , 0x0F1A
+    , -0x0F1A
+    , 0x0001FAB5
+    , -0x0001FAB5
+    , 0x0000000112345678
+    , -0x0000000112345678
+    , 0x7FFFFFFFFFFFFFFF
+    , -0x7FFFFFFFFFFFFFFF
+    , 9223372036854775807
+    , -9223372036854775808
+    ]
+
+
+float =
+    [ 2.0
+    ]
+
+
 string =
     "string"
 
