@@ -17,7 +17,7 @@ brew cask install virtualbox
 
 ## Preparation
 
-1. Start a new branch from `origin/master` named `release/<new version>`
+1. Start a new branch from `origin/main` named `release/<new version>`
 1. Edit `CHANGELOG.md` to set the correct version number.
 1. Create `Release Notes/<new version>.md` to draft the release notes.
 1. Update the version number in `elm-format.cabal`.
