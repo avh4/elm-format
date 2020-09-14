@@ -1,4 +1,4 @@
-## main
+## 0.8.4
 
 New features:
   - newlines in tuple types are now preserved
