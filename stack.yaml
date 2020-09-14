@@ -43,8 +43,6 @@ packages:
 extra-deps:
 - indents-0.3.3
 - concatenative-1.0.1 # required by indents-0.3.3
-- binary-0.8.7.0 # lts-13.25 only has 0.8.6.0
-- clock-0.8 # Fixes a bug which crashes 32-bit Windows
 - json-0.10 # lts-16.14 does not include json
 
 # Override default flag values for local packages and extra-deps
