@@ -2,8 +2,8 @@ name: Build Windows release
 
 on:
   push:
-    tags:
-      - '*'
+    tags: '*'
+    branches: 'release/*'
 
 jobs:
   build:
