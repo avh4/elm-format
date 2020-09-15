@@ -35,6 +35,7 @@ import Prelude hiding (takeWhile)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Control.Monad
+import Control.Monad.Fail
 import Control.Applicative
 import qualified Data.Set as Set
 
@@ -109,13 +110,15 @@ instance Alternative Parser where
 
 instance Monad Parser where
   return x = Parser $ \st -> Right (st, x)
-  fail e = Parser $ \st -> Left $ ParseError (position st) e
   p >>= g = Parser $ \st ->
     case evalParser p st of
          Left e        -> Left e
          Right (st',x) -> evalParser (g x) st'
   {-# INLINE return #-}
   {-# INLINE (>>=) #-}
+
+instance MonadFail Parser where
+  fail e = Parser $ \st -> Left $ ParseError (position st) e
 
 instance MonadPlus Parser where
   mzero = Parser $ \st -> Left $ ParseError (position st) "(mzero)"

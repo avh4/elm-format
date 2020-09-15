@@ -25,7 +25,7 @@ jobs:
     - uses: actions/setup-haskell@v1.1
       name: Setup Haskell Stack
       with:
-        ghc-version: 8.6.5
+        ghc-version: 8.8.4
         enable-stack: true
         stack-version: latest
     - uses: actions/cache@v2
