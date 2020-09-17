@@ -211,7 +211,11 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 
     1. Install elm-mode ([official instructions](https://github.com/jcollard/elm-mode#installation)): Use `M-x list-packages` and choose `elm-mode`.
 
-1. Set `elm-format-on-save` to `t` to apply elm-format on the current buffer on every save. (The setting can be changed via `M-x customize-variable elm-format-on-save`. Click button `Toggle` to change the setting and button `State` to activate the setting.)
+1. Add the following to your `~/.emacs.d/init.el`:
+
+    ```lisp
+    (add-hook 'elm-mode-hook 'elm-format-on-save-mode)
+    ```
 
 
 ### elm-vim installation
