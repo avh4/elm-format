@@ -216,8 +216,13 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 
 ### elm-vim installation
 
+> If you are an advanced vim user and already have a preferred vim plugin installation method,
+> you may prefer to refer to the [official elm-vim installation instructions](https://github.com/ElmCast/elm-vim#install).
+> The instructions below are for those who need a step-by-step walkthrough of how to get the plugin set up.
+
 1. Install elm-format
 1. Install [vim-plug](https://github.com/junegunn/vim-plug) ([official instructions](https://github.com/junegunn/vim-plug#installation))
+   NOTE: if you are using neovim, you will need to refer to the official instructions.
 
     1. Download vim-plug:
 
@@ -226,15 +231,13 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
             https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
         ```
 
-   1. Make sure there is a section like this in your `~/.vimrc`:
+   1. Make sure `~/.vimrc` exists and has a section like this:
 
         ```vim
         call plug#begin('~/.vim/plugged')
         " ... any active plugins
         call plug#end()
         ```
-
-
 
 1. Install elm-vim ([official instructions](https://github.com/ElmCast/elm-vim#install))
 
