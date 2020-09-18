@@ -118,8 +118,8 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td>:warning: <a href="#visual-studio-code-installation">3 steps</a></td>
     <td>:white_check_mark:</td>
     <td>:warning: requires configuration</td>
-    <td>❔ TBD</td>
-    <td>❔ TBD</td>
+    <td>:white_check_mark:</td>
+    <td>:x: uninformative error message</td>
   </tr>
   </tr>
   <tr>
@@ -257,10 +257,8 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 
 ### Visual Studio Code installation
 
-> Note: If you previously installed a VSCode extension called "elm-format", uninstall it (it is deprecated, and the "elm" extension now provides elm-format integration).
-
 1. Install elm-format
-1. Install the extension [Elm Language Support](https://marketplace.visualstudio.com/items?itemName=sbrink.elm) for VSCode, which includes syntax and error highlighting
+1. Install the extension [Elm Plugin for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=Elmtooling.elm-ls-vscode).
 1. Configure the extension to format on save:
 
     1. Find your `settings.json` file ([instructions](https://code.visualstudio.com/docs/getstarted/settings#_settings-file-locations)).
