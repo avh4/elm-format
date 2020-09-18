@@ -289,6 +289,8 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 
 ### Building from source
 
+If you are running macOS:
+
 ```bash
 # check out the repo
 brew install haskell-stack
@@ -305,6 +307,10 @@ stack runhaskell Shakefile.hs -- build
 # run the built elm-format
 "$(stack path --local-install-root)"/bin/elm-format
 ```
+
+If you are running a Linux distribution other than nixOS, the above instructions should work if you replace `brew install haskell-stack` with obtaining [Stack](http://haskellstack.org) for your distribution.
+
+If you are running nixOS, install [Stack](http://haskellstack.org) with `nix-env -iA nixos.stack` instead of `brew install haskell-stack` above. You'll also need to activate stack's [nix integration](https://docs.haskellstack.org/en/stable/nix_integration/) by substituting `stack --nix` for `stack` in all of the above commands.
 
 ### Running tests
 
