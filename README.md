@@ -135,9 +135,9 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td rowspan=1>JetBrains (WebStorm, etc)</td>
     <td>:trophy: <a href="https://klazuka.github.io/intellij-elm/">intellij-elm</a></td>
     <td>:warning: <a href="#jetbrains-installation">4 steps</a></td>
-    <td>❔ TBD</td>
     <td>:white_check_mark:</td>
-    <td>❔ TBD</td>
+    <td>:warning: requires configuration</td>
+    <td>:warning: requires configuration</td>
     <td>❔ TBD</td>
   </tr>
   <tr>
@@ -284,7 +284,9 @@ This is for WebStorm and other JetBrains IDEs like IntelliJ and PyCharm.
 1. Install elm-format
 1. Install the [intellij-elm plugin](https://klazuka.github.io/intellij-elm/)
 1. In IntelliJ, open Settings -> Languages & Frameworks -> Elm
-1. Specify the path to elm-format
+
+    1. Specify the path to elm-format (try the "Auto Discover" button first)
+    1. Check the "Run when file saved?" checkbox
 
 
 
