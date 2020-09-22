@@ -3,6 +3,21 @@ import Development.Shake.Command
 import Development.Shake.FilePath
 import Development.Shake.Util
 import Control.Monad (forM_)
+import qualified System.Info
+
+data OS = Linux | Mac | Windows
+
+os :: OS
+os =
+    case (System.Info.os, System.Info.arch) of
+        ("linux", "x86_64") -> Linux
+        _ -> error "unhandled operating system"
+
+instance Show OS where
+    show Linux = "linux-x64"
+    show Mac = "mac-x64"
+    show Windows = "win-x64"
+
 
 main :: IO ()
 main = do
@@ -37,7 +52,7 @@ main = do
     phony "build" $ need [ elmFormat ]
     phony "stack-test" $ need [ "_build/stack-test.ok" ]
     phony "profile" $ need [ "_build/tests/test-files/prof.ok" ]
-    phony "dist" $ need [ elmFormatDist ]
+    phony "dist" $ need [ "_build/dist/" ++ show os ++ "/elm-format" ]
 
     phony "clean" $ do
         cmd_ "stack" "clean"
@@ -84,6 +99,10 @@ main = do
         need sourceFiles
         need generatedSourceFiles
         cmd_ "stack" "build" workDirDist "--ghc-options=-O2"
+
+    ("_build/dist/" ++ show os ++ "/elm-format") %> \out -> do
+        need [ elmFormatDist ]
+        cmd_ "strip" "-o" out elmFormatDist
 
     "_build/bin/elm-format-prof" %> \out -> do
         StdoutTrim profileInstallRoot <- liftIO $ cmd "stack path --profile --local-install-root"
