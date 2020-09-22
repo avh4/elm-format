@@ -41,7 +41,7 @@ jobs:
       if: runner.os == 'Windows'
       with:
         path: C:\sr
-        key: ${{ runner.os }}-stack-root
+        key: ${{ runner.os }}-stack-root-v1
     - name: Configure Haskell Stack
       run: |
         stack config set system-ghc --global true
