@@ -47,6 +47,7 @@ jobs:
         stack config set system-ghc --global true
     - run: stack update
     - run: stack path
+    - run: stack build --only-snapshot
     - run: stack build --only-dependencies
     - run: stack install shake
     - name: Build
