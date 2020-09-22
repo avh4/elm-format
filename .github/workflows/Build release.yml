@@ -54,7 +54,12 @@ jobs:
         max_attempts: 3
         command: stack build --only-snapshot
     - run: stack build --only-dependencies
-    - run: stack install shake
+    - name: stack install shake
+      uses: nick-invision/retry@v1
+      with:
+        timeout_minutes: 60
+        max_attempts: 3
+        command: stack install shake
     - name: Build dist
       run: stack runhaskell Shakefile.hs -- dist
     - name: Copy binary
