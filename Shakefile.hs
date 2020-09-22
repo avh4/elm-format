@@ -11,7 +11,11 @@ os :: OS
 os =
     case (System.Info.os, System.Info.arch) of
         ("linux", "x86_64") -> Linux
-        _ -> error "unhandled operating system"
+        ("darwin", "x86_64") -> Mac
+        ("osx", "x86_64") -> Mac
+        ("mingw32", "x86_64") -> Windows
+        ("win32", "x86_64") -> Windows
+        other -> error ("unhandled operating system: " ++ show other)
 
 instance Show OS where
     show Linux = "linux-x64"
