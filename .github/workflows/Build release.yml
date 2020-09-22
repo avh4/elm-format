@@ -27,21 +27,6 @@ jobs:
         ghc-version: 8.8.4
         enable-stack: true
         stack-version: latest
-    - uses: actions/cache@v2
-      name: Cache stack-root
-      if: runner.os != 'Windows'
-      with:
-        # NOTE: the "/*" below is required otherwise the exclude line doesn't work.  See https://github.com/actions/cache/issues/364#issuecomment-678118231
-        path: |
-          ~/.stack/*
-          !~/.stack/setup-exe-cache
-        key: ${{ runner.os }}-stack-root-v4
-    - uses: actions/cache@v2
-      name: Cache stack-root (for Windows)
-      if: runner.os == 'Windows'
-      with:
-        path: C:\sr
-        key: ${{ runner.os }}-stack-root-v1
     - name: Configure Haskell Stack
       run: |
         stack config set system-ghc --global true
