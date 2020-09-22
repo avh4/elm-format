@@ -3,6 +3,7 @@ import Development.Shake.Command
 import Development.Shake.FilePath
 import Development.Shake.Util
 import Control.Monad (forM_)
+import qualified System.Directory
 import qualified System.Info
 
 data OS = Linux | Mac | Windows
@@ -108,14 +109,22 @@ main = do
         need generatedSourceFiles
         cmd_ "stack" "build" workDirDist "--ghc-options=-O2"
 
-    ("_build/dist/" ++ show os ++ "/elm-format") %> \out -> do
+    ("_build/dist/" ++ show os ++ "/elm-format" <.> exe) %> \out -> do
         need [ elmFormatDist ]
         cmd_ "strip" "-o" out elmFormatDist
 
     ("dist/elm-format-" ++ gitDescribe ++ "-" ++ show os <.> "tgz") %> \out -> do
         let binDir = "_build/dist/" ++ show os
-        need [ binDir </> "elm-format" ]
-        cmd_ "tar" "zcvf" out "-C" binDir "elm-format"
+        need [ binDir </> "elm-format" <.> exe ]
+        cmd_ "tar" "zcvf" out "-C" binDir ("elm-format" <.> exe)
+
+    ("dist/elm-format-" ++ gitDescribe ++ "-" ++ show os <.> "zip") %> \out -> do
+        let binDir = "_build/dist/" ++ show os
+        let bin = binDir </> "elm-format" <.> exe
+        need [ bin ]
+        absoluteBinPath <- liftIO $ System.Directory.makeAbsolute bin
+        liftIO $  removeFiles "." [ out ]
+        cmd_ "7z" "a" "-bb3" "-tzip" "-mfb=258" "-mpass=15" out absoluteBinPath
 
     "_build/bin/elm-format-prof" %> \out -> do
         StdoutTrim profileInstallRoot <- liftIO $ cmd "stack path --profile --local-install-root"
