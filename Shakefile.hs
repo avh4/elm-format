@@ -12,12 +12,17 @@ main = do
       shakeColor = True,
       shakeVersion = shakefilesHash
     } $ do
+
+    let workDirDist = "--work-dir=.stack-work-dist"
+
     StdoutTrim stackLocalInstallRoot <- liftIO $ cmd "stack path --local-install-root"
+    StdoutTrim stackLocalInstallRootDist <- liftIO $ cmd "stack" "path" workDirDist "--local-install-root"
     StdoutTrim stackLocalBin <- liftIO $ cmd "stack path --local-bin"
     StdoutTrim gitDescribe <- liftIO $ cmd "git" [ "describe", "--abbrev=8", "--always" ]
     StdoutTrim gitSha <- liftIO $ cmd "git" [ "describe", "--always", "--match", "NOT A TAG", "--dirty" ]
 
-    let elmFormat = stackLocalInstallRoot </> "bin/elm-format" <.> exe
+    let elmFormat = stackLocalInstallRoot </> "bin" </> "elm-format" <.> exe
+    let elmFormatDist = stackLocalInstallRootDist </> "bin" </> "elm-format" <.> exe
     let shellcheck = stackLocalBin </> "shellcheck" <.> exe
 
     want [ "test" ]
@@ -32,9 +37,11 @@ main = do
     phony "build" $ need [ elmFormat ]
     phony "stack-test" $ need [ "_build/stack-test.ok" ]
     phony "profile" $ need [ "_build/tests/test-files/prof.ok" ]
+    phony "dist" $ need [ elmFormatDist ]
 
     phony "clean" $ do
-        cmd_ "stack clean"
+        cmd_ "stack" "clean"
+        cmd_ "stack" "clean" workDirDist
         removeFilesAfter "_build" [ "//*" ]
         removeFilesAfter ""
             [ "_input.elm"
@@ -71,6 +78,12 @@ main = do
         need sourceFiles
         need generatedSourceFiles
         cmd_ "stack build --test --no-run-tests"
+
+    elmFormatDist %> \out -> do
+        sourceFiles <- getDirectoryFiles "" sourceFilesPattern
+        need sourceFiles
+        need generatedSourceFiles
+        cmd_ "stack" "build" workDirDist "--ghc-options=-O2"
 
     "_build/bin/elm-format-prof" %> \out -> do
         StdoutTrim profileInstallRoot <- liftIO $ cmd "stack path --profile --local-install-root"
