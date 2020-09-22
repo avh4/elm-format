@@ -18,6 +18,9 @@ instance Show OS where
     show Mac = "mac-x64"
     show Windows = "win-x64"
 
+zipFormatFor Linux = "tgz"
+zipFormatFor Mac = "tgz"
+zipFormatFor Windows = "zip"
 
 main :: IO ()
 main = do
@@ -29,6 +32,7 @@ main = do
     } $ do
 
     let workDirDist = "--work-dir=.stack-work-dist"
+    let zipFormat = zipFormatFor os
 
     StdoutTrim stackLocalInstallRoot <- liftIO $ cmd "stack path --local-install-root"
     StdoutTrim stackLocalInstallRootDist <- liftIO $ cmd "stack" "path" workDirDist "--local-install-root"
@@ -52,7 +56,7 @@ main = do
     phony "build" $ need [ elmFormat ]
     phony "stack-test" $ need [ "_build/stack-test.ok" ]
     phony "profile" $ need [ "_build/tests/test-files/prof.ok" ]
-    phony "dist" $ need [ "_build/dist/" ++ show os ++ "/elm-format" ]
+    phony "dist" $ need [ "dist/elm-format-" ++ gitDescribe ++ "-" ++ show os <.> zipFormat ]
 
     phony "clean" $ do
         cmd_ "stack" "clean"
@@ -103,6 +107,11 @@ main = do
     ("_build/dist/" ++ show os ++ "/elm-format") %> \out -> do
         need [ elmFormatDist ]
         cmd_ "strip" "-o" out elmFormatDist
+
+    ("dist/elm-format-" ++ gitDescribe ++ "-" ++ show os <.> "tgz") %> \out -> do
+        let binDir = "_build/dist/" ++ show os
+        need [ binDir </> "elm-format" ]
+        cmd_ "tar" "zcvf" out "-C" binDir "elm-format"
 
     "_build/bin/elm-format-prof" %> \out -> do
         StdoutTrim profileInstallRoot <- liftIO $ cmd "stack path --profile --local-install-root"
