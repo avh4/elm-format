@@ -61,7 +61,12 @@ jobs:
         command: stack build --only-snapshot
     - run: stack build --only-dependencies
     - run: stack build --test --only-dependencies
-    - run: stack install shake
+    - name: stack install shake
+      uses: nick-invision/retry@v1
+      with:
+        timeout_minutes: 60
+        max_attempts: 3
+        command: stack install shake
     - name: Build
       run: stack runhaskell Shakefile.hs -- build
     - name: Tests
