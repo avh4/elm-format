@@ -35,7 +35,7 @@ jobs:
         path: |
           ~/.stack/*
           !~/.stack/setup-exe-cache
-        key: ${{ runner.os }}-stack-root-v3
+        key: ${{ runner.os }}-stack-root-v4
     - uses: actions/cache@v2
       name: Cache stack-root (for Windows)
       if: runner.os == 'Windows'
