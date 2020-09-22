@@ -53,7 +53,12 @@ jobs:
         stack config set system-ghc --global true
     - run: stack update
     - run: stack path
-    - run: stack build --only-snapshot
+    - name: stack build --only-snapshot
+      uses: nick-invision/retry@v1
+      with:
+        timeout_minutes: 60
+        max_attempts: 3
+        command: stack build --only-snapshot
     - run: stack build --only-dependencies
     - run: stack build --test --only-dependencies
     - run: stack install shake
