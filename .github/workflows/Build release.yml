@@ -50,8 +50,8 @@ jobs:
     - run: stack build --only-snapshot
     - run: stack build --only-dependencies
     - run: stack install shake
-    - name: Build
-      run: stack runhaskell Shakefile.hs -- build
+    - name: Build dist
+      run: stack runhaskell Shakefile.hs -- dist
     - name: Copy binary
       shell: bash
       run: |
