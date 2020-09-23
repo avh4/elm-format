@@ -5,9 +5,14 @@ on:
     tags: '*'
     branches: 'release/*'
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os:
         - windows-latest
@@ -24,31 +29,30 @@ jobs:
       with:
         fetch-depth: 0
     - uses: actions/setup-haskell@v1.1
-      name: Setup Haskell Stack
+      name: Setup Haskell
+      id: setup-haskell
       with:
         ghc-version: 8.8.4
-        enable-stack: true
-        stack-version: latest
-    - name: Configure Haskell Stack
+    - name: Workaround for https://github.com/actions/setup-haskell/issues/36
+      if: runner.os == 'macOS'
       run: |
-        stack config set system-ghc --global true
-    - run: stack update
-    - run: stack path
-    - name: stack build --only-snapshot
-      uses: nick-invision/retry@v1
+        ghcup list
+        ghcup set ghc 8.8.4
+    - name: Verify Haskell version
+      run: |
+        cabal --version
+        ghc --version
+        [[ $(ghc --numeric-version) == 8.8.4 ]]
+    - uses: actions/cache@v2
+      name: Cache cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:
-        timeout_minutes: 60
-        max_attempts: 10
-        command: stack build --only-snapshot
-    - run: stack build --only-dependencies
-    - name: stack install shake
-      uses: nick-invision/retry@v1
-      with:
-        timeout_minutes: 60
-        max_attempts: 10
-        command: stack install shake
-    - name: Build dist
-      run: stack runhaskell Shakefile.hs -- dist
+        path: ${{ steps.setup-haskell.outputs.cabal-store }}
+        key: cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+    - run: cabal v2-update
+    - run: cabal v2-build --only-dependencies
+    - run: cabal v2-build --only-dependencies  --enable-tests
+    - run: ./build.sh -- dependencies
+    - run: ./build.sh -- dist
     - uses: actions/upload-artifact@v2
       with:
         name: elm-format-${{ github.sha }}-${{ runner.os }}

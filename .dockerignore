@@ -1,3 +1,4 @@
 *
-!stack.yaml
+!cabal.project
+!cabal.project.freeze
 !elm-format.cabal
