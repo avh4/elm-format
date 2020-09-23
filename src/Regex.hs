@@ -8,7 +8,7 @@ import Data.Array.Unboxed (Array, UArray, (!))
 import Data.Bits ((.|.), (.&.))
 import Data.ByteString (ByteString)
 import Data.Foldable (foldl')
-import Data.Word (Word8, Word64)
+import Data.Word (Word8)
 import Foreign (peek, plusPtr, withForeignPtr)
 
 import qualified Data.Array.Base

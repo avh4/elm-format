@@ -1,6 +1,5 @@
 module Flags where
 
-import Data.Monoid ((<>))
 import ElmVersion (ElmVersion(..))
 
 import qualified ElmVersion

@@ -35,7 +35,7 @@ import Prelude hiding (takeWhile)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Control.Monad
-import Control.Monad.Fail
+import Control.Monad.Fail ()
 import Control.Applicative
 import qualified Data.Set as Set
 
