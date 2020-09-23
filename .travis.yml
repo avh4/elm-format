@@ -6,11 +6,16 @@ cabal: "3.2"
 ghc: "8.8.4"
 
 
+cache:
+  directories:
+  - "$HOME/.cabal/store"
+
+
 install:
 - cabal v2-update
 - cabal v2-build --only-dependencies
 - cabal v2-build --only-dependencies --enable-tests
-- cabal v2-install --lib shake
+- ./build.sh -- dependencies
 
 
 script:

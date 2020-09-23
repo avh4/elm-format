@@ -34,6 +34,7 @@ cabalInstallOs =
         os =
             case System.Info.os of
                 "darwin" -> "osx"
+                "mingw32" -> "windows"
                 o -> o
 
 main :: IO ()
@@ -57,22 +58,26 @@ main = do
 
     want [ "test" ]
 
-    phony "test" $ do
-        need
-            [ "unit-tests"
-            , "integration-tests"
-            , "_build/shellcheck.ok"
-            ]
+    phony "test" $ need
+        [ "unit-tests"
+        , "integration-tests"
+        , "_build/shellcheck.ok"
+        ]
 
     phony "build" $ need [ elmFormat ]
     phony "unit-tests" $ need [ "_build/cabal-test.ok" ]
     phony "profile" $ need [ "_build/tests/test-files/prof.ok" ]
     phony "dist" $ need [ "dist/elm-format-" ++ gitDescribe ++ "-" ++ show os <.> zipFormat ]
 
+    phony "dependencies" $ need
+        [ shellcheck
+        ]
+
     phony "clean" $ do
         removeFilesAfter "dist-newstyle" [ "//*" ]
         removeFilesAfter "_build" [ "//*" ]
-        removeFilesAfter ""
+        removeFilesAfter ".shake" [ "//*" ]
+        removeFilesAfter "."
             [ "_input.elm"
             , "_input2.elm"
             , "formatted.elm"
@@ -111,13 +116,13 @@ main = do
         sourceFiles <- getDirectoryFiles "" sourceFilesPattern
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "cabal" "new-build" "-O0"
+        cmd_ "cabal" "v2-build" "-O0"
 
     elmFormatDist %> \out -> do
         sourceFiles <- getDirectoryFiles "" sourceFilesPattern
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "cabal" "new-build" "-O2"
+        cmd_ "cabal" "v2-build" "-O2"
 
     ("_build/dist/" ++ show os ++ "/elm-format" <.> exe) %> \out -> do
         need [ elmFormatDist ]
@@ -151,7 +156,7 @@ main = do
         sourceFiles <- getDirectoryFiles "" sourceFilesPattern
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "cabal new-test -O0"
+        cmd_ "cabal" "v2-test" "-O0"
         writeFile' out ""
 
 
@@ -327,7 +332,8 @@ main = do
     --
 
     shellcheck %> \out -> do
-        cmd_ "cabal" "new-install" "ShellCheck" "--installdir" localBinDir
+        -- install-method is currently needed because Windows doesn't support the default symlink method
+        cmd_ "cabal" "v2-install" "ShellCheck" "--installdir" localBinDir "--install-method=copy" "--overwrite-policy=always"
 
     "_build/shellcheck.ok" %> \out -> do
         scriptFiles <- getDirectoryFiles ""
@@ -338,6 +344,7 @@ main = do
             , "package/mac/build-package.sh"
             , "package/nix/build.sh"
             , "package/win/build-package.sh"
+            , "build.sh"
             ]
         let oks = ["_build" </> f <.> "shellcheck.ok" | f <- scriptFiles]
         need oks
