@@ -23,58 +23,32 @@ jobs:
         git config --global core.autocrlf false
     - uses: actions/checkout@v2
     - uses: actions/setup-haskell@v1.1
-      name: Setup Haskell Stack
+      name: Setup Haskell
+      id: setup-haskell
       with:
         ghc-version: 8.8.4
-        enable-stack: true
-        stack-version: latest
     - uses: actions/cache@v2
-      name: Cache stack-root
-      if: runner.os != 'Windows'
+      name: Cache cabal store
       with:
-        # NOTE: the "/*" below is required otherwise the exclude line doesn't work.  See https://github.com/actions/cache/issues/364#issuecomment-678118231
-        path: |
-          ~/.stack/*
-          !~/.stack/setup-exe-cache
-        key: ${{ runner.os }}-stack-root-v3
+        path: ${{ steps.setup-haskell.outputs.cabal-store }}
+        key: ${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
     - uses: actions/cache@v2
-      name: Cache stack-root (for Windows)
-      if: runner.os == 'Windows'
+      name: Cache dist
       with:
-        path: C:\sr
-        key: ${{ runner.os }}-stack-root
-    - uses: actions/cache@v2
-      name: Cache stack-work
-      with:
-        path: .stack-work
-        key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml') }}
-    - name: Configure Haskell Stack
-      run: |
-        stack config set system-ghc --global true
-    - run: stack update
-    - run: stack path
-    - name: stack build --only-snapshot
-      uses: nick-invision/retry@v1
-      with:
-        timeout_minutes: 60
-        max_attempts: 10
-        command: stack build --only-snapshot
-    - run: stack build --only-dependencies
-    - run: stack build --test --only-dependencies
-    - name: stack install shake
-      uses: nick-invision/retry@v1
-      with:
-        timeout_minutes: 60
-        max_attempts: 10
-        command: stack install shake
+        path: dist-newstyle
+        key: ${{ runner.os }}-dist
+    - run: cabal v2-update
+    - run: cabal v2-build --only-dependencies
+    - run: cabal v2-build --only-dependencies  --enable-tests
+    - run: cabal v2-install --lib shake
     - name: Build
-      run: stack runhaskell Shakefile.hs -- build
+      run: ./build.sh -- build
     - name: Tests
       if: matrix.os != 'windows-latest'
       run: |
-        stack runhaskell Shakefile.hs
+        ./build.sh
     - name: Tests (for Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        stack runhaskell Shakefile.hs -- _build/stack-test.ok
+        ./build.sh -- unit-tests
         echo "##[warning]integration tests are currently disabled on Windows CI"

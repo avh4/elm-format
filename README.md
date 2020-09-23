@@ -296,27 +296,22 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 
 ### Building from source
 
-1. Install Haskell Stack following the instructions for your operating system: https://docs.haskellstack.org/en/stable/install_and_upgrade/
+1. Install Haskell ghcup following the instructions for your operating system: https://www.haskell.org/ghcup/
 
 ```bash
 # check out the repo
 git clone https://github.com/avh4/elm-format.git
 cd elm-format
 
-# initial setup
-stack setup
-stack install shake
-
 # build
-stack runhaskell Shakefile.hs -- build
+./build.sh -- build
 
 # run the built elm-format
-"$(stack path --local-install-root)"/bin/elm-format
+./_build/elm-format
 ```
 
 ### Running tests
 
 ```bash
-stack install shake
-stack runhaskell Shakefile.hs
+./build.sh
 ```

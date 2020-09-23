@@ -27,6 +27,15 @@ zipFormatFor Linux = "tgz"
 zipFormatFor Mac = "tgz"
 zipFormatFor Windows = "zip"
 
+cabalInstallOs :: String
+cabalInstallOs =
+    System.Info.arch ++ "-" ++ os
+    where
+        os =
+            case System.Info.os of
+                "darwin" -> "osx"
+                o -> o
+
 main :: IO ()
 main = do
     shakefilesHash <- getHashedShakeVersion [ "Shakefile.hs" ]
@@ -36,36 +45,32 @@ main = do
       shakeVersion = shakefilesHash
     } $ do
 
-    let workDirDist = "--work-dir=.stack-work-dist"
     let zipFormat = zipFormatFor os
+    let localBinDir = "bin"
 
-    StdoutTrim stackLocalInstallRoot <- liftIO $ cmd "stack path --local-install-root"
-    StdoutTrim stackLocalInstallRootDist <- liftIO $ cmd "stack" "path" workDirDist "--local-install-root"
-    StdoutTrim stackLocalBin <- liftIO $ cmd "stack path --local-bin"
     StdoutTrim gitDescribe <- liftIO $ cmd "git" [ "describe", "--abbrev=8", "--always" ]
     StdoutTrim gitSha <- liftIO $ cmd "git" [ "describe", "--always", "--match", "NOT A TAG", "--dirty" ]
 
-    let elmFormat = stackLocalInstallRoot </> "bin" </> "elm-format" <.> exe
-    let elmFormatDist = stackLocalInstallRootDist </> "bin" </> "elm-format" <.> exe
-    let shellcheck = stackLocalBin </> "shellcheck" <.> exe
+    let elmFormat = "_build" </> "elm-format" <.> exe
+    let elmFormatDist = "dist-newstyle/build" </> cabalInstallOs </> "ghc-8.8.4/elm-format-0.8.4/x/elm-format/opt/build/elm-format/elm-format" <.> exe
+    let shellcheck = localBinDir </> "shellcheck" <.> exe
 
     want [ "test" ]
 
     phony "test" $ do
         need
-            [ "stack-test"
+            [ "unit-tests"
             , "integration-tests"
             , "_build/shellcheck.ok"
             ]
 
     phony "build" $ need [ elmFormat ]
-    phony "stack-test" $ need [ "_build/stack-test.ok" ]
+    phony "unit-tests" $ need [ "_build/cabal-test.ok" ]
     phony "profile" $ need [ "_build/tests/test-files/prof.ok" ]
     phony "dist" $ need [ "dist/elm-format-" ++ gitDescribe ++ "-" ++ show os <.> zipFormat ]
 
     phony "clean" $ do
-        cmd_ "stack" "clean"
-        cmd_ "stack" "clean" workDirDist
+        removeFilesAfter "dist-newstyle" [ "//*" ]
         removeFilesAfter "_build" [ "//*" ]
         removeFilesAfter ""
             [ "_input.elm"
@@ -85,7 +90,9 @@ main = do
           , "parser/src//*.hs"
           , "markdown//*.hs"
           , "elm-format.cabal"
-          , "stack.yaml"
+          , "cabal.project"
+          , "cabal.project.freeze"
+          , "cabal.project.local"
           ]
 
     "generated/Build_elm_format.hs" %> \out -> do
@@ -98,16 +105,19 @@ main = do
             ]
 
     elmFormat %> \out -> do
+        copyFileChanged ("dist-newstyle/build" </> cabalInstallOs </> "ghc-8.8.4/elm-format-0.8.4/x/elm-format/noopt/build/elm-format/elm-format" <.> exe) out
+
+    ("dist-newstyle/build" </> cabalInstallOs </> "ghc-8.8.4/elm-format-0.8.4/x/elm-format/noopt/build/elm-format/elm-format" <.> exe) %> \out -> do
         sourceFiles <- getDirectoryFiles "" sourceFilesPattern
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "stack build --test --no-run-tests"
+        cmd_ "cabal" "new-build" "-O0"
 
     elmFormatDist %> \out -> do
         sourceFiles <- getDirectoryFiles "" sourceFilesPattern
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "stack" "build" workDirDist "--ghc-options=-O2"
+        cmd_ "cabal" "new-build" "-O2"
 
     ("_build/dist/" ++ show os ++ "/elm-format" <.> exe) %> \out -> do
         need [ elmFormatDist ]
@@ -126,20 +136,12 @@ main = do
         liftIO $  removeFiles "." [ out ]
         cmd_ "7z" "a" "-bb3" "-tzip" "-mfb=258" "-mpass=15" out absoluteBinPath
 
-    "_build/bin/elm-format-prof" %> \out -> do
-        StdoutTrim profileInstallRoot <- liftIO $ cmd "stack path --profile --local-install-root"
-        sourceFiles <- getDirectoryFiles "" sourceFilesPattern
-        need sourceFiles
-        need generatedSourceFiles
-        cmd_ "stack build --profile --executable-profiling --library-profiling"
-        copyFileChanged (profileInstallRoot </> "bin/elm-format" <.> exe) out
-
 
     --
     -- Haskell tests
     --
 
-    "_build/stack-test.ok" %> \out -> do
+    "_build/cabal-test.ok" %> \out -> do
         testFiles <- getDirectoryFiles ""
             [ "tests//*.hs"
             , "tests//*.stdout"
@@ -149,7 +151,7 @@ main = do
         sourceFiles <- getDirectoryFiles "" sourceFilesPattern
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "stack test"
+        cmd_ "cabal new-test -O0"
         writeFile' out ""
 
 
@@ -325,7 +327,7 @@ main = do
     --
 
     shellcheck %> \out -> do
-        cmd_ "stack install ShellCheck"
+        cmd_ "cabal" "new-install" "ShellCheck" "--installdir" localBinDir
 
     "_build/shellcheck.ok" %> \out -> do
         scriptFiles <- getDirectoryFiles ""

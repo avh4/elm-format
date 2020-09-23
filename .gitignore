@@ -3,10 +3,9 @@
 /_input2.elm
 /_stdout.txt
 *.tix
-/.stack-work/
-/.stack-work-dist/
-/stack.yaml.lock
+/dist-newstyle/
 /.shake/
 /_build/
 /generated/
 /_profile/
+/bin/
