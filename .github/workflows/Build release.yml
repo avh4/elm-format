@@ -5,9 +5,14 @@ on:
     tags: '*'
     branches: 'release/*'
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os:
         - windows-latest
@@ -28,17 +33,26 @@ jobs:
       id: setup-haskell
       with:
         ghc-version: 8.8.4
+    - name: Workaround for https://github.com/actions/setup-haskell/issues/36
+      if: runner.os == 'macOS'
+      run: |
+        ghcup list
+        ghcup set ghc 8.8.4
+    - name: Verify Haskell version
+      run: |
+        cabal --version
+        ghc --version
+        [[ $(ghc --numeric-version) == 8.8.4 ]]
     - uses: actions/cache@v2
-      name: Cache cabal store
+      name: Cache cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
-        key: ${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+        key: cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
     - run: cabal v2-update
     - run: cabal v2-build --only-dependencies
     - run: cabal v2-build --only-dependencies  --enable-tests
-    - run: cabal v2-install --lib shake
-    - name: Build dist
-      run: ./build.sh -- dist
+    - run: ./build.sh -- dependencies
+    - run: ./build.sh -- dist
     - uses: actions/upload-artifact@v2
       with:
         name: elm-format-${{ github.sha }}-${{ runner.os }}
