@@ -38,14 +38,14 @@ jobs:
       uses: nick-invision/retry@v1
       with:
         timeout_minutes: 60
-        max_attempts: 3
+        max_attempts: 10
         command: stack build --only-snapshot
     - run: stack build --only-dependencies
     - name: stack install shake
       uses: nick-invision/retry@v1
       with:
         timeout_minutes: 60
-        max_attempts: 3
+        max_attempts: 10
         command: stack install shake
     - name: Build dist
       run: stack runhaskell Shakefile.hs -- dist
