@@ -1,32 +1,17 @@
 sudo: false
 
 
-language: c
-
-
-cache:
-  directories:
-  - $HOME/.stack
-
-
-addons:
-  apt:
-    packages:
-    - libgmp3-dev
-
-
-before_install:
-- mkdir -p ~/.local/bin
-- export PATH=$HOME/.local/bin:$PATH
-- travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
-- stack --version
+language: haskell
+cabal: "3.2"
+ghc: "8.8.4"
 
 
 install:
-- stack setup
-- stack build --only-dependencies
-- stack install shake
+- cabal v2-update
+- cabal v2-build --only-dependencies
+- cabal v2-build --only-dependencies --enable-tests
+- cabal v2-install --lib shake
 
 
 script:
-- stack runhaskell Shakefile.hs
+- ./build.sh

@@ -24,31 +24,21 @@ jobs:
       with:
         fetch-depth: 0
     - uses: actions/setup-haskell@v1.1
-      name: Setup Haskell Stack
+      name: Setup Haskell
+      id: setup-haskell
       with:
         ghc-version: 8.8.4
-        enable-stack: true
-        stack-version: latest
-    - name: Configure Haskell Stack
-      run: |
-        stack config set system-ghc --global true
-    - run: stack update
-    - run: stack path
-    - name: stack build --only-snapshot
-      uses: nick-invision/retry@v1
+    - uses: actions/cache@v2
+      name: Cache cabal store
       with:
-        timeout_minutes: 60
-        max_attempts: 10
-        command: stack build --only-snapshot
-    - run: stack build --only-dependencies
-    - name: stack install shake
-      uses: nick-invision/retry@v1
-      with:
-        timeout_minutes: 60
-        max_attempts: 10
-        command: stack install shake
+        path: ${{ steps.setup-haskell.outputs.cabal-store }}
+        key: ${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+    - run: cabal v2-update
+    - run: cabal v2-build --only-dependencies
+    - run: cabal v2-build --only-dependencies  --enable-tests
+    - run: cabal v2-install --lib shake
     - name: Build dist
-      run: stack runhaskell Shakefile.hs -- dist
+      run: ./build.sh -- dist
     - uses: actions/upload-artifact@v2
       with:
         name: elm-format-${{ github.sha }}-${{ runner.os }}
