@@ -303,6 +303,10 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 git clone https://github.com/avh4/elm-format.git
 cd elm-format
 
+# initial setup
+ghcup install ghc 8.8.4
+ghcup set ghc 8.8.4
+
 # build
 ./build.sh -- build
 
