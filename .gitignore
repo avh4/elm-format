@@ -4,6 +4,7 @@
 /_stdout.txt
 *.tix
 /.stack-work/
+/.stack-work-dist/
 /stack.yaml.lock
 /.shake/
 /_build/
