@@ -47,38 +47,7 @@ jobs:
         command: stack install shake
     - name: Build dist
       run: stack runhaskell Shakefile.hs -- dist
-    - name: Copy binary
-      shell: bash
-      run: |
-        mkdir -p dist
-        stack install --local-bin-path=dist
-    - name: Compress binary
-      if: runner.os != 'Windows'
-      shell: bash
-      run: |
-        strip dist/elm-format
-        tar zcvf elm-format.tgz -C dist elm-format
-        shasum dist/elm-format
-        shasum elm-format.tgz
-    - name: Compress binary (for Windows)
-      if: runner.os == 'Windows'
-      shell: bash
-      run: |
-        strip dist/elm-format.exe
-        7z a -bb3 -tzip -mfb=258 -mpass=15 elm-format.zip "$(pwd)"/dist/elm-format.exe
-    - name: Binary hashes (for Windows)
-      if: runner.os == 'Windows'
-      shell: powershell
-      run: |
-        Get-FileHash -Algorithm SHA1 dist/elm-format.exe
-        Get-FileHash -Algorithm SHA1 elm-format.zip
     - uses: actions/upload-artifact@v2
-      if: runner.os != 'Windows'
       with:
-        name: elm-format-${{ github.sha }}-${{ runner.os }}.tgz
-        path: elm-format.tgz
-    - uses: actions/upload-artifact@v2
-      if: runner.os == 'Windows'
-      with:
-        name: elm-format-${{ github.sha }}-${{ runner.os }}.zip
-        path: elm-format.zip
+        name: elm-format-${{ github.sha }}-${{ runner.os }}
+        path: dist/
