@@ -31,12 +31,12 @@ brew install keybase
 1. Pushing the tag should have triggered a build at <https://github.com/avh4/elm-format/actions?query=workflow%3A%22Build+release%22>
 1. Download the artifacts from the successful build (keep them as zip files)
 1. Run `./package/collect_files.sh` passing the paths to the downloaded zip files as arguments
-1. Check that the new files are reported to have valid signatures
+1. Check that the script reports that the new files have valid signatures
 
 
 ## Linux
 
-1. Make sure you have Docker installed and running
+1. Make sure you have [Docker](https://docs.docker.com/get-docker/) installed and running
 1. Run `./package/linux/build-in-docker.sh`
 
 
