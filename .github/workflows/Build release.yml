@@ -33,8 +33,12 @@ jobs:
       env:
         GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
     - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
+    - name: Workaround for https://github.com/actions/checkout/issues/290
+      run: git fetch --tags --force
+    - name: Check git describe
+      run: |
+        git describe --abbrev=8 --always --match '[0-9]*' --debug
+        env
     - uses: actions/setup-haskell@v1.1
       name: Setup Haskell
       id: setup-haskell
