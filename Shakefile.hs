@@ -49,7 +49,7 @@ main = do
     let zipFormat = zipFormatFor os
     let localBinDir = "bin"
 
-    StdoutTrim gitDescribe <- liftIO $ cmd "git" [ "describe", "--abbrev=8", "--always" ]
+    StdoutTrim gitDescribe <- liftIO $ cmd "git" [ "describe", "--abbrev=8", "--match", "[0-9]*", "--always" ]
     StdoutTrim gitSha <- liftIO $ cmd "git" [ "describe", "--always", "--match", "NOT A TAG", "--dirty" ]
 
     let elmFormat = "_build" </> "elm-format" <.> exe
