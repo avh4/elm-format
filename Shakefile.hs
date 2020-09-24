@@ -70,7 +70,12 @@ main = do
     phony "dist" $ need [ "dist/elm-format-" ++ gitDescribe ++ "-" ++ show os <.> zipFormat ]
 
     phony "dependencies" $ need
-        [ shellcheck
+        [ "_build/cabal-dependencies.ok"
+        , "_build/cabal-test-dependencies.ok"
+        , shellcheck
+        ]
+    phony "dist-dependencies" $ need
+        [ "_build/cabal-dependencies.ok"
         ]
 
     phony "clean" $ do
@@ -324,6 +329,29 @@ main = do
         let expected = dropDirectory1 $ out -<.> "json"
         need [ actual, expected ]
         cmd_ "diff" "--strip-trailing-cr" "-u" actual expected
+        writeFile' out ""
+
+
+    --
+    -- dependencies
+    --
+
+    "_build/cabal-dependencies.ok" %> \out -> do
+        need
+            [ "elm-format.cabal"
+            , "cabal.project"
+            , "cabal.project.freeze"
+            ]
+        cmd_ "cabal" [ "v2-build", "--only-dependencies" ]
+        writeFile' out ""
+
+    "_build/cabal-test-dependencies.ok" %> \out -> do
+        need
+            [ "elm-format.cabal"
+            , "cabal.project"
+            , "cabal.project.freeze"
+            ]
+        cmd_ "cabal" [ "v2-build", "--only-dependencies", "--enable-tests" ]
         writeFile' out ""
 
 

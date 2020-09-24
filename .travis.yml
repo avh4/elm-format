@@ -13,8 +13,6 @@ cache:
 
 install:
 - cabal v2-update
-- cabal v2-build --only-dependencies
-- cabal v2-build --only-dependencies --enable-tests
 - ./build.sh -- dependencies
 
 
