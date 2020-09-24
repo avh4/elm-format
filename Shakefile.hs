@@ -156,7 +156,7 @@ main = do
         sourceFiles <- getDirectoryFiles "" sourceFilesPattern
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "cabal" "v2-test" "-O0"
+        cmd_ "cabal" "v2-test" "-O0" "--test-show-details=streaming"
         writeFile' out ""
 
 
