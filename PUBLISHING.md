@@ -20,7 +20,7 @@ brew install keybase
 1. If this is a stable release, update references to the version in `README.md`.
 1. Update `ElmFormat.Version.experimental` to `Just <survey URL>` for experimental versions and `Nothing` otherwise.
 1. `(cd package/npm && npm version "<new version>")`
-1. Commit the changes "Bump version to <new version>"
+1. Commit the changes "Bump version to \<new version>"
 1. Create a signed tag for the new version. `git tag -s <new version> -m <new version>`
 1. Push the tag. `git push origin <new version>`
 1. Wait for CI to successfully build the tag.

@@ -5,8 +5,8 @@ New features:
   - newlines in type constructor application are now preserved
 
 Bug fixes:
-  - special characters in link text in doc comments are now handled more correctly
   - negative hex int literals are now handled correctly
+  - in doc comments, special characters in link text are now handled more correctly
   - in doc comments, non-Elm code blocks are no longer elm-formatted
   - in doc comments, inline code containing backticks is now escaped correctly
   - in doc comments, relative links with text matching the relative URL are now handled correctly
