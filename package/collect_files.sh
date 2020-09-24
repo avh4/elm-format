@@ -1,13 +1,19 @@
 #!/bin/bash
 
-set -ex
+set -euo pipefail
 
-VERSION="$(git describe --abbrev=8)"
+for i in "$@"; do
+    echo "Extracting $i"
+    unzip -d dist/ "$i"
+done
 
-pushd package/win/elm-format
-tar zxvf "elm-format-${VERSION}-win-i386.tgz"
-zip "elm-format-${VERSION}-win-i386.zip" elm-format.exe
-popd
 
-cp -v package/win/elm-format/elm-format-"${VERSION}"-win-i386.zip ./
-
+echo "Verifying signatures"
+for i in dist/*.{zip,tgz}; do
+    echo ">>> $i"
+    if [ -f "$i.sig" ]; then
+        gpgv --keyring "$(pwd)"/keys/github-actions.gpg "$i".sig "$i"
+    else
+        echo "WARNING: No signature"
+    fi
+done
