@@ -3,6 +3,39 @@ import Development.Shake.Command
 import Development.Shake.FilePath
 import Development.Shake.Util
 import Control.Monad (forM_)
+import qualified System.Directory
+import qualified System.Info
+
+data OS = Linux | Mac | Windows
+
+os :: OS
+os =
+    case (System.Info.os, System.Info.arch) of
+        ("linux", "x86_64") -> Linux
+        ("darwin", "x86_64") -> Mac
+        ("osx", "x86_64") -> Mac
+        ("mingw32", "x86_64") -> Windows
+        ("win32", "x86_64") -> Windows
+        other -> error ("unhandled operating system: " ++ show other)
+
+instance Show OS where
+    show Linux = "linux-x64"
+    show Mac = "mac-x64"
+    show Windows = "win-x64"
+
+zipFormatFor Linux = "tgz"
+zipFormatFor Mac = "tgz"
+zipFormatFor Windows = "zip"
+
+cabalInstallOs :: String
+cabalInstallOs =
+    System.Info.arch ++ "-" ++ os
+    where
+        os =
+            case System.Info.os of
+                "darwin" -> "osx"
+                "mingw32" -> "windows"
+                o -> o
 
 main :: IO ()
 main = do
@@ -12,31 +45,44 @@ main = do
       shakeColor = True,
       shakeVersion = shakefilesHash
     } $ do
-    StdoutTrim stackLocalInstallRoot <- liftIO $ cmd "stack path --local-install-root"
-    StdoutTrim stackLocalBin <- liftIO $ cmd "stack path --local-bin"
-    StdoutTrim gitDescribe <- liftIO $ cmd "git" [ "describe", "--abbrev=8", "--always" ]
+
+    let zipFormat = zipFormatFor os
+    let localBinDir = "bin"
+
+    StdoutTrim gitDescribe <- liftIO $ cmd "git" [ "describe", "--abbrev=8", "--match", "[0-9]*", "--always" ]
     StdoutTrim gitSha <- liftIO $ cmd "git" [ "describe", "--always", "--match", "NOT A TAG", "--dirty" ]
 
-    let elmFormat = stackLocalInstallRoot </> "bin/elm-format" <.> exe
-    let shellcheck = stackLocalBin </> "shellcheck" <.> exe
+    let elmFormat = "_build" </> "elm-format" <.> exe
+    let elmFormatDist = "dist-newstyle/build" </> cabalInstallOs </> "ghc-8.8.4/elm-format-0.8.4/x/elm-format/opt/build/elm-format/elm-format" <.> exe
+    let shellcheck = localBinDir </> "shellcheck" <.> exe
 
     want [ "test" ]
 
-    phony "test" $ do
-        need
-            [ "stack-test"
-            , "integration-tests"
-            , "_build/shellcheck.ok"
-            ]
+    phony "test" $ need
+        [ "unit-tests"
+        , "integration-tests"
+        , "_build/shellcheck.ok"
+        ]
 
     phony "build" $ need [ elmFormat ]
-    phony "stack-test" $ need [ "_build/stack-test.ok" ]
+    phony "unit-tests" $ need [ "_build/cabal-test.ok" ]
     phony "profile" $ need [ "_build/tests/test-files/prof.ok" ]
+    phony "dist" $ need [ "dist/elm-format-" ++ gitDescribe ++ "-" ++ show os <.> zipFormat ]
+
+    phony "dependencies" $ need
+        [ "_build/cabal-dependencies.ok"
+        , "_build/cabal-test-dependencies.ok"
+        , shellcheck
+        ]
+    phony "dist-dependencies" $ need
+        [ "_build/cabal-dependencies.ok"
+        ]
 
     phony "clean" $ do
-        cmd_ "stack clean"
+        removeFilesAfter "dist-newstyle" [ "//*" ]
         removeFilesAfter "_build" [ "//*" ]
-        removeFilesAfter ""
+        removeFilesAfter ".shake" [ "//*" ]
+        removeFilesAfter "."
             [ "_input.elm"
             , "_input2.elm"
             , "formatted.elm"
@@ -54,7 +100,9 @@ main = do
           , "parser/src//*.hs"
           , "markdown//*.hs"
           , "elm-format.cabal"
-          , "stack.yaml"
+          , "cabal.project"
+          , "cabal.project.freeze"
+          , "cabal.project.local"
           ]
 
     "generated/Build_elm_format.hs" %> \out -> do
@@ -67,25 +115,43 @@ main = do
             ]
 
     elmFormat %> \out -> do
-        sourceFiles <- getDirectoryFiles "" sourceFilesPattern
-        need sourceFiles
-        need generatedSourceFiles
-        cmd_ "stack build --test --no-run-tests"
+        copyFileChanged ("dist-newstyle/build" </> cabalInstallOs </> "ghc-8.8.4/elm-format-0.8.4/x/elm-format/noopt/build/elm-format/elm-format" <.> exe) out
 
-    "_build/bin/elm-format-prof" %> \out -> do
-        StdoutTrim profileInstallRoot <- liftIO $ cmd "stack path --profile --local-install-root"
+    ("dist-newstyle/build" </> cabalInstallOs </> "ghc-8.8.4/elm-format-0.8.4/x/elm-format/noopt/build/elm-format/elm-format" <.> exe) %> \out -> do
         sourceFiles <- getDirectoryFiles "" sourceFilesPattern
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "stack build --profile --executable-profiling --library-profiling"
-        copyFileChanged (profileInstallRoot </> "bin/elm-format" <.> exe) out
+        cmd_ "cabal" "v2-build" "-O0"
+
+    elmFormatDist %> \out -> do
+        sourceFiles <- getDirectoryFiles "" sourceFilesPattern
+        need sourceFiles
+        need generatedSourceFiles
+        cmd_ "cabal" "v2-build" "-O2"
+
+    ("_build/dist/" ++ show os ++ "/elm-format" <.> exe) %> \out -> do
+        need [ elmFormatDist ]
+        cmd_ "strip" "-o" out elmFormatDist
+
+    ("dist/elm-format-" ++ gitDescribe ++ "-" ++ show os <.> "tgz") %> \out -> do
+        let binDir = "_build/dist/" ++ show os
+        need [ binDir </> "elm-format" <.> exe ]
+        cmd_ "tar" "zcvf" out "-C" binDir ("elm-format" <.> exe)
+
+    ("dist/elm-format-" ++ gitDescribe ++ "-" ++ show os <.> "zip") %> \out -> do
+        let binDir = "_build/dist/" ++ show os
+        let bin = binDir </> "elm-format" <.> exe
+        need [ bin ]
+        absoluteBinPath <- liftIO $ System.Directory.makeAbsolute bin
+        liftIO $  removeFiles "." [ out ]
+        cmd_ "7z" "a" "-bb3" "-tzip" "-mfb=258" "-mpass=15" out absoluteBinPath
 
 
     --
     -- Haskell tests
     --
 
-    "_build/stack-test.ok" %> \out -> do
+    "_build/cabal-test.ok" %> \out -> do
         testFiles <- getDirectoryFiles ""
             [ "tests//*.hs"
             , "tests//*.stdout"
@@ -95,7 +161,7 @@ main = do
         sourceFiles <- getDirectoryFiles "" sourceFilesPattern
         need sourceFiles
         need generatedSourceFiles
-        cmd_ "stack test"
+        cmd_ "cabal" "v2-test" "-O0" "--test-show-details=streaming"
         writeFile' out ""
 
 
@@ -267,11 +333,35 @@ main = do
 
 
     --
+    -- dependencies
+    --
+
+    "_build/cabal-dependencies.ok" %> \out -> do
+        need
+            [ "elm-format.cabal"
+            , "cabal.project"
+            , "cabal.project.freeze"
+            ]
+        cmd_ "cabal" [ "v2-build", "--only-dependencies" ]
+        writeFile' out ""
+
+    "_build/cabal-test-dependencies.ok" %> \out -> do
+        need
+            [ "elm-format.cabal"
+            , "cabal.project"
+            , "cabal.project.freeze"
+            ]
+        cmd_ "cabal" [ "v2-build", "--only-dependencies", "--enable-tests" ]
+        writeFile' out ""
+
+
+    --
     -- shellcheck
     --
 
     shellcheck %> \out -> do
-        cmd_ "stack install ShellCheck"
+        -- install-method is currently needed because Windows doesn't support the default symlink method
+        cmd_ "cabal" "v2-install" "ShellCheck" "--installdir" localBinDir "--install-method=copy" "--overwrite-policy=always"
 
     "_build/shellcheck.ok" %> \out -> do
         scriptFiles <- getDirectoryFiles ""
@@ -282,6 +372,7 @@ main = do
             , "package/mac/build-package.sh"
             , "package/nix/build.sh"
             , "package/win/build-package.sh"
+            , "build.sh"
             ]
         let oks = ["_build" </> f <.> "shellcheck.ok" | f <- scriptFiles]
         need oks

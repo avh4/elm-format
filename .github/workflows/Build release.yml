@@ -1,0 +1,69 @@
+name: Build release
+
+on:
+  push:
+    tags: '*'
+    branches: 'release/*'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+        - windows-latest
+        - macOS-latest
+
+    name: release-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Configure environment
+      run: |
+        git config --global core.autocrlf false
+    - name: Configure GPG Key
+      run: |
+        echo "$GPG_SIGNING_KEY" | base64 --decode > private.key
+        gpg --import private.key
+        rm private.key
+      env:
+        GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+    - uses: actions/checkout@v2
+    - name: Workaround for https://github.com/actions/checkout/issues/290
+      run: git fetch --tags --force
+    - uses: actions/setup-haskell@v1.1
+      name: Setup Haskell
+      id: setup-haskell
+      with:
+        ghc-version: 8.8.4
+    - name: Workaround for https://github.com/actions/setup-haskell/issues/36
+      if: runner.os == 'macOS'
+      run: |
+        ghcup list
+        ghcup set ghc 8.8.4
+    - name: Verify Haskell version
+      run: |
+        cabal --version
+        ghc --version
+        [[ $(ghc --numeric-version) == 8.8.4 ]]
+    - uses: actions/cache@v2
+      name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+      with:
+        path: ${{ steps.setup-haskell.outputs.cabal-store }}
+        key: cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+    - run: cabal v2-update
+    - run: ./build.sh -- dist-dependencies
+    - run: ./build.sh -- dist
+    - name: Sign artifacts
+      run: |
+        for i in dist/*; do
+          gpg --verbose --local-user 1508E30E65C8C21F --output "$i".sig --detach-sig "$i"
+        done
+    - uses: actions/upload-artifact@v2
+      with:
+        name: elm-format-${{ github.sha }}-${{ runner.os }}
+        path: dist/

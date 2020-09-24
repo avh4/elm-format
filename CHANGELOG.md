@@ -1,14 +1,15 @@
-## main
+## 0.8.4
 
 New features:
   - newlines in tuple types are now preserved
   - newlines in type constructor application are now preserved
 
 Bug fixes:
-  - special characters in link text in doc comments are now handled more correctly
+  - negative hex int literals are now handled correctly
+  - in doc comments, special characters in link text are now handled more correctly
   - in doc comments, non-Elm code blocks are no longer elm-formatted
   - in doc comments, inline code containing backticks is now escaped correctly
-  - negative hex int literals are now handled correctly
+  - in doc comments, relative links with text matching the relative URL are now handled correctly
 
 Other changes:
   - dropped support for 32-bit Windows (Windows CI platforms are no longer supporting it)

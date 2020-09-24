@@ -1,6 +1,7 @@
 module ElmFormat.Render.Markdown where
 
 import Cheapskate.Types
+import qualified Data.Char as Char
 import Data.Foldable (fold, toList)
 import qualified Data.List as List
 import Data.Maybe (fromMaybe)
@@ -8,6 +9,7 @@ import qualified Data.Text as Text
 import Data.Text (Text)
 import Data.Text.Extra (longestSpanOf, LongestSpanResult(..))
 import Elm.Utils ((|>))
+import qualified Regex
 
 
 formatMarkdown :: (String -> Maybe String) -> Blocks -> String
@@ -187,8 +189,11 @@ formatMarkdownInline fixSpecialChars inline =
 
                 title' = Text.unpack title
                 url' = Text.unpack url
+
+                isValidAutolink =
+                    Regex.match absoluteUrlRegex
             in
-                if textRaw == url' && title' == ""
+                if textRaw == url' && title' == "" && isValidAutolink url'
                     then
                         if fixSpecialChars
                             then "<" ++ url' ++ ">"
@@ -236,3 +241,31 @@ formatMarkdownInline fixSpecialChars inline =
                 -- TODO: .   dot (when?)
                 -- TODO: !   exclamation mark (when?)
                 _ -> Text.singleton c
+
+
+{-| As defined at https://spec.commonmark.org/0.29/#autolinks -}
+absoluteUrlRegex :: Regex.Regex Char
+absoluteUrlRegex =
+    schemeInitial * Regex.plus schemeSubsequent * Regex.once ':' * Regex.star urlSafe
+    where
+        schemeInitial = Regex.satisfy isSchemeInitial
+        schemeSubsequent = Regex.satisfy isSchemeSubsequent
+        urlSafe = Regex.satisfy isUrlSafe
+
+        isSchemeInitial c =
+            isAsciiUpper c || isAsciiLower c
+
+        isSchemeSubsequent c =
+            isAsciiUpper c || isAsciiLower c || isAsciiDigit c || c == '+' || c == '.' || c == '-'
+
+        isUrlSafe c =
+            not (Char.isSpace c && c == '<' && c == '>')
+
+        isAsciiUpper c =
+            c >= 'A' && c <= 'Z'
+
+        isAsciiLower c =
+            c >= 'a' && c <= 'z'
+
+        isAsciiDigit c =
+            c >= '0' && c <= '9'
