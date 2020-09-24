@@ -25,6 +25,13 @@ jobs:
     - name: Configure environment
       run: |
         git config --global core.autocrlf false
+    - name: Configure GPG Key
+      run: |
+        echo "$GPG_SIGNING_KEY" | base64 --decode > private.key
+        gpg --import private.key
+        rm private.key
+      env:
+        GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
@@ -44,15 +51,18 @@ jobs:
         ghc --version
         [[ $(ghc --numeric-version) == 8.8.4 ]]
     - uses: actions/cache@v2
-      name: Cache cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+      name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
-        key: cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+        key: cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
     - run: cabal v2-update
     - run: cabal v2-build --only-dependencies
-    - run: cabal v2-build --only-dependencies  --enable-tests
-    - run: ./build.sh -- dependencies
     - run: ./build.sh -- dist
+    - name: Sign artifacts
+      run: |
+        for i in dist/*; do
+          gpg --verbose --local-user 1508E30E65C8C21F --output "$i".sig --detach-sig "$i"
+        done
     - uses: actions/upload-artifact@v2
       with:
         name: elm-format-${{ github.sha }}-${{ runner.os }}
