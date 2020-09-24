@@ -26,7 +26,7 @@ cabal2nix --no-check cabal://indents-0.3.3 > nixpkgs/pkgs/development/compilers/
 
 pushd nixpkgs
 rm -f result
-nix-build -A elmPackages.elm-format
+nix-build --option sandbox true -A elmPackages.elm-format
 git status
 result/bin/elm-format | head -n1
 popd
