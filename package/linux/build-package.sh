@@ -4,7 +4,7 @@ set -euxo pipefail
 
 ## Run tests
 ./build.sh -- clean
-./build.sh -- build
+./build.sh
 
 ## Build binaries
 ./build.sh -- dist

@@ -4,7 +4,7 @@ set -euo pipefail
 PKG_ENV_FILE=_build/shake-package-env
 
 mkdir -p _build
-if ! grep -qs '^package-id shk-' "$PKG_ENV_FILE"; then
+if ! grep -qs '^package-id \(shake\|shk\)-' "$PKG_ENV_FILE"; then
   echo "$0: installing shake"
   cabal v2-install --package-env "$PKG_ENV_FILE" --lib shake
 fi
