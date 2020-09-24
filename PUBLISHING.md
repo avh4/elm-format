@@ -8,10 +8,6 @@
 ```bash
 brew update
 brew install keybase
-brew install github-release
-brew install caskroom/cask/brew-cask
-brew cask install vagrant
-brew cask install virtualbox
 ```
 
 
