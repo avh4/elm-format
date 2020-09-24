@@ -42,8 +42,6 @@ jobs:
     #     path: dist-newstyle
     #     key: dist-v1-${{ runner.os }}
     - run: cabal v2-update
-    - run: cabal v2-build --only-dependencies
-    - run: cabal v2-build --only-dependencies  --enable-tests
     - run: ./build.sh -- dependencies
     - run: ./build.sh -- build
     - name: Tests
