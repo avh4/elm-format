@@ -35,6 +35,7 @@ Images ![][img],
 URL as link: <http://elm-lang.org>
 Link with special characters: <https://developer.mozilla.org/en-US/docs/Web/CSS/@media#Media_features>
 Link with special characters: [Media\_features](https://developer.mozilla.org/en-US/docs/Web/CSS/@media#Media_features)
+Link to [Module](Module) is not changed to autolink.
 
 [link]: http://example.com#link "with title"
 [reflink]: http://example.com#reflink

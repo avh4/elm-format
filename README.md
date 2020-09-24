@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
-[![latest version: 0.8.3](https://img.shields.io/badge/version-0.8.3-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.3)
+[![latest version: 0.8.4](https://img.shields.io/badge/version-0.8.4-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.4)
 
 # elm-format
 
@@ -29,7 +29,7 @@ elm-format --help  # See other command line options
 ```
 
 
-## Installation [![(latest version: 0.8.3)](https://img.shields.io/badge/version-0.8.3-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.3)
+## Installation [![(latest version: 0.8.4)](https://img.shields.io/badge/version-0.8.4-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.4)
 
 > `elm-format` is still in beta.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
 >
@@ -41,7 +41,7 @@ To install `elm-format`:
 npm install -g elm-format
 ```
 
-or download the version appropriate for your OS from the [release page](https://github.com/avh4/elm-format/releases/tag/0.8.3),
+or download the version appropriate for your OS from the [release page](https://github.com/avh4/elm-format/releases/tag/0.8.4),
 unzip it,
 and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.
 
@@ -114,12 +114,12 @@ Find your editor in the table below.  The recommended plugin for each editor is 
   </tr>
   <tr>
     <td rowspan=1>Visual Studio Code</td>
-    <td>:trophy: <a href="https://marketplace.visualstudio.com/items?itemName=sbrink.elm">Elm Language Support</a></td>
+    <td>:trophy: <a href="https://marketplace.visualstudio.com/items?itemName=Elmtooling.elm-ls-vscode">Elm Tooling</a></td>
     <td>:warning: <a href="#visual-studio-code-installation">3 steps</a></td>
     <td>:white_check_mark:</td>
     <td>:warning: requires configuration</td>
-    <td>❔ TBD</td>
-    <td>❔ TBD</td>
+    <td>:white_check_mark:</td>
+    <td>:x: uninformative error message</td>
   </tr>
   </tr>
   <tr>
@@ -135,9 +135,9 @@ Find your editor in the table below.  The recommended plugin for each editor is 
     <td rowspan=1>JetBrains (WebStorm, etc)</td>
     <td>:trophy: <a href="https://klazuka.github.io/intellij-elm/">intellij-elm</a></td>
     <td>:warning: <a href="#jetbrains-installation">4 steps</a></td>
-    <td>❔ TBD</td>
     <td>:white_check_mark:</td>
-    <td>❔ TBD</td>
+    <td>:warning: requires configuration</td>
+    <td>:warning: requires configuration</td>
     <td>❔ TBD</td>
   </tr>
   <tr>
@@ -211,13 +211,22 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 
     1. Install elm-mode ([official instructions](https://github.com/jcollard/elm-mode#installation)): Use `M-x list-packages` and choose `elm-mode`.
 
-1. Set `elm-format-on-save` to `t` to apply elm-format on the current buffer on every save. (The setting can be changed via `M-x customize-variable elm-format-on-save`. Click button `Toggle` to change the setting and button `State` to activate the setting.)
+1. Add the following to your `~/.emacs.d/init.el`:
+
+    ```lisp
+    (add-hook 'elm-mode-hook 'elm-format-on-save-mode)
+    ```
 
 
 ### elm-vim installation
 
+> If you are an advanced vim user and already have a preferred vim plugin installation method,
+> you may prefer to refer to the [official elm-vim installation instructions](https://github.com/ElmCast/elm-vim#install).
+> The instructions below are for those who need a step-by-step walkthrough of how to get the plugin set up.
+
 1. Install elm-format
 1. Install [vim-plug](https://github.com/junegunn/vim-plug) ([official instructions](https://github.com/junegunn/vim-plug#installation))
+   NOTE: if you are using neovim, you will need to refer to the official instructions.
 
     1. Download vim-plug:
 
@@ -226,15 +235,13 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
             https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
         ```
 
-   1. Make sure there is a section like this in your `~/.vimrc`:
+   1. Make sure `~/.vimrc` exists and has a section like this:
 
         ```vim
         call plug#begin('~/.vim/plugged')
         " ... any active plugins
         call plug#end()
         ```
-
-
 
 1. Install elm-vim ([official instructions](https://github.com/ElmCast/elm-vim#install))
 
@@ -250,10 +257,8 @@ The default behavior of `elm-format`-approved plugins is to format Elm files on 
 
 ### Visual Studio Code installation
 
-> Note: If you previously installed a VSCode extension called "elm-format", uninstall it (it is deprecated, and the "elm" extension now provides elm-format integration).
-
 1. Install elm-format
-1. Install the extension [Elm Language Support](https://marketplace.visualstudio.com/items?itemName=sbrink.elm) for VSCode, which includes syntax and error highlighting
+1. Install the extension [Elm Plugin for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=Elmtooling.elm-ls-vscode).
 1. Configure the extension to format on save:
 
     1. Find your `settings.json` file ([instructions](https://code.visualstudio.com/docs/getstarted/settings#_settings-file-locations)).
@@ -279,7 +284,9 @@ This is for WebStorm and other JetBrains IDEs like IntelliJ and PyCharm.
 1. Install elm-format
 1. Install the [intellij-elm plugin](https://klazuka.github.io/intellij-elm/)
 1. In IntelliJ, open Settings -> Languages & Frameworks -> Elm
-1. Specify the path to elm-format
+
+    1. Specify the path to elm-format (try the "Auto Discover" button first)
+    1. Check the "Run when file saved?" checkbox
 
 
 
@@ -289,26 +296,26 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 
 ### Building from source
 
+1. Install Haskell ghcup following the instructions for your operating system: https://www.haskell.org/ghcup/
+
 ```bash
 # check out the repo
-brew install haskell-stack
 git clone https://github.com/avh4/elm-format.git
 cd elm-format
 
 # initial setup
-stack setup
-stack install shake
+ghcup install ghc 8.8.4
+ghcup set ghc 8.8.4
 
 # build
-stack runhaskell Shakefile.hs -- build
+./build.sh -- build
 
 # run the built elm-format
-"$(stack path --local-install-root)"/bin/elm-format
+./_build/elm-format
 ```
 
 ### Running tests
 
 ```bash
-stack install shake
-stack runhaskell Shakefile.hs
+./build.sh
 ```
