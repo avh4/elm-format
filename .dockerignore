@@ -2,3 +2,12 @@
 !cabal.project
 !cabal.project.freeze
 !elm-format.cabal
+!src
+!src-cli
+!markdown
+markdown/*
+!markdown/Cheapskate
+!parser
+parser/*
+!parser/src
+!generated
