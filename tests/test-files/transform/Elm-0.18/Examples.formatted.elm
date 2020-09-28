@@ -2,13 +2,7 @@ module Main exposing (bar, multilineList, ratio)
 
 
 ratio =
-    graphHeight
-        / (if range == 0 then
-            0.1
-
-           else
-            toFloat range
-          )
+    graphHeight / (if range == 0 then 0.1 else toFloat range)
 
 
 

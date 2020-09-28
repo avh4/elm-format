@@ -59,7 +59,7 @@ data Expr'
     | AccessFunction LowercaseIdentifier
 
     | Lambda [(Comments, Pattern.Pattern)] Comments Expr Bool
-    | If IfClause [(Comments, IfClause)] (Comments, Expr)
+    | If IfClause [(Comments, IfClause)] (Comments, Expr) Multiline
     | Let [LetDeclaration] Comments Expr
     | Case (Commented Expr, Bool) [(Commented Pattern.Pattern, (Comments, Expr))]
 

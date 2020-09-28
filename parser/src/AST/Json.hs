@@ -373,7 +373,7 @@ instance ToJSON Expr where
                   , ("body", showJSON body)
                   ]
 
-          If (Commented _ cond' _, Commented _ thenBody' _) rest' (_, elseBody) ->
+          If (Commented _ cond' _, Commented _ thenBody' _) rest' (_, elseBody) _ ->
               let
                   ifThenElse :: Expr -> Expr -> [(Comments, IfClause)] -> JSValue
                   ifThenElse cond thenBody rest =

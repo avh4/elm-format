@@ -81,8 +81,8 @@ instance MapExpr Expr' where
         AccessFunction _ -> expr
         Lambda params pre body multi ->
             Lambda params pre (mapExpr f body) multi
-        If c1 elseIfs els ->
-            If (mapExpr f c1) (mapExpr f elseIfs) (mapExpr f els)
+        If c1 elseIfs els multiline ->
+            If (mapExpr f c1) (mapExpr f elseIfs) (mapExpr f els) multiline
         Let decls pre body ->
             Let (mapExpr f decls) pre body
         Case cond branches ->

@@ -273,6 +273,16 @@ lambdaWithMultilinePattern =
 ifStatement =
     let
         a =
+            if True then 1 else 2
+
+        b =
+            if True then
+                1
+
+            else
+                2
+
+        c =
             if True then
                 1
 
@@ -282,44 +292,100 @@ ifStatement =
             else
                 3
 
-        b =
-            if {- C -} True {- D -} then
-                {- E -}
-                1
-                {- F -}
+        d =
+            if {- A -} True {- B -} then {- C -} 1 {- D -} else {- E -} 2
 
-            else {- G -} if {- H -} False {- I -} then
-                {- J -}
+        e =
+            if {- A -} {- B -} True {- C -} {- D -} then {- E -} {- F -} 1 {- G -} {- H -} else {- I -} {- J -} 2
+
+        f =
+            if {- A -} True {- B -} then
+                {- C -}
+                1
+                {- D -}
+
+            else {- E -} if {- F -} False {- G -} then
+                {- H -}
                 2
-                {- K -}
+                {- I -}
 
             else
-                {- L -}
+                {- J -}
                 3
 
-        c =
+        g =
+            if {- A -} {- B -} True {- C -} {- D -} then
+                {- E -} {- F -}
+                1
+                {- G -} {- H -}
+
+            else {- I -} {- J -} if {- K -} {- L -} False {- M -} {- N -} then
+                {- O -} {- P -}
+                2
+                {- Q -} {- R -}
+
+            else
+                {- S -} {- T -}
+                3
+
+        h =
             if
-                --C
+                --A
                 True
+                --B
+            then
+                --C
+                1
+                --D
+
+            else
+            --E
+            if
+                --F
+                False
+                --G
+            then
+                --H
+                2
+                --I
+
+            else
+                --J
+                3
+
+        i =
+            if
+                --A
+                --B
+                True
+                --C
                 --D
             then
                 --E
-                1
                 --F
-
-            else
-            --G
-            if
+                1
+                --G
                 --H
-                False
-                --I
-            then
-                --J
-                2
-                --K
 
             else
+            --I
+            --J
+            if
+                --K
                 --L
+                False
+                --M
+                --N
+            then
+                --O
+                --P
+                2
+                --Q
+                --R
+
+            else
+                --S
+                --T
                 3
     in
     {}

@@ -1407,57 +1407,9 @@ formatExpression' elmVersion importInfo context aexpr =
                 (fmap (formatPreCommentedExpression elmVersion importInfo SpaceSeparated) args)
                 |> expressionParens SpaceSeparated context
 
-        AST.Expression.If if' elseifs (elsComments, els) ->
-            let
-                opening key cond =
-                    case (key, cond) of
-                        (SingleLine key', SingleLine cond') ->
-                            line $ row
-                                [ key'
-                                , space
-                                , cond'
-                                , space
-                                , keyword "then"
-                                ]
-                        _ ->
-                            stack1
-                                [ key
-                                , cond |> indent
-                                , line $ keyword "then"
-                                ]
-
-                formatIf (cond, body) =
-                    stack1
-                        [ opening (line $ keyword "if") $ formatCommentedExpression elmVersion importInfo SyntaxSeparated cond
-                        , indent $ formatCommented_ True (formatExpression elmVersion importInfo SyntaxSeparated) body
-                        ]
-
-                formatElseIf (ifComments, (cond, body)) =
-                  let
-                    key =
-                      case (formatHeadCommented id (ifComments, line $ keyword "if")) of
-                        SingleLine key' ->
-                          line $ row [ keyword "else", space, key' ]
-                        key' ->
-                          stack1
-                            [ line $ keyword "else"
-                            , key'
-                            ]
-                  in
-                    stack1
-                      [ blankLine
-                      , opening key $ formatCommentedExpression elmVersion importInfo SyntaxSeparated cond
-                      , indent $ formatCommented_ True (formatExpression elmVersion importInfo SyntaxSeparated) body
-                      ]
-            in
-                formatIf if'
-                    |> andThen (map formatElseIf elseifs)
-                    |> andThen
-                        [ blankLine
-                        , line $ keyword "else"
-                        , indent $ formatCommented_ True (formatExpression elmVersion importInfo SyntaxSeparated) (AST.Commented elsComments els [])
-                        ]
-                    |> expressionParens AmbiguousEnd context
+        AST.Expression.If if' elseifs els multiline ->
+            formatIfExpression elmVersion importInfo if' elseifs els multiline
+                |> expressionParens AmbiguousEnd context
 
         AST.Expression.Let defs bodyComments expr ->
             let
@@ -1593,6 +1545,112 @@ formatExpression' elmVersion importInfo context aexpr =
             , literal $ src
             , punc "|]"
             ]
+
+
+formatIfExpression ::
+    ElmVersion
+    -> ImportInfo
+    -> AST.Expression.IfClause
+    -> [(AST.Comments, AST.Expression.IfClause)]
+    -> (AST.Comments, AST.Expression.Expr)
+    -> AST.Multiline
+    -> Box
+formatIfExpression elmVersion importInfo if' elseifs (elsComments, els) multiline =
+    let
+        (cond, (AST.Commented preThen thenExpr postThen)) =
+            if'
+
+        cond' =
+            formatIfOpening (line $ keyword "if") $
+                formatCommentedExpression elmVersion importInfo SyntaxSeparated cond
+
+        then' =
+            concat $
+                [ Maybe.maybeToList $ formatComments preThen
+                , [ formatExpression elmVersion importInfo SyntaxSeparated thenExpr ]
+                , Maybe.maybeToList $ formatComments postThen
+                ]
+
+        else' =
+            (Maybe.maybeToList $ formatComments elsComments)
+                ++ [ formatExpression elmVersion importInfo SyntaxSeparated els ]
+    in
+    case
+        ( multiline
+        , isLine cond'
+        , allSingles then'
+        , fmap (formatElseIf elmVersion importInfo) elseifs
+        , allSingles else'
+        )
+    of
+        (AST.JoinAll, Right singleCond, Right singleThens, [], Right singleElses)  ->
+            line $ row $ concat
+                [ [singleCond, space]
+                , List.intersperse space singleThens
+                , [ space, keyword "else", space ]
+                , List.intersperse space singleElses
+                ]
+
+        (_, ifCond, thenBody, elseIfs', elseBody) ->
+            stack1
+                [ boxOrLineToBox ifCond
+                , indent $ boxesOrLinesToBox True thenBody
+                ]
+                |> andThen elseIfs'
+                |> andThen
+                    [ blankLine
+                    , line $ keyword "else"
+                    , indent $ boxesOrLinesToBox True elseBody
+                    ]
+
+
+formatIfOpening :: Box -> Box -> Box
+formatIfOpening key cond =
+    case (key, cond) of
+        (SingleLine key', SingleLine cond') ->
+            line $ row [ key', space, cond', space, keyword "then" ]
+
+        _ ->
+            stack1
+                [ key
+                , cond |> indent
+                , line $ keyword "then"
+                ]
+
+
+formatElseIf :: ElmVersion -> ImportInfo -> (AST.Comments, AST.Expression.IfClause) -> Box
+formatElseIf elmVersion importInfo (ifComments, (cond', body')) =
+    let
+        key =
+            case (formatHeadCommented id (ifComments, line $ keyword "if")) of
+                SingleLine key' ->
+                    line $ row [ keyword "else", space, key' ]
+                key' ->
+                    stack1
+                        [ line $ keyword "else"
+                        , key'
+                        ]
+    in
+    stack1
+        [ blankLine
+        , formatIfOpening key $ formatCommentedExpression elmVersion importInfo SyntaxSeparated cond'
+        , indent $ formatCommented_ True (formatExpression elmVersion importInfo SyntaxSeparated) body'
+        ]
+
+
+boxOrLineToBox :: Either Box Line -> Box
+boxOrLineToBox boxOrLine =
+    case boxOrLine of
+        Right singleLine -> line singleLine
+        Left box -> box
+
+
+boxesOrLinesToBox :: Bool -> Either [Box] [Line] -> Box
+boxesOrLinesToBox forceMultiline boxesOrLines =
+    ElmStructure.forceableSpaceSepOrStack1 forceMultiline $
+        case boxesOrLines of
+            Right singleLines -> fmap line singleLines
+            Left boxes -> boxes
 
 
 formatCommentedExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.Commented AST.Expression.Expr -> Box
