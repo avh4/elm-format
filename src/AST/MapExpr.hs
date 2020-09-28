@@ -32,12 +32,12 @@ instance MapExpr a => MapExpr [a] where
     mapExpr f list = fmap (mapExpr f) list
 
 
-instance MapExpr a => MapExpr (a, Bool) where
-    mapExpr f (a, b) = (mapExpr f a, b)
+instance MapExpr a => MapExpr (a, Multiline) where
+    mapExpr f (a, multi) = (mapExpr f a, multi)
 
 
-instance MapExpr a => MapExpr (Commented Pattern, a) where
-    mapExpr f (x, a) = (x, mapExpr f a)
+instance MapExpr a => MapExpr (Commented Pattern, a, Multiline) where
+    mapExpr f (x, a, multi) = (x, mapExpr f a, multi)
 
 
 instance MapExpr a => MapExpr (Comments, Ref, Comments, a) where
@@ -85,7 +85,7 @@ instance MapExpr Expr' where
             If (mapExpr f c1) (mapExpr f elseIfs) (mapExpr f els)
         Let decls pre body ->
             Let (mapExpr f decls) pre body
-        Case cond branches ->
+        Case cond branches  ->
             Case (mapExpr f cond) (mapExpr f branches)
         GLShader _ -> expr
 

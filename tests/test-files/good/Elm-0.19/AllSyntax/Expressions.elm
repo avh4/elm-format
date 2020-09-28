@@ -340,19 +340,34 @@ caseStatement =
     let
         a =
             case Just 1 of
+                Just x -> x
+                _ -> 2
+
+        b =
+            case {- A -} Just 1 {- B -} of
+                Just x {- C -} -> {- D -} x
+                _ {- E -} -> {- F -} 2
+
+        c =
+            case {- A -} {- B -} Just 1 {- C -} {- D -} of
+                Just x {- E -} {- F -} -> {- G -} {- H -} x
+                _ {- I -} {- J -} -> {- K -} {- L -} 2
+
+        d =
+            case Just 1 of
                 Just x ->
                     x
 
                 _ ->
                     2
 
-        b =
-            case {- M -} Just 1 {- N -} of
-                {- O -}
+        e =
+            case {- A -} Just 1 {- B -} of
+                {- C -}
                 Just x
-                {- P -}
+                {- D -}
                 ->
-                    {- Q -}
+                    {- E -}
                     x
 
                 {- R -}
@@ -362,24 +377,68 @@ caseStatement =
                     {- T -}
                     2
 
-        c =
+        f =
             case
-                --M
+                --A
                 Just 1
-                --N
+                --B
             of
-                --O
+                --C
                 Just x
-                --P
+                --D
                 ->
-                    --Q
+                    --E
                     x
 
-                --R
+                --F
                 _
-                --S
+                --G
                 ->
-                    --T
+                    --H
+                    2
+
+        g =
+            case {- A -} {- B -} Just 1 {- C -} {- D -} of
+                {- E -} {- F -}
+                Just x
+                {- G -} {- H -}
+                ->
+                    {- I -} {- J -}
+                    x
+
+                {- K -} {- L -}
+                _
+                {- M -} {- N -}
+                ->
+                    {- O -} {- P -}
+                    2
+
+        h =
+            case
+                --A
+                --B
+                Just 1
+                --C
+                --D
+            of
+                --E
+                --F
+                Just x
+                --G
+                --H
+                ->
+                    --I
+                    --J
+                    x
+
+                --K
+                --L
+                _
+                --M
+                --N
+                ->
+                    --O
+                    --P
                     2
     in
     {}

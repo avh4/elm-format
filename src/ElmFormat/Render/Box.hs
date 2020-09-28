@@ -1284,8 +1284,8 @@ formatPair formatA delim formatB (AST.Pair a b (AST.ForceMultiline forceMultilin
         (formatHeadCommented formatB b)
 
 
-negativeCasePatternWorkaround :: AST.Commented AST.Pattern.Pattern -> Box -> Box
-negativeCasePatternWorkaround (AST.Commented _ (RA.A _ pattern) _) =
+negativeCasePatternWorkaround :: AST.Pattern.Pattern -> Box -> Box
+negativeCasePatternWorkaround (RA.A _ pattern) =
     case pattern of
         AST.Pattern.Literal (AST.IntNum i _) | i < 0 -> parens
         AST.Pattern.Literal (AST.FloatNum f _) | f < 0 -> parens
@@ -1493,65 +1493,9 @@ formatExpression' elmVersion importInfo context aexpr =
                         ]
                     |> expressionParens AmbiguousEnd context -- TODO: not tested
 
-        AST.Expression.Case (subject,multiline) clauses ->
-            let
-                opening =
-                  case
-                    ( multiline
-                    , formatCommentedExpression elmVersion importInfo SyntaxSeparated subject
-                    )
-                  of
-                      (False, SingleLine subject') ->
-                          line $ row
-                              [ keyword "case"
-                              , space
-                              , subject'
-                              , space
-                              , keyword "of"
-                              ]
-                      (_, subject') ->
-                          stack1
-                              [ line $ keyword "case"
-                              , indent subject'
-                              , line $ keyword "of"
-                              ]
-
-                clause (pat, expr) =
-                    case
-                      ( pat
-                      , (formatPattern elmVersion False $ (\(AST.Commented _ x _) -> x) pat)
-                          |> negativeCasePatternWorkaround pat
-                      , formatCommentedStack (formatPattern elmVersion False) pat
-                          |> negativeCasePatternWorkaround pat
-                      , formatHeadCommentedStack (formatExpression elmVersion importInfo SyntaxSeparated) expr
-                      )
-                    of
-                        (_, _, SingleLine pat', body') ->
-                            stack1
-                                [ line $ row [ pat', space, keyword "->"]
-                                , indent body'
-                                ]
-                        (AST.Commented pre _ [], SingleLine pat', _, body') ->
-                            stack1 $
-                                (map formatComment pre)
-                                ++ [ line $ row [ pat', space, keyword "->"]
-                                   , indent body'
-                                   ]
-                        (_, _, pat', body') ->
-                            stack1 $
-                              [ pat'
-                              , line $ keyword "->"
-                              , indent body'
-                              ]
-            in
-                opening
-                    |> andThen
-                        (clauses
-                            |> map clause
-                            |> List.intersperse blankLine
-                            |> map indent
-                        )
-                    |> expressionParens AmbiguousEnd context -- TODO: not tested
+        AST.Expression.Case subject branches ->
+            formatCaseExpression elmVersion importInfo subject branches
+                |> expressionParens AmbiguousEnd context -- TODO: not tested
 
         AST.Expression.Tuple exprs multiline ->
             ElmStructure.group True "(" "," ")" multiline $ map (formatCommentedExpression elmVersion importInfo SyntaxSeparated) exprs
@@ -1593,6 +1537,92 @@ formatExpression' elmVersion importInfo context aexpr =
             , literal $ src
             , punc "|]"
             ]
+
+
+formatCaseExpression ::
+    ElmVersion
+    -> ImportInfo
+    -> (AST.Commented AST.Expression.Expr, AST.Multiline)
+    -> [(AST.Commented AST.Pattern.Pattern, (AST.Comments, AST.Expression.Expr), AST.Multiline)]
+    -> Box
+formatCaseExpression elmVersion importInfo subject branches =
+    let
+        branchBoxes multilineAcc (AST.Commented prePat pat postPat, (preBody, body), multilineBranch) =
+            let
+                (prePat', pat', postPat') =
+                    ( Maybe.maybeToList $ formatComments prePat
+                    , formatPattern elmVersion False pat |> negativeCasePatternWorkaround pat
+                    , Maybe.maybeToList $ formatComments postPat
+                    )
+                (preBody', body') =
+                    ( Maybe.maybeToList $ formatComments preBody
+                    , formatExpression elmVersion importInfo SyntaxSeparated body
+                    )
+                (singlesPat, singlesBody) =
+                    ( allSingles $ concat [ prePat', [pat'], postPat']
+                    , allSingles $ concat [ preBody', [body']]
+                    )
+            in
+            case (multilineBranch, singlesPat, singlesBody) of
+                (AST.JoinAll, Right patLines, Right bodyLines) ->
+                    (multilineAcc, Right (patLines, bodyLines))
+                _ ->
+                    (AST.SplitAll, Left (prePat', pat', postPat', preBody', body'))
+
+        (multilineBranches, branches') =
+            List.mapAccumR branchBoxes AST.JoinAll branches
+
+        branch multiline' boxes =
+            case (multiline', boxes) of
+                (AST.JoinAll, Right (patLines, bodyLines)) ->
+                    line $ row $ List.intersperse space $ patLines ++ [keyword "->"] ++ bodyLines
+                (AST.SplitAll, Right (patLines, bodyLines))  ->
+                    stack1
+                        [ line $ row $ List.intersperse space $ patLines ++ [keyword "->"]
+                        , indent $ line $ row $ bodyLines
+                        ]
+                (_, Left ([], SingleLine pat, [], preBody, body))  ->
+                    stack1
+                        [ line $ row [pat, space, keyword "->"]
+                        , indent $ stack1 $ preBody ++ [body]
+                        ]
+                (_, Left (prePat, SingleLine pat', [], preBody, body))  ->
+                    stack1
+                        [ stack1 prePat
+                        , line $ row [pat', space, keyword "->"]
+                        , indent $ stack1 $ preBody ++ [body]
+                        ]
+                (_, Left (prePat, pat, postPat, preBody, body))  ->
+                    stack1
+                      [ stack1 $ prePat ++ [pat] ++ postPat
+                      , line $ keyword "->"
+                      , indent $ stack1 $ preBody ++ [body]
+                      ]
+    in
+    formatCaseExpressionOpening elmVersion importInfo subject
+        |> andThen
+            (branches'
+                |> fmap (branch multilineBranches)
+                |> (if AST.isMultiline multilineBranches then List.intersperse blankLine else id)
+                |> fmap indent
+            )
+
+formatCaseExpressionOpening :: ElmVersion -> ImportInfo -> (AST.Commented AST.Expression.Expr, AST.Multiline) -> Box
+formatCaseExpressionOpening elmVersion importInfo (subject, multiline) =
+    case
+      ( multiline
+      , formatCommentedExpression elmVersion importInfo SyntaxSeparated subject
+      )
+    of
+        (AST.JoinAll, SingleLine subject') ->
+            line $ row [ keyword "case" , space , subject' , space , keyword "of" ]
+
+        (_, subject') ->
+            stack1
+                [ line $ keyword "case"
+                , indent subject'
+                , line $ keyword "of"
+                ]
 
 
 formatCommentedExpression :: ElmVersion -> ImportInfo -> ExpressionContext -> AST.Commented AST.Expression.Expr -> Box
