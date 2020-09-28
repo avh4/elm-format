@@ -1,3 +1,9 @@
+## main
+
+Other changeS:
+  - Linux binaries installed with `npm` are now statically linked (should now work on alpine linux and other systems without glibc-2.27)
+
+
 ## 0.8.4
 
 New features:

@@ -1,30 +1,57 @@
-FROM buildpack-deps:latest
+FROM alpine:latest as build
 
 ENV GHC_VERSION 8.8.4
 
-ENV DEBIAN_FRONTEND noninteractive
 ENV LANG C.UTF-8
 
-RUN apt-get update && apt-get install -y \
-    build-essential curl libffi-dev libffi6 libgmp-dev libgmp10 libncurses-dev libncurses5 libtinfo5 \
-    jq \
-    && rm -rf /var/lib/apt/lists/*
-
+# Install ghc and cabal-isntall
+RUN apk add --no-cache curl
 RUN curl https://downloads.haskell.org/~ghcup/x86_64-linux-ghcup > /usr/local/bin/ghcup && \
     chmod +x /usr/local/bin/ghcup
 RUN ghcup install cabal recommended
+RUN apk add --no-cache \
+        autoconf \
+        gcc \
+        gmp \
+        gmp-dev \
+        libffi \
+        libffi-dev \
+        llvm10 \
+        make \
+        musl-dev \
+        ncurses-dev \
+        ncurses-static \
+        wget \
+        zlib-dev \
+        zlib-static
 RUN ghcup install ghc $GHC_VERSION && \
     ghcup set ghc $GHC_VERSION
 ENV PATH $PATH:/root/.ghcup/bin
 
+
+WORKDIR /elm-format
 
 # Install elm-format dependencies
 COPY cabal.project ./
 COPY cabal.project.freeze ./
 COPY elm-format.cabal ./
 RUN cabal v2-update
-RUN cabal v2-install --lib shake
+# RUN cabal v2-install --lib shake
+# RUN cabal v2-build --only-dependencies
+# RUN cabal v2-build --only-dependencies --enable-tests
+# RUN cabal v2-install ShellCheck
+RUN cabal v2-build --ghc-option=-optl=-static --ghc-option=-split-sections -O2 --only-dependencies
 
-RUN cabal v2-build --only-dependencies
-RUN cabal v2-build --only-dependencies --enable-tests
-RUN cabal v2-install ShellCheck
+# Build elm-format
+COPY src-cli src-cli
+COPY markdown markdown
+COPY parser parser
+COPY src src
+COPY generated generated
+RUN cabal v2-build --ghc-option=-optl=-static --ghc-option=-split-sections -O2
+RUN cp dist-newstyle/build/x86_64-linux/ghc-*/elm-format-*/x/elm-format/opt/build/elm-format/elm-format ./
+RUN strip -s ./elm-format
+
+
+FROM scratch as artifact
+COPY --from=build /elm-format/elm-format /elm-format
