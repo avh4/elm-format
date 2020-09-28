@@ -1,11 +1,13 @@
 module ElmFormat.World where
 
+import Control.Exception
 import Data.Text (Text)
 import System.Console.ANSI (SGR, hSetSGR)
 import System.IO (hFlush, hPutStr, hPutStrLn, stdout, stderr)
 import qualified Data.ByteString as ByteString
 import qualified Data.ByteString.Char8 as Char8
 import qualified Data.ByteString.Lazy as Lazy
+import qualified Data.Either as Either
 import qualified Data.Text.Encoding as Text
 import qualified System.Directory as Dir
 import qualified System.Environment
@@ -21,6 +23,7 @@ class Monad m => World m where
     doesFileExist :: FilePath -> m Bool
     doesDirectoryExist :: FilePath -> m Bool
     listDirectory :: FilePath -> m [FilePath]
+    makeAbsolute :: FilePath -> m FilePath
 
     getProgName :: m String
 
@@ -44,9 +47,16 @@ instance World IO where
     writeFile = Prelude.writeFile
     writeUtf8File path content = ByteString.writeFile path $ Text.encodeUtf8 content
 
-    doesFileExist = Dir.doesFileExist
-    doesDirectoryExist = Dir.doesDirectoryExist
+    doesFileExist path = do
+        exists <- try (Dir.doesFileExist path) :: IO (Either IOException Bool)
+        return $ Either.fromRight False exists
+
+    doesDirectoryExist path = do
+        exists <- try (Dir.doesDirectoryExist path) :: IO (Either IOException Bool)
+        return $ Either.fromRight False exists
+
     listDirectory = Dir.listDirectory
+    makeAbsolute = Dir.makeAbsolute
 
     getProgName = System.Environment.getProgName
 

@@ -14,6 +14,7 @@ import qualified Data.Map.Strict as Dict
 import qualified Data.Text.Lazy as Text
 import qualified Data.Text.Lazy.Encoding as Text
 import qualified Data.Text as StrictText
+import qualified System.FilePath as FilePath
 
 
 data TestWorldState =
@@ -43,20 +44,28 @@ fullStderr state =
         |> reverse
         |> concat
 
-
+{-| Files paths are normalized to allow:
+   - "./elm-package.json" and "package.json" for example to point to the same file
+        (this is required for Elm version autodetection to work correctly in tests)
+   - POSIX paths like "src/test.elm" to also work on Windows in tests
+-}
 instance World (State.State TestWorldState) where
     doesFileExist path =
         do
             state <- State.get
-            return $ Dict.member path (filesystem state)
+            return $ Dict.member (FilePath.normalise path) (filesystem state)
 
     doesDirectoryExist _path =
         return False
 
+    makeAbsolute path =
+        -- wrong but enough for tests
+        return path
+
     readFile path =
         do
             state <- State.get
-            case Dict.lookup path (filesystem state) of
+            case Dict.lookup (FilePath.normalise path) (filesystem state) of
                 Nothing ->
                     error $ path ++ ": does not exist"
 
@@ -71,7 +80,7 @@ instance World (State.State TestWorldState) where
     writeFile path content =
         do
             state <- State.get
-            State.put $ state { filesystem = Dict.insert path content (filesystem state) }
+            State.put $ state { filesystem = Dict.insert (FilePath.normalise path) content (filesystem state) }
 
     writeUtf8File path content =
         writeFile path (StrictText.unpack content)
@@ -152,7 +161,7 @@ assertOutput :: [(String, String)] -> TestWorldState -> Assertion
 assertOutput expectedFiles context =
     assertBool
         ("Expected filesystem to contain: " ++ show expectedFiles ++ "\nActual: " ++ show (filesystem context))
-        (all (\(k,v) -> Dict.lookup k (filesystem context) == Just v) expectedFiles)
+        (all (\(k,v) -> Dict.lookup (FilePath.normalise k) (filesystem context) == Just v) expectedFiles)
 
 
 goldenStdout :: String -> FilePath -> TestWorldState -> TestTree
@@ -187,12 +196,12 @@ init = testWorld []
 
 uploadFile :: String -> String -> TestWorld -> TestWorld
 uploadFile name content world =
-    world { filesystem = Dict.insert name content (filesystem world) }
+    world { filesystem = Dict.insert (FilePath.normalise name) content (filesystem world) }
 
 
 downloadFile :: String -> TestWorld -> Maybe String
 downloadFile name world =
-    Dict.lookup name (filesystem world)
+    Dict.lookup (FilePath.normalise name) (filesystem world)
 
 
 installProgram :: String -> ([String] -> State.State TestWorld ()) -> TestWorld -> TestWorld
