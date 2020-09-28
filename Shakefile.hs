@@ -130,8 +130,25 @@ main = do
         cmd_ "cabal" "v2-build" "-O2"
 
     ("_build/dist/" ++ show os ++ "/elm-format" <.> exe) %> \out -> do
-        need [ elmFormatDist ]
-        cmd_ "strip" "-o" out elmFormatDist
+        let target = takeDirectory1 $ dropDirectory1 $ dropDirectory1 out
+        case target of
+            "linux-x64" -> do
+                let built = "_build/docker/elm-format"
+                need [ built ]
+                copyFileChanged built out
+            _ -> do
+                need [ elmFormatDist ]
+                cmd_ "strip" "-o" out elmFormatDist
+
+    "_build/docker/elm-format" %> \out -> do
+        need
+            [ "Dockerfile"
+            , "package/linux/build-in-docker.sh"
+            ]
+        sourceFiles <- getDirectoryFiles "" sourceFilesPattern
+        need sourceFiles
+        need generatedSourceFiles
+        cmd_ "package/linux/build-in-docker.sh"
 
     ("dist/elm-format-" ++ gitDescribe ++ "-" ++ show os <.> "tgz") %> \out -> do
         let binDir = "_build/dist/" ++ show os
