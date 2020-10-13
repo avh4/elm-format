@@ -1,3 +1,5 @@
+{-# LANGUAGE TupleSections #-}
+
 module Parse.Module (moduleDecl, elmModule, topLevel) where
 
 import qualified Control.Applicative
@@ -40,21 +42,21 @@ elmModule elmVersion =
           h
           docs
           (preDocsComments ++ postDocsComments ++ preImportComments, imports')
-          ((map AST.Declaration.BodyComment postImportComments) ++ decls ++ (map AST.Declaration.BodyComment trailingComments))
+          (map AST.Declaration.BodyComment postImportComments ++ decls ++ map AST.Declaration.BodyComment trailingComments)
 
 
 topLevel :: IParser a -> IParser [AST.Declaration.TopLevelStructure a]
 topLevel entry =
-  (++) <$> option [] (((\x -> [x]) <$> Decl.topLevelStructure entry))
+  (++) <$> option [] ((: []) <$> Decl.topLevelStructure entry)
       <*> (concat <$> many (freshDef entry))
 
 
 freshDef :: IParser a -> IParser [AST.Declaration.TopLevelStructure a]
 freshDef entry =
-    commitIf (freshLine >> (letter <|> char '_')) $
-      do  comments <- freshLine
-          decl <- Decl.topLevelStructure entry
-          return $ (map AST.Declaration.BodyComment comments) ++ [decl]
+    commitIf (freshLine >> (letter <|> char '_')) $ do
+      comments <- freshLine
+      decl <- Decl.topLevelStructure entry
+      pure $ map AST.Declaration.BodyComment comments ++ [decl]
 
 
 moduleDecl :: ElmVersion -> IParser (Maybe Module.Header)
@@ -148,12 +150,12 @@ imports elmVersion =
 
 import' :: ElmVersion -> IParser Module.UserImport
 import' elmVersion =
-  expecting "an import" $
-  do  try (reserved elmVersion "import")
-      preName <- whitespace
-      names <- dotSep1 $ capVar elmVersion
-      method' <- method names
-      return ((,) preName names, method')
+  expecting "an import" $ do
+    try (reserved elmVersion "import")
+    preName <- whitespace
+    names <- dotSep1 $ capVar elmVersion
+    method' <- method names
+    pure ((preName, names), method')
   where
     method :: [UppercaseIdentifier] -> IParser Module.ImportMethod
     method originalName =
@@ -162,31 +164,28 @@ import' elmVersion =
         <*> option ([], ([], Var.ClosedListing)) exposing
 
     as' :: [UppercaseIdentifier] -> IParser (Comments, PreCommented UppercaseIdentifier)
-    as' moduleName =
-      do  preAs <- try (whitespace <* reserved elmVersion "as")
-          postAs <- whitespace
-          (,) preAs <$> (,) postAs <$> capVar elmVersion <?> ("an alias for module `" ++ show moduleName ++ "`") -- TODO: do something correct instead of show
+    as' moduleName = do
+      preAs <- try (whitespace <* reserved elmVersion "as")
+      postAs <- whitespace
+      (,) preAs . (,) postAs <$> capVar elmVersion <?> ("an alias for module `" ++ show moduleName ++ "`") -- TODO: do something correct instead of show
 
     exposing :: IParser (Comments, PreCommented (Var.Listing Module.DetailedListing))
-    exposing =
-      do  preExposing <- try (whitespace <* reserved elmVersion "exposing")
-      -- TODO: I'll come back
-          postExposing <- whitespace
-          imports <-
-            choice
-              [ listing $ detailedListing elmVersion
-              , listingWithoutParens elmVersion
-              ]
-          return (preExposing, (postExposing, imports))
-
+    exposing = do
+      preExposing <- try (whitespace <* reserved elmVersion "exposing") <|> whitespace -- TODO: fix this for rest of the cases 😅
+      postExposing <- whitespace
+      imports <- 
+        choice
+          [ listing $ detailedListing elmVersion
+          , listingWithoutParens elmVersion
+          ]
+      pure (preExposing, (postExposing, imports))
 
 listing :: IParser (Comments -> Comments -> a) -> IParser (Var.Listing a)
 listing explicit =
   let
     subparser = choice
-        [ (\_ pre post _ -> (Var.OpenListing (Commented pre () post))) <$> string ".."
-        , (\x pre post sawNewline -> (Var.ExplicitListing (x pre post) sawNewline)) <$>
-            explicit
+        [ (\_ pre post _ -> Var.OpenListing (Commented pre () post)) <$> string ".."
+        , (\x pre post sawNewline -> Var.ExplicitListing (x pre post) sawNewline) <$> explicit
         ]
   in
     expecting "a listing of values and types to expose, like (..)" $
@@ -200,14 +199,14 @@ listingWithoutParens :: ElmVersion -> IParser (Var.Listing Module.DetailedListin
 listingWithoutParens elmVersion =
   expecting "a listing of values and types to expose, but with missing parentheses" $
   choice
-    [ (\_ -> (Var.OpenListing (Commented [] () []))) <$> string ".."
-    , (\x -> (Var.ExplicitListing (x [] []) False)) <$> detailedListing elmVersion
+    [ (\_ -> Var.OpenListing (Commented [] () [])) <$> string ".."
+    , (\x -> Var.ExplicitListing (x [] []) False) <$> detailedListing elmVersion
     ]
 
 
 commentedSet :: Ord a => IParser a -> IParser (Comments -> Comments -> Var.CommentedMap a ())
 commentedSet item =
-    commaSep1Set' ((\x -> (x, ())) <$> item) (\() () -> ())
+    commaSep1Set' ((, ()) <$> item) (\() () -> ())
 
 
 detailedListing :: ElmVersion -> IParser (Comments -> Comments -> Module.DetailedListing)
