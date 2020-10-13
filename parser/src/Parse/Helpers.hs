@@ -512,12 +512,10 @@ dot =
 
 
 commentedKeyword :: ElmVersion -> String -> IParser a -> IParser (KeywordCommented a)
-commentedKeyword elmVersion word parser =
-  do
-    pre <- try (whitespace <* reserved elmVersion word)
-    post <- whitespace
-    value <- parser
-    return $ KeywordCommented pre post value
+commentedKeyword elmVersion word parser = do
+  pre <- try (whitespace <* reserved elmVersion word)
+  post <- whitespace
+  KeywordCommented pre post <$> parser
 
 
 -- ODD COMBINATORS
