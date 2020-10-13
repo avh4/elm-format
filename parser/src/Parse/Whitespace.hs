@@ -22,7 +22,7 @@ spaces :: IParser Comments
 spaces =
   let
       blank = string " " >> return []
-      comment = ((\x -> [x]) <$> multiComment)
+      comment = ((: []) <$> multiComment)
       space =
         blank
         <|> (const [CommentTrickOpener] <$> (try $ string "{--}"))

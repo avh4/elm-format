@@ -85,35 +85,28 @@ moduleDecl_0_16 elmVersion =
 
 
 moduleDecl_0_17 :: ElmVersion -> IParser Module.Header
-moduleDecl_0_17 elmVersion =
-  expecting "a module declaration" $
-  do
-      srcTag <-
-        try $
-            choice
-                [ Module.Port <$> (reserved elmVersion "port" *> whitespace)
-                , Module.Effect <$> (reserved elmVersion "effect" *> whitespace)
-                , return Module.Normal
-                ]
-            <* reserved elmVersion "module"
-      preName <- whitespace
-      names <- dotSep1 (capVar elmVersion) <?> "the name of this module"
-      whereClause <-
-        optionMaybe $
-          commentedKeyword elmVersion "where" $
-            brackets $ (\f pre post _ -> f pre post) <$> commaSep1 (keyValue equals (lowVar elmVersion) (capVar elmVersion))
+moduleDecl_0_17 elmVersion = expecting "a module declaration" $ do
+  srcTag <-
+    try $
+        choice
+            [ Module.Port <$> (reserved elmVersion "port" *> whitespace)
+            , Module.Effect <$> (reserved elmVersion "effect" *> whitespace)
+            , pure Module.Normal
+            ]
+        <* reserved elmVersion "module"
+  preName <- whitespace
+  names <- dotSep1 (capVar elmVersion) <?> "the name of this module"
+  whereClause <-
+    optionMaybe $
+      commentedKeyword elmVersion "where" $
+        brackets $ (\f pre post _ -> f pre post) <$> commaSep1 (keyValue equals (lowVar elmVersion) (capVar elmVersion))
 
-      exports <-
-        optionMaybe $
-        commentedKeyword elmVersion "exposing" $
-          listing $ detailedListing elmVersion
+  exports <-
+    optionMaybe $
+      commentedKeyword elmVersion "exposing" (listing $ detailedListing elmVersion)
+        <|> try (KeywordCommented [] <$> whitespace <*> listing (detailedListing elmVersion))
 
-      return $
-        Module.Header
-          srcTag
-          (Commented preName names [])
-          whereClause
-          exports
+  pure $ Module.Header srcTag (Commented preName names []) whereClause exports
 
 
 mergePreCommented :: (a -> a -> a) -> PreCommented a -> PreCommented a -> PreCommented a
@@ -177,6 +170,7 @@ import' elmVersion =
     exposing :: IParser (Comments, PreCommented (Var.Listing Module.DetailedListing))
     exposing =
       do  preExposing <- try (whitespace <* reserved elmVersion "exposing")
+      -- TODO: I'll come back
           postExposing <- whitespace
           imports <-
             choice
