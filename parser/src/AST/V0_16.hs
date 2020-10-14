@@ -13,17 +13,17 @@ newtype ForceMultiline =
     deriving (Eq, Show)
 
 
-data LowercaseIdentifier =
+newtype LowercaseIdentifier =
     LowercaseIdentifier String
     deriving (Eq, Ord, Show)
 
 
-data UppercaseIdentifier =
+newtype UppercaseIdentifier =
     UppercaseIdentifier String
     deriving (Eq, Ord, Show)
 
 
-data SymbolIdentifier =
+newtype SymbolIdentifier =
     SymbolIdentifier String
     deriving (Eq, Ord, Show)
 

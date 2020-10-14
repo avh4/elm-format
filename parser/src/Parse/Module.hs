@@ -1,62 +1,61 @@
 {-# LANGUAGE TupleSections #-}
 
-module Parse.Module (moduleDecl, elmModule, topLevel) where
+module Parse.Module ( moduleDecl, elmModule, topLevel ) where
 
 import qualified Control.Applicative
-import Data.Map.Strict hiding (foldl, map)
+import Data.Map.Strict ( Map, empty, insert, insertWith, unionWith )
 import Elm.Utils ((|>))
-import Text.Parsec hiding (newline, spaces)
+import Text.Parsec ( char, letter, string, choice, eof, option, optionMaybe, (<?>), (<|>), many, try )
 
 import Parse.Helpers
-import Parse.Declaration as Decl
+import Parse.Declaration as Decl ( declaration, topLevelStructure )
 import qualified AST.Declaration
 import qualified AST.Module as Module
 import qualified AST.Variable as Var
-import AST.V0_16
-import ElmVersion
-import Parse.IParser
-import Parse.Whitespace
+import AST.V0_16 ( Commented(..), Comments, KeywordCommented(KeywordCommented), PreCommented, UppercaseIdentifier )
+import ElmVersion ( ElmVersion )
+import Parse.IParser ( IParser )
+import Parse.Whitespace ( docCommentAsMarkdown, freshLine, spaces, trackNewline, whitespace )
 
 
 elmModule :: ElmVersion -> IParser Module.Module
-elmModule elmVersion =
-  do  preModule <- option [] freshLine
-      h <- moduleDecl elmVersion
-      preDocsComments <- option [] freshLine
-      (docs, postDocsComments) <-
-        choice
-          [ (,) <$> addLocation (Just <$> docCommentAsMarkdown) <*> freshLine
-          , (,) <$> addLocation (return Nothing) <*> return []
-          ]
-      (preImportComments, imports', postImportComments) <- imports elmVersion
-      decls <- topLevel $ Decl.declaration elmVersion
-      trailingComments <-
-          (++)
-              <$> option [] freshLine
-              <*> option [] spaces
-      eof
-
-      return $
-        Module.Module
-          preModule
-          h
-          docs
-          (preDocsComments ++ postDocsComments ++ preImportComments, imports')
-          (map AST.Declaration.BodyComment postImportComments ++ decls ++ map AST.Declaration.BodyComment trailingComments)
+elmModule elmVersion = do
+  preModule <- option [] freshLine
+  h <- moduleDecl elmVersion
+  preDocsComments <- option [] freshLine
+  (docs, postDocsComments) <-
+    choice
+      [ (,) <$> addLocation (Just <$> docCommentAsMarkdown) <*> freshLine
+      , (,) <$> addLocation (pure Nothing) <*> pure []
+      ]
+  (preImportComments, imports', postImportComments) <- imports elmVersion
+  decls <- topLevel $ Decl.declaration elmVersion
+  trailingComments <-
+      (++)
+          <$> option [] freshLine
+          <*> option [] spaces
+  eof
+  pure $
+    Module.Module
+      preModule
+      h
+      docs
+      (preDocsComments ++ postDocsComments ++ preImportComments, imports')
+      (map AST.Declaration.BodyComment postImportComments ++ decls ++ map AST.Declaration.BodyComment trailingComments)
 
 
 topLevel :: IParser a -> IParser [AST.Declaration.TopLevelStructure a]
 topLevel entry =
   (++) <$> option [] ((: []) <$> Decl.topLevelStructure entry)
-      <*> (concat <$> many (freshDef entry))
+       <*> (concat <$> many (freshDef entry))
 
 
 freshDef :: IParser a -> IParser [AST.Declaration.TopLevelStructure a]
 freshDef entry =
-    commitIf (freshLine >> (letter <|> char '_')) $ do
-      comments <- freshLine
-      decl <- Decl.topLevelStructure entry
-      pure $ map AST.Declaration.BodyComment comments ++ [decl]
+  commitIf (freshLine >> (letter <|> char '_')) $ do
+    comments <- freshLine
+    decl <- Decl.topLevelStructure entry
+    pure $ map AST.Declaration.BodyComment comments ++ [decl]
 
 
 moduleDecl :: ElmVersion -> IParser (Maybe Module.Header)
@@ -64,26 +63,21 @@ moduleDecl elmVersion =
   choice
     [ try $ Just <$> moduleDecl_0_16 elmVersion
     , Just <$> moduleDecl_0_17 elmVersion
-    , return Nothing
+    , pure Nothing
     ]
 
 
 moduleDecl_0_16 :: ElmVersion -> IParser Module.Header
 moduleDecl_0_16 elmVersion =
-  expecting "a module declaration" $
-  do  try (reserved elmVersion "module")
-      preName <- whitespace
-      names <- dotSep1 (capVar elmVersion) <?> "the name of this module"
-      postName <- whitespace
-      exports <- option (Var.OpenListing (Commented [] () [])) (listing $ detailedListing elmVersion)
-      preWhere <- whitespace
-      reserved elmVersion "where"
-      return $
-        Module.Header
-          Module.Normal
-          (Commented preName names postName)
-          Nothing
-          (Just $ KeywordCommented preWhere [] exports)
+  expecting "a module declaration" $ do
+    try (reserved elmVersion "module")
+    preName <- whitespace
+    names <- dotSep1 (capVar elmVersion) <?> "the name of this module"
+    postName <- whitespace
+    exports <- option (Var.OpenListing (Commented [] () [])) (listing $ detailedListing elmVersion)
+    preWhere <- whitespace
+    reserved elmVersion "where"
+    pure $ Module.Header Module.Normal (Commented preName names postName) Nothing (Just $ KeywordCommented preWhere [] exports)
 
 
 moduleDecl_0_17 :: ElmVersion -> IParser Module.Header
@@ -112,39 +106,37 @@ moduleDecl_0_17 elmVersion = expecting "a module declaration" $ do
 
 
 mergePreCommented :: (a -> a -> a) -> PreCommented a -> PreCommented a -> PreCommented a
-mergePreCommented merge (pre1, left) (pre2, right) =
-    (pre1 ++ pre2, merge left right)
+mergePreCommented merge (pre1, left) (pre2, right) = (pre1 ++ pre2, merge left right)
 
 
 mergeDetailedListing :: Module.DetailedListing -> Module.DetailedListing -> Module.DetailedListing
 mergeDetailedListing left right =
-    Module.DetailedListing
-        (mergeCommentedMap (\() () -> ()) (Module.values left) (Module.values right))
-        (mergeCommentedMap (\() () -> ()) (Module.operators left) (Module.operators right))
-        (mergeCommentedMap (mergePreCommented $ mergeListing $ mergeCommentedMap (\() () -> ())) (Module.types left) (Module.types right))
+  Module.DetailedListing
+    (mergeCommentedMap (\() () -> ()) (Module.values left) (Module.values right))
+    (mergeCommentedMap (\() () -> ()) (Module.operators left) (Module.operators right))
+    (mergeCommentedMap (mergePreCommented $ mergeListing $ mergeCommentedMap (\() () -> ())) (Module.types left) (Module.types right))
 
 
 imports :: ElmVersion -> IParser (Comments, Map [UppercaseIdentifier] (Comments, Module.ImportMethod), Comments)
 imports elmVersion =
-    let
-        merge :: PreCommented Module.ImportMethod -> PreCommented Module.ImportMethod -> PreCommented Module.ImportMethod
-        merge (comments1, import1) (comments2, import2) =
-            ( comments1 ++ comments2
-            , Module.ImportMethod
-                (Module.alias import1 Control.Applicative.<|> Module.alias import2)
-                (mergePreCommented (mergePreCommented $ mergeListing mergeDetailedListing) (Module.exposedVars import1) (Module.exposedVars import2))
-            )
+  let
+    merge :: PreCommented Module.ImportMethod -> PreCommented Module.ImportMethod -> PreCommented Module.ImportMethod
+    merge (comments1, import1) (comments2, import2) =
+        ( comments1 ++ comments2
+        , Module.ImportMethod
+            (Module.alias import1 Control.Applicative.<|> Module.alias import2)
+            (mergePreCommented (mergePreCommented $ mergeListing mergeDetailedListing) (Module.exposedVars import1) (Module.exposedVars import2))
+        )
 
-        step (comments, m, finalComments) (((pre, name), method), post) =
-            ( comments ++ finalComments
-            , insertWith merge name (pre, method) m
-            , post
-            )
+    step (comments, m, finalComments) (((pre, name), method), post) =
+        ( comments ++ finalComments
+        , insertWith merge name (pre, method) m
+        , post
+        )
 
-        done :: [(Module.UserImport, Comments)] -> (Comments, Map [UppercaseIdentifier] (Comments, Module.ImportMethod), Comments)
-        done results =
-            foldl step ([], empty, []) results
-    in
+    done :: [(Module.UserImport, Comments)] -> (Comments, Map [UppercaseIdentifier] (Comments, Module.ImportMethod), Comments)
+    done results = foldl step ([], empty, []) results
+  in
     done <$> many ((,) <$> import' elmVersion <*> freshLine)
 
 
@@ -160,8 +152,8 @@ import' elmVersion =
     method :: [UppercaseIdentifier] -> IParser Module.ImportMethod
     method originalName =
       Module.ImportMethod
-        <$> option Nothing (Just <$> as' originalName)
-        <*> option ([], ([], Var.ClosedListing)) exposing
+        <$> try (option Nothing (Just <$> try (as' originalName)))
+        <*> option ([], ([], Var.ClosedListing)) (exposing <|> withoutExposing)
 
     as' :: [UppercaseIdentifier] -> IParser (Comments, PreCommented UppercaseIdentifier)
     as' moduleName = do
@@ -171,7 +163,7 @@ import' elmVersion =
 
     exposing :: IParser (Comments, PreCommented (Var.Listing Module.DetailedListing))
     exposing = do
-      preExposing <- try (whitespace <* reserved elmVersion "exposing") <|> whitespace -- TODO: fix this for rest of the cases 😅
+      preExposing <- try (whitespace <* reserved elmVersion "exposing")
       postExposing <- whitespace
       imports <- 
         choice
@@ -180,19 +172,22 @@ import' elmVersion =
           ]
       pure (preExposing, (postExposing, imports))
 
+    withoutExposing :: IParser (Comments, PreCommented (Var.Listing Module.DetailedListing))
+    withoutExposing = try ((,) <$> whitespace <*> (([], ) <$> listing (detailedListing elmVersion)))
+
 listing :: IParser (Comments -> Comments -> a) -> IParser (Var.Listing a)
 listing explicit =
   let
     subparser = choice
-        [ (\_ pre post _ -> Var.OpenListing (Commented pre () post)) <$> string ".."
-        , (\x pre post sawNewline -> Var.ExplicitListing (x pre post) sawNewline) <$> explicit
-        ]
+      [ (\_ pre post _ -> Var.OpenListing (Commented pre () post)) <$> string ".."
+      , (\x pre post sawNewline -> Var.ExplicitListing (x pre post) sawNewline) <$> explicit
+      ]
   in
-    expecting "a listing of values and types to expose, like (..)" $
-    do  _ <- try (char '(')
-        ((pre, listing, post), multiline) <- trackNewline ((,,) <$> whitespace <*> subparser <*> whitespace)
-        _ <- char ')'
-        return $ listing pre post $ multilineToBool multiline
+    expecting "a listing of values and types to expose, like (..)" $ do
+      _ <- try (char '(')
+      ((pre, listing, post), multiline) <- trackNewline ((,,) <$> whitespace <*> subparser <*> whitespace)
+      _ <- char ')'
+      pure $ listing pre post $ multilineToBool multiline
 
 
 listingWithoutParens :: ElmVersion -> IParser (Var.Listing Module.DetailedListing)
@@ -210,33 +205,31 @@ commentedSet item =
 
 
 detailedListing :: ElmVersion -> IParser (Comments -> Comments -> Module.DetailedListing)
-detailedListing elmVersion =
-    do
-      values <- commaSep1' (value elmVersion)
-      return $ \pre post -> toDetailedListing $ values pre post
+detailedListing elmVersion = do
+  values <- commaSep1' (value elmVersion)
+  pure $ \pre post -> toDetailedListing $ values pre post
 
 
 mergeCommentedMap :: Ord k => (v -> v -> v) -> Var.CommentedMap k v -> Var.CommentedMap k v -> Var.CommentedMap k v
 mergeCommentedMap merge left right =
-    let
-        merge' (Commented pre1 a post1) (Commented pre2 b post2) =
-            Commented (pre1 ++ pre2) (merge a b) (post1 ++ post2)
-    in
+  let
+    merge' (Commented pre1 a post1) (Commented pre2 b post2) = Commented (pre1 ++ pre2) (merge a b) (post1 ++ post2)
+  in
     unionWith merge' left right
 
 
 mergeListing :: (a -> a -> a) -> Var.Listing a -> Var.Listing a -> Var.Listing a
 mergeListing merge left right =
-    case (left, right) of
-        (Var.ClosedListing, Var.ClosedListing) -> Var.ClosedListing
-        (Var.ClosedListing, Var.OpenListing comments) -> Var.OpenListing comments
-        (Var.OpenListing comments, Var.ClosedListing) -> Var.OpenListing comments
-        (Var.OpenListing (Commented pre1 () post1), Var.OpenListing (Commented pre2 () post2)) -> Var.OpenListing (Commented (pre1 ++ pre2) () (post1 ++ post2))
-        (Var.ClosedListing, Var.ExplicitListing a multiline) -> Var.ExplicitListing a multiline
-        (Var.ExplicitListing a multiline, Var.ClosedListing) -> Var.ExplicitListing a multiline
-        (Var.OpenListing comments, Var.ExplicitListing _a _multiline) -> Var.OpenListing comments
-        (Var.ExplicitListing _a _multiline, Var.OpenListing comments) -> Var.OpenListing comments
-        (Var.ExplicitListing a multiline1, Var.ExplicitListing b multiline2) -> Var.ExplicitListing (merge a b) (multiline1 || multiline2)
+  case (left, right) of
+    (Var.ClosedListing, Var.ClosedListing) -> Var.ClosedListing
+    (Var.ClosedListing, Var.OpenListing comments) -> Var.OpenListing comments
+    (Var.OpenListing comments, Var.ClosedListing) -> Var.OpenListing comments
+    (Var.OpenListing (Commented pre1 () post1), Var.OpenListing (Commented pre2 () post2)) -> Var.OpenListing (Commented (pre1 ++ pre2) () (post1 ++ post2))
+    (Var.ClosedListing, Var.ExplicitListing a multiline) -> Var.ExplicitListing a multiline
+    (Var.ExplicitListing a multiline, Var.ClosedListing) -> Var.ExplicitListing a multiline
+    (Var.OpenListing comments, Var.ExplicitListing _a _multiline) -> Var.OpenListing comments
+    (Var.ExplicitListing _a _multiline, Var.OpenListing comments) -> Var.OpenListing comments
+    (Var.ExplicitListing a multiline1, Var.ExplicitListing b multiline2) -> Var.ExplicitListing (merge a b) (multiline1 || multiline2)
 
 
 toDetailedListing :: [Commented Var.Value] -> Module.DetailedListing
@@ -265,9 +258,7 @@ toDetailedListing values =
 
         done (vs, os, ts) =
             Module.DetailedListing vs os ts
-    in
-    foldl step (empty, empty, empty) values
-        |> done
+    in  foldl step (empty, empty, empty) values |> done
 
 
 value :: ElmVersion -> IParser Var.Value
