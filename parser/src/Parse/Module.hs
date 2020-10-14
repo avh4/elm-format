@@ -152,7 +152,7 @@ import' elmVersion =
     method :: [UppercaseIdentifier] -> IParser Module.ImportMethod
     method originalName =
       Module.ImportMethod
-        <$> try (option Nothing (Just <$> try (as' originalName)))
+        <$> option Nothing (Just <$> as' originalName)
         <*> option ([], ([], Var.ClosedListing)) (exposing <|> withoutExposing)
 
     as' :: [UppercaseIdentifier] -> IParser (Comments, PreCommented UppercaseIdentifier)
