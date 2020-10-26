@@ -1,19 +1,26 @@
+{-# LANGUAGE DataKinds #-}
 module Parse.TypeTest where
 
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import Parse.Type
+import qualified Parse.Type
 import AST.V0_16
+import AST.Structure
 
 import Parse.TestHelpers
 import ElmVersion
 import ElmFormat.Render.Box (formatType)
 import qualified Box
 import qualified Data.Text as Text
+import Parse.IParser
+import Reporting.Annotation (Located)
 
 
 pending = at 0 0 0 0 $ TupleType [] (ForceMultiline False) 
+
+expr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
+expr = Parse.Type.expr
 
 
 example :: String -> String -> String -> TestTree

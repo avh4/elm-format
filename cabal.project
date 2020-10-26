@@ -1,2 +1,6 @@
-packages: .
+packages:
+    ./elm-format-markdown,
+    ./elm-format-lib,
+    ./elm-format-test-lib,
+    ./
 with-compiler: ghc-8.8.4

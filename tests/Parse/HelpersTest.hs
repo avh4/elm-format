@@ -24,12 +24,12 @@ tests :: TestTree
 tests =
     testGroup "Parse.Helpers"
     [ testGroup "parens''"
-        [ example (parens'' x) "single term" "(x)" $ Right [Commented [] "x" []]
-        , example (parens'' x) "whitespace" "( x )" $ Right [Commented [] "x" []]
-        , example (parens'' x) "comments" "({-A-}x{-B-})" $ Right [Commented [BlockComment ["A"]] "x" [BlockComment ["B"]]]
+        [ example (parens'' x) "single term" "(x)" $ Right [C ([], []) "x"]
+        , example (parens'' x) "whitespace" "( x )" $ Right [C ([], []) "x"]
+        , example (parens'' x) "comments" "({-A-}x{-B-})" $ Right [C ([BlockComment ["A"]], [BlockComment ["B"]]) "x"]
 
-        , example (parens'' x) "multiple terms" "(a,b,c)" $ Right [Commented [] "a" [], Commented [] "b" [], Commented [] "c" []]
-        , example (parens'' x) "whitespace" "( a , b , c )" $ Right [Commented [] "a" [], Commented [] "b" [], Commented [] "c" []]
+        , example (parens'' x) "multiple terms" "(a,b,c)" $ Right [C ([], []) "a", C ([], []) "b", C ([], []) "c"]
+        , example (parens'' x) "whitespace" "( a , b , c )" $ Right [C ([], []) "a", C ([], []) "b", C ([], []) "c"]
 
         , example (parens'' x) "no terms" "()" $ Left []
         , example (parens'' x) "whitespace" "( )" $ Left []

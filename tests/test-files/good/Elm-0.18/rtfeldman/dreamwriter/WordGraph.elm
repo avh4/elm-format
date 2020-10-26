@@ -135,7 +135,7 @@ viewWordGraph list =
                     , xOffset = offset
                     }
                 )
-                [0..maxDays - 1]
+                (List.range 0 (maxDays - 1))
                 lastTwoWeeks
     in
     graph yOffset days
