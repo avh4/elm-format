@@ -41,7 +41,7 @@ common common-options
         tasty-hspec >= 1.1.5.1 && < 1.2,
         tasty-hunit >= 0.10.0.1 && < 0.11,
         text >= 1.2.3.1 && < 2,
-        elm-format-lib
+        avh4-lib
 
 
 library
@@ -50,6 +50,7 @@ library
     exposed-modules:
         CommandLine.TestWorld
         Data.FileTree
+        Expect
 
 
 test-suite elm-format-test-lib-tests
@@ -62,6 +63,7 @@ test-suite elm-format-test-lib-tests
     other-modules:
         Data.FileTree
         Data.FileTreeTest
+        Expect
 
     build-tool-depends:
         tasty-discover:tasty-discover >= 4.2.1 && < 5
