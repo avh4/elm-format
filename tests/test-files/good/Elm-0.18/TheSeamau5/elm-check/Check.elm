@@ -263,7 +263,7 @@ claim name actualStatement expectedStatement investigator =
                 -- trampoline.
                 --
                 -- originalCounterExample' : Seed -> Int -> Trampoline (Result (a, b, b, Seed, Int) Int)
-                originalCounterExample' seed currentNumberOfChecks =
+                originalCounterExample_ seed currentNumberOfChecks =
                     if currentNumberOfChecks >= numberOfChecks then
                         ------------------------------------------------------------------
                         -- Stopping Condition:
@@ -298,14 +298,14 @@ claim name actualStatement expectedStatement investigator =
                                 expectedStatement value
                         in
                         if actual == expected then
-                            Continue (\() -> originalCounterExample' nextSeed (currentNumberOfChecks + 1))
+                            Continue (\() -> originalCounterExample_ nextSeed (currentNumberOfChecks + 1))
 
                         else
                             Done (Err ( value, actual, expected, nextSeed, currentNumberOfChecks + 1 ))
 
                 -- originalCounterExample : Result (a, b, b, Seed, Int) Int
                 originalCounterExample =
-                    trampoline (originalCounterExample' seed 0)
+                    trampoline (originalCounterExample_ seed 0)
             in
             case originalCounterExample of
                 ------------------------------------------------------------
