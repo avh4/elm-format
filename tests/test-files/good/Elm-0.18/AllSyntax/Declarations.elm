@@ -62,15 +62,15 @@ type DataTypeWithCommentedOutConstructors
 
 
 type DataTypeWithParams1 a b c
-    = Ctor1'
-    | Ctor2' a
-    | Ctor3' b c
+    = Ctor1_
+    | Ctor2_ a
+    | Ctor3_ b c
 
 
 type {- K -} DataTypeWithParams2 {- L -} a {- M -} b {- N -} c {- O -}
-    = Ctor1'
-    | Ctor2' a
-    | Ctor3' b c
+    = Ctor1_
+    | Ctor2_ a
+    | Ctor3_ b c
 
 
 type
@@ -83,9 +83,9 @@ type
         --N
         c
     --O
-    = Ctor1'
-    | Ctor2' a
-    | Ctor3' b c
+    = Ctor1_
+    | Ctor2_ a
+    | Ctor3_ b c
 
 
 

@@ -1,6 +1,6 @@
 {
     "body": [
-        "TODO: Entry (at 34 1 36 11 (Datatype {nameWithArgs = Commented [] (UppercaseIdentifier \"CustomType\",[]) [], tags = OpenCommentedList [Commented [] (WithEol (UppercaseIdentifier \"TagA\",[]) Nothing) []] ([],WithEol (UppercaseIdentifier \"TagB\",[]) Nothing)}))",
+        "TODO: Entry (Fix {unFix = at 34 1 36 11 (Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"CustomType\") []), tags = OpenCommentedList [C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"TagA\") [])] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"TagB\") []))})})",
         {
             "expression": {
                 "display": {

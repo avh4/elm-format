@@ -1,14 +1,1 @@
-ERRORS
--- SYNTAX PROBLEM ------------------------------------------------------ <STDIN>
-
-I ran into something unexpected when parsing your code!
-
-1| syntax error:True
-               ^
-I am looking for one of the following things:
-
-    =
-    a pattern
-    whitespace
-
-
+Unable to parse file <STDIN>:1:13 To see a detailed explanation, run elm make on the file.

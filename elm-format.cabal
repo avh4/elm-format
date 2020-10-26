@@ -30,145 +30,59 @@ source-repository head
     location: git://github.com/avh4/elm-format.git
 
 
-library
-
+common common-options
+    default-language: Haskell2010
     ghc-options:
-        -O2 -Wall -Wno-name-shadowing
+        -threaded -O2 -Wall -Wno-name-shadowing
+    default-extensions:
+        DeriveFunctor
+        LambdaCase
+        OverloadedStrings
+        ScopedTypeVariables
 
     hs-source-dirs:
         src
-        parser/src
-        markdown
         generated
-
-    exposed-modules:
-        ElmFormat
-        ElmVersion
-        -- exposed for tests
-        AST.Declaration
-        AST.Expression
-        AST.Helpers
-        AST.Module
-        AST.Pattern
-        AST.V0_16
-        AST.Variable
-        Box
-        Data.Text.Extra
-        Elm.Utils
-        ElmFormat.Parse
-        ElmFormat.Render.Box
-        ElmFormat.Render.ElmStructure
-        ElmFormat.Render.Markdown
-        ElmFormat.Render.Text
-        ElmFormat.World
-        Parse.Expression
-        Parse.Helpers
-        Parse.IParser
-        Parse.Literal
-        Parse.Markdown
-        Parse.Pattern
-        Parse.Type
-        Reporting.Annotation
-        Reporting.Error.Syntax
-        Reporting.Region
-        Util.List
 
     other-modules:
         AST.Json
-        AST.MapExpr
-        AST.MapNamespace
         Build_elm_format
-        Cheapskate.Inlines
-        Cheapskate.Parse
-        Cheapskate.ParserCombinators
-        Cheapskate.Types
-        Cheapskate.Util
-        CommandLine.Helpers
-        ElmFormat.Execute
-        ElmFormat.Filesystem
-        ElmFormat.FileStore
-        ElmFormat.FileWriter
-        ElmFormat.InputConsole
-        ElmFormat.Operation
-        ElmFormat.OutputConsole
-        ElmFormat.Upgrade_0_19
+        ElmFormat.Cli
+        ElmFormat.CliFlags
+        ElmFormat.Messages
         ElmFormat.Version
-        Flags
-        Messages.Formatter.Format
-        Messages.Formatter.HumanReadable
-        Messages.Formatter.Json
-        Messages.Strings
-        Messages.Types
-        Paths_elm_format
-        Parse.Binop
-        Parse.Common
-        Parse.Comments
-        Parse.Declaration
-        Parse.Module
-        Parse.Parse
-        Parse.State
-        Parse.Whitespace
-        Regex
-        Reporting.Report
-        Reporting.Result
-        ReversedList
 
     build-depends:
-        ansi-terminal >= 0.10.3 && < 0.11,
         ansi-wl-pprint >= 0.6.8.2 && < 0.7,
-        array >= 0.5.4.0 && < 0.6,
         base >= 4.12.0.0 && < 5,
-        binary >= 0.8.7.0 && < 0.9,
-        bytestring >= 0.10.8.2 && < 0.11,
         containers >= 0.6.0.1 && < 0.7,
-        directory >= 1.3.3.0 && < 2,
-        filepath >= 1.4.2.1 && < 2,
-        free >= 5.1.1 && < 6,
-        indents >= 0.3.3 && < 0.4,
         json >= 0.10 && < 0.11,
-        mtl >= 2.2.2 && < 3,
         optparse-applicative >= 0.15.1.0 && < 0.16,
-        parsec >= 3.1.13.0 && < 4,
-        process >= 1.6.5.0 && < 2,
-        split >= 0.2.3.3 && < 0.3,
-        text >= 1.2.3.1 && < 2
+        relude >= 0.7 && < 0.8,
+        text >= 1.2.3.1 && < 2,
+        elm-format-lib
 
 
 executable elm-format
-
-    ghc-options:
-        -threaded -O2 -Wall -Wno-name-shadowing
-
-    hs-source-dirs:
-        src-cli
-
-    main-is:
-        Main.hs
-
-    build-depends:
-        base >= 4.12.0.0 && < 5,
-        elm-format
+    import: common-options
+    main-is: Main.hs
 
 
 test-Suite elm-format-tests
-    type:
-        exitcode-stdio-1.0
+    import: common-options
+    type: exitcode-stdio-1.0
 
-    ghc-options:
-        -threaded -Wall -Wno-name-shadowing
-
-    hs-source-dirs:
-        tests
-
-    main-is:
-        Test.hs
+    hs-source-dirs: tests
+    main-is: Test.hs
 
     other-modules:
+        AST.MatchReferencesTest
         BoxTest
         CommonMarkTests
-        Data.Text.ExtraTest
+        Data.List.ExtraTest
+        ElmFormat.ImportInfoTest
         ElmFormat.Render.ElmStructureTest
-        ElmFormat.TestWorld
+        Expect
         Integration.CliTest
         Integration.LiteralTest
         Parse.ExpressionTest
@@ -181,21 +95,15 @@ test-Suite elm-format-tests
         Test.ElmSourceGenerators
         Test.Generators
         Test.Property
-        Util.ListTest
 
     build-depends:
         tasty >= 1.2 && < 2,
-        tasty-golden >= 2.3.2 && < 3,
         tasty-hunit >= 0.10.0.1 && < 0.11,
         tasty-quickcheck >= 0.10.1 && < 0.11,
-        HUnit >= 1.6.0.0 && < 2,
         QuickCheck >= 2.12.6.1 && < 3,
         quickcheck-io >= 0.2.0 && < 0.3,
-        base >= 4.12.0.0 && < 5,
+        bimap >= 0.3.3 && < 0.4,
         cmark >= 0.6 && < 0.7,
-        containers >= 0.6.0.1 && < 0.7,
-        mtl >= 2.2.2 && < 3,
         parsec >= 3.1.13.0 && < 4,
         split >= 0.2.3.3 && < 0.3,
-        text >= 1.2.3.1 && < 2,
-        elm-format
+        elm-format-test-lib

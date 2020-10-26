@@ -3,9 +3,11 @@ module Main where
 import Test.Tasty
 
 import qualified Test.Property
+import qualified AST.MatchReferencesTest
 import qualified BoxTest
-import qualified CommonMarkTests
-import qualified Data.Text.ExtraTest
+-- import qualified CommonMarkTests
+import qualified Data.List.ExtraTest
+import qualified ElmFormat.ImportInfoTest
 import qualified ElmFormat.Render.ElmStructureTest
 import qualified Integration.CliTest
 import qualified Integration.LiteralTest
@@ -15,17 +17,18 @@ import qualified Parse.LiteralTest
 import qualified Parse.PatternTest
 import qualified Parse.TypeTest
 import qualified Parse.TestHelpersTest
-import qualified Util.ListTest
 
 
 main :: IO ()
 main =
     do
-        markdownTests <- CommonMarkTests.construct
+        -- markdownTests <- CommonMarkTests.construct
         defaultMain $ testGroup "elm-format" $
             [ Test.Property.propertyTests
+            , AST.MatchReferencesTest.tests
             , BoxTest.tests
-            , Data.Text.ExtraTest.tests
+            , Data.List.ExtraTest.tests
+            , ElmFormat.ImportInfoTest.tests
             , ElmFormat.Render.ElmStructureTest.tests
             , Integration.CliTest.tests
             , Integration.LiteralTest.tests
@@ -35,6 +38,5 @@ main =
             , Parse.PatternTest.tests
             , Parse.TypeTest.tests
             , Parse.TestHelpersTest.tests
-            , Util.ListTest.tests
             -- , markdownTests
             ]

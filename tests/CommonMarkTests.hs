@@ -1,7 +1,6 @@
 module CommonMarkTests (construct) where
 
 import qualified CMark
-import Data.Maybe (fromMaybe)
 import Prelude hiding (init)
 import Test.Tasty
 import Test.Tasty.HUnit

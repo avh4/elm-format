@@ -1,0 +1,67 @@
+cabal-version: 2.4
+
+Name: elm-format-test-lib
+version: 0.0.0.1
+
+Synopsis:
+    Test helpers used by elm-format-tests and elm-refactor-tests
+
+License: BSD-3-Clause
+License-file: ../LICENSE
+
+Author:     Aaron VonderHaar
+Maintainer: gruen0aermel@gmail.com
+Copyright:  See https://github.com/avh4/elm-format/blob/master/LICENSE
+
+build-type: Simple
+
+
+common common-options
+    ghc-options:
+        -O2 -Wall -Wno-name-shadowing
+
+    default-language: Haskell2010
+
+    default-extensions:
+        DeriveFunctor
+        LambdaCase
+        OverloadedStrings
+        ScopedTypeVariables
+
+    hs-source-dirs: src
+
+    build-depends:
+        base >= 4.12.0.0 && < 5,
+        containers >= 0.6.0.1 && < 0.7,
+        filepath >= 1.4.2.1 && < 1.5,
+        mtl >= 2.2.2 && < 3,
+        split >= 0.2.3.3 && < 0.3,
+        tasty >= 1.2 && < 2,
+        tasty-golden >= 2.3.2 && < 3,
+        tasty-hspec >= 1.1.5.1 && < 1.2,
+        tasty-hunit >= 0.10.0.1 && < 0.11,
+        text >= 1.2.3.1 && < 2,
+        elm-format-lib
+
+
+library
+    import: common-options
+
+    exposed-modules:
+        CommandLine.TestWorld
+        Data.FileTree
+
+
+test-suite elm-format-test-lib-tests
+    import: common-options
+    type: exitcode-stdio-1.0
+
+    hs-source-dirs: test
+    main-is: Tests.hs
+
+    other-modules:
+        Data.FileTree
+        Data.FileTreeTest
+
+    build-tool-depends:
+        tasty-discover:tasty-discover >= 4.2.1 && < 5
