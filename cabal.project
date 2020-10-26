@@ -1,4 +1,5 @@
 packages:
+    ./avh4-lib,
     ./elm-format-markdown,
     ./elm-format-lib,
     ./elm-format-test-lib,

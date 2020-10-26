@@ -33,15 +33,24 @@ common common-options
         src
 
     other-modules:
-        CommandLine.Filesystem
-        Data.Text.Extra
+        AST.Helpers
+        Box
+        ElmFormat.Render.Box
+        ElmFormat.Render.ElmStructure
         Parse.Binop
         Parse.Comments
         Parse.Common
         Parse.Declaration
+        Parse.Expression
+        Parse.Helpers
+        Parse.IParser
+        Parse.Literal
+        Parse.Module
+        Parse.Parse
+        Parse.Pattern
         Parse.State
+        Parse.Type
         Parse.Whitespace
-        Regex
 
     build-depends:
         ansi-terminal >= 0.10.3 && < 0.11,
@@ -62,6 +71,7 @@ common common-options
         process >= 1.6.5.0 && < 2,
         relude >= 0.7 && < 0.8,
         text >= 1.2.3.1 && < 2,
+        avh4-lib,
         elm-format-markdown
 
 
@@ -69,43 +79,22 @@ library
     import: common-options
 
     exposed-modules:
-        CommandLine.InfoFormatter
-        CommandLine.Program
-        CommandLine.ResolveFiles
-        CommandLine.TransformFiles
-        CommandLine.World
-        CommandLine.World.IO
-        -- exposed for tests
-        AST.Helpers
         AST.Listing
         AST.MatchReferences
         AST.Module
         AST.Structure
         AST.V0_16
-        Box
-        Data.Coapplicative
-        Data.Either.Extra
-        Data.Indexed
-        Data.List.Extra
-        Data.ReversedList
-        Elm.Utils
+        CommandLine.InfoFormatter
+        CommandLine.Program
+        CommandLine.ResolveFiles
+        CommandLine.TransformFiles
         ElmFormat.ImportInfo
         ElmFormat.KnownContents
         ElmFormat.Parse
-        ElmFormat.Render.Box
-        ElmFormat.Render.ElmStructure
         ElmFormat.Render.Markdown
         ElmFormat.Render.Text
         ElmVersion
-        Parse.Expression
-        Parse.Helpers
-        Parse.IParser
-        Parse.Literal
         Parse.Markdown
-        Parse.Module
-        Parse.Parse
-        Parse.Pattern
-        Parse.Type
         Reporting.Annotation
         Reporting.Error.Syntax
         Reporting.Region
@@ -120,34 +109,44 @@ test-suite efl-tests
     main-is: Tests.hs
 
     other-modules:
-        AST.Helpers
+        AST.Listing
+        AST.MatchReferences
+        AST.Module
         AST.Structure
         AST.V0_16
-        CommandLine.World
-        CommandLine.World.IO
-        Data.Coapplicative
-        Data.Indexed
-        Elm.Utils
+        CommandLine.InfoFormatter
+        ElmFormat.ImportInfo
         ElmFormat.KnownContents
+        ElmFormat.Parse
+        ElmFormat.Render.Markdown
+        ElmFormat.Render.Text
         ElmVersion
-        Parse.Expression
-        Parse.Helpers
-        Parse.IParser
-        Parse.Literal
         Parse.Markdown
-        Parse.Pattern
-        Parse.Type
         Reporting.Annotation
         Reporting.Error.Syntax
         Reporting.Region
+        Reporting.Result
 
     other-modules:
-        Data.Text.ExtraTest
+        AST.MatchReferencesTest
+        BoxTest
+        ElmFormat.ImportInfoTest
+        ElmFormat.Render.ElmStructureTest
+        Parse.ExpressionTest
+        Parse.HelpersTest
+        Parse.LiteralTest
+        Parse.PatternTest
+        Parse.TestHelpers
+        Parse.TestHelpersTest
+        Parse.TypeTest
 
     build-depends:
+        split >= 0.2.3.3 && < 0.3,
         tasty >= 1.2 && < 2,
         tasty-hspec >= 1.1.5.1 && < 1.2,
-        tasty-hunit >= 0.10.0.1 && < 0.11
+        tasty-hunit >= 0.10.0.1 && < 0.11,
+        avh4-lib,
+        elm-format-test-lib
 
     build-tool-depends:
         tasty-discover:tasty-discover >= 4.2.1 && < 5

@@ -60,6 +60,7 @@ common common-options
         optparse-applicative >= 0.15.1.0 && < 0.16,
         relude >= 0.7 && < 0.8,
         text >= 1.2.3.1 && < 2,
+        avh4-lib,
         elm-format-lib
 
 
@@ -76,22 +77,9 @@ test-Suite elm-format-tests
     main-is: Test.hs
 
     other-modules:
-        AST.MatchReferencesTest
-        BoxTest
         CommonMarkTests
-        Data.List.ExtraTest
-        ElmFormat.ImportInfoTest
-        ElmFormat.Render.ElmStructureTest
-        Expect
         Integration.CliTest
         Integration.LiteralTest
-        Parse.ExpressionTest
-        Parse.HelpersTest
-        Parse.LiteralTest
-        Parse.PatternTest
-        Parse.TestHelpers
-        Parse.TestHelpersTest
-        Parse.TypeTest
         Test.ElmSourceGenerators
         Test.Generators
         Test.Property
@@ -105,5 +93,4 @@ test-Suite elm-format-tests
         bimap >= 0.3.3 && < 0.4,
         cmark >= 0.6 && < 0.7,
         parsec >= 3.1.13.0 && < 4,
-        split >= 0.2.3.3 && < 0.3,
         elm-format-test-lib

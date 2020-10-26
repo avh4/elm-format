@@ -71,6 +71,13 @@ main = do
             , "gitDescribe = " ++ show (gitDescribe :: String)
             ]
 
+    Shakefiles.Haskell.cabalProject "avh4-lib"
+        [ "avh4-lib/avh4-lib.cabal" ]
+        [ "avh4-lib/src//*.hs" ]
+        []
+        [ "avh4-lib/test//*.hs" ]
+        []
+
     Shakefiles.Haskell.cabalProject "elm-format-markdown"
         [ "elm-format-markdown/elm-format-markdown.cabal" ]
         [ "elm-format-markdown/src//*.hs"
@@ -81,14 +88,16 @@ main = do
     Shakefiles.Haskell.cabalProject "elm-format-lib"
         [ "elm-format-lib/elm-format-lib.cabal" ]
         [ "elm-format-lib/src//*.hs" ]
-        [ "elm-format-markdown" ]
+        [ "avh4-lib"
+        , "elm-format-markdown"
+        ]
         [ "elm-format-lib/test//*.hs" ]
-        []
+        [ "elm-format-test-lib" ]
 
     Shakefiles.Haskell.cabalProject "elm-format-test-lib"
         [ "elm-format-test-lib/elm-format-test-lib.cabal" ]
         [ "elm-format-test-lib/src//*.hs" ]
-        [ "elm-format-lib" ]
+        [ "avh4-lib" ]
         [ "elm-format-test-lib/test//*.hs" ]
         []
 
@@ -97,7 +106,9 @@ main = do
         , "generated/Build_elm_format.hs"
         ]
         [ "src//*.hs" ]
-        [ "elm-format-lib" ]
+        [ "avh4-lib"
+        , "elm-format-lib"
+        ]
         [ "tests//*.hs"
         , "tests//*.stdout"
         , "tests//*.stderr"
