@@ -25,8 +25,11 @@ data TestWorldState =
         { filesystem :: FileTree Text
         , stdio :: Stdio.State
         , programs :: Dict.Map String ([String] -> State.State TestWorld ())
-        , lastExitCode :: Maybe Int
+        , lastExitCode :: LastExitCode
         }
+
+newtype LastExitCode = LastExitCode (Maybe Int)
+
 
 data Lens outer inner =
     Lens (outer -> inner) (inner -> outer -> outer)
@@ -36,6 +39,9 @@ lstdio = Lens stdio (\x s -> s { stdio = x })
 
 lfilesystem :: Lens TestWorldState (FileTree Text)
 lfilesystem = Lens filesystem (\x s -> s { filesystem = x })
+
+llastExitCode :: Lens TestWorldState LastExitCode
+llastExitCode = Lens lastExitCode (\x s -> s { lastExitCode = x })
 
 over :: Lens outer inner -> (inner -> inner) -> outer -> outer
 over (Lens get set) f outer = set (f $ get outer) outer
@@ -65,6 +71,11 @@ instance Monad m => Has Stdio.State (State.StateT TestWorldState m) where
     modify = State.modify . over lstdio
     gets = State.gets . from lstdio
 
+instance Monad m => Has LastExitCode (State.StateT TestWorldState m) where
+    state = State.state . over' llastExitCode
+    modify = State.modify . over llastExitCode
+    gets = State.gets . from llastExitCode
+
 
 instance Monad m => World (State.StateT TestWorldState m) where
     doesFileExist = gets . (FileTree.doesFileExist :: FilePath -> FileTree Text -> Bool)
@@ -92,15 +103,8 @@ instance Monad m => World (State.StateT TestWorldState m) where
     getProgName =
         return "elm-format"
 
-    exitSuccess =
-        do
-            state <- State.get
-            State.put $ state { lastExitCode = Just 0 }
-
-    exitFailure =
-        do
-            state <- State.get
-            State.put $ state { lastExitCode = Just 1 }
+    exitSuccess = modify $ const (LastExitCode $ Just 0)
+    exitFailure = modify $ const (LastExitCode $ Just 1)
 
 
 infixr 8 <<<
@@ -114,7 +118,7 @@ testWorld files =
           { filesystem = foldl (\t (p, c) -> FileTree.write p c t) mempty $ fmap (fmap Text.pack) files
           , stdio = Stdio.empty
           , programs = mempty
-          , lastExitCode = Nothing
+          , lastExitCode = LastExitCode Nothing
           }
 
 
@@ -189,7 +193,7 @@ run name args testWorld =
         Nothing ->
             testWorld
                 { stdio = Stdio.putStrLn (Text.pack (name ++ ": command not found")) (stdio testWorld)
-                , lastExitCode = Just 127
+                , lastExitCode = LastExitCode (Just 127)
                 }
 
         Just handler ->
@@ -202,10 +206,10 @@ run name args testWorld =
 expectExit :: Int -> TestWorld -> Assertion
 expectExit expectedExitCode testWorld =
     case lastExitCode testWorld of
-        Nothing ->
+        LastExitCode Nothing ->
             fail ("Expected last exit code to be: " ++ show expectedExitCode ++ ", but no program was executed")
 
-        Just actualExitCode ->
+        LastExitCode (Just actualExitCode) ->
             assertEqual "last exit code" expectedExitCode actualExitCode
 
 
