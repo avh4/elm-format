@@ -1,7 +1,7 @@
 module Integration.CliTest (tests) where
 
 import CommandLine.World (readUtf8File)
-import CommandLine.TestWorld (TestWorld, run, expectExit, goldenExitStdout, expectFileContents)
+import CommandLine.TestWorld (TestWorldState, run, expectExit, goldenExitStdout, expectFileContents)
 import qualified CommandLine.TestWorld as TestWorld
 import Elm.Utils ((|>))
 import Test.Tasty
@@ -100,7 +100,7 @@ assertPrefix prefix str =
     assertEqual ("should start with " ++ prefix) prefix (take (length prefix) (Text.unpack str))
 
 
-world :: TestWorld
+world :: TestWorldState
 world =
     TestWorld.init
         |> TestWorld.installProgram "elm-format" ElmFormat.main

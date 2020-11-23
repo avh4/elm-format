@@ -1,8 +1,8 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
-module CommandLine.TestWorld where
+module CommandLine.TestWorld (TestWorldState, TestWorld,expectExit,expectFileContents,goldenExitStdout,run,installProgram,init,uploadFile,goldenStderr,eval,queueStdin, goldenStdout) where
 
-import Prelude hiding (putStr, putStrLn, readFile, writeFile)
+import Prelude hiding (putStr, putStrLn, readFile, writeFile, init)
 import CommandLine.World
 import Elm.Utils ((|>))
 import Test.Tasty (TestTree, testGroup)
@@ -18,20 +18,21 @@ import qualified Data.Text.Lazy.Encoding as LazyText
 import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified TestWorld.Stdio as Stdio
+import Control.Monad.Identity (Identity)
 
 
 data TestWorldState =
     TestWorldState
         { filesystem :: FileTree Text
         , stdio :: Stdio.State
-        , programs :: Dict.Map String ([String] -> State.State TestWorld ())
+        , programs :: Dict.Map String ([String] -> State.State TestWorldState ())
         , lastExitCode :: LastExitCode
         }
 
 newtype LastExitCode = LastExitCode (Maybe Int)
 
 
-type TestWorld = TestWorldState
+type TestWorld = State.StateT TestWorldState Identity
 
 
 --
@@ -48,6 +49,9 @@ class Lens s t where
     from :: (t -> z) -> s -> z
     from f = f . get
 
+instance Lens t t where
+    get = id
+    set = const
 
 class Has t m where
     state :: (t -> (a, t)) -> m a
@@ -175,26 +179,26 @@ goldenExitStdout testName expectedExitCode goldenFile state =
         ]
 
 
-init :: TestWorld
+init :: TestWorldState
 init = testWorld []
 
 
-uploadFile :: FilePath -> Text -> TestWorld -> TestWorld
+uploadFile :: FilePath -> Text -> TestWorldState -> TestWorldState
 uploadFile =
     over <<< FileTree.write
 
 
-downloadFile :: String -> TestWorld -> Maybe Text
+downloadFile :: String -> TestWorldState -> Maybe Text
 downloadFile =
     from . FileTree.read
 
 
-installProgram :: String -> ([String] -> State.State TestWorld ()) -> TestWorld -> TestWorld
+installProgram :: String -> ([String] -> State.State TestWorldState ()) -> TestWorldState -> TestWorldState
 installProgram name handler testWorld =
     testWorld { programs = Dict.insert name handler (programs testWorld) }
 
 
-run :: String -> [String] -> TestWorld -> TestWorld
+run :: String -> [String] -> TestWorldState -> TestWorldState
 run name args testWorld =
     case Dict.lookup name (programs testWorld) of
         Nothing ->
@@ -210,7 +214,7 @@ run name args testWorld =
                 newTestWorld
 
 
-expectExit :: Int -> TestWorld -> Assertion
+expectExit :: Int -> TestWorldState -> Assertion
 expectExit expectedExitCode testWorld =
     case lastExitCode testWorld of
         LastExitCode Nothing ->
@@ -220,7 +224,7 @@ expectExit expectedExitCode testWorld =
             assertEqual "last exit code" expectedExitCode actualExitCode
 
 
-expectFileContents :: String -> Text -> TestWorld -> Assertion
+expectFileContents :: String -> Text -> TestWorldState -> Assertion
 expectFileContents filename expectedContent testWorld =
     case downloadFile filename testWorld of
         Nothing ->
