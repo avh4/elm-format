@@ -31,51 +31,58 @@ data TestWorldState =
 newtype LastExitCode = LastExitCode (Maybe Int)
 
 
-data Lens outer inner =
-    Lens (outer -> inner) (inner -> outer -> outer)
-
-lstdio :: Lens TestWorldState Stdio.State
-lstdio = Lens stdio (\x s -> s { stdio = x })
-
-lfilesystem :: Lens TestWorldState (FileTree Text)
-lfilesystem = Lens filesystem (\x s -> s { filesystem = x })
-
-llastExitCode :: Lens TestWorldState LastExitCode
-llastExitCode = Lens lastExitCode (\x s -> s { lastExitCode = x })
-
-over :: Lens outer inner -> (inner -> inner) -> outer -> outer
-over (Lens get set) f outer = set (f $ get outer) outer
-
-
-over' :: Lens outer inner -> (inner -> (a, inner)) -> outer -> (a, outer)
-over' (Lens get set) f outer = fmap (flip set outer) (f $ get outer)
-
-from :: Lens outer b -> (b -> z) -> outer -> z
-from (Lens get _) f = f . get
-
 type TestWorld = TestWorldState
+
+
+--
+-- Generic types
+--
+
+class Lens s t where
+    get :: s -> t
+    set :: t -> s -> s
+
+    over :: (t -> t) -> s -> s
+    over f s = set (f $ get s) s
+
+    from :: (t -> z) -> s -> z
+    from f = f . get
 
 
 class Has t m where
     state :: (t -> (a, t)) -> m a
+
     modify :: (t -> t) -> m ()
+    modify f = state (\t -> ((), f t))
+
     gets :: (t -> a) -> m a
+    gets f = state (\t -> (f t, t))
 
-instance Monad m => Has (FileTree Text) (State.StateT TestWorld m) where
-    state = State.state . over' lfilesystem
-    modify = State.modify . over lfilesystem
-    gets = State.gets . from lfilesystem
+instance (Monad m, Lens s t) => Has t (State.StateT s m) where
+    state f = State.state $ \outer -> fmap (flip set outer) (f $ get outer)
+    gets f = State.gets (f . get)
 
-instance Monad m => Has Stdio.State (State.StateT TestWorldState m) where
-    state = State.state . over' lstdio
-    modify = State.modify . over lstdio
-    gets = State.gets . from lstdio
 
-instance Monad m => Has LastExitCode (State.StateT TestWorldState m) where
-    state = State.state . over' llastExitCode
-    modify = State.modify . over llastExitCode
-    gets = State.gets . from llastExitCode
+--
+-- Lens definitions
+--
 
+instance Lens TestWorldState (FileTree Text) where
+    get = filesystem
+    set x s = s { filesystem = x }
+
+instance Lens TestWorldState Stdio.State where
+    get = stdio
+    set x s = s { stdio = x }
+
+instance Lens TestWorldState LastExitCode where
+    get = lastExitCode
+    set x s = s { lastExitCode = x }
+
+
+--
+-- World instance
+--
 
 instance Monad m => World (State.StateT TestWorldState m) where
     doesFileExist = gets . (FileTree.doesFileExist :: FilePath -> FileTree Text -> Bool)
@@ -132,7 +139,7 @@ eval = State.evalState
 
 queueStdin :: Text -> TestWorldState -> TestWorldState
 queueStdin =
-    over lstdio . Stdio.queueStdin
+    over . Stdio.queueStdin
 
 
 assertOutput :: [(String, String)] -> TestWorldState -> Assertion
@@ -174,12 +181,12 @@ init = testWorld []
 
 uploadFile :: FilePath -> Text -> TestWorld -> TestWorld
 uploadFile =
-    over lfilesystem <<< FileTree.write
+    over <<< FileTree.write
 
 
 downloadFile :: String -> TestWorld -> Maybe Text
 downloadFile =
-    from lfilesystem . FileTree.read
+    from . FileTree.read
 
 
 installProgram :: String -> ([String] -> State.State TestWorld ()) -> TestWorld -> TestWorld
