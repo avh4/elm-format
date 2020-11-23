@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
 module CommandLine.TestWorld where
 
@@ -43,37 +44,52 @@ over (Lens get set) f outer = set (f $ get outer) outer
 over' :: Lens outer inner -> (inner -> (a, inner)) -> outer -> (a, outer)
 over' (Lens get set) f outer = fmap (flip set outer) (f $ get outer)
 
-modify :: State.MonadState s m => Lens s inner -> (inner -> inner) -> m ()
-modify l = State.modify . over l
-
 from :: Lens outer b -> (b -> z) -> outer -> z
 from (Lens get _) f = f . get
 
 type TestWorld = TestWorldState
 
 
+class HasFilesystem m where
+    getsFilesystem :: (FileTree Text -> b) -> m b
+    modifyFilesystem :: (FileTree Text -> FileTree Text) -> m ()
+
+instance Monad m => HasFilesystem (State.StateT TestWorldState m) where
+    getsFilesystem = State.gets . from lfilesystem
+    modifyFilesystem = State.modify . over lfilesystem
+
+
+class HasStdio m where
+    stateStdio :: (Stdio.State -> (a, Stdio.State)) -> m a
+    modifyStdio :: (Stdio.State -> Stdio.State) -> m ()
+
+instance Monad m => HasStdio (State.StateT TestWorldState m) where
+    stateStdio = State.state . over' lstdio
+    modifyStdio = State.modify . over lstdio
+
+
 instance Monad m => World (State.StateT TestWorldState m) where
-    doesFileExist = State.gets . from lfilesystem . FileTree.doesFileExist
-    doesDirectoryExist = State.gets . from lfilesystem . FileTree.doesDirectoryExist
-    listDirectory = State.gets . from lfilesystem . FileTree.listDirectory
+    doesFileExist = getsFilesystem . FileTree.doesFileExist
+    doesDirectoryExist = getsFilesystem . FileTree.doesDirectoryExist
+    listDirectory = getsFilesystem . FileTree.listDirectory
 
     readUtf8File path =
-        State.gets $ from lfilesystem $ orError . FileTree.read path
+        getsFilesystem $ orError . FileTree.read path
         where
             orError (Just a) = a
             orError Nothing = error $ path ++ ": does not exist"
 
-    writeUtf8File = State.modify . over lfilesystem <<< FileTree.write
+    writeUtf8File = modifyFilesystem <<< FileTree.write
 
-    getStdin = State.state (over' lstdio Stdio.getStdin)
-    putStr = modify lstdio . Stdio.putStr
-    putStrLn = modify lstdio . Stdio.putStrLn
+    getStdin = stateStdio Stdio.getStdin
+    putStr = modifyStdio . Stdio.putStr
+    putStrLn = modifyStdio . Stdio.putStrLn
 
     writeStdout text =
         putStr text
 
-    putStrStderr = modify lstdio . Stdio.putStrStderr
-    putStrLnStderr = modify lstdio . Stdio.putStrLnStderr
+    putStrStderr = modifyStdio . Stdio.putStrStderr
+    putStrLnStderr = modifyStdio . Stdio.putStrLnStderr
 
     getProgName =
         return "elm-format"
