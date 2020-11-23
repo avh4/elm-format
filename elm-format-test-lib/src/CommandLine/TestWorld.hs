@@ -33,6 +33,9 @@ data Lens outer inner =
 lstdio :: Lens TestWorldState Stdio.State
 lstdio = Lens stdio (\x s -> s { stdio = x })
 
+lfilesystem :: Lens TestWorldState (FileTree Text)
+lfilesystem = Lens filesystem (\x s -> s { filesystem = x })
+
 over :: Lens outer inner -> (inner -> inner) -> outer -> outer
 over (Lens get set) f outer = set (f $ get outer) outer
 
@@ -43,40 +46,24 @@ over' (Lens get set) f outer = fmap (flip set outer) (f $ get outer)
 modify :: State.MonadState s m => Lens s inner -> (inner -> inner) -> m ()
 modify l = State.modify . over l
 
+from :: Lens outer b -> (b -> z) -> outer -> z
+from (Lens get _) f = f . get
 
 type TestWorld = TestWorldState
 
 
 instance Monad m => World (State.StateT TestWorldState m) where
-    doesFileExist path =
-        do
-            state <- State.get
-            return $ FileTree.doesFileExist path (filesystem state)
-
-    doesDirectoryExist path =
-        do
-            state <- State.get
-            return $ FileTree.doesDirectoryExist path (filesystem state)
-
-    listDirectory path =
-        do
-            state <- State.get
-            return $ FileTree.listDirectory path (filesystem state)
+    doesFileExist = State.gets . from lfilesystem . FileTree.doesFileExist
+    doesDirectoryExist = State.gets . from lfilesystem . FileTree.doesDirectoryExist
+    listDirectory = State.gets . from lfilesystem . FileTree.listDirectory
 
     readUtf8File path =
-        do
-            state <- State.get
-            case FileTree.read path (filesystem state) of
-                Nothing ->
-                    error $ path ++ ": does not exist"
+        State.gets $ from lfilesystem $ orError . FileTree.read path
+        where
+            orError (Just a) = a
+            orError Nothing = error $ path ++ ": does not exist"
 
-                Just content ->
-                    return content
-
-    writeUtf8File path content =
-        do
-            state <- State.get
-            State.put $ state { filesystem = FileTree.write path content (filesystem state) }
+    writeUtf8File = State.modify . over lfilesystem <<< FileTree.write
 
     getStdin = State.state (over' lstdio Stdio.getStdin)
     putStr = modify lstdio . Stdio.putStr
@@ -100,6 +87,11 @@ instance Monad m => World (State.StateT TestWorldState m) where
         do
             state <- State.get
             State.put $ state { lastExitCode = Just 1 }
+
+
+infixr 8 <<<
+(<<<) :: (c -> z) -> (a -> b -> c) -> a -> b -> z
+(<<<) f g a b = f $ g a b
 
 
 testWorld :: [(String, String)] -> TestWorldState
@@ -163,13 +155,13 @@ init = testWorld []
 
 
 uploadFile :: FilePath -> Text -> TestWorld -> TestWorld
-uploadFile name content world =
-    world { filesystem = FileTree.write name content (filesystem world) }
+uploadFile =
+    over lfilesystem <<< FileTree.write
 
 
 downloadFile :: String -> TestWorld -> Maybe Text
-downloadFile name world =
-    FileTree.read name (filesystem world)
+downloadFile =
+    from lfilesystem . FileTree.read
 
 
 installProgram :: String -> ([String] -> State.State TestWorld ()) -> TestWorld -> TestWorld
