@@ -1,13 +1,13 @@
 {-# LANGUAGE FlexibleInstances #-}
 module CommandLine.TestWorld where
 
+import Prelude hiding (putStr, putStrLn, readFile, writeFile)
 import CommandLine.World
 import Elm.Utils ((|>))
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (Assertion, assertBool, assertEqual, testCase)
 import Test.Tasty.Golden (goldenVsStringDiff)
 
-import Prelude hiding (putStr, readFile, writeFile)
 import qualified Control.Monad.State.Lazy as State
 import Data.FileTree (FileTree)
 import qualified Data.FileTree as FileTree
@@ -16,37 +16,38 @@ import qualified Data.Text.Lazy as LazyText
 import qualified Data.Text.Lazy.Encoding as LazyText
 import Data.Text (Text)
 import qualified Data.Text as Text
+import qualified TestWorld.Stdio as Stdio
 
 
 data TestWorldState =
     TestWorldState
         { filesystem :: FileTree Text
-        , queuedStdin :: Text
-        , stdout :: [Text]
-        , stderr :: [Text]
+        , stdio :: Stdio.State
         , programs :: Dict.Map String ([String] -> State.State TestWorld ())
         , lastExitCode :: Maybe Int
         }
+
+data Lens outer inner =
+    Lens (outer -> inner) (inner -> outer -> outer)
+
+lstdio :: Lens TestWorldState Stdio.State
+lstdio = Lens stdio (\x s -> s { stdio = x })
+
+over :: Lens outer inner -> (inner -> inner) -> outer -> outer
+over (Lens get set) f outer = set (f $ get outer) outer
+
+
+over' :: Lens outer inner -> (inner -> (a, inner)) -> outer -> (a, outer)
+over' (Lens get set) f outer = fmap (flip set outer) (f $ get outer)
+
+modify :: State.MonadState s m => Lens s inner -> (inner -> inner) -> m ()
+modify l = State.modify . over l
 
 
 type TestWorld = TestWorldState
 
 
-fullStdout :: TestWorldState -> Text
-fullStdout state =
-    stdout state
-        |> reverse
-        |> mconcat
-
-
-fullStderr :: TestWorldState -> Text
-fullStderr state =
-    stderr state
-        |> reverse
-        |> mconcat
-
-
-instance World (State.State TestWorldState) where
+instance Monad m => World (State.StateT TestWorldState m) where
     doesFileExist path =
         do
             state <- State.get
@@ -77,34 +78,15 @@ instance World (State.State TestWorldState) where
             state <- State.get
             State.put $ state { filesystem = FileTree.write path content (filesystem state) }
 
-    getStdin =
-        do
-            state <- State.get
-            State.put $ state { queuedStdin = "" }
-            return $ queuedStdin state
-
-    putStr string =
-        do
-            state <- State.get
-            State.put $ state { stdout = string : stdout state }
-
-    putStrLn string =
-        do
-            state <- State.get
-            State.put $ state { stdout = (string <> "\n") : stdout state }
+    getStdin = State.state (over' lstdio Stdio.getStdin)
+    putStr = modify lstdio . Stdio.putStr
+    putStrLn = modify lstdio . Stdio.putStrLn
 
     writeStdout text =
         putStr text
 
-    putStrStderr string =
-        do
-            state <- State.get
-            State.put $ state { stderr = string : stderr state }
-
-    putStrLnStderr string =
-        do
-            state <- State.get
-            State.put $ state { stderr = (string <> "\n") : stderr state }
+    putStrStderr = modify lstdio . Stdio.putStrStderr
+    putStrLnStderr = modify lstdio . Stdio.putStrLnStderr
 
     getProgName =
         return "elm-format"
@@ -124,9 +106,7 @@ testWorld :: [(String, String)] -> TestWorldState
 testWorld files =
       TestWorldState
           { filesystem = foldl (\t (p, c) -> FileTree.write p c t) mempty $ fmap (fmap Text.pack) files
-          , queuedStdin = ""
-          , stdout = []
-          , stderr = []
+          , stdio = Stdio.empty
           , programs = mempty
           , lastExitCode = Nothing
           }
@@ -141,8 +121,8 @@ eval = State.evalState
 
 
 queueStdin :: Text -> TestWorldState -> TestWorldState
-queueStdin newStdin state =
-    state { queuedStdin = newStdin }
+queueStdin =
+    over lstdio . Stdio.queueStdin
 
 
 assertOutput :: [(String, String)] -> TestWorldState -> Assertion
@@ -154,12 +134,12 @@ assertOutput expectedFiles context =
 
 goldenStdout :: String -> FilePath -> TestWorldState -> TestTree
 goldenStdout =
-    goldenOutputStream fullStdout
+    goldenOutputStream (Stdio.fullStdout . stdio)
 
 
 goldenStderr :: String -> FilePath -> TestWorldState -> TestTree
 goldenStderr =
-    goldenOutputStream fullStderr
+    goldenOutputStream (Stdio.fullStderr . stdio)
 
 
 goldenOutputStream :: (TestWorldState -> Text) -> String -> FilePath -> TestWorldState -> TestTree
@@ -202,7 +182,7 @@ run name args testWorld =
     case Dict.lookup name (programs testWorld) of
         Nothing ->
             testWorld
-                { stdout = Text.pack (name ++ ": command not found") : stdout testWorld
+                { stdio = Stdio.putStrLn (Text.pack (name ++ ": command not found")) (stdio testWorld)
                 , lastExitCode = Just 127
                 }
 

@@ -30,6 +30,9 @@ common common-options
 
     hs-source-dirs: src
 
+    other-modules:
+        TestWorld.Stdio
+
     build-depends:
         base >= 4.12.0.0 && < 5,
         containers >= 0.6.0.1 && < 0.7,
