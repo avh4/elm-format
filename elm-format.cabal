@@ -85,7 +85,9 @@ test-Suite elm-format-tests
         Test.Property
 
     build-depends:
+        mtl >= 2.2.2 && < 3,
         tasty >= 1.2 && < 2,
+        tasty-hspec >= 1.1.5.1 && < 1.2,
         tasty-hunit >= 0.10.0.1 && < 0.11,
         tasty-quickcheck >= 0.10.1 && < 0.11,
         QuickCheck >= 2.12.6.1 && < 3,

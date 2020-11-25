@@ -1,32 +1,31 @@
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
-module CommandLine.TestWorld (TestWorldState, TestWorld,expectExit,expectFileContents,goldenExitStdout,run,installProgram,init,uploadFile,goldenStderr,eval,queueStdin, goldenStdout) where
+{-# OPTIONS_GHC -Wno-orphans #-}
+module CommandLine.TestWorld (TestWorldState, TestWorld, lastExitCode, init,uploadFile, downloadFile, eval,queueStdin,fullStdout,golden,fullStderr,expectExit,expectFileContents,goldenExitStdout) where
 
 import Prelude hiding (putStr, putStrLn, readFile, writeFile, init)
 import CommandLine.World
-import Elm.Utils ((|>))
-import Test.Tasty (TestTree, testGroup)
-import Test.Tasty.HUnit (Assertion, assertBool, assertEqual, testCase)
-import Test.Tasty.Golden (goldenVsStringDiff)
 
 import qualified Control.Monad.State.Lazy as State
 import Data.FileTree (FileTree)
 import qualified Data.FileTree as FileTree
-import qualified Data.Map.Strict as Dict
-import qualified Data.Text.Lazy as LazyText
-import qualified Data.Text.Lazy.Encoding as LazyText
 import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified TestWorld.Stdio as Stdio
 import Control.Monad.Identity (Identity)
+import Test.Hspec.Golden ( Golden(..) )
+import qualified Data.Text.IO
+import Test.Hspec.Core.Spec (Example(..), Result(..), ResultStatus(..))
+import Test.Tasty.Hspec (shouldBe, Expectation)
 
 
 data TestWorldState =
     TestWorldState
         { filesystem :: FileTree Text
         , stdio :: Stdio.State
-        , programs :: Dict.Map String ([String] -> State.State TestWorldState ())
-        , lastExitCode :: LastExitCode
+        , _lastExitCode :: LastExitCode
         }
 
 newtype LastExitCode = LastExitCode (Maybe Int)
@@ -59,8 +58,14 @@ class Has t m where
     modify :: (t -> t) -> m ()
     modify f = state (\t -> ((), f t))
 
+    modify' :: t -> (t -> t) -> m ()
+    modify' _ = modify
+
     gets :: (t -> a) -> m a
     gets f = state (\t -> (f t, t))
+
+    gets' :: t -> (t -> a) -> m a
+    gets' _ = gets
 
 instance (Monad m, Lens s t) => Has t (State.StateT s m) where
     state f = State.state $ \outer -> fmap (flip set outer) (f $ get outer)
@@ -80,8 +85,8 @@ instance Lens TestWorldState Stdio.State where
     set x s = s { stdio = x }
 
 instance Lens TestWorldState LastExitCode where
-    get = lastExitCode
-    set x s = s { lastExitCode = x }
+    get = _lastExitCode
+    set x s = s { _lastExitCode = x }
 
 
 --
@@ -128,107 +133,128 @@ testWorld files =
       TestWorldState
           { filesystem = foldl (\t (p, c) -> FileTree.write p c t) mempty $ fmap (fmap Text.pack) files
           , stdio = Stdio.empty
-          , programs = mempty
-          , lastExitCode = LastExitCode Nothing
+          , _lastExitCode = LastExitCode Nothing
           }
-
-
-exec :: State.State s a -> s -> s
-exec = State.execState
 
 
 eval :: State.State s a -> s -> a
 eval = State.evalState
 
 
-queueStdin :: Text -> TestWorldState -> TestWorldState
+queueStdin :: Text -> TestWorld ()
 queueStdin =
-    over . Stdio.queueStdin
-
-
-assertOutput :: [(String, String)] -> TestWorldState -> Assertion
-assertOutput expectedFiles context =
-    assertBool
-        ("Expected filesystem to contain: " ++ show expectedFiles ++ "\nActual: " ++ show (filesystem context))
-        (all (\(k,v) -> FileTree.read k (filesystem context) == Just (Text.pack v)) expectedFiles)
-
-
-goldenStdout :: String -> FilePath -> TestWorldState -> TestTree
-goldenStdout =
-    goldenOutputStream (Stdio.fullStdout . stdio)
-
-
-goldenStderr :: String -> FilePath -> TestWorldState -> TestTree
-goldenStderr =
-    goldenOutputStream (Stdio.fullStderr . stdio)
-
-
-goldenOutputStream :: (TestWorldState -> Text) -> String -> FilePath -> TestWorldState -> TestTree
-goldenOutputStream getStream testName goldenFile state =
-    goldenVsStringDiff testName
-        (\ref new -> ["diff", "-u", ref, new])
-        goldenFile
-        (return $ LazyText.encodeUtf8 $ LazyText.fromStrict $ getStream state)
-
-
-goldenExitStdout :: String -> Int -> String -> TestWorldState -> TestTree
-goldenExitStdout testName expectedExitCode goldenFile state =
-    testGroup testName
-        [ testCase "exit code" $ state |> expectExit expectedExitCode
-        , goldenStdout "stdout" goldenFile state
-        ]
+    modify' (undefined :: Stdio.State) . over . Stdio.queueStdin
 
 
 init :: TestWorldState
 init = testWorld []
 
 
-uploadFile :: FilePath -> Text -> TestWorldState -> TestWorldState
-uploadFile =
-    over <<< FileTree.write
+uploadFile :: FilePath -> Text -> TestWorld ()
+uploadFile  =
+    modify' (undefined :: FileTree Text) <<< over <<< FileTree.write
 
 
-downloadFile :: String -> TestWorldState -> Maybe Text
+downloadFile :: FilePath -> TestWorld (Maybe Text)
 downloadFile =
-    from . FileTree.read
+    gets' (undefined :: FileTree Text) . from . FileTree.read
 
 
-installProgram :: String -> ([String] -> State.State TestWorldState ()) -> TestWorldState -> TestWorldState
-installProgram name handler testWorld =
-    testWorld { programs = Dict.insert name handler (programs testWorld) }
+fullStdout :: TestWorld Text
+fullStdout =
+    gets' (undefined :: Stdio.State) $ from Stdio.fullStdout
 
 
-run :: String -> [String] -> TestWorldState -> TestWorldState
-run name args testWorld =
-    case Dict.lookup name (programs testWorld) of
-        Nothing ->
-            testWorld
-                { stdio = Stdio.putStrLn (Text.pack (name ++ ": command not found")) (stdio testWorld)
-                , lastExitCode = LastExitCode (Just 127)
-                }
-
-        Just handler ->
-            let
-                ((), newTestWorld) = State.runState (handler args) testWorld
-            in
-                newTestWorld
+fullStderr :: TestWorld Text
+fullStderr =
+    gets' (undefined :: Stdio.State) $ from Stdio.fullStderr
 
 
-expectExit :: Int -> TestWorldState -> Assertion
-expectExit expectedExitCode testWorld =
-    case lastExitCode testWorld of
-        LastExitCode Nothing ->
-            fail ("Expected last exit code to be: " ++ show expectedExitCode ++ ", but no program was executed")
-
-        LastExitCode (Just actualExitCode) ->
-            assertEqual "last exit code" expectedExitCode actualExitCode
+lastExitCode :: TestWorld (Maybe Int)
+lastExitCode =
+    gets' (undefined :: LastExitCode) $ from (\(LastExitCode i) -> i)
 
 
-expectFileContents :: String -> Text -> TestWorldState -> Assertion
-expectFileContents filename expectedContent testWorld =
-    case downloadFile filename testWorld of
-        Nothing ->
-            fail ("Expected file " ++ show filename ++ " to have contents, but it did not exist")
 
-        Just actualContent ->
-            assertEqual ("contents of " ++ show filename) expectedContent actualContent
+--
+-- hspec helpers
+--
+
+
+expectExit :: Int -> TestWorld Expectation
+expectExit expected =
+    fmap (\actual -> actual `shouldBe` Just expected) lastExitCode
+
+
+expectFileContents :: FilePath -> Text -> TestWorld Expectation
+expectFileContents filename expectedContent = do
+    actual <- downloadFile filename
+    return $ actual `shouldBe` Just expectedContent
+
+
+goldenExitStdout :: Int -> FilePath -> TestWorld (Expectation, Golden Text)
+goldenExitStdout expectedExitCode goldenFile = do
+    actualExitCode <- lastExitCode
+    actualStdout <- fullStdout
+    return
+        ( actualExitCode `shouldBe` Just expectedExitCode
+        , golden goldenFile actualStdout
+        )
+
+
+--
+-- hspec instances
+--
+
+
+instance Example a => Example (TestWorld a) where
+    type Arg (TestWorld a) = Arg a
+    evaluateExample e =
+        evaluateExample (State.evalState e init)
+
+
+golden :: FilePath -> Text -> Golden Text
+golden name actualOutput =
+    Golden
+        { output = actualOutput
+        , encodePretty = Text.unpack
+        , writeToFile = Data.Text.IO.writeFile
+        , readFromFile = Data.Text.IO.readFile
+        , testName = name
+        , directory = "."
+        , failFirstTime = True
+        }
+
+
+
+--
+-- A mess of instances to allow `goldenExitStdout`
+-- to return both a Spec and a Golden
+--
+
+
+instance (Example a, Arg a ~ ()) => Example (Maybe a) where
+    type Arg (Maybe a) = Arg a
+    evaluateExample Nothing =
+        evaluateExample (Result "" Success)
+    evaluateExample (Just a) =
+        evaluateExample a
+
+
+instance (Example a, Example b, Arg a ~ Arg b) => Example (a, b) where
+    type Arg (a, b) = Arg a
+    evaluateExample (a, b) params actionWith callback = do
+        ra <- evaluateExample a params actionWith callback
+        rb <- evaluateExample b params actionWith callback
+        return (ra <> rb)
+
+
+instance Semigroup Result where
+    (Result a ra) <> (Result b rb) = Result (a ++ "/" ++ b) (ra <> rb)
+
+
+instance Semigroup ResultStatus where
+    Success <> b = b
+    Pending a1 a2 <> Success = Pending a1 a2
+    Pending _ _ <> b = b
+    a <> _ = a

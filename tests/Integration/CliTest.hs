@@ -1,82 +1,91 @@
-module Integration.CliTest (tests) where
+module Integration.CliTest (spec_spec) where
 
-import CommandLine.World (readUtf8File)
-import CommandLine.TestWorld (TestWorldState, run, expectExit, goldenExitStdout, expectFileContents)
-import qualified CommandLine.TestWorld as TestWorld
-import Elm.Utils ((|>))
-import Test.Tasty
-import Test.Tasty.HUnit
+import CommandLine.TestWorld
+import Test.Tasty.Hspec hiding (Success)
 import qualified ElmFormat.Cli as ElmFormat
 import Data.Text (Text)
 import qualified Data.Text as Text
 
 
-tests :: TestTree
-tests =
-    testGroup "CLI"
-        [ testCase "usage" $
-            world
-                |> run "elm-format" [ "--help" ]
-                |> expectExit 0
-        , world
-            |> run "elm-format-xxx" []
-            |> TestWorld.goldenStdout "usage instructions"
-                "tests/usage.stdout"
-        , testCase "simple file" $ world
-            |> TestWorld.uploadFile "test.elm" "module Main exposing (..)\nf = 1"
-            |> run "elm-format" ["test.elm", "--output", "out.elm", "--elm-version=0.19"]
-            |> TestWorld.eval (readUtf8File "out.elm")
-            |> assertPrefix "module Main"
-        , world
-            |> TestWorld.queueStdin "syntax error:True"
-            |> run "elm-format" ["--stdin", "--elm-version=0.19"]
-            |> TestWorld.goldenStderr "using --stdin writes errors to stderr" "tests/stdin-error.stderr"
-        , testGroup "auto-detects Elm version"
-            [ testCase "for Elm 0.19 applications" $ world
-                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"
-                |> TestWorld.uploadFile "elm.json" "{\"elm-version\": \"0.19.0\"}"
-                |> run "elm-format" ["test.elm", "--validate"]
-                |> expectExit 0
-            , testCase "for Elm 0.19 packages" $ world
-                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"
-                |> TestWorld.uploadFile "elm.json" "{\"elm-version\": \"0.19.0 <= v < 0.20.0\"}"
-                |> run "elm-format" ["test.elm", "--validate"]
-                |> expectExit 0
-            , testCase "for Elm 0.18" $ world
-                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\x2000'\n"
-                |> TestWorld.uploadFile "elm-package.json" "{\"elm-version\": \"0.18.0 <= v < 0.19.0\"}"
-                |> run "elm-format" ["test.elm", "--validate"]
-                |> expectExit 0
-            , testCase "default to Elm 0.19" $ world
-                |> TestWorld.uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"
-                |> run "elm-format" ["test.elm", "--validate"]
-                |> expectExit 0
-            ]
-        , testGroup "ways to run"
-            [ goldenExitStdout "elm-format --help" 0 "tests/usage.stdout" $ world
-                |> run "elm-format-xxx" [ "--help" ]
-            , goldenExitStdout "elm-format -h" 0 "tests/usage.stdout" $ world
-                |> run "elm-format-xxx" [ "-h" ]
-            , goldenExitStdout "elm-format (no args)" 1 "tests/usage.stdout" $ world
-                |> run "elm-format-xxx" []
-            , testCase "elm-format INPUT --yes does change the file" $ world
-                |> TestWorld.uploadFile "file.elm" unformatted_elm
-                |> run "elm-format" [ "file.elm", "--elm-version=0.19", "--yes" ]
-                |> expectFileContents "file.elm" formatted_elm
-            , testCase "elm-format INPUT --validate does not change things" $ world
-                |> TestWorld.uploadFile "unformatted.elm" unformatted_elm
-                |> run "elm-format" [ "unformatted.elm", "--elm-version=0.19", "--validate" ]
-                |> expectFileContents "unformatted.elm" unformatted_elm
-            , testCase "elm-format INPUT --validate with unformatted file exits 1" $ world
-                |> TestWorld.uploadFile "unformatted.elm" unformatted_elm
-                |> run "elm-format" [ "unformatted.elm", "--elm-version=0.19", "--validate" ]
-                |> expectExit 1
-            , testCase "elm-format INPUT --validate with formatted file exits 0" $ world
-                |> TestWorld.uploadFile "formatted.elm" formatted_elm
-                |> run "elm-format" [ "formatted.elm", "--elm-version=0.19", "--validate" ]
-                |> expectExit 0
-            ]
-        ]
+spec_spec :: Spec
+spec_spec =
+    describe "CLI" $ do
+        it "usage" $ do
+            ElmFormat.main [ "--help" ]
+            expectExit 0
+
+        it "usage instructions" $ do
+            elmFormatXxx []
+            fmap (golden "tests/usage.stdout") fullStdout
+
+        it "simple file" $ do
+            uploadFile "test.elm" "module Main exposing (..)\nf = 1"
+            ElmFormat.main ["test.elm", "--output", "out.elm", "--elm-version=0.19"]
+            result <- downloadFile "out.elm"
+            return $ result `shouldSatisfy` hasPrefix "module Main"
+
+        it "using --stdin writes errors to stderr" $ do
+            queueStdin "syntax error:True"
+            ElmFormat.main ["--stdin", "--elm-version=0.19"]
+            fmap (golden "tests/stdin-error.stderr") fullStderr
+
+        describe "auto-detects Elm version" $ do
+            it "for Elm 0.19 applications" $ do
+                uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"
+                uploadFile "elm.json" "{\"elm-version\": \"0.19.0\"}"
+                ElmFormat.main ["test.elm", "--validate"]
+                expectExit 0
+
+            it "for Elm 0.19 packages" $ do
+                uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"
+                uploadFile "elm.json" "{\"elm-version\": \"0.19.0 <= v < 0.20.0\"}"
+                ElmFormat.main ["test.elm", "--validate"]
+                expectExit 0
+
+            it "for Elm 0.18" $ do
+                uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\x2000'\n"
+                uploadFile "elm-package.json" "{\"elm-version\": \"0.18.0 <= v < 0.19.0\"}"
+                ElmFormat.main ["test.elm", "--validate"]
+                expectExit 0
+
+            it "default to Elm 0.19" $ do
+                uploadFile "test.elm" "module Main exposing (f)\n\n\nf =\n    '\\u{2000}'\n"
+                ElmFormat.main ["test.elm", "--validate"]
+                expectExit 0
+
+        describe "ways to run" $ do
+            it "elm-format --help" $ do
+                elmFormatXxx [ "--help" ]
+                goldenExitStdout 0 "tests/usage.stdout"
+
+            it "elm-format -h" $ do
+                elmFormatXxx [ "-h" ]
+                goldenExitStdout 0 "tests/usage.stdout"
+
+            it "elm-format (no args)" $ do
+                elmFormatXxx []
+                goldenExitStdout 1 "tests/usage.stdout"
+
+            it "elm-format INPUT --yes does change the file" $ do
+                uploadFile "file.elm" unformatted_elm
+                ElmFormat.main [ "file.elm", "--elm-version=0.19", "--yes" ]
+                expectFileContents "file.elm" formatted_elm
+
+            it "elm-format INPUT --validate does not change things" $ do
+                uploadFile "unformatted.elm" unformatted_elm
+                ElmFormat.main [ "unformatted.elm", "--elm-version=0.19", "--validate" ]
+                expectFileContents "unformatted.elm" unformatted_elm
+
+            it "elm-format INPUT --validate with unformatted file exits 1" $ do
+                uploadFile "unformatted.elm" unformatted_elm
+                ElmFormat.main [ "unformatted.elm", "--elm-version=0.19", "--validate" ]
+                expectExit 1
+
+            it "elm-format INPUT --validate with formatted file exits 0" $ do
+                uploadFile "formatted.elm" formatted_elm
+                ElmFormat.main [ "formatted.elm", "--elm-version=0.19", "--validate" ]
+                expectExit 0
+
 
 unformatted_elm :: Text
 unformatted_elm =
@@ -95,13 +104,13 @@ formatted_elm =
         , "    ()"
         ]
 
-assertPrefix :: String -> Text -> Assertion
-assertPrefix prefix str =
-    assertEqual ("should start with " ++ prefix) prefix (take (length prefix) (Text.unpack str))
+
+hasPrefix :: String -> Maybe Text -> Bool
+hasPrefix prefix =
+    maybe
+        False
+        ((==) prefix . take (length prefix) . Text.unpack)
 
 
-world :: TestWorldState
-world =
-    TestWorld.init
-        |> TestWorld.installProgram "elm-format" ElmFormat.main
-        |> TestWorld.installProgram "elm-format-xxx" (ElmFormat.main' "x.x.x" Nothing)
+elmFormatXxx :: [String] -> TestWorld ()
+elmFormatXxx = ElmFormat.main' "x.x.x" Nothing
