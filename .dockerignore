@@ -1,13 +1,10 @@
 *
+!cabal.config
 !cabal.project
 !cabal.project.freeze
 !elm-format.cabal
+!elm-format-markdown
+!elm-format-lib
 !src
-!src-cli
-!markdown
-markdown/*
-!markdown/Cheapskate
-!parser
-parser/*
-!parser/src
 !generated
+!elm-format-test-lib

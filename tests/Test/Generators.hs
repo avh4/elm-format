@@ -1,14 +1,19 @@
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE DataKinds #-}
+
 module Test.Generators where
 
 import Data.Map.Strict
 import Test.QuickCheck
 
 import AST.V0_16
-import qualified AST.Declaration
-import qualified AST.Expression
+import AST.Module (Module)
 import qualified AST.Module
-import qualified AST.Pattern
-import qualified AST.Variable
+import AST.Structure
+import qualified AST.Listing
+import Data.Functor.Identity
+import qualified Data.Indexed as I
 import qualified Reporting.Annotation
 import qualified Reporting.Region
 
@@ -50,49 +55,24 @@ lowerIdentifier =
         return $ LowercaseIdentifier $ first:rest
 
 
-nowhere :: Reporting.Region.Position
-nowhere =
-    Reporting.Region.Position 0 0
-
-
-located :: a -> Reporting.Annotation.Located a
-located =
-    Reporting.Annotation.at nowhere nowhere
-
-
-instance Arbitrary Reporting.Region.Region where
-    arbitrary =
-        return $ Reporting.Region.Region nowhere nowhere
-
-
-instance (Arbitrary a) => Arbitrary (Reporting.Annotation.Located a) where
-    arbitrary =
-        do
-            ann <- arbitrary
-            a <- arbitrary
-            return $ Reporting.Annotation.A ann a
-
-
-commented :: Gen a -> Gen (Commented a)
+commented :: Gen a -> Gen (C2 before after a)
 commented inner =
-    do
-        a <- inner
-        return $ Commented [] a []
+    C ([], []) <$> inner
 
 
-instance Arbitrary AST.Variable.Value where
+instance Arbitrary AST.Listing.Value where
     arbitrary =
         do
             name <- capIdentifier
-            return $ AST.Variable.Union (name, []) AST.Variable.ClosedListing
+            return $ AST.Listing.Union (C [] name) AST.Listing.ClosedListing
 
 
-listing :: Gen (AST.Variable.Listing a)
+listing :: Gen (AST.Listing.Listing a)
 listing =
-    return $ AST.Variable.OpenListing (Commented [] () [])
+    return $ AST.Listing.OpenListing (C ([], []) ())
 
 
-instance Arbitrary AST.Module.Module where
+instance Arbitrary (Module [UppercaseIdentifier] (ASTNS Identity [UppercaseIdentifier] 'TopLevelNK)) where
     arbitrary =
         do
             name <- listOf1 $ capIdentifier
@@ -102,10 +82,10 @@ instance Arbitrary AST.Module.Module where
                 []
                 (Just $ AST.Module.Header
                   moduleType
-                  (Commented [] name [])
+                  (C ([], []) name)
                   Nothing
-                  (Just $ KeywordCommented [] [] listing)
+                  (Just $ C ([], []) listing)
                 )
-                (located Nothing)
-                ([], empty)
-                [ AST.Declaration.Entry $ located $ AST.Declaration.Definition (located $ AST.Pattern.Anything) [] [] (located $ AST.Expression.TupleFunction 2)]
+                (Reporting.Annotation.at (Reporting.Region.Position 0 0) (Reporting.Region.Position 0 0) Nothing)
+                (C [] empty)
+                (I.Fix $ pure $ TopLevel [ Entry $ I.Fix $ pure $ Definition (I.Fix $ pure $ Anything) [] [] (I.Fix $ pure $ TupleFunction 2)])

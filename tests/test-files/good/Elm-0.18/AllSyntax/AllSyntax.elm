@@ -85,7 +85,7 @@ type alias NestedRecords a =
         , multiline2 : { inner : List Char }
         , multiline3 :
             { a
-                | multiline' : Bool
+                | multiline_ : Bool
             }
         }
     , f4 :
@@ -205,11 +205,11 @@ functionWithParam a =
     a
 
 
-functionParameters a b ( t, s, _, ( t', s', _, ( t'', s'' ), { x', y' } ) ) { x, y } _ =
+functionParameters a b ( t, s, _, ( t_, s_, _, ( t__, s__ ), { x_, y_ } ) ) { x, y } _ =
     ()
 
 
-patternAlias ({ x, y } as r) ( a, { b } as r' ) =
+patternAlias ({ x, y } as r) ( a, { b } as r_ ) =
     r.x == y
 
 
@@ -218,7 +218,7 @@ fnAsLambda =
 
 
 multiArgLambda =
-    \a b ( t, s, _, ( t', s', _, ( t'', s'' ), { x', y' } ) ) { x, y } _ -> \c -> \d -> ()
+    \a b ( t, s, _, ( t_, s_, _, ( t__, s__ ), { x_, y_ } ) ) { x, y } _ -> \c -> \d -> ()
 
 
 multilineLambda =
@@ -326,7 +326,7 @@ multilineDeclarationInLet =
         string =
             "String"
 
-        string' =
+        string_ =
             "String Prime"
     in
     string
@@ -490,40 +490,40 @@ multilineCaseSubject a =
 
 
 singleLineRange =
-    [{ f1 = 6 }.f1..(9 + 6 |> (-) 2) + 2]
+    List.range { f1 = 6 }.f1 ((9 + 6 |> (-) 2) + 2)
 
 
 multilineRange =
-    [
-        if True then
+    List.range
+        (if True then
             1
 
-        else
+         else
             2
-    ..
-        if False then
+        )
+        (if False then
             3
 
-        else
+         else
             5
-    ]
+        )
 
 
 nestedMultilineRange =
-    [ [
-        if True then
+    [ List.range
+        (if True then
             1
 
-        else
+         else
             2
-      ..
-        if False then
+        )
+        (if False then
             3
 
-        else
+         else
             5
-      ]
-    , [4..2]
+        )
+    , List.range 4 2
     ]
 
 

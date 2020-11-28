@@ -1,13 +1,14 @@
 module Integration.CliTest (tests) where
 
-import Prelude hiding (readFile)
+import CommandLine.World (readUtf8File)
+import CommandLine.TestWorld (TestWorld, run, expectExit, goldenExitStdout, expectFileContents)
+import qualified CommandLine.TestWorld as TestWorld
 import Elm.Utils ((|>))
 import Test.Tasty
 import Test.Tasty.HUnit
-import ElmFormat.World (readFile)
-import ElmFormat.TestWorld (TestWorld, run, expectExit, goldenExitStdout, expectFileContents)
-import qualified ElmFormat
-import qualified ElmFormat.TestWorld as TestWorld
+import qualified ElmFormat.Cli as ElmFormat
+import Data.Text (Text)
+import qualified Data.Text as Text
 
 
 tests :: TestTree
@@ -24,7 +25,7 @@ tests =
         , testCase "simple file" $ world
             |> TestWorld.uploadFile "test.elm" "module Main exposing (..)\nf = 1"
             |> run "elm-format" ["test.elm", "--output", "out.elm", "--elm-version=0.19"]
-            |> TestWorld.eval (readFile "out.elm")
+            |> TestWorld.eval (readUtf8File "out.elm")
             |> assertPrefix "module Main"
         , world
             |> TestWorld.queueStdin "syntax error:True"
@@ -77,16 +78,16 @@ tests =
             ]
         ]
 
-unformatted_elm :: String
+unformatted_elm :: Text
 unformatted_elm =
-    unlines
+    Text.unlines
         [ "module MyMain exposing (x)"
         , "x = ()"
         ]
 
-formatted_elm :: String
+formatted_elm :: Text
 formatted_elm =
-    unlines
+    Text.unlines
         [ "module MyMain exposing (x)"
         , ""
         , ""
@@ -94,13 +95,13 @@ formatted_elm =
         , "    ()"
         ]
 
-assertPrefix :: String -> String -> Assertion
+assertPrefix :: String -> Text -> Assertion
 assertPrefix prefix str =
-    assertEqual ("should start with " ++ prefix) prefix (take (length prefix) str)
+    assertEqual ("should start with " ++ prefix) prefix (take (length prefix) (Text.unpack str))
 
 
 world :: TestWorld
 world =
     TestWorld.init
-        |> TestWorld.installProgram "elm-format" ElmFormat.main'
-        |> TestWorld.installProgram "elm-format-xxx" (ElmFormat.main'' "x.x.x" Nothing)
+        |> TestWorld.installProgram "elm-format" ElmFormat.main
+        |> TestWorld.installProgram "elm-format-xxx" (ElmFormat.main' "x.x.x" Nothing)
