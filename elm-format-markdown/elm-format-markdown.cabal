@@ -1,0 +1,49 @@
+cabal-version: 2.4
+
+Name: elm-format-markdown
+version: 0.0.0.1
+
+Synopsis:
+    Markdown parsing for Elm documentation comments
+
+License: BSD-3-Clause
+License-file: LICENSE
+
+Author:     Aaron VonderHaar
+Maintainer: gruen0aermel@gmail.com
+Copyright:  See https://github.com/avh4/elm-format/blob/master/LICENSE
+
+build-type: Simple
+
+
+common common-options
+
+    ghc-options:
+        -O2 -Wall -Wno-name-shadowing
+
+    default-language: Haskell2010
+
+    default-extensions:
+        DeriveFunctor
+        MultiParamTypeClasses
+        LambdaCase
+        OverloadedStrings
+        ScopedTypeVariables
+
+    hs-source-dirs: .
+
+    build-depends:
+        base >= 4.12.0.0 && < 5,
+        containers >= 0.6.0.1 && < 0.7,
+        mtl >= 2.2.2 && < 3,
+        text >= 1.2.3.1 && < 2
+
+library
+    import: common-options
+
+    exposed-modules:
+        Cheapskate.Inlines
+        Cheapskate.Parse
+        Cheapskate.ParserCombinators
+        Cheapskate.Types
+        Cheapskate.Util
