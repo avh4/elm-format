@@ -2,10 +2,9 @@
 module Parse.Module (moduleDecl, elmModule, topLevel, import') where
 
 import qualified Control.Applicative
-import Data.Map.Strict hiding (foldl, map)
+import Data.Map.Strict ( Map, empty, insert, insertWith )
 import Elm.Utils ((|>))
-import Text.Parsec hiding (newline, spaces)
-
+import Text.Parsec ( char, letter, string, choice, eof, option, optionMaybe, (<?>), (<|>), many, try )
 import Parse.Helpers
 import qualified Parse.Declaration as Decl
 import AST.Listing (Listing(..), mergeCommentedMap, mergeListing)
@@ -116,8 +115,8 @@ moduleDecl_0_17 elmVersion =
 
       exports <-
         optionMaybe $
-        commentedKeyword elmVersion "exposing" $
-          listing $ detailedListing elmVersion
+        commentedKeyword elmVersion "exposing" (listing $ detailedListing elmVersion)
+          <|> try (noKeywordComment $ listing $ detailedListing elmVersion)
 
       return $
         Module.Header
@@ -126,6 +125,10 @@ moduleDecl_0_17 elmVersion =
           whereClause
           exports
 
+noKeywordComment :: IParser a -> IParser (C2 beforeKeyword afterKeyword a)
+noKeywordComment parser = do
+    post <- whitespace
+    C ([], post) <$> parser
 
 mergePreCommented :: (a -> a -> a) -> C1 before a -> C1 before a -> C1 before a
 mergePreCommented merge (C pre1 left) (C pre2 right) =
@@ -180,7 +183,7 @@ import' elmVersion =
     method originalName =
       Module.ImportMethod
         <$> option Nothing (Just <$> as' originalName)
-        <*> option (C ([], []) ClosedListing) exposing
+        <*> option (C ([], []) ClosedListing) (exposing <|> noKeywordComment (listing $ detailedListing elmVersion))
 
     as' :: [UppercaseIdentifier] -> IParser (C2 BeforeAs AfterAs UppercaseIdentifier)
     as' moduleName =
@@ -190,7 +193,7 @@ import' elmVersion =
 
     exposing :: IParser (C2 BeforeExposing AfterExposing (Listing Module.DetailedListing))
     exposing =
-      do  preExposing <- try (whitespace <* reserved elmVersion "exposing")
+      do  preExposing <- try ((whitespace <* reserved elmVersion "exposing") <|> whitespace)
           postExposing <- whitespace
           imports <-
             choice
