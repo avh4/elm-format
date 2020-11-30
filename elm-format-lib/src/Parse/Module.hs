@@ -193,7 +193,7 @@ import' elmVersion =
 
     exposing :: IParser (C2 BeforeExposing AfterExposing (Listing Module.DetailedListing))
     exposing =
-      do  preExposing <- try ((whitespace <* reserved elmVersion "exposing") <|> whitespace)
+      do  preExposing <- try (whitespace <* reserved elmVersion "exposing")
           postExposing <- whitespace
           imports <-
             choice
