@@ -6,7 +6,7 @@ module Parse.Helpers where
 import qualified AST.Helpers as Help
 import AST.Structure (FixAST)
 import AST.V0_16
-import Control.Monad (guard, when)
+import Control.Monad (guard)
 import qualified Data.Indexed as I
 import Data.Map.Strict hiding (foldl)
 import ElmVersion
@@ -129,39 +129,39 @@ symOpInParens =
 
 equals :: IParser ()
 equals =
-  () <$ char '=' <?> "="
+  const () <$> char '=' <?> "="
 
 lenientEquals :: IParser ()
 lenientEquals =
-  () <$ (char '=' <|> char ':') <?> "="
+  const () <$> (char '=' <|> char ':') <?> "="
 
 rightArrow :: IParser ()
 rightArrow =
-  () <$ (string "->" <|> string "\8594") <?> "->"
+  const () <$> (string "->" <|> string "\8594") <?> "->"
 
 cons :: IParser ()
 cons =
-  () <$ string "::" <?> "a cons operator '::'"
+  const () <$> string "::" <?> "a cons operator '::'"
 
 hasType :: IParser ()
 hasType =
-  () <$ char ':' <?> "the \"has type\" symbol ':'"
+  const () <$> char ':' <?> "the \"has type\" symbol ':'"
 
 lenientHasType :: IParser ()
 lenientHasType =
-  () <$ (char ':' <|> char '=') <?> "the \"has type\" symbol ':'"
+  const () <$> (char ':' <|> char '=') <?> "the \"has type\" symbol ':'"
 
 comma :: IParser ()
 comma =
-  () <$ char ',' <?> "a comma ','"
+  const () <$> char ',' <?> "a comma ','"
 
 semicolon :: IParser ()
 semicolon =
-  () <$ char ';' <?> "a semicolon ';'"
+  const () <$> char ';' <?> "a semicolon ';'"
 
 verticalBar :: IParser ()
 verticalBar =
-  () <$ char '|' <?> "a vertical bar '|'"
+  const () <$> char '|' <?> "a vertical bar '|'"
 
 commitIf :: IParser any -> IParser a -> IParser a
 commitIf check p =
@@ -303,7 +303,7 @@ constrainedSpacePrefix :: IParser a -> IParser [(C1 before a, Multiline)]
 constrainedSpacePrefix parser =
   constrainedSpacePrefix' parser constraint
   where
-    constraint empty = when empty $ notFollowedBy (char '-')
+    constraint empty = if empty then notFollowedBy (char '-') else return ()
 
 constrainedSpacePrefix' :: IParser a -> (Bool -> IParser b) -> IParser [(C1 before a, Multiline)]
 constrainedSpacePrefix' parser constraint =
@@ -389,7 +389,7 @@ surround'' leftDelim rightDelim inner =
   let sep''' =
         do
           v <- (\pre a post -> C (pre, post) a) <$> whitespace <*> inner <*> whitespace
-          option [v] ((v :) <$> (char ',' >> sep'''))
+          option [v] ((\x -> v : x) <$> (char ',' >> sep'''))
       sep'' =
         do
           pre <- whitespace
@@ -398,7 +398,7 @@ surround'' leftDelim rightDelim inner =
             Nothing ->
               return $ Left pre
             Just v' ->
-              Right <$> option [v'] ((v' :) <$> (char ',' >> sep'''))
+              Right <$> option [v'] ((\x -> v' : x) <$> (char ',' >> sep'''))
    in do
         _ <- char leftDelim
         vs <- sep''
@@ -449,10 +449,12 @@ dot =
     notFollowedBy (char '.')
 
 commentedKeyword :: ElmVersion -> String -> IParser a -> IParser (C2 beforeKeyword afterKeyword a)
-commentedKeyword elmVersion word parser = do
-  pre <- try (whitespace <* reserved elmVersion word)
-  post <- whitespace
-  C (pre, post) <$> parser
+commentedKeyword elmVersion word parser =
+  do
+    pre <- try (whitespace <* reserved elmVersion word)
+    post <- whitespace
+    value <- parser
+    return $ C (pre, post) value
 
 -- ODD COMBINATORS
 
