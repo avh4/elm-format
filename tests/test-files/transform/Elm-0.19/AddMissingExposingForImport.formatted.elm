@@ -1,3 +1,3 @@
 module Main exposing (..)
 
-import {- A -} Bar {- B -} exposing (Foo)
+import {- A -} Bar exposing {- B -} (Foo)
