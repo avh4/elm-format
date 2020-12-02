@@ -4,7 +4,8 @@ on:
   push:
     branches: '**'
   pull_request:
-    branches: [ $default-branch ]
+    branches:
+    - main
 
 defaults:
   run:
@@ -26,7 +27,7 @@ jobs:
       run: |
         git config --global core.autocrlf false
     - uses: actions/checkout@v2
-    - uses: actions/setup-haskell@v1.1
+    - uses: actions/setup-haskell@v1.1.4
       name: Setup Haskell
       id: setup-haskell
       with:
