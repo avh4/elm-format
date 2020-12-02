@@ -116,7 +116,7 @@ moduleDecl_0_17 elmVersion =
       exports <-
         optionMaybe $
         commentedKeyword elmVersion "exposing" (listing $ detailedListing elmVersion)
-          <|> listingWithoutExposing elmVersion
+          <|> try (listingWithoutExposing elmVersion)
 
       return $
         Module.Header
@@ -184,7 +184,7 @@ import' elmVersion =
     method originalName =
       Module.ImportMethod
         <$> option Nothing (Just <$> as' originalName)
-        <*> option (C ([], []) ClosedListing) (exposing <|> listingWithoutExposing elmVersion)
+        <*> option (C ([], []) ClosedListing) (exposing <|> try (listingWithoutExposing elmVersion))
 
     as' :: [UppercaseIdentifier] -> IParser (C2 BeforeAs AfterAs UppercaseIdentifier)
     as' moduleName =
