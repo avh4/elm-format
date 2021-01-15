@@ -30,14 +30,18 @@ common common-options
 
     hs-source-dirs: src
 
+    other-modules:
+        TestWorld.Stdio
+
     build-depends:
         base >= 4.12.0.0 && < 5,
         containers >= 0.6.0.1 && < 0.7,
         filepath >= 1.4.2.1 && < 1.5,
+        hspec-core >= 2.7.4 && < 3,
+        hspec-golden >= 0.1.0.3 && < 0.2,
         mtl >= 2.2.2 && < 3,
         split >= 0.2.3.3 && < 0.3,
         tasty >= 1.2 && < 2,
-        tasty-golden >= 2.3.2 && < 3,
         tasty-hspec >= 1.1.5.1 && < 1.2,
         tasty-hunit >= 0.10.0.1 && < 0.11,
         text >= 1.2.3.1 && < 2,
