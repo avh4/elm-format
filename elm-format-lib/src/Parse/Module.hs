@@ -2,15 +2,14 @@
 module Parse.Module (moduleDecl, elmModule, topLevel, import') where
 
 import qualified Control.Applicative
-import Data.Map.Strict hiding (foldl, map)
+import Data.Map.Strict ( Map, empty, insert, insertWith )
 import Elm.Utils ((|>))
-import Text.Parsec hiding (newline, spaces)
-
+import Text.Parsec ( char, letter, string, choice, eof, option, optionMaybe, (<?>), (<|>), many, try )
 import Parse.Helpers
 import qualified Parse.Declaration as Decl
 import AST.Listing (Listing(..), mergeCommentedMap, mergeListing)
 import qualified AST.Listing as Listing
-import AST.Module (Module, BeforeExposing, AfterExposing, BeforeAs, AfterAs, ImportMethod)
+import AST.Module (DetailedListing, Module, BeforeExposing, AfterExposing, BeforeAs, AfterAs, ImportMethod)
 import qualified AST.Module as Module
 import AST.Structure
 import AST.V0_16
@@ -116,8 +115,8 @@ moduleDecl_0_17 elmVersion =
 
       exports <-
         optionMaybe $
-        commentedKeyword elmVersion "exposing" $
-          listing $ detailedListing elmVersion
+        commentedKeyword elmVersion "exposing" (listing $ detailedListing elmVersion)
+          <|> try (listingWithoutExposing elmVersion)
 
       return $
         Module.Header
@@ -126,6 +125,11 @@ moduleDecl_0_17 elmVersion =
           whereClause
           exports
 
+listingWithoutExposing :: ElmVersion -> IParser (C2 beforeKeyword afterKeyword (Listing DetailedListing))
+listingWithoutExposing elmVersion = do
+    let pre = []
+    post <- whitespace
+    C (pre, post) <$> listing (detailedListing elmVersion)
 
 mergePreCommented :: (a -> a -> a) -> C1 before a -> C1 before a -> C1 before a
 mergePreCommented merge (C pre1 left) (C pre2 right) =
@@ -180,7 +184,7 @@ import' elmVersion =
     method originalName =
       Module.ImportMethod
         <$> option Nothing (Just <$> as' originalName)
-        <*> option (C ([], []) ClosedListing) exposing
+        <*> option (C ([], []) ClosedListing) (exposing <|> try (listingWithoutExposing elmVersion))
 
     as' :: [UppercaseIdentifier] -> IParser (C2 BeforeAs AfterAs UppercaseIdentifier)
     as' moduleName =
