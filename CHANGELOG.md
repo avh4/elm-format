@@ -4,6 +4,7 @@ Feature changes:
   - Detailed error messages for syntax errors have been removed.  Use elm make to see a detailed error if elm-format fails.
 
 Other changes:
+  - The npm installer now provides a (Rosetta) binary for Mac ARM64
   - Linux binaries installed with `npm` are now statically linked (should now work on alpine linux and other systems without glibc-2.27)
   - Removed `--upgrade` (now use elm-refactor instead)
   - Adds "exposing" keyword for `module`s and `import`s
