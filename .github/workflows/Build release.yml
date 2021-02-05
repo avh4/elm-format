@@ -39,17 +39,17 @@ jobs:
       name: Setup Haskell
       id: setup-haskell
       with:
-        ghc-version: 8.8.4
+        ghc-version: 8.10.3
     - name: Workaround for https://github.com/actions/setup-haskell/issues/36
       if: runner.os == 'macOS'
       run: |
         ghcup list
-        ghcup set ghc 8.8.4
+        ghcup set ghc 8.10.3
     - name: Verify Haskell version
       run: |
         cabal --version
         ghc --version
-        [[ $(ghc --numeric-version) == 8.8.4 ]]
+        [[ $(ghc --numeric-version) == 8.10.3 ]]
     - uses: actions/cache@v2
       name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:

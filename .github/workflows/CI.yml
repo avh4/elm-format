@@ -31,7 +31,7 @@ jobs:
       name: Setup Haskell
       id: setup-haskell
       with:
-        ghc-version: 8.8.4
+        ghc-version: 8.10.3
     - uses: actions/cache@v2
       name: Cache cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:
