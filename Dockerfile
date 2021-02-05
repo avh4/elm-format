@@ -34,6 +34,7 @@ WORKDIR /elm-format
 COPY cabal.project ./
 COPY cabal.project.freeze ./
 
+COPY avh4-lib/avh4-lib.cabal avh4-lib/
 COPY elm-format-markdown/elm-format-markdown.cabal elm-format-markdown/
 COPY elm-format-lib/elm-format-lib.cabal elm-format-lib/
 COPY elm-format-test-lib/elm-format-test-lib.cabal elm-format-test-lib/
@@ -42,6 +43,8 @@ COPY elm-format.cabal ./
 RUN cabal v2-update
 
 RUN cabal v2-build --ghc-option=-optl=-static --ghc-option=-split-sections -O2 elm-format-markdown --only-dependencies
+COPY avh4-lib avh4-lib
+RUN cabal v2-build --ghc-option=-optl=-static --ghc-option=-split-sections -O2 avh4-lib
 COPY elm-format-markdown elm-format-markdown
 RUN cabal v2-build --ghc-option=-optl=-static --ghc-option=-split-sections -O2 elm-format-markdown
 
