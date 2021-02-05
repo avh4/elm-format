@@ -304,8 +304,8 @@ git clone https://github.com/avh4/elm-format.git
 cd elm-format
 
 # initial setup
-ghcup install ghc 8.8.4
-ghcup set ghc 8.8.4
+ghcup install ghc 8.10.3
+ghcup set ghc 8.10.3
 
 # build
 ./build.sh -- build
