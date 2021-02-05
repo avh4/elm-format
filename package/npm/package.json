@@ -31,9 +31,9 @@
     "elm-format": "bin/elm-format"
   },
   "dependencies": {
-    "binwrap": "^0.2.2"
+    "binwrap": "^0.2.3"
   },
   "devDependencies": {
-    "eslint": "^3.18.0"
+    "eslint": "^7.19.0"
   }
 }
