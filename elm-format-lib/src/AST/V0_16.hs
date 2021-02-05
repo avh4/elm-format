@@ -17,6 +17,7 @@ import Data.Int (Int64)
 import qualified Data.Indexed as I
 import qualified Data.Maybe as Maybe
 import qualified Cheapskate.Types as Markdown
+import Control.Applicative
 
 
 type List a = [a]
@@ -66,6 +67,10 @@ data Commented c a =
 instance Coapplicative (Commented c) where
     extract (C _ a) = a
     {-# INLINE extract #-}
+
+instance Monoid c => Applicative (Commented c) where
+    pure = C mempty
+    liftA2 f (C ca a) (C cb b) = C (ca <> cb) (f a b)
 
 type C1 l1 a = Commented Comments a
 type C2 l1 l2 a = Commented (Comments, Comments) a
