@@ -3,7 +3,7 @@ sudo: false
 
 language: haskell
 cabal: "3.2"
-ghc: "8.8.4"
+ghc: "8.10.3"
 
 
 cache:
