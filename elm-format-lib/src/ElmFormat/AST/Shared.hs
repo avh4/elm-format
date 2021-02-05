@@ -3,6 +3,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 module ElmFormat.AST.Shared where
 
+import Control.Applicative
 import Data.Coapplicative
 import Data.Int (Int64)
 import GHC.Generics
@@ -39,6 +40,10 @@ newtype SymbolIdentifier =
 data Commented c a =
     C c a
     deriving (Eq, Ord, Functor, Show) -- TODO: is Ord needed?
+
+instance Monoid c => Applicative (Commented c) where
+    pure = C mempty
+    liftA2 f (C ca a) (C cb b) = C (ca <> cb) (f a b)
 
 instance Coapplicative (Commented c) where
     extract (C _ a) = a
