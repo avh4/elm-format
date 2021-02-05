@@ -6,6 +6,7 @@ Feature changes:
 Other changes:
   - Linux binaries installed with `npm` are now statically linked (should now work on alpine linux and other systems without glibc-2.27)
   - Removed `--upgrade` (now use elm-refactor instead)
+  - Adds "exposing" keyword for `module`s and `import`s
 
 
 ## 0.8.4

@@ -122,7 +122,7 @@ main = do
     -- integration tests
     --
 
-    phony "integration-tests" $ do
+    phony "integration-tests" $ 
         need
             [ "_build/run-tests.ok"
             , "_build/tests/test-files/good-json.ok"
