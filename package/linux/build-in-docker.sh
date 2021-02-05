@@ -2,9 +2,7 @@
 
 set -euo pipefail
 
-if [[ $(docker --version) == *" 19.0"[3-9]* ]]; then
-    true
-else
+if [[ $(docker --version) == *" 19.0"[0-2]* ]]; then
     echo "ERROR: Docker >= 19.03 is required"
     docker --version
     exit 1
