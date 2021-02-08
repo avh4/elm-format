@@ -209,7 +209,7 @@ main = do
             elmFiles <- getDirectoryFiles ""
                 [ "tests/test-files/transform/Elm-" ++ elmVersion ++ "//*.elm"
                 ]
-            let oks = ["_build" </> f -<.> "elm_transform_matches" | f <- elmFiles, ( takeExtension $ dropExtension f) /= ".formatted" ]
+            let oks = ["_build" </> f -<.> "elm_transform_matches" | f <- elmFiles, takeExtension (dropExtension f) /= ".formatted" ]
             need oks
             writeFile' out (unlines oks)
 

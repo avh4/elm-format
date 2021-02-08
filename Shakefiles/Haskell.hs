@@ -30,8 +30,7 @@ cabalProject name sourceFiles sourcePatterns deps testPatterns testDeps =
                     , sourceFilesFromPatterns
                     ]
             need allFiles
-            hash <- liftIO $ getHashedShakeVersion allFiles
-            return hash
+            liftIO $ getHashedShakeVersion allFiles
     in
     do
         "_build/cabal/" </> name </> "build.ok" %> \out -> do
@@ -39,11 +38,11 @@ cabalProject name sourceFiles sourcePatterns deps testPatterns testDeps =
             cmd_ "cabal" "v2-build" "-O0"  (name ++ ":libs") "--enable-tests"
             writeFile' out hash
 
-        (cabalBinPath name "noopt") %> \out -> do
+        cabalBinPath name "noopt" %> \out -> do
             _ <- needProjectFiles
             cmd_ "cabal" "v2-build" "-O0" (name ++ ":exes") "--enable-tests"
 
-        (cabalBinPath name "opt") %> \out -> do
+        cabalBinPath name "opt" %> \out -> do
             _ <- needProjectFiles
             cmd_ "cabal" "v2-build" "-O2" (name ++ ":exes")
 
