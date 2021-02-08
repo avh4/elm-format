@@ -9,6 +9,8 @@ import qualified System.Info
 import qualified Shakefiles.Haskell
 import qualified Shakefiles.Shellcheck
 import qualified Shakefiles.Dependencies
+import qualified Shakefiles.Signature
+import Shakefiles.Extra
 
 
 main :: IO ()
@@ -44,6 +46,8 @@ main = do
         ]
     phony "profile" $ need [ "_build/tests/test-files/prof.ok" ]
     phony "dist" $ need [ "dist-elm-format" ]
+    phonyPrefix "publish-" $ \version ->
+        need [ "elm-format-publish-" ++ version ]
 
     phony "clean" $ do
         removeFilesAfter "dist-newstyle" [ "//*" ]
@@ -56,6 +60,8 @@ main = do
             , "formatted.json"
             , "_stdout.txt"
             ]
+
+    Shakefiles.Signature.rules
 
 
     --
@@ -122,7 +128,7 @@ main = do
     -- integration tests
     --
 
-    phony "integration-tests" $ 
+    phony "integration-tests" $
         need
             [ "_build/run-tests.ok"
             , "_build/tests/test-files/good-json.ok"

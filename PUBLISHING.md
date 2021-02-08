@@ -26,23 +26,21 @@ brew install keybase
 1. Wait for CI to successfully build the tag.
 
 
-## Mac / Windows
+## Platforms built on CI (Mac / Windows)
 
 1. Pushing the tag should have triggered a build at <https://github.com/avh4/elm-format/actions?query=workflow%3A%22Build+release%22>
-1. Download the artifacts from the successful build (keep them as zip files)
-1. Run `./package/collect_files.sh` passing the paths to the downloaded zip files as arguments
-1. Check that the script reports that the new files have valid signatures
+1. Download the artifacts from the successful build (keep them as zip files), and put them in `downloads/`
 
 
-## Linux
+## Platforms built in docker (Linux)
 
 1. Make sure you have [Docker](https://docs.docker.com/get-docker/) installed and running
-1. Run `./package/linux/build-in-docker.sh`
+1. The binaries will be built automatically in the next section
 
 
 ## Publishing
 
-1. Run `./package/sign_files.sh`
+1. Run `./build.sh publish-<new version>`
 1. Go to the release page for the new tag on github.
 1. Enter the contents of `Release Notes/<new version>.md` as the release notes.
 1. Upload the zip, tgz and asc files.
