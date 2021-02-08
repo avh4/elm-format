@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-PKG_ENV_FILE=_build/shake-package-env
+PKG_ENV_FILE="_build/shake-package-env-$(ghc --numeric-version)"
 
 mkdir -p _build
 # install shake if it's not installed
