@@ -14,3 +14,8 @@
 /_build/
 /dist-newstyle/
 /bin/
+
+# Output files
+/dist/
+/publish/
+/downloads/
