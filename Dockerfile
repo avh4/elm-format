@@ -60,7 +60,8 @@ RUN cabal v2-build --ghc-option=-optl=-static --ghc-option=-split-sections -O2 -
 
 # Build elm-format
 COPY src src
-COPY generated generated
+ARG ELM_FORMAT_VERSION="unknown"
+RUN mkdir generated && echo -e "module Build_elm_format where\n\ngitDescribe :: String\ngitDescribe = \"$ELM_FORMAT_VERSION\"\n" > generated/Build_elm_format.hs
 RUN cabal v2-build --ghc-option=-optl=-static --ghc-option=-split-sections -O2
 RUN cp dist-newstyle/build/x86_64-linux/ghc-*/elm-format-*/x/elm-format/opt/build/elm-format/elm-format ./
 RUN strip -s ./elm-format
