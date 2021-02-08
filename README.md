@@ -3,11 +3,9 @@
 
 # elm-format
 
-> `elm-format` is still in beta.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
->
-> **The format produced by elm-format may change significantly before the 1.0.0 release.**  If this will cause problems for you, please refrain from using elm-format during the beta-test period.
-
-`elm-format` formats [Elm](https://elm-lang.org) source code according to a standard set of rules based on [the official Elm Style Guide](https://elm-lang.org/docs/style-guide). It is inspired by the popular [gofmt](https://blog.golang.org/go-fmt-your-code).
+`elm-format` formats [Elm](https://elm-lang.org) source code
+according to a standard set of rules based on [the official Elm Style Guide](https://elm-lang.org/docs/style-guide).
+It is inspired by the popular [gofmt](https://blog.golang.org/go-fmt-your-code).
 
 The benefits of `elm-format`:
  - It makes code **easier to write**, because you never have to worry about minor formatting concerns while powering out new code.
@@ -20,20 +18,15 @@ The benefits of `elm-format`:
 ## Usage
 
 ```bash
+elm-format .  # Format all *.elm files in the current directory
 elm-format Main.elm  # Format a single file
 elm-format Main.elm --yes  # Overwrite the file without prompting
-elm-format src/  # Format all *.elm files in a directory
-elm-format --stdin  # Format input from stdin and write to stdout
-elm-format --stdin --output Main.elm  # Format input from stdin and write to file
+elm-format src/ Main.elm  # Format the listed files and directories
 elm-format --help  # See other command line options
 ```
 
 
 ## Installation [![(latest version: 0.8.5)](https://img.shields.io/badge/version-0.8.5-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.5)
-
-> `elm-format` is still in beta.  If you run into any problems, please [report them](https://github.com/avh4/elm-format/issues).
->
-> **The format produced by elm-format may change significantly before the 1.0.0 release.**  If this will cause problems for you, please refrain from using elm-format during the beta-test period.
 
 To install `elm-format`:
 
@@ -44,8 +37,6 @@ npm install -g elm-format
 or download the version appropriate for your OS from the [release page](https://github.com/avh4/elm-format/releases/tag/0.8.5),
 unzip it,
 and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.
-
-On FreeBSD you can `pkg install hs-elm-format` or use [devel/elm-format](https://www.freshports.org/devel/elm-format/), then execute `elm-format` normally.
 
 You must run `elm-format` from the directory that contains your `elm.json` (for Elm 0.19) or `elm-package.json` (for Elm 0.18),
 or else you must pass the appropriate `--elm-version=0.19`/`--elm-version=0.18` command line argument.
