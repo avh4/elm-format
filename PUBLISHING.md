@@ -47,9 +47,19 @@ brew install keybase
 1. Publish the release.
 
 
+## elm-tooling
+
+```sh
+cd package/elm-tooling
+./build.sh
+```
+
+Then `cd elm-tooling`, push the resulting branch, and make a PR to <https://github.com/elm-tooling/elm-tooling-cli> with the title "`Add elm-format <new version>`"
+
+
 ## NPM
 
-```
+```sh
 cd package/npm
 npm install
 # for experimental releases
@@ -64,7 +74,7 @@ npm dist-tag add elm-format@<new version> latest-0.19.1
 
 ## Nix
 
-```
+```sh
 cd package/nix
 ./build.sh
 ```
