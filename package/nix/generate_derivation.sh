@@ -12,10 +12,9 @@
 # store. If you already have all the dependencies installed, feel free to remove
 # them from the shebang to speed up the process.
 
-set -exo pipefail
+set -euo pipefail
 
 REV="$(git rev-parse HEAD)"
-VERSION="$(git describe --abbrev=8 "$REV")"
 
 PATCH=$(cat <<END
   postPatch = ''
@@ -24,7 +23,7 @@ PATCH=$(cat <<END
     module Build_elm_format where
 
     gitDescribe :: String
-    gitDescribe = "$VERSION"
+    gitDescribe = "\${version}"
     EOHS
   '';
 END
@@ -37,5 +36,6 @@ quoteSubst() {
 }
 
 cabal2nix --no-haddock https://github.com/avh4/elm-format --revision "$REV" |
+  sed "s#^mkDerivation#mkDerivation rec#" |
   sed "s#isLibrary = true#isLibrary = false#" |
   sed "s#^}\$#$(quoteSubst "$PATCH")\n}#"
