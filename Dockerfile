@@ -6,7 +6,7 @@ ENV LANG C.UTF-8
 
 # Install ghc and cabal-isntall
 RUN apk add --no-cache curl
-RUN curl https://downloads.haskell.org/~ghcup/x86_64-linux-ghcup > /usr/local/bin/ghcup && \
+RUN curl https://downloads.haskell.org/~ghcup/0.1.12/x86_64-linux-ghcup-0.1.12 > /usr/local/bin/ghcup && \
     chmod +x /usr/local/bin/ghcup
 RUN ghcup install cabal recommended
 RUN apk add --no-cache \
