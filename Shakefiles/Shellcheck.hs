@@ -18,6 +18,7 @@ rules shellcheck = do
             , "package/linux/build-package.sh"
             , "package/mac/build-package.sh"
             , "package/nix/build.sh"
+            , "package/nix/generate_derivation.sh"
             , "package/win/build-package.sh"
             ]
         let oks = ["_build" </> f <.> "shellcheck.ok" | f <- scriptFiles]
@@ -27,5 +28,5 @@ rules shellcheck = do
     "_build//*.shellcheck.ok" %> \out -> do
         let script = dropDirectory1 $ dropExtension $ dropExtension out
         need [ shellcheck, script ]
-        cmd_ shellcheck script
+        cmd_ shellcheck "-s" "bash" script
         writeFile' out ""
