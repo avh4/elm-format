@@ -32,15 +32,34 @@ spaces =
       concat <$> many1 space
 
 
+spacesIgnoreComma :: IParser Comments
+spacesIgnoreComma =
+    let
+        blank = (string " " <|> string ",") >> return []
+        comment = ((: []) <$> multiComment)
+        space =
+            blank
+            <|> (const [CommentTrickOpener] <$> (try $ string "{--}"))
+            <|> comment
+            <?> Syntax.whitespace
+    in
+    concat <$> many1 space
+
+
 forcedWS :: IParser Comments
 forcedWS =
+    forcedWS' spaces
+
+
+forcedWS' :: IParser Comments -> IParser Comments
+forcedWS' sp =
   choice
-    [ (++) <$> spaces <*> (concat <$> many nl_space)
+    [ (++) <$> sp <*> (concat <$> many nl_space)
     , concat <$> many1 nl_space
     ]
   where
     nl_space =
-      try ((++) <$> (concat <$> many1 newline) <*> option [] spaces)
+      try ((++) <$> (concat <$> many1 newline) <*> option [] sp)
 
 
 -- Just eats whitespace until the next meaningful character.
@@ -56,7 +75,12 @@ whitespace' =
 
 whitespace :: IParser Comments
 whitespace =
-  snd <$> whitespace'
+    option [] forcedWS
+
+
+whitespaceIgnoreCommas :: IParser Comments
+whitespaceIgnoreCommas =
+    option [] (forcedWS' spacesIgnoreComma)
 
 
 freshLine :: IParser Comments

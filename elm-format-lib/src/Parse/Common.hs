@@ -27,7 +27,7 @@ sectionedGroup term =
     let
         step leading terms =
             do
-                pre <- whitespace
+                pre <- whitespaceIgnoreCommas
                 (C eol first) <- withEol term
                 preSep <- whitespace
                 hasMore <- choice [ comma *> return True, return False ]
