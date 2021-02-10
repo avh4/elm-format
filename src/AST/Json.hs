@@ -537,6 +537,13 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'PatternNK) where
             LiteralPattern lit ->
                 literalValue region lit
 
+            VarPattern name ->
+                makeObj
+                    [ type_ "VariableDefinition"
+                    , ( "name" , showJSON name )
+                    , sourceLocation region
+                    ]
+
             DataPattern (namespace, tag) args ->
                 makeObj
                     [ type_ "DataPattern"

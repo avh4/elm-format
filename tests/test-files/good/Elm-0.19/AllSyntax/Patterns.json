@@ -141,7 +141,20 @@
             "name": "variable",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"v\"))",
+                    "pattern": {
+                        "name": "v",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 16
+                            },
+                            "start": {
+                                "col": 10,
+                                "line": 16
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 }
             ],
@@ -167,8 +180,34 @@
                 {
                     "pattern": {
                         "arguments": [
-                            "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))",
-                            "TODO: Pattern (VarPattern (LowercaseIdentifier \"y\"))"
+                            {
+                                "name": "x",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 20
+                                    },
+                                    "start": {
+                                        "col": 11,
+                                        "line": 20
+                                    }
+                                },
+                                "tag": "VariableDefinition"
+                            },
+                            {
+                                "name": "y",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 14,
+                                        "line": 20
+                                    },
+                                    "start": {
+                                        "col": 13,
+                                        "line": 20
+                                    }
+                                },
+                                "tag": "VariableDefinition"
+                            }
                         ],
                         "constructor": {
                             "identifier": "Foo",
@@ -234,7 +273,20 @@
             "name": "parens",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"v\"))",
+                    "pattern": {
+                        "name": "v",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 28
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 28
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 }
             ],
@@ -580,7 +632,20 @@
             "name": "patternWithQualifiedConstructorAsCosntructorArgument",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"m\"))",
+                    "pattern": {
+                        "name": "m",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 55,
+                                "line": 88
+                            },
+                            "start": {
+                                "col": 54,
+                                "line": 88
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 }
             ],
@@ -700,7 +765,20 @@
             "name": "patternWithUnqualifiedConstructorAsCosntructorArgument",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"m\"))",
+                    "pattern": {
+                        "name": "m",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 57,
+                                "line": 100
+                            },
+                            "start": {
+                                "col": 56,
+                                "line": 100
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 }
             ],
