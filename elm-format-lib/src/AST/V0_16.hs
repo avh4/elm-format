@@ -229,11 +229,17 @@ data FloatRepresentation
   deriving (Eq, Show)
 
 
+data StringRepresentation
+    = SingleQuotedString
+    | TripleQuotedString
+    deriving (Eq, Show)
+
+
 data LiteralValue
     = IntNum Int64 IntRepresentation
     | FloatNum Double FloatRepresentation
     | Chr Char
-    | Str String Bool
+    | Str String StringRepresentation
     | Boolean Bool
     deriving (Eq, Show)
 
