@@ -48,6 +48,16 @@
                         "display": {
                             "representation": "DecimalInt"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 12
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 12
+                            }
+                        },
                         "tag": "IntLiteral",
                         "value": 1
                     },
@@ -57,6 +67,16 @@
                     "pattern": {
                         "display": {
                             "representation": "DecimalFloat"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 12
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 12
+                            }
                         },
                         "tag": "FloatLiteral",
                         "value": 2

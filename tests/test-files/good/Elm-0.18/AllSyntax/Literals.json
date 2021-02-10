@@ -78,12 +78,32 @@
                         "display": {
                             "representation": "DecimalInt"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 15
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 15
+                            }
+                        },
                         "tag": "IntLiteral",
                         "value": 1
                     },
                     {
                         "display": {
                             "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 13,
+                                "line": 16
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 16
+                            }
                         },
                         "tag": "IntLiteral",
                         "value": 3866
@@ -92,12 +112,15 @@
                         "display": {
                             "representation": "HexadecimalInt"
                         },
-                        "tag": "IntLiteral",
-                        "value": 9223372036854776000
-                    },
-                    {
-                        "display": {
-                            "representation": "DecimalInt"
+                        "sourceLocation": {
+                            "end": {
+                                "col": 25,
+                                "line": 17
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 17
+                            }
                         },
                         "tag": "IntLiteral",
                         "value": 9223372036854776000
@@ -105,6 +128,33 @@
                     {
                         "display": {
                             "representation": "DecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 18
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 18
+                            }
+                        },
+                        "tag": "IntLiteral",
+                        "value": 9223372036854776000
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 27,
+                                "line": 19
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 19
+                            }
                         },
                         "tag": "IntLiteral",
                         "value": -9223372036854776000
@@ -133,6 +183,16 @@
                     {
                         "display": {
                             "representation": "DecimalFloat"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 24
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 24
+                            }
                         },
                         "tag": "FloatLiteral",
                         "value": 2

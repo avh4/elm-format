@@ -390,7 +390,8 @@ literalValue region lit =
                 , makeObj
                     [ ("representation", showJSON repr)
                     ]
-                )
+                  )
+                , sourceLocation region
                 ]
 
         FloatNum value repr ->
@@ -402,6 +403,7 @@ literalValue region lit =
                     [ ("representation", showJSON repr)
                     ]
                   )
+                , sourceLocation region
                 ]
 
         Boolean value ->

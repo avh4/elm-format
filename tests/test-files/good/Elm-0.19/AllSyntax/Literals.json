@@ -78,12 +78,32 @@
                         "display": {
                             "representation": "DecimalInt"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 15
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 15
+                            }
+                        },
                         "tag": "IntLiteral",
                         "value": 1
                     },
                     {
                         "display": {
                             "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 16
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 16
+                            }
                         },
                         "tag": "IntLiteral",
                         "value": 9
@@ -92,12 +112,32 @@
                         "display": {
                             "representation": "HexadecimalInt"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 17
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 17
+                            }
+                        },
                         "tag": "IntLiteral",
                         "value": -9
                     },
                     {
                         "display": {
                             "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 13,
+                                "line": 18
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 18
+                            }
                         },
                         "tag": "IntLiteral",
                         "value": 3866
@@ -106,12 +146,32 @@
                         "display": {
                             "representation": "HexadecimalInt"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 19
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 19
+                            }
+                        },
                         "tag": "IntLiteral",
                         "value": -3866
                     },
                     {
                         "display": {
                             "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 20
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 20
+                            }
                         },
                         "tag": "IntLiteral",
                         "value": 129717
@@ -120,12 +180,32 @@
                         "display": {
                             "representation": "HexadecimalInt"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 21
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 21
+                            }
+                        },
                         "tag": "IntLiteral",
                         "value": -129717
                     },
                     {
                         "display": {
                             "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 25,
+                                "line": 22
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 22
+                            }
                         },
                         "tag": "IntLiteral",
                         "value": 4600387192
@@ -134,6 +214,16 @@
                         "display": {
                             "representation": "HexadecimalInt"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 23
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 23
+                            }
+                        },
                         "tag": "IntLiteral",
                         "value": -4600387192
                     },
@@ -141,12 +231,32 @@
                         "display": {
                             "representation": "HexadecimalInt"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 25,
+                                "line": 24
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 24
+                            }
+                        },
                         "tag": "IntLiteral",
                         "value": 9223372036854776000
                     },
                     {
                         "display": {
                             "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 25
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 25
+                            }
                         },
                         "tag": "IntLiteral",
                         "value": -9223372036854776000
@@ -155,12 +265,32 @@
                         "display": {
                             "representation": "DecimalInt"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 26
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 26
+                            }
+                        },
                         "tag": "IntLiteral",
                         "value": 9223372036854776000
                     },
                     {
                         "display": {
                             "representation": "DecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 27,
+                                "line": 27
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 27
+                            }
                         },
                         "tag": "IntLiteral",
                         "value": -9223372036854776000
@@ -189,6 +319,16 @@
                     {
                         "display": {
                             "representation": "DecimalFloat"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 32
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 32
+                            }
                         },
                         "tag": "FloatLiteral",
                         "value": 2
