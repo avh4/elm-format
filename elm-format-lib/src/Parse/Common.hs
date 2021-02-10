@@ -22,6 +22,22 @@ pair a sep b =
     checkMultiline $ Pair <$> postCommented a <* sep <*> preCommented b
 
 
+{-| This is a comma-separated list of terms,
+where terms can have attached end-of-line comments,
+and `--` comments on their own line introduce a new grouped section of terms.
+
+Example:
+
+    [ -- Section 1
+      A
+    , B
+
+    , -- Section 2
+      C
+    , D
+    ]
+
+-}
 sectionedGroup :: IParser a -> IParser (Sequence a, Comments)
 sectionedGroup term =
     let

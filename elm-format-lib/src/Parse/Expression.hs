@@ -95,7 +95,8 @@ parensTerm elmVersion =
   choice
     [ try (parens' opFn )
     , try (parens' tupleFn)
-    , parens (parened <|> unit)
+    , parens' parened
+    , parens unit
     ]
   where
     opFn =
@@ -106,14 +107,21 @@ parensTerm elmVersion =
           return $ TupleFunction (length commas + 1)
 
     parened =
-      do  expressions <- commaSep1 ((\e a b -> C (a, b) e) <$> expr elmVersion)
-          return $ \pre post multiline ->
-            case expressions pre post of
-              [single] ->
-                  Parens single
+      do  (expressions, trailing) <- sectionedGroup (expr elmVersion)
+          case expressions of
+            Sequence [C (pre, post, eol) single] ->
+                return $ Parens $ C (pre, post ++ eolToComment eol ++ trailing) single
+            _ ->
+                -- checkMultiline (return $ Tuple expressions trailing)
+                (return $ Tuple expressions trailing (ForceMultiline True))
+      --commaSep1 ((\e a b -> C (a, b) e) <$> expr elmVersion)
+          -- return $ \pre post multiline ->
+          --   case expressions pre post of
+          --     [single] ->
+          --         Parens single
 
-              expressions' ->
-                  Tuple expressions' multiline
+          --     expressions' ->
+          --         Tuple expressions' multiline
 
     unit =
         return $ \pre post _ -> Unit (pre ++ post)

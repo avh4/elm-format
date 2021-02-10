@@ -1512,8 +1512,13 @@ formatExpression elmVersion importInfo context aexpr =
                         )
                     |> expressionParens AmbiguousEnd context -- TODO: not tested
 
-        Tuple exprs multiline ->
-            ElmStructure.group True "(" "," ")" multiline $ map (formatCommentedExpression elmVersion importInfo SyntaxSeparated) exprs
+        Tuple exprs trailing multiline ->
+            -- ElmStructure.group True "(" "," ")" multiline $ map (formatCommentedExpression elmVersion importInfo SyntaxSeparated) exprs
+            formatSequence '(' ',' (Just ')')
+                (formatExpression elmVersion importInfo SyntaxSeparated)
+                multiline
+                trailing
+                exprs
 
         TupleFunction n ->
             line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
@@ -1541,7 +1546,6 @@ formatExpression elmVersion importInfo context aexpr =
                 _ ->
                     formatCommentedExpression elmVersion importInfo SyntaxSeparated expr
                         |> parens
-
 
         Unit comments ->
             formatUnit '(' ')' comments
@@ -2055,7 +2059,7 @@ formatType' elmVersion requireParens atype =
 
         TypeConstruction ctor args forceMultiline ->
             let
-                join = 
+                join =
                     case forceMultiline of
                         ForceMultiline True -> FASplitFirst
                         ForceMultiline False -> FAJoinFirst JoinAll

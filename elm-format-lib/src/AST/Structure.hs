@@ -78,7 +78,7 @@ foldReferences ftype fctor fvar =
             Parens e -> extract e
             ExplicitList terms _ _ -> fold terms
             Range left right _ -> extract left <> extract right
-            Tuple terms _ -> mconcat $ fmap extract terms
+            Tuple terms _ _ -> fold terms
             TupleFunction _ -> mempty
             Record _ fields _ _ -> foldMap (extract . _value) fields
             Access e _ -> e

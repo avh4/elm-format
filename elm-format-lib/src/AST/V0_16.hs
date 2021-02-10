@@ -78,9 +78,8 @@ type C2Eol l1 l2 a = Commented (Comments, Comments, Maybe String) a
 
 {-| This represents a list of things separated by comments.
 
-Currently, the first item will never have leading comments.
-However, if Elm ever changes to allow optional leading delimiters, then
-comments before the first delimiter will go there.
+The first item will only have leading comments if there are
+unnecessary leading commas.
 -}
 data BeforeSeparator; data AfterSeparator
 newtype Sequence a =
@@ -404,8 +403,9 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
 
     Tuple ::
-        [C2 Before After (getType 'ExpressionNK)]
-        -> Bool
+        Sequence (getType 'ExpressionNK)
+        -> Comments
+        -> ForceMultiline
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     TupleFunction ::
         Int -- will be 2 or greater, indicating the number of elements in the tuple
@@ -613,7 +613,7 @@ mapAll ftyp fctor fvar fast = \case
     Parens e -> Parens (fmap fast e)
     ExplicitList terms c ml -> ExplicitList (fmap fast terms) c ml
     Range left right ml -> Range (fmap fast left) (fmap fast right) ml
-    Tuple terms ml -> Tuple (fmap (fmap fast) terms) ml
+    Tuple terms c ml -> Tuple (fmap fast terms) c ml
     TupleFunction n -> TupleFunction n
     Record base fields c ml -> Record base (fmap (fmap fast) fields) c ml
     Access e field -> Access (fast e) field

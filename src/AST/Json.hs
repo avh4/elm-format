@@ -309,10 +309,10 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
                   , ("terms", JSArray $ fmap showJSON $ toList terms)
                   ]
 
-          Tuple exprs _ ->
+          Tuple exprs _ _ ->
               makeObj
                   [ type_ "TupleLiteral"
-                  , ("terms", JSArray $ fmap showJSON (map extract exprs))
+                  , ("terms", JSArray $ fmap showJSON $ toList exprs)
                   ]
 
           TupleFunction n | n <= 1 ->
