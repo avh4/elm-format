@@ -419,10 +419,15 @@ literalValue region lit =
                 , sourceLocation region
                 ]
 
-        Str str _ ->
+        Str str repr ->
             makeObj
                 [ type_ "StringLiteral"
                 , ("value", JSString $ toJSString str)
+                , ( "display"
+                  , makeObj
+                    [ ( "representation", showJSON repr )
+                    ]
+                  )
                 , sourceLocation region
                 ]
 
@@ -511,6 +516,11 @@ instance ToJSON IntRepresentation where
 instance ToJSON FloatRepresentation where
     showJSON DecimalFloat = JSString $ toJSString "DecimalFloat"
     showJSON ExponentFloat = JSString $ toJSString "ExponentFloat"
+
+
+instance ToJSON StringRepresentation where
+    showJSON SingleQuotedString = JSString $ toJSString "SingleQuotedString"
+    showJSON TripleQuotedString = JSString $ toJSString "TripleQuotedString"
 
 
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'PatternNK) where

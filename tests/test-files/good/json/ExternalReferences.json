@@ -2,6 +2,9 @@
     "body": [
         {
             "expression": {
+                "display": {
+                    "representation": "SingleQuotedString"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 12,

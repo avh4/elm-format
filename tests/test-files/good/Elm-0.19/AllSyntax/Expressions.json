@@ -49,6 +49,9 @@
                         "value": 2
                     },
                     {
+                        "display": {
+                            "representation": "SingleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 15,

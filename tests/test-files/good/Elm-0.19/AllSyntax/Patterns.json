@@ -65,6 +65,9 @@
                 },
                 {
                     "pattern": {
+                        "display": {
+                            "representation": "SingleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 23,
