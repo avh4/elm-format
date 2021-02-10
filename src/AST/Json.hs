@@ -504,6 +504,12 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'PatternNK) where
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
     showJSON (I.Fix (A region type')) =
         case type' of
+            UnitType comments ->
+                makeObj
+                    [ type_ "UnitType"
+                    , sourceLocation region
+                    ]
+
             TypeConstruction (NamedConstructor (namespace, name)) args forceMultine ->
                 makeObj
                     [ type_ "TypeReference"
