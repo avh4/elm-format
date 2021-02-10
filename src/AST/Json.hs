@@ -516,12 +516,14 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
                     , ( "name", showJSON name )
                     , ( "module", showJSON namespace )
                     , ( "arguments", JSArray $ fmap (showJSON . extract) args )
+                    , sourceLocation region
                     ]
 
             TypeVariable name ->
                 makeObj
                     [ type_ "TypeVariable"
                     , ( "name", showJSON name )
+                    , sourceLocation region
                     ]
 
             TupleType terms multiline ->
@@ -538,6 +540,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
                             [ type_ "FunctionType"
                             , ( "returnType", showJSON last)
                             , ( "argumentTypes", JSArray $ fmap (\(C _ t) -> showJSON t) $ args )
+                            , sourceLocation region
                             ]
 
             _ ->

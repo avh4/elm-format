@@ -21,6 +21,16 @@
                 "arguments": [],
                 "module": null,
                 "name": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 15,
+                        "line": 11
+                    },
+                    "start": {
+                        "col": 9,
+                        "line": 11
+                    }
+                },
                 "tag": "TypeReference"
             },
             "sourceLocation": {
@@ -75,11 +85,31 @@
                 "arguments": [
                     {
                         "name": "msg",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 34,
+                                "line": 16
+                            },
+                            "start": {
+                                "col": 31,
+                                "line": 16
+                            }
+                        },
                         "tag": "TypeVariable"
                     }
                 ],
                 "module": "Html.Attributes",
                 "name": "Attribute",
+                "sourceLocation": {
+                    "end": {
+                        "col": 34,
+                        "line": 16
+                    },
+                    "start": {
+                        "col": 16,
+                        "line": 16
+                    }
+                },
                 "tag": "TypeReference"
             },
             "sourceLocation": {
@@ -117,6 +147,16 @@
                         "arguments": [],
                         "module": null,
                         "name": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 21
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 21
+                            }
+                        },
                         "tag": "TypeReference"
                     }
                 ],
@@ -124,12 +164,42 @@
                     "arguments": [
                         {
                             "name": "msg",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 26,
+                                    "line": 21
+                                },
+                                "start": {
+                                    "col": 23,
+                                    "line": 21
+                                }
+                            },
                             "tag": "TypeVariable"
                         }
                     ],
                     "module": null,
                     "name": "Html",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 26,
+                            "line": 21
+                        },
+                        "start": {
+                            "col": 18,
+                            "line": 21
+                        }
+                    },
                     "tag": "TypeReference"
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 26,
+                        "line": 21
+                    },
+                    "start": {
+                        "col": 8,
+                        "line": 21
+                    }
                 },
                 "tag": "FunctionType"
             },
@@ -302,11 +372,31 @@
                 "arguments": [
                     {
                         "name": "msg",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 16,
+                                "line": 26
+                            },
+                            "start": {
+                                "col": 13,
+                                "line": 26
+                            }
+                        },
                         "tag": "TypeVariable"
                     }
                 ],
                 "module": null,
                 "name": "Html",
+                "sourceLocation": {
+                    "end": {
+                        "col": 16,
+                        "line": 26
+                    },
+                    "start": {
+                        "col": 8,
+                        "line": 26
+                    }
+                },
                 "tag": "TypeReference"
             },
             "sourceLocation": {
