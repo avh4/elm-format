@@ -415,7 +415,6 @@ literalValue region lit =
         Chr chr ->
             makeObj
                 [ type_ "CharLiteral"
-                , ("module", JSString $ toJSString "Char")
                 , ("value", JSString $ toJSString [chr])
                 , sourceLocation region
                 ]
@@ -423,7 +422,6 @@ literalValue region lit =
         Str str _ ->
             makeObj
                 [ type_ "StringLiteral"
-                , ("module", JSString $ toJSString "String")
                 , ("value", JSString $ toJSString str)
                 , sourceLocation region
                 ]

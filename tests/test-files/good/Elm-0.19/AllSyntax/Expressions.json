@@ -49,7 +49,6 @@
                         "value": 2
                     },
                     {
-                        "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
@@ -64,7 +63,6 @@
                         "value": "string"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 10,

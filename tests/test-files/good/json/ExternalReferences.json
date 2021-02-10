@@ -2,7 +2,6 @@
     "body": [
         {
             "expression": {
-                "module": "String",
                 "sourceLocation": {
                     "end": {
                         "col": 12,
