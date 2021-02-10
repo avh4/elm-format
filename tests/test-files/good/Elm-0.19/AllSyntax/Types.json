@@ -11,7 +11,7 @@
         "TODO: Entry (Fix {unFix = at 111 1 114 6 (TypeAlias [] (C ([],[]) (NameWithArgs (UppercaseIdentifier \"TupleMultilineWithSingleLineChildren\") [])) (C [] (Fix {unFix = at 112 5 114 6 (TupleType [C ([],[],Nothing) (Fix {unFix = at 112 7 112 24 (FunctionType {first_ft = C Nothing (Fix {unFix = at 112 7 112 10 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), rest_ft = Sequence [C ([],[],Nothing) (Fix {unFix = at 112 14 112 17 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}),C ([],[],Nothing) (Fix {unFix = at 112 21 112 24 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))})], forceMultiline_ft = ForceMultiline False})}),C ([],[],Nothing) (Fix {unFix = at 113 7 113 33 (FunctionType {first_ft = C Nothing (Fix {unFix = at 113 7 113 13 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"String\")) [] (ForceMultiline False))}), rest_ft = Sequence [C ([],[],Nothing) (Fix {unFix = at 113 17 113 23 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"String\")) [] (ForceMultiline False))}),C ([],[],Nothing) (Fix {unFix = at 113 27 113 33 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"String\")) [] (ForceMultiline False))})], forceMultiline_ft = ForceMultiline False})})] (ForceMultiline True))})))})",
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "emptyRecord",
             "returnType": {
@@ -19,7 +19,7 @@
                     "TODO: Type (Fix {unFix = at 117 15 117 17 (RecordType {base_rt = Nothing, fields_rt = Sequence [], trailingComments_rt = [], forceMultiline_rt = ForceMultiline False})})"
                 ],
                 "returnType": "TODO: Type (Fix {unFix = at 117 21 117 23 (UnitType [])})",
-                "type": "FunctionType"
+                "tag": "FunctionType"
             },
             "sourceLocation": {
                 "end": {
@@ -31,13 +31,13 @@
                     "line": 118
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         "TODO: Entry (Fix {unFix = at 122 1 127 6 (TypeAlias [] (C ([],[]) (NameWithArgs (UppercaseIdentifier \"Record\") [])) (C [] (Fix {unFix = at 123 5 127 6 (TupleType [C ([],[],Nothing) (Fix {unFix = at 123 7 123 26 (RecordType {base_rt = Nothing, fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"x\"), _value = C [] (Fix {unFix = at 123 13 123 16 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"y\"), _value = C [] (Fix {unFix = at 123 22 123 24 (UnitType [])}), forceMultiline = ForceMultiline False})], trailingComments_rt = [], forceMultiline_rt = ForceMultiline False})}),C ([],[],Nothing) (Fix {unFix = at 124 7 126 8 (RecordType {base_rt = Nothing, fields_rt = Sequence [C ([],[],Just \" X\") (Pair {_key = C [] (LowercaseIdentifier \"x\"), _value = C [] (Fix {unFix = at 124 13 124 16 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([],[],Just \" Y\") (Pair {_key = C [] (LowercaseIdentifier \"y\"), _value = C [] (Fix {unFix = at 125 13 125 15 (UnitType [])}), forceMultiline = ForceMultiline False})], trailingComments_rt = [], forceMultiline_rt = ForceMultiline True})})] (ForceMultiline True))})))})",
         "TODO: Entry (Fix {unFix = at 130 1 138 6 (TypeAlias [] (C ([],[]) (NameWithArgs (UppercaseIdentifier \"RecordWithCommentedOutTerms\") [])) (C [] (Fix {unFix = at 131 5 138 6 (RecordType {base_rt = Nothing, fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"a\"), _value = C [] (Fix {unFix = at 131 11 131 14 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([LineComment \" , b : Int\",LineComment \" , c : Int\"],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"d\"), _value = C [] (Fix {unFix = at 135 11 135 14 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False})], trailingComments_rt = [LineComment \" , e : Int\"], forceMultiline_rt = ForceMultiline True})})))})",
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "recordExtension",
             "returnType": {
@@ -45,7 +45,7 @@
                     "TODO: Type (Fix {unFix = at 141 19 141 43 (RecordType {base_rt = Just (C ([],[]) (LowercaseIdentifier \"a\")), fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"x\"), _value = C [] (Fix {unFix = at 141 29 141 32 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"y\"), _value = C [] (Fix {unFix = at 141 38 141 41 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False})], trailingComments_rt = [], forceMultiline_rt = ForceMultiline False})})"
                 ],
                 "returnType": "TODO: Type (Fix {unFix = at 141 47 141 49 (UnitType [])})",
-                "type": "FunctionType"
+                "tag": "FunctionType"
             },
             "sourceLocation": {
                 "end": {
@@ -57,7 +57,7 @@
                     "line": 142
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         "TODO: Entry (Fix {unFix = at 146 1 155 6 (TypeAlias [] (C ([],[]) (NameWithArgs (UppercaseIdentifier \"RecordExtensionWithCommentedOutTerms\") [C [] (LowercaseIdentifier \"z\")])) (C [] (Fix {unFix = at 147 5 155 6 (RecordType {base_rt = Just (C ([],[]) (LowercaseIdentifier \"z\")), fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"a\"), _value = C [] (Fix {unFix = at 148 15 148 18 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([LineComment \" , b : Int\",LineComment \" , c : Int\"],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"d\"), _value = C [] (Fix {unFix = at 152 15 152 18 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False})], trailingComments_rt = [LineComment \" , e : Int\"], forceMultiline_rt = ForceMultiline True})})))})"
     ],

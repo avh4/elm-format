@@ -522,7 +522,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
 
 type_ :: String -> (String, JSValue)
 type_ t =
-    ("type", JSString $ toJSString t)
+    ("tag", JSString $ toJSString t)
 
 
 nowhere :: Region.Position

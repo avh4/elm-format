@@ -2,7 +2,7 @@
     "body": [
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "unit",
             "returnType": null,
@@ -16,10 +16,11 @@
                     "line": 4
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
                         "identifier": "True",
@@ -34,7 +35,7 @@
                                 "line": 9
                             }
                         },
-                        "type": "ExternalReference"
+                        "tag": "ExternalReference"
                     },
                     {
                         "identifier": "False",
@@ -49,10 +50,9 @@
                                 "line": 10
                             }
                         },
-                        "type": "ExternalReference"
+                        "tag": "ExternalReference"
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "boolean",
             "returnType": null,
@@ -66,48 +66,48 @@
                     "line": 8
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 1
                     },
                     {
                         "display": {
                             "representation": "HexadecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 3866
                     },
                     {
                         "display": {
                             "representation": "HexadecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 9223372036854776000
                     },
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 9223372036854776000
                     },
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": -9223372036854776000
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "integer",
             "returnType": null,
@@ -121,20 +121,20 @@
                     "line": 14
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
                         "display": {
                             "representation": "DecimalFloat"
                         },
-                        "type": "FloatLiteral",
+                        "tag": "FloatLiteral",
                         "value": 2
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "float",
             "returnType": null,
@@ -148,7 +148,7 @@
                     "line": 23
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -163,7 +163,7 @@
                         "line": 29
                     }
                 },
-                "type": "StringLiteral",
+                "tag": "StringLiteral",
                 "value": "string"
             },
             "name": "string",
@@ -178,7 +178,7 @@
                     "line": 28
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -193,7 +193,7 @@
                         "line": 33
                     }
                 },
-                "type": "StringLiteral",
+                "tag": "StringLiteral",
                 "value": "a b'`<>{}/\u06a5\ud83d\ude00\u3041\u2f83\ud835\udfdf"
             },
             "name": "stringWithUnicodeCharacters",
@@ -208,7 +208,7 @@
                     "line": 32
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -223,7 +223,7 @@
                         "line": 37
                     }
                 },
-                "type": "StringLiteral",
+                "tag": "StringLiteral",
                 "value": "\ud83d\ude000\ud83d\ude009\ud83d\ude00a\ud83d\ude00F"
             },
             "name": "stringWithEscapedCharacterFollowedByHexDigit",
@@ -238,7 +238,7 @@
                     "line": 36
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -253,7 +253,7 @@
                         "line": 41
                     }
                 },
-                "type": "StringLiteral",
+                "tag": "StringLiteral",
                 "value": "\t\n\\\""
             },
             "name": "stringWithSpecialEscapedCharacters",
@@ -268,10 +268,11 @@
                     "line": 40
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
                         "module": "String",
@@ -285,7 +286,7 @@
                                 "line": 45
                             }
                         },
-                        "type": "StringLiteral",
+                        "tag": "StringLiteral",
                         "value": "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\u000b\f\r\u000e\u000f"
                     },
                     {
@@ -300,7 +301,7 @@
                                 "line": 46
                             }
                         },
-                        "type": "StringLiteral",
+                        "tag": "StringLiteral",
                         "value": "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f"
                     },
                     {
@@ -315,11 +316,10 @@
                                 "line": 47
                             }
                         },
-                        "type": "StringLiteral",
+                        "tag": "StringLiteral",
                         "value": "\u007f"
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "stringWithEscapedControlCharacters",
             "returnType": null,
@@ -333,7 +333,7 @@
                     "line": 44
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -348,7 +348,7 @@
                         "line": 53
                     }
                 },
-                "type": "StringLiteral",
+                "tag": "StringLiteral",
                 "value": "\u00a0"
             },
             "name": "stringWithWindowsWorkaroundCharacters",
@@ -363,7 +363,7 @@
                     "line": 51
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -378,7 +378,7 @@
                         "line": 57
                     }
                 },
-                "type": "StringLiteral",
+                "tag": "StringLiteral",
                 "value": "\u06dd\ufffb\ud804\udcbd\udb40\udc7f"
             },
             "name": "stringWithEscapedNonPrintCharacters",
@@ -393,7 +393,7 @@
                     "line": 56
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -408,7 +408,7 @@
                         "line": 61
                     }
                 },
-                "type": "StringLiteral",
+                "tag": "StringLiteral",
                 "value": "\u00a0\u2000\u205f"
             },
             "name": "stringWithWhitespace",
@@ -423,7 +423,7 @@
                     "line": 60
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -438,7 +438,7 @@
                         "line": 65
                     }
                 },
-                "type": "CharLiteral",
+                "tag": "CharLiteral",
                 "value": "c"
             },
             "name": "char",
@@ -453,10 +453,11 @@
                     "line": 64
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
                         "module": "Char",
@@ -470,7 +471,7 @@
                                 "line": 69
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "a"
                     },
                     {
@@ -485,7 +486,7 @@
                                 "line": 69
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": " "
                     },
                     {
@@ -500,7 +501,7 @@
                                 "line": 69
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "/"
                     },
                     {
@@ -515,7 +516,7 @@
                                 "line": 69
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\""
                     },
                     {
@@ -530,7 +531,7 @@
                                 "line": 69
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\u06a5"
                     },
                     {
@@ -545,7 +546,7 @@
                                 "line": 69
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\ud83d\ude00"
                     },
                     {
@@ -560,7 +561,7 @@
                                 "line": 69
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\u3041"
                     },
                     {
@@ -575,7 +576,7 @@
                                 "line": 69
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\u2f83"
                     },
                     {
@@ -590,11 +591,10 @@
                                 "line": 69
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\ud835\udfdf"
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "unicodeChars",
             "returnType": null,
@@ -608,10 +608,11 @@
                     "line": 68
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
                         "module": "Char",
@@ -625,7 +626,7 @@
                                 "line": 73
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\t"
                     },
                     {
@@ -640,7 +641,7 @@
                                 "line": 73
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\n"
                     },
                     {
@@ -655,7 +656,7 @@
                                 "line": 73
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\\"
                     },
                     {
@@ -670,11 +671,10 @@
                                 "line": 73
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "'"
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "escapedSpecialChars",
             "returnType": null,
@@ -688,10 +688,11 @@
                     "line": 72
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
                         "module": "Char",
@@ -705,7 +706,7 @@
                                 "line": 77
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\u0000"
                     },
                     {
@@ -720,7 +721,7 @@
                                 "line": 77
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\u001f"
                     },
                     {
@@ -735,11 +736,10 @@
                                 "line": 77
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\u007f"
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "escapedControlChars",
             "returnType": null,
@@ -753,10 +753,11 @@
                     "line": 76
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
                         "module": "Char",
@@ -770,7 +771,7 @@
                                 "line": 81
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\u06dd"
                     },
                     {
@@ -785,7 +786,7 @@
                                 "line": 81
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\ufffb"
                     },
                     {
@@ -800,7 +801,7 @@
                                 "line": 81
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\ud804\udcbd"
                     },
                     {
@@ -815,11 +816,10 @@
                                 "line": 81
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\udb40\udc7f"
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "escapedNonPrintChars",
             "returnType": null,
@@ -833,10 +833,11 @@
                     "line": 80
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
                         "module": "Char",
@@ -850,7 +851,7 @@
                                 "line": 85
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\u00a0"
                     },
                     {
@@ -865,7 +866,7 @@
                                 "line": 85
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\u2000"
                     },
                     {
@@ -880,11 +881,10 @@
                                 "line": 85
                             }
                         },
-                        "type": "CharLiteral",
+                        "tag": "CharLiteral",
                         "value": "\u205f"
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "whitespaceChars",
             "returnType": null,
@@ -898,7 +898,7 @@
                     "line": 84
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -913,7 +913,7 @@
                         "line": 89
                     }
                 },
-                "type": "StringLiteral",
+                "tag": "StringLiteral",
                 "value": "normals = \"a b'`<>{}/\u06a5\ud83d\ude00\u3041\u2f83\ud835\udfdf\"\n\"\t\\\n\"\"\n\"\"\"\n\"\"\"\"\n\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\u000b\f\r\u000e\u000f\n\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f\n\u007f\n\u06dd\ufffb\ud804\udcbd\udb40\udc7f\n\u00a0\u2000\u205f\n"
             },
             "name": "multilineString",
@@ -928,10 +928,11 @@
                     "line": 88
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
                         "module": "String",
@@ -945,7 +946,7 @@
                                 "line": 103
                             }
                         },
-                        "type": "StringLiteral",
+                        "tag": "StringLiteral",
                         "value": "trailing double quote\""
                     },
                     {
@@ -960,7 +961,7 @@
                                 "line": 104
                             }
                         },
-                        "type": "StringLiteral",
+                        "tag": "StringLiteral",
                         "value": "trailing double quote 2\"\""
                     },
                     {
@@ -975,7 +976,7 @@
                                 "line": 105
                             }
                         },
-                        "type": "StringLiteral",
+                        "tag": "StringLiteral",
                         "value": "trailing double quote 3\"\"\""
                     },
                     {
@@ -990,7 +991,7 @@
                                 "line": 106
                             }
                         },
-                        "type": "StringLiteral",
+                        "tag": "StringLiteral",
                         "value": "trailing double quote 4\"\"\"\""
                     },
                     {
@@ -1005,7 +1006,7 @@
                                 "line": 107
                             }
                         },
-                        "type": "StringLiteral",
+                        "tag": "StringLiteral",
                         "value": "embedded triple double quotes (\"\"\")"
                     },
                     {
@@ -1020,7 +1021,7 @@
                                 "line": 108
                             }
                         },
-                        "type": "StringLiteral",
+                        "tag": "StringLiteral",
                         "value": "embedded triple double quotes (\"\"\") (\"\"\"\")"
                     },
                     {
@@ -1035,7 +1036,7 @@
                                 "line": 109
                             }
                         },
-                        "type": "StringLiteral",
+                        "tag": "StringLiteral",
                         "value": "\"\"leading double quote 2"
                     },
                     {
@@ -1050,7 +1051,7 @@
                                 "line": 110
                             }
                         },
-                        "type": "StringLiteral",
+                        "tag": "StringLiteral",
                         "value": "\"\"\" leading double quote 3"
                     },
                     {
@@ -1065,11 +1066,10 @@
                                 "line": 111
                             }
                         },
-                        "type": "StringLiteral",
+                        "tag": "StringLiteral",
                         "value": "\"\"\"\" leading double quote 4"
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "multilineStringQuoteHandling",
             "returnType": null,
@@ -1083,7 +1083,7 @@
                     "line": 102
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         }
     ],
     "imports": {},
