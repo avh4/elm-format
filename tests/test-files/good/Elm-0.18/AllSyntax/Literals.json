@@ -156,6 +156,9 @@
         },
         {
             "expression": {
+                "display": {
+                    "representation": "SingleQuotedString"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 13,
@@ -186,6 +189,9 @@
         },
         {
             "expression": {
+                "display": {
+                    "representation": "SingleQuotedString"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 22,
@@ -216,6 +222,9 @@
         },
         {
             "expression": {
+                "display": {
+                    "representation": "SingleQuotedString"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 15,
@@ -246,6 +255,9 @@
         },
         {
             "expression": {
+                "display": {
+                    "representation": "SingleQuotedString"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 15,
@@ -279,6 +291,9 @@
                 "tag": "ListLiteral",
                 "terms": [
                     {
+                        "display": {
+                            "representation": "SingleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 65,
@@ -293,6 +308,9 @@
                         "value": "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\u000b\f\r\u000e\u000f"
                     },
                     {
+                        "display": {
+                            "representation": "SingleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 73,
@@ -307,6 +325,9 @@
                         "value": "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f"
                     },
                     {
+                        "display": {
+                            "representation": "SingleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 13,
@@ -339,6 +360,9 @@
         },
         {
             "expression": {
+                "display": {
+                    "representation": "SingleQuotedString"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 8,
@@ -369,6 +393,9 @@
         },
         {
             "expression": {
+                "display": {
+                    "representation": "SingleQuotedString"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 33,
@@ -399,6 +426,9 @@
         },
         {
             "expression": {
+                "display": {
+                    "representation": "SingleQuotedString"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 20,
@@ -886,6 +916,9 @@
         },
         {
             "expression": {
+                "display": {
+                    "representation": "TripleQuotedString"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 4,
@@ -919,6 +952,9 @@
                 "tag": "ListLiteral",
                 "terms": [
                     {
+                        "display": {
+                            "representation": "TripleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 36,
@@ -933,6 +969,9 @@
                         "value": "trailing double quote\""
                     },
                     {
+                        "display": {
+                            "representation": "TripleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 40,
@@ -947,6 +986,9 @@
                         "value": "trailing double quote 2\"\""
                     },
                     {
+                        "display": {
+                            "representation": "TripleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 42,
@@ -961,6 +1003,9 @@
                         "value": "trailing double quote 3\"\"\""
                     },
                     {
+                        "display": {
+                            "representation": "TripleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 44,
@@ -975,6 +1020,9 @@
                         "value": "trailing double quote 4\"\"\"\""
                     },
                     {
+                        "display": {
+                            "representation": "TripleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 51,
@@ -989,6 +1037,9 @@
                         "value": "embedded triple double quotes (\"\"\")"
                     },
                     {
+                        "display": {
+                            "representation": "TripleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 62,
@@ -1003,6 +1054,9 @@
                         "value": "embedded triple double quotes (\"\"\") (\"\"\"\")"
                     },
                     {
+                        "display": {
+                            "representation": "TripleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 37,
@@ -1017,6 +1071,9 @@
                         "value": "\"\"leading double quote 2"
                     },
                     {
+                        "display": {
+                            "representation": "TripleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 42,
@@ -1031,6 +1088,9 @@
                         "value": "\"\"\" leading double quote 3"
                     },
                     {
+                        "display": {
+                            "representation": "TripleQuotedString"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 44,
