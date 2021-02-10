@@ -1224,7 +1224,13 @@
             "name": "emptyRecord",
             "returnType": {
                 "argumentTypes": [
-                    "TODO: Type (RecordType {base_rt = Nothing, fields_rt = Sequence [], trailingComments_rt = [], forceMultiline_rt = ForceMultiline False})"
+                    {
+                        "display": {
+                            "fieldOrder": []
+                        },
+                        "fields": {},
+                        "tag": "RecordType"
+                    }
                 ],
                 "returnType": {
                     "sourceLocation": {
@@ -1289,8 +1295,86 @@
                 },
                 "tag": "TupleType",
                 "terms": [
-                    "TODO: Type (RecordType {base_rt = Nothing, fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"x\"), _value = C [] (Fix {unFix = at 109 13 109 16 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"y\"), _value = C [] (Fix {unFix = at 109 22 109 24 (UnitType [])}), forceMultiline = ForceMultiline False})], trailingComments_rt = [], forceMultiline_rt = ForceMultiline False})",
-                    "TODO: Type (RecordType {base_rt = Nothing, fields_rt = Sequence [C ([],[],Just \" X\") (Pair {_key = C [] (LowercaseIdentifier \"x\"), _value = C [] (Fix {unFix = at 110 13 110 16 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([],[],Just \" Y\") (Pair {_key = C [] (LowercaseIdentifier \"y\"), _value = C [] (Fix {unFix = at 111 13 111 15 (UnitType [])}), forceMultiline = ForceMultiline False})], trailingComments_rt = [], forceMultiline_rt = ForceMultiline True})"
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 16,
+                                        "line": 109
+                                    },
+                                    "start": {
+                                        "col": 13,
+                                        "line": 109
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            "y": {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 24,
+                                        "line": 109
+                                    },
+                                    "start": {
+                                        "col": 22,
+                                        "line": 109
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
+                        },
+                        "tag": "RecordType"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 16,
+                                        "line": 110
+                                    },
+                                    "start": {
+                                        "col": 13,
+                                        "line": 110
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            "y": {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 111
+                                    },
+                                    "start": {
+                                        "col": 13,
+                                        "line": 111
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
+                        },
+                        "tag": "RecordType"
+                    }
                 ]
             }
         },
@@ -1307,7 +1391,49 @@
                 }
             },
             "tag": "TypeAlias",
-            "type": "TODO: Type (RecordType {base_rt = Nothing, fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"a\"), _value = C [] (Fix {unFix = at 117 11 117 14 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([LineComment \" , b : Int\",LineComment \" , c : Int\"],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"d\"), _value = C [] (Fix {unFix = at 121 11 121 14 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False})], trailingComments_rt = [LineComment \" , e : Int\"], forceMultiline_rt = ForceMultiline True})"
+            "type": {
+                "display": {
+                    "fieldOrder": [
+                        "a",
+                        "d"
+                    ]
+                },
+                "fields": {
+                    "a": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 117
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 117
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "d": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 121
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 121
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                },
+                "tag": "RecordType"
+            }
         },
         {
             "expression": {
@@ -1316,7 +1442,50 @@
             "name": "recordExtension",
             "returnType": {
                 "argumentTypes": [
-                    "TODO: Type (RecordType {base_rt = Just (C ([],[]) (LowercaseIdentifier \"a\")), fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"x\"), _value = C [] (Fix {unFix = at 127 29 127 32 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"y\"), _value = C [] (Fix {unFix = at 127 38 127 41 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False})], trailingComments_rt = [], forceMultiline_rt = ForceMultiline False})"
+                    {
+                        "base": "a",
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 32,
+                                        "line": 127
+                                    },
+                                    "start": {
+                                        "col": 29,
+                                        "line": 127
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            "y": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 41,
+                                        "line": 127
+                                    },
+                                    "start": {
+                                        "col": 38,
+                                        "line": 127
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        },
+                        "tag": "RecordTypeExtension"
+                    }
                 ],
                 "returnType": {
                     "sourceLocation": {
@@ -1368,7 +1537,50 @@
                 }
             },
             "tag": "TypeAlias",
-            "type": "TODO: Type (RecordType {base_rt = Just (C ([],[]) (LowercaseIdentifier \"z\")), fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"a\"), _value = C [] (Fix {unFix = at 134 15 134 18 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([LineComment \" , b : Int\",LineComment \" , c : Int\"],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"d\"), _value = C [] (Fix {unFix = at 138 15 138 18 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False})], trailingComments_rt = [LineComment \" , e : Int\"], forceMultiline_rt = ForceMultiline True})"
+            "type": {
+                "base": "z",
+                "display": {
+                    "fieldOrder": [
+                        "a",
+                        "d"
+                    ]
+                },
+                "fields": {
+                    "a": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 134
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 134
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "d": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 138
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 138
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                },
+                "tag": "RecordTypeExtension"
+            }
         }
     ],
     "imports": {
