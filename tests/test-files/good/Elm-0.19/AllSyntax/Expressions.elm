@@ -253,7 +253,7 @@ recordAccess f a b r =
     )
 
 
-recordAccessfunction =
+recordAccessFunction =
     .x { x = 1 }
 
 

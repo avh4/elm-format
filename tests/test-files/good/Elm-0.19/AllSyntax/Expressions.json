@@ -1706,10 +1706,23 @@
                         "type": "RecordLiteral"
                     }
                 ],
-                "function": "TODO: AccessFunction",
+                "function": {
+                    "field": "x",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 257
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 257
+                        }
+                    },
+                    "type": "RecordAccess"
+                },
                 "type": "FunctionApplication"
             },
-            "name": "recordAccessfunction",
+            "name": "recordAccessFunction",
             "returnType": null,
             "sourceLocation": {
                 "end": {

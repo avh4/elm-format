@@ -1653,7 +1653,20 @@
                         "type": "RecordLiteral"
                     }
                 ],
-                "function": "TODO: AccessFunction",
+                "function": {
+                    "field": "x",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 250
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 250
+                        }
+                    },
+                    "type": "RecordAccess"
+                },
                 "type": "FunctionApplication"
             },
             "name": "recordAccessfunction",
