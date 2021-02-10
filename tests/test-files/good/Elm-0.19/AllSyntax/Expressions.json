@@ -134,7 +134,20 @@
             "name": "var",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))",
+                    "pattern": {
+                        "name": "x",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 6,
+                                "line": 22
+                            },
+                            "start": {
+                                "col": 5,
+                                "line": 22
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 }
             ],
@@ -253,15 +266,54 @@
             "name": "infixPipeLeft",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))",
+                    "pattern": {
+                        "name": "x",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 16,
+                                "line": 30
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 30
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"y\"))",
+                    "pattern": {
+                        "name": "y",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 30
+                            },
+                            "start": {
+                                "col": 17,
+                                "line": 30
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"z\"))",
+                    "pattern": {
+                        "name": "z",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 20,
+                                "line": 30
+                            },
+                            "start": {
+                                "col": 19,
+                                "line": 30
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 }
             ],
@@ -355,15 +407,54 @@
             "name": "infixPipeLeft2",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))",
+                    "pattern": {
+                        "name": "x",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 37
+                            },
+                            "start": {
+                                "col": 16,
+                                "line": 37
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"y\"))",
+                    "pattern": {
+                        "name": "y",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 19,
+                                "line": 37
+                            },
+                            "start": {
+                                "col": 18,
+                                "line": 37
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"z\"))",
+                    "pattern": {
+                        "name": "z",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 21,
+                                "line": 37
+                            },
+                            "start": {
+                                "col": 20,
+                                "line": 37
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 }
             ],
@@ -609,7 +700,20 @@
             "name": "unary",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))",
+                    "pattern": {
+                        "name": "x",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 61
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 61
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 }
             ],
@@ -786,15 +890,54 @@
             "name": "parens",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"f\"))",
+                    "pattern": {
+                        "name": "f",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 69
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 69
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))",
+                    "pattern": {
+                        "name": "x",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 69
+                            },
+                            "start": {
+                                "col": 10,
+                                "line": 69
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"a\"))",
+                    "pattern": {
+                        "name": "a",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 13,
+                                "line": 69
+                            },
+                            "start": {
+                                "col": 12,
+                                "line": 69
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 }
             ],
@@ -2056,7 +2199,20 @@
             "name": "recordUpdate",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"a\"))",
+                    "pattern": {
+                        "name": "a",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 217
+                            },
+                            "start": {
+                                "col": 14,
+                                "line": 217
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 }
             ],
@@ -2123,7 +2279,20 @@
             "name": "recordUpdateWithCommentedOutFields",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"a\"))",
+                    "pattern": {
+                        "name": "a",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 37,
+                                "line": 230
+                            },
+                            "start": {
+                                "col": 36,
+                                "line": 230
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 }
             ],
@@ -2387,19 +2556,71 @@
             "name": "recordAccess",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"f\"))",
+                    "pattern": {
+                        "name": "f",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 242
+                            },
+                            "start": {
+                                "col": 14,
+                                "line": 242
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"a\"))",
+                    "pattern": {
+                        "name": "a",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 242
+                            },
+                            "start": {
+                                "col": 16,
+                                "line": 242
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"b\"))",
+                    "pattern": {
+                        "name": "b",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 19,
+                                "line": 242
+                            },
+                            "start": {
+                                "col": 18,
+                                "line": 242
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"r\"))",
+                    "pattern": {
+                        "name": "r",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 21,
+                                "line": 242
+                            },
+                            "start": {
+                                "col": 20,
+                                "line": 242
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
                     "type": null
                 }
             ],
@@ -2533,7 +2754,20 @@
                     "tag": "BinaryOperatorList"
                 },
                 "parameters": [
-                    "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))"
+                    {
+                        "name": "x",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 7,
+                                "line": 261
+                            },
+                            "start": {
+                                "col": 6,
+                                "line": 261
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    }
                 ],
                 "tag": "AnonymousFunction"
             },
@@ -3004,7 +3238,20 @@
                                     },
                                     "pattern": {
                                         "arguments": [
-                                            "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))"
+                                            {
+                                                "name": "x",
+                                                "sourceLocation": {
+                                                    "end": {
+                                                        "col": 23,
+                                                        "line": 343
+                                                    },
+                                                    "start": {
+                                                        "col": 22,
+                                                        "line": 343
+                                                    }
+                                                },
+                                                "tag": "VariableDefinition"
+                                            }
                                         ],
                                         "constructor": {
                                             "identifier": "Just",
@@ -3119,7 +3366,20 @@
                                     },
                                     "pattern": {
                                         "arguments": [
-                                            "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))"
+                                            {
+                                                "name": "x",
+                                                "sourceLocation": {
+                                                    "end": {
+                                                        "col": 23,
+                                                        "line": 352
+                                                    },
+                                                    "start": {
+                                                        "col": 22,
+                                                        "line": 352
+                                                    }
+                                                },
+                                                "tag": "VariableDefinition"
+                                            }
                                         ],
                                         "constructor": {
                                             "identifier": "Just",
@@ -3234,7 +3494,20 @@
                                     },
                                     "pattern": {
                                         "arguments": [
-                                            "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))"
+                                            {
+                                                "name": "x",
+                                                "sourceLocation": {
+                                                    "end": {
+                                                        "col": 23,
+                                                        "line": 372
+                                                    },
+                                                    "start": {
+                                                        "col": 22,
+                                                        "line": 372
+                                                    }
+                                                },
+                                                "tag": "VariableDefinition"
+                                            }
                                         ],
                                         "constructor": {
                                             "identifier": "Just",
