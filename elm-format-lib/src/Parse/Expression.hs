@@ -91,13 +91,11 @@ listTerm elmVersion =
 
 parensTerm :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
 parensTerm elmVersion =
-  fmap I.Fix $
+  fmap I.Fix $ addLocation $
   choice
-    [ try (addLocation $ parens' opFn )
-    , try (addLocation $ parens' tupleFn)
-    , do
-          (start, e, end) <- located $ parens (parened <|> unit)
-          return $ A.at start end e
+    [ try (parens' opFn )
+    , try (parens' tupleFn)
+    , parens (parened <|> unit)
     ]
   where
     opFn =
