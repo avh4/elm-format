@@ -68,12 +68,19 @@ showModule modu@(Module _ maybeHeader _ (C _ imports) body) =
 data MergedTopLevelStructure ns
     = MergedDefinition
         { _definitionLocation :: Region.Region
-        , _name :: LowercaseIdentifier
-        , _args :: List (C1 Before (ASTNS Located ns 'PatternNK))
+        , _name_d :: LowercaseIdentifier
+        , _args_d :: List (C1 Before (ASTNS Located ns 'PatternNK))
         , _preEquals :: Comments
         , _expression :: ASTNS Located ns 'ExpressionNK
         , _doc :: Maybe Comment
         , _annotation :: Maybe (Comments, Comments, ASTNS Located ns 'TypeNK)
+        }
+    | MergedTypeAlias
+        { _location_ta :: Region.Region
+        , _preAlias :: Comments
+        , _name_ta :: UppercaseIdentifier
+        , _args_ta :: [C1 BeforeTerm LowercaseIdentifier]
+        , _type :: C1 AfterEquals (ASTNS Located ns 'TypeNK)
         }
     | TodoTopLevelStructure String
 
@@ -96,8 +103,8 @@ mergeDeclarations (I.Fix (A _ (TopLevel decls))) =
                 Entry (A region (Definition (I.Fix (A _ (VarPattern name))) args preEquals expr)) ->
                     Just $ MergedDefinition
                         { _definitionLocation = region
-                        , _name = name
-                        , _args = args
+                        , _name_d = name
+                        , _args_d = args
                         , _preEquals = preEquals
                         , _expression = expr
                         , _doc = Nothing -- TODO: merge docs
@@ -107,6 +114,15 @@ mergeDeclarations (I.Fix (A _ (TopLevel decls))) =
                 Entry (A _ (TypeAnnotation _ _)) ->
                     -- TODO: retain annotations that don't have a matching definition
                     Nothing
+
+                Entry (A region (TypeAlias c1 (C (c2, c3) (NameWithArgs name args)) type_)) ->
+                    Just $ MergedTypeAlias
+                        { _location_ta = region
+                        , _preAlias = c1
+                        , _name_ta = name
+                        , _args_ta = args
+                        , _type = type_
+                        }
 
                 _ ->
                     Just $ TodoTopLevelStructure (show decl)
@@ -173,6 +189,13 @@ instance ToJSON (MergedTopLevelStructure [UppercaseIdentifier]) where
             , ( "name" , showJSON name )
             , ( "returnType", maybe JSNull (\(_, _, t) -> showJSON t) annotation )
             , ( "expression" , showJSON expression )
+            , sourceLocation region
+            ]
+    showJSON (MergedTypeAlias region preAlias name args (C c t)) =
+        makeObj
+            [ type_ "TypeAlias"
+            , ( "name", showJSON name )
+            , ( "type", showJSON t)
             , sourceLocation region
             ]
 
