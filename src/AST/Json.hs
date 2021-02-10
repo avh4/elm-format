@@ -226,51 +226,8 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
           Unit _ ->
               makeObj [ type_ "UnitLiteral" ]
 
-          Literal (IntNum value repr) ->
-              makeObj
-                  [ type_ "IntLiteral"
-                  , ("value", JSRational False $ toRational value)
-                  , ("display"
-                    , makeObj
-                        [ ("representation", showJSON repr)
-                        ]
-                    )
-                  ]
-
-          Literal (FloatNum value repr) ->
-              makeObj
-                  [ type_ "FloatLiteral"
-                  , ("value", JSRational False $ toRational value)
-                  , ("display"
-                    , makeObj
-                        [ ("representation", showJSON repr)
-                        ]
-                    )
-                  ]
-
-          Literal (Boolean value) ->
-            makeObj
-                [ type_ "ExternalReference"
-                , ("module", JSString $ toJSString "Basics")
-                , ("identifier", JSString $ toJSString $ show value)
-                , sourceLocation region
-                ]
-
-          Literal (Chr chr) ->
-              makeObj
-                  [ type_ "CharLiteral"
-                  , ("module", JSString $ toJSString "Char")
-                  , ("value", JSString $ toJSString [chr])
-                  , sourceLocation region
-                  ]
-
-          Literal (Str str _) ->
-              makeObj
-                  [ type_ "StringLiteral"
-                  , ("module", JSString $ toJSString "String")
-                  , ("value", JSString $ toJSString str)
-                  , sourceLocation region
-                  ]
+          Literal lit ->
+              literalValue region lit
 
           VarExpr (VarRef [] (LowercaseIdentifier var)) ->
             variableReference region var
@@ -422,6 +379,56 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
               JSString $ toJSString "TODO: GLShader"
 
 
+literalValue :: Region.Region -> LiteralValue -> JSValue
+literalValue region lit =
+    case lit of
+        IntNum value repr ->
+            makeObj
+                [ type_ "IntLiteral"
+                , ("value", JSRational False $ toRational value)
+                , ("display"
+                , makeObj
+                    [ ("representation", showJSON repr)
+                    ]
+                )
+                ]
+
+        FloatNum value repr ->
+            makeObj
+                [ type_ "FloatLiteral"
+                , ("value", JSRational False $ toRational value)
+                , ("display"
+                  , makeObj
+                    [ ("representation", showJSON repr)
+                    ]
+                  )
+                ]
+
+        Boolean value ->
+            makeObj
+                [ type_ "ExternalReference"
+                , ("module", JSString $ toJSString "Basics")
+                , ("identifier", JSString $ toJSString $ show value)
+                , sourceLocation region
+                ]
+
+        Chr chr ->
+            makeObj
+                [ type_ "CharLiteral"
+                , ("module", JSString $ toJSString "Char")
+                , ("value", JSString $ toJSString [chr])
+                , sourceLocation region
+                ]
+
+        Str str _ ->
+            makeObj
+                [ type_ "StringLiteral"
+                , ("module", JSString $ toJSString "String")
+                , ("value", JSString $ toJSString str)
+                , sourceLocation region
+                ]
+
+
 recordJSON :: (ToJSON base, ToJSON value) => String -> String -> Maybe (C2 Before After base) -> Sequence (Pair LowercaseIdentifier value) -> JSValue
 recordJSON tag extensionTag base fields =
     let
@@ -516,6 +523,9 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'PatternNK) where
                     [ type_ "AnythingPattern"
                     , sourceLocation region
                     ]
+
+            LiteralPattern lit ->
+                literalValue region lit
 
             DataPattern (namespace, tag) args ->
                 makeObj
