@@ -17,6 +17,7 @@
                 "value": "XYZZY"
             },
             "name": "token",
+            "parameters": [],
             "returnType": {
                 "arguments": [],
                 "module": null,
@@ -81,6 +82,7 @@
                 "tag": "FunctionApplication"
             },
             "name": "theBestClass",
+            "parameters": [],
             "returnType": {
                 "arguments": [
                     {
@@ -141,6 +143,7 @@
                 "tag": "ExternalReference"
             },
             "name": "text",
+            "parameters": [],
             "returnType": {
                 "argumentTypes": [
                     {
@@ -368,6 +371,7 @@
                 "tag": "FunctionApplication"
             },
             "name": "main",
+            "parameters": [],
             "returnType": {
                 "arguments": [
                     {

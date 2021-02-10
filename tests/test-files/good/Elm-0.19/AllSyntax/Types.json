@@ -1222,6 +1222,24 @@
                 "tag": "UnitLiteral"
             },
             "name": "emptyRecord",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 104
+                            },
+                            "start": {
+                                "col": 13,
+                                "line": 104
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": null
+                }
+            ],
             "returnType": {
                 "argumentTypes": [
                     {
@@ -1440,6 +1458,24 @@
                 "tag": "UnitLiteral"
             },
             "name": "recordExtension",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 128
+                            },
+                            "start": {
+                                "col": 17,
+                                "line": 128
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": null
+                }
+            ],
             "returnType": {
                 "argumentTypes": [
                     {

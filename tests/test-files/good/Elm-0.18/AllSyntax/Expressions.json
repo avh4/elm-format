@@ -16,6 +16,7 @@
                 ]
             },
             "name": "unit",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -45,6 +46,12 @@
                 "tag": "VariableReference"
             },
             "name": "var",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -75,6 +82,7 @@
                 "tag": "ExternalReference"
             },
             "name": "qualifiedVar",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -104,6 +112,7 @@
                 "tag": "VariableReference"
             },
             "name": "operator",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -187,6 +196,20 @@
                 "tag": "BinaryOperatorList"
             },
             "name": "infixPipeLeft",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"y\"))",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"z\"))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -275,6 +298,20 @@
                 "tag": "BinaryOperatorList"
             },
             "name": "infixPipeLeft2",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"y\"))",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"z\"))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -323,6 +360,7 @@
                 "tag": "FunctionApplication"
             },
             "name": "functionApplication",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -371,6 +409,7 @@
                 "tag": "FunctionApplication"
             },
             "name": "functionApplicationMultilineWithFirstArg",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -419,6 +458,7 @@
                 "tag": "FunctionApplication"
             },
             "name": "functionApplicationMultiline",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -452,6 +492,12 @@
                 }
             },
             "name": "unary",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -525,6 +571,7 @@
                 "tag": "BinaryOperatorList"
             },
             "name": "binary",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -592,6 +639,20 @@
                 "tag": "FunctionApplication"
             },
             "name": "parens",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"f\"))",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"a\"))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -624,6 +685,7 @@
                 ]
             },
             "name": "emptyList",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -688,6 +750,7 @@
                 ]
             },
             "name": "list",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -729,6 +792,7 @@
                 ]
             },
             "name": "listWithCommentedOutItems",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -825,6 +889,7 @@
                 ]
             },
             "name": "tuple",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -866,6 +931,7 @@
                 ]
             },
             "name": "tupleWithCommentedOutItems",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -921,6 +987,7 @@
                 "tag": "FunctionApplication"
             },
             "name": "tupleFunction",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -962,6 +1029,7 @@
                 ]
             },
             "name": "emptyRecord",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -1231,6 +1299,7 @@
                 ]
             },
             "name": "record",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -1271,6 +1340,7 @@
                 "tag": "RecordLiteral"
             },
             "name": "recordWithCommentedOutFields",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -1379,6 +1449,12 @@
                 ]
             },
             "name": "recordUpdate",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"a\"))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -1420,6 +1496,12 @@
                 "tag": "RecordUpdate"
             },
             "name": "recordUpdateWithCommentedOutFields",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"a\"))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -1619,6 +1701,24 @@
                 ]
             },
             "name": "recordAccess",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"f\"))",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"a\"))",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"b\"))",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"r\"))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -1670,6 +1770,7 @@
                 "tag": "FunctionApplication"
             },
             "name": "recordAccessfunction",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -1733,6 +1834,7 @@
                 "tag": "AnonymousFunction"
             },
             "name": "lambda",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -1757,6 +1859,7 @@
                 "tag": "AnonymousFunction"
             },
             "name": "lambdaWithMultilinePattern",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -1967,6 +2070,7 @@
                 "tag": "LetExpression"
             },
             "name": "ifStatement",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -2042,6 +2146,7 @@
                 "tag": "LetExpression"
             },
             "name": "letStatement",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -2354,6 +2459,7 @@
                 "tag": "LetExpression"
             },
             "name": "caseStatement",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {

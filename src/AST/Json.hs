@@ -187,6 +187,7 @@ instance ToJSON (MergedTopLevelStructure [UppercaseIdentifier]) where
         makeObj
             [ type_ "Definition"
             , ( "name" , showJSON name )
+            , ( "parameters", JSArray $ fmap mergedParameter args )
             , ( "returnType", maybe JSNull (\(_, _, t) -> showJSON t) annotation )
             , ( "expression" , showJSON expression )
             , sourceLocation region
@@ -198,6 +199,14 @@ instance ToJSON (MergedTopLevelStructure [UppercaseIdentifier]) where
             , ( "type", showJSON t)
             , sourceLocation region
             ]
+
+
+mergedParameter (C comments pattern) =
+    makeObj
+        [ ( "pattern", showJSON pattern )
+        , ( "type", JSNull ) -- TODO
+        ]
+
 
 -- instance ToJSON (TopLevelStructure Declaration) where
 --   showJSON (Entry (A region (Definition (A _ (VarPattern var)) _ _ expr))) =
