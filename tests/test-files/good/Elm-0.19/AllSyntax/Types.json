@@ -765,8 +765,38 @@
                 },
                 "tag": "TupleType",
                 "terms": [
-                    "TODO: Type (TypeParens (C ([BlockComment [\"A\"]],[BlockComment [\"B\"]]) (Fix {unFix = at 64 16 64 19 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))})))",
-                    "TODO: Type (TypeParens (C ([LineComment \"A\"],[LineComment \"B\"]) (Fix {unFix = at 66 8 66 11 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))})))"
+                    {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 19,
+                                "line": 64
+                            },
+                            "start": {
+                                "col": 16,
+                                "line": 64
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 66
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 66
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
                 ]
             }
         },

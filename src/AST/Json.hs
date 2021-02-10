@@ -320,7 +320,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
                 , ("term", showJSON expr)
                 ]
 
-          Parens (C _ expr) ->
+          Parens (C comments expr) ->
               showJSON expr
 
           ExplicitList terms _ _ ->
@@ -525,6 +525,9 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
                     , ( "name", showJSON name )
                     , sourceLocation region
                     ]
+
+            TypeParens (C comments t) ->
+                showJSON t
 
             TupleType terms multiline ->
                 makeObj
