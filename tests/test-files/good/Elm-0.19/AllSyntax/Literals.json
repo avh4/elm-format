@@ -212,7 +212,6 @@
         },
         {
             "expression": {
-                "module": "String",
                 "sourceLocation": {
                     "end": {
                         "col": 13,
@@ -243,7 +242,6 @@
         },
         {
             "expression": {
-                "module": "String",
                 "sourceLocation": {
                     "end": {
                         "col": 22,
@@ -274,7 +272,6 @@
         },
         {
             "expression": {
-                "module": "String",
                 "sourceLocation": {
                     "end": {
                         "col": 15,
@@ -305,7 +302,6 @@
         },
         {
             "expression": {
-                "module": "String",
                 "sourceLocation": {
                     "end": {
                         "col": 15,
@@ -339,7 +335,6 @@
                 "tag": "TupleLiteral",
                 "terms": [
                     {
-                        "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 121,
@@ -354,7 +349,6 @@
                         "value": "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\u000b\f\r\u000e\u000f"
                     },
                     {
-                        "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 137,
@@ -369,7 +363,6 @@
                         "value": "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f"
                     },
                     {
-                        "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 17,
@@ -402,7 +395,6 @@
         },
         {
             "expression": {
-                "module": "String",
                 "sourceLocation": {
                     "end": {
                         "col": 41,
@@ -433,7 +425,6 @@
         },
         {
             "expression": {
-                "module": "String",
                 "sourceLocation": {
                     "end": {
                         "col": 32,
@@ -464,7 +455,6 @@
         },
         {
             "expression": {
-                "module": "Char",
                 "sourceLocation": {
                     "end": {
                         "col": 8,
@@ -498,7 +488,6 @@
                 "tag": "ListLiteral",
                 "terms": [
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 10,
@@ -513,7 +502,6 @@
                         "value": "a"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
@@ -528,7 +516,6 @@
                         "value": " "
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 20,
@@ -543,7 +530,6 @@
                         "value": "/"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 25,
@@ -558,7 +544,6 @@
                         "value": "\""
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 30,
@@ -573,7 +558,6 @@
                         "value": "\u06a5"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 35,
@@ -588,7 +572,6 @@
                         "value": "\ud83d\ude00"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 40,
@@ -603,7 +586,6 @@
                         "value": "\u3041"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 45,
@@ -618,7 +600,6 @@
                         "value": "\u2f83"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 50,
@@ -654,7 +635,6 @@
                 "tag": "ListLiteral",
                 "terms": [
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 11,
@@ -669,7 +649,6 @@
                         "value": "\t"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 17,
@@ -684,7 +663,6 @@
                         "value": "\n"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 23,
@@ -699,7 +677,6 @@
                         "value": "\\"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 29,
@@ -735,7 +712,6 @@
                 "tag": "ListLiteral",
                 "terms": [
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 17,
@@ -750,7 +726,6 @@
                         "value": "\u0000"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 29,
@@ -765,7 +740,6 @@
                         "value": "\u001f"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 41,
@@ -801,7 +775,6 @@
                 "tag": "ListLiteral",
                 "terms": [
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 17,
@@ -816,7 +789,6 @@
                         "value": "\u06dd"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 29,
@@ -831,7 +803,6 @@
                         "value": "\ufffb"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 42,
@@ -846,7 +817,6 @@
                         "value": "\ud804\udcbd"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 55,
@@ -882,7 +852,6 @@
                 "tag": "ListLiteral",
                 "terms": [
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 10,
@@ -897,7 +866,6 @@
                         "value": " "
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 22,
@@ -912,7 +880,6 @@
                         "value": "\u00a0"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 34,
@@ -927,7 +894,6 @@
                         "value": "\u2000"
                     },
                     {
-                        "module": "Char",
                         "sourceLocation": {
                             "end": {
                                 "col": 46,
@@ -960,7 +926,6 @@
         },
         {
             "expression": {
-                "module": "String",
                 "sourceLocation": {
                     "end": {
                         "col": 4,
@@ -991,7 +956,6 @@
         },
         {
             "expression": {
-                "module": "String",
                 "sourceLocation": {
                     "end": {
                         "col": 4,
@@ -1025,7 +989,6 @@
                 "tag": "ListLiteral",
                 "terms": [
                     {
-                        "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 36,
@@ -1040,7 +1003,6 @@
                         "value": "trailing double quote\""
                     },
                     {
-                        "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 40,
@@ -1055,7 +1017,6 @@
                         "value": "trailing double quote 2\"\""
                     },
                     {
-                        "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 42,
@@ -1070,7 +1031,6 @@
                         "value": "trailing double quote 3\"\"\""
                     },
                     {
-                        "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 44,
@@ -1085,7 +1045,6 @@
                         "value": "trailing double quote 4\"\"\"\""
                     },
                     {
-                        "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 51,
@@ -1100,7 +1059,6 @@
                         "value": "embedded triple double quotes (\"\"\")"
                     },
                     {
-                        "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 62,
@@ -1115,7 +1073,6 @@
                         "value": "embedded triple double quotes (\"\"\") (\"\"\"\")"
                     },
                     {
-                        "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 37,
@@ -1130,7 +1087,6 @@
                         "value": "\"\"leading double quote 2"
                     },
                     {
-                        "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 42,
@@ -1145,7 +1101,6 @@
                         "value": "\"\"\" leading double quote 3"
                     },
                     {
-                        "module": "String",
                         "sourceLocation": {
                             "end": {
                                 "col": 44,
