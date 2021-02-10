@@ -167,20 +167,20 @@ instance ToJSON DetailedListing where
 instance ToJSON (MergedTopLevelStructure [UppercaseIdentifier]) where
     showJSON (TodoTopLevelStructure what) =
         JSString $ toJSString ("TODO: " ++ what)
-    showJSON (MergedDefinition region (LowercaseIdentifier name) args _ expression doc annotation) =
+    showJSON (MergedDefinition region name args _ expression doc annotation) =
         makeObj
             [ type_ "Definition"
-            , ( "name" , JSString $ toJSString name )
+            , ( "name" , showJSON name )
             , ( "returnType", maybe JSNull (\(_, _, t) -> showJSON t) annotation )
             , ( "expression" , showJSON expression )
             , sourceLocation region
             ]
 
 -- instance ToJSON (TopLevelStructure Declaration) where
---   showJSON (Entry (A region (Definition (A _ (VarPattern (LowercaseIdentifier var))) _ _ expr))) =
+--   showJSON (Entry (A region (Definition (A _ (VarPattern var)) _ _ expr))) =
 --     makeObj
 --       [ type_ "Definition"
---       , ( "name" , JSString $ toJSString var )
+--       , ( "name" , showJSON var )
 --       , ( "returnType", JSNull )
 --       , ( "expression" , showJSON expr )
 --       , sourceLocation region
@@ -243,12 +243,12 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
           VarExpr (VarRef [] (LowercaseIdentifier var)) ->
             variableReference region var
 
-          VarExpr (VarRef namespace (LowercaseIdentifier var)) ->
+          VarExpr (VarRef namespace var) ->
               makeObj
                   [ type_ "ExternalReference"
                   , ("module"
                     , showJSON namespace)
-                  , ("identifier", JSString $ toJSString var)
+                  , ("identifier", showJSON var)
                   , sourceLocation region
                   ]
 
@@ -266,9 +266,6 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
 
           VarExpr (OpRef (SymbolIdentifier sym)) ->
             variableReference region sym
-
-          VarExpr _ ->
-              JSString $ toJSString "TODO: VarExpr"
 
           App expr args _ ->
               makeObj
@@ -335,16 +332,15 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
                   fieldOrder =
                       ( "fieldOrder"
                       , JSArray $
-                            fmap (JSString . toJSString) $
-                            fmap (\(Pair (C _ (LowercaseIdentifier key)) _ _) -> key) $
+                            fmap (\(Pair (C _ key) _ _) -> showJSON key) $
                             toList fields
                       )
               in
               case base of
-                  Just (C _ (LowercaseIdentifier identifier)) ->
+                  Just (C _ identifier) ->
                       makeObj
                           [ type_ "RecordUpdate"
-                          , ("base", JSString $ toJSString identifier)
+                          , ("base", showJSON identifier)
                           , fieldsJSON
                           , ( "display"
                             , makeObj
@@ -364,11 +360,11 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
                             )
                           ]
 
-          Access base (LowercaseIdentifier field) ->
+          Access base field ->
             makeObj
                 [ type_ "RecordAccess"
                 , ( "record", showJSON base )
-                , ( "field", JSString $ toJSString field )
+                , ( "field", showJSON field )
                 ]
 
           Lambda parameters _ body _ ->
@@ -424,8 +420,12 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
           Range _ _ _ ->
               JSString $ toJSString "TODO: Range"
 
-          AccessFunction _ ->
-              JSString $ toJSString "TODO: AccessFunction"
+          AccessFunction field ->
+              makeObj
+                  [ type_ "RecordAccess"
+                  , ( "field", showJSON field )
+                  , sourceLocation region
+                  ]
 
           GLShader _ ->
               JSString $ toJSString "TODO: GLShader"
@@ -445,13 +445,17 @@ sourceLocation region =
     ( "sourceLocation", showJSON region )
 
 
+instance ToJSON LowercaseIdentifier where
+    showJSON (LowercaseIdentifier name) = JSString $ toJSString name
+
+
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'LetDeclarationNK) where
   showJSON letDeclaration =
       case extract $ I.unFix letDeclaration of
-          LetDefinition (I.Fix (A _ (VarPattern (LowercaseIdentifier var)))) [] _ expr ->
+          LetDefinition (I.Fix (A _ (VarPattern var))) [] _ expr ->
               makeObj
                   [ type_ "Definition"
-                  , ("name" , JSString $ toJSString var)
+                  , ("name" , showJSON var)
                   , ("expression" , showJSON expr)
                   ]
 
@@ -460,8 +464,8 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'LetDeclarationNK) where
 
 
 instance ToJSON IntRepresentation where
-    showJSON DecimalInt = JSString $ toJSString $ "DecimalInt"
-    showJSON HexadecimalInt = JSString $ toJSString $ "HexadecimalInt"
+    showJSON DecimalInt = JSString $ toJSString "DecimalInt"
+    showJSON HexadecimalInt = JSString $ toJSString "HexadecimalInt"
 
 
 instance ToJSON FloatRepresentation where
@@ -485,10 +489,10 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
                     , ( "arguments", JSArray $ fmap (showJSON . extract) args )
                     ]
 
-            TypeVariable (LowercaseIdentifier name) ->
+            TypeVariable name ->
                 makeObj
                     [ type_ "TypeVariable"
-                    , ( "name", JSString $ toJSString name )
+                    , ( "name", showJSON name )
                     ]
 
             FunctionType first rest _ ->
