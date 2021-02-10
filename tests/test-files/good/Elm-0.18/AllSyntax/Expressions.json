@@ -1728,7 +1728,7 @@
                     "tag": "BinaryOperatorList"
                 },
                 "parameters": [
-                    "TODO: Pattern (Fix {unFix = at 254 6 254 7 (VarPattern (LowercaseIdentifier \"x\"))})"
+                    "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))"
                 ],
                 "tag": "AnonymousFunction"
             },
@@ -1752,7 +1752,7 @@
                     "tag": "UnitLiteral"
                 },
                 "parameters": [
-                    "TODO: Pattern (Fix {unFix = at 258 6 261 7 (RecordPattern [C ([],[]) (LowercaseIdentifier \"x\"),C ([LineComment \"A\"],[]) (LowercaseIdentifier \"y\")])})"
+                    "TODO: Pattern (RecordPattern [C ([],[]) (LowercaseIdentifier \"x\"),C ([LineComment \"A\"],[]) (LowercaseIdentifier \"y\")])"
                 ],
                 "tag": "AnonymousFunction"
             },
@@ -2083,7 +2083,27 @@
                                         },
                                         "tag": "VariableReference"
                                     },
-                                    "pattern": "TODO: Pattern (Fix {unFix = at 336 17 336 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 336 22 336 23 (VarPattern (LowercaseIdentifier \"x\"))})])})"
+                                    "pattern": {
+                                        "arguments": [
+                                            "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))"
+                                        ],
+                                        "constructor": {
+                                            "identifier": "Just",
+                                            "module": "Maybe",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 23,
+                                                "line": 336
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 336
+                                            }
+                                        },
+                                        "tag": "DataPattern"
+                                    }
                                 },
                                 {
                                     "body": {
@@ -2093,7 +2113,7 @@
                                         "tag": "IntLiteral",
                                         "value": 2
                                     },
-                                    "pattern": "TODO: Pattern (Fix {unFix = at 339 17 339 18 Anything})"
+                                    "pattern": "TODO: Pattern (Anything)"
                                 }
                             ],
                             "subject": {
@@ -2146,7 +2166,27 @@
                                         },
                                         "tag": "VariableReference"
                                     },
-                                    "pattern": "TODO: Pattern (Fix {unFix = at 345 17 345 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 345 22 345 23 (VarPattern (LowercaseIdentifier \"x\"))})])})"
+                                    "pattern": {
+                                        "arguments": [
+                                            "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))"
+                                        ],
+                                        "constructor": {
+                                            "identifier": "Just",
+                                            "module": "Maybe",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 23,
+                                                "line": 345
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 345
+                                            }
+                                        },
+                                        "tag": "DataPattern"
+                                    }
                                 },
                                 {
                                     "body": {
@@ -2156,7 +2196,7 @@
                                         "tag": "IntLiteral",
                                         "value": 2
                                     },
-                                    "pattern": "TODO: Pattern (Fix {unFix = at 352 17 352 18 Anything})"
+                                    "pattern": "TODO: Pattern (Anything)"
                                 }
                             ],
                             "subject": {
@@ -2209,7 +2249,27 @@
                                         },
                                         "tag": "VariableReference"
                                     },
-                                    "pattern": "TODO: Pattern (Fix {unFix = at 365 17 365 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 365 22 365 23 (VarPattern (LowercaseIdentifier \"x\"))})])})"
+                                    "pattern": {
+                                        "arguments": [
+                                            "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))"
+                                        ],
+                                        "constructor": {
+                                            "identifier": "Just",
+                                            "module": "Maybe",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 23,
+                                                "line": 365
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 365
+                                            }
+                                        },
+                                        "tag": "DataPattern"
+                                    }
                                 },
                                 {
                                     "body": {
@@ -2219,7 +2279,7 @@
                                         "tag": "IntLiteral",
                                         "value": 2
                                     },
-                                    "pattern": "TODO: Pattern (Fix {unFix = at 372 17 372 18 Anything})"
+                                    "pattern": "TODO: Pattern (Anything)"
                                 }
                             ],
                             "subject": {

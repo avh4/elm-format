@@ -269,8 +269,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
           VarExpr (VarRef namespace var) ->
               makeObj
                   [ type_ "ExternalReference"
-                  , ("module"
-                    , showJSON namespace)
+                  , ("module", showJSON namespace)
                   , ("identifier", showJSON var)
                   , sourceLocation region
                   ]
@@ -281,8 +280,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
           VarExpr (TagRef namespace (UppercaseIdentifier var)) ->
               makeObj
                   [ type_ "ExternalReference"
-                  , ("module"
-                    , showJSON namespace)
+                  , ("module", showJSON namespace)
                   , ("identifier", JSString $ toJSString var)
                   , sourceLocation region
                   ]
@@ -502,8 +500,26 @@ instance ToJSON FloatRepresentation where
 
 
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'PatternNK) where
-  showJSON pattern' =
-      JSString $ toJSString $ "TODO: Pattern (" ++ show pattern' ++ ")"
+    showJSON (I.Fix (A region pattern')) =
+        case pattern' of
+            DataPattern (namespace, tag) args ->
+                makeObj
+                    [ type_ "DataPattern"
+                    , ( "constructor"
+                      , makeObj
+                        [ type_ "ExternalReference"
+                        , ("module", showJSON namespace)
+                        , ("identifier", showJSON tag)
+                        ]
+                      )
+                    , ( "arguments"
+                      , JSArray $ fmap (\(C c p) -> showJSON p) args
+                      )
+                    , sourceLocation region
+                    ]
+
+            _ ->
+                JSString $ toJSString $ "TODO: Pattern (" ++ show pattern' ++ ")"
 
 
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
