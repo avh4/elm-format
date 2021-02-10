@@ -249,7 +249,19 @@
             "name": "unit",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (UnitPattern [])",
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 24
+                            },
+                            "start": {
+                                "col": 6,
+                                "line": 24
+                            }
+                        },
+                        "tag": "UnitPattern"
+                    },
                     "type": null
                 }
             ],

@@ -223,7 +223,7 @@ mergedParameter (C comments pattern) =
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
   showJSON (I.Fix (A region expr)) =
       case expr of
-          Unit _ ->
+          Unit comments ->
               makeObj [ type_ "UnitLiteral" ]
 
           Literal lit ->
@@ -531,6 +531,12 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'PatternNK) where
             Anything ->
                 makeObj
                     [ type_ "AnythingPattern"
+                    , sourceLocation region
+                    ]
+
+            UnitPattern comments ->
+                makeObj
+                    [ type_ "UnitPattern"
                     , sourceLocation region
                     ]
 
