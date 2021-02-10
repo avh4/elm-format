@@ -44,19 +44,59 @@
             "name": "literal",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (LiteralPattern (IntNum 1 DecimalInt))",
+                    "pattern": {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "tag": "IntLiteral",
+                        "value": 1
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (LiteralPattern (FloatNum 2.0 DecimalFloat))",
+                    "pattern": {
+                        "display": {
+                            "representation": "DecimalFloat"
+                        },
+                        "tag": "FloatLiteral",
+                        "value": 2
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (LiteralPattern (Str \"string\" False))",
+                    "pattern": {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 12
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 12
+                            }
+                        },
+                        "tag": "StringLiteral",
+                        "value": "string"
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (LiteralPattern (Chr 'c'))",
+                    "pattern": {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 27,
+                                "line": 12
+                            },
+                            "start": {
+                                "col": 24,
+                                "line": 12
+                            }
+                        },
+                        "tag": "CharLiteral",
+                        "value": "c"
+                    },
                     "type": null
                 }
             ],
