@@ -6,6 +6,16 @@
                 "display": {
                     "representation": "DecimalInt"
                 },
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 40
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 40
+                    }
+                },
                 "tag": "IntLiteral",
                 "value": 1
             },
@@ -29,6 +39,16 @@
                 "display": {
                     "representation": "DecimalInt"
                 },
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 44
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 44
+                    }
+                },
                 "tag": "IntLiteral",
                 "value": 2
             },
@@ -51,6 +71,16 @@
             "expression": {
                 "display": {
                     "representation": "DecimalInt"
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 48
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 48
+                    }
                 },
                 "tag": "IntLiteral",
                 "value": 3
