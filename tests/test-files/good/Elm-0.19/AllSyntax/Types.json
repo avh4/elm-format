@@ -26,9 +26,45 @@
                 },
                 "tag": "TupleType",
                 "terms": [
-                    "TODO: Type (UnitType [])",
-                    "TODO: Type (UnitType [BlockComment [\"A\"]])",
-                    "TODO: Type (UnitType [LineComment \"B\"])"
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 7
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 7
+                            }
+                        },
+                        "tag": "UnitType"
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 16,
+                                "line": 8
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 8
+                            }
+                        },
+                        "tag": "UnitType"
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 10
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 9
+                            }
+                        },
+                        "tag": "UnitType"
+                    }
                 ]
             }
         },
@@ -60,50 +96,266 @@
                 "terms": [
                     {
                         "argumentTypes": [
-                            "TODO: Type (UnitType [])",
-                            "TODO: Type (UnitType [])"
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 15
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 15
+                                    }
+                                },
+                                "tag": "UnitType"
+                            },
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 15
+                                    },
+                                    "start": {
+                                        "col": 13,
+                                        "line": 15
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
                         ],
-                        "returnType": "TODO: Type (UnitType [])",
+                        "returnType": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 21,
+                                    "line": 15
+                                },
+                                "start": {
+                                    "col": 19,
+                                    "line": 15
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
                         "tag": "FunctionType"
                     },
                     {
                         "argumentTypes": [
-                            "TODO: Type (UnitType [])",
-                            "TODO: Type (UnitType [])"
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 16
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 16
+                                    }
+                                },
+                                "tag": "UnitType"
+                            },
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 17
+                                    },
+                                    "start": {
+                                        "col": 10,
+                                        "line": 17
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
                         ],
-                        "returnType": "TODO: Type (UnitType [])",
+                        "returnType": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 12,
+                                    "line": 18
+                                },
+                                "start": {
+                                    "col": 10,
+                                    "line": 18
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
                         "tag": "FunctionType"
                     },
                     {
                         "argumentTypes": [
-                            "TODO: Type (UnitType [LineComment \"\"])",
-                            "TODO: Type (UnitType [LineComment \"\"])"
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 8,
+                                        "line": 20
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 19
+                                    }
+                                },
+                                "tag": "UnitType"
+                            },
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 23
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 22
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
                         ],
-                        "returnType": "TODO: Type (UnitType [LineComment \"\"])",
+                        "returnType": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 10,
+                                    "line": 26
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 25
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
                         "tag": "FunctionType"
                     },
                     {
                         "argumentTypes": [
-                            "TODO: Type (UnitType [])",
-                            "TODO: Type (UnitType [])"
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 27
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 27
+                                    }
+                                },
+                                "tag": "UnitType"
+                            },
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 33,
+                                        "line": 27
+                                    },
+                                    "start": {
+                                        "col": 31,
+                                        "line": 27
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
                         ],
-                        "returnType": "TODO: Type (UnitType [])",
+                        "returnType": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 57,
+                                    "line": 27
+                                },
+                                "start": {
+                                    "col": 55,
+                                    "line": 27
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
                         "tag": "FunctionType"
                     },
                     {
                         "argumentTypes": [
-                            "TODO: Type (UnitType [])",
-                            "TODO: Type (UnitType [])"
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 28
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 28
+                                    }
+                                },
+                                "tag": "UnitType"
+                            },
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 11,
+                                        "line": 32
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 32
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
                         ],
-                        "returnType": "TODO: Type (UnitType [])",
+                        "returnType": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 11,
+                                    "line": 36
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 36
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
                         "tag": "FunctionType"
                     },
                     {
                         "argumentTypes": [
-                            "TODO: Type (UnitType [])",
-                            "TODO: Type (UnitType [])"
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 37
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 37
+                                    }
+                                },
+                                "tag": "UnitType"
+                            },
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 38
+                                    },
+                                    "start": {
+                                        "col": 10,
+                                        "line": 38
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
                         ],
-                        "returnType": "TODO: Type (UnitType [])",
+                        "returnType": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 12,
+                                    "line": 39
+                                },
+                                "start": {
+                                    "col": 10,
+                                    "line": 39
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
                         "tag": "FunctionType"
                     }
                 ]
@@ -567,7 +819,19 @@
                 "argumentTypes": [
                     "TODO: Type (RecordType {base_rt = Nothing, fields_rt = Sequence [], trailingComments_rt = [], forceMultiline_rt = ForceMultiline False})"
                 ],
-                "returnType": "TODO: Type (UnitType [])",
+                "returnType": {
+                    "sourceLocation": {
+                        "end": {
+                            "col": 23,
+                            "line": 117
+                        },
+                        "start": {
+                            "col": 21,
+                            "line": 117
+                        }
+                    },
+                    "tag": "UnitType"
+                },
                 "tag": "FunctionType"
             },
             "sourceLocation": {
@@ -637,7 +901,19 @@
                 "argumentTypes": [
                     "TODO: Type (RecordType {base_rt = Just (C ([],[]) (LowercaseIdentifier \"a\")), fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"x\"), _value = C [] (Fix {unFix = at 141 29 141 32 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"y\"), _value = C [] (Fix {unFix = at 141 38 141 41 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False})], trailingComments_rt = [], forceMultiline_rt = ForceMultiline False})"
                 ],
-                "returnType": "TODO: Type (UnitType [])",
+                "returnType": {
+                    "sourceLocation": {
+                        "end": {
+                            "col": 49,
+                            "line": 141
+                        },
+                        "start": {
+                            "col": 47,
+                            "line": 141
+                        }
+                    },
+                    "tag": "UnitType"
+                },
                 "tag": "FunctionType"
             },
             "sourceLocation": {
