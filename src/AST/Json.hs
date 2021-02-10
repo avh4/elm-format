@@ -502,8 +502,8 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'PatternNK) where
 
 
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
-    showJSON type' =
-        case extract $ I.unFix type' of
+    showJSON (I.Fix (A region type')) =
+        case type' of
             TypeConstruction (NamedConstructor (namespace, name)) args forceMultine ->
                 makeObj
                     [ type_ "TypeReference"
@@ -516,6 +516,13 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
                 makeObj
                     [ type_ "TypeVariable"
                     , ( "name", showJSON name )
+                    ]
+
+            TupleType terms multiline ->
+                makeObj
+                    [ type_ "TupleType"
+                    , ("terms", JSArray $ fmap showJSON (map extract terms))
+                    , sourceLocation region
                     ]
 
             FunctionType first rest _ ->
