@@ -801,11 +801,11 @@
             }
         },
         {
-            "name": "TupleConstructor",
+            "name": "Tuple",
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 83
+                    "line": 85
                 },
                 "start": {
                     "col": 1,
@@ -817,7 +817,7 @@
                 "sourceLocation": {
                     "end": {
                         "col": 6,
-                        "line": 83
+                        "line": 85
                     },
                     "start": {
                         "col": 5,
@@ -826,48 +826,15 @@
                 },
                 "tag": "TupleType",
                 "terms": [
-                    "TODO: Type (TypeConstruction (TupleConstructor 2) [C [] (Fix {unFix = at 73 11 73 14 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}),C [] (Fix {unFix = at 73 15 73 21 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"String\")) [] (ForceMultiline False))})] (ForceMultiline False))",
-                    "TODO: Type (TypeConstruction (TupleConstructor 3) [C [] (Fix {unFix = at 74 12 74 15 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}),C [] (Fix {unFix = at 74 16 74 22 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"String\")) [] (ForceMultiline False))}),C [] (Fix {unFix = at 74 23 74 27 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Bool\")) [] (ForceMultiline False))})] (ForceMultiline False))",
-                    "TODO: Type (TypeConstruction (TupleConstructor 3) [C [BlockComment [\"C\"]] (Fix {unFix = at 75 20 75 23 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}),C [BlockComment [\"D\"]] (Fix {unFix = at 75 32 75 38 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"String\")) [] (ForceMultiline False))}),C [BlockComment [\"E\"]] (Fix {unFix = at 75 47 75 51 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Bool\")) [] (ForceMultiline False))})] (ForceMultiline False))",
-                    "TODO: Type (TypeConstruction (TupleConstructor 3) [C [LineComment \" C\"] (Fix {unFix = at 78 9 78 12 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}),C [LineComment \" D\"] (Fix {unFix = at 80 9 80 15 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"String\")) [] (ForceMultiline False))}),C [LineComment \"E\"] (Fix {unFix = at 82 9 82 13 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Bool\")) [] (ForceMultiline False))})] (ForceMultiline True))"
-                ]
-            }
-        },
-        {
-            "name": "Tuple",
-            "sourceLocation": {
-                "end": {
-                    "col": 6,
-                    "line": 99
-                },
-                "start": {
-                    "col": 1,
-                    "line": 86
-                }
-            },
-            "tag": "TypeAlias",
-            "type": {
-                "sourceLocation": {
-                    "end": {
-                        "col": 6,
-                        "line": 99
-                    },
-                    "start": {
-                        "col": 5,
-                        "line": 87
-                    }
-                },
-                "tag": "TupleType",
-                "terms": [
                     {
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 87
+                                "line": 73
                             },
                             "start": {
                                 "col": 7,
-                                "line": 87
+                                "line": 73
                             }
                         },
                         "tag": "TupleType",
@@ -877,11 +844,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 10,
-                                        "line": 87
+                                        "line": 73
                                     },
                                     "start": {
                                         "col": 9,
-                                        "line": 87
+                                        "line": 73
                                     }
                                 },
                                 "tag": "TypeVariable"
@@ -891,11 +858,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 13,
-                                        "line": 87
+                                        "line": 73
                                     },
                                     "start": {
                                         "col": 12,
-                                        "line": 87
+                                        "line": 73
                                     }
                                 },
                                 "tag": "TypeVariable"
@@ -906,11 +873,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 47,
-                                "line": 88
+                                "line": 74
                             },
                             "start": {
                                 "col": 7,
-                                "line": 88
+                                "line": 74
                             }
                         },
                         "tag": "TupleType",
@@ -920,11 +887,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 18,
-                                        "line": 88
+                                        "line": 74
                                     },
                                     "start": {
                                         "col": 17,
-                                        "line": 88
+                                        "line": 74
                                     }
                                 },
                                 "tag": "TypeVariable"
@@ -934,11 +901,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 37,
-                                        "line": 88
+                                        "line": 74
                                     },
                                     "start": {
                                         "col": 36,
-                                        "line": 88
+                                        "line": 74
                                     }
                                 },
                                 "tag": "TypeVariable"
@@ -949,11 +916,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 8,
-                                "line": 95
+                                "line": 81
                             },
                             "start": {
                                 "col": 7,
-                                "line": 89
+                                "line": 75
                             }
                         },
                         "tag": "TupleType",
@@ -963,11 +930,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 10,
-                                        "line": 90
+                                        "line": 76
                                     },
                                     "start": {
                                         "col": 9,
-                                        "line": 90
+                                        "line": 76
                                     }
                                 },
                                 "tag": "TypeVariable"
@@ -977,11 +944,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 10,
-                                        "line": 93
+                                        "line": 79
                                     },
                                     "start": {
                                         "col": 9,
-                                        "line": 93
+                                        "line": 79
                                     }
                                 },
                                 "tag": "TypeVariable"
@@ -992,11 +959,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 8,
-                                "line": 98
+                                "line": 84
                             },
                             "start": {
                                 "col": 7,
-                                "line": 96
+                                "line": 82
                             }
                         },
                         "tag": "TupleType",
@@ -1006,11 +973,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 10,
-                                        "line": 96
+                                        "line": 82
                                     },
                                     "start": {
                                         "col": 9,
-                                        "line": 96
+                                        "line": 82
                                     }
                                 },
                                 "tag": "TypeVariable"
@@ -1020,11 +987,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 10,
-                                        "line": 97
+                                        "line": 83
                                     },
                                     "start": {
                                         "col": 9,
-                                        "line": 97
+                                        "line": 83
                                     }
                                 },
                                 "tag": "TypeVariable"
@@ -1039,11 +1006,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 108
+                    "line": 94
                 },
                 "start": {
                     "col": 1,
-                    "line": 102
+                    "line": 88
                 }
             },
             "tag": "TypeAlias",
@@ -1051,11 +1018,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 6,
-                        "line": 108
+                        "line": 94
                     },
                     "start": {
                         "col": 5,
-                        "line": 103
+                        "line": 89
                     }
                 },
                 "tag": "TupleType",
@@ -1067,11 +1034,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 10,
-                                "line": 103
+                                "line": 89
                             },
                             "start": {
                                 "col": 7,
-                                "line": 103
+                                "line": 89
                             }
                         },
                         "tag": "TypeReference"
@@ -1083,11 +1050,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 10,
-                                "line": 106
+                                "line": 92
                             },
                             "start": {
                                 "col": 7,
-                                "line": 106
+                                "line": 92
                             }
                         },
                         "tag": "TypeReference"
@@ -1100,11 +1067,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 114
+                    "line": 100
                 },
                 "start": {
                     "col": 1,
-                    "line": 111
+                    "line": 97
                 }
             },
             "tag": "TypeAlias",
@@ -1112,11 +1079,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 6,
-                        "line": 114
+                        "line": 100
                     },
                     "start": {
                         "col": 5,
-                        "line": 112
+                        "line": 98
                     }
                 },
                 "tag": "TupleType",
@@ -1130,11 +1097,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 10,
-                                        "line": 112
+                                        "line": 98
                                     },
                                     "start": {
                                         "col": 7,
-                                        "line": 112
+                                        "line": 98
                                     }
                                 },
                                 "tag": "TypeReference"
@@ -1146,11 +1113,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 17,
-                                        "line": 112
+                                        "line": 98
                                     },
                                     "start": {
                                         "col": 14,
-                                        "line": 112
+                                        "line": 98
                                     }
                                 },
                                 "tag": "TypeReference"
@@ -1163,11 +1130,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 24,
-                                    "line": 112
+                                    "line": 98
                                 },
                                 "start": {
                                     "col": 21,
-                                    "line": 112
+                                    "line": 98
                                 }
                             },
                             "tag": "TypeReference"
@@ -1175,11 +1142,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 24,
-                                "line": 112
+                                "line": 98
                             },
                             "start": {
                                 "col": 7,
-                                "line": 112
+                                "line": 98
                             }
                         },
                         "tag": "FunctionType"
@@ -1193,11 +1160,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 13,
-                                        "line": 113
+                                        "line": 99
                                     },
                                     "start": {
                                         "col": 7,
-                                        "line": 113
+                                        "line": 99
                                     }
                                 },
                                 "tag": "TypeReference"
@@ -1209,11 +1176,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 23,
-                                        "line": 113
+                                        "line": 99
                                     },
                                     "start": {
                                         "col": 17,
-                                        "line": 113
+                                        "line": 99
                                     }
                                 },
                                 "tag": "TypeReference"
@@ -1226,11 +1193,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 33,
-                                    "line": 113
+                                    "line": 99
                                 },
                                 "start": {
                                     "col": 27,
-                                    "line": 113
+                                    "line": 99
                                 }
                             },
                             "tag": "TypeReference"
@@ -1238,11 +1205,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 33,
-                                "line": 113
+                                "line": 99
                             },
                             "start": {
                                 "col": 7,
-                                "line": 113
+                                "line": 99
                             }
                         },
                         "tag": "FunctionType"
@@ -1263,11 +1230,11 @@
                     "sourceLocation": {
                         "end": {
                             "col": 23,
-                            "line": 117
+                            "line": 103
                         },
                         "start": {
                             "col": 21,
-                            "line": 117
+                            "line": 103
                         }
                     },
                     "tag": "UnitType"
@@ -1275,11 +1242,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 23,
-                        "line": 117
+                        "line": 103
                     },
                     "start": {
                         "col": 15,
-                        "line": 117
+                        "line": 103
                     }
                 },
                 "tag": "FunctionType"
@@ -1287,11 +1254,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 7,
-                    "line": 119
+                    "line": 105
                 },
                 "start": {
                     "col": 1,
-                    "line": 118
+                    "line": 104
                 }
             },
             "tag": "Definition"
@@ -1301,11 +1268,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 127
+                    "line": 113
                 },
                 "start": {
                     "col": 1,
-                    "line": 122
+                    "line": 108
                 }
             },
             "tag": "TypeAlias",
@@ -1313,17 +1280,17 @@
                 "sourceLocation": {
                     "end": {
                         "col": 6,
-                        "line": 127
+                        "line": 113
                     },
                     "start": {
                         "col": 5,
-                        "line": 123
+                        "line": 109
                     }
                 },
                 "tag": "TupleType",
                 "terms": [
-                    "TODO: Type (RecordType {base_rt = Nothing, fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"x\"), _value = C [] (Fix {unFix = at 123 13 123 16 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"y\"), _value = C [] (Fix {unFix = at 123 22 123 24 (UnitType [])}), forceMultiline = ForceMultiline False})], trailingComments_rt = [], forceMultiline_rt = ForceMultiline False})",
-                    "TODO: Type (RecordType {base_rt = Nothing, fields_rt = Sequence [C ([],[],Just \" X\") (Pair {_key = C [] (LowercaseIdentifier \"x\"), _value = C [] (Fix {unFix = at 124 13 124 16 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([],[],Just \" Y\") (Pair {_key = C [] (LowercaseIdentifier \"y\"), _value = C [] (Fix {unFix = at 125 13 125 15 (UnitType [])}), forceMultiline = ForceMultiline False})], trailingComments_rt = [], forceMultiline_rt = ForceMultiline True})"
+                    "TODO: Type (RecordType {base_rt = Nothing, fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"x\"), _value = C [] (Fix {unFix = at 109 13 109 16 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"y\"), _value = C [] (Fix {unFix = at 109 22 109 24 (UnitType [])}), forceMultiline = ForceMultiline False})], trailingComments_rt = [], forceMultiline_rt = ForceMultiline False})",
+                    "TODO: Type (RecordType {base_rt = Nothing, fields_rt = Sequence [C ([],[],Just \" X\") (Pair {_key = C [] (LowercaseIdentifier \"x\"), _value = C [] (Fix {unFix = at 110 13 110 16 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([],[],Just \" Y\") (Pair {_key = C [] (LowercaseIdentifier \"y\"), _value = C [] (Fix {unFix = at 111 13 111 15 (UnitType [])}), forceMultiline = ForceMultiline False})], trailingComments_rt = [], forceMultiline_rt = ForceMultiline True})"
                 ]
             }
         },
@@ -1332,15 +1299,15 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 138
+                    "line": 124
                 },
                 "start": {
                     "col": 1,
-                    "line": 130
+                    "line": 116
                 }
             },
             "tag": "TypeAlias",
-            "type": "TODO: Type (RecordType {base_rt = Nothing, fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"a\"), _value = C [] (Fix {unFix = at 131 11 131 14 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([LineComment \" , b : Int\",LineComment \" , c : Int\"],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"d\"), _value = C [] (Fix {unFix = at 135 11 135 14 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False})], trailingComments_rt = [LineComment \" , e : Int\"], forceMultiline_rt = ForceMultiline True})"
+            "type": "TODO: Type (RecordType {base_rt = Nothing, fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"a\"), _value = C [] (Fix {unFix = at 117 11 117 14 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([LineComment \" , b : Int\",LineComment \" , c : Int\"],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"d\"), _value = C [] (Fix {unFix = at 121 11 121 14 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False})], trailingComments_rt = [LineComment \" , e : Int\"], forceMultiline_rt = ForceMultiline True})"
         },
         {
             "expression": {
@@ -1349,17 +1316,17 @@
             "name": "recordExtension",
             "returnType": {
                 "argumentTypes": [
-                    "TODO: Type (RecordType {base_rt = Just (C ([],[]) (LowercaseIdentifier \"a\")), fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"x\"), _value = C [] (Fix {unFix = at 141 29 141 32 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"y\"), _value = C [] (Fix {unFix = at 141 38 141 41 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False})], trailingComments_rt = [], forceMultiline_rt = ForceMultiline False})"
+                    "TODO: Type (RecordType {base_rt = Just (C ([],[]) (LowercaseIdentifier \"a\")), fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"x\"), _value = C [] (Fix {unFix = at 127 29 127 32 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"y\"), _value = C [] (Fix {unFix = at 127 38 127 41 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False})], trailingComments_rt = [], forceMultiline_rt = ForceMultiline False})"
                 ],
                 "returnType": {
                     "sourceLocation": {
                         "end": {
                             "col": 49,
-                            "line": 141
+                            "line": 127
                         },
                         "start": {
                             "col": 47,
-                            "line": 141
+                            "line": 127
                         }
                     },
                     "tag": "UnitType"
@@ -1367,11 +1334,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 49,
-                        "line": 141
+                        "line": 127
                     },
                     "start": {
                         "col": 19,
-                        "line": 141
+                        "line": 127
                     }
                 },
                 "tag": "FunctionType"
@@ -1379,11 +1346,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 7,
-                    "line": 143
+                    "line": 129
                 },
                 "start": {
                     "col": 1,
-                    "line": 142
+                    "line": 128
                 }
             },
             "tag": "Definition"
@@ -1393,15 +1360,15 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 155
+                    "line": 141
                 },
                 "start": {
                     "col": 1,
-                    "line": 146
+                    "line": 132
                 }
             },
             "tag": "TypeAlias",
-            "type": "TODO: Type (RecordType {base_rt = Just (C ([],[]) (LowercaseIdentifier \"z\")), fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"a\"), _value = C [] (Fix {unFix = at 148 15 148 18 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([LineComment \" , b : Int\",LineComment \" , c : Int\"],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"d\"), _value = C [] (Fix {unFix = at 152 15 152 18 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False})], trailingComments_rt = [LineComment \" , e : Int\"], forceMultiline_rt = ForceMultiline True})"
+            "type": "TODO: Type (RecordType {base_rt = Just (C ([],[]) (LowercaseIdentifier \"z\")), fields_rt = Sequence [C ([],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"a\"), _value = C [] (Fix {unFix = at 134 15 134 18 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False}),C ([LineComment \" , b : Int\",LineComment \" , c : Int\"],[],Nothing) (Pair {_key = C [] (LowercaseIdentifier \"d\"), _value = C [] (Fix {unFix = at 138 15 138 18 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"Int\")) [] (ForceMultiline False))}), forceMultiline = ForceMultiline False})], trailingComments_rt = [LineComment \" , e : Int\"], forceMultiline_rt = ForceMultiline True})"
         }
     ],
     "imports": {
