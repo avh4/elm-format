@@ -342,46 +342,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
             variableReference region $ replicate (n-1) ','
 
           Record base fields _ _ ->
-              let
-                  fieldsJSON =
-                      ( "fields"
-                      , makeObj $ fmap
-                          (\(Pair (C _ (LowercaseIdentifier key)) (C _ value) _) ->
-                             (key, showJSON value)
-                          )
-                          $ toList fields
-                      )
-
-                  fieldOrder =
-                      ( "fieldOrder"
-                      , JSArray $
-                            fmap (\(Pair (C _ key) _ _) -> showJSON key) $
-                            toList fields
-                      )
-              in
-              case base of
-                  Just (C _ identifier) ->
-                      makeObj
-                          [ type_ "RecordUpdate"
-                          , ("base", showJSON identifier)
-                          , fieldsJSON
-                          , ( "display"
-                            , makeObj
-                                [ fieldOrder
-                                ]
-                            )
-                          ]
-
-                  Nothing ->
-                      makeObj
-                          [ type_ "RecordLiteral"
-                          , fieldsJSON
-                          , ( "display"
-                            , makeObj
-                                [ fieldOrder
-                                ]
-                            )
-                          ]
+              recordJSON "RecordLiteral" "RecordUpdate" base fields
 
           Access base field ->
             makeObj
@@ -452,6 +413,50 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
 
           GLShader _ ->
               JSString $ toJSString "TODO: GLShader"
+
+
+recordJSON :: (ToJSON base, ToJSON value) => String -> String -> Maybe (C2 Before After base) -> Sequence (Pair LowercaseIdentifier value) -> JSValue
+recordJSON tag extensionTag base fields =
+    let
+        fieldsJSON =
+            ( "fields"
+            , makeObj $ fmap
+                (\(Pair (C _ (LowercaseIdentifier key)) (C _ value) _) ->
+                    (key, showJSON value)
+                )
+                $ toList fields
+            )
+
+        fieldOrder =
+            ( "fieldOrder"
+            , JSArray $
+                fmap (\(Pair (C _ key) _ _) -> showJSON key) $
+                toList fields
+            )
+    in
+    case base of
+        Just (C _ identifier) ->
+            makeObj
+                [ type_ extensionTag
+                , ("base", showJSON identifier)
+                , fieldsJSON
+                , ( "display"
+                , makeObj
+                    [ fieldOrder
+                    ]
+                )
+                ]
+
+        Nothing ->
+            makeObj
+                [ type_ tag
+                , fieldsJSON
+                , ( "display"
+                , makeObj
+                    [ fieldOrder
+                    ]
+                )
+                ]
 
 
 variableReference :: Region.Region -> String -> JSValue
@@ -536,6 +541,9 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
                     , sourceLocation region
                     ]
 
+            RecordType base fields comments multiline ->
+                recordJSON "RecordType" "RecordTypeExtension" base fields
+
             FunctionType first rest _ ->
                 case firstRestToRestLast first (sequenceToList rest) of
                     (args, C _ last) ->
@@ -545,9 +553,6 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
                             , ( "argumentTypes", JSArray $ fmap (\(C _ t) -> showJSON t) $ args )
                             , sourceLocation region
                             ]
-
-            _ ->
-                JSString $ toJSString $ "TODO: Type (" ++ show type' ++ ")"
         where
             firstRestToRestLast :: C0Eol x -> List (C2Eol a b x) -> (List (C2Eol a b x), C0Eol x)
             firstRestToRestLast first rest =
