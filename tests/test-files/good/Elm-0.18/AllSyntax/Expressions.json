@@ -2,18 +2,18 @@
     "body": [
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
-                        "type": "UnitLiteral"
+                        "tag": "UnitLiteral"
                     },
                     {
-                        "type": "UnitLiteral"
+                        "tag": "UnitLiteral"
                     },
                     {
-                        "type": "UnitLiteral"
+                        "tag": "UnitLiteral"
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "unit",
             "returnType": null,
@@ -27,7 +27,7 @@
                     "line": 4
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -42,7 +42,7 @@
                         "line": 13
                     }
                 },
-                "type": "VariableReference"
+                "tag": "VariableReference"
             },
             "name": "var",
             "returnType": null,
@@ -56,7 +56,7 @@
                     "line": 12
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -72,7 +72,7 @@
                         "line": 17
                     }
                 },
-                "type": "ExternalReference"
+                "tag": "ExternalReference"
             },
             "name": "qualifiedVar",
             "returnType": null,
@@ -86,7 +86,7 @@
                     "line": 16
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -101,7 +101,7 @@
                         "line": 21
                     }
                 },
-                "type": "VariableReference"
+                "tag": "VariableReference"
             },
             "name": "operator",
             "returnType": null,
@@ -115,7 +115,7 @@
                     "line": 20
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -131,7 +131,7 @@
                             "line": 25
                         }
                     },
-                    "type": "VariableReference"
+                    "tag": "VariableReference"
                 },
                 "operations": [
                     {
@@ -147,9 +147,10 @@
                                     "line": 0
                                 }
                             },
-                            "type": "VariableReference"
+                            "tag": "VariableReference"
                         },
                         "term": {
+                            "tag": "ListLiteral",
                             "terms": [
                                 {
                                     "name": "y",
@@ -163,7 +164,7 @@
                                             "line": 26
                                         }
                                     },
-                                    "type": "VariableReference"
+                                    "tag": "VariableReference"
                                 },
                                 {
                                     "name": "z",
@@ -177,14 +178,13 @@
                                             "line": 27
                                         }
                                     },
-                                    "type": "VariableReference"
+                                    "tag": "VariableReference"
                                 }
-                            ],
-                            "type": "ListLiteral"
+                            ]
                         }
                     }
                 ],
-                "type": "BinaryOperatorList"
+                "tag": "BinaryOperatorList"
             },
             "name": "infixPipeLeft",
             "returnType": null,
@@ -198,11 +198,12 @@
                     "line": 24
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
                 "first": {
+                    "tag": "ListLiteral",
                     "terms": [
                         {
                             "name": "x",
@@ -216,10 +217,9 @@
                                     "line": 32
                                 }
                             },
-                            "type": "VariableReference"
+                            "tag": "VariableReference"
                         }
-                    ],
-                    "type": "ListLiteral"
+                    ]
                 },
                 "operations": [
                     {
@@ -235,9 +235,10 @@
                                     "line": 0
                                 }
                             },
-                            "type": "VariableReference"
+                            "tag": "VariableReference"
                         },
                         "term": {
+                            "tag": "ListLiteral",
                             "terms": [
                                 {
                                     "name": "y",
@@ -251,7 +252,7 @@
                                             "line": 35
                                         }
                                     },
-                                    "type": "VariableReference"
+                                    "tag": "VariableReference"
                                 },
                                 {
                                     "name": "z",
@@ -265,14 +266,13 @@
                                             "line": 36
                                         }
                                     },
-                                    "type": "VariableReference"
+                                    "tag": "VariableReference"
                                 }
-                            ],
-                            "type": "ListLiteral"
+                            ]
                         }
                     }
                 ],
-                "type": "BinaryOperatorList"
+                "tag": "BinaryOperatorList"
             },
             "name": "infixPipeLeft2",
             "returnType": null,
@@ -286,7 +286,7 @@
                     "line": 31
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -295,14 +295,14 @@
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 1
                     },
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 2
                     }
                 ],
@@ -318,9 +318,9 @@
                             "line": 41
                         }
                     },
-                    "type": "VariableReference"
+                    "tag": "VariableReference"
                 },
-                "type": "FunctionApplication"
+                "tag": "FunctionApplication"
             },
             "name": "functionApplication",
             "returnType": null,
@@ -334,7 +334,7 @@
                     "line": 40
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -343,14 +343,14 @@
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 1
                     },
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 2
                     }
                 ],
@@ -366,9 +366,9 @@
                             "line": 45
                         }
                     },
-                    "type": "VariableReference"
+                    "tag": "VariableReference"
                 },
-                "type": "FunctionApplication"
+                "tag": "FunctionApplication"
             },
             "name": "functionApplicationMultilineWithFirstArg",
             "returnType": null,
@@ -382,7 +382,7 @@
                     "line": 44
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -391,14 +391,14 @@
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 1
                     },
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 2
                     }
                 ],
@@ -414,9 +414,9 @@
                             "line": 50
                         }
                     },
-                    "type": "VariableReference"
+                    "tag": "VariableReference"
                 },
-                "type": "FunctionApplication"
+                "tag": "FunctionApplication"
             },
             "name": "functionApplicationMultiline",
             "returnType": null,
@@ -430,11 +430,12 @@
                     "line": 49
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
                 "operator": "-",
+                "tag": "UnaryOperator",
                 "term": {
                     "name": "x",
                     "sourceLocation": {
@@ -447,9 +448,8 @@
                             "line": 56
                         }
                     },
-                    "type": "VariableReference"
-                },
-                "type": "UnaryOperator"
+                    "tag": "VariableReference"
+                }
             },
             "name": "unary",
             "returnType": null,
@@ -463,7 +463,7 @@
                     "line": 55
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -471,7 +471,7 @@
                     "display": {
                         "representation": "DecimalInt"
                     },
-                    "type": "IntLiteral",
+                    "tag": "IntLiteral",
                     "value": 1
                 },
                 "operations": [
@@ -488,13 +488,13 @@
                                     "line": 0
                                 }
                             },
-                            "type": "VariableReference"
+                            "tag": "VariableReference"
                         },
                         "term": {
                             "display": {
                                 "representation": "DecimalInt"
                             },
-                            "type": "IntLiteral",
+                            "tag": "IntLiteral",
                             "value": 2
                         }
                     },
@@ -511,18 +511,18 @@
                                     "line": 0
                                 }
                             },
-                            "type": "VariableReference"
+                            "tag": "VariableReference"
                         },
                         "term": {
                             "display": {
                                 "representation": "DecimalInt"
                             },
-                            "type": "IntLiteral",
+                            "tag": "IntLiteral",
                             "value": 3
                         }
                     }
                 ],
-                "type": "BinaryOperatorList"
+                "tag": "BinaryOperatorList"
             },
             "name": "binary",
             "returnType": null,
@@ -536,7 +536,7 @@
                     "line": 59
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -555,7 +555,7 @@
                                         "line": 64
                                     }
                                 },
-                                "type": "VariableReference"
+                                "tag": "VariableReference"
                             }
                         ],
                         "function": {
@@ -570,9 +570,9 @@
                                     "line": 64
                                 }
                             },
-                            "type": "VariableReference"
+                            "tag": "VariableReference"
                         },
-                        "type": "FunctionApplication"
+                        "tag": "FunctionApplication"
                     }
                 ],
                 "function": {
@@ -587,9 +587,9 @@
                             "line": 64
                         }
                     },
-                    "type": "VariableReference"
+                    "tag": "VariableReference"
                 },
-                "type": "FunctionApplication"
+                "tag": "FunctionApplication"
             },
             "name": "parens",
             "returnType": null,
@@ -603,25 +603,25 @@
                     "line": 63
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
-                        "terms": [],
-                        "type": "ListLiteral"
+                        "tag": "ListLiteral",
+                        "terms": []
                     },
                     {
-                        "terms": [],
-                        "type": "ListLiteral"
+                        "tag": "ListLiteral",
+                        "terms": []
                     },
                     {
-                        "terms": [],
-                        "type": "ListLiteral"
+                        "tag": "ListLiteral",
+                        "terms": []
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "emptyList",
             "returnType": null,
@@ -635,57 +635,57 @@
                     "line": 67
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
+                        "tag": "ListLiteral",
                         "terms": [
                             {
-                                "type": "UnitLiteral"
+                                "tag": "UnitLiteral"
                             },
                             {
-                                "type": "UnitLiteral"
+                                "tag": "UnitLiteral"
                             }
-                        ],
-                        "type": "ListLiteral"
+                        ]
                     },
                     {
+                        "tag": "ListLiteral",
                         "terms": [
                             {
-                                "type": "UnitLiteral"
+                                "tag": "UnitLiteral"
                             },
                             {
-                                "type": "UnitLiteral"
+                                "tag": "UnitLiteral"
                             }
-                        ],
-                        "type": "ListLiteral"
+                        ]
                     },
                     {
+                        "tag": "ListLiteral",
                         "terms": [
                             {
-                                "type": "UnitLiteral"
+                                "tag": "UnitLiteral"
                             },
                             {
-                                "type": "UnitLiteral"
+                                "tag": "UnitLiteral"
                             }
-                        ],
-                        "type": "ListLiteral"
+                        ]
                     },
                     {
+                        "tag": "ListLiteral",
                         "terms": [
                             {
-                                "type": "UnitLiteral"
+                                "tag": "UnitLiteral"
                             },
                             {
-                                "type": "UnitLiteral"
+                                "tag": "UnitLiteral"
                             }
-                        ],
-                        "type": "ListLiteral"
+                        ]
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "list",
             "returnType": null,
@@ -699,34 +699,34 @@
                     "line": 75
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 1
                     },
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 4
                     },
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 6
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "listWithCommentedOutItems",
             "returnType": null,
@@ -740,89 +740,89 @@
                     "line": 99
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
+                        "tag": "TupleLiteral",
                         "terms": [
                             {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             },
                             {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 2
                             }
-                        ],
-                        "type": "TupleLiteral"
+                        ]
                     },
                     {
+                        "tag": "TupleLiteral",
                         "terms": [
                             {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             },
                             {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 2
                             }
-                        ],
-                        "type": "TupleLiteral"
+                        ]
                     },
                     {
+                        "tag": "TupleLiteral",
                         "terms": [
                             {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             },
                             {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 2
                             }
-                        ],
-                        "type": "TupleLiteral"
+                        ]
                     },
                     {
+                        "tag": "TupleLiteral",
                         "terms": [
                             {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             },
                             {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 2
                             }
-                        ],
-                        "type": "TupleLiteral"
+                        ]
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "tuple",
             "returnType": null,
@@ -836,34 +836,34 @@
                     "line": 111
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "TupleLiteral",
                 "terms": [
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 1
                     },
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 4
                     },
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 6
                     }
-                ],
-                "type": "TupleLiteral"
+                ]
             },
             "name": "tupleWithCommentedOutItems",
             "returnType": null,
@@ -877,7 +877,7 @@
                     "line": 129
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -886,21 +886,21 @@
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 1
                     },
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 2
                     },
                     {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 3
                     }
                 ],
@@ -916,9 +916,9 @@
                             "line": 140
                         }
                     },
-                    "type": "VariableReference"
+                    "tag": "VariableReference"
                 },
-                "type": "FunctionApplication"
+                "tag": "FunctionApplication"
             },
             "name": "tupleFunction",
             "returnType": null,
@@ -932,34 +932,34 @@
                     "line": 139
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "ListLiteral",
                 "terms": [
                     {
                         "display": {
                             "fieldOrder": []
                         },
                         "fields": {},
-                        "type": "RecordLiteral"
+                        "tag": "RecordLiteral"
                     },
                     {
                         "display": {
                             "fieldOrder": []
                         },
                         "fields": {},
-                        "type": "RecordLiteral"
+                        "tag": "RecordLiteral"
                     },
                     {
                         "display": {
                             "fieldOrder": []
                         },
                         "fields": {},
-                        "type": "RecordLiteral"
+                        "tag": "RecordLiteral"
                     }
-                ],
-                "type": "ListLiteral"
+                ]
             },
             "name": "emptyRecord",
             "returnType": null,
@@ -973,10 +973,11 @@
                     "line": 143
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "TupleLiteral",
                 "terms": [
                     {
                         "display": {
@@ -989,11 +990,11 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             }
                         },
-                        "type": "RecordLiteral"
+                        "tag": "RecordLiteral"
                     },
                     {
                         "display": {
@@ -1007,18 +1008,18 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             },
                             "y": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 2
                             }
                         },
-                        "type": "RecordLiteral"
+                        "tag": "RecordLiteral"
                     },
                     {
                         "display": {
@@ -1033,25 +1034,25 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             },
                             "y": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 2
                             },
                             "z": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 3
                             }
                         },
-                        "type": "RecordLiteral"
+                        "tag": "RecordLiteral"
                     },
                     {
                         "display": {
@@ -1064,11 +1065,11 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             }
                         },
-                        "type": "RecordLiteral"
+                        "tag": "RecordLiteral"
                     },
                     {
                         "display": {
@@ -1082,18 +1083,18 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             },
                             "y": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 2
                             }
                         },
-                        "type": "RecordLiteral"
+                        "tag": "RecordLiteral"
                     },
                     {
                         "display": {
@@ -1108,25 +1109,25 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             },
                             "y": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 2
                             },
                             "z": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 3
                             }
                         },
-                        "type": "RecordLiteral"
+                        "tag": "RecordLiteral"
                     },
                     {
                         "display": {
@@ -1141,25 +1142,25 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             },
                             "y": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 2
                             },
                             "z": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 3
                             }
                         },
-                        "type": "RecordLiteral"
+                        "tag": "RecordLiteral"
                     },
                     {
                         "display": {
@@ -1174,25 +1175,25 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             },
                             "y": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 2
                             },
                             "z": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 3
                             }
                         },
-                        "type": "RecordLiteral"
+                        "tag": "RecordLiteral"
                     },
                     {
                         "display": {
@@ -1207,28 +1208,27 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             },
                             "y": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 2
                             },
                             "z": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 3
                             }
                         },
-                        "type": "RecordLiteral"
+                        "tag": "RecordLiteral"
                     }
-                ],
-                "type": "TupleLiteral"
+                ]
             },
             "name": "record",
             "returnType": null,
@@ -1242,7 +1242,7 @@
                     "line": 151
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -1257,18 +1257,18 @@
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 4
                     },
                     "x": {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 1
                     }
                 },
-                "type": "RecordLiteral"
+                "tag": "RecordLiteral"
             },
             "name": "recordWithCommentedOutFields",
             "returnType": null,
@@ -1282,10 +1282,11 @@
                     "line": 200
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "TupleLiteral",
                 "terms": [
                     {
                         "base": "a",
@@ -1299,11 +1300,11 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             }
                         },
-                        "type": "RecordUpdate"
+                        "tag": "RecordUpdate"
                     },
                     {
                         "base": "a",
@@ -1318,18 +1319,18 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             },
                             "y": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 2
                             }
                         },
-                        "type": "RecordUpdate"
+                        "tag": "RecordUpdate"
                     },
                     {
                         "base": "a",
@@ -1343,11 +1344,11 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             }
                         },
-                        "type": "RecordUpdate"
+                        "tag": "RecordUpdate"
                     },
                     {
                         "base": "a",
@@ -1362,21 +1363,20 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             },
                             "y": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 2
                             }
                         },
-                        "type": "RecordUpdate"
+                        "tag": "RecordUpdate"
                     }
-                ],
-                "type": "TupleLiteral"
+                ]
             },
             "name": "recordUpdate",
             "returnType": null,
@@ -1390,7 +1390,7 @@
                     "line": 211
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -1406,18 +1406,18 @@
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 4
                     },
                     "x": {
                         "display": {
                             "representation": "DecimalInt"
                         },
-                        "type": "IntLiteral",
+                        "tag": "IntLiteral",
                         "value": 1
                     }
                 },
-                "type": "RecordUpdate"
+                "tag": "RecordUpdate"
             },
             "name": "recordUpdateWithCommentedOutFields",
             "returnType": null,
@@ -1431,17 +1431,18 @@
                     "line": 224
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
+                "tag": "TupleLiteral",
                 "terms": [
                     {
                         "field": "x",
                         "record": {
-                            "type": "UnitLiteral"
+                            "tag": "UnitLiteral"
                         },
-                        "type": "RecordAccess"
+                        "tag": "RecordAccess"
                     },
                     {
                         "field": "x",
@@ -1457,9 +1458,9 @@
                                     "line": 238
                                 }
                             },
-                            "type": "VariableReference"
+                            "tag": "VariableReference"
                         },
-                        "type": "RecordAccess"
+                        "tag": "RecordAccess"
                     },
                     {
                         "field": "x",
@@ -1477,7 +1478,7 @@
                                             "line": 239
                                         }
                                     },
-                                    "type": "VariableReference"
+                                    "tag": "VariableReference"
                                 }
                             ],
                             "function": {
@@ -1492,34 +1493,34 @@
                                         "line": 239
                                     }
                                 },
-                                "type": "VariableReference"
+                                "tag": "VariableReference"
                             },
-                            "type": "FunctionApplication"
+                            "tag": "FunctionApplication"
                         },
-                        "type": "RecordAccess"
+                        "tag": "RecordAccess"
                     },
                     {
                         "field": "x",
                         "record": {
+                            "tag": "TupleLiteral",
                             "terms": [
                                 {
                                     "display": {
                                         "representation": "DecimalInt"
                                     },
-                                    "type": "IntLiteral",
+                                    "tag": "IntLiteral",
                                     "value": 1
                                 },
                                 {
                                     "display": {
                                         "representation": "DecimalInt"
                                     },
-                                    "type": "IntLiteral",
+                                    "tag": "IntLiteral",
                                     "value": 2
                                 }
-                            ],
-                            "type": "TupleLiteral"
+                            ]
                         },
-                        "type": "RecordAccess"
+                        "tag": "RecordAccess"
                     },
                     {
                         "field": "x",
@@ -1535,9 +1536,9 @@
                                     "line": 241
                                 }
                             },
-                            "type": "VariableReference"
+                            "tag": "VariableReference"
                         },
-                        "type": "RecordAccess"
+                        "tag": "RecordAccess"
                     },
                     {
                         "field": "x",
@@ -1546,9 +1547,9 @@
                                 "fieldOrder": []
                             },
                             "fields": {},
-                            "type": "RecordLiteral"
+                            "tag": "RecordLiteral"
                         },
-                        "type": "RecordAccess"
+                        "tag": "RecordAccess"
                     },
                     {
                         "field": "x",
@@ -1563,13 +1564,13 @@
                                     "display": {
                                         "representation": "DecimalInt"
                                     },
-                                    "type": "IntLiteral",
+                                    "tag": "IntLiteral",
                                     "value": 1
                                 }
                             },
-                            "type": "RecordLiteral"
+                            "tag": "RecordLiteral"
                         },
-                        "type": "RecordAccess"
+                        "tag": "RecordAccess"
                     },
                     {
                         "field": "x",
@@ -1585,13 +1586,13 @@
                                     "display": {
                                         "representation": "DecimalInt"
                                     },
-                                    "type": "IntLiteral",
+                                    "tag": "IntLiteral",
                                     "value": 1
                                 }
                             },
-                            "type": "RecordUpdate"
+                            "tag": "RecordUpdate"
                         },
-                        "type": "RecordAccess"
+                        "tag": "RecordAccess"
                     },
                     {
                         "field": "y",
@@ -1609,14 +1610,13 @@
                                         "line": 245
                                     }
                                 },
-                                "type": "VariableReference"
+                                "tag": "VariableReference"
                             },
-                            "type": "RecordAccess"
+                            "tag": "RecordAccess"
                         },
-                        "type": "RecordAccess"
+                        "tag": "RecordAccess"
                     }
-                ],
-                "type": "TupleLiteral"
+                ]
             },
             "name": "recordAccess",
             "returnType": null,
@@ -1630,7 +1630,7 @@
                     "line": 236
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -1646,11 +1646,11 @@
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             }
                         },
-                        "type": "RecordLiteral"
+                        "tag": "RecordLiteral"
                     }
                 ],
                 "function": {
@@ -1665,9 +1665,9 @@
                             "line": 250
                         }
                     },
-                    "type": "RecordAccess"
+                    "tag": "RecordAccess"
                 },
-                "type": "FunctionApplication"
+                "tag": "FunctionApplication"
             },
             "name": "recordAccessfunction",
             "returnType": null,
@@ -1681,7 +1681,7 @@
                     "line": 249
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -1698,7 +1698,7 @@
                                 "line": 254
                             }
                         },
-                        "type": "VariableReference"
+                        "tag": "VariableReference"
                     },
                     "operations": [
                         {
@@ -1714,23 +1714,23 @@
                                         "line": 0
                                     }
                                 },
-                                "type": "VariableReference"
+                                "tag": "VariableReference"
                             },
                             "term": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
                             }
                         }
                     ],
-                    "type": "BinaryOperatorList"
+                    "tag": "BinaryOperatorList"
                 },
                 "parameters": [
                     "TODO: Pattern (Fix {unFix = at 254 6 254 7 (VarPattern (LowercaseIdentifier \"x\"))})"
                 ],
-                "type": "AnonymousFunction"
+                "tag": "AnonymousFunction"
             },
             "name": "lambda",
             "returnType": null,
@@ -1744,17 +1744,17 @@
                     "line": 253
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
                 "body": {
-                    "type": "UnitLiteral"
+                    "tag": "UnitLiteral"
                 },
                 "parameters": [
                     "TODO: Pattern (Fix {unFix = at 258 6 261 7 (RecordPattern [C ([],[]) (LowercaseIdentifier \"x\"),C ([LineComment \"A\"],[]) (LowercaseIdentifier \"y\")])})"
                 ],
-                "type": "AnonymousFunction"
+                "tag": "AnonymousFunction"
             },
             "name": "lambdaWithMultilinePattern",
             "returnType": null,
@@ -1768,7 +1768,7 @@
                     "line": 257
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -1777,7 +1777,7 @@
                         "fieldOrder": []
                     },
                     "fields": {},
-                    "type": "RecordLiteral"
+                    "tag": "RecordLiteral"
                 },
                 "declarations": [
                     {
@@ -1787,7 +1787,7 @@
                                     "display": {
                                         "representation": "DecimalInt"
                                     },
-                                    "type": "IntLiteral",
+                                    "tag": "IntLiteral",
                                     "value": 3
                                 },
                                 "if": {
@@ -1803,16 +1803,16 @@
                                             "line": 272
                                         }
                                     },
-                                    "type": "ExternalReference"
+                                    "tag": "ExternalReference"
                                 },
+                                "tag": "IfExpression",
                                 "then": {
                                     "display": {
                                         "representation": "DecimalInt"
                                     },
-                                    "type": "IntLiteral",
+                                    "tag": "IntLiteral",
                                     "value": 2
-                                },
-                                "type": "IfExpression"
+                                }
                             },
                             "if": {
                                 "identifier": "True",
@@ -1827,19 +1827,19 @@
                                         "line": 269
                                     }
                                 },
-                                "type": "ExternalReference"
+                                "tag": "ExternalReference"
                             },
+                            "tag": "IfExpression",
                             "then": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
-                            },
-                            "type": "IfExpression"
+                            }
                         },
                         "name": "a",
-                        "type": "Definition"
+                        "tag": "Definition"
                     },
                     {
                         "expression": {
@@ -1848,7 +1848,7 @@
                                     "display": {
                                         "representation": "DecimalInt"
                                     },
-                                    "type": "IntLiteral",
+                                    "tag": "IntLiteral",
                                     "value": 3
                                 },
                                 "if": {
@@ -1864,16 +1864,16 @@
                                             "line": 284
                                         }
                                     },
-                                    "type": "ExternalReference"
+                                    "tag": "ExternalReference"
                                 },
+                                "tag": "IfExpression",
                                 "then": {
                                     "display": {
                                         "representation": "DecimalInt"
                                     },
-                                    "type": "IntLiteral",
+                                    "tag": "IntLiteral",
                                     "value": 2
-                                },
-                                "type": "IfExpression"
+                                }
                             },
                             "if": {
                                 "identifier": "True",
@@ -1888,19 +1888,19 @@
                                         "line": 279
                                     }
                                 },
-                                "type": "ExternalReference"
+                                "tag": "ExternalReference"
                             },
+                            "tag": "IfExpression",
                             "then": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
-                            },
-                            "type": "IfExpression"
+                            }
                         },
                         "name": "b",
-                        "type": "Definition"
+                        "tag": "Definition"
                     },
                     {
                         "expression": {
@@ -1909,7 +1909,7 @@
                                     "display": {
                                         "representation": "DecimalInt"
                                     },
-                                    "type": "IntLiteral",
+                                    "tag": "IntLiteral",
                                     "value": 3
                                 },
                                 "if": {
@@ -1925,16 +1925,16 @@
                                             "line": 307
                                         }
                                     },
-                                    "type": "ExternalReference"
+                                    "tag": "ExternalReference"
                                 },
+                                "tag": "IfExpression",
                                 "then": {
                                     "display": {
                                         "representation": "DecimalInt"
                                     },
-                                    "type": "IntLiteral",
+                                    "tag": "IntLiteral",
                                     "value": 2
-                                },
-                                "type": "IfExpression"
+                                }
                             },
                             "if": {
                                 "identifier": "True",
@@ -1949,22 +1949,22 @@
                                         "line": 296
                                     }
                                 },
-                                "type": "ExternalReference"
+                                "tag": "ExternalReference"
                             },
+                            "tag": "IfExpression",
                             "then": {
                                 "display": {
                                     "representation": "DecimalInt"
                                 },
-                                "type": "IntLiteral",
+                                "tag": "IntLiteral",
                                 "value": 1
-                            },
-                            "type": "IfExpression"
+                            }
                         },
                         "name": "c",
-                        "type": "Definition"
+                        "tag": "Definition"
                     }
                 ],
-                "type": "LetExpression"
+                "tag": "LetExpression"
             },
             "name": "ifStatement",
             "returnType": null,
@@ -1978,11 +1978,12 @@
                     "line": 266
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
                 "body": {
+                    "tag": "TupleLiteral",
                     "terms": [
                         {
                             "name": "x",
@@ -1996,7 +1997,7 @@
                                     "line": 329
                                 }
                             },
-                            "type": "VariableReference"
+                            "tag": "VariableReference"
                         },
                         {
                             "name": "y",
@@ -2010,10 +2011,9 @@
                                     "line": 329
                                 }
                             },
-                            "type": "VariableReference"
+                            "tag": "VariableReference"
                         }
-                    ],
-                    "type": "TupleLiteral"
+                    ]
                 },
                 "declarations": [
                     {
@@ -2021,25 +2021,25 @@
                             "display": {
                                 "representation": "DecimalInt"
                             },
-                            "type": "IntLiteral",
+                            "tag": "IntLiteral",
                             "value": 1
                         },
                         "name": "x",
-                        "type": "Definition"
+                        "tag": "Definition"
                     },
                     {
                         "expression": {
                             "display": {
                                 "representation": "DecimalInt"
                             },
-                            "type": "IntLiteral",
+                            "tag": "IntLiteral",
                             "value": 2
                         },
                         "name": "y",
-                        "type": "Definition"
+                        "tag": "Definition"
                     }
                 ],
-                "type": "LetExpression"
+                "tag": "LetExpression"
             },
             "name": "letStatement",
             "returnType": null,
@@ -2053,7 +2053,7 @@
                     "line": 321
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -2062,7 +2062,7 @@
                         "fieldOrder": []
                     },
                     "fields": {},
-                    "type": "RecordLiteral"
+                    "tag": "RecordLiteral"
                 },
                 "declarations": [
                     {
@@ -2081,7 +2081,7 @@
                                                 "line": 337
                                             }
                                         },
-                                        "type": "VariableReference"
+                                        "tag": "VariableReference"
                                     },
                                     "pattern": "TODO: Pattern (Fix {unFix = at 336 17 336 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 336 22 336 23 (VarPattern (LowercaseIdentifier \"x\"))})])})"
                                 },
@@ -2090,7 +2090,7 @@
                                         "display": {
                                             "representation": "DecimalInt"
                                         },
-                                        "type": "IntLiteral",
+                                        "tag": "IntLiteral",
                                         "value": 2
                                     },
                                     "pattern": "TODO: Pattern (Fix {unFix = at 339 17 339 18 Anything})"
@@ -2102,7 +2102,7 @@
                                         "display": {
                                             "representation": "DecimalInt"
                                         },
-                                        "type": "IntLiteral",
+                                        "tag": "IntLiteral",
                                         "value": 1
                                     }
                                 ],
@@ -2119,14 +2119,14 @@
                                             "line": 335
                                         }
                                     },
-                                    "type": "ExternalReference"
+                                    "tag": "ExternalReference"
                                 },
-                                "type": "FunctionApplication"
+                                "tag": "FunctionApplication"
                             },
-                            "type": "CaseExpression"
+                            "tag": "CaseExpression"
                         },
                         "name": "a",
-                        "type": "Definition"
+                        "tag": "Definition"
                     },
                     {
                         "expression": {
@@ -2144,7 +2144,7 @@
                                                 "line": 349
                                             }
                                         },
-                                        "type": "VariableReference"
+                                        "tag": "VariableReference"
                                     },
                                     "pattern": "TODO: Pattern (Fix {unFix = at 345 17 345 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 345 22 345 23 (VarPattern (LowercaseIdentifier \"x\"))})])})"
                                 },
@@ -2153,7 +2153,7 @@
                                         "display": {
                                             "representation": "DecimalInt"
                                         },
-                                        "type": "IntLiteral",
+                                        "tag": "IntLiteral",
                                         "value": 2
                                     },
                                     "pattern": "TODO: Pattern (Fix {unFix = at 352 17 352 18 Anything})"
@@ -2165,7 +2165,7 @@
                                         "display": {
                                             "representation": "DecimalInt"
                                         },
-                                        "type": "IntLiteral",
+                                        "tag": "IntLiteral",
                                         "value": 1
                                     }
                                 ],
@@ -2182,14 +2182,14 @@
                                             "line": 343
                                         }
                                     },
-                                    "type": "ExternalReference"
+                                    "tag": "ExternalReference"
                                 },
-                                "type": "FunctionApplication"
+                                "tag": "FunctionApplication"
                             },
-                            "type": "CaseExpression"
+                            "tag": "CaseExpression"
                         },
                         "name": "b",
-                        "type": "Definition"
+                        "tag": "Definition"
                     },
                     {
                         "expression": {
@@ -2207,7 +2207,7 @@
                                                 "line": 369
                                             }
                                         },
-                                        "type": "VariableReference"
+                                        "tag": "VariableReference"
                                     },
                                     "pattern": "TODO: Pattern (Fix {unFix = at 365 17 365 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 365 22 365 23 (VarPattern (LowercaseIdentifier \"x\"))})])})"
                                 },
@@ -2216,7 +2216,7 @@
                                         "display": {
                                             "representation": "DecimalInt"
                                         },
-                                        "type": "IntLiteral",
+                                        "tag": "IntLiteral",
                                         "value": 2
                                     },
                                     "pattern": "TODO: Pattern (Fix {unFix = at 372 17 372 18 Anything})"
@@ -2228,7 +2228,7 @@
                                         "display": {
                                             "representation": "DecimalInt"
                                         },
-                                        "type": "IntLiteral",
+                                        "tag": "IntLiteral",
                                         "value": 1
                                     }
                                 ],
@@ -2245,17 +2245,17 @@
                                             "line": 361
                                         }
                                     },
-                                    "type": "ExternalReference"
+                                    "tag": "ExternalReference"
                                 },
-                                "type": "FunctionApplication"
+                                "tag": "FunctionApplication"
                             },
-                            "type": "CaseExpression"
+                            "tag": "CaseExpression"
                         },
                         "name": "c",
-                        "type": "Definition"
+                        "tag": "Definition"
                     }
                 ],
-                "type": "LetExpression"
+                "tag": "LetExpression"
             },
             "name": "caseStatement",
             "returnType": null,
@@ -2269,7 +2269,7 @@
                     "line": 332
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         }
     ],
     "imports": {},

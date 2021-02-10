@@ -6,7 +6,7 @@
                 "display": {
                     "representation": "DecimalInt"
                 },
-                "type": "IntLiteral",
+                "tag": "IntLiteral",
                 "value": 1
             },
             "name": "a",
@@ -21,14 +21,14 @@
                     "line": 39
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
                 "display": {
                     "representation": "DecimalInt"
                 },
-                "type": "IntLiteral",
+                "tag": "IntLiteral",
                 "value": 2
             },
             "name": "b",
@@ -43,14 +43,14 @@
                     "line": 43
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
                 "display": {
                     "representation": "DecimalInt"
                 },
-                "type": "IntLiteral",
+                "tag": "IntLiteral",
                 "value": 3
             },
             "name": "c",
@@ -65,7 +65,7 @@
                     "line": 47
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         }
     ],
     "imports": {

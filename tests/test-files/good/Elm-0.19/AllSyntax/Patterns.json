@@ -3,7 +3,7 @@
         "TODO: Entry (Fix {unFix = at 4 1 5 16 (Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"Foo\") []), tags = OpenCommentedList [] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Foo\") [C [] (Fix {unFix = at 5 11 5 13 (UnitType [])}),C [] (Fix {unFix = at 5 14 5 16 (UnitType [])})]))})})",
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "wildcard",
             "returnType": null,
@@ -17,11 +17,11 @@
                     "line": 8
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "literal",
             "returnType": null,
@@ -35,11 +35,11 @@
                     "line": 12
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "variable",
             "returnType": null,
@@ -53,11 +53,11 @@
                     "line": 16
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "data",
             "returnType": null,
@@ -71,11 +71,11 @@
                     "line": 20
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "unit",
             "returnType": null,
@@ -89,11 +89,11 @@
                     "line": 24
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "parens",
             "returnType": null,
@@ -107,11 +107,11 @@
                     "line": 28
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "tuple",
             "returnType": null,
@@ -125,11 +125,11 @@
                     "line": 32
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "emptyList",
             "returnType": null,
@@ -143,11 +143,11 @@
                     "line": 36
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "list",
             "returnType": null,
@@ -161,11 +161,11 @@
                     "line": 40
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "consList",
             "returnType": null,
@@ -179,11 +179,11 @@
                     "line": 44
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "complexCons",
             "returnType": null,
@@ -197,11 +197,11 @@
                     "line": 68
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "record",
             "returnType": null,
@@ -215,11 +215,11 @@
                     "line": 72
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "emptyRecord",
             "returnType": null,
@@ -233,11 +233,11 @@
                     "line": 76
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
-                "type": "UnitLiteral"
+                "tag": "UnitLiteral"
             },
             "name": "asAlias",
             "returnType": null,
@@ -251,26 +251,26 @@
                     "line": 84
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
                 "branches": [
                     {
                         "body": {
-                            "type": "UnitLiteral"
+                            "tag": "UnitLiteral"
                         },
                         "pattern": "TODO: Pattern (Fix {unFix = at 90 9 90 33 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 90 20 90 33 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})])})"
                     },
                     {
                         "body": {
-                            "type": "UnitLiteral"
+                            "tag": "UnitLiteral"
                         },
                         "pattern": "TODO: Pattern (Fix {unFix = at 93 9 93 21 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 93 20 93 21 Anything})])})"
                     },
                     {
                         "body": {
-                            "type": "UnitLiteral"
+                            "tag": "UnitLiteral"
                         },
                         "pattern": "TODO: Pattern (Fix {unFix = at 96 9 96 22 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})"
                     }
@@ -287,9 +287,9 @@
                             "line": 89
                         }
                     },
-                    "type": "VariableReference"
+                    "tag": "VariableReference"
                 },
-                "type": "CaseExpression"
+                "tag": "CaseExpression"
             },
             "name": "patternWithQualifiedConstructorAsCosntructorArgument",
             "returnType": null,
@@ -303,38 +303,38 @@
                     "line": 88
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
                 "branches": [
                     {
                         "body": {
-                            "type": "UnitLiteral"
+                            "tag": "UnitLiteral"
                         },
                         "pattern": "TODO: Pattern (Fix {unFix = at 102 9 102 27 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 102 20 102 27 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})])})"
                     },
                     {
                         "body": {
-                            "type": "UnitLiteral"
+                            "tag": "UnitLiteral"
                         },
                         "pattern": "TODO: Pattern (Fix {unFix = at 105 9 105 22 (Alias (C [] (Fix {unFix = at 105 10 105 16 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 105 15 105 16 Anything})])})) (C [] (LowercaseIdentifier \"x\")))})"
                     },
                     {
                         "body": {
-                            "type": "UnitLiteral"
+                            "tag": "UnitLiteral"
                         },
                         "pattern": "TODO: Pattern (Fix {unFix = at 108 9 108 21 (Alias (C [] (Fix {unFix = at 108 9 108 16 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})) (C [] (LowercaseIdentifier \"x\")))})"
                     },
                     {
                         "body": {
-                            "type": "UnitLiteral"
+                            "tag": "UnitLiteral"
                         },
                         "pattern": "TODO: Pattern (Fix {unFix = at 111 9 111 34 (Alias (C [] (Fix {unFix = at 111 10 111 28 (Alias (C [] (Fix {unFix = at 111 10 111 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})) (C [] (LowercaseIdentifier \"y\")))})) (C [] (LowercaseIdentifier \"x\")))})"
                     },
                     {
                         "body": {
-                            "type": "UnitLiteral"
+                            "tag": "UnitLiteral"
                         },
                         "pattern": "TODO: Pattern (Fix {unFix = at 114 9 114 10 Anything})"
                     }
@@ -351,9 +351,9 @@
                             "line": 101
                         }
                     },
-                    "type": "VariableReference"
+                    "tag": "VariableReference"
                 },
-                "type": "CaseExpression"
+                "tag": "CaseExpression"
             },
             "name": "patternWithUnqualifiedConstructorAsCosntructorArgument",
             "returnType": null,
@@ -367,7 +367,7 @@
                     "line": 100
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         }
     ],
     "imports": {},
