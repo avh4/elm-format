@@ -136,6 +136,16 @@
                             },
                             "tag": "UnitType"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 21,
+                                "line": 15
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 15
+                            }
+                        },
                         "tag": "FunctionType"
                     },
                     {
@@ -179,6 +189,16 @@
                                 }
                             },
                             "tag": "UnitType"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 18
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 16
+                            }
                         },
                         "tag": "FunctionType"
                     },
@@ -224,6 +244,16 @@
                             },
                             "tag": "UnitType"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 26
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 19
+                            }
+                        },
                         "tag": "FunctionType"
                     },
                     {
@@ -267,6 +297,16 @@
                                 }
                             },
                             "tag": "UnitType"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 57,
+                                "line": 27
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 27
+                            }
                         },
                         "tag": "FunctionType"
                     },
@@ -312,6 +352,16 @@
                             },
                             "tag": "UnitType"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 36
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 28
+                            }
+                        },
                         "tag": "FunctionType"
                     },
                     {
@@ -356,6 +406,16 @@
                             },
                             "tag": "UnitType"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 16,
+                                "line": 39
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 37
+                            }
+                        },
                         "tag": "FunctionType"
                     }
                 ]
@@ -376,6 +436,16 @@
             "tag": "TypeAlias",
             "type": {
                 "name": "a",
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 44
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 44
+                    }
+                },
                 "tag": "TypeVariable"
             }
         },
@@ -409,6 +479,16 @@
                         "arguments": [],
                         "module": null,
                         "name": "Bool",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 48
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 48
+                            }
+                        },
                         "tag": "TypeReference"
                     },
                     {
@@ -417,17 +497,47 @@
                                 "arguments": [],
                                 "module": null,
                                 "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 18,
+                                        "line": 49
+                                    },
+                                    "start": {
+                                        "col": 12,
+                                        "line": 49
+                                    }
+                                },
                                 "tag": "TypeReference"
                             },
                             {
                                 "arguments": [],
                                 "module": null,
                                 "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 22,
+                                        "line": 49
+                                    },
+                                    "start": {
+                                        "col": 19,
+                                        "line": 49
+                                    }
+                                },
                                 "tag": "TypeReference"
                             }
                         ],
                         "module": "Dict",
                         "name": "Dict",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 22,
+                                "line": 49
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 49
+                            }
+                        },
                         "tag": "TypeReference"
                     },
                     {
@@ -436,17 +546,47 @@
                                 "arguments": [],
                                 "module": null,
                                 "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 23,
+                                        "line": 50
+                                    },
+                                    "start": {
+                                        "col": 17,
+                                        "line": 50
+                                    }
+                                },
                                 "tag": "TypeReference"
                             },
                             {
                                 "arguments": [],
                                 "module": null,
                                 "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 27,
+                                        "line": 50
+                                    },
+                                    "start": {
+                                        "col": 24,
+                                        "line": 50
+                                    }
+                                },
                                 "tag": "TypeReference"
                             }
                         ],
                         "module": "Dict",
                         "name": "Dict",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 27,
+                                "line": 50
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 50
+                            }
+                        },
                         "tag": "TypeReference"
                     },
                     {
@@ -455,17 +595,47 @@
                                 "arguments": [],
                                 "module": null,
                                 "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 52
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 52
+                                    }
+                                },
                                 "tag": "TypeReference"
                             },
                             {
                                 "arguments": [],
                                 "module": null,
                                 "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 53
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 53
+                                    }
+                                },
                                 "tag": "TypeReference"
                             }
                         ],
                         "module": "Dict",
                         "name": "Dict",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 53
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 51
+                            }
+                        },
                         "tag": "TypeReference"
                     },
                     {
@@ -474,17 +644,47 @@
                                 "arguments": [],
                                 "module": null,
                                 "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 31,
+                                        "line": 54
+                                    },
+                                    "start": {
+                                        "col": 25,
+                                        "line": 54
+                                    }
+                                },
                                 "tag": "TypeReference"
                             },
                             {
                                 "arguments": [],
                                 "module": null,
                                 "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 43,
+                                        "line": 54
+                                    },
+                                    "start": {
+                                        "col": 40,
+                                        "line": 54
+                                    }
+                                },
                                 "tag": "TypeReference"
                             }
                         ],
                         "module": "Dict",
                         "name": "Dict",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 43,
+                                "line": 54
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 54
+                            }
+                        },
                         "tag": "TypeReference"
                     },
                     {
@@ -493,17 +693,47 @@
                                 "arguments": [],
                                 "module": null,
                                 "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 57
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 57
+                                    }
+                                },
                                 "tag": "TypeReference"
                             },
                             {
                                 "arguments": [],
                                 "module": null,
                                 "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 59
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 59
+                                    }
+                                },
                                 "tag": "TypeReference"
                             }
                         ],
                         "module": "Dict",
                         "name": "Dict",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 59
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 55
+                            }
+                        },
                         "tag": "TypeReference"
                     }
                 ]
@@ -614,10 +844,30 @@
                         "terms": [
                             {
                                 "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 87
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 87
+                                    }
+                                },
                                 "tag": "TypeVariable"
                             },
                             {
                                 "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 13,
+                                        "line": 87
+                                    },
+                                    "start": {
+                                        "col": 12,
+                                        "line": 87
+                                    }
+                                },
                                 "tag": "TypeVariable"
                             }
                         ]
@@ -637,10 +887,30 @@
                         "terms": [
                             {
                                 "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 18,
+                                        "line": 88
+                                    },
+                                    "start": {
+                                        "col": 17,
+                                        "line": 88
+                                    }
+                                },
                                 "tag": "TypeVariable"
                             },
                             {
                                 "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 37,
+                                        "line": 88
+                                    },
+                                    "start": {
+                                        "col": 36,
+                                        "line": 88
+                                    }
+                                },
                                 "tag": "TypeVariable"
                             }
                         ]
@@ -660,10 +930,30 @@
                         "terms": [
                             {
                                 "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 90
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 90
+                                    }
+                                },
                                 "tag": "TypeVariable"
                             },
                             {
                                 "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 93
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 93
+                                    }
+                                },
                                 "tag": "TypeVariable"
                             }
                         ]
@@ -683,10 +973,30 @@
                         "terms": [
                             {
                                 "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 96
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 96
+                                    }
+                                },
                                 "tag": "TypeVariable"
                             },
                             {
                                 "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 97
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 97
+                                    }
+                                },
                                 "tag": "TypeVariable"
                             }
                         ]
@@ -724,12 +1034,32 @@
                         "arguments": [],
                         "module": null,
                         "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 103
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 103
+                            }
+                        },
                         "tag": "TypeReference"
                     },
                     {
                         "arguments": [],
                         "module": null,
                         "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 106
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 106
+                            }
+                        },
                         "tag": "TypeReference"
                     }
                 ]
@@ -767,12 +1097,32 @@
                                 "arguments": [],
                                 "module": null,
                                 "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 112
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 112
+                                    }
+                                },
                                 "tag": "TypeReference"
                             },
                             {
                                 "arguments": [],
                                 "module": null,
                                 "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 17,
+                                        "line": 112
+                                    },
+                                    "start": {
+                                        "col": 14,
+                                        "line": 112
+                                    }
+                                },
                                 "tag": "TypeReference"
                             }
                         ],
@@ -780,7 +1130,27 @@
                             "arguments": [],
                             "module": null,
                             "name": "Int",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 24,
+                                    "line": 112
+                                },
+                                "start": {
+                                    "col": 21,
+                                    "line": 112
+                                }
+                            },
                             "tag": "TypeReference"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 24,
+                                "line": 112
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 112
+                            }
                         },
                         "tag": "FunctionType"
                     },
@@ -790,12 +1160,32 @@
                                 "arguments": [],
                                 "module": null,
                                 "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 13,
+                                        "line": 113
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 113
+                                    }
+                                },
                                 "tag": "TypeReference"
                             },
                             {
                                 "arguments": [],
                                 "module": null,
                                 "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 23,
+                                        "line": 113
+                                    },
+                                    "start": {
+                                        "col": 17,
+                                        "line": 113
+                                    }
+                                },
                                 "tag": "TypeReference"
                             }
                         ],
@@ -803,7 +1193,27 @@
                             "arguments": [],
                             "module": null,
                             "name": "String",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 33,
+                                    "line": 113
+                                },
+                                "start": {
+                                    "col": 27,
+                                    "line": 113
+                                }
+                            },
                             "tag": "TypeReference"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 33,
+                                "line": 113
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 113
+                            }
                         },
                         "tag": "FunctionType"
                     }
@@ -831,6 +1241,16 @@
                         }
                     },
                     "tag": "UnitType"
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 23,
+                        "line": 117
+                    },
+                    "start": {
+                        "col": 15,
+                        "line": 117
+                    }
                 },
                 "tag": "FunctionType"
             },
@@ -913,6 +1333,16 @@
                         }
                     },
                     "tag": "UnitType"
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 49,
+                        "line": 141
+                    },
+                    "start": {
+                        "col": 19,
+                        "line": 141
+                    }
                 },
                 "tag": "FunctionType"
             },
