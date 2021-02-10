@@ -502,6 +502,12 @@ instance ToJSON FloatRepresentation where
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'PatternNK) where
     showJSON (I.Fix (A region pattern')) =
         case pattern' of
+            Anything ->
+                makeObj
+                    [ type_ "AnythingPattern"
+                    , sourceLocation region
+                    ]
+
             DataPattern (namespace, tag) args ->
                 makeObj
                     [ type_ "DataPattern"

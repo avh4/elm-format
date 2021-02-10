@@ -2113,7 +2113,19 @@
                                         "tag": "IntLiteral",
                                         "value": 2
                                     },
-                                    "pattern": "TODO: Pattern (Anything)"
+                                    "pattern": {
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 18,
+                                                "line": 339
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 339
+                                            }
+                                        },
+                                        "tag": "AnythingPattern"
+                                    }
                                 }
                             ],
                             "subject": {
@@ -2196,7 +2208,19 @@
                                         "tag": "IntLiteral",
                                         "value": 2
                                     },
-                                    "pattern": "TODO: Pattern (Anything)"
+                                    "pattern": {
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 18,
+                                                "line": 352
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 352
+                                            }
+                                        },
+                                        "tag": "AnythingPattern"
+                                    }
                                 }
                             ],
                             "subject": {
@@ -2279,7 +2303,19 @@
                                         "tag": "IntLiteral",
                                         "value": 2
                                     },
-                                    "pattern": "TODO: Pattern (Anything)"
+                                    "pattern": {
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 18,
+                                                "line": 372
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 372
+                                            }
+                                        },
+                                        "tag": "AnythingPattern"
+                                    }
                                 }
                             ],
                             "subject": {

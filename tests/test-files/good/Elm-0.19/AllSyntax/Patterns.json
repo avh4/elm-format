@@ -306,7 +306,19 @@
                         },
                         "pattern": {
                             "arguments": [
-                                "TODO: Pattern (Anything)"
+                                {
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 21,
+                                            "line": 93
+                                        },
+                                        "start": {
+                                            "col": 20,
+                                            "line": 93
+                                        }
+                                    },
+                                    "tag": "AnythingPattern"
+                                }
                             ],
                             "constructor": {
                                 "identifier": "Just",
@@ -450,7 +462,19 @@
                         "body": {
                             "tag": "UnitLiteral"
                         },
-                        "pattern": "TODO: Pattern (Anything)"
+                        "pattern": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 10,
+                                    "line": 114
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 114
+                                }
+                            },
+                            "tag": "AnythingPattern"
+                        }
                     }
                 ],
                 "subject": {
