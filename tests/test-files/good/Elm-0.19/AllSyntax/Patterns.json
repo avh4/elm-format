@@ -1,0 +1,375 @@
+{
+    "body": [
+        "TODO: Entry (Fix {unFix = at 4 1 5 16 (Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"Foo\") []), tags = OpenCommentedList [] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Foo\") [C [] (Fix {unFix = at 5 11 5 13 (UnitType [])}),C [] (Fix {unFix = at 5 14 5 16 (UnitType [])})]))})})",
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "wildcard",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 9
+                },
+                "start": {
+                    "col": 1,
+                    "line": 8
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "literal",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 13
+                },
+                "start": {
+                    "col": 1,
+                    "line": 12
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "variable",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 17
+                },
+                "start": {
+                    "col": 1,
+                    "line": 16
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "data",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 21
+                },
+                "start": {
+                    "col": 1,
+                    "line": 20
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "unit",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 25
+                },
+                "start": {
+                    "col": 1,
+                    "line": 24
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "parens",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 29
+                },
+                "start": {
+                    "col": 1,
+                    "line": 28
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "tuple",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 33
+                },
+                "start": {
+                    "col": 1,
+                    "line": 32
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "emptyList",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 37
+                },
+                "start": {
+                    "col": 1,
+                    "line": 36
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "list",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 41
+                },
+                "start": {
+                    "col": 1,
+                    "line": 40
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "consList",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 65
+                },
+                "start": {
+                    "col": 1,
+                    "line": 44
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "complexCons",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 69
+                },
+                "start": {
+                    "col": 1,
+                    "line": 68
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "record",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 73
+                },
+                "start": {
+                    "col": 1,
+                    "line": 72
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "emptyRecord",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 81
+                },
+                "start": {
+                    "col": 1,
+                    "line": 76
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "asAlias",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 85
+                },
+                "start": {
+                    "col": 1,
+                    "line": 84
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "branches": [
+                    {
+                        "body": {
+                            "type": "UnitLiteral"
+                        },
+                        "pattern": "TODO: Pattern (Fix {unFix = at 90 9 90 33 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 90 20 90 33 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})])})"
+                    },
+                    {
+                        "body": {
+                            "type": "UnitLiteral"
+                        },
+                        "pattern": "TODO: Pattern (Fix {unFix = at 93 9 93 21 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 93 20 93 21 Anything})])})"
+                    },
+                    {
+                        "body": {
+                            "type": "UnitLiteral"
+                        },
+                        "pattern": "TODO: Pattern (Fix {unFix = at 96 9 96 22 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})"
+                    }
+                ],
+                "subject": {
+                    "name": "m",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 11,
+                            "line": 89
+                        },
+                        "start": {
+                            "col": 10,
+                            "line": 89
+                        }
+                    },
+                    "type": "VariableReference"
+                },
+                "type": "CaseExpression"
+            },
+            "name": "patternWithQualifiedConstructorAsCosntructorArgument",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 15,
+                    "line": 97
+                },
+                "start": {
+                    "col": 1,
+                    "line": 88
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "branches": [
+                    {
+                        "body": {
+                            "type": "UnitLiteral"
+                        },
+                        "pattern": "TODO: Pattern (Fix {unFix = at 102 9 102 27 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 102 20 102 27 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})])})"
+                    },
+                    {
+                        "body": {
+                            "type": "UnitLiteral"
+                        },
+                        "pattern": "TODO: Pattern (Fix {unFix = at 105 9 105 22 (Alias (C [] (Fix {unFix = at 105 10 105 16 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 105 15 105 16 Anything})])})) (C [] (LowercaseIdentifier \"x\")))})"
+                    },
+                    {
+                        "body": {
+                            "type": "UnitLiteral"
+                        },
+                        "pattern": "TODO: Pattern (Fix {unFix = at 108 9 108 21 (Alias (C [] (Fix {unFix = at 108 9 108 16 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})) (C [] (LowercaseIdentifier \"x\")))})"
+                    },
+                    {
+                        "body": {
+                            "type": "UnitLiteral"
+                        },
+                        "pattern": "TODO: Pattern (Fix {unFix = at 111 9 111 34 (Alias (C [] (Fix {unFix = at 111 10 111 28 (Alias (C [] (Fix {unFix = at 111 10 111 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})) (C [] (LowercaseIdentifier \"y\")))})) (C [] (LowercaseIdentifier \"x\")))})"
+                    },
+                    {
+                        "body": {
+                            "type": "UnitLiteral"
+                        },
+                        "pattern": "TODO: Pattern (Fix {unFix = at 114 9 114 10 Anything})"
+                    }
+                ],
+                "subject": {
+                    "name": "m",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 11,
+                            "line": 101
+                        },
+                        "start": {
+                            "col": 10,
+                            "line": 101
+                        }
+                    },
+                    "type": "VariableReference"
+                },
+                "type": "CaseExpression"
+            },
+            "name": "patternWithUnqualifiedConstructorAsCosntructorArgument",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 15,
+                    "line": 115
+                },
+                "start": {
+                    "col": 1,
+                    "line": 100
+                }
+            },
+            "type": "Definition"
+        }
+    ],
+    "imports": {},
+    "moduleName": "AllSyntax.Patterns"
+}

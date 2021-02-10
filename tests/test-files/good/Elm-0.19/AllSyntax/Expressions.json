@@ -1,0 +1,2322 @@
+{
+    "body": [
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "type": "UnitLiteral"
+                    },
+                    {
+                        "type": "UnitLiteral"
+                    },
+                    {
+                        "type": "UnitLiteral"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "unit",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 11
+                },
+                "start": {
+                    "col": 1,
+                    "line": 6
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalFloat"
+                        },
+                        "type": "FloatLiteral",
+                        "value": 2
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 17
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 17
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "string"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 18
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 18
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "c"
+                    }
+                ],
+                "type": "TupleLiteral"
+            },
+            "name": "literal",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 19
+                },
+                "start": {
+                    "col": 1,
+                    "line": 14
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "name": "x",
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 23
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 23
+                    }
+                },
+                "type": "VariableReference"
+            },
+            "name": "var",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 23
+                },
+                "start": {
+                    "col": 1,
+                    "line": 22
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "name": "+",
+                "sourceLocation": {
+                    "end": {
+                        "col": 8,
+                        "line": 27
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 27
+                    }
+                },
+                "type": "VariableReference"
+            },
+            "name": "operator",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 8,
+                    "line": 27
+                },
+                "start": {
+                    "col": 1,
+                    "line": 26
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "first": {
+                    "name": "x",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 6,
+                            "line": 31
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 31
+                        }
+                    },
+                    "type": "VariableReference"
+                },
+                "operations": [
+                    {
+                        "operator": {
+                            "name": "<|",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 0,
+                                    "line": 0
+                                },
+                                "start": {
+                                    "col": 0,
+                                    "line": 0
+                                }
+                            },
+                            "type": "VariableReference"
+                        },
+                        "term": {
+                            "terms": [
+                                {
+                                    "name": "y",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 12,
+                                            "line": 32
+                                        },
+                                        "start": {
+                                            "col": 11,
+                                            "line": 32
+                                        }
+                                    },
+                                    "type": "VariableReference"
+                                },
+                                {
+                                    "name": "z",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 12,
+                                            "line": 33
+                                        },
+                                        "start": {
+                                            "col": 11,
+                                            "line": 33
+                                        }
+                                    },
+                                    "type": "VariableReference"
+                                }
+                            ],
+                            "type": "ListLiteral"
+                        }
+                    }
+                ],
+                "type": "BinaryOperatorList"
+            },
+            "name": "infixPipeLeft",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 10,
+                    "line": 34
+                },
+                "start": {
+                    "col": 1,
+                    "line": 30
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "first": {
+                    "terms": [
+                        {
+                            "name": "x",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 8,
+                                    "line": 38
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 38
+                                }
+                            },
+                            "type": "VariableReference"
+                        }
+                    ],
+                    "type": "ListLiteral"
+                },
+                "operations": [
+                    {
+                        "operator": {
+                            "name": "<|",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 0,
+                                    "line": 0
+                                },
+                                "start": {
+                                    "col": 0,
+                                    "line": 0
+                                }
+                            },
+                            "type": "VariableReference"
+                        },
+                        "term": {
+                            "terms": [
+                                {
+                                    "name": "y",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 12,
+                                            "line": 41
+                                        },
+                                        "start": {
+                                            "col": 11,
+                                            "line": 41
+                                        }
+                                    },
+                                    "type": "VariableReference"
+                                },
+                                {
+                                    "name": "z",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 12,
+                                            "line": 42
+                                        },
+                                        "start": {
+                                            "col": 11,
+                                            "line": 42
+                                        }
+                                    },
+                                    "type": "VariableReference"
+                                }
+                            ],
+                            "type": "ListLiteral"
+                        }
+                    }
+                ],
+                "type": "BinaryOperatorList"
+            },
+            "name": "infixPipeLeft2",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 10,
+                    "line": 43
+                },
+                "start": {
+                    "col": 1,
+                    "line": 37
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "arguments": [
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 2
+                    }
+                ],
+                "function": {
+                    "name": "max",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 8,
+                            "line": 47
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 47
+                        }
+                    },
+                    "type": "VariableReference"
+                },
+                "type": "FunctionApplication"
+            },
+            "name": "functionApplication",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 12,
+                    "line": 47
+                },
+                "start": {
+                    "col": 1,
+                    "line": 46
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "arguments": [
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 2
+                    }
+                ],
+                "function": {
+                    "name": "max",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 8,
+                            "line": 51
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 51
+                        }
+                    },
+                    "type": "VariableReference"
+                },
+                "type": "FunctionApplication"
+            },
+            "name": "functionApplicationMultilineWithFirstArg",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 10,
+                    "line": 52
+                },
+                "start": {
+                    "col": 1,
+                    "line": 50
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "arguments": [
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 2
+                    }
+                ],
+                "function": {
+                    "name": "max",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 8,
+                            "line": 56
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 56
+                        }
+                    },
+                    "type": "VariableReference"
+                },
+                "type": "FunctionApplication"
+            },
+            "name": "functionApplicationMultiline",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 10,
+                    "line": 58
+                },
+                "start": {
+                    "col": 1,
+                    "line": 55
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "operator": "-",
+                "term": {
+                    "name": "x",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 62
+                        },
+                        "start": {
+                            "col": 6,
+                            "line": 62
+                        }
+                    },
+                    "type": "VariableReference"
+                },
+                "type": "UnaryOperator"
+            },
+            "name": "unary",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 62
+                },
+                "start": {
+                    "col": 1,
+                    "line": 61
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "first": {
+                    "display": {
+                        "representation": "DecimalInt"
+                    },
+                    "type": "IntLiteral",
+                    "value": 1
+                },
+                "operations": [
+                    {
+                        "operator": {
+                            "name": "+",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 0,
+                                    "line": 0
+                                },
+                                "start": {
+                                    "col": 0,
+                                    "line": 0
+                                }
+                            },
+                            "type": "VariableReference"
+                        },
+                        "term": {
+                            "display": {
+                                "representation": "DecimalInt"
+                            },
+                            "type": "IntLiteral",
+                            "value": 2
+                        }
+                    },
+                    {
+                        "operator": {
+                            "name": "+",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 0,
+                                    "line": 0
+                                },
+                                "start": {
+                                    "col": 0,
+                                    "line": 0
+                                }
+                            },
+                            "type": "VariableReference"
+                        },
+                        "term": {
+                            "display": {
+                                "representation": "DecimalInt"
+                            },
+                            "type": "IntLiteral",
+                            "value": 3
+                        }
+                    }
+                ],
+                "type": "BinaryOperatorList"
+            },
+            "name": "binary",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 14,
+                    "line": 66
+                },
+                "start": {
+                    "col": 1,
+                    "line": 65
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "arguments": [
+                    {
+                        "arguments": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 11,
+                                        "line": 70
+                                    },
+                                    "start": {
+                                        "col": 10,
+                                        "line": 70
+                                    }
+                                },
+                                "type": "VariableReference"
+                            }
+                        ],
+                        "function": {
+                            "name": "x",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 9,
+                                    "line": 70
+                                },
+                                "start": {
+                                    "col": 8,
+                                    "line": 70
+                                }
+                            },
+                            "type": "VariableReference"
+                        },
+                        "type": "FunctionApplication"
+                    }
+                ],
+                "function": {
+                    "name": "f",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 6,
+                            "line": 70
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 70
+                        }
+                    },
+                    "type": "VariableReference"
+                },
+                "type": "FunctionApplication"
+            },
+            "name": "parens",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 12,
+                    "line": 70
+                },
+                "start": {
+                    "col": 1,
+                    "line": 69
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "terms": [],
+                        "type": "ListLiteral"
+                    },
+                    {
+                        "terms": [],
+                        "type": "ListLiteral"
+                    },
+                    {
+                        "terms": [],
+                        "type": "ListLiteral"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "emptyList",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 78
+                },
+                "start": {
+                    "col": 1,
+                    "line": 73
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "terms": [
+                            {
+                                "type": "UnitLiteral"
+                            },
+                            {
+                                "type": "UnitLiteral"
+                            }
+                        ],
+                        "type": "ListLiteral"
+                    },
+                    {
+                        "terms": [
+                            {
+                                "type": "UnitLiteral"
+                            },
+                            {
+                                "type": "UnitLiteral"
+                            }
+                        ],
+                        "type": "ListLiteral"
+                    },
+                    {
+                        "terms": [
+                            {
+                                "type": "UnitLiteral"
+                            },
+                            {
+                                "type": "UnitLiteral"
+                            }
+                        ],
+                        "type": "ListLiteral"
+                    },
+                    {
+                        "terms": [
+                            {
+                                "type": "UnitLiteral"
+                            },
+                            {
+                                "type": "UnitLiteral"
+                            }
+                        ],
+                        "type": "ListLiteral"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "list",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 102
+                },
+                "start": {
+                    "col": 1,
+                    "line": 81
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 4
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 6
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "listWithCommentedOutItems",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 114
+                },
+                "start": {
+                    "col": 1,
+                    "line": 105
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "terms": [
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
+                        ],
+                        "type": "TupleLiteral"
+                    },
+                    {
+                        "terms": [
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
+                        ],
+                        "type": "TupleLiteral"
+                    },
+                    {
+                        "terms": [
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
+                        ],
+                        "type": "TupleLiteral"
+                    },
+                    {
+                        "terms": [
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
+                        ],
+                        "type": "TupleLiteral"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "tuple",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 132
+                },
+                "start": {
+                    "col": 1,
+                    "line": 117
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 4
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 6
+                    }
+                ],
+                "type": "TupleLiteral"
+            },
+            "name": "tupleWithCommentedOutItems",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 142
+                },
+                "start": {
+                    "col": 1,
+                    "line": 135
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "arguments": [
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 2
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 3
+                    }
+                ],
+                "function": {
+                    "name": ",,",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 9,
+                            "line": 146
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 146
+                        }
+                    },
+                    "type": "VariableReference"
+                },
+                "type": "FunctionApplication"
+            },
+            "name": "tupleFunction",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 15,
+                    "line": 146
+                },
+                "start": {
+                    "col": 1,
+                    "line": 145
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "display": {
+                            "fieldOrder": []
+                        },
+                        "fields": {},
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": []
+                        },
+                        "fields": {},
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": []
+                        },
+                        "fields": {},
+                        "type": "RecordLiteral"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "emptyRecord",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 154
+                },
+                "start": {
+                    "col": 1,
+                    "line": 149
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            }
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y",
+                                "z"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            },
+                            "z": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 3
+                            }
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            }
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y",
+                                "z"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            },
+                            "z": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 3
+                            }
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y",
+                                "z"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            },
+                            "z": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 3
+                            }
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y",
+                                "z"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            },
+                            "z": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 3
+                            }
+                        },
+                        "type": "RecordLiteral"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y",
+                                "z"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            },
+                            "z": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 3
+                            }
+                        },
+                        "type": "RecordLiteral"
+                    }
+                ],
+                "type": "TupleLiteral"
+            },
+            "name": "record",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 203
+                },
+                "start": {
+                    "col": 1,
+                    "line": 157
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "display": {
+                    "fieldOrder": [
+                        "x",
+                        "a"
+                    ]
+                },
+                "fields": {
+                    "a": {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 4
+                    },
+                    "x": {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    }
+                },
+                "type": "RecordLiteral"
+            },
+            "name": "recordWithCommentedOutFields",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 214
+                },
+                "start": {
+                    "col": 1,
+                    "line": 206
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "base": "a",
+                        "display": {
+                            "fieldOrder": [
+                                "x"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            }
+                        },
+                        "type": "RecordUpdate"
+                    },
+                    {
+                        "base": "a",
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
+                        },
+                        "type": "RecordUpdate"
+                    },
+                    {
+                        "base": "a",
+                        "display": {
+                            "fieldOrder": [
+                                "x"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            }
+                        },
+                        "type": "RecordUpdate"
+                    },
+                    {
+                        "base": "a",
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "y": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 2
+                            }
+                        },
+                        "type": "RecordUpdate"
+                    }
+                ],
+                "type": "TupleLiteral"
+            },
+            "name": "recordUpdate",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 227
+                },
+                "start": {
+                    "col": 1,
+                    "line": 217
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "base": "a",
+                "display": {
+                    "fieldOrder": [
+                        "x",
+                        "a"
+                    ]
+                },
+                "fields": {
+                    "a": {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 4
+                    },
+                    "x": {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    }
+                },
+                "type": "RecordUpdate"
+            },
+            "name": "recordUpdateWithCommentedOutFields",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 239
+                },
+                "start": {
+                    "col": 1,
+                    "line": 230
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "field": "x",
+                        "record": {
+                            "type": "UnitLiteral"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "name": "a",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 8,
+                                    "line": 244
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 244
+                                }
+                            },
+                            "type": "VariableReference"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "arguments": [
+                                {
+                                    "name": "a",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 11,
+                                            "line": 245
+                                        },
+                                        "start": {
+                                            "col": 10,
+                                            "line": 245
+                                        }
+                                    },
+                                    "type": "VariableReference"
+                                }
+                            ],
+                            "function": {
+                                "name": "f",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 245
+                                    },
+                                    "start": {
+                                        "col": 8,
+                                        "line": 245
+                                    }
+                                },
+                                "type": "VariableReference"
+                            },
+                            "type": "FunctionApplication"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "terms": [
+                                {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 1
+                                },
+                                {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 2
+                                }
+                            ],
+                            "type": "TupleLiteral"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "name": ",,",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 11,
+                                    "line": 247
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 247
+                                }
+                            },
+                            "type": "VariableReference"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "display": {
+                                "fieldOrder": []
+                            },
+                            "fields": {},
+                            "type": "RecordLiteral"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "display": {
+                                "fieldOrder": [
+                                    "x"
+                                ]
+                            },
+                            "fields": {
+                                "x": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 1
+                                }
+                            },
+                            "type": "RecordLiteral"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "base": "r",
+                            "display": {
+                                "fieldOrder": [
+                                    "x"
+                                ]
+                            },
+                            "fields": {
+                                "x": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 1
+                                }
+                            },
+                            "type": "RecordUpdate"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "y",
+                        "record": {
+                            "field": "x",
+                            "record": {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 8,
+                                        "line": 251
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 251
+                                    }
+                                },
+                                "type": "VariableReference"
+                            },
+                            "type": "RecordAccess"
+                        },
+                        "type": "RecordAccess"
+                    },
+                    {
+                        "field": "x",
+                        "record": {
+                            "identifier": "record",
+                            "module": "Foo",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 17,
+                                    "line": 252
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 252
+                                }
+                            },
+                            "type": "ExternalReference"
+                        },
+                        "type": "RecordAccess"
+                    }
+                ],
+                "type": "TupleLiteral"
+            },
+            "name": "recordAccess",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 253
+                },
+                "start": {
+                    "col": 1,
+                    "line": 242
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "arguments": [
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            }
+                        },
+                        "type": "RecordLiteral"
+                    }
+                ],
+                "function": "TODO: AccessFunction",
+                "type": "FunctionApplication"
+            },
+            "name": "recordAccessfunction",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 17,
+                    "line": 257
+                },
+                "start": {
+                    "col": 1,
+                    "line": 256
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "body": {
+                    "first": {
+                        "name": "x",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 261
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 261
+                            }
+                        },
+                        "type": "VariableReference"
+                    },
+                    "operations": [
+                        {
+                            "operator": {
+                                "name": "+",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 0,
+                                        "line": 0
+                                    },
+                                    "start": {
+                                        "col": 0,
+                                        "line": 0
+                                    }
+                                },
+                                "type": "VariableReference"
+                            },
+                            "term": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            }
+                        }
+                    ],
+                    "type": "BinaryOperatorList"
+                },
+                "parameters": [
+                    "TODO: Pattern (Fix {unFix = at 261 6 261 7 (VarPattern (LowercaseIdentifier \"x\"))})"
+                ],
+                "type": "AnonymousFunction"
+            },
+            "name": "lambda",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 16,
+                    "line": 261
+                },
+                "start": {
+                    "col": 1,
+                    "line": 260
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "body": {
+                    "type": "UnitLiteral"
+                },
+                "parameters": [
+                    "TODO: Pattern (Fix {unFix = at 265 6 268 7 (RecordPattern [C ([],[]) (LowercaseIdentifier \"x\"),C ([LineComment \"A\"],[]) (LowercaseIdentifier \"y\")])})"
+                ],
+                "type": "AnonymousFunction"
+            },
+            "name": "lambdaWithMultilinePattern",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 11,
+                    "line": 270
+                },
+                "start": {
+                    "col": 1,
+                    "line": 264
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "body": {
+                    "display": {
+                        "fieldOrder": []
+                    },
+                    "fields": {},
+                    "type": "RecordLiteral"
+                },
+                "declarations": [
+                    {
+                        "expression": {
+                            "else": {
+                                "else": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 3
+                                },
+                                "if": {
+                                    "identifier": "False",
+                                    "module": "Basics",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 26,
+                                            "line": 279
+                                        },
+                                        "start": {
+                                            "col": 21,
+                                            "line": 279
+                                        }
+                                    },
+                                    "type": "ExternalReference"
+                                },
+                                "then": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 2
+                                },
+                                "type": "IfExpression"
+                            },
+                            "if": {
+                                "identifier": "True",
+                                "module": "Basics",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 20,
+                                        "line": 276
+                                    },
+                                    "start": {
+                                        "col": 16,
+                                        "line": 276
+                                    }
+                                },
+                                "type": "ExternalReference"
+                            },
+                            "then": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "type": "IfExpression"
+                        },
+                        "name": "a",
+                        "type": "Definition"
+                    },
+                    {
+                        "expression": {
+                            "else": {
+                                "else": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 3
+                                },
+                                "if": {
+                                    "identifier": "False",
+                                    "module": "Basics",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 42,
+                                            "line": 291
+                                        },
+                                        "start": {
+                                            "col": 37,
+                                            "line": 291
+                                        }
+                                    },
+                                    "type": "ExternalReference"
+                                },
+                                "then": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 2
+                                },
+                                "type": "IfExpression"
+                            },
+                            "if": {
+                                "identifier": "True",
+                                "module": "Basics",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 28,
+                                        "line": 286
+                                    },
+                                    "start": {
+                                        "col": 24,
+                                        "line": 286
+                                    }
+                                },
+                                "type": "ExternalReference"
+                            },
+                            "then": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "type": "IfExpression"
+                        },
+                        "name": "b",
+                        "type": "Definition"
+                    },
+                    {
+                        "expression": {
+                            "else": {
+                                "else": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 3
+                                },
+                                "if": {
+                                    "identifier": "False",
+                                    "module": "Basics",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 22,
+                                            "line": 314
+                                        },
+                                        "start": {
+                                            "col": 17,
+                                            "line": 314
+                                        }
+                                    },
+                                    "type": "ExternalReference"
+                                },
+                                "then": {
+                                    "display": {
+                                        "representation": "DecimalInt"
+                                    },
+                                    "type": "IntLiteral",
+                                    "value": 2
+                                },
+                                "type": "IfExpression"
+                            },
+                            "if": {
+                                "identifier": "True",
+                                "module": "Basics",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 21,
+                                        "line": 303
+                                    },
+                                    "start": {
+                                        "col": 17,
+                                        "line": 303
+                                    }
+                                },
+                                "type": "ExternalReference"
+                            },
+                            "then": {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "type": "IntLiteral",
+                                "value": 1
+                            },
+                            "type": "IfExpression"
+                        },
+                        "name": "c",
+                        "type": "Definition"
+                    }
+                ],
+                "type": "LetExpression"
+            },
+            "name": "ifStatement",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 325
+                },
+                "start": {
+                    "col": 1,
+                    "line": 273
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "body": {
+                    "terms": [
+                        {
+                            "name": "x",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 8,
+                                    "line": 336
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 336
+                                }
+                            },
+                            "type": "VariableReference"
+                        },
+                        {
+                            "name": "y",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 11,
+                                    "line": 336
+                                },
+                                "start": {
+                                    "col": 10,
+                                    "line": 336
+                                }
+                            },
+                            "type": "VariableReference"
+                        }
+                    ],
+                    "type": "TupleLiteral"
+                },
+                "declarations": [
+                    {
+                        "expression": {
+                            "display": {
+                                "representation": "DecimalInt"
+                            },
+                            "type": "IntLiteral",
+                            "value": 1
+                        },
+                        "name": "x",
+                        "type": "Definition"
+                    },
+                    {
+                        "expression": {
+                            "display": {
+                                "representation": "DecimalInt"
+                            },
+                            "type": "IntLiteral",
+                            "value": 2
+                        },
+                        "name": "y",
+                        "type": "Definition"
+                    }
+                ],
+                "type": "LetExpression"
+            },
+            "name": "letStatement",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 13,
+                    "line": 336
+                },
+                "start": {
+                    "col": 1,
+                    "line": 328
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "body": {
+                    "display": {
+                        "fieldOrder": []
+                    },
+                    "fields": {},
+                    "type": "RecordLiteral"
+                },
+                "declarations": [
+                    {
+                        "expression": {
+                            "branches": [
+                                {
+                                    "body": {
+                                        "name": "x",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 22,
+                                                "line": 344
+                                            },
+                                            "start": {
+                                                "col": 21,
+                                                "line": 344
+                                            }
+                                        },
+                                        "type": "VariableReference"
+                                    },
+                                    "pattern": "TODO: Pattern (Fix {unFix = at 343 17 343 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 343 22 343 23 (VarPattern (LowercaseIdentifier \"x\"))})])})"
+                                },
+                                {
+                                    "body": {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "type": "IntLiteral",
+                                        "value": 2
+                                    },
+                                    "pattern": "TODO: Pattern (Fix {unFix = at 346 17 346 18 Anything})"
+                                }
+                            ],
+                            "subject": {
+                                "arguments": [
+                                    {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "type": "IntLiteral",
+                                        "value": 1
+                                    }
+                                ],
+                                "function": {
+                                    "identifier": "Just",
+                                    "module": "Maybe",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 22,
+                                            "line": 342
+                                        },
+                                        "start": {
+                                            "col": 18,
+                                            "line": 342
+                                        }
+                                    },
+                                    "type": "ExternalReference"
+                                },
+                                "type": "FunctionApplication"
+                            },
+                            "type": "CaseExpression"
+                        },
+                        "name": "a",
+                        "type": "Definition"
+                    },
+                    {
+                        "expression": {
+                            "branches": [
+                                {
+                                    "body": {
+                                        "name": "x",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 22,
+                                                "line": 356
+                                            },
+                                            "start": {
+                                                "col": 21,
+                                                "line": 356
+                                            }
+                                        },
+                                        "type": "VariableReference"
+                                    },
+                                    "pattern": "TODO: Pattern (Fix {unFix = at 352 17 352 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 352 22 352 23 (VarPattern (LowercaseIdentifier \"x\"))})])})"
+                                },
+                                {
+                                    "body": {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "type": "IntLiteral",
+                                        "value": 2
+                                    },
+                                    "pattern": "TODO: Pattern (Fix {unFix = at 359 17 359 18 Anything})"
+                                }
+                            ],
+                            "subject": {
+                                "arguments": [
+                                    {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "type": "IntLiteral",
+                                        "value": 1
+                                    }
+                                ],
+                                "function": {
+                                    "identifier": "Just",
+                                    "module": "Maybe",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 30,
+                                            "line": 350
+                                        },
+                                        "start": {
+                                            "col": 26,
+                                            "line": 350
+                                        }
+                                    },
+                                    "type": "ExternalReference"
+                                },
+                                "type": "FunctionApplication"
+                            },
+                            "type": "CaseExpression"
+                        },
+                        "name": "b",
+                        "type": "Definition"
+                    },
+                    {
+                        "expression": {
+                            "branches": [
+                                {
+                                    "body": {
+                                        "name": "x",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 22,
+                                                "line": 376
+                                            },
+                                            "start": {
+                                                "col": 21,
+                                                "line": 376
+                                            }
+                                        },
+                                        "type": "VariableReference"
+                                    },
+                                    "pattern": "TODO: Pattern (Fix {unFix = at 372 17 372 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 372 22 372 23 (VarPattern (LowercaseIdentifier \"x\"))})])})"
+                                },
+                                {
+                                    "body": {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "type": "IntLiteral",
+                                        "value": 2
+                                    },
+                                    "pattern": "TODO: Pattern (Fix {unFix = at 379 17 379 18 Anything})"
+                                }
+                            ],
+                            "subject": {
+                                "arguments": [
+                                    {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "type": "IntLiteral",
+                                        "value": 1
+                                    }
+                                ],
+                                "function": {
+                                    "identifier": "Just",
+                                    "module": "Maybe",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 21,
+                                            "line": 368
+                                        },
+                                        "start": {
+                                            "col": 17,
+                                            "line": 368
+                                        }
+                                    },
+                                    "type": "ExternalReference"
+                                },
+                                "type": "FunctionApplication"
+                            },
+                            "type": "CaseExpression"
+                        },
+                        "name": "c",
+                        "type": "Definition"
+                    }
+                ],
+                "type": "LetExpression"
+            },
+            "name": "caseStatement",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 385
+                },
+                "start": {
+                    "col": 1,
+                    "line": 339
+                }
+            },
+            "type": "Definition"
+        }
+    ],
+    "imports": {
+        "Foo": {
+            "as": "Foo",
+            "exposing": null
+        }
+    },
+    "moduleName": "AllSyntax.Expressions"
+}

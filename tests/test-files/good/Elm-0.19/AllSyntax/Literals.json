@@ -1,0 +1,1162 @@
+{
+    "body": [
+        {
+            "expression": {
+                "type": "UnitLiteral"
+            },
+            "name": "unit",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 5
+                },
+                "start": {
+                    "col": 1,
+                    "line": 4
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "identifier": "True",
+                        "module": "Basics",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 9
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 9
+                            }
+                        },
+                        "type": "ExternalReference"
+                    },
+                    {
+                        "identifier": "False",
+                        "module": "Basics",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 10
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 10
+                            }
+                        },
+                        "type": "ExternalReference"
+                    }
+                ],
+                "type": "TupleLiteral"
+            },
+            "name": "boolean",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 11
+                },
+                "start": {
+                    "col": 1,
+                    "line": 8
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 1
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 9
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": -9
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 3866
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": -3866
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 129717
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": -129717
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 4600387192
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": -4600387192
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 9223372036854776000
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": -9223372036854776000
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": 9223372036854776000
+                    },
+                    {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "type": "IntLiteral",
+                        "value": -9223372036854776000
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "integer",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 28
+                },
+                "start": {
+                    "col": 1,
+                    "line": 14
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "display": {
+                            "representation": "DecimalFloat"
+                        },
+                        "type": "FloatLiteral",
+                        "value": 2
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "float",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 33
+                },
+                "start": {
+                    "col": 1,
+                    "line": 31
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 13,
+                        "line": 37
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 37
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "string"
+            },
+            "name": "string",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 13,
+                    "line": 37
+                },
+                "start": {
+                    "col": 1,
+                    "line": 36
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 22,
+                        "line": 41
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 41
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "a b'`<>{}/\u06a5\ud83d\ude00\u3041\u2f83\ud835\udfdf"
+            },
+            "name": "stringWithUnicodeCharacters",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 22,
+                    "line": 41
+                },
+                "start": {
+                    "col": 1,
+                    "line": 40
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 15,
+                        "line": 45
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 45
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "\ud83d\ude000\ud83d\ude009\ud83d\ude00a\ud83d\ude00F"
+            },
+            "name": "stringWithEscapedCharacterFollowedByHexDigit",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 15,
+                    "line": 45
+                },
+                "start": {
+                    "col": 1,
+                    "line": 44
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 15,
+                        "line": 49
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 49
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "\t\n\\\""
+            },
+            "name": "stringWithSpecialEscapedCharacters",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 15,
+                    "line": 49
+                },
+                "start": {
+                    "col": 1,
+                    "line": 48
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 121,
+                                "line": 53
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 53
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\u000b\f\r\u000e\u000f"
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 137,
+                                "line": 54
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 54
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f"
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 55
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 55
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "\u007f"
+                    }
+                ],
+                "type": "TupleLiteral"
+            },
+            "name": "stringWithEscapedControlCharacters",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 56
+                },
+                "start": {
+                    "col": 1,
+                    "line": 52
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 41,
+                        "line": 60
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 60
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "\u06dd\ufffb\ud804\udcbd\udb40\udc7f"
+            },
+            "name": "stringWithEscapedNonPrintCharacters",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 41,
+                    "line": 60
+                },
+                "start": {
+                    "col": 1,
+                    "line": 59
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 32,
+                        "line": 64
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 64
+                    }
+                },
+                "type": "StringLiteral",
+                "value": " \u00a0\u2000\u205f"
+            },
+            "name": "stringWithWhitespace",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 32,
+                    "line": 64
+                },
+                "start": {
+                    "col": 1,
+                    "line": 63
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "module": "Char",
+                "sourceLocation": {
+                    "end": {
+                        "col": 8,
+                        "line": 68
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 68
+                    }
+                },
+                "type": "CharLiteral",
+                "value": "c"
+            },
+            "name": "char",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 8,
+                    "line": 68
+                },
+                "start": {
+                    "col": 1,
+                    "line": 67
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 72
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 72
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "a"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 72
+                            },
+                            "start": {
+                                "col": 12,
+                                "line": 72
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": " "
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 20,
+                                "line": 72
+                            },
+                            "start": {
+                                "col": 17,
+                                "line": 72
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "/"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 25,
+                                "line": 72
+                            },
+                            "start": {
+                                "col": 22,
+                                "line": 72
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\""
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 30,
+                                "line": 72
+                            },
+                            "start": {
+                                "col": 27,
+                                "line": 72
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u06a5"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 35,
+                                "line": 72
+                            },
+                            "start": {
+                                "col": 32,
+                                "line": 72
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\ud83d\ude00"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 40,
+                                "line": 72
+                            },
+                            "start": {
+                                "col": 37,
+                                "line": 72
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u3041"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 45,
+                                "line": 72
+                            },
+                            "start": {
+                                "col": 42,
+                                "line": 72
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u2f83"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 50,
+                                "line": 72
+                            },
+                            "start": {
+                                "col": 47,
+                                "line": 72
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\ud835\udfdf"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "unicodeChars",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 52,
+                    "line": 72
+                },
+                "start": {
+                    "col": 1,
+                    "line": 71
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 76
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 76
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\t"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 76
+                            },
+                            "start": {
+                                "col": 13,
+                                "line": 76
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\n"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 76
+                            },
+                            "start": {
+                                "col": 19,
+                                "line": 76
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\\"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 29,
+                                "line": 76
+                            },
+                            "start": {
+                                "col": 25,
+                                "line": 76
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "'"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "escapedSpecialChars",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 31,
+                    "line": 76
+                },
+                "start": {
+                    "col": 1,
+                    "line": 75
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 80
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 80
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u0000"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 29,
+                                "line": 80
+                            },
+                            "start": {
+                                "col": 19,
+                                "line": 80
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u001f"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 41,
+                                "line": 80
+                            },
+                            "start": {
+                                "col": 31,
+                                "line": 80
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u007f"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "escapedControlChars",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 43,
+                    "line": 80
+                },
+                "start": {
+                    "col": 1,
+                    "line": 79
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 84
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 84
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u06dd"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 29,
+                                "line": 84
+                            },
+                            "start": {
+                                "col": 19,
+                                "line": 84
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\ufffb"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 42,
+                                "line": 84
+                            },
+                            "start": {
+                                "col": 31,
+                                "line": 84
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\ud804\udcbd"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 55,
+                                "line": 84
+                            },
+                            "start": {
+                                "col": 44,
+                                "line": 84
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\udb40\udc7f"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "escapedNonPrintChars",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 57,
+                    "line": 84
+                },
+                "start": {
+                    "col": 1,
+                    "line": 83
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 88
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 88
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": " "
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 22,
+                                "line": 88
+                            },
+                            "start": {
+                                "col": 12,
+                                "line": 88
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u00a0"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 34,
+                                "line": 88
+                            },
+                            "start": {
+                                "col": 24,
+                                "line": 88
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u2000"
+                    },
+                    {
+                        "module": "Char",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 46,
+                                "line": 88
+                            },
+                            "start": {
+                                "col": 36,
+                                "line": 88
+                            }
+                        },
+                        "type": "CharLiteral",
+                        "value": "\u205f"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "whitespaceChars",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 48,
+                    "line": 88
+                },
+                "start": {
+                    "col": 1,
+                    "line": 87
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 4,
+                        "line": 102
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 92
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "normals = \"a b'`<>{}/\u06a5\ud83d\ude00\u3041\u2f83\ud835\udfdf\"\n\"\t\\\n\"\"\n\"\"\"\n\"\"\"\"\n\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\u000b\f\r\u000e\u000f\n\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f\n\u007f\n\u06dd\ufffb\ud804\udcbd\udb40\udc7f\n\u00a0\u2000\u205f\n"
+            },
+            "name": "multilineString",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 4,
+                    "line": 102
+                },
+                "start": {
+                    "col": 1,
+                    "line": 91
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "module": "String",
+                "sourceLocation": {
+                    "end": {
+                        "col": 4,
+                        "line": 109
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 106
+                    }
+                },
+                "type": "StringLiteral",
+                "value": "   3   \n  2  \n 1 \n"
+            },
+            "name": "multilineString_keepsTrailingWhitespace",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 4,
+                    "line": 109
+                },
+                "start": {
+                    "col": 1,
+                    "line": 105
+                }
+            },
+            "type": "Definition"
+        },
+        {
+            "expression": {
+                "terms": [
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 36,
+                                "line": 113
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 113
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "trailing double quote\""
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 40,
+                                "line": 114
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 114
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "trailing double quote 2\"\""
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 42,
+                                "line": 115
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 115
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "trailing double quote 3\"\"\""
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 44,
+                                "line": 116
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 116
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "trailing double quote 4\"\"\"\""
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 51,
+                                "line": 117
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 117
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "embedded triple double quotes (\"\"\")"
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 62,
+                                "line": 118
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 118
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "embedded triple double quotes (\"\"\") (\"\"\"\")"
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 37,
+                                "line": 119
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 119
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "\"\"leading double quote 2"
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 42,
+                                "line": 120
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 120
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "\"\"\" leading double quote 3"
+                    },
+                    {
+                        "module": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 44,
+                                "line": 121
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 121
+                            }
+                        },
+                        "type": "StringLiteral",
+                        "value": "\"\"\"\" leading double quote 4"
+                    }
+                ],
+                "type": "ListLiteral"
+            },
+            "name": "multilineStringQuoteHandling",
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 122
+                },
+                "start": {
+                    "col": 1,
+                    "line": 112
+                }
+            },
+            "type": "Definition"
+        }
+    ],
+    "imports": {},
+    "moduleName": "AllSyntax.Literals"
+}
