@@ -5,6 +5,7 @@
                 "tag": "UnitLiteral"
             },
             "name": "unit",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -55,6 +56,7 @@
                 ]
             },
             "name": "boolean",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -166,6 +168,7 @@
                 ]
             },
             "name": "integer",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -193,6 +196,7 @@
                 ]
             },
             "name": "float",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -223,6 +227,7 @@
                 "value": "string"
             },
             "name": "string",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -253,6 +258,7 @@
                 "value": "a b'`<>{}/\u06a5\ud83d\ude00\u3041\u2f83\ud835\udfdf"
             },
             "name": "stringWithUnicodeCharacters",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -283,6 +289,7 @@
                 "value": "\ud83d\ude000\ud83d\ude009\ud83d\ude00a\ud83d\ude00F"
             },
             "name": "stringWithEscapedCharacterFollowedByHexDigit",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -313,6 +320,7 @@
                 "value": "\t\n\\\""
             },
             "name": "stringWithSpecialEscapedCharacters",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -378,6 +386,7 @@
                 ]
             },
             "name": "stringWithEscapedControlCharacters",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -408,6 +417,7 @@
                 "value": "\u06dd\ufffb\ud804\udcbd\udb40\udc7f"
             },
             "name": "stringWithEscapedNonPrintCharacters",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -438,6 +448,7 @@
                 "value": " \u00a0\u2000\u205f"
             },
             "name": "stringWithWhitespace",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -468,6 +479,7 @@
                 "value": "c"
             },
             "name": "char",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -623,6 +635,7 @@
                 ]
             },
             "name": "unicodeChars",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -703,6 +716,7 @@
                 ]
             },
             "name": "escapedSpecialChars",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -768,6 +782,7 @@
                 ]
             },
             "name": "escapedControlChars",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -848,6 +863,7 @@
                 ]
             },
             "name": "escapedNonPrintChars",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -928,6 +944,7 @@
                 ]
             },
             "name": "whitespaceChars",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -958,6 +975,7 @@
                 "value": "normals = \"a b'`<>{}/\u06a5\ud83d\ude00\u3041\u2f83\ud835\udfdf\"\n\"\t\\\n\"\"\n\"\"\"\n\"\"\"\"\n\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\u000b\f\r\u000e\u000f\n\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f\n\u007f\n\u06dd\ufffb\ud804\udcbd\udb40\udc7f\n\u00a0\u2000\u205f\n"
             },
             "name": "multilineString",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -988,6 +1006,7 @@
                 "value": "   3   \n  2  \n 1 \n"
             },
             "name": "multilineString_keepsTrailingWhitespace",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -1143,6 +1162,7 @@
                 ]
             },
             "name": "multilineStringQuoteHandling",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {

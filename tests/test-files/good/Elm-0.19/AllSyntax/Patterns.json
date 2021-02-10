@@ -6,6 +6,24 @@
                 "tag": "UnitLiteral"
             },
             "name": "wildcard",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 8
+                            },
+                            "start": {
+                                "col": 10,
+                                "line": 8
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -24,6 +42,24 @@
                 "tag": "UnitLiteral"
             },
             "name": "literal",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (LiteralPattern (IntNum 1 DecimalInt))",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (LiteralPattern (FloatNum 2.0 DecimalFloat))",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (LiteralPattern (Str \"string\" False))",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (LiteralPattern (Chr 'c'))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -42,6 +78,12 @@
                 "tag": "UnitLiteral"
             },
             "name": "variable",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"v\"))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -60,6 +102,33 @@
                 "tag": "UnitLiteral"
             },
             "name": "data",
+            "parameters": [
+                {
+                    "pattern": {
+                        "arguments": [
+                            "TODO: Pattern (VarPattern (LowercaseIdentifier \"x\"))",
+                            "TODO: Pattern (VarPattern (LowercaseIdentifier \"y\"))"
+                        ],
+                        "constructor": {
+                            "identifier": "Foo",
+                            "module": null,
+                            "tag": "ExternalReference"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 20
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 20
+                            }
+                        },
+                        "tag": "DataPattern"
+                    },
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -78,6 +147,12 @@
                 "tag": "UnitLiteral"
             },
             "name": "unit",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (UnitPattern [])",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -96,6 +171,12 @@
                 "tag": "UnitLiteral"
             },
             "name": "parens",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"v\"))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -114,6 +195,12 @@
                 "tag": "UnitLiteral"
             },
             "name": "tuple",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (TuplePattern [C ([],[]) (Fix {unFix = at 32 9 32 10 (VarPattern (LowercaseIdentifier \"a\"))}),C ([],[]) (Fix {unFix = at 32 12 32 13 (VarPattern (LowercaseIdentifier \"b\"))})])",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -132,6 +219,12 @@
                 "tag": "UnitLiteral"
             },
             "name": "emptyList",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (EmptyListPattern [])",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -150,6 +243,12 @@
                 "tag": "UnitLiteral"
             },
             "name": "list",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (ListPattern [C ([],[]) (Fix {unFix = at 40 8 40 9 (VarPattern (LowercaseIdentifier \"a\"))}),C ([],[]) (Fix {unFix = at 40 11 40 12 (VarPattern (LowercaseIdentifier \"b\"))})])",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -168,6 +267,12 @@
                 "tag": "UnitLiteral"
             },
             "name": "consList",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (TuplePattern [C ([],[]) (Fix {unFix = at 45 7 45 18 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 45 7 45 8 (VarPattern (LowercaseIdentifier \"a\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 45 12 45 13 (VarPattern (LowercaseIdentifier \"b\"))}),C ([],[],Nothing) (Fix {unFix = at 45 17 45 18 (VarPattern (LowercaseIdentifier \"c\"))})]})}),C ([],[]) (Fix {unFix = at 46 7 46 50 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 46 7 46 8 (VarPattern (LowercaseIdentifier \"a\"))}), rest_cp = Sequence [C ([BlockComment [\"1\"]],[BlockComment [\"2\"]],Nothing) (Fix {unFix = at 46 28 46 29 (VarPattern (LowercaseIdentifier \"b\"))}),C ([BlockComment [\"3\"]],[BlockComment [\"4\"]],Nothing) (Fix {unFix = at 46 49 46 50 (VarPattern (LowercaseIdentifier \"c\"))})]})}),C ([LineComment \"0\"],[LineComment \"5\"]) (Fix {unFix = at 48 7 53 13 (ConsPattern {first_cp = C (Just \"1\") (Fix {unFix = at 48 7 48 8 (VarPattern (LowercaseIdentifier \"d\"))}), rest_cp = Sequence [C ([],[LineComment \"2\"],Nothing) (Fix {unFix = at 50 12 50 13 (VarPattern (LowercaseIdentifier \"e\"))}),C ([LineComment \"3\"],[LineComment \"4\"],Nothing) (Fix {unFix = at 53 12 53 13 (VarPattern (LowercaseIdentifier \"f\"))})]})}),C ([],[]) (Fix {unFix = at 55 7 59 13 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 55 7 55 8 (VarPattern (LowercaseIdentifier \"d\"))}), rest_cp = Sequence [C ([LineComment \"E\"],[],Nothing) (Fix {unFix = at 57 12 57 13 (VarPattern (LowercaseIdentifier \"e\"))}),C ([LineComment \"F\"],[],Nothing) (Fix {unFix = at 59 12 59 13 (VarPattern (LowercaseIdentifier \"f\"))})]})}),C ([],[]) (Fix {unFix = at 60 7 62 17 (ConsPattern {first_cp = C (Just \"D\") (Fix {unFix = at 60 7 60 8 (VarPattern (LowercaseIdentifier \"d\"))}), rest_cp = Sequence [C ([],[],Just \"E\") (Fix {unFix = at 61 12 61 13 (VarPattern (LowercaseIdentifier \"e\"))}),C ([],[],Just \"F\") (Fix {unFix = at 62 12 62 13 (VarPattern (LowercaseIdentifier \"f\"))})]})})])",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -186,6 +291,12 @@
                 "tag": "UnitLiteral"
             },
             "name": "complexCons",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (ConsPattern {first_cp = C Nothing (Fix {unFix = at 68 14 68 15 (VarPattern (LowercaseIdentifier \"a\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 68 20 68 27 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 68 20 68 21 (VarPattern (LowercaseIdentifier \"x\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 68 25 68 27 (EmptyListPattern [])})]})}),C ([],[],Nothing) (Fix {unFix = at 68 33 68 49 (Alias (C [] (Fix {unFix = at 68 34 68 40 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 68 34 68 35 (VarPattern (LowercaseIdentifier \"b\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 68 39 68 40 Anything})]})})) (C [] (LowercaseIdentifier \"blah\")))})]})",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -204,6 +315,12 @@
                 "tag": "UnitLiteral"
             },
             "name": "record",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (RecordPattern [C ([],[]) (LowercaseIdentifier \"a\"),C ([],[]) (LowercaseIdentifier \"b\")])",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -222,6 +339,20 @@
                 "tag": "UnitLiteral"
             },
             "name": "emptyRecord",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (EmptyRecordPattern [])",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (EmptyRecordPattern [BlockComment [\"1\"]])",
+                    "type": null
+                },
+                {
+                    "pattern": "TODO: Pattern (EmptyRecordPattern [LineComment \"2\"])",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -240,6 +371,12 @@
                 "tag": "UnitLiteral"
             },
             "name": "asAlias",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (Alias (C [] (Fix {unFix = at 84 10 84 12 (UnitPattern [])})) (C [] (LowercaseIdentifier \"x\")))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -380,6 +517,12 @@
                 "tag": "CaseExpression"
             },
             "name": "patternWithQualifiedConstructorAsCosntructorArgument",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"m\"))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -494,6 +637,12 @@
                 "tag": "CaseExpression"
             },
             "name": "patternWithUnqualifiedConstructorAsCosntructorArgument",
+            "parameters": [
+                {
+                    "pattern": "TODO: Pattern (VarPattern (LowercaseIdentifier \"m\"))",
+                    "type": null
+                }
+            ],
             "returnType": null,
             "sourceLocation": {
                 "end": {

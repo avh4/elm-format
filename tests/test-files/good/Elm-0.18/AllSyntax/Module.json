@@ -10,6 +10,7 @@
                 "value": 1
             },
             "name": "a",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -32,6 +33,7 @@
                 "value": 2
             },
             "name": "b",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -54,6 +56,7 @@
                 "value": 3
             },
             "name": "c",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
