@@ -260,19 +260,95 @@
                         "body": {
                             "tag": "UnitLiteral"
                         },
-                        "pattern": "TODO: Pattern (Fix {unFix = at 90 9 90 33 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 90 20 90 33 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})])})"
+                        "pattern": {
+                            "arguments": [
+                                {
+                                    "arguments": [],
+                                    "constructor": {
+                                        "identifier": "Nothing",
+                                        "module": "Maybe",
+                                        "tag": "ExternalReference"
+                                    },
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 33,
+                                            "line": 90
+                                        },
+                                        "start": {
+                                            "col": 20,
+                                            "line": 90
+                                        }
+                                    },
+                                    "tag": "DataPattern"
+                                }
+                            ],
+                            "constructor": {
+                                "identifier": "Just",
+                                "module": "Maybe",
+                                "tag": "ExternalReference"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 33,
+                                    "line": 90
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 90
+                                }
+                            },
+                            "tag": "DataPattern"
+                        }
                     },
                     {
                         "body": {
                             "tag": "UnitLiteral"
                         },
-                        "pattern": "TODO: Pattern (Fix {unFix = at 93 9 93 21 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 93 20 93 21 Anything})])})"
+                        "pattern": {
+                            "arguments": [
+                                "TODO: Pattern (Anything)"
+                            ],
+                            "constructor": {
+                                "identifier": "Just",
+                                "module": "Maybe",
+                                "tag": "ExternalReference"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 21,
+                                    "line": 93
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 93
+                                }
+                            },
+                            "tag": "DataPattern"
+                        }
                     },
                     {
                         "body": {
                             "tag": "UnitLiteral"
                         },
-                        "pattern": "TODO: Pattern (Fix {unFix = at 96 9 96 22 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})"
+                        "pattern": {
+                            "arguments": [],
+                            "constructor": {
+                                "identifier": "Nothing",
+                                "module": "Maybe",
+                                "tag": "ExternalReference"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 22,
+                                    "line": 96
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 96
+                                }
+                            },
+                            "tag": "DataPattern"
+                        }
                     }
                 ],
                 "subject": {
@@ -312,31 +388,69 @@
                         "body": {
                             "tag": "UnitLiteral"
                         },
-                        "pattern": "TODO: Pattern (Fix {unFix = at 102 9 102 27 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 102 20 102 27 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})])})"
+                        "pattern": {
+                            "arguments": [
+                                {
+                                    "arguments": [],
+                                    "constructor": {
+                                        "identifier": "Nothing",
+                                        "module": "Maybe",
+                                        "tag": "ExternalReference"
+                                    },
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 27,
+                                            "line": 102
+                                        },
+                                        "start": {
+                                            "col": 20,
+                                            "line": 102
+                                        }
+                                    },
+                                    "tag": "DataPattern"
+                                }
+                            ],
+                            "constructor": {
+                                "identifier": "Just",
+                                "module": "Maybe",
+                                "tag": "ExternalReference"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 27,
+                                    "line": 102
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 102
+                                }
+                            },
+                            "tag": "DataPattern"
+                        }
                     },
                     {
                         "body": {
                             "tag": "UnitLiteral"
                         },
-                        "pattern": "TODO: Pattern (Fix {unFix = at 105 9 105 22 (Alias (C [] (Fix {unFix = at 105 10 105 16 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 105 15 105 16 Anything})])})) (C [] (LowercaseIdentifier \"x\")))})"
+                        "pattern": "TODO: Pattern (Alias (C [] (Fix {unFix = at 105 10 105 16 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 105 15 105 16 Anything})])})) (C [] (LowercaseIdentifier \"x\")))"
                     },
                     {
                         "body": {
                             "tag": "UnitLiteral"
                         },
-                        "pattern": "TODO: Pattern (Fix {unFix = at 108 9 108 21 (Alias (C [] (Fix {unFix = at 108 9 108 16 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})) (C [] (LowercaseIdentifier \"x\")))})"
+                        "pattern": "TODO: Pattern (Alias (C [] (Fix {unFix = at 108 9 108 16 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})) (C [] (LowercaseIdentifier \"x\")))"
                     },
                     {
                         "body": {
                             "tag": "UnitLiteral"
                         },
-                        "pattern": "TODO: Pattern (Fix {unFix = at 111 9 111 34 (Alias (C [] (Fix {unFix = at 111 10 111 28 (Alias (C [] (Fix {unFix = at 111 10 111 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})) (C [] (LowercaseIdentifier \"y\")))})) (C [] (LowercaseIdentifier \"x\")))})"
+                        "pattern": "TODO: Pattern (Alias (C [] (Fix {unFix = at 111 10 111 28 (Alias (C [] (Fix {unFix = at 111 10 111 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})) (C [] (LowercaseIdentifier \"y\")))})) (C [] (LowercaseIdentifier \"x\")))"
                     },
                     {
                         "body": {
                             "tag": "UnitLiteral"
                         },
-                        "pattern": "TODO: Pattern (Fix {unFix = at 114 9 114 10 Anything})"
+                        "pattern": "TODO: Pattern (Anything)"
                     }
                 ],
                 "subject": {
