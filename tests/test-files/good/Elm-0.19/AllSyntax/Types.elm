@@ -69,20 +69,6 @@ type alias Parens =
     )
 
 
-type alias TupleConstructor =
-    ( (,) Int String
-    , (,,) Int String Bool
-    , (,,) {- C -} Int {- D -} String {- E -} Bool
-    , (,,)
-        -- C
-        Int
-        -- D
-        String
-        --E
-        Bool
-    )
-
-
 type alias Tuple =
     ( ( a, b )
     , ( {- A -} a {- B -}, {- C -} b {- D -} )
