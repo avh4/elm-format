@@ -42,6 +42,9 @@ data Pattern
         { constructor :: ExternalReference
         , arguments :: List (Located Pattern)
         }
+    | TuplePattern
+        { terms :: List (Located Pattern)
+        }
     | PatternAlias
         { alias :: VariableDefinition
         , pattern :: Located Pattern
@@ -73,6 +76,10 @@ fromRawAST' = \case
         DataPattern
             (ExternalReference (ModuleName namespace) tag)
             (fmap (fromRawAST . (\(C comments a) -> a)) args)
+
+    AST.TuplePattern terms ->
+        TuplePattern
+            (fmap (fromRawAST . (\(C comments a) -> a)) terms)
 
     AST.Alias (C comments1 pat) (C comments2 name) ->
         PatternAlias
@@ -244,6 +251,12 @@ instance ToJSON Pattern where
                 [ type_ "DataPattern"
                 , ( "constructor", showJSON constructor )
                 , ( "arguments", showJSON arguments )
+                ]
+
+        TuplePattern terms ->
+            makeObj
+                [ type_ "TuplePattern"
+                , ( "terms", showJSON terms )
                 ]
 
         PatternAlias alias pat ->
