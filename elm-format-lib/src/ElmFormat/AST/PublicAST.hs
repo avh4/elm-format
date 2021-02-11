@@ -15,6 +15,7 @@ import qualified Data.List as List
 import AST.Structure (ASTNS, ASTNS1)
 import Data.Indexed as I
 import Data.Maybe (listToMaybe)
+import Data.Coapplicative
 
 
 data ModuleName =
@@ -89,6 +90,9 @@ fromRawAST' = \case
         DataPattern
             (ExternalReference (ModuleName namespace) tag)
             (fmap (fromRawAST . (\(C comments a) -> a)) args)
+
+    AST.PatternParens (C (pre, post) pat) ->
+        extract $ fromRawAST pat
 
     AST.TuplePattern terms ->
         TuplePattern
