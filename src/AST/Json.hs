@@ -26,7 +26,7 @@ import qualified Reporting.Region as Region
 import Data.ReversedList (Reversed)
 import qualified Data.ReversedList as ReversedList
 import qualified ElmFormat.AST.PublicAST as PublicAST
-import ElmFormat.AST.PublicAST (ToJSON(..), type_, sourceLocation, ModuleName(..))
+import ElmFormat.AST.PublicAST (ToJSON(..), type_, ModuleName(..))
 
 
 pleaseReport :: String -> String -> a
@@ -404,6 +404,11 @@ variableReference region name =
         , ( "name" , JSString $ toJSString name )
         , sourceLocation region
         ]
+
+
+sourceLocation :: Region.Region -> (String, JSValue)
+sourceLocation region =
+    ( "sourceLocation", showJSON region )
 
 
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'LetDeclarationNK) where

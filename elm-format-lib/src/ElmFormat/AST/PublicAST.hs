@@ -104,16 +104,31 @@ type_ t =
     ("tag", JSString $ toJSString t)
 
 
-sourceLocation :: Region -> (String, JSValue)
-sourceLocation region =
-    ( "sourceLocation", showJSON region )
-
-
 instance ToJSON a => ToJSON [a] where
     showJSON = JSArray . fmap showJSON
 
 
-instance ToJSON Region.Region where
+instance ToJSON a => ToJSON (Located a) where
+    showJSON (A region a) =
+        let
+            locationField =
+                ( "sourceLocation", showJSON region )
+        in
+        case showJSON a of
+            JSObject obj ->
+                JSObject
+                    $ toJSObject
+                    $ (++ [ locationField ])
+                    $ fromJSObject $ obj
+
+            otherJson ->
+                makeObj
+                    [ ( "value", otherJson )
+                    , locationField
+                    ]
+
+
+instance ToJSON Region where
     showJSON region =
         makeObj
             [ ( "start", showJSON $ Region.start region )
@@ -157,100 +172,89 @@ instance ToJSON ModuleName where
     showJSON (ModuleName namespace) = (JSString . toJSString . List.intercalate "." . fmap (\(UppercaseIdentifier v) -> v)) namespace
 
 
-instance ToJSON (Located AST.LiteralValue) where
-    showJSON (A region lit) =
-        case lit of
-            IntNum value repr ->
-                makeObj
-                    [ type_ "IntLiteral"
-                    , ("value", JSRational False $ toRational value)
-                    , ("display"
-                    , makeObj
-                        [ ("representation", showJSON repr)
-                        ]
-                    )
-                    , sourceLocation region
+instance ToJSON AST.LiteralValue where
+    showJSON = \case
+        IntNum value repr ->
+            makeObj
+                [ type_ "IntLiteral"
+                , ("value", JSRational False $ toRational value)
+                , ("display"
+                , makeObj
+                    [ ("representation", showJSON repr)
                     ]
+                )
+                ]
 
-            FloatNum value repr ->
-                makeObj
-                    [ type_ "FloatLiteral"
-                    , ("value", JSRational False $ toRational value)
-                    , ("display"
-                    , makeObj
-                        [ ("representation", showJSON repr)
-                        ]
-                    )
-                    , sourceLocation region
+        FloatNum value repr ->
+            makeObj
+                [ type_ "FloatLiteral"
+                , ("value", JSRational False $ toRational value)
+                , ("display"
+                , makeObj
+                    [ ("representation", showJSON repr)
                     ]
+                )
+                ]
 
-            Boolean value ->
-                makeObj
-                    [ type_ "ExternalReference"
-                    , ("module", JSString $ toJSString "Basics")
-                    , ("identifier", JSString $ toJSString $ show value)
-                    , sourceLocation region
+        Boolean value ->
+            makeObj
+                [ type_ "ExternalReference"
+                , ("module", JSString $ toJSString "Basics")
+                , ("identifier", JSString $ toJSString $ show value)
+                ]
+
+        Chr chr ->
+            makeObj
+                [ type_ "CharLiteral"
+                , ("value", JSString $ toJSString [chr])
+                ]
+
+        Str str repr ->
+            makeObj
+                [ type_ "StringLiteral"
+                , ("value", JSString $ toJSString str)
+                , ( "display"
+                , makeObj
+                    [ ( "representation", showJSON repr )
                     ]
-
-            Chr chr ->
-                makeObj
-                    [ type_ "CharLiteral"
-                    , ("value", JSString $ toJSString [chr])
-                    , sourceLocation region
-                    ]
-
-            Str str repr ->
-                makeObj
-                    [ type_ "StringLiteral"
-                    , ("value", JSString $ toJSString str)
-                    , ( "display"
-                    , makeObj
-                        [ ( "representation", showJSON repr )
-                        ]
-                    )
-                    , sourceLocation region
-                    ]
+                )
+                ]
 
 
-instance ToJSON (Located Pattern) where
-    showJSON (A region pattern') =
-        case pattern' of
-            AnythingPattern ->
-                makeObj
-                    [ type_ "AnythingPattern"
-                    , sourceLocation region
-                    ]
+instance ToJSON Pattern where
+    showJSON = \case
+        AnythingPattern ->
+            makeObj
+                [ type_ "AnythingPattern"
+                ]
 
-            UnitPattern ->
-                makeObj
-                    [ type_ "UnitPattern"
-                    , sourceLocation region
-                    ]
+        UnitPattern ->
+            makeObj
+                [ type_ "UnitPattern"
+                ]
 
-            LiteralPattern lit ->
-                showJSON (A region lit)
+        LiteralPattern lit ->
+            showJSON lit
 
-            VariablePattern def ->
-                showJSON (A region def)
+        VariablePattern def ->
+            showJSON def
 
-            DataPattern constructor arguments ->
-                makeObj
-                    [ type_ "DataPattern"
-                    , ( "constructor", showJSON constructor )
-                    , ( "arguments", showJSON arguments )
-                    , sourceLocation region
-                    ]
+        DataPattern constructor arguments ->
+            makeObj
+                [ type_ "DataPattern"
+                , ( "constructor", showJSON constructor )
+                , ( "arguments", showJSON arguments )
+                ]
 
-            PatternAlias alias pat ->
-                makeObj
-                    [ type_ "PatternAlias"
-                    , ( "alias", showJSON alias )
-                    , ( "pattern", showJSON pat )
-                    , sourceLocation region
-                    ]
+        PatternAlias alias pat ->
+            makeObj
+                [ type_ "PatternAlias"
+                , ( "alias", showJSON alias )
+                , ( "pattern", showJSON pat )
+                ]
 
-            TODO_Pattern string ->
-                JSString $ toJSString $ "TODO: Pattern (" ++ string ++ ")"
+        TODO_Pattern string ->
+            JSString $ toJSString $ "TODO: Pattern (" ++ string ++ ")"
 
 
 instance ToJSON ExternalReference where
@@ -259,15 +263,6 @@ instance ToJSON ExternalReference where
             [ type_ "ExternalReference"
             , ("module", showJSON module_)
             , ("identifier", showJSON identifier)
-            ]
-
-
-instance ToJSON (Located VariableDefinition) where
-    showJSON (A region (VariableDefinition name)) =
-        makeObj
-            [ type_ "VariableDefinition"
-            , ( "name" , showJSON name )
-            , sourceLocation region
             ]
 
 
