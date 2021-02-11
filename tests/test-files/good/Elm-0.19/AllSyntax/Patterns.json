@@ -399,7 +399,8 @@
                                 "line": 36
                             }
                         },
-                        "value": "TODO: Pattern (EmptyListPattern [])"
+                        "tag": "ListPattern",
+                        "terms": []
                     },
                     "type": null
                 }

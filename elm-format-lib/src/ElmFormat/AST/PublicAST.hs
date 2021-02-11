@@ -45,6 +45,9 @@ data Pattern
     | TuplePattern
         { terms :: List (Located Pattern)
         }
+    | ListPattern
+        { terms :: List (Located Pattern)
+        }
     | PatternAlias
         { alias :: VariableDefinition
         , pattern :: Located Pattern
@@ -80,6 +83,9 @@ fromRawAST' = \case
     AST.TuplePattern terms ->
         TuplePattern
             (fmap (fromRawAST . (\(C comments a) -> a)) terms)
+
+    AST.EmptyListPattern comments ->
+        ListPattern []
 
     AST.Alias (C comments1 pat) (C comments2 name) ->
         PatternAlias
@@ -256,6 +262,12 @@ instance ToJSON Pattern where
         TuplePattern terms ->
             makeObj
                 [ type_ "TuplePattern"
+                , ( "terms", showJSON terms )
+                ]
+
+        ListPattern terms ->
+            makeObj
+                [ type_ "ListPattern"
                 , ( "terms", showJSON terms )
                 ]
 
