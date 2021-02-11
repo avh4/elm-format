@@ -25,6 +25,8 @@ import qualified ElmFormat.Version
 import qualified Reporting.Region as Region
 import Data.ReversedList (Reversed)
 import qualified Data.ReversedList as ReversedList
+import qualified ElmFormat.AST.PublicAST as PublicAST
+import ElmFormat.AST.PublicAST (ToJSON(..), type_, sourceLocation, ModuleName(..))
 
 
 pleaseReport :: String -> String -> a
@@ -59,7 +61,7 @@ showModule modu@(Module _ maybeHeader _ (C _ imports) body) =
             mapNs (fromMatched []) . matchReferences importInfo
     in
     makeObj
-        [ ( "moduleName", showJSON name )
+        [ ( "moduleName", showJSON $ ModuleName name )
         , ( "imports", makeObj $ fmap importJson $ Map.toList imports )
         , ( "body", JSArray $ fmap showJSON $ mergeDeclarations $ normalize body )
         ]
@@ -130,35 +132,6 @@ mergeDeclarations (I.Fix (A _ (TopLevel decls))) =
     mapMaybe merge decls
 
 
-class ToJSON a where
-  showJSON :: a -> JSValue
-
-
-instance ToJSON Region.Region where
-    showJSON region =
-        makeObj
-            [ ( "start", showJSON $ Region.start region )
-            , ( "end", showJSON $ Region.end region )
-            ]
-
-
-instance ToJSON Region.Position where
-    showJSON pos =
-        makeObj
-            [ ( "line", JSRational False $ toRational $ Region.line pos )
-            , ( "col", JSRational False $ toRational $ Region.column pos )
-            ]
-
-
-instance ToJSON (List UppercaseIdentifier) where
-    showJSON [] = JSNull
-    showJSON namespace = (JSString . toJSString . List.intercalate "." . fmap (\(UppercaseIdentifier v) -> v)) namespace
-
-
-instance ToJSON UppercaseIdentifier where
-    showJSON (UppercaseIdentifier name) = JSString $ toJSString name
-
-
 showImportListingJSON :: Listing DetailedListing -> JSValue
 showImportListingJSON (ExplicitListing a _) = showJSON a
 showImportListingJSON (OpenListing (C _ ())) = JSString $ toJSString "Everything"
@@ -201,9 +174,10 @@ instance ToJSON (MergedTopLevelStructure [UppercaseIdentifier]) where
             ]
 
 
+mergedParameter :: C1 Before (ASTNS Located [UppercaseIdentifier] 'PatternNK) -> JSValue
 mergedParameter (C comments pattern) =
     makeObj
-        [ ( "pattern", showJSON pattern )
+        [ ( "pattern", showJSON $ PublicAST.fromRawAST pattern )
         , ( "type", JSNull ) -- TODO
         ]
 
@@ -227,7 +201,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
               makeObj [ type_ "UnitLiteral" ]
 
           Literal lit ->
-              literalValue region lit
+              showJSON (A region lit)
 
           VarExpr (VarRef [] (LowercaseIdentifier var)) ->
             variableReference region var
@@ -235,7 +209,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
           VarExpr (VarRef namespace var) ->
               makeObj
                   [ type_ "ExternalReference"
-                  , ("module", showJSON namespace)
+                  , ("module", showJSON $ ModuleName namespace)
                   , ("identifier", showJSON var)
                   , sourceLocation region
                   ]
@@ -246,7 +220,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
           VarExpr (TagRef namespace (UppercaseIdentifier var)) ->
               makeObj
                   [ type_ "ExternalReference"
-                  , ("module", showJSON namespace)
+                  , ("module", showJSON $ ModuleName namespace)
                   , ("identifier", JSString $ toJSString var)
                   , sourceLocation region
                   ]
@@ -318,7 +292,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
           Lambda parameters _ body _ ->
               makeObj
                   [ type_ "AnonymousFunction"
-                  , ("parameters", JSArray $ fmap (showJSON . extract) parameters)
+                  , ("parameters", JSArray $ fmap (showJSON . PublicAST.fromRawAST . extract) parameters)
                   , ("body", showJSON body)
                   ]
 
@@ -357,7 +331,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
                     , JSArray $ map
                         (\(I.Fix (A _ (CaseBranch _ _ _ pat body))) ->
                            makeObj
-                               [ ("pattern", showJSON pat)
+                               [ ("pattern", showJSON $ PublicAST.fromRawAST pat)
                                , ("body", showJSON body)
                                ]
                         )
@@ -377,61 +351,6 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
 
           GLShader _ ->
               JSString $ toJSString "TODO: GLShader"
-
-
-literalValue :: Region.Region -> LiteralValue -> JSValue
-literalValue region lit =
-    case lit of
-        IntNum value repr ->
-            makeObj
-                [ type_ "IntLiteral"
-                , ("value", JSRational False $ toRational value)
-                , ("display"
-                , makeObj
-                    [ ("representation", showJSON repr)
-                    ]
-                  )
-                , sourceLocation region
-                ]
-
-        FloatNum value repr ->
-            makeObj
-                [ type_ "FloatLiteral"
-                , ("value", JSRational False $ toRational value)
-                , ("display"
-                  , makeObj
-                    [ ("representation", showJSON repr)
-                    ]
-                  )
-                , sourceLocation region
-                ]
-
-        Boolean value ->
-            makeObj
-                [ type_ "ExternalReference"
-                , ("module", JSString $ toJSString "Basics")
-                , ("identifier", JSString $ toJSString $ show value)
-                , sourceLocation region
-                ]
-
-        Chr chr ->
-            makeObj
-                [ type_ "CharLiteral"
-                , ("value", JSString $ toJSString [chr])
-                , sourceLocation region
-                ]
-
-        Str str repr ->
-            makeObj
-                [ type_ "StringLiteral"
-                , ("value", JSString $ toJSString str)
-                , ( "display"
-                  , makeObj
-                    [ ( "representation", showJSON repr )
-                    ]
-                  )
-                , sourceLocation region
-                ]
 
 
 recordJSON :: (ToJSON base, ToJSON value) => String -> String -> Maybe (C2 Before After base) -> Sequence (Pair LowercaseIdentifier value) -> JSValue
@@ -487,15 +406,6 @@ variableReference region name =
         ]
 
 
-sourceLocation :: Region.Region -> (String, JSValue)
-sourceLocation region =
-    ( "sourceLocation", showJSON region )
-
-
-instance ToJSON LowercaseIdentifier where
-    showJSON (LowercaseIdentifier name) = JSString $ toJSString name
-
-
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'LetDeclarationNK) where
   showJSON letDeclaration =
       case extract $ I.unFix letDeclaration of
@@ -508,66 +418,6 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'LetDeclarationNK) where
 
           _ ->
               JSString $ toJSString $ "TODO: LetDeclaration (" ++ show letDeclaration ++ ")"
-
-
-instance ToJSON IntRepresentation where
-    showJSON DecimalInt = JSString $ toJSString "DecimalInt"
-    showJSON HexadecimalInt = JSString $ toJSString "HexadecimalInt"
-
-
-instance ToJSON FloatRepresentation where
-    showJSON DecimalFloat = JSString $ toJSString "DecimalFloat"
-    showJSON ExponentFloat = JSString $ toJSString "ExponentFloat"
-
-
-instance ToJSON StringRepresentation where
-    showJSON SingleQuotedString = JSString $ toJSString "SingleQuotedString"
-    showJSON TripleQuotedString = JSString $ toJSString "TripleQuotedString"
-
-
-instance ToJSON (ASTNS Located [UppercaseIdentifier] 'PatternNK) where
-    showJSON (I.Fix (A region pattern')) =
-        case pattern' of
-            Anything ->
-                makeObj
-                    [ type_ "AnythingPattern"
-                    , sourceLocation region
-                    ]
-
-            UnitPattern comments ->
-                makeObj
-                    [ type_ "UnitPattern"
-                    , sourceLocation region
-                    ]
-
-            LiteralPattern lit ->
-                literalValue region lit
-
-            VarPattern name ->
-                makeObj
-                    [ type_ "VariableDefinition"
-                    , ( "name" , showJSON name )
-                    , sourceLocation region
-                    ]
-
-            DataPattern (namespace, tag) args ->
-                makeObj
-                    [ type_ "DataPattern"
-                    , ( "constructor"
-                      , makeObj
-                        [ type_ "ExternalReference"
-                        , ("module", showJSON namespace)
-                        , ("identifier", showJSON tag)
-                        ]
-                      )
-                    , ( "arguments"
-                      , JSArray $ fmap (\(C c p) -> showJSON p) args
-                      )
-                    , sourceLocation region
-                    ]
-
-            _ ->
-                JSString $ toJSString $ "TODO: Pattern (" ++ show pattern' ++ ")"
 
 
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
@@ -583,7 +433,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
                 makeObj
                     [ type_ "TypeReference"
                     , ( "name", showJSON name )
-                    , ( "module", showJSON namespace )
+                    , ( "module", showJSON $ ModuleName namespace )
                     , ( "arguments", JSArray $ fmap (showJSON . extract) args )
                     , sourceLocation region
                     ]
@@ -629,11 +479,6 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
                     done :: (Reversed (C2Eol a b x), C0Eol x) -> (List (C2Eol a b x), C0Eol x)
                     done (acc, last) =
                         (ReversedList.toList acc, last)
-
-
-type_ :: String -> (String, JSValue)
-type_ t =
-    ("tag", JSString $ toJSString t)
 
 
 nowhere :: Region.Position
