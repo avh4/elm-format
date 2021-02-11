@@ -99,6 +99,21 @@ class ToJSON a where
   showJSON :: a -> JSValue
 
 
+addField :: ( String, JSValue ) -> JSValue -> JSValue
+addField field = \case
+    JSObject obj ->
+        JSObject
+            $ toJSObject
+            $ (++ [ field ])
+            $ fromJSObject $ obj
+
+    otherJson ->
+        makeObj
+            [ ( "value", otherJson )
+            , field
+            ]
+
+
 type_ :: String -> (String, JSValue)
 type_ t =
     ("tag", JSString $ toJSString t)
@@ -110,22 +125,7 @@ instance ToJSON a => ToJSON [a] where
 
 instance ToJSON a => ToJSON (Located a) where
     showJSON (A region a) =
-        let
-            locationField =
-                ( "sourceLocation", showJSON region )
-        in
-        case showJSON a of
-            JSObject obj ->
-                JSObject
-                    $ toJSObject
-                    $ (++ [ locationField ])
-                    $ fromJSObject $ obj
-
-            otherJson ->
-                makeObj
-                    [ ( "value", otherJson )
-                    , locationField
-                    ]
+        addField ( "sourceLocation", showJSON region ) (showJSON a)
 
 
 instance ToJSON Region where
