@@ -58,7 +58,6 @@ data Pattern
         { alias :: VariableDefinition
         , pattern :: Located Pattern
         }
-    | TODO_Pattern String
 
 
 mkListPattern :: List (Located Pattern) -> Maybe (Located Pattern) -> Pattern
@@ -85,6 +84,9 @@ fromRawAST' = \case
 
     AST.VarPattern name ->
         VariablePattern $ VariableDefinition name
+
+    AST.OpPattern _ ->
+        error "PublicAST: OpPattern is not supported in Elm 0.19"
 
     AST.DataPattern (namespace, tag) args ->
         DataPattern
@@ -126,10 +128,6 @@ fromRawAST' = \case
         PatternAlias
             (VariableDefinition name)
             (fromRawAST pat)
-
-    pat ->
-        TODO_Pattern (show pat)
-
 
 
 fromRawAST :: ASTNS Located [UppercaseIdentifier] 'PatternNK -> Located (Pattern)
@@ -324,9 +322,6 @@ instance ToJSON Pattern where
                 , ( "alias", showJSON alias )
                 , ( "pattern", showJSON pat )
                 ]
-
-        TODO_Pattern string ->
-            JSString $ toJSString $ "TODO: Pattern (" ++ string ++ ")"
 
 
 instance ToJSON ExternalReference where
