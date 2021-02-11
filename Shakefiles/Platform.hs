@@ -1,4 +1,4 @@
-module Shakefiles.Platform (Platform, platform, zipFormatFor, cabalInstallOs) where
+module Shakefiles.Platform (Platform(..), Shakefiles.Platform.all, platform, zipFormatFor, cabalInstallOs, githubRunnerOs, binExt) where
 
 import qualified System.Info
 
@@ -9,6 +9,14 @@ instance Show Platform where
     show Linux = "linux-x64"
     show Mac = "mac-x64"
     show Windows = "win-x64"
+
+
+all :: [Platform]
+all =
+    [ Linux
+    , Mac
+    , Windows
+    ]
 
 
 platform :: Platform
@@ -23,9 +31,24 @@ platform =
 
 
 zipFormatFor :: Platform -> String
-zipFormatFor Linux = "tgz"
-zipFormatFor Mac = "tgz"
-zipFormatFor Windows = "zip"
+zipFormatFor = \case
+    Linux -> "tgz"
+    Mac -> "tgz"
+    Windows -> "zip"
+
+
+binExt :: Platform -> String
+binExt = \case
+    Linux -> ""
+    Mac -> ""
+    Windows -> ".exe"
+
+
+githubRunnerOs :: Platform -> String
+githubRunnerOs = \case
+    Linux -> "Linux"
+    Windows -> "Windows"
+    Mac -> "macOS"
 
 
 cabalInstallOs :: String

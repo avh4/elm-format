@@ -1,12 +1,15 @@
-## main
+## 0.8.5
 
 Feature changes:
-  - Detailed error messages for syntax errors have been removed.  Use elm make to see a detailed error if elm-format fails.
+  - Detailed error messages for syntax errors have been removed.  Use `elm make` to see a detailed error if elm-format fails.
+
+New features:
+  - In `module` and `import` lines, `exposing` is automatically added if missing
 
 Other changes:
-  - Linux binaries installed with `npm` are now statically linked (should now work on alpine linux and other systems without glibc-2.27)
+  - The npm installer now provides a (Rosetta) binary for Mac ARM64
+  - Linux binaries are now statically linked (should now work on alpine linux and other systems without glibc-2.27)
   - Removed `--upgrade` (now use elm-refactor instead)
-  - Adds "exposing" keyword for `module`s and `import`s
 
 
 ## 0.8.4

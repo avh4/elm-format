@@ -12,26 +12,18 @@
 # store. If you already have all the dependencies installed, feel free to remove
 # them from the shebang to speed up the process.
 
-set -exo pipefail
+set -euo pipefail
 
 REV="$(git rev-parse HEAD)"
-VERSION="$(git describe --abbrev=8 "$REV")"
-ROOTDIR="$(git rev-parse --show-toplevel)"
-SHA="$(nix-prefetch-git --url "$ROOTDIR" --rev "$REV" --quiet --no-deepClone | jq --raw-output .sha256)"
 
 PATCH=$(cat <<END
-  src = fetchgit {
-    url = "https://github.com/avh4/elm-format";
-    sha256 = "$SHA";
-    rev = "$REV";
-  };
   postPatch = ''
     mkdir -p ./generated
     cat <<EOHS > ./generated/Build_elm_format.hs
     module Build_elm_format where
 
     gitDescribe :: String
-    gitDescribe = "$VERSION"
+    gitDescribe = "\${version}"
     EOHS
   '';
 END
@@ -43,7 +35,7 @@ quoteSubst() {
   printf %s "${REPLY%$'\n'}"
 }
 
-cabal2nix --no-haddock "$ROOTDIR" |
-  sed "s#^{ mkDerivation#{ mkDerivation, fetchgit#" |
+cabal2nix --no-haddock https://github.com/avh4/elm-format --revision "$REV" |
+  sed "s#^mkDerivation#mkDerivation rec#" |
   sed "s#isLibrary = true#isLibrary = false#" |
-  sed "s#\\s*src = .*;#$(quoteSubst "$PATCH")#"
+  sed "s#^}\$#$(quoteSubst "$PATCH")\n}#"
