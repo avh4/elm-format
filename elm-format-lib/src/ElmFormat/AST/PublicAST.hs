@@ -5,7 +5,7 @@
 module ElmFormat.AST.PublicAST where
 
 import ElmFormat.AST.Shared
-import AST.V0_16 (NodeKind(..))
+import AST.V0_16 (NodeKind(..), sequenceToList)
 import qualified AST.V0_16 as AST
 import Reporting.Annotation (Located(A))
 import Reporting.Region (Region)
@@ -14,6 +14,7 @@ import Text.JSON hiding (showJSON)
 import qualified Data.List as List
 import AST.Structure (ASTNS, ASTNS1)
 import Data.Indexed as I
+import Data.Maybe (listToMaybe)
 
 
 data ModuleName =
@@ -45,8 +46,9 @@ data Pattern
     | TuplePattern
         { terms :: List (Located Pattern)
         }
-    | ListPattern
-        { terms :: List (Located Pattern)
+    | ListPattern -- Construct with mkListPattern
+        { prefix :: List (Located Pattern)
+        , rest :: Maybe (Located Pattern)
         }
     | RecordPattern
         { fields :: List VariableDefinition
@@ -57,6 +59,11 @@ data Pattern
         }
     | TODO_Pattern String
 
+
+mkListPattern :: List (Located Pattern) -> Maybe (Located Pattern) -> Pattern
+mkListPattern prefix (Just (A _ (ListPattern prefix2 rest2))) =
+    ListPattern (prefix ++ prefix2) rest2
+mkListPattern prefix rest = ListPattern prefix rest
 
 
 --
@@ -88,11 +95,21 @@ fromRawAST' = \case
             (fmap (fromRawAST . (\(C comments a) -> a)) terms)
 
     AST.EmptyListPattern comments ->
-        ListPattern []
+        mkListPattern [] Nothing
 
     AST.ListPattern terms ->
-        ListPattern
+        mkListPattern
             (fmap (fromRawAST . (\(C comments a) -> a)) terms)
+            Nothing
+
+    AST.ConsPattern (C firstEol first) rest ->
+        let
+            first' = fromRawAST first
+            rest' = fmap (fromRawAST . (\(C comments a) -> a)) (sequenceToList rest)
+        in
+        case reverse rest' of
+            [] -> mkListPattern [] (Just first')
+            last : mid -> mkListPattern (first' : reverse mid) (Just last)
 
     AST.EmptyRecordPattern comment ->
         RecordPattern []
@@ -148,6 +165,11 @@ type_ t =
 
 instance ToJSON a => ToJSON [a] where
     showJSON = JSArray . fmap showJSON
+
+
+instance ToJSON a => ToJSON (Maybe a) where
+    showJSON Nothing = JSNull
+    showJSON (Just a) = showJSON a
 
 
 instance ToJSON a => ToJSON (Located a) where
@@ -279,10 +301,11 @@ instance ToJSON Pattern where
                 , ( "terms", showJSON terms )
                 ]
 
-        ListPattern terms ->
+        ListPattern prefix rest ->
             makeObj
                 [ type_ "ListPattern"
-                , ( "terms", showJSON terms )
+                , ( "prefix", showJSON prefix )
+                , ( "rest", showJSON rest )
                 ]
 
         RecordPattern fields ->

@@ -389,6 +389,8 @@
             "parameters": [
                 {
                     "pattern": {
+                        "prefix": [],
+                        "rest": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 13,
@@ -399,8 +401,7 @@
                                 "line": 36
                             }
                         },
-                        "tag": "ListPattern",
-                        "terms": []
+                        "tag": "ListPattern"
                     },
                     "type": null
                 }
@@ -426,18 +427,7 @@
             "parameters": [
                 {
                     "pattern": {
-                        "sourceLocation": {
-                            "end": {
-                                "col": 14,
-                                "line": 40
-                            },
-                            "start": {
-                                "col": 6,
-                                "line": 40
-                            }
-                        },
-                        "tag": "ListPattern",
-                        "terms": [
+                        "prefix": [
                             {
                                 "name": "a",
                                 "sourceLocation": {
@@ -466,7 +456,19 @@
                                 },
                                 "tag": "VariableDefinition"
                             }
-                        ]
+                        ],
+                        "rest": null,
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 40
+                            },
+                            "start": {
+                                "col": 6,
+                                "line": 40
+                            }
+                        },
+                        "tag": "ListPattern"
                     },
                     "type": null
                 }
@@ -505,6 +507,50 @@
                         "tag": "TuplePattern",
                         "terms": [
                             {
+                                "prefix": [
+                                    {
+                                        "name": "a",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 45
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 45
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "b",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 13,
+                                                "line": 45
+                                            },
+                                            "start": {
+                                                "col": 12,
+                                                "line": 45
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": {
+                                    "name": "c",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 18,
+                                            "line": 45
+                                        },
+                                        "start": {
+                                            "col": 17,
+                                            "line": 45
+                                        }
+                                    },
+                                    "tag": "VariableDefinition"
+                                },
                                 "sourceLocation": {
                                     "end": {
                                         "col": 18,
@@ -515,9 +561,53 @@
                                         "line": 45
                                     }
                                 },
-                                "value": "TODO: Pattern (ConsPattern {first_cp = C Nothing (Fix {unFix = at 45 7 45 8 (VarPattern (LowercaseIdentifier \"a\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 45 12 45 13 (VarPattern (LowercaseIdentifier \"b\"))}),C ([],[],Nothing) (Fix {unFix = at 45 17 45 18 (VarPattern (LowercaseIdentifier \"c\"))})]})"
+                                "tag": "ListPattern"
                             },
                             {
+                                "prefix": [
+                                    {
+                                        "name": "a",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 46
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 46
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "b",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 29,
+                                                "line": 46
+                                            },
+                                            "start": {
+                                                "col": 28,
+                                                "line": 46
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": {
+                                    "name": "c",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 50,
+                                            "line": 46
+                                        },
+                                        "start": {
+                                            "col": 49,
+                                            "line": 46
+                                        }
+                                    },
+                                    "tag": "VariableDefinition"
+                                },
                                 "sourceLocation": {
                                     "end": {
                                         "col": 50,
@@ -528,9 +618,53 @@
                                         "line": 46
                                     }
                                 },
-                                "value": "TODO: Pattern (ConsPattern {first_cp = C Nothing (Fix {unFix = at 46 7 46 8 (VarPattern (LowercaseIdentifier \"a\"))}), rest_cp = Sequence [C ([BlockComment [\"1\"]],[BlockComment [\"2\"]],Nothing) (Fix {unFix = at 46 28 46 29 (VarPattern (LowercaseIdentifier \"b\"))}),C ([BlockComment [\"3\"]],[BlockComment [\"4\"]],Nothing) (Fix {unFix = at 46 49 46 50 (VarPattern (LowercaseIdentifier \"c\"))})]})"
+                                "tag": "ListPattern"
                             },
                             {
+                                "prefix": [
+                                    {
+                                        "name": "d",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 48
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 48
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "e",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 13,
+                                                "line": 50
+                                            },
+                                            "start": {
+                                                "col": 12,
+                                                "line": 50
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": {
+                                    "name": "f",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 13,
+                                            "line": 53
+                                        },
+                                        "start": {
+                                            "col": 12,
+                                            "line": 53
+                                        }
+                                    },
+                                    "tag": "VariableDefinition"
+                                },
                                 "sourceLocation": {
                                     "end": {
                                         "col": 13,
@@ -541,9 +675,53 @@
                                         "line": 48
                                     }
                                 },
-                                "value": "TODO: Pattern (ConsPattern {first_cp = C (Just \"1\") (Fix {unFix = at 48 7 48 8 (VarPattern (LowercaseIdentifier \"d\"))}), rest_cp = Sequence [C ([],[LineComment \"2\"],Nothing) (Fix {unFix = at 50 12 50 13 (VarPattern (LowercaseIdentifier \"e\"))}),C ([LineComment \"3\"],[LineComment \"4\"],Nothing) (Fix {unFix = at 53 12 53 13 (VarPattern (LowercaseIdentifier \"f\"))})]})"
+                                "tag": "ListPattern"
                             },
                             {
+                                "prefix": [
+                                    {
+                                        "name": "d",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 55
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 55
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "e",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 13,
+                                                "line": 57
+                                            },
+                                            "start": {
+                                                "col": 12,
+                                                "line": 57
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": {
+                                    "name": "f",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 13,
+                                            "line": 59
+                                        },
+                                        "start": {
+                                            "col": 12,
+                                            "line": 59
+                                        }
+                                    },
+                                    "tag": "VariableDefinition"
+                                },
                                 "sourceLocation": {
                                     "end": {
                                         "col": 13,
@@ -554,9 +732,53 @@
                                         "line": 55
                                     }
                                 },
-                                "value": "TODO: Pattern (ConsPattern {first_cp = C Nothing (Fix {unFix = at 55 7 55 8 (VarPattern (LowercaseIdentifier \"d\"))}), rest_cp = Sequence [C ([LineComment \"E\"],[],Nothing) (Fix {unFix = at 57 12 57 13 (VarPattern (LowercaseIdentifier \"e\"))}),C ([LineComment \"F\"],[],Nothing) (Fix {unFix = at 59 12 59 13 (VarPattern (LowercaseIdentifier \"f\"))})]})"
+                                "tag": "ListPattern"
                             },
                             {
+                                "prefix": [
+                                    {
+                                        "name": "d",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 60
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 60
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "e",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 13,
+                                                "line": 61
+                                            },
+                                            "start": {
+                                                "col": 12,
+                                                "line": 61
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": {
+                                    "name": "f",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 13,
+                                            "line": 62
+                                        },
+                                        "start": {
+                                            "col": 12,
+                                            "line": 62
+                                        }
+                                    },
+                                    "tag": "VariableDefinition"
+                                },
                                 "sourceLocation": {
                                     "end": {
                                         "col": 17,
@@ -567,7 +789,7 @@
                                         "line": 60
                                     }
                                 },
-                                "value": "TODO: Pattern (ConsPattern {first_cp = C (Just \"D\") (Fix {unFix = at 60 7 60 8 (VarPattern (LowercaseIdentifier \"d\"))}), rest_cp = Sequence [C ([],[],Just \"E\") (Fix {unFix = at 61 12 61 13 (VarPattern (LowercaseIdentifier \"e\"))}),C ([],[],Just \"F\") (Fix {unFix = at 62 12 62 13 (VarPattern (LowercaseIdentifier \"f\"))})]})"
+                                "tag": "ListPattern"
                             }
                         ]
                     },
@@ -608,18 +830,7 @@
                         "tag": "TuplePattern",
                         "terms": [
                             {
-                                "sourceLocation": {
-                                    "end": {
-                                        "col": 15,
-                                        "line": 69
-                                    },
-                                    "start": {
-                                        "col": 7,
-                                        "line": 69
-                                    }
-                                },
-                                "tag": "ListPattern",
-                                "terms": [
+                                "prefix": [
                                     {
                                         "name": "y",
                                         "sourceLocation": {
@@ -648,9 +859,52 @@
                                         },
                                         "tag": "VariableDefinition"
                                     }
-                                ]
+                                ],
+                                "rest": null,
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 69
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 69
+                                    }
+                                },
+                                "tag": "ListPattern"
                             },
                             {
+                                "prefix": [
+                                    {
+                                        "name": "y",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 70
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 70
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "x",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 15,
+                                                "line": 70
+                                            },
+                                            "start": {
+                                                "col": 14,
+                                                "line": 70
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": null,
                                 "sourceLocation": {
                                     "end": {
                                         "col": 17,
@@ -661,9 +915,40 @@
                                         "line": 70
                                     }
                                 },
-                                "value": "TODO: Pattern (ConsPattern {first_cp = C Nothing (Fix {unFix = at 70 7 70 8 (VarPattern (LowercaseIdentifier \"y\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 70 12 70 17 (ListPattern [C ([],[]) (Fix {unFix = at 70 14 70 15 (VarPattern (LowercaseIdentifier \"x\"))})])})]})"
+                                "tag": "ListPattern"
                             },
                             {
+                                "prefix": [
+                                    {
+                                        "name": "y",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 71
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 71
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "x",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 13,
+                                                "line": 71
+                                            },
+                                            "start": {
+                                                "col": 12,
+                                                "line": 71
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": null,
                                 "sourceLocation": {
                                     "end": {
                                         "col": 19,
@@ -674,7 +959,7 @@
                                         "line": 71
                                     }
                                 },
-                                "value": "TODO: Pattern (ConsPattern {first_cp = C Nothing (Fix {unFix = at 71 7 71 8 (VarPattern (LowercaseIdentifier \"y\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 71 12 71 13 (VarPattern (LowercaseIdentifier \"x\"))}),C ([],[],Nothing) (Fix {unFix = at 71 17 71 19 (EmptyListPattern [])})]})"
+                                "tag": "ListPattern"
                             }
                         ]
                     },
@@ -702,6 +987,111 @@
             "parameters": [
                 {
                     "pattern": {
+                        "prefix": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 78
+                                    },
+                                    "start": {
+                                        "col": 14,
+                                        "line": 78
+                                    }
+                                },
+                                "tag": "VariableDefinition"
+                            },
+                            {
+                                "prefix": [
+                                    {
+                                        "name": "x",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 21,
+                                                "line": 78
+                                            },
+                                            "start": {
+                                                "col": 20,
+                                                "line": 78
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": null,
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 27,
+                                        "line": 78
+                                    },
+                                    "start": {
+                                        "col": 20,
+                                        "line": 78
+                                    }
+                                },
+                                "tag": "ListPattern"
+                            }
+                        ],
+                        "rest": {
+                            "alias": {
+                                "name": "blah",
+                                "tag": "VariableDefinition"
+                            },
+                            "pattern": {
+                                "prefix": [
+                                    {
+                                        "name": "b",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 35,
+                                                "line": 78
+                                            },
+                                            "start": {
+                                                "col": 34,
+                                                "line": 78
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": {
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 40,
+                                            "line": 78
+                                        },
+                                        "start": {
+                                            "col": 39,
+                                            "line": 78
+                                        }
+                                    },
+                                    "tag": "AnythingPattern"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 40,
+                                        "line": 78
+                                    },
+                                    "start": {
+                                        "col": 34,
+                                        "line": 78
+                                    }
+                                },
+                                "tag": "ListPattern"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 49,
+                                    "line": 78
+                                },
+                                "start": {
+                                    "col": 33,
+                                    "line": 78
+                                }
+                            },
+                            "tag": "PatternAlias"
+                        },
                         "sourceLocation": {
                             "end": {
                                 "col": 50,
@@ -712,7 +1102,7 @@
                                 "line": 78
                             }
                         },
-                        "value": "TODO: Pattern (ConsPattern {first_cp = C Nothing (Fix {unFix = at 78 14 78 15 (VarPattern (LowercaseIdentifier \"a\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 78 20 78 27 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 78 20 78 21 (VarPattern (LowercaseIdentifier \"x\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 78 25 78 27 (EmptyListPattern [])})]})}),C ([],[],Nothing) (Fix {unFix = at 78 33 78 49 (Alias (C [] (Fix {unFix = at 78 34 78 40 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 78 34 78 35 (VarPattern (LowercaseIdentifier \"b\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 78 39 78 40 Anything})]})})) (C [] (LowercaseIdentifier \"blah\")))})]})"
+                        "tag": "ListPattern"
                     },
                     "type": null
                 }
