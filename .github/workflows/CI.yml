@@ -16,6 +16,7 @@ jobs:
     strategy:
       matrix:
         os:
+        - ubuntu-latest
         - windows-latest
         # - macOS-latest
 
@@ -27,11 +28,11 @@ jobs:
       run: |
         git config --global core.autocrlf false
     - uses: actions/checkout@v2
-    - uses: actions/setup-haskell@v1.1.4
+    - uses: haskell/actions/setup@v1
       name: Setup Haskell
       id: setup-haskell
       with:
-        ghc-version: 8.10.3
+        ghc-version: 8.10.4
     - uses: actions/cache@v2
       name: Cache cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:

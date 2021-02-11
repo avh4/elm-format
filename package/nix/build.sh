@@ -1,7 +1,9 @@
-#!/bin/bash
+#! /usr/bin/env nix-shell
+#! nix-shell -i bash -p git cabal2nix
 
 set -exo pipefail
 
+REV="$(git rev-parse HEAD)"
 ELM_FORMAT_VERSION="$(git describe --abbrev=8)"
 BRANCH="elm-format-$ELM_FORMAT_VERSION"
 
@@ -22,6 +24,11 @@ fi
 popd
 
 cabal2nix --no-check cabal://indents-0.3.3 > nixpkgs/pkgs/development/compilers/elm/packages/indents.nix
+cabal2nix cabal://bimap-0.3.3 > nixpkgs/pkgs/development/compilers/elm/packages/bimap.nix
+cabal2nix --no-haddock https://github.com/avh4/elm-format --revision "$REV" --subpath avh4-lib > nixpkgs/pkgs/development/compilers/elm/packages/avh4-lib.nix
+cabal2nix --no-haddock https://github.com/avh4/elm-format --revision "$REV" --subpath elm-format-lib > nixpkgs/pkgs/development/compilers/elm/packages/elm-format-lib.nix
+cabal2nix --no-haddock https://github.com/avh4/elm-format --revision "$REV" --subpath elm-format-test-lib > nixpkgs/pkgs/development/compilers/elm/packages/elm-format-test-lib.nix
+cabal2nix --no-haddock https://github.com/avh4/elm-format --revision "$REV" --subpath elm-format-markdown > nixpkgs/pkgs/development/compilers/elm/packages/elm-format-markdown.nix
 ./generate_derivation.sh > nixpkgs/pkgs/development/compilers/elm/packages/elm-format.nix
 
 pushd nixpkgs
