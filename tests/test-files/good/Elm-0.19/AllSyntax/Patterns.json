@@ -631,6 +631,16 @@
             "parameters": [
                 {
                     "pattern": {
+                        "fields": [
+                            {
+                                "name": "a",
+                                "tag": "VariableDefinition"
+                            },
+                            {
+                                "name": "b",
+                                "tag": "VariableDefinition"
+                            }
+                        ],
                         "sourceLocation": {
                             "end": {
                                 "col": 16,
@@ -641,7 +651,7 @@
                                 "line": 72
                             }
                         },
-                        "value": "TODO: Pattern (RecordPattern [C ([],[]) (LowercaseIdentifier \"a\"),C ([],[]) (LowercaseIdentifier \"b\")])"
+                        "tag": "RecordPattern"
                     },
                     "type": null
                 }
@@ -667,6 +677,7 @@
             "parameters": [
                 {
                     "pattern": {
+                        "fields": [],
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
@@ -677,12 +688,13 @@
                                 "line": 76
                             }
                         },
-                        "value": "TODO: Pattern (EmptyRecordPattern [])"
+                        "tag": "RecordPattern"
                     },
                     "type": null
                 },
                 {
                     "pattern": {
+                        "fields": [],
                         "sourceLocation": {
                             "end": {
                                 "col": 14,
@@ -693,12 +705,13 @@
                                 "line": 77
                             }
                         },
-                        "value": "TODO: Pattern (EmptyRecordPattern [BlockComment [\"1\"]])"
+                        "tag": "RecordPattern"
                     },
                     "type": null
                 },
                 {
                     "pattern": {
+                        "fields": [],
                         "sourceLocation": {
                             "end": {
                                 "col": 6,
@@ -709,7 +722,7 @@
                                 "line": 78
                             }
                         },
-                        "value": "TODO: Pattern (EmptyRecordPattern [LineComment \"2\"])"
+                        "tag": "RecordPattern"
                     },
                     "type": null
                 }

@@ -48,6 +48,9 @@ data Pattern
     | ListPattern
         { terms :: List (Located Pattern)
         }
+    | RecordPattern
+        { fields :: List VariableDefinition
+        }
     | PatternAlias
         { alias :: VariableDefinition
         , pattern :: Located Pattern
@@ -90,6 +93,13 @@ fromRawAST' = \case
     AST.ListPattern terms ->
         ListPattern
             (fmap (fromRawAST . (\(C comments a) -> a)) terms)
+
+    AST.EmptyRecordPattern comment ->
+        RecordPattern []
+
+    AST.RecordPattern fields ->
+        RecordPattern
+            (fmap (VariableDefinition . (\(C comments a) -> a)) fields)
 
     AST.Alias (C comments1 pat) (C comments2 name) ->
         PatternAlias
@@ -273,6 +283,12 @@ instance ToJSON Pattern where
             makeObj
                 [ type_ "ListPattern"
                 , ( "terms", showJSON terms )
+                ]
+
+        RecordPattern fields ->
+            makeObj
+                [ type_ "RecordPattern"
+                , ( "fields", showJSON fields )
                 ]
 
         PatternAlias alias pat ->

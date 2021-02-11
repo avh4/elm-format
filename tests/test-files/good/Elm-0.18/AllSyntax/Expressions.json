@@ -2719,6 +2719,16 @@
                 },
                 "parameters": [
                     {
+                        "fields": [
+                            {
+                                "name": "x",
+                                "tag": "VariableDefinition"
+                            },
+                            {
+                                "name": "y",
+                                "tag": "VariableDefinition"
+                            }
+                        ],
                         "sourceLocation": {
                             "end": {
                                 "col": 7,
@@ -2729,7 +2739,7 @@
                                 "line": 258
                             }
                         },
-                        "value": "TODO: Pattern (RecordPattern [C ([],[]) (LowercaseIdentifier \"x\"),C ([LineComment \"A\"],[]) (LowercaseIdentifier \"y\")])"
+                        "tag": "RecordPattern"
                     }
                 ],
                 "tag": "AnonymousFunction"
