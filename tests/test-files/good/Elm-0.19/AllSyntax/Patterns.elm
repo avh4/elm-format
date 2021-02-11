@@ -65,6 +65,16 @@ consList
     ()
 
 
+equivalentCons
+    ( [ y, x ]
+    , y :: [ x ]
+    , y :: x :: []
+      -- keep multiline
+    )
+    =
+    ()
+
+
 complexCons (a :: (x :: []) :: ((b :: _) as blah)) =
     ()
 
