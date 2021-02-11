@@ -436,7 +436,37 @@
                                 "line": 40
                             }
                         },
-                        "value": "TODO: Pattern (ListPattern [C ([],[]) (Fix {unFix = at 40 8 40 9 (VarPattern (LowercaseIdentifier \"a\"))}),C ([],[]) (Fix {unFix = at 40 11 40 12 (VarPattern (LowercaseIdentifier \"b\"))})])"
+                        "tag": "ListPattern",
+                        "terms": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 40
+                                    },
+                                    "start": {
+                                        "col": 8,
+                                        "line": 40
+                                    }
+                                },
+                                "tag": "VariableDefinition"
+                            },
+                            {
+                                "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 40
+                                    },
+                                    "start": {
+                                        "col": 11,
+                                        "line": 40
+                                    }
+                                },
+                                "tag": "VariableDefinition"
+                            }
+                        ]
                     },
                     "type": null
                 }

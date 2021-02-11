@@ -87,6 +87,10 @@ fromRawAST' = \case
     AST.EmptyListPattern comments ->
         ListPattern []
 
+    AST.ListPattern terms ->
+        ListPattern
+            (fmap (fromRawAST . (\(C comments a) -> a)) terms)
+
     AST.Alias (C comments1 pat) (C comments2 name) ->
         PatternAlias
             (VariableDefinition name)
