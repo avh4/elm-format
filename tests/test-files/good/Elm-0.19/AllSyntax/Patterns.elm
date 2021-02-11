@@ -25,7 +25,7 @@ unit () =
     ()
 
 
-parens v =
+parens ({- A -} v {- B -}) =
     ()
 
 
