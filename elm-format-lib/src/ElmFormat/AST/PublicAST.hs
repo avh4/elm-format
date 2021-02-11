@@ -141,8 +141,14 @@ fromRawAST =
 --
 
 
+data Config =
+    Config
+        { showSourceLocation :: Bool
+        }
+
+
 class ToJSON a where
-  showJSON :: a -> JSValue
+  showJSON :: Config -> a -> JSValue
 
 
 addField :: ( String, JSValue ) -> JSValue -> JSValue
@@ -166,29 +172,31 @@ type_ t =
 
 
 instance ToJSON a => ToJSON [a] where
-    showJSON = JSArray . fmap showJSON
+    showJSON c = JSArray . fmap (showJSON c)
 
 
 instance ToJSON a => ToJSON (Maybe a) where
-    showJSON Nothing = JSNull
-    showJSON (Just a) = showJSON a
+    showJSON _ Nothing = JSNull
+    showJSON c (Just a) = showJSON c a
 
 
 instance ToJSON a => ToJSON (Located a) where
-    showJSON (A region a) =
-        addField ( "sourceLocation", showJSON region ) (showJSON a)
+    showJSON c (A region a) =
+        if showSourceLocation c
+            then addField ( "sourceLocation", showJSON c region ) (showJSON c a)
+            else showJSON c a
 
 
 instance ToJSON Region where
-    showJSON region =
+    showJSON c region =
         makeObj
-            [ ( "start", showJSON $ Region.start region )
-            , ( "end", showJSON $ Region.end region )
+            [ ( "start", showJSON c $ Region.start region )
+            , ( "end", showJSON c $ Region.end region )
             ]
 
 
 instance ToJSON Region.Position where
-    showJSON pos =
+    showJSON _ pos =
         makeObj
             [ ( "line", JSRational False $ toRational $ Region.line pos )
             , ( "col", JSRational False $ toRational $ Region.column pos )
@@ -196,42 +204,42 @@ instance ToJSON Region.Position where
 
 
 instance ToJSON UppercaseIdentifier where
-    showJSON (UppercaseIdentifier name) = JSString $ toJSString name
+    showJSON _ (UppercaseIdentifier name) = JSString $ toJSString name
 
 
 instance ToJSON LowercaseIdentifier where
-    showJSON (LowercaseIdentifier name) = JSString $ toJSString name
+    showJSON _ (LowercaseIdentifier name) = JSString $ toJSString name
 
 
 instance ToJSON IntRepresentation where
-    showJSON DecimalInt = JSString $ toJSString "DecimalInt"
-    showJSON HexadecimalInt = JSString $ toJSString "HexadecimalInt"
+    showJSON _ DecimalInt = JSString $ toJSString "DecimalInt"
+    showJSON _ HexadecimalInt = JSString $ toJSString "HexadecimalInt"
 
 
 instance ToJSON FloatRepresentation where
-    showJSON DecimalFloat = JSString $ toJSString "DecimalFloat"
-    showJSON ExponentFloat = JSString $ toJSString "ExponentFloat"
+    showJSON _ DecimalFloat = JSString $ toJSString "DecimalFloat"
+    showJSON _ ExponentFloat = JSString $ toJSString "ExponentFloat"
 
 
 instance ToJSON StringRepresentation where
-    showJSON SingleQuotedString = JSString $ toJSString "SingleQuotedString"
-    showJSON TripleQuotedString = JSString $ toJSString "TripleQuotedString"
+    showJSON _ SingleQuotedString = JSString $ toJSString "SingleQuotedString"
+    showJSON _ TripleQuotedString = JSString $ toJSString "TripleQuotedString"
 
 
 instance ToJSON ModuleName where
-    showJSON (ModuleName []) = JSNull
-    showJSON (ModuleName namespace) = (JSString . toJSString . List.intercalate "." . fmap (\(UppercaseIdentifier v) -> v)) namespace
+    showJSON _ (ModuleName []) = JSNull
+    showJSON _ (ModuleName namespace) = (JSString . toJSString . List.intercalate "." . fmap (\(UppercaseIdentifier v) -> v)) namespace
 
 
 instance ToJSON AST.LiteralValue where
-    showJSON = \case
+    showJSON c = \case
         IntNum value repr ->
             makeObj
                 [ type_ "IntLiteral"
                 , ("value", JSRational False $ toRational value)
                 , ("display"
                 , makeObj
-                    [ ("representation", showJSON repr)
+                    [ ("representation", showJSON c repr)
                     ]
                 )
                 ]
@@ -242,7 +250,7 @@ instance ToJSON AST.LiteralValue where
                 , ("value", JSRational False $ toRational value)
                 , ("display"
                 , makeObj
-                    [ ("representation", showJSON repr)
+                    [ ("representation", showJSON c repr)
                     ]
                 )
                 ]
@@ -266,14 +274,14 @@ instance ToJSON AST.LiteralValue where
                 , ("value", JSString $ toJSString str)
                 , ( "display"
                 , makeObj
-                    [ ( "representation", showJSON repr )
+                    [ ( "representation", showJSON c repr )
                     ]
                 )
                 ]
 
 
 instance ToJSON Pattern where
-    showJSON = \case
+    showJSON c = \case
         AnythingPattern ->
             makeObj
                 [ type_ "AnythingPattern"
@@ -285,57 +293,57 @@ instance ToJSON Pattern where
                 ]
 
         LiteralPattern lit ->
-            showJSON lit
+            showJSON c lit
 
         VariablePattern def ->
-            showJSON def
+            showJSON c def
 
         DataPattern constructor arguments ->
             makeObj
                 [ type_ "DataPattern"
-                , ( "constructor", showJSON constructor )
-                , ( "arguments", showJSON arguments )
+                , ( "constructor", showJSON c constructor )
+                , ( "arguments", showJSON c arguments )
                 ]
 
         TuplePattern terms ->
             makeObj
                 [ type_ "TuplePattern"
-                , ( "terms", showJSON terms )
+                , ( "terms", showJSON c terms )
                 ]
 
         ListPattern prefix rest ->
             makeObj
                 [ type_ "ListPattern"
-                , ( "prefix", showJSON prefix )
-                , ( "rest", showJSON rest )
+                , ( "prefix", showJSON c prefix )
+                , ( "rest", showJSON c rest )
                 ]
 
         RecordPattern fields ->
             makeObj
                 [ type_ "RecordPattern"
-                , ( "fields", showJSON fields )
+                , ( "fields", showJSON c fields )
                 ]
 
         PatternAlias alias pat ->
             makeObj
                 [ type_ "PatternAlias"
-                , ( "alias", showJSON alias )
-                , ( "pattern", showJSON pat )
+                , ( "alias", showJSON c alias )
+                , ( "pattern", showJSON c pat )
                 ]
 
 
 instance ToJSON ExternalReference where
-    showJSON (ExternalReference module_ identifier) =
+    showJSON c (ExternalReference module_ identifier) =
         makeObj
             [ type_ "ExternalReference"
-            , ("module", showJSON module_)
-            , ("identifier", showJSON identifier)
+            , ("module", showJSON c module_)
+            , ("identifier", showJSON c identifier)
             ]
 
 
 instance ToJSON VariableDefinition where
-    showJSON (VariableDefinition name) =
+    showJSON c (VariableDefinition name) =
         makeObj
             [ type_ "VariableDefinition"
-            , ( "name" , showJSON name )
+            , ( "name" , showJSON c name )
             ]

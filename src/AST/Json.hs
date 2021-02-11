@@ -53,17 +53,20 @@ showModule modu@(Module _ maybeHeader _ (C _ imports) body) =
             ( name
             , makeObj
                 [ ( "as", JSString $ toJSString $ maybe name (\(C _ (UppercaseIdentifier n)) -> n) alias)
-                , ( "exposing", showImportListingJSON exposing )
+                , ( "exposing", showImportListingJSON c exposing )
                 ]
             )
 
         normalize =
             mapNs (fromMatched []) . matchReferences importInfo
+
+        c =
+            PublicAST.Config True
     in
     makeObj
-        [ ( "moduleName", showJSON $ ModuleName name )
+        [ ( "moduleName", showJSON c $ ModuleName name )
         , ( "imports", makeObj $ fmap importJson $ Map.toList imports )
-        , ( "body", JSArray $ fmap showJSON $ mergeDeclarations $ normalize body )
+        , ( "body", JSArray $ fmap (showJSON c) $ mergeDeclarations $ normalize body )
         ]
 
 
@@ -132,10 +135,10 @@ mergeDeclarations (I.Fix (A _ (TopLevel decls))) =
     mapMaybe merge decls
 
 
-showImportListingJSON :: Listing DetailedListing -> JSValue
-showImportListingJSON (ExplicitListing a _) = showJSON a
-showImportListingJSON (OpenListing (C _ ())) = JSString $ toJSString "Everything"
-showImportListingJSON ClosedListing = JSNull
+showImportListingJSON :: PublicAST.Config -> Listing DetailedListing -> JSValue
+showImportListingJSON c (ExplicitListing a _) = showJSON c a
+showImportListingJSON _ (OpenListing (C _ ())) = JSString $ toJSString "Everything"
+showImportListingJSON _ ClosedListing = JSNull
 
 
 showTagListingJSON :: Listing (CommentedMap UppercaseIdentifier ()) -> JSValue
@@ -146,7 +149,7 @@ showTagListingJSON ClosedListing = JSString $ toJSString "NoTags"
 
 
 instance ToJSON DetailedListing where
-    showJSON (DetailedListing values _operators types) =
+    showJSON _ (DetailedListing values _operators types) =
         makeObj
             [ ( "values", makeObj $ fmap (\(LowercaseIdentifier k) -> (k, JSBool True)) $ Map.keys values )
             , ( "types", makeObj $ fmap (\(UppercaseIdentifier k, (C _ (C _ listing))) -> (k, showTagListingJSON listing)) $ Map.toList types )
@@ -154,54 +157,54 @@ instance ToJSON DetailedListing where
 
 
 instance ToJSON (MergedTopLevelStructure [UppercaseIdentifier]) where
-    showJSON (TodoTopLevelStructure what) =
+    showJSON _ (TodoTopLevelStructure what) =
         JSString $ toJSString ("TODO: " ++ what)
-    showJSON (MergedDefinition region name args _ expression doc annotation) =
+    showJSON c (MergedDefinition region name args _ expression doc annotation) =
         makeObj
             [ type_ "Definition"
-            , ( "name" , showJSON name )
-            , ( "parameters", JSArray $ fmap mergedParameter args )
-            , ( "returnType", maybe JSNull (\(_, _, t) -> showJSON t) annotation )
-            , ( "expression" , showJSON expression )
+            , ( "name" , showJSON c name )
+            , ( "parameters", JSArray $ fmap (mergedParameter c) args )
+            , ( "returnType", maybe JSNull (\(_, _, t) -> showJSON c t) annotation )
+            , ( "expression" , showJSON c expression )
             , sourceLocation region
             ]
-    showJSON (MergedTypeAlias region preAlias name args (C c t)) =
+    showJSON c (MergedTypeAlias region preAlias name args (C comments t)) =
         makeObj
             [ type_ "TypeAlias"
-            , ( "name", showJSON name )
-            , ( "type", showJSON t)
+            , ( "name", showJSON c name )
+            , ( "type", showJSON c t)
             , sourceLocation region
             ]
 
 
-mergedParameter :: C1 Before (ASTNS Located [UppercaseIdentifier] 'PatternNK) -> JSValue
-mergedParameter (C comments pattern) =
+mergedParameter :: PublicAST.Config -> C1 Before (ASTNS Located [UppercaseIdentifier] 'PatternNK) -> JSValue
+mergedParameter c (C comments pattern) =
     makeObj
-        [ ( "pattern", showJSON $ PublicAST.fromRawAST pattern )
+        [ ( "pattern", showJSON c $ PublicAST.fromRawAST pattern )
         , ( "type", JSNull ) -- TODO
         ]
 
 
 -- instance ToJSON (TopLevelStructure Declaration) where
---   showJSON (Entry (A region (Definition (A _ (VarPattern var)) _ _ expr))) =
+--   showJSON c (Entry (A region (Definition (A _ (VarPattern var)) _ _ expr))) =
 --     makeObj
 --       [ type_ "Definition"
---       , ( "name" , showJSON var )
+--       , ( "name" , showJSON c var )
 --       , ( "returnType", JSNull )
---       , ( "expression" , showJSON expr )
+--       , ( "expression" , showJSON c expr )
 --       , sourceLocation region
 --       ]
---   showJSON _ = JSString $ toJSString "TODO: Decl"
+--   showJSON _ _ = JSString $ toJSString "TODO: Decl"
 
 
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
-  showJSON (I.Fix (A region expr)) =
+  showJSON c (I.Fix (A region expr)) =
       case expr of
           Unit comments ->
               makeObj [ type_ "UnitLiteral" ]
 
           Literal lit ->
-              showJSON (A region lit)
+              showJSON c (A region lit)
 
           VarExpr (VarRef [] (LowercaseIdentifier var)) ->
             variableReference region var
@@ -209,8 +212,8 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
           VarExpr (VarRef namespace var) ->
               makeObj
                   [ type_ "ExternalReference"
-                  , ("module", showJSON $ ModuleName namespace)
-                  , ("identifier", showJSON var)
+                  , ("module", showJSON c $ ModuleName namespace)
+                  , ("identifier", showJSON c var)
                   , sourceLocation region
                   ]
 
@@ -220,7 +223,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
           VarExpr (TagRef namespace (UppercaseIdentifier var)) ->
               makeObj
                   [ type_ "ExternalReference"
-                  , ("module", showJSON $ ModuleName namespace)
+                  , ("module", showJSON c $ ModuleName namespace)
                   , ("identifier", JSString $ toJSString var)
                   , sourceLocation region
                   ]
@@ -231,20 +234,20 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
           App expr args _ ->
               makeObj
                   [ type_ "FunctionApplication"
-                  , ("function", showJSON expr)
-                  , ("arguments", JSArray $ showJSON <$> map extract args)
+                  , ("function", showJSON c expr)
+                  , ("arguments", JSArray $ showJSON c <$> map extract args)
                   ]
 
           Binops first rest _ ->
               makeObj
                   [ type_ "BinaryOperatorList"
-                  , ("first", showJSON first)
+                  , ("first", showJSON c first)
                   , ("operations"
                     , JSArray $ map
                         (\(BinopsClause _ op _ expr) ->
                            makeObj
-                               [ ("operator", showJSON $ (I.Fix $ noRegion $ VarExpr op :: ASTNS Located [UppercaseIdentifier] 'ExpressionNK))
-                               , ("term", showJSON expr)
+                               [ ("operator", showJSON c $ (I.Fix $ noRegion $ VarExpr op :: ASTNS Located [UppercaseIdentifier] 'ExpressionNK))
+                               , ("term", showJSON c expr)
                                ]
                         )
                         rest
@@ -255,22 +258,22 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
             makeObj
                 [ type_ "UnaryOperator"
                 , ("operator", JSString $ toJSString "-")
-                , ("term", showJSON expr)
+                , ("term", showJSON c expr)
                 ]
 
           Parens (C comments expr) ->
-              showJSON expr
+              showJSON c expr
 
           ExplicitList terms _ _ ->
               makeObj
                   [ type_ "ListLiteral"
-                  , ("terms", JSArray $ fmap showJSON $ toList terms)
+                  , ("terms", JSArray $ fmap (showJSON c) $ toList terms)
                   ]
 
           Tuple exprs _ ->
               makeObj
                   [ type_ "TupleLiteral"
-                  , ("terms", JSArray $ fmap showJSON (map extract exprs))
+                  , ("terms", JSArray $ fmap (showJSON c) (map extract exprs))
                   ]
 
           TupleFunction n | n <= 1 ->
@@ -280,20 +283,20 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
             variableReference region $ replicate (n-1) ','
 
           Record base fields _ _ ->
-              recordJSON "RecordLiteral" "RecordUpdate" base fields
+              recordJSON c "RecordLiteral" "RecordUpdate" base fields
 
           Access base field ->
             makeObj
                 [ type_ "RecordAccess"
-                , ( "record", showJSON base )
-                , ( "field", showJSON field )
+                , ( "record", showJSON c base )
+                , ( "field", showJSON c field )
                 ]
 
           Lambda parameters _ body _ ->
               makeObj
                   [ type_ "AnonymousFunction"
-                  , ("parameters", JSArray $ fmap (showJSON . PublicAST.fromRawAST . extract) parameters)
-                  , ("body", showJSON body)
+                  , ("parameters", JSArray $ fmap (showJSON c . PublicAST.fromRawAST . extract) parameters)
+                  , ("body", showJSON c body)
                   ]
 
           If (IfClause (C _ cond') (C _ thenBody')) rest' (C _ elseBody) ->
@@ -302,12 +305,12 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
                   ifThenElse cond thenBody rest =
                       makeObj
                           [ type_ "IfExpression"
-                          , ( "if", showJSON cond )
-                          , ( "then", showJSON thenBody )
+                          , ( "if", showJSON c cond )
+                          , ( "then", showJSON c thenBody )
                           , ( "else"
                             , case rest of
                                 [] ->
-                                    showJSON elseBody
+                                    showJSON c elseBody
 
                                 C _ (IfClause (C _ nextCond) (C _ nextBody)) : nextRest ->
                                     ifThenElse nextCond nextBody nextRest
@@ -319,20 +322,20 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
           Let decls _ body ->
               makeObj
                   [ type_ "LetExpression"
-                  , ( "declarations", JSArray $ map showJSON decls)
-                  , ("body", showJSON body)
+                  , ( "declarations", JSArray $ map (showJSON c) decls)
+                  , ("body", showJSON c body)
                   ]
 
           Case (C _ subject, _) branches ->
               makeObj
                   [ type_ "CaseExpression"
-                  , ( "subject", showJSON subject )
+                  , ( "subject", showJSON c subject )
                   , ( "branches"
                     , JSArray $ map
                         (\(I.Fix (A _ (CaseBranch _ _ _ pat body))) ->
                            makeObj
-                               [ ("pattern", showJSON $ PublicAST.fromRawAST pat)
-                               , ("body", showJSON body)
+                               [ ("pattern", showJSON c $ PublicAST.fromRawAST pat)
+                               , ("body", showJSON c body)
                                ]
                         )
                         branches
@@ -345,7 +348,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
           AccessFunction field ->
               makeObj
                   [ type_ "RecordAccess"
-                  , ( "field", showJSON field )
+                  , ( "field", showJSON c field )
                   , sourceLocation region
                   ]
 
@@ -353,14 +356,14 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) where
               JSString $ toJSString "TODO: GLShader"
 
 
-recordJSON :: (ToJSON base, ToJSON value) => String -> String -> Maybe (C2 Before After base) -> Sequence (Pair LowercaseIdentifier value) -> JSValue
-recordJSON tag extensionTag base fields =
+recordJSON :: (ToJSON base, ToJSON value) => PublicAST.Config -> String -> String -> Maybe (C2 Before After base) -> Sequence (Pair LowercaseIdentifier value) -> JSValue
+recordJSON c tag extensionTag base fields =
     let
         fieldsJSON =
             ( "fields"
             , makeObj $ fmap
                 (\(Pair (C _ (LowercaseIdentifier key)) (C _ value) _) ->
-                    (key, showJSON value)
+                    (key, showJSON c value)
                 )
                 $ toList fields
             )
@@ -368,7 +371,7 @@ recordJSON tag extensionTag base fields =
         fieldOrder =
             ( "fieldOrder"
             , JSArray $
-                fmap (\(Pair (C _ key) _ _) -> showJSON key) $
+                fmap (\(Pair (C _ key) _ _) -> showJSON c key) $
                 toList fields
             )
     in
@@ -376,7 +379,7 @@ recordJSON tag extensionTag base fields =
         Just (C _ identifier) ->
             makeObj
                 [ type_ extensionTag
-                , ("base", showJSON identifier)
+                , ("base", showJSON c identifier)
                 , fieldsJSON
                 , ( "display"
                 , makeObj
@@ -408,17 +411,17 @@ variableReference region name =
 
 sourceLocation :: Region.Region -> (String, JSValue)
 sourceLocation region =
-    ( "sourceLocation", showJSON region )
+    ( "sourceLocation", showJSON undefined region )
 
 
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'LetDeclarationNK) where
-  showJSON letDeclaration =
+  showJSON c letDeclaration =
       case extract $ I.unFix letDeclaration of
           LetDefinition (I.Fix (A _ (VarPattern var))) [] _ expr ->
               makeObj
                   [ type_ "Definition"
-                  , ("name" , showJSON var)
-                  , ("expression" , showJSON expr)
+                  , ("name" , showJSON c var)
+                  , ("expression" , showJSON c expr)
                   ]
 
           _ ->
@@ -426,7 +429,7 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'LetDeclarationNK) where
 
 
 instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
-    showJSON (I.Fix (A region type')) =
+    showJSON c (I.Fix (A region type')) =
         case type' of
             UnitType comments ->
                 makeObj
@@ -437,39 +440,39 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
             TypeConstruction (NamedConstructor (namespace, name)) args forceMultine ->
                 makeObj
                     [ type_ "TypeReference"
-                    , ( "name", showJSON name )
-                    , ( "module", showJSON $ ModuleName namespace )
-                    , ( "arguments", JSArray $ fmap (showJSON . extract) args )
+                    , ( "name", showJSON c name )
+                    , ( "module", showJSON c $ ModuleName namespace )
+                    , ( "arguments", JSArray $ fmap (showJSON c . extract) args )
                     , sourceLocation region
                     ]
 
             TypeVariable name ->
                 makeObj
                     [ type_ "TypeVariable"
-                    , ( "name", showJSON name )
+                    , ( "name", showJSON c name )
                     , sourceLocation region
                     ]
 
             TypeParens (C comments t) ->
-                showJSON t
+                showJSON c t
 
             TupleType terms multiline ->
                 makeObj
                     [ type_ "TupleType"
-                    , ("terms", JSArray $ fmap showJSON (map extract terms))
+                    , ("terms", JSArray $ fmap (showJSON c) (map extract terms))
                     , sourceLocation region
                     ]
 
             RecordType base fields comments multiline ->
-                recordJSON "RecordType" "RecordTypeExtension" base fields
+                recordJSON c "RecordType" "RecordTypeExtension" base fields
 
             FunctionType first rest _ ->
                 case firstRestToRestLast first (sequenceToList rest) of
                     (args, C _ last) ->
                         makeObj
                             [ type_ "FunctionType"
-                            , ( "returnType", showJSON last)
-                            , ( "argumentTypes", JSArray $ fmap (\(C _ t) -> showJSON t) $ args )
+                            , ( "returnType", showJSON c last)
+                            , ( "argumentTypes", JSArray $ fmap (\(C _ t) -> showJSON c t) $ args )
                             , sourceLocation region
                             ]
         where
