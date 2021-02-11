@@ -2792,7 +2792,19 @@
                     "tag": "UnitLiteral"
                 },
                 "parameters": [
-                    "TODO: Pattern (RecordPattern [C ([],[]) (LowercaseIdentifier \"x\"),C ([LineComment \"A\"],[]) (LowercaseIdentifier \"y\")])"
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 7,
+                                "line": 268
+                            },
+                            "start": {
+                                "col": 6,
+                                "line": 265
+                            }
+                        },
+                        "value": "TODO: Pattern (RecordPattern [C ([],[]) (LowercaseIdentifier \"x\"),C ([LineComment \"A\"],[]) (LowercaseIdentifier \"y\")])"
+                    }
                 ],
                 "tag": "AnonymousFunction"
             },

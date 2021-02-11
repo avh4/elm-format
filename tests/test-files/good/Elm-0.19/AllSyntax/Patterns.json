@@ -322,7 +322,19 @@
             "name": "tuple",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (TuplePattern [C ([],[]) (Fix {unFix = at 32 9 32 10 (VarPattern (LowercaseIdentifier \"a\"))}),C ([],[]) (Fix {unFix = at 32 12 32 13 (VarPattern (LowercaseIdentifier \"b\"))})])",
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 32
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 32
+                            }
+                        },
+                        "value": "TODO: Pattern (TuplePattern [C ([],[]) (Fix {unFix = at 32 9 32 10 (VarPattern (LowercaseIdentifier \"a\"))}),C ([],[]) (Fix {unFix = at 32 12 32 13 (VarPattern (LowercaseIdentifier \"b\"))})])"
+                    },
                     "type": null
                 }
             ],
@@ -346,7 +358,19 @@
             "name": "emptyList",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (EmptyListPattern [])",
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 13,
+                                "line": 36
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 36
+                            }
+                        },
+                        "value": "TODO: Pattern (EmptyListPattern [])"
+                    },
                     "type": null
                 }
             ],
@@ -370,7 +394,19 @@
             "name": "list",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (ListPattern [C ([],[]) (Fix {unFix = at 40 8 40 9 (VarPattern (LowercaseIdentifier \"a\"))}),C ([],[]) (Fix {unFix = at 40 11 40 12 (VarPattern (LowercaseIdentifier \"b\"))})])",
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 40
+                            },
+                            "start": {
+                                "col": 6,
+                                "line": 40
+                            }
+                        },
+                        "value": "TODO: Pattern (ListPattern [C ([],[]) (Fix {unFix = at 40 8 40 9 (VarPattern (LowercaseIdentifier \"a\"))}),C ([],[]) (Fix {unFix = at 40 11 40 12 (VarPattern (LowercaseIdentifier \"b\"))})])"
+                    },
                     "type": null
                 }
             ],
@@ -394,7 +430,19 @@
             "name": "consList",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (TuplePattern [C ([],[]) (Fix {unFix = at 45 7 45 18 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 45 7 45 8 (VarPattern (LowercaseIdentifier \"a\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 45 12 45 13 (VarPattern (LowercaseIdentifier \"b\"))}),C ([],[],Nothing) (Fix {unFix = at 45 17 45 18 (VarPattern (LowercaseIdentifier \"c\"))})]})}),C ([],[]) (Fix {unFix = at 46 7 46 50 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 46 7 46 8 (VarPattern (LowercaseIdentifier \"a\"))}), rest_cp = Sequence [C ([BlockComment [\"1\"]],[BlockComment [\"2\"]],Nothing) (Fix {unFix = at 46 28 46 29 (VarPattern (LowercaseIdentifier \"b\"))}),C ([BlockComment [\"3\"]],[BlockComment [\"4\"]],Nothing) (Fix {unFix = at 46 49 46 50 (VarPattern (LowercaseIdentifier \"c\"))})]})}),C ([LineComment \"0\"],[LineComment \"5\"]) (Fix {unFix = at 48 7 53 13 (ConsPattern {first_cp = C (Just \"1\") (Fix {unFix = at 48 7 48 8 (VarPattern (LowercaseIdentifier \"d\"))}), rest_cp = Sequence [C ([],[LineComment \"2\"],Nothing) (Fix {unFix = at 50 12 50 13 (VarPattern (LowercaseIdentifier \"e\"))}),C ([LineComment \"3\"],[LineComment \"4\"],Nothing) (Fix {unFix = at 53 12 53 13 (VarPattern (LowercaseIdentifier \"f\"))})]})}),C ([],[]) (Fix {unFix = at 55 7 59 13 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 55 7 55 8 (VarPattern (LowercaseIdentifier \"d\"))}), rest_cp = Sequence [C ([LineComment \"E\"],[],Nothing) (Fix {unFix = at 57 12 57 13 (VarPattern (LowercaseIdentifier \"e\"))}),C ([LineComment \"F\"],[],Nothing) (Fix {unFix = at 59 12 59 13 (VarPattern (LowercaseIdentifier \"f\"))})]})}),C ([],[]) (Fix {unFix = at 60 7 62 17 (ConsPattern {first_cp = C (Just \"D\") (Fix {unFix = at 60 7 60 8 (VarPattern (LowercaseIdentifier \"d\"))}), rest_cp = Sequence [C ([],[],Just \"E\") (Fix {unFix = at 61 12 61 13 (VarPattern (LowercaseIdentifier \"e\"))}),C ([],[],Just \"F\") (Fix {unFix = at 62 12 62 13 (VarPattern (LowercaseIdentifier \"f\"))})]})})])",
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 6,
+                                "line": 63
+                            },
+                            "start": {
+                                "col": 5,
+                                "line": 45
+                            }
+                        },
+                        "value": "TODO: Pattern (TuplePattern [C ([],[]) (Fix {unFix = at 45 7 45 18 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 45 7 45 8 (VarPattern (LowercaseIdentifier \"a\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 45 12 45 13 (VarPattern (LowercaseIdentifier \"b\"))}),C ([],[],Nothing) (Fix {unFix = at 45 17 45 18 (VarPattern (LowercaseIdentifier \"c\"))})]})}),C ([],[]) (Fix {unFix = at 46 7 46 50 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 46 7 46 8 (VarPattern (LowercaseIdentifier \"a\"))}), rest_cp = Sequence [C ([BlockComment [\"1\"]],[BlockComment [\"2\"]],Nothing) (Fix {unFix = at 46 28 46 29 (VarPattern (LowercaseIdentifier \"b\"))}),C ([BlockComment [\"3\"]],[BlockComment [\"4\"]],Nothing) (Fix {unFix = at 46 49 46 50 (VarPattern (LowercaseIdentifier \"c\"))})]})}),C ([LineComment \"0\"],[LineComment \"5\"]) (Fix {unFix = at 48 7 53 13 (ConsPattern {first_cp = C (Just \"1\") (Fix {unFix = at 48 7 48 8 (VarPattern (LowercaseIdentifier \"d\"))}), rest_cp = Sequence [C ([],[LineComment \"2\"],Nothing) (Fix {unFix = at 50 12 50 13 (VarPattern (LowercaseIdentifier \"e\"))}),C ([LineComment \"3\"],[LineComment \"4\"],Nothing) (Fix {unFix = at 53 12 53 13 (VarPattern (LowercaseIdentifier \"f\"))})]})}),C ([],[]) (Fix {unFix = at 55 7 59 13 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 55 7 55 8 (VarPattern (LowercaseIdentifier \"d\"))}), rest_cp = Sequence [C ([LineComment \"E\"],[],Nothing) (Fix {unFix = at 57 12 57 13 (VarPattern (LowercaseIdentifier \"e\"))}),C ([LineComment \"F\"],[],Nothing) (Fix {unFix = at 59 12 59 13 (VarPattern (LowercaseIdentifier \"f\"))})]})}),C ([],[]) (Fix {unFix = at 60 7 62 17 (ConsPattern {first_cp = C (Just \"D\") (Fix {unFix = at 60 7 60 8 (VarPattern (LowercaseIdentifier \"d\"))}), rest_cp = Sequence [C ([],[],Just \"E\") (Fix {unFix = at 61 12 61 13 (VarPattern (LowercaseIdentifier \"e\"))}),C ([],[],Just \"F\") (Fix {unFix = at 62 12 62 13 (VarPattern (LowercaseIdentifier \"f\"))})]})})])"
+                    },
                     "type": null
                 }
             ],
@@ -418,7 +466,19 @@
             "name": "complexCons",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (ConsPattern {first_cp = C Nothing (Fix {unFix = at 68 14 68 15 (VarPattern (LowercaseIdentifier \"a\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 68 20 68 27 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 68 20 68 21 (VarPattern (LowercaseIdentifier \"x\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 68 25 68 27 (EmptyListPattern [])})]})}),C ([],[],Nothing) (Fix {unFix = at 68 33 68 49 (Alias (C [] (Fix {unFix = at 68 34 68 40 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 68 34 68 35 (VarPattern (LowercaseIdentifier \"b\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 68 39 68 40 Anything})]})})) (C [] (LowercaseIdentifier \"blah\")))})]})",
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 50,
+                                "line": 68
+                            },
+                            "start": {
+                                "col": 14,
+                                "line": 68
+                            }
+                        },
+                        "value": "TODO: Pattern (ConsPattern {first_cp = C Nothing (Fix {unFix = at 68 14 68 15 (VarPattern (LowercaseIdentifier \"a\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 68 20 68 27 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 68 20 68 21 (VarPattern (LowercaseIdentifier \"x\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 68 25 68 27 (EmptyListPattern [])})]})}),C ([],[],Nothing) (Fix {unFix = at 68 33 68 49 (Alias (C [] (Fix {unFix = at 68 34 68 40 (ConsPattern {first_cp = C Nothing (Fix {unFix = at 68 34 68 35 (VarPattern (LowercaseIdentifier \"b\"))}), rest_cp = Sequence [C ([],[],Nothing) (Fix {unFix = at 68 39 68 40 Anything})]})})) (C [] (LowercaseIdentifier \"blah\")))})]})"
+                    },
                     "type": null
                 }
             ],
@@ -442,7 +502,19 @@
             "name": "record",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (RecordPattern [C ([],[]) (LowercaseIdentifier \"a\"),C ([],[]) (LowercaseIdentifier \"b\")])",
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 16,
+                                "line": 72
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 72
+                            }
+                        },
+                        "value": "TODO: Pattern (RecordPattern [C ([],[]) (LowercaseIdentifier \"a\"),C ([],[]) (LowercaseIdentifier \"b\")])"
+                    },
                     "type": null
                 }
             ],
@@ -466,15 +538,51 @@
             "name": "emptyRecord",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (EmptyRecordPattern [])",
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 76
+                            },
+                            "start": {
+                                "col": 13,
+                                "line": 76
+                            }
+                        },
+                        "value": "TODO: Pattern (EmptyRecordPattern [])"
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (EmptyRecordPattern [BlockComment [\"1\"]])",
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 77
+                            },
+                            "start": {
+                                "col": 5,
+                                "line": 77
+                            }
+                        },
+                        "value": "TODO: Pattern (EmptyRecordPattern [BlockComment [\"1\"]])"
+                    },
                     "type": null
                 },
                 {
-                    "pattern": "TODO: Pattern (EmptyRecordPattern [LineComment \"2\"])",
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 6,
+                                "line": 79
+                            },
+                            "start": {
+                                "col": 5,
+                                "line": 78
+                            }
+                        },
+                        "value": "TODO: Pattern (EmptyRecordPattern [LineComment \"2\"])"
+                    },
                     "type": null
                 }
             ],
