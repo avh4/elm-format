@@ -1,12 +1,12 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 module ElmFormat.AST.PublicAST where
 
 import ElmFormat.AST.Shared
-import AST.V0_16 (NodeKind(..), AST)
+import AST.V0_16 (NodeKind(..))
 import qualified AST.V0_16 as AST
-import Data.Kind (Type)
 import Reporting.Annotation (Located(A))
 import Reporting.Region (Region)
 import qualified Reporting.Region as Region
@@ -14,7 +14,6 @@ import Text.JSON hiding (showJSON)
 import qualified Data.List as List
 import AST.Structure (ASTNS, ASTNS1)
 import Data.Indexed as I
-import Data.Coapplicative
 
 
 data ModuleName =
@@ -28,16 +27,24 @@ data ExternalReference
         }
 
 
+data VariableDefinition
+    = VariableDefinition
+        { name :: LowercaseIdentifier
+        }
+
+
 data Pattern
     = AnythingPattern
     | UnitPattern
     | LiteralPattern LiteralValue
-    | VariableDefinition
-        { name :: LowercaseIdentifier
-        }
+    | VariablePattern VariableDefinition
     | DataPattern
         { constructor :: ExternalReference
         , arguments :: List (Located Pattern)
+        }
+    | PatternAlias
+        { alias :: VariableDefinition
+        , pattern :: Located Pattern
         }
     | TODO_Pattern String
 
@@ -60,12 +67,17 @@ fromRawAST' = \case
         LiteralPattern lit
 
     AST.VarPattern name ->
-        VariableDefinition name
+        VariablePattern $ VariableDefinition name
 
     AST.DataPattern (namespace, tag) args ->
         DataPattern
             (ExternalReference (ModuleName namespace) tag)
-            (fmap (fromRawAST . extract) args)
+            (fmap (fromRawAST . (\(C comments a) -> a)) args)
+
+    AST.Alias (C comments1 pat) (C comments2 name) ->
+        PatternAlias
+            (VariableDefinition name)
+            (fromRawAST pat)
 
     pat ->
         TODO_Pattern (show pat)
@@ -218,18 +230,22 @@ instance ToJSON (Located Pattern) where
             LiteralPattern lit ->
                 showJSON (A region lit)
 
-            VariableDefinition name ->
-                makeObj
-                    [ type_ "VariableDefinition"
-                    , ( "name" , showJSON name )
-                    , sourceLocation region
-                    ]
+            VariablePattern def ->
+                showJSON (A region def)
 
             DataPattern constructor arguments ->
                 makeObj
                     [ type_ "DataPattern"
-                    , ( "constructor", showJSON constructor)
-                    , ( "arguments", showJSON arguments)
+                    , ( "constructor", showJSON constructor )
+                    , ( "arguments", showJSON arguments )
+                    , sourceLocation region
+                    ]
+
+            PatternAlias alias pat ->
+                makeObj
+                    [ type_ "PatternAlias"
+                    , ( "alias", showJSON alias )
+                    , ( "pattern", showJSON pat )
                     , sourceLocation region
                     ]
 
@@ -243,4 +259,21 @@ instance ToJSON ExternalReference where
             [ type_ "ExternalReference"
             , ("module", showJSON module_)
             , ("identifier", showJSON identifier)
+            ]
+
+
+instance ToJSON (Located VariableDefinition) where
+    showJSON (A region (VariableDefinition name)) =
+        makeObj
+            [ type_ "VariableDefinition"
+            , ( "name" , showJSON name )
+            , sourceLocation region
+            ]
+
+
+instance ToJSON VariableDefinition where
+    showJSON (VariableDefinition name) =
+        makeObj
+            [ type_ "VariableDefinition"
+            , ( "name" , showJSON name )
             ]

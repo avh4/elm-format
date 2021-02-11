@@ -498,7 +498,36 @@
             "name": "asAlias",
             "parameters": [
                 {
-                    "pattern": "TODO: Pattern (Alias (C [] (Fix {unFix = at 84 10 84 12 (UnitPattern [])})) (C [] (LowercaseIdentifier \"x\")))",
+                    "pattern": {
+                        "alias": {
+                            "name": "x",
+                            "tag": "VariableDefinition"
+                        },
+                        "pattern": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 12,
+                                    "line": 84
+                                },
+                                "start": {
+                                    "col": 10,
+                                    "line": 84
+                                }
+                            },
+                            "tag": "UnitPattern"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 84
+                            },
+                            "start": {
+                                "col": 10,
+                                "line": 84
+                            }
+                        },
+                        "tag": "PatternAlias"
+                    },
                     "type": null
                 }
             ],
@@ -725,19 +754,155 @@
                         "body": {
                             "tag": "UnitLiteral"
                         },
-                        "pattern": "TODO: Pattern (Alias (C [] (Fix {unFix = at 105 10 105 16 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Just\") [C [] (Fix {unFix = at 105 15 105 16 Anything})])})) (C [] (LowercaseIdentifier \"x\")))"
+                        "pattern": {
+                            "alias": {
+                                "name": "x",
+                                "tag": "VariableDefinition"
+                            },
+                            "pattern": {
+                                "arguments": [
+                                    {
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 16,
+                                                "line": 105
+                                            },
+                                            "start": {
+                                                "col": 15,
+                                                "line": 105
+                                            }
+                                        },
+                                        "tag": "AnythingPattern"
+                                    }
+                                ],
+                                "constructor": {
+                                    "identifier": "Just",
+                                    "module": "Maybe",
+                                    "tag": "ExternalReference"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 16,
+                                        "line": 105
+                                    },
+                                    "start": {
+                                        "col": 10,
+                                        "line": 105
+                                    }
+                                },
+                                "tag": "DataPattern"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 22,
+                                    "line": 105
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 105
+                                }
+                            },
+                            "tag": "PatternAlias"
+                        }
                     },
                     {
                         "body": {
                             "tag": "UnitLiteral"
                         },
-                        "pattern": "TODO: Pattern (Alias (C [] (Fix {unFix = at 108 9 108 16 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})) (C [] (LowercaseIdentifier \"x\")))"
+                        "pattern": {
+                            "alias": {
+                                "name": "x",
+                                "tag": "VariableDefinition"
+                            },
+                            "pattern": {
+                                "arguments": [],
+                                "constructor": {
+                                    "identifier": "Nothing",
+                                    "module": "Maybe",
+                                    "tag": "ExternalReference"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 16,
+                                        "line": 108
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 108
+                                    }
+                                },
+                                "tag": "DataPattern"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 21,
+                                    "line": 108
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 108
+                                }
+                            },
+                            "tag": "PatternAlias"
+                        }
                     },
                     {
                         "body": {
                             "tag": "UnitLiteral"
                         },
-                        "pattern": "TODO: Pattern (Alias (C [] (Fix {unFix = at 111 10 111 28 (Alias (C [] (Fix {unFix = at 111 10 111 23 (DataPattern ([UppercaseIdentifier \"Maybe\"],UppercaseIdentifier \"Nothing\") [])})) (C [] (LowercaseIdentifier \"y\")))})) (C [] (LowercaseIdentifier \"x\")))"
+                        "pattern": {
+                            "alias": {
+                                "name": "x",
+                                "tag": "VariableDefinition"
+                            },
+                            "pattern": {
+                                "alias": {
+                                    "name": "y",
+                                    "tag": "VariableDefinition"
+                                },
+                                "pattern": {
+                                    "arguments": [],
+                                    "constructor": {
+                                        "identifier": "Nothing",
+                                        "module": "Maybe",
+                                        "tag": "ExternalReference"
+                                    },
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 23,
+                                            "line": 111
+                                        },
+                                        "start": {
+                                            "col": 10,
+                                            "line": 111
+                                        }
+                                    },
+                                    "tag": "DataPattern"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 28,
+                                        "line": 111
+                                    },
+                                    "start": {
+                                        "col": 10,
+                                        "line": 111
+                                    }
+                                },
+                                "tag": "PatternAlias"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 34,
+                                    "line": 111
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 111
+                                }
+                            },
+                            "tag": "PatternAlias"
+                        }
                     },
                     {
                         "body": {
