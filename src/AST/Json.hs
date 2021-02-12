@@ -164,7 +164,7 @@ instance ToJSON (MergedTopLevelStructure [UppercaseIdentifier]) where
             [ type_ "Definition"
             , ( "name" , showJSON c name )
             , ( "parameters", JSArray $ fmap (mergedParameter c) args )
-            , ( "returnType", maybe JSNull (\(_, _, t) -> showJSON c t) annotation )
+            , ( "returnType", maybe JSNull (\(_, _, t) -> showJSON c $ PublicAST.typeFromRawAST t) annotation )
             , ( "expression" , showJSON c expression )
             , sourceLocation region
             ]
@@ -172,7 +172,7 @@ instance ToJSON (MergedTopLevelStructure [UppercaseIdentifier]) where
         makeObj
             [ type_ "TypeAlias"
             , ( "name", showJSON c name )
-            , ( "type", showJSON c t)
+            , ( "type", showJSON c $ PublicAST.typeFromRawAST t)
             , sourceLocation region
             ]
 
@@ -426,67 +426,6 @@ instance ToJSON (ASTNS Located [UppercaseIdentifier] 'LetDeclarationNK) where
 
           _ ->
               JSString $ toJSString $ "TODO: LetDeclaration (" ++ show letDeclaration ++ ")"
-
-
-instance ToJSON (ASTNS Located [UppercaseIdentifier] 'TypeNK) where
-    showJSON c (I.Fix (A region type')) =
-        case type' of
-            UnitType comments ->
-                makeObj
-                    [ type_ "UnitType"
-                    , sourceLocation region
-                    ]
-
-            TypeConstruction (NamedConstructor (namespace, name)) args forceMultine ->
-                makeObj
-                    [ type_ "TypeReference"
-                    , ( "name", showJSON c name )
-                    , ( "module", showJSON c $ ModuleName namespace )
-                    , ( "arguments", JSArray $ fmap (showJSON c . extract) args )
-                    , sourceLocation region
-                    ]
-
-            TypeVariable name ->
-                makeObj
-                    [ type_ "TypeVariable"
-                    , ( "name", showJSON c name )
-                    , sourceLocation region
-                    ]
-
-            TypeParens (C comments t) ->
-                showJSON c t
-
-            TupleType terms multiline ->
-                makeObj
-                    [ type_ "TupleType"
-                    , ("terms", JSArray $ fmap (showJSON c) (map extract terms))
-                    , sourceLocation region
-                    ]
-
-            RecordType base fields comments multiline ->
-                recordJSON c "RecordType" "RecordTypeExtension" base fields
-
-            FunctionType first rest _ ->
-                case firstRestToRestLast first (sequenceToList rest) of
-                    (args, C _ last) ->
-                        makeObj
-                            [ type_ "FunctionType"
-                            , ( "returnType", showJSON c last)
-                            , ( "argumentTypes", JSArray $ fmap (\(C _ t) -> showJSON c t) $ args )
-                            , sourceLocation region
-                            ]
-        where
-            firstRestToRestLast :: C0Eol x -> List (C2Eol a b x) -> (List (C2Eol a b x), C0Eol x)
-            firstRestToRestLast first rest =
-                done $ foldl (flip step) (ReversedList.empty, first) rest
-                where
-                    step :: C2Eol a b x -> (Reversed (C2Eol a b x), C0Eol x) -> (Reversed (C2Eol a b x), C0Eol x)
-                    step (C (a, b, dn) next) (acc, C dn' last) =
-                        (ReversedList.push (C (a, b, dn') last) acc, C dn next)
-
-                    done :: (Reversed (C2Eol a b x), C0Eol x) -> (List (C2Eol a b x), C0Eol x)
-                    done (acc, last) =
-                        (ReversedList.toList acc, last)
 
 
 nowhere :: Region.Position
