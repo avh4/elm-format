@@ -771,11 +771,11 @@
                         "name": "Int",
                         "sourceLocation": {
                             "end": {
-                                "col": 19,
+                                "col": 28,
                                 "line": 64
                             },
                             "start": {
-                                "col": 16,
+                                "col": 7,
                                 "line": 64
                             }
                         },
@@ -787,12 +787,12 @@
                         "name": "Int",
                         "sourceLocation": {
                             "end": {
-                                "col": 11,
-                                "line": 66
+                                "col": 8,
+                                "line": 68
                             },
                             "start": {
-                                "col": 8,
-                                "line": 66
+                                "col": 7,
+                                "line": 65
                             }
                         },
                         "tag": "TypeReference"
@@ -1247,6 +1247,16 @@
                             "fieldOrder": []
                         },
                         "fields": {},
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 103
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 103
+                            }
+                        },
                         "tag": "RecordType"
                     }
                 ],
@@ -1351,6 +1361,16 @@
                                 "tag": "UnitType"
                             }
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 109
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 109
+                            }
+                        },
                         "tag": "RecordType"
                     },
                     {
@@ -1389,6 +1409,16 @@
                                     }
                                 },
                                 "tag": "UnitType"
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 112
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 110
                             }
                         },
                         "tag": "RecordType"
@@ -1448,6 +1478,16 @@
                             }
                         },
                         "tag": "TypeReference"
+                    }
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 124
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 117
                     }
                 },
                 "tag": "RecordType"
@@ -1518,6 +1558,16 @@
                                     }
                                 },
                                 "tag": "TypeReference"
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 43,
+                                "line": 127
+                            },
+                            "start": {
+                                "col": 19,
+                                "line": 127
                             }
                         },
                         "tag": "RecordTypeExtension"
@@ -1613,6 +1663,16 @@
                             }
                         },
                         "tag": "TypeReference"
+                    }
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 141
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 133
                     }
                 },
                 "tag": "RecordTypeExtension"

@@ -5,7 +5,7 @@
 module ElmFormat.AST.PublicAST where
 
 import ElmFormat.AST.Shared
-import AST.V0_16 (NodeKind(..), sequenceToList)
+import AST.V0_16 (NodeKind(..), sequenceToList, Pair(..))
 import qualified AST.V0_16 as AST
 import Reporting.Annotation (Located(A))
 import Reporting.Region (Region)
@@ -16,6 +16,10 @@ import AST.Structure (ASTNS, ASTNS1)
 import Data.Indexed as I
 import Data.Maybe (listToMaybe)
 import Data.Coapplicative
+import Data.ReversedList (Reversed)
+import qualified Data.ReversedList as ReversedList
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
 
 
 data ModuleName =
@@ -42,14 +46,14 @@ data Pattern
     | VariablePattern VariableDefinition
     | DataPattern
         { constructor :: ExternalReference
-        , arguments :: List (Located Pattern)
+        , arguments :: List (Located Pattern) -- Non-empty
         }
     | TuplePattern
-        { terms :: List (Located Pattern)
+        { terms :: List (Located Pattern) -- At least two items
         }
     | ListPattern -- Construct with mkListPattern
         { prefix :: List (Located Pattern)
-        , rest :: Maybe (Located Pattern)
+        , rest :: Maybe (Located Pattern) -- Must not be a ListPattern
         }
     | RecordPattern
         { fields :: List VariableDefinition
@@ -64,6 +68,36 @@ mkListPattern :: List (Located Pattern) -> Maybe (Located Pattern) -> Pattern
 mkListPattern prefix (Just (A _ (ListPattern prefix2 rest2))) =
     ListPattern (prefix ++ prefix2) rest2
 mkListPattern prefix rest = ListPattern prefix rest
+
+
+data Type_
+    = UnitType
+    | TypeReference
+        { name_tr :: UppercaseIdentifier
+        , module_ :: ModuleName
+        , arguments :: List (Located Type_)
+        }
+    | TypeVariable
+        { name_tv :: LowercaseIdentifier
+        }
+    | TupleType
+        { terms :: List (Located Type_) -- At least two items
+        }
+    | RecordType
+        { base :: Maybe LowercaseIdentifier
+        , fields :: Map LowercaseIdentifier (Located Type_) -- Cannot be empty if base is present
+        , display :: RecordTypeDisplay
+        }
+    | FunctionType
+        { returnType :: Located Type_
+        , argumentTypes :: List (Located Type_) -- Non-empty
+        }
+
+
+newtype RecordTypeDisplay
+    = RecordTypeDisplay
+        { fieldOrder :: List LowercaseIdentifier
+        }
 
 
 --
@@ -130,10 +164,62 @@ fromRawAST' = \case
             (fromRawAST pat)
 
 
-fromRawAST :: ASTNS Located [UppercaseIdentifier] 'PatternNK -> Located (Pattern)
+typeFromRawAST' :: ASTNS1 Located [UppercaseIdentifier] 'TypeNK -> Type_
+typeFromRawAST' = \case
+    AST.UnitType comments ->
+        UnitType
+
+    AST.TypeConstruction (AST.NamedConstructor (namespace, name)) args forceMultine ->
+        TypeReference
+            name
+            (ModuleName namespace)
+            (fmap (\(C comments a) -> typeFromRawAST a) args)
+
+    AST.TypeVariable name ->
+        TypeVariable name
+
+    AST.TypeParens (C comments t) ->
+        typeFromRawAST' (extract $ I.unFix t)
+
+    AST.TupleType terms multiline ->
+        TupleType
+            (fmap (\(C comments a) -> typeFromRawAST a) terms)
+
+    AST.RecordType base fields comments multiline ->
+        RecordType
+            (fmap (\(C comments a) -> a) base)
+            (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, typeFromRawAST value)) $ sequenceToList fields)
+            $ RecordTypeDisplay
+                (fmap (extract . _key . extract) $ sequenceToList fields)
+
+    AST.FunctionType first rest multiline ->
+        case firstRestToRestLast first (sequenceToList rest) of
+            (args, C comments last) ->
+                FunctionType
+                    (typeFromRawAST last)
+                    (fmap (\(C comments a) -> typeFromRawAST a) args)
+    where
+        firstRestToRestLast :: C0Eol x -> List (C2Eol a b x) -> (List (C2Eol a b x), C0Eol x)
+        firstRestToRestLast first rest =
+            done $ foldl (flip step) (ReversedList.empty, first) rest
+            where
+                step :: C2Eol a b x -> (Reversed (C2Eol a b x), C0Eol x) -> (Reversed (C2Eol a b x), C0Eol x)
+                step (C (a, b, dn) next) (acc, C dn' last) =
+                    (ReversedList.push (C (a, b, dn') last) acc, C dn next)
+
+                done :: (Reversed (C2Eol a b x), C0Eol x) -> (List (C2Eol a b x), C0Eol x)
+                done (acc, last) =
+                    (ReversedList.toList acc, last)
+
+
+fromRawAST :: ASTNS Located [UppercaseIdentifier] 'PatternNK -> Located Pattern
 fromRawAST =
     fmap fromRawAST' . I.unFix
 
+
+typeFromRawAST :: ASTNS Located [UppercaseIdentifier] 'TypeNK -> Located Type_
+typeFromRawAST =
+    fmap typeFromRawAST' . I.unFix
 
 
 --
@@ -178,6 +264,13 @@ instance ToJSON a => ToJSON [a] where
 instance ToJSON a => ToJSON (Maybe a) where
     showJSON _ Nothing = JSNull
     showJSON c (Just a) = showJSON c a
+
+
+instance ToJSON v => ToJSON (Map LowercaseIdentifier v) where
+    showJSON c =
+        makeObj
+            . fmap (\((LowercaseIdentifier k), a) -> (k, showJSON c a))
+            . Map.toList
 
 
 instance ToJSON a => ToJSON (Located a) where
@@ -330,6 +423,63 @@ instance ToJSON Pattern where
                 , ( "alias", showJSON c alias )
                 , ( "pattern", showJSON c pat )
                 ]
+
+
+instance ToJSON Type_ where
+    showJSON c = \case
+        UnitType ->
+            makeObj
+                [ type_ "UnitType"
+                ]
+
+        TypeReference name module_ arguments ->
+            makeObj
+                [ type_ "TypeReference"
+                , ( "name", showJSON c name )
+                , ( "module", showJSON c module_ )
+                , ( "arguments", showJSON c arguments )
+                ]
+
+        TypeVariable name ->
+            makeObj
+                [ type_ "TypeVariable"
+                , ( "name", showJSON c name )
+                ]
+
+        TupleType terms ->
+            makeObj
+                [ type_ "TupleType"
+                , ( "terms", showJSON c terms )
+                ]
+
+        RecordType Nothing fields display ->
+            makeObj
+                [ type_ "RecordType"
+                , ( "fields", showJSON c fields )
+                , ( "display", showJSON c display )
+                ]
+
+        RecordType (Just base) fields display ->
+            makeObj
+                [ type_ "RecordTypeExtension"
+                , ( "base", showJSON c base )
+                , ( "fields", showJSON c fields )
+                , ( "display", showJSON c display )
+                ]
+
+        FunctionType returnType argumentTypes ->
+            makeObj
+                [ type_ "FunctionType"
+                , ( "returnType", showJSON c returnType )
+                , ( "argumentTypes", showJSON c argumentTypes )
+                ]
+
+
+instance ToJSON RecordTypeDisplay where
+    showJSON c (RecordTypeDisplay fieldOrder) =
+        makeObj
+            [ ( "fieldOrder", showJSON c fieldOrder )
+            ]
 
 
 instance ToJSON ExternalReference where
