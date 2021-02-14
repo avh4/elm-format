@@ -105,121 +105,125 @@ newtype RecordTypeDisplay
 --
 
 
-fromRawAST' :: ASTNS1 Located [UppercaseIdentifier] 'PatternNK -> Pattern
-fromRawAST' = \case
-    AST.Anything ->
-        AnythingPattern
-
-    AST.UnitPattern comments ->
-        UnitPattern
-
-    AST.LiteralPattern lit ->
-        LiteralPattern lit
-
-    AST.VarPattern name ->
-        VariablePattern $ VariableDefinition name
-
-    AST.OpPattern _ ->
-        error "PublicAST: OpPattern is not supported in Elm 0.19"
-
-    AST.DataPattern (namespace, tag) args ->
-        DataPattern
-            (ExternalReference (ModuleName namespace) tag)
-            (fmap (fromRawAST . (\(C comments a) -> a)) args)
-
-    AST.PatternParens (C (pre, post) pat) ->
-        extract $ fromRawAST pat
-
-    AST.TuplePattern terms ->
-        TuplePattern
-            (fmap (fromRawAST . (\(C comments a) -> a)) terms)
-
-    AST.EmptyListPattern comments ->
-        mkListPattern [] Nothing
-
-    AST.ListPattern terms ->
-        mkListPattern
-            (fmap (fromRawAST . (\(C comments a) -> a)) terms)
-            Nothing
-
-    AST.ConsPattern (C firstEol first) rest ->
-        let
-            first' = fromRawAST first
-            rest' = fmap (fromRawAST . (\(C comments a) -> a)) (sequenceToList rest)
-        in
-        case reverse rest' of
-            [] -> mkListPattern [] (Just first')
-            last : mid -> mkListPattern (first' : reverse mid) (Just last)
-
-    AST.EmptyRecordPattern comment ->
-        RecordPattern []
-
-    AST.RecordPattern fields ->
-        RecordPattern
-            (fmap (VariableDefinition . (\(C comments a) -> a)) fields)
-
-    AST.Alias (C comments1 pat) (C comments2 name) ->
-        PatternAlias
-            (VariableDefinition name)
-            (fromRawAST pat)
+class ToPublicAST (nk :: NodeKind) where
+    type PublicAST nk
+    fromRawAST' :: ASTNS1 Located [UppercaseIdentifier] nk -> PublicAST nk
 
 
-typeFromRawAST' :: ASTNS1 Located [UppercaseIdentifier] 'TypeNK -> Type_
-typeFromRawAST' = \case
-    AST.UnitType comments ->
-        UnitType
-
-    AST.TypeConstruction (AST.NamedConstructor (namespace, name)) args forceMultine ->
-        TypeReference
-            name
-            (ModuleName namespace)
-            (fmap (\(C comments a) -> typeFromRawAST a) args)
-
-    AST.TypeVariable name ->
-        TypeVariable name
-
-    AST.TypeParens (C comments t) ->
-        typeFromRawAST' (extract $ I.unFix t)
-
-    AST.TupleType terms multiline ->
-        TupleType
-            (fmap (\(C comments a) -> typeFromRawAST a) terms)
-
-    AST.RecordType base fields comments multiline ->
-        RecordType
-            (fmap (\(C comments a) -> a) base)
-            (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, typeFromRawAST value)) $ sequenceToList fields)
-            $ RecordTypeDisplay
-                (fmap (extract . _key . extract) $ sequenceToList fields)
-
-    AST.FunctionType first rest multiline ->
-        case firstRestToRestLast first (sequenceToList rest) of
-            (args, C comments last) ->
-                FunctionType
-                    (typeFromRawAST last)
-                    (fmap (\(C comments a) -> typeFromRawAST a) args)
-    where
-        firstRestToRestLast :: C0Eol x -> List (C2Eol a b x) -> (List (C2Eol a b x), C0Eol x)
-        firstRestToRestLast first rest =
-            done $ foldl (flip step) (ReversedList.empty, first) rest
-            where
-                step :: C2Eol a b x -> (Reversed (C2Eol a b x), C0Eol x) -> (Reversed (C2Eol a b x), C0Eol x)
-                step (C (a, b, dn) next) (acc, C dn' last) =
-                    (ReversedList.push (C (a, b, dn') last) acc, C dn next)
-
-                done :: (Reversed (C2Eol a b x), C0Eol x) -> (List (C2Eol a b x), C0Eol x)
-                done (acc, last) =
-                    (ReversedList.toList acc, last)
-
-
-fromRawAST :: ASTNS Located [UppercaseIdentifier] 'PatternNK -> Located Pattern
+fromRawAST :: ToPublicAST nk => ASTNS Located [UppercaseIdentifier] nk -> Located (PublicAST nk)
 fromRawAST =
     fmap fromRawAST' . I.unFix
 
 
-typeFromRawAST :: ASTNS Located [UppercaseIdentifier] 'TypeNK -> Located Type_
-typeFromRawAST =
-    fmap typeFromRawAST' . I.unFix
+instance ToPublicAST 'PatternNK where
+    type PublicAST 'PatternNK = Pattern
+
+    fromRawAST' = \case
+        AST.Anything ->
+            AnythingPattern
+
+        AST.UnitPattern comments ->
+            UnitPattern
+
+        AST.LiteralPattern lit ->
+            LiteralPattern lit
+
+        AST.VarPattern name ->
+            VariablePattern $ VariableDefinition name
+
+        AST.OpPattern _ ->
+            error "PublicAST: OpPattern is not supported in Elm 0.19"
+
+        AST.DataPattern (namespace, tag) args ->
+            DataPattern
+                (ExternalReference (ModuleName namespace) tag)
+                (fmap (fromRawAST . (\(C comments a) -> a)) args)
+
+        AST.PatternParens (C (pre, post) pat) ->
+            extract $ fromRawAST pat
+
+        AST.TuplePattern terms ->
+            TuplePattern
+                (fmap (fromRawAST . (\(C comments a) -> a)) terms)
+
+        AST.EmptyListPattern comments ->
+            mkListPattern [] Nothing
+
+        AST.ListPattern terms ->
+            mkListPattern
+                (fmap (fromRawAST . (\(C comments a) -> a)) terms)
+                Nothing
+
+        AST.ConsPattern (C firstEol first) rest ->
+            let
+                first' = fromRawAST first
+                rest' = fmap (fromRawAST . (\(C comments a) -> a)) (sequenceToList rest)
+            in
+            case reverse rest' of
+                [] -> mkListPattern [] (Just first')
+                last : mid -> mkListPattern (first' : reverse mid) (Just last)
+
+        AST.EmptyRecordPattern comment ->
+            RecordPattern []
+
+        AST.RecordPattern fields ->
+            RecordPattern
+                (fmap (VariableDefinition . (\(C comments a) -> a)) fields)
+
+        AST.Alias (C comments1 pat) (C comments2 name) ->
+            PatternAlias
+                (VariableDefinition name)
+                (fromRawAST pat)
+
+
+instance ToPublicAST 'TypeNK where
+    type PublicAST 'TypeNK = Type_
+
+    fromRawAST' = \case
+        AST.UnitType comments ->
+            UnitType
+
+        AST.TypeConstruction (AST.NamedConstructor (namespace, name)) args forceMultine ->
+            TypeReference
+                name
+                (ModuleName namespace)
+                (fmap (\(C comments a) -> fromRawAST a) args)
+
+        AST.TypeVariable name ->
+            TypeVariable name
+
+        AST.TypeParens (C comments t) ->
+            fromRawAST' (extract $ I.unFix t)
+
+        AST.TupleType terms multiline ->
+            TupleType
+                (fmap (\(C comments a) -> fromRawAST a) terms)
+
+        AST.RecordType base fields comments multiline ->
+            RecordType
+                (fmap (\(C comments a) -> a) base)
+                (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, fromRawAST value)) $ sequenceToList fields)
+                $ RecordTypeDisplay
+                    (fmap (extract . _key . extract) $ sequenceToList fields)
+
+        AST.FunctionType first rest multiline ->
+            case firstRestToRestLast first (sequenceToList rest) of
+                (args, C comments last) ->
+                    FunctionType
+                        (fromRawAST last)
+                        (fmap (\(C comments a) -> fromRawAST a) args)
+        where
+            firstRestToRestLast :: C0Eol x -> List (C2Eol a b x) -> (List (C2Eol a b x), C0Eol x)
+            firstRestToRestLast first rest =
+                done $ foldl (flip step) (ReversedList.empty, first) rest
+                where
+                    step :: C2Eol a b x -> (Reversed (C2Eol a b x), C0Eol x) -> (Reversed (C2Eol a b x), C0Eol x)
+                    step (C (a, b, dn) next) (acc, C dn' last) =
+                        (ReversedList.push (C (a, b, dn') last) acc, C dn next)
+
+                    done :: (Reversed (C2Eol a b x), C0Eol x) -> (List (C2Eol a b x), C0Eol x)
+                    done (acc, last) =
+                        (ReversedList.toList acc, last)
 
 
 --
