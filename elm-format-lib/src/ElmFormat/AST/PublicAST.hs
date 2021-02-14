@@ -409,7 +409,6 @@ data Expression
         { subject :: Located Expression
         , branches :: List (Located CaseBranch)
         }
-    | TODO_Range String
     | TODO_GLShader String
 
 
@@ -525,8 +524,8 @@ instance ToPublicAST 'ExpressionNK where
                 (fromRawAST subject)
                 (fmap fromRawAST branches)
 
-        other@(AST.Range _ _ _) ->
-            TODO_Range (show other)
+        AST.Range _ _ _ ->
+            error "Range syntax is not supported in Elm 0.19"
 
         AST.AccessFunction field ->
             RecordAccessFunction field
@@ -631,9 +630,6 @@ instance ToJSON Expression where
                 , ( "subject", showJSON c subject )
                 , ( "branches", showJSON c branches )
                 ]
-
-        TODO_Range s ->
-            JSString $ toJSString s
 
         TODO_GLShader s ->
             JSString $ toJSString s
