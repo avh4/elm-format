@@ -1219,6 +1219,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 105
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 105
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "emptyRecord",
@@ -1495,6 +1505,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 129
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 129
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "recordExtension",

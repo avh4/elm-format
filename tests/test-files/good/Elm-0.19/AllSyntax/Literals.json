@@ -2,6 +2,16 @@
     "body": [
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 5
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 5
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "unit",
@@ -21,6 +31,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 11
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 9
+                    }
+                },
                 "tag": "TupleLiteral",
                 "terms": [
                     {
@@ -72,6 +92,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 28
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 15
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {
@@ -314,6 +344,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 33
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 32
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {
@@ -484,6 +524,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 56
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 53
+                    }
+                },
                 "tag": "TupleLiteral",
                 "terms": [
                     {
@@ -652,6 +702,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 52,
+                        "line": 72
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 72
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {
@@ -799,6 +859,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 31,
+                        "line": 76
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 76
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {
@@ -876,6 +946,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 43,
+                        "line": 80
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 80
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {
@@ -939,6 +1019,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 57,
+                        "line": 84
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 84
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {
@@ -1016,6 +1106,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 48,
+                        "line": 88
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 88
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {
@@ -1159,6 +1259,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 122
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 113
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {

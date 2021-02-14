@@ -2,15 +2,55 @@
     "body": [
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 11
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 7
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 7
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 7
+                            }
+                        },
                         "tag": "UnitLiteral"
                     },
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 16,
+                                "line": 8
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 8
+                            }
+                        },
                         "tag": "UnitLiteral"
                     },
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 10
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 9
+                            }
+                        },
                         "tag": "UnitLiteral"
                     }
                 ]
@@ -32,6 +72,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 19
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 15
+                    }
+                },
                 "tag": "TupleLiteral",
                 "terms": [
                     {
@@ -214,19 +264,19 @@
                     {
                         "operator": {
                             "name": "<|",
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 0,
-                                    "line": 0
-                                },
-                                "start": {
-                                    "col": 0,
-                                    "line": 0
-                                }
-                            },
                             "tag": "VariableReference"
                         },
                         "term": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 10,
+                                    "line": 34
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 32
+                                }
+                            },
                             "tag": "ListLiteral",
                             "terms": [
                                 {
@@ -261,6 +311,16 @@
                         }
                     }
                 ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 10,
+                        "line": 34
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 31
+                    }
+                },
                 "tag": "BinaryOperatorList"
             },
             "name": "infixPipeLeft",
@@ -333,6 +393,16 @@
         {
             "expression": {
                 "first": {
+                    "sourceLocation": {
+                        "end": {
+                            "col": 6,
+                            "line": 39
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 38
+                        }
+                    },
                     "tag": "ListLiteral",
                     "terms": [
                         {
@@ -355,19 +425,19 @@
                     {
                         "operator": {
                             "name": "<|",
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 0,
-                                    "line": 0
-                                },
-                                "start": {
-                                    "col": 0,
-                                    "line": 0
-                                }
-                            },
                             "tag": "VariableReference"
                         },
                         "term": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 10,
+                                    "line": 43
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 41
+                                }
+                            },
                             "tag": "ListLiteral",
                             "terms": [
                                 {
@@ -402,6 +472,16 @@
                         }
                     }
                 ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 10,
+                        "line": 43
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 38
+                    }
+                },
                 "tag": "BinaryOperatorList"
             },
             "name": "infixPipeLeft2",
@@ -523,6 +603,16 @@
                     },
                     "tag": "VariableReference"
                 },
+                "sourceLocation": {
+                    "end": {
+                        "col": 12,
+                        "line": 47
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 47
+                    }
+                },
                 "tag": "FunctionApplication"
             },
             "name": "functionApplication",
@@ -591,6 +681,16 @@
                         }
                     },
                     "tag": "VariableReference"
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 10,
+                        "line": 52
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 51
+                    }
                 },
                 "tag": "FunctionApplication"
             },
@@ -661,6 +761,16 @@
                     },
                     "tag": "VariableReference"
                 },
+                "sourceLocation": {
+                    "end": {
+                        "col": 10,
+                        "line": 58
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 56
+                    }
+                },
                 "tag": "FunctionApplication"
             },
             "name": "functionApplicationMultiline",
@@ -681,6 +791,16 @@
         {
             "expression": {
                 "operator": "-",
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 62
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 62
+                    }
+                },
                 "tag": "UnaryOperator",
                 "term": {
                     "name": "x",
@@ -753,16 +873,6 @@
                     {
                         "operator": {
                             "name": "+",
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 0,
-                                    "line": 0
-                                },
-                                "start": {
-                                    "col": 0,
-                                    "line": 0
-                                }
-                            },
                             "tag": "VariableReference"
                         },
                         "term": {
@@ -786,16 +896,6 @@
                     {
                         "operator": {
                             "name": "+",
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 0,
-                                    "line": 0
-                                },
-                                "start": {
-                                    "col": 0,
-                                    "line": 0
-                                }
-                            },
                             "tag": "VariableReference"
                         },
                         "term": {
@@ -817,6 +917,16 @@
                         }
                     }
                 ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 14,
+                        "line": 66
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 66
+                    }
+                },
                 "tag": "BinaryOperatorList"
             },
             "name": "binary",
@@ -868,6 +978,16 @@
                             },
                             "tag": "VariableReference"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 70
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 70
+                            }
+                        },
                         "tag": "FunctionApplication"
                     }
                 ],
@@ -884,6 +1004,16 @@
                         }
                     },
                     "tag": "VariableReference"
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 12,
+                        "line": 70
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 70
+                    }
                 },
                 "tag": "FunctionApplication"
             },
@@ -956,17 +1086,57 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 78
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 74
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 74
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 74
+                            }
+                        },
                         "tag": "ListLiteral",
                         "terms": []
                     },
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 16,
+                                "line": 75
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 75
+                            }
+                        },
                         "tag": "ListLiteral",
                         "terms": []
                     },
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 77
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 76
+                            }
+                        },
                         "tag": "ListLiteral",
                         "terms": []
                     }
@@ -989,48 +1159,178 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 102
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 82
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 82
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 82
+                            }
+                        },
                         "tag": "ListLiteral",
                         "terms": [
                             {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 11,
+                                        "line": 82
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 82
+                                    }
+                                },
                                 "tag": "UnitLiteral"
                             },
                             {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 82
+                                    },
+                                    "start": {
+                                        "col": 13,
+                                        "line": 82
+                                    }
+                                },
                                 "tag": "UnitLiteral"
                             }
                         ]
                     },
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 89
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 83
+                            }
+                        },
                         "tag": "ListLiteral",
                         "terms": [
                             {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 19,
+                                        "line": 83
+                                    },
+                                    "start": {
+                                        "col": 17,
+                                        "line": 83
+                                    }
+                                },
                                 "tag": "UnitLiteral"
                             },
                             {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 19,
+                                        "line": 86
+                                    },
+                                    "start": {
+                                        "col": 17,
+                                        "line": 86
+                                    }
+                                },
                                 "tag": "UnitLiteral"
                             }
                         ]
                     },
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 98
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 90
+                            }
+                        },
                         "tag": "ListLiteral",
                         "terms": [
                             {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 11,
+                                        "line": 91
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 91
+                                    }
+                                },
                                 "tag": "UnitLiteral"
                             },
                             {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 11,
+                                        "line": 95
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 95
+                                    }
+                                },
                                 "tag": "UnitLiteral"
                             }
                         ]
                     },
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 101
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 99
+                            }
+                        },
                         "tag": "ListLiteral",
                         "terms": [
                             {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 11,
+                                        "line": 99
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 99
+                                    }
+                                },
                                 "tag": "UnitLiteral"
                             },
                             {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 11,
+                                        "line": 100
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 100
+                                    }
+                                },
                                 "tag": "UnitLiteral"
                             }
                         ]
@@ -1054,6 +1354,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 114
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 106
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {
@@ -1126,9 +1436,29 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 132
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 118
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 118
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 118
+                            }
+                        },
                         "tag": "TupleLiteral",
                         "terms": [
                             {
@@ -1168,6 +1498,16 @@
                         ]
                     },
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 47,
+                                "line": 119
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 119
+                            }
+                        },
                         "tag": "TupleLiteral",
                         "terms": [
                             {
@@ -1207,6 +1547,16 @@
                         ]
                     },
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 126
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 120
+                            }
+                        },
                         "tag": "TupleLiteral",
                         "terms": [
                             {
@@ -1246,6 +1596,16 @@
                         ]
                     },
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 131
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 127
+                            }
+                        },
                         "tag": "TupleLiteral",
                         "terms": [
                             {
@@ -1303,6 +1663,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 142
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 136
+                    }
+                },
                 "tag": "TupleLiteral",
                 "terms": [
                     {
@@ -1442,6 +1812,16 @@
                     },
                     "tag": "VariableReference"
                 },
+                "sourceLocation": {
+                    "end": {
+                        "col": 15,
+                        "line": 146
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 146
+                    }
+                },
                 "tag": "FunctionApplication"
             },
             "name": "tupleFunction",
@@ -1461,6 +1841,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 154
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 150
+                    }
+                },
                 "tag": "ListLiteral",
                 "terms": [
                     {
@@ -1468,6 +1858,16 @@
                             "fieldOrder": []
                         },
                         "fields": {},
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 150
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 150
+                            }
+                        },
                         "tag": "RecordLiteral"
                     },
                     {
@@ -1475,6 +1875,16 @@
                             "fieldOrder": []
                         },
                         "fields": {},
+                        "sourceLocation": {
+                            "end": {
+                                "col": 16,
+                                "line": 151
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 151
+                            }
+                        },
                         "tag": "RecordLiteral"
                     },
                     {
@@ -1482,6 +1892,16 @@
                             "fieldOrder": []
                         },
                         "fields": {},
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 153
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 152
+                            }
+                        },
                         "tag": "RecordLiteral"
                     }
                 ]
@@ -1503,6 +1923,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 203
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 158
+                    }
+                },
                 "tag": "TupleLiteral",
                 "terms": [
                     {
@@ -1528,6 +1958,16 @@
                                 },
                                 "tag": "IntLiteral",
                                 "value": 1
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 16,
+                                "line": 158
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 158
                             }
                         },
                         "tag": "RecordLiteral"
@@ -1573,6 +2013,16 @@
                                 },
                                 "tag": "IntLiteral",
                                 "value": 2
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 159
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 159
                             }
                         },
                         "tag": "RecordLiteral"
@@ -1638,6 +2088,16 @@
                                 "value": 3
                             }
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 30,
+                                "line": 160
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 160
+                            }
+                        },
                         "tag": "RecordLiteral"
                     },
                     {
@@ -1663,6 +2123,16 @@
                                 },
                                 "tag": "IntLiteral",
                                 "value": 1
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 162
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 161
                             }
                         },
                         "tag": "RecordLiteral"
@@ -1710,6 +2180,16 @@
                                 "value": 2
                             }
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 165
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 163
+                            }
+                        },
                         "tag": "RecordLiteral"
                     },
                     {
@@ -1771,6 +2251,16 @@
                                 },
                                 "tag": "IntLiteral",
                                 "value": 3
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 175
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 166
                             }
                         },
                         "tag": "RecordLiteral"
@@ -1836,6 +2326,16 @@
                                 "value": 3
                             }
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 191
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 176
+                            }
+                        },
                         "tag": "RecordLiteral"
                     },
                     {
@@ -1899,6 +2399,16 @@
                                 "value": 3
                             }
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 195
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 192
+                            }
+                        },
                         "tag": "RecordLiteral"
                     },
                     {
@@ -1960,6 +2470,16 @@
                                 },
                                 "tag": "IntLiteral",
                                 "value": 3
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 202
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 196
                             }
                         },
                         "tag": "RecordLiteral"
@@ -2025,6 +2545,16 @@
                         "value": 1
                     }
                 },
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 214
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 207
+                    }
+                },
                 "tag": "RecordLiteral"
             },
             "name": "recordWithCommentedOutFields",
@@ -2044,6 +2574,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 227
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 218
+                    }
+                },
                 "tag": "TupleLiteral",
                 "terms": [
                     {
@@ -2070,6 +2610,16 @@
                                 },
                                 "tag": "IntLiteral",
                                 "value": 1
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 20,
+                                "line": 218
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 218
                             }
                         },
                         "tag": "RecordUpdate"
@@ -2118,6 +2668,16 @@
                                 "value": 2
                             }
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 27,
+                                "line": 219
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 219
+                            }
+                        },
                         "tag": "RecordUpdate"
                     },
                     {
@@ -2144,6 +2704,16 @@
                                 },
                                 "tag": "IntLiteral",
                                 "value": 1
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 222
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 220
                             }
                         },
                         "tag": "RecordUpdate"
@@ -2190,6 +2760,16 @@
                                 },
                                 "tag": "IntLiteral",
                                 "value": 2
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 226
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 223
                             }
                         },
                         "tag": "RecordUpdate"
@@ -2274,6 +2854,16 @@
                         "value": 1
                     }
                 },
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 239
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 231
+                    }
+                },
                 "tag": "RecordUpdate"
             },
             "name": "recordUpdateWithCommentedOutFields",
@@ -2311,12 +2901,42 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 253
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 243
+                    }
+                },
                 "tag": "TupleLiteral",
                 "terms": [
                     {
                         "field": "x",
                         "record": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 9,
+                                    "line": 243
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 243
+                                }
+                            },
                             "tag": "UnitLiteral"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 243
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 243
+                            }
                         },
                         "tag": "RecordAccess"
                     },
@@ -2335,6 +2955,16 @@
                                 }
                             },
                             "tag": "VariableReference"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 244
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 244
+                            }
                         },
                         "tag": "RecordAccess"
                     },
@@ -2371,13 +3001,43 @@
                                 },
                                 "tag": "VariableReference"
                             },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 12,
+                                    "line": 245
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 245
+                                }
+                            },
                             "tag": "FunctionApplication"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 245
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 245
+                            }
                         },
                         "tag": "RecordAccess"
                     },
                     {
                         "field": "x",
                         "record": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 246
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 246
+                                }
+                            },
                             "tag": "TupleLiteral",
                             "terms": [
                                 {
@@ -2416,6 +3076,16 @@
                                 }
                             ]
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 246
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 246
+                            }
+                        },
                         "tag": "RecordAccess"
                     },
                     {
@@ -2434,6 +3104,16 @@
                             },
                             "tag": "VariableReference"
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 13,
+                                "line": 247
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 247
+                            }
+                        },
                         "tag": "RecordAccess"
                     },
                     {
@@ -2443,7 +3123,27 @@
                                 "fieldOrder": []
                             },
                             "fields": {},
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 9,
+                                    "line": 248
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 248
+                                }
+                            },
                             "tag": "RecordLiteral"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 248
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 248
+                            }
                         },
                         "tag": "RecordAccess"
                     },
@@ -2474,7 +3174,27 @@
                                     "value": 1
                                 }
                             },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 16,
+                                    "line": 249
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 249
+                                }
+                            },
                             "tag": "RecordLiteral"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 249
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 249
+                            }
                         },
                         "tag": "RecordAccess"
                     },
@@ -2506,7 +3226,27 @@
                                     "value": 1
                                 }
                             },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 20,
+                                    "line": 250
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 250
+                                }
+                            },
                             "tag": "RecordUpdate"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 22,
+                                "line": 250
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 250
+                            }
                         },
                         "tag": "RecordAccess"
                     },
@@ -2528,7 +3268,27 @@
                                 },
                                 "tag": "VariableReference"
                             },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 10,
+                                    "line": 251
+                                },
+                                "start": {
+                                    "col": 7,
+                                    "line": 251
+                                }
+                            },
                             "tag": "RecordAccess"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 251
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 251
+                            }
                         },
                         "tag": "RecordAccess"
                     },
@@ -2548,6 +3308,16 @@
                                 }
                             },
                             "tag": "ExternalReference"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 19,
+                                "line": 252
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 252
+                            }
                         },
                         "tag": "RecordAccess"
                     }
@@ -2665,11 +3435,22 @@
                                 "value": 1
                             }
                         },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 257
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 257
+                            }
+                        },
                         "tag": "RecordLiteral"
                     }
                 ],
                 "function": {
                     "field": "x",
+                    "record": null,
                     "sourceLocation": {
                         "end": {
                             "col": 7,
@@ -2681,6 +3462,16 @@
                         }
                     },
                     "tag": "RecordAccess"
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 17,
+                        "line": 257
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 257
+                    }
                 },
                 "tag": "FunctionApplication"
             },
@@ -2720,16 +3511,6 @@
                         {
                             "operator": {
                                 "name": "+",
-                                "sourceLocation": {
-                                    "end": {
-                                        "col": 0,
-                                        "line": 0
-                                    },
-                                    "start": {
-                                        "col": 0,
-                                        "line": 0
-                                    }
-                                },
                                 "tag": "VariableReference"
                             },
                             "term": {
@@ -2751,6 +3532,16 @@
                             }
                         }
                     ],
+                    "sourceLocation": {
+                        "end": {
+                            "col": 16,
+                            "line": 261
+                        },
+                        "start": {
+                            "col": 11,
+                            "line": 261
+                        }
+                    },
                     "tag": "BinaryOperatorList"
                 },
                 "parameters": [
@@ -2769,6 +3560,16 @@
                         "tag": "VariableDefinition"
                     }
                 ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 16,
+                        "line": 261
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 261
+                    }
+                },
                 "tag": "AnonymousFunction"
             },
             "name": "lambda",
@@ -2789,6 +3590,16 @@
         {
             "expression": {
                 "body": {
+                    "sourceLocation": {
+                        "end": {
+                            "col": 11,
+                            "line": 270
+                        },
+                        "start": {
+                            "col": 9,
+                            "line": 270
+                        }
+                    },
                     "tag": "UnitLiteral"
                 },
                 "parameters": [
@@ -2816,6 +3627,16 @@
                         "tag": "RecordPattern"
                     }
                 ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 11,
+                        "line": 270
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 265
+                    }
+                },
                 "tag": "AnonymousFunction"
             },
             "name": "lambdaWithMultilinePattern",
@@ -2840,6 +3661,16 @@
                         "fieldOrder": []
                     },
                     "fields": {},
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 325
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 325
+                        }
+                    },
                     "tag": "RecordLiteral"
                 },
                 "declarations": [
@@ -2912,6 +3743,16 @@
                                 },
                                 "tag": "ExternalReference"
                             },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 18,
+                                    "line": 283
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 276
+                                }
+                            },
                             "tag": "IfExpression",
                             "then": {
                                 "display": {
@@ -2932,6 +3773,16 @@
                             }
                         },
                         "name": "a",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 283
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 275
+                            }
+                        },
                         "tag": "Definition"
                     },
                     {
@@ -3003,6 +3854,16 @@
                                 },
                                 "tag": "ExternalReference"
                             },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 18,
+                                    "line": 298
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 286
+                                }
+                            },
                             "tag": "IfExpression",
                             "then": {
                                 "display": {
@@ -3023,6 +3884,16 @@
                             }
                         },
                         "name": "b",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 298
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 285
+                            }
+                        },
                         "tag": "Definition"
                     },
                     {
@@ -3094,6 +3965,16 @@
                                 },
                                 "tag": "ExternalReference"
                             },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 18,
+                                    "line": 323
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 301
+                                }
+                            },
                             "tag": "IfExpression",
                             "then": {
                                 "display": {
@@ -3114,9 +3995,29 @@
                             }
                         },
                         "name": "c",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 323
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 300
+                            }
+                        },
                         "tag": "Definition"
                     }
                 ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 325
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 274
+                    }
+                },
                 "tag": "LetExpression"
             },
             "name": "ifStatement",
@@ -3137,6 +4038,16 @@
         {
             "expression": {
                 "body": {
+                    "sourceLocation": {
+                        "end": {
+                            "col": 13,
+                            "line": 336
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 336
+                        }
+                    },
                     "tag": "TupleLiteral",
                     "terms": [
                         {
@@ -3189,6 +4100,16 @@
                             "value": 1
                         },
                         "name": "x",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 331
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 330
+                            }
+                        },
                         "tag": "Definition"
                     },
                     {
@@ -3210,9 +4131,29 @@
                             "value": 2
                         },
                         "name": "y",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 334
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 333
+                            }
+                        },
                         "tag": "Definition"
                     }
                 ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 13,
+                        "line": 336
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 329
+                    }
+                },
                 "tag": "LetExpression"
             },
             "name": "letStatement",
@@ -3237,6 +4178,16 @@
                         "fieldOrder": []
                     },
                     "fields": {},
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 385
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 385
+                        }
+                    },
                     "tag": "RecordLiteral"
                 },
                 "declarations": [
@@ -3291,6 +4242,16 @@
                                             }
                                         },
                                         "tag": "DataPattern"
+                                    },
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 22,
+                                            "line": 344
+                                        },
+                                        "start": {
+                                            "col": 17,
+                                            "line": 343
+                                        }
                                     }
                                 },
                                 {
@@ -3323,9 +4284,29 @@
                                             }
                                         },
                                         "tag": "AnythingPattern"
+                                    },
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 22,
+                                            "line": 347
+                                        },
+                                        "start": {
+                                            "col": 22,
+                                            "line": 344
+                                        }
                                     }
                                 }
                             ],
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 22,
+                                    "line": 347
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 342
+                                }
+                            },
                             "subject": {
                                 "arguments": [
                                     {
@@ -3361,11 +4342,31 @@
                                     },
                                     "tag": "ExternalReference"
                                 },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 24,
+                                        "line": 342
+                                    },
+                                    "start": {
+                                        "col": 18,
+                                        "line": 342
+                                    }
+                                },
                                 "tag": "FunctionApplication"
                             },
                             "tag": "CaseExpression"
                         },
                         "name": "a",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 22,
+                                "line": 347
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 341
+                            }
+                        },
                         "tag": "Definition"
                     },
                     {
@@ -3419,6 +4420,16 @@
                                             }
                                         },
                                         "tag": "DataPattern"
+                                    },
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 22,
+                                            "line": 356
+                                        },
+                                        "start": {
+                                            "col": 17,
+                                            "line": 352
+                                        }
                                     }
                                 },
                                 {
@@ -3451,9 +4462,29 @@
                                             }
                                         },
                                         "tag": "AnythingPattern"
+                                    },
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 22,
+                                            "line": 363
+                                        },
+                                        "start": {
+                                            "col": 22,
+                                            "line": 356
+                                        }
                                     }
                                 }
                             ],
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 22,
+                                    "line": 363
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 350
+                                }
+                            },
                             "subject": {
                                 "arguments": [
                                     {
@@ -3489,11 +4520,31 @@
                                     },
                                     "tag": "ExternalReference"
                                 },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 32,
+                                        "line": 350
+                                    },
+                                    "start": {
+                                        "col": 26,
+                                        "line": 350
+                                    }
+                                },
                                 "tag": "FunctionApplication"
                             },
                             "tag": "CaseExpression"
                         },
                         "name": "b",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 22,
+                                "line": 363
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 349
+                            }
+                        },
                         "tag": "Definition"
                     },
                     {
@@ -3547,6 +4598,16 @@
                                             }
                                         },
                                         "tag": "DataPattern"
+                                    },
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 22,
+                                            "line": 376
+                                        },
+                                        "start": {
+                                            "col": 17,
+                                            "line": 372
+                                        }
                                     }
                                 },
                                 {
@@ -3579,9 +4640,29 @@
                                             }
                                         },
                                         "tag": "AnythingPattern"
+                                    },
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 22,
+                                            "line": 383
+                                        },
+                                        "start": {
+                                            "col": 22,
+                                            "line": 376
+                                        }
                                     }
                                 }
                             ],
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 22,
+                                    "line": 383
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 366
+                                }
+                            },
                             "subject": {
                                 "arguments": [
                                     {
@@ -3617,14 +4698,44 @@
                                     },
                                     "tag": "ExternalReference"
                                 },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 23,
+                                        "line": 368
+                                    },
+                                    "start": {
+                                        "col": 17,
+                                        "line": 368
+                                    }
+                                },
                                 "tag": "FunctionApplication"
                             },
                             "tag": "CaseExpression"
                         },
                         "name": "c",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 22,
+                                "line": 383
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 365
+                            }
+                        },
                         "tag": "Definition"
                     }
                 ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 385
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 340
+                    }
+                },
                 "tag": "LetExpression"
             },
             "name": "caseStatement",
