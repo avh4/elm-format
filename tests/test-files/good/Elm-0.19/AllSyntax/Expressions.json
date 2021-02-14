@@ -2914,19 +2914,27 @@
                 "tag": "TupleLiteral",
                 "terms": [
                     {
-                        "field": "x",
-                        "record": {
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 9,
-                                    "line": 243
+                        "arguments": [
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 243
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 243
+                                    }
                                 },
-                                "start": {
-                                    "col": 7,
-                                    "line": 243
-                                }
-                            },
-                            "tag": "UnitLiteral"
+                                "tag": "UnitLiteral"
+                            }
+                        ],
+                        "display": {
+                            "showAsRecordAccess": true
+                        },
+                        "function": {
+                            "field": "x",
+                            "tag": "RecordAccessFunction"
                         },
                         "sourceLocation": {
                             "end": {
@@ -2938,23 +2946,31 @@
                                 "line": 243
                             }
                         },
-                        "tag": "RecordAccess"
+                        "tag": "FunctionApplication"
                     },
                     {
-                        "field": "x",
-                        "record": {
-                            "name": "a",
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 8,
-                                    "line": 244
+                        "arguments": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 8,
+                                        "line": 244
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 244
+                                    }
                                 },
-                                "start": {
-                                    "col": 7,
-                                    "line": 244
-                                }
-                            },
-                            "tag": "VariableReference"
+                                "tag": "VariableReference"
+                            }
+                        ],
+                        "display": {
+                            "showAsRecordAccess": true
+                        },
+                        "function": {
+                            "field": "x",
+                            "tag": "RecordAccessFunction"
                         },
                         "sourceLocation": {
                             "end": {
@@ -2966,52 +2982,60 @@
                                 "line": 244
                             }
                         },
-                        "tag": "RecordAccess"
+                        "tag": "FunctionApplication"
                     },
                     {
-                        "field": "x",
-                        "record": {
-                            "arguments": [
-                                {
-                                    "name": "a",
+                        "arguments": [
+                            {
+                                "arguments": [
+                                    {
+                                        "name": "a",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 11,
+                                                "line": 245
+                                            },
+                                            "start": {
+                                                "col": 10,
+                                                "line": 245
+                                            }
+                                        },
+                                        "tag": "VariableReference"
+                                    }
+                                ],
+                                "function": {
+                                    "name": "f",
                                     "sourceLocation": {
                                         "end": {
-                                            "col": 11,
+                                            "col": 9,
                                             "line": 245
                                         },
                                         "start": {
-                                            "col": 10,
+                                            "col": 8,
                                             "line": 245
                                         }
                                     },
                                     "tag": "VariableReference"
-                                }
-                            ],
-                            "function": {
-                                "name": "f",
+                                },
                                 "sourceLocation": {
                                     "end": {
-                                        "col": 9,
+                                        "col": 12,
                                         "line": 245
                                     },
                                     "start": {
-                                        "col": 8,
+                                        "col": 7,
                                         "line": 245
                                     }
                                 },
-                                "tag": "VariableReference"
-                            },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 12,
-                                    "line": 245
-                                },
-                                "start": {
-                                    "col": 7,
-                                    "line": 245
-                                }
-                            },
-                            "tag": "FunctionApplication"
+                                "tag": "FunctionApplication"
+                            }
+                        ],
+                        "display": {
+                            "showAsRecordAccess": true
+                        },
+                        "function": {
+                            "field": "x",
+                            "tag": "RecordAccessFunction"
                         },
                         "sourceLocation": {
                             "end": {
@@ -3023,58 +3047,66 @@
                                 "line": 245
                             }
                         },
-                        "tag": "RecordAccess"
+                        "tag": "FunctionApplication"
                     },
                     {
-                        "field": "x",
-                        "record": {
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 15,
-                                    "line": 246
+                        "arguments": [
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 246
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 246
+                                    }
                                 },
-                                "start": {
-                                    "col": 7,
-                                    "line": 246
-                                }
-                            },
-                            "tag": "TupleLiteral",
-                            "terms": [
-                                {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 10,
-                                            "line": 246
+                                "tag": "TupleLiteral",
+                                "terms": [
+                                    {
+                                        "display": {
+                                            "representation": "DecimalInt"
                                         },
-                                        "start": {
-                                            "col": 9,
-                                            "line": 246
-                                        }
-                                    },
-                                    "tag": "IntLiteral",
-                                    "value": 1
-                                },
-                                {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 13,
-                                            "line": 246
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 10,
+                                                "line": 246
+                                            },
+                                            "start": {
+                                                "col": 9,
+                                                "line": 246
+                                            }
                                         },
-                                        "start": {
-                                            "col": 12,
-                                            "line": 246
-                                        }
+                                        "tag": "IntLiteral",
+                                        "value": 1
                                     },
-                                    "tag": "IntLiteral",
-                                    "value": 2
-                                }
-                            ]
+                                    {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 13,
+                                                "line": 246
+                                            },
+                                            "start": {
+                                                "col": 12,
+                                                "line": 246
+                                            }
+                                        },
+                                        "tag": "IntLiteral",
+                                        "value": 2
+                                    }
+                                ]
+                            }
+                        ],
+                        "display": {
+                            "showAsRecordAccess": true
+                        },
+                        "function": {
+                            "field": "x",
+                            "tag": "RecordAccessFunction"
                         },
                         "sourceLocation": {
                             "end": {
@@ -3086,23 +3118,31 @@
                                 "line": 246
                             }
                         },
-                        "tag": "RecordAccess"
+                        "tag": "FunctionApplication"
                     },
                     {
-                        "field": "x",
-                        "record": {
-                            "name": ",,",
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 11,
-                                    "line": 247
+                        "arguments": [
+                            {
+                                "name": ",,",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 11,
+                                        "line": 247
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 247
+                                    }
                                 },
-                                "start": {
-                                    "col": 7,
-                                    "line": 247
-                                }
-                            },
-                            "tag": "VariableReference"
+                                "tag": "VariableReference"
+                            }
+                        ],
+                        "display": {
+                            "showAsRecordAccess": true
+                        },
+                        "function": {
+                            "field": "x",
+                            "tag": "RecordAccessFunction"
                         },
                         "sourceLocation": {
                             "end": {
@@ -3114,26 +3154,34 @@
                                 "line": 247
                             }
                         },
-                        "tag": "RecordAccess"
+                        "tag": "FunctionApplication"
                     },
                     {
-                        "field": "x",
-                        "record": {
-                            "display": {
-                                "fieldOrder": []
-                            },
-                            "fields": {},
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 9,
-                                    "line": 248
+                        "arguments": [
+                            {
+                                "display": {
+                                    "fieldOrder": []
                                 },
-                                "start": {
-                                    "col": 7,
-                                    "line": 248
-                                }
-                            },
-                            "tag": "RecordLiteral"
+                                "fields": {},
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 248
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 248
+                                    }
+                                },
+                                "tag": "RecordLiteral"
+                            }
+                        ],
+                        "display": {
+                            "showAsRecordAccess": true
+                        },
+                        "function": {
+                            "field": "x",
+                            "tag": "RecordAccessFunction"
                         },
                         "sourceLocation": {
                             "end": {
@@ -3145,46 +3193,54 @@
                                 "line": 248
                             }
                         },
-                        "tag": "RecordAccess"
+                        "tag": "FunctionApplication"
                     },
                     {
-                        "field": "x",
-                        "record": {
-                            "display": {
-                                "fieldOrder": [
-                                    "x"
-                                ]
-                            },
-                            "fields": {
-                                "x": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 14,
-                                            "line": 249
-                                        },
-                                        "start": {
-                                            "col": 13,
-                                            "line": 249
-                                        }
-                                    },
-                                    "tag": "IntLiteral",
-                                    "value": 1
-                                }
-                            },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 16,
-                                    "line": 249
+                        "arguments": [
+                            {
+                                "display": {
+                                    "fieldOrder": [
+                                        "x"
+                                    ]
                                 },
-                                "start": {
-                                    "col": 7,
-                                    "line": 249
-                                }
-                            },
-                            "tag": "RecordLiteral"
+                                "fields": {
+                                    "x": {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 14,
+                                                "line": 249
+                                            },
+                                            "start": {
+                                                "col": 13,
+                                                "line": 249
+                                            }
+                                        },
+                                        "tag": "IntLiteral",
+                                        "value": 1
+                                    }
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 16,
+                                        "line": 249
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 249
+                                    }
+                                },
+                                "tag": "RecordLiteral"
+                            }
+                        ],
+                        "display": {
+                            "showAsRecordAccess": true
+                        },
+                        "function": {
+                            "field": "x",
+                            "tag": "RecordAccessFunction"
                         },
                         "sourceLocation": {
                             "end": {
@@ -3196,47 +3252,55 @@
                                 "line": 249
                             }
                         },
-                        "tag": "RecordAccess"
+                        "tag": "FunctionApplication"
                     },
                     {
-                        "field": "x",
-                        "record": {
-                            "base": "r",
-                            "display": {
-                                "fieldOrder": [
-                                    "x"
-                                ]
-                            },
-                            "fields": {
-                                "x": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 18,
-                                            "line": 250
-                                        },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 250
-                                        }
-                                    },
-                                    "tag": "IntLiteral",
-                                    "value": 1
-                                }
-                            },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 20,
-                                    "line": 250
+                        "arguments": [
+                            {
+                                "base": "r",
+                                "display": {
+                                    "fieldOrder": [
+                                        "x"
+                                    ]
                                 },
-                                "start": {
-                                    "col": 7,
-                                    "line": 250
-                                }
-                            },
-                            "tag": "RecordUpdate"
+                                "fields": {
+                                    "x": {
+                                        "display": {
+                                            "representation": "DecimalInt"
+                                        },
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 18,
+                                                "line": 250
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 250
+                                            }
+                                        },
+                                        "tag": "IntLiteral",
+                                        "value": 1
+                                    }
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 20,
+                                        "line": 250
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 250
+                                    }
+                                },
+                                "tag": "RecordUpdate"
+                            }
+                        ],
+                        "display": {
+                            "showAsRecordAccess": true
+                        },
+                        "function": {
+                            "field": "x",
+                            "tag": "RecordAccessFunction"
                         },
                         "sourceLocation": {
                             "end": {
@@ -3248,17 +3312,37 @@
                                 "line": 250
                             }
                         },
-                        "tag": "RecordAccess"
+                        "tag": "FunctionApplication"
                     },
                     {
-                        "field": "y",
-                        "record": {
-                            "field": "x",
-                            "record": {
-                                "name": "a",
+                        "arguments": [
+                            {
+                                "arguments": [
+                                    {
+                                        "name": "a",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 251
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 251
+                                            }
+                                        },
+                                        "tag": "VariableReference"
+                                    }
+                                ],
+                                "display": {
+                                    "showAsRecordAccess": true
+                                },
+                                "function": {
+                                    "field": "x",
+                                    "tag": "RecordAccessFunction"
+                                },
                                 "sourceLocation": {
                                     "end": {
-                                        "col": 8,
+                                        "col": 10,
                                         "line": 251
                                     },
                                     "start": {
@@ -3266,19 +3350,15 @@
                                         "line": 251
                                     }
                                 },
-                                "tag": "VariableReference"
-                            },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 10,
-                                    "line": 251
-                                },
-                                "start": {
-                                    "col": 7,
-                                    "line": 251
-                                }
-                            },
-                            "tag": "RecordAccess"
+                                "tag": "FunctionApplication"
+                            }
+                        ],
+                        "display": {
+                            "showAsRecordAccess": true
+                        },
+                        "function": {
+                            "field": "y",
+                            "tag": "RecordAccessFunction"
                         },
                         "sourceLocation": {
                             "end": {
@@ -3290,24 +3370,32 @@
                                 "line": 251
                             }
                         },
-                        "tag": "RecordAccess"
+                        "tag": "FunctionApplication"
                     },
                     {
-                        "field": "x",
-                        "record": {
-                            "identifier": "record",
-                            "module": "Foo",
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 17,
-                                    "line": 252
+                        "arguments": [
+                            {
+                                "identifier": "record",
+                                "module": "Foo",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 17,
+                                        "line": 252
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 252
+                                    }
                                 },
-                                "start": {
-                                    "col": 7,
-                                    "line": 252
-                                }
-                            },
-                            "tag": "ExternalReference"
+                                "tag": "ExternalReference"
+                            }
+                        ],
+                        "display": {
+                            "showAsRecordAccess": true
+                        },
+                        "function": {
+                            "field": "x",
+                            "tag": "RecordAccessFunction"
                         },
                         "sourceLocation": {
                             "end": {
@@ -3319,7 +3407,7 @@
                                 "line": 252
                             }
                         },
-                        "tag": "RecordAccess"
+                        "tag": "FunctionApplication"
                     }
                 ]
             },
@@ -3450,7 +3538,6 @@
                 ],
                 "function": {
                     "field": "x",
-                    "record": null,
                     "sourceLocation": {
                         "end": {
                             "col": 7,
@@ -3461,7 +3548,7 @@
                             "line": 257
                         }
                     },
-                    "tag": "RecordAccess"
+                    "tag": "RecordAccessFunction"
                 },
                 "sourceLocation": {
                     "end": {

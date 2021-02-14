@@ -366,8 +366,9 @@ data Expression
     | LiteralExpression LiteralValue
     | VariableReferenceExpression Reference
     | FunctionApplication
-        { function :: Located Expression
+        { function :: MaybeF Located Expression
         , arguments :: List (Located Expression)
+        , display_fa :: FunctionApplicationDisplay
         }
     | BinaryOperatorList
         { first :: Located Expression
@@ -386,11 +387,10 @@ data Expression
     | RecordLiteral
         { base :: Maybe LowercaseIdentifier
         , fields :: Map LowercaseIdentifier (Located Expression) -- Cannot be empty if base is present
-        , display :: RecordDisplay
+        , display_rl :: RecordDisplay
         }
-    | RecordAccess
-        { record :: Maybe (Located Expression) -- Nothing means record access function
-        , field :: LowercaseIdentifier
+    | RecordAccessFunction
+        { field :: LowercaseIdentifier
         }
     | AnonymousFunction
         { parameters :: List (Located Pattern) -- Non-empty
@@ -411,6 +411,21 @@ data Expression
         }
     | TODO_Range String
     | TODO_GLShader String
+
+
+data FunctionApplicationDisplay
+    = FunctionApplicationDisplay
+        { showAsRecordAccess :: Bool
+        }
+
+instance ToJSON FunctionApplicationDisplay where
+    showJSON _ = \case
+        FunctionApplicationDisplay showAsRecordAccess ->
+            makeObj $ Maybe.catMaybes
+                [ if showAsRecordAccess
+                    then Just ( "showAsRecordAccess", JSBool True )
+                    else Nothing
+                ]
 
 
 data MaybeF f a
@@ -438,8 +453,9 @@ instance ToPublicAST 'ExpressionNK where
 
         AST.App expr args multiline ->
             FunctionApplication
-                (fromRawAST expr)
+                (JustF $ fromRawAST expr)
                 (fmap (\(C comments a) -> fromRawAST a) args)
+                (FunctionApplicationDisplay False)
 
         AST.Binops first rest multiline ->
             BinaryOperatorList
@@ -477,9 +493,10 @@ instance ToPublicAST 'ExpressionNK where
                     (fmap (extract . _key . extract) $ sequenceToList fields)
 
         AST.Access base field ->
-            RecordAccess
-                (Just $ fromRawAST base)
-                field
+            FunctionApplication
+                (NothingF $ RecordAccessFunction field)
+                [ fromRawAST base ]
+                (FunctionApplicationDisplay True)
 
         AST.Lambda parameters comments body multiline ->
             AnonymousFunction
@@ -512,7 +529,7 @@ instance ToPublicAST 'ExpressionNK where
             TODO_Range (show other)
 
         AST.AccessFunction field ->
-            RecordAccess Nothing field
+            RecordAccessFunction field
 
         other@(AST.GLShader _) ->
             TODO_GLShader (show other)
@@ -531,11 +548,12 @@ instance ToJSON Expression where
         VariableReferenceExpression ref ->
             showJSON c ref
 
-        FunctionApplication function arguments ->
-            makeObj
+        FunctionApplication function arguments display ->
+            makeObj $ mapMaybe removeEmpty
                 [ type_ "FunctionApplication"
                 , ( "function", showJSON c function )
                 , ( "arguments", showJSON c arguments)
+                , ( "display", showJSON c display )
                 ]
 
         BinaryOperatorList first operations ->
@@ -579,10 +597,9 @@ instance ToJSON Expression where
                 , ( "display", showJSON c display )
                 ]
 
-        RecordAccess record field ->
+        RecordAccessFunction field ->
             makeObj
-                [ type_ "RecordAccess"
-                , ( "record", showJSON c record )
+                [ type_ "RecordAccessFunction"
                 , ( "field", showJSON c field )
                 ]
 
@@ -769,13 +786,23 @@ addField field = \case
         JSObject
             $ toJSObject
             $ (++ [ field ])
-            $ fromJSObject $ obj
+            $ fromJSObject obj
 
     otherJson ->
         makeObj
             [ ( "value", otherJson )
             , field
             ]
+
+
+removeEmpty :: ( String, JSValue ) -> Maybe ( String, JSValue )
+removeEmpty (key, val) =
+    case val of
+        JSObject obj ->
+            case fromJSObject obj of
+                [] -> Nothing
+                _ -> Just (key, val)
+        _ -> Just (key, val)
 
 
 type_ :: String -> (String, JSValue)
