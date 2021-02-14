@@ -164,7 +164,7 @@ instance ToJSON (MergedTopLevelStructure [UppercaseIdentifier]) where
             [ type_ "Definition"
             , ( "name" , showJSON c name )
             , ( "parameters", JSArray $ fmap (mergedParameter c) args )
-            , ( "returnType", maybe JSNull (\(_, _, t) -> showJSON c $ PublicAST.typeFromRawAST t) annotation )
+            , ( "returnType", maybe JSNull (\(_, _, t) -> showJSON c $ PublicAST.fromRawAST t) annotation )
             , ( "expression" , showJSON c expression )
             , sourceLocation region
             ]
@@ -172,7 +172,7 @@ instance ToJSON (MergedTopLevelStructure [UppercaseIdentifier]) where
         makeObj
             [ type_ "TypeAlias"
             , ( "name", showJSON c name )
-            , ( "type", showJSON c $ PublicAST.typeFromRawAST t)
+            , ( "type", showJSON c $ PublicAST.fromRawAST t)
             , sourceLocation region
             ]
 
