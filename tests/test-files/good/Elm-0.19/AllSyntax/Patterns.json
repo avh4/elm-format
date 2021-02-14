@@ -3,6 +3,16 @@
         "TODO: Entry (Fix {unFix = at 4 1 5 16 (Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"Foo\") []), tags = OpenCommentedList [] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Foo\") [C [] (Fix {unFix = at 5 11 5 13 (UnitType [])}),C [] (Fix {unFix = at 5 14 5 16 (UnitType [])})]))})})",
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 9
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 9
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "wildcard",
@@ -39,6 +49,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 13
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 13
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "literal",
@@ -136,6 +156,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 17
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 17
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "variable",
@@ -173,6 +203,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 21
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 21
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "data",
@@ -210,9 +250,8 @@
                             }
                         ],
                         "constructor": {
-                            "identifier": "Foo",
-                            "module": null,
-                            "tag": "ExternalReference"
+                            "name": "Foo",
+                            "tag": "VariableReference"
                         },
                         "sourceLocation": {
                             "end": {
@@ -244,6 +283,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 25
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 25
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "unit",
@@ -280,6 +329,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 29
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 29
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "parens",
@@ -317,6 +376,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 33
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 33
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "tuple",
@@ -383,6 +452,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 37
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 37
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "emptyList",
@@ -421,6 +500,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 41
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 41
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "list",
@@ -488,6 +577,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 65
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 65
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "consList",
@@ -811,6 +910,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 75
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 75
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "equivalentCons",
@@ -981,6 +1090,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 79
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 79
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "complexCons",
@@ -1122,6 +1241,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 83
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 83
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "record",
@@ -1168,6 +1297,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 91
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 91
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "emptyRecord",
@@ -1239,6 +1378,16 @@
         },
         {
             "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 95
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 95
+                    }
+                },
                 "tag": "UnitLiteral"
             },
             "name": "asAlias",
@@ -1295,6 +1444,16 @@
                 "branches": [
                     {
                         "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 101
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 101
+                                }
+                            },
                             "tag": "UnitLiteral"
                         },
                         "pattern": {
@@ -1335,10 +1494,30 @@
                                 }
                             },
                             "tag": "DataPattern"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 101
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 100
+                            }
                         }
                     },
                     {
                         "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 104
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 104
+                                }
+                            },
                             "tag": "UnitLiteral"
                         },
                         "pattern": {
@@ -1373,10 +1552,30 @@
                                 }
                             },
                             "tag": "DataPattern"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 104
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 101
+                            }
                         }
                     },
                     {
                         "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 107
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 107
+                                }
+                            },
                             "tag": "UnitLiteral"
                         },
                         "pattern": {
@@ -1397,9 +1596,29 @@
                                 }
                             },
                             "tag": "DataPattern"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 107
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 104
+                            }
                         }
                     }
                 ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 15,
+                        "line": 107
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 99
+                    }
+                },
                 "subject": {
                     "name": "m",
                     "sourceLocation": {
@@ -1454,6 +1673,16 @@
                 "branches": [
                     {
                         "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 113
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 113
+                                }
+                            },
                             "tag": "UnitLiteral"
                         },
                         "pattern": {
@@ -1494,10 +1723,30 @@
                                 }
                             },
                             "tag": "DataPattern"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 113
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 112
+                            }
                         }
                     },
                     {
                         "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 116
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 116
+                                }
+                            },
                             "tag": "UnitLiteral"
                         },
                         "pattern": {
@@ -1549,10 +1798,30 @@
                                 }
                             },
                             "tag": "PatternAlias"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 116
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 113
+                            }
                         }
                     },
                     {
                         "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 119
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 119
+                                }
+                            },
                             "tag": "UnitLiteral"
                         },
                         "pattern": {
@@ -1590,10 +1859,30 @@
                                 }
                             },
                             "tag": "PatternAlias"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 119
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 116
+                            }
                         }
                     },
                     {
                         "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 122
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 122
+                                }
+                            },
                             "tag": "UnitLiteral"
                         },
                         "pattern": {
@@ -1648,10 +1937,30 @@
                                 }
                             },
                             "tag": "PatternAlias"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 122
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 119
+                            }
                         }
                     },
                     {
                         "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 125
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 125
+                                }
+                            },
                             "tag": "UnitLiteral"
                         },
                         "pattern": {
@@ -1666,9 +1975,29 @@
                                 }
                             },
                             "tag": "AnythingPattern"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 125
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 122
+                            }
                         }
                     }
                 ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 15,
+                        "line": 125
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 111
+                    }
+                },
                 "subject": {
                     "name": "m",
                     "sourceLocation": {

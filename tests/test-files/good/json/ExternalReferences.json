@@ -81,6 +81,16 @@
                     },
                     "tag": "ExternalReference"
                 },
+                "sourceLocation": {
+                    "end": {
+                        "col": 21,
+                        "line": 18
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 18
+                    }
+                },
                 "tag": "FunctionApplication"
             },
             "name": "theBestClass",
@@ -224,6 +234,16 @@
             "expression": {
                 "arguments": [
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 25,
+                                "line": 29
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 29
+                            }
+                        },
                         "tag": "ListLiteral",
                         "terms": [
                             {
@@ -243,6 +263,16 @@
                         ]
                     },
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 32
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 30
+                            }
+                        },
                         "tag": "ListLiteral",
                         "terms": [
                             {
@@ -277,6 +307,16 @@
                                     },
                                     "tag": "ExternalReference"
                                 },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 26,
+                                        "line": 30
+                                    },
+                                    "start": {
+                                        "col": 11,
+                                        "line": 30
+                                    }
+                                },
                                 "tag": "FunctionApplication"
                             },
                             {
@@ -299,22 +339,22 @@
                                     {
                                         "operator": {
                                             "name": "<|",
-                                            "sourceLocation": {
-                                                "end": {
-                                                    "col": 0,
-                                                    "line": 0
-                                                },
-                                                "start": {
-                                                    "col": 0,
-                                                    "line": 0
-                                                }
-                                            },
                                             "tag": "VariableReference"
                                         },
                                         "term": {
                                             "arguments": [
                                                 {
                                                     "operator": "-",
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 36,
+                                                            "line": 31
+                                                        },
+                                                        "start": {
+                                                            "col": 33,
+                                                            "line": 31
+                                                        }
+                                                    },
                                                     "tag": "UnaryOperator",
                                                     "term": {
                                                         "name": "pi",
@@ -346,10 +386,30 @@
                                                 },
                                                 "tag": "VariableReference"
                                             },
+                                            "sourceLocation": {
+                                                "end": {
+                                                    "col": 36,
+                                                    "line": 31
+                                                },
+                                                "start": {
+                                                    "col": 24,
+                                                    "line": 31
+                                                }
+                                            },
                                             "tag": "FunctionApplication"
                                         }
                                     }
                                 ],
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 36,
+                                        "line": 31
+                                    },
+                                    "start": {
+                                        "col": 11,
+                                        "line": 31
+                                    }
+                                },
                                 "tag": "BinaryOperatorList"
                             }
                         ]
@@ -369,6 +429,16 @@
                         }
                     },
                     "tag": "ExternalReference"
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 10,
+                        "line": 32
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 28
+                    }
                 },
                 "tag": "FunctionApplication"
             },

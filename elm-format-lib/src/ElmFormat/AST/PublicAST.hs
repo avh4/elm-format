@@ -26,11 +26,36 @@ data ModuleName =
     ModuleName [UppercaseIdentifier]
 
 
-data ExternalReference
+data Reference
     = ExternalReference
         { module_ :: ModuleName
-        , identifier :: UppercaseIdentifier
+        , identifier :: Ref ()
         }
+    | VariableReference
+        { name :: Ref ()
+        }
+
+
+mkReference :: Ref [UppercaseIdentifier] -> Reference
+mkReference = \case
+    VarRef [] var ->
+        VariableReference $ VarRef () var
+
+    VarRef namespace var ->
+        ExternalReference
+            (ModuleName namespace)
+            (VarRef () var)
+
+    TagRef [] tag ->
+        VariableReference $ TagRef () tag
+
+    TagRef namespace tag ->
+        ExternalReference
+            (ModuleName namespace)
+            (TagRef () tag)
+
+    OpRef sym ->
+        VariableReference $ OpRef sym
 
 
 data VariableDefinition
@@ -45,7 +70,7 @@ data Pattern
     | LiteralPattern LiteralValue
     | VariablePattern VariableDefinition
     | DataPattern
-        { constructor :: ExternalReference
+        { constructor :: Reference
         , arguments :: List (Located Pattern) -- Non-empty
         }
     | TuplePattern
@@ -86,7 +111,7 @@ data Type_
     | RecordType
         { base :: Maybe LowercaseIdentifier
         , fields :: Map LowercaseIdentifier (Located Type_) -- Cannot be empty if base is present
-        , display :: RecordTypeDisplay
+        , display :: RecordDisplay
         }
     | FunctionType
         { returnType :: Located Type_
@@ -94,10 +119,342 @@ data Type_
         }
 
 
-newtype RecordTypeDisplay
-    = RecordTypeDisplay
+newtype RecordDisplay
+    = RecordDisplay
         { fieldOrder :: List LowercaseIdentifier
         }
+
+
+data BinaryOperation
+    = BinaryOperation
+        { operator :: Reference
+        , term :: Located Expression
+        }
+
+instance ToJSON BinaryOperation where
+    showJSON c = \case
+        BinaryOperation operator term ->
+            makeObj
+                [ ( "operator", showJSON c operator )
+                , ( "term", showJSON c term )
+                ]
+
+
+data LetDeclaration
+    = Definition
+        { name :: LowercaseIdentifier
+        , expression :: Located Expression
+        }
+    | TODO_LetDeclaration String
+
+instance ToPublicAST 'LetDeclarationNK where
+    type PublicAST 'LetDeclarationNK = LetDeclaration
+
+    fromRawAST' = \case
+        AST.LetDefinition (I.Fix (A region (AST.VarPattern var))) [] comments expr ->
+            Definition
+                var
+                (fromRawAST expr)
+
+        other ->
+            TODO_LetDeclaration ("TODO: " ++ show other)
+
+instance ToJSON LetDeclaration where
+    showJSON c = \case
+        Definition name expression ->
+            makeObj
+                [ type_ "Definition"
+                , ( "name", showJSON c name )
+                , ( "expression", showJSON c expression )
+                ]
+
+        TODO_LetDeclaration s ->
+            JSString $ toJSString s
+
+
+data CaseBranch
+    = CaseBranch
+        { pattern :: Located Pattern
+        , body :: Located Expression
+        }
+
+instance ToPublicAST 'CaseBranchNK where
+    type PublicAST 'CaseBranchNK = CaseBranch
+
+    fromRawAST' = \case
+        AST.CaseBranch c1 c2 c3 pat body ->
+            CaseBranch
+                (fromRawAST pat)
+                (fromRawAST body)
+
+instance ToJSON CaseBranch where
+    showJSON c = \case
+        CaseBranch pattern body ->
+            makeObj
+                [ ( "pattern", showJSON c pattern )
+                , ( "body", showJSON c body )
+                ]
+
+
+data Expression
+    = UnitLiteral
+    | LiteralExpression LiteralValue
+    | VariableReferenceExpression Reference
+    | FunctionApplication
+        { function :: Located Expression
+        , arguments :: List (Located Expression)
+        }
+    | BinaryOperatorList
+        { first :: Located Expression
+        , operations :: List BinaryOperation
+        }
+    | UnaryOperator
+        { operator :: AST.UnaryOperator
+        , term :: Located Expression
+        }
+    | ListLiteral
+        { terms :: List (Located Expression)
+        }
+    | TupleLiteral
+        { terms :: List (Located Expression) -- At least two items
+        }
+    | RecordLiteral
+        { base :: Maybe LowercaseIdentifier
+        , fields :: Map LowercaseIdentifier (Located Expression) -- Cannot be empty if base is present
+        , display :: RecordDisplay
+        }
+    | RecordAccess
+        { record :: Maybe (Located Expression) -- Nothing means record access function
+        , field :: LowercaseIdentifier
+        }
+    | AnonymousFunction
+        { parameters :: List (Located Pattern) -- Non-empty
+        , body :: Located Expression
+        }
+    | IfExpression
+        { if_ :: Located Expression
+        , then_ :: Located Expression
+        , else_ :: MaybeF Located Expression
+        }
+    | LetExpression
+        { declarations :: List (Located LetDeclaration)
+        , body :: Located Expression
+        }
+    | CaseExpression
+        { subject :: Located Expression
+        , branches :: List (Located CaseBranch)
+        }
+    | TODO_Range String
+    | TODO_GLShader String
+
+
+data MaybeF f a
+    = JustF (f a)
+    | NothingF a
+
+instance (ToJSON a, ToJSON (f a)) => ToJSON (MaybeF f a) where
+    showJSON c = \case
+        JustF fa -> showJSON c fa
+        NothingF a -> showJSON c a
+
+
+instance ToPublicAST 'ExpressionNK where
+    type PublicAST 'ExpressionNK = Expression
+
+    fromRawAST' = \case
+        AST.Unit comments ->
+            UnitLiteral
+
+        AST.Literal lit ->
+            LiteralExpression lit
+
+        AST.VarExpr var ->
+            VariableReferenceExpression $ mkReference var
+
+        AST.App expr args multiline ->
+            FunctionApplication
+                (fromRawAST expr)
+                (fmap (\(C comments a) -> fromRawAST a) args)
+
+        AST.Binops first rest multiline ->
+            BinaryOperatorList
+                (fromRawAST first)
+                (fmap (\(AST.BinopsClause c1 op c2 expr) -> BinaryOperation (mkReference op) (fromRawAST expr)) rest)
+
+        AST.Unary op expr ->
+            UnaryOperator
+                op
+                (fromRawAST expr)
+
+        AST.Parens (C comments expr) ->
+            fromRawAST' $ extract $ I.unFix expr
+
+        AST.ExplicitList terms comments multiline ->
+            ListLiteral
+                (fmap (\(C comments a) -> fromRawAST a) $ sequenceToList terms)
+
+        AST.Tuple terms multiline ->
+            TupleLiteral
+                (fmap (\(C comments a) -> fromRawAST a) terms)
+
+        AST.TupleFunction n | n <= 1 ->
+            error ("INVALID TUPLE CONSTRUCTOR: " ++ show n)
+
+        AST.TupleFunction n ->
+            VariableReferenceExpression
+                (mkReference $ OpRef $ SymbolIdentifier $ replicate (n-1) ',')
+
+        AST.Record base fields comments multiline ->
+            RecordLiteral
+                (fmap (\(C comments a) -> a) base)
+                (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, fromRawAST value)) $ sequenceToList fields)
+                $ RecordDisplay
+                    (fmap (extract . _key . extract) $ sequenceToList fields)
+
+        AST.Access base field ->
+            RecordAccess
+                (Just $ fromRawAST base)
+                field
+
+        AST.Lambda parameters comments body multiline ->
+            AnonymousFunction
+                (fmap (\(C c a) -> fromRawAST a) parameters)
+                (fromRawAST body)
+
+        AST.If (AST.IfClause cond' thenBody') rest' (C c3 elseBody) ->
+            ifThenElse cond' thenBody' rest'
+            where
+                ifThenElse (C c1 cond) (C c2 thenBody) rest =
+                    IfExpression
+                        (fromRawAST cond)
+                        (fromRawAST thenBody)
+                        $ case rest of
+                            [] -> JustF $ fromRawAST elseBody
+                            C c4 (AST.IfClause nextCond nextBody) : nextRest ->
+                                NothingF $ ifThenElse nextCond nextBody nextRest
+
+        AST.Let decls comments body ->
+            LetExpression
+                (fmap fromRawAST decls)
+                (fromRawAST body)
+
+        AST.Case (C comments subject, multiline) branches ->
+            CaseExpression
+                (fromRawAST subject)
+                (fmap fromRawAST branches)
+
+        other@(AST.Range _ _ _) ->
+            TODO_Range (show other)
+
+        AST.AccessFunction field ->
+            RecordAccess Nothing field
+
+        other@(AST.GLShader _) ->
+            TODO_GLShader (show other)
+
+
+instance ToJSON Expression where
+    showJSON c = \case
+        UnitLiteral ->
+            makeObj
+                [ type_ "UnitLiteral"
+                ]
+
+        LiteralExpression lit ->
+            showJSON c lit
+
+        VariableReferenceExpression ref ->
+            showJSON c ref
+
+        FunctionApplication function arguments ->
+            makeObj
+                [ type_ "FunctionApplication"
+                , ( "function", showJSON c function )
+                , ( "arguments", showJSON c arguments)
+                ]
+
+        BinaryOperatorList first operations ->
+            makeObj
+                [ type_ "BinaryOperatorList"
+                , ( "first", showJSON c first )
+                , ( "operations", showJSON c operations )
+                ]
+
+        UnaryOperator operator term ->
+            makeObj
+                [ type_ "UnaryOperator"
+                , ( "operator", showJSON c operator )
+                , ( "term", showJSON c term )
+                ]
+
+        ListLiteral terms ->
+            makeObj
+                [ type_ "ListLiteral"
+                , ( "terms", showJSON c terms)
+                ]
+
+        TupleLiteral terms ->
+            makeObj
+                [ type_ "TupleLiteral"
+                , ( "terms", showJSON c terms)
+                ]
+
+        RecordLiteral Nothing fields display ->
+            makeObj
+                [ type_ "RecordLiteral"
+                , ( "fields", showJSON c fields )
+                , ( "display", showJSON c display )
+                ]
+
+        RecordLiteral (Just base) fields display ->
+            makeObj
+                [ type_ "RecordUpdate"
+                , ( "base", showJSON c base )
+                , ( "fields", showJSON c fields )
+                , ( "display", showJSON c display )
+                ]
+
+        RecordAccess record field ->
+            makeObj
+                [ type_ "RecordAccess"
+                , ( "record", showJSON c record )
+                , ( "field", showJSON c field )
+                ]
+
+        AnonymousFunction parameters body ->
+            makeObj
+                [ type_ "AnonymousFunction"
+                , ( "parameters", showJSON c parameters )
+                , ( "body", showJSON c body )
+                ]
+
+        IfExpression if_ then_ else_ ->
+            makeObj
+                [ type_ "IfExpression"
+                , ( "if", showJSON c if_ )
+                , ( "then", showJSON c then_ )
+                , ( "else", showJSON c else_ )
+                ]
+
+        LetExpression declarations body ->
+            makeObj
+                [ type_ "LetExpression"
+                , ( "declarations", showJSON c declarations )
+                , ( "body", showJSON c body )
+                ]
+
+        CaseExpression subject branches ->
+            makeObj
+                [ type_ "CaseExpression"
+                , ( "subject", showJSON c subject )
+                , ( "branches", showJSON c branches )
+                ]
+
+        TODO_Range s ->
+            JSString $ toJSString s
+
+        TODO_GLShader s ->
+            JSString $ toJSString s
 
 
 --
@@ -136,7 +493,7 @@ instance ToPublicAST 'PatternNK where
 
         AST.DataPattern (namespace, tag) args ->
             DataPattern
-                (ExternalReference (ModuleName namespace) tag)
+                (mkReference (TagRef namespace tag))
                 (fmap (fromRawAST . (\(C comments a) -> a)) args)
 
         AST.PatternParens (C (pre, post) pat) ->
@@ -203,7 +560,7 @@ instance ToPublicAST 'TypeNK where
             RecordType
                 (fmap (\(C comments a) -> a) base)
                 (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, fromRawAST value)) $ sequenceToList fields)
-                $ RecordTypeDisplay
+                $ RecordDisplay
                     (fmap (extract . _key . extract) $ sequenceToList fields)
 
         AST.FunctionType first rest multiline ->
@@ -308,6 +665,20 @@ instance ToJSON LowercaseIdentifier where
     showJSON _ (LowercaseIdentifier name) = JSString $ toJSString name
 
 
+instance ToJSON SymbolIdentifier where
+    showJSON _ (SymbolIdentifier sym) = JSString $ toJSString sym
+
+
+instance ToJSON (Ref ()) where
+    showJSON c (VarRef () var) = showJSON c var
+    showJSON c (TagRef () tag) = showJSON c tag
+    showJSON c (OpRef sym) = showJSON c sym
+
+
+instance ToJSON AST.UnaryOperator where
+    showJSON _ Negative = JSString $ toJSString "-"
+
+
 instance ToJSON IntRepresentation where
     showJSON _ DecimalInt = JSString $ toJSString "DecimalInt"
     showJSON _ HexadecimalInt = JSString $ toJSString "HexadecimalInt"
@@ -353,11 +724,10 @@ instance ToJSON AST.LiteralValue where
                 ]
 
         Boolean value ->
-            makeObj
-                [ type_ "ExternalReference"
-                , ("module", JSString $ toJSString "Basics")
-                , ("identifier", JSString $ toJSString $ show value)
-                ]
+            showJSON c $
+                ExternalReference
+                    (ModuleName [UppercaseIdentifier "Basics"])
+                    (TagRef () $ UppercaseIdentifier $ show value)
 
         Chr chr ->
             makeObj
@@ -479,20 +849,27 @@ instance ToJSON Type_ where
                 ]
 
 
-instance ToJSON RecordTypeDisplay where
-    showJSON c (RecordTypeDisplay fieldOrder) =
+instance ToJSON RecordDisplay where
+    showJSON c (RecordDisplay fieldOrder) =
         makeObj
             [ ( "fieldOrder", showJSON c fieldOrder )
             ]
 
 
-instance ToJSON ExternalReference where
-    showJSON c (ExternalReference module_ identifier) =
-        makeObj
-            [ type_ "ExternalReference"
-            , ("module", showJSON c module_)
-            , ("identifier", showJSON c identifier)
-            ]
+instance ToJSON Reference where
+    showJSON c = \case
+        ExternalReference module_ identifier ->
+            makeObj
+                [ type_ "ExternalReference"
+                , ("module", showJSON c module_)
+                , ("identifier", showJSON c identifier)
+                ]
+
+        VariableReference name ->
+            makeObj
+                [ type_ "VariableReference"
+                , ( "name", showJSON c name )
+                ]
 
 
 instance ToJSON VariableDefinition where
