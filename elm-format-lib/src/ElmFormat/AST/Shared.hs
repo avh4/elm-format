@@ -13,7 +13,10 @@ type List a = [a]
 
 data LowercaseIdentifier =
     LowercaseIdentifier String
-    deriving (Eq, Ord, Show)
+    deriving (Eq, Ord)
+
+instance Show LowercaseIdentifier where
+    show (LowercaseIdentifier name) = name
 
 
 data UppercaseIdentifier =
