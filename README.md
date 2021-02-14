@@ -143,7 +143,14 @@ Find your editor in the table below.  The recommended plugin for each editor is 
 </table>
 
 
-## Detailed instructions
+## Integration with other tools
+
+These tools also integrate with elm-format:
+
+- [Prettier](https://prettier.io/) via [gicentre/prettier-plugin-elm](https://github.com/gicentre/prettier-plugin-elm)
+
+
+## Detailed installation instructions
 
 If you can simplify or improve the installation instructions or add instructions for another editor, please [make a pull request](https://github.com/avh4/elm-format/edit/master/README.md).
 The default behavior of `elm-format`-approved plugins is to format Elm files on save.
