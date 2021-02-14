@@ -1,0 +1,1455 @@
+{
+    "body": [
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 25,
+                    "line": 11
+                },
+                "start": {
+                    "col": 1,
+                    "line": 8
+                }
+            },
+            "value": "TODO: Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"DataType1\") []), tags = OpenCommentedList [C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor1\") []),C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor2\") [C [] (Fix {unFix = at 10 13 10 15 (UnitType [])})])] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor3\") [C [] (Fix {unFix = at 11 13 11 22 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"List\")) [C [] (Fix {unFix = at 11 19 11 21 (UnitType [])})] (ForceMultiline False))}),C [] (Fix {unFix = at 11 23 11 25 (UnitType [])})]))}"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 49,
+                    "line": 17
+                },
+                "start": {
+                    "col": 1,
+                    "line": 14
+                }
+            },
+            "value": "TODO: Datatype {nameWithArgs = C ([BlockComment [\"A\"]],[BlockComment [\"B\"]]) (NameWithArgs (UppercaseIdentifier \"DataType2\") []), tags = OpenCommentedList [C ([BlockComment [\"C\"]],[BlockComment [\"D\"]],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor1\") []),C ([BlockComment [\"E\"]],[BlockComment [\"G\"]],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor2\") [C [BlockComment [\"F\"]] (Fix {unFix = at 16 29 16 31 (UnitType [])})])] (C ([BlockComment [\"H\"]],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor3\") [C [BlockComment [\"I\"]] (Fix {unFix = at 17 29 17 38 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"List\")) [C [] (Fix {unFix = at 17 35 17 37 (UnitType [])})] (ForceMultiline False))}),C [BlockComment [\"J\"]] (Fix {unFix = at 17 47 17 49 (UnitType [])})]))}"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 11,
+                    "line": 37
+                },
+                "start": {
+                    "col": 1,
+                    "line": 20
+                }
+            },
+            "value": "TODO: Datatype {nameWithArgs = C ([LineComment \"A\"],[LineComment \"B\"]) (NameWithArgs (UppercaseIdentifier \"DataType3\") []), tags = OpenCommentedList [C ([LineComment \"C\"],[LineComment \"D\"],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor1\") []),C ([LineComment \"E\"],[LineComment \"G\"],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor2\") [C [LineComment \"F\"] (Fix {unFix = at 30 9 30 11 (UnitType [])})])] (C ([LineComment \"H\"],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor3\") [C [LineComment \"I\"] (Fix {unFix = at 35 9 35 18 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"List\")) [C [] (Fix {unFix = at 35 15 35 17 (UnitType [])})] (ForceMultiline False))}),C [LineComment \"J\"] (Fix {unFix = at 37 9 37 11 (UnitType [])})]))}"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 16,
+                    "line": 41
+                },
+                "start": {
+                    "col": 1,
+                    "line": 40
+                }
+            },
+            "value": "TODO: Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"DataTypeWithEolComments1\") []), tags = OpenCommentedList [] (C ([],Just \"A\") (NameWithArgs (UppercaseIdentifier \"Ctor1\") []))}"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 20,
+                    "line": 47
+                },
+                "start": {
+                    "col": 1,
+                    "line": 44
+                }
+            },
+            "value": "TODO: Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"DataTypeWithEolComments2\") []), tags = OpenCommentedList [C ([],[],Just \"A\") (NameWithArgs (UppercaseIdentifier \"Ctor1\") []),C ([],[],Just \"B\") (NameWithArgs (UppercaseIdentifier \"Ctor2\") [C [] (Fix {unFix = at 46 13 46 14 (TypeVariable a)})])] (C ([],Just \"C\") (NameWithArgs (UppercaseIdentifier \"Ctor3\") [C [] (Fix {unFix = at 47 13 47 14 (TypeVariable b)}),C [] (Fix {unFix = at 47 15 47 16 (TypeVariable c)})]))}"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 8,
+                    "line": 55
+                },
+                "start": {
+                    "col": 1,
+                    "line": 50
+                }
+            },
+            "value": "TODO: Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"DataTypeWithCommentedOutConstructors\") []), tags = OpenCommentedList [C ([],[LineComment \" | B\",LineComment \" | C\"],Nothing) (NameWithArgs (UppercaseIdentifier \"A\") []),C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"D\") [])] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"E\") []))}"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 0,
+                    "line": 0
+                },
+                "start": {
+                    "col": 0,
+                    "line": 0
+                }
+            },
+            "value": "TODO: BodyComment (LineComment \"\")"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 0,
+                    "line": 0
+                },
+                "start": {
+                    "col": 0,
+                    "line": 0
+                }
+            },
+            "value": "TODO: BodyComment (LineComment \" Union type with params\")"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 0,
+                    "line": 0
+                },
+                "start": {
+                    "col": 0,
+                    "line": 0
+                }
+            },
+            "value": "TODO: BodyComment (LineComment \"\")"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 17,
+                    "line": 67
+                },
+                "start": {
+                    "col": 1,
+                    "line": 64
+                }
+            },
+            "value": "TODO: Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"DataTypeWithParams1\") [C [] a,C [] b,C [] c]), tags = OpenCommentedList [C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor1_\") []),C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor2_\") [C [] (Fix {unFix = at 66 14 66 15 (TypeVariable a)})])] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor3_\") [C [] (Fix {unFix = at 67 14 67 15 (TypeVariable b)}),C [] (Fix {unFix = at 67 16 67 17 (TypeVariable c)})]))}"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 17,
+                    "line": 73
+                },
+                "start": {
+                    "col": 1,
+                    "line": 70
+                }
+            },
+            "value": "TODO: Datatype {nameWithArgs = C ([BlockComment [\"K\"]],[BlockComment [\"O\"]]) (NameWithArgs (UppercaseIdentifier \"DataTypeWithParams2\") [C [BlockComment [\"L\"]] a,C [BlockComment [\"M\"]] b,C [BlockComment [\"N\"]] c]), tags = OpenCommentedList [C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor1_\") []),C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor2_\") [C [] (Fix {unFix = at 72 14 72 15 (TypeVariable a)})])] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor3_\") [C [] (Fix {unFix = at 73 14 73 15 (TypeVariable b)}),C [] (Fix {unFix = at 73 16 73 17 (TypeVariable c)})]))}"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 17,
+                    "line": 88
+                },
+                "start": {
+                    "col": 1,
+                    "line": 76
+                }
+            },
+            "value": "TODO: Datatype {nameWithArgs = C ([LineComment \"K\"],[LineComment \"O\"]) (NameWithArgs (UppercaseIdentifier \"DataTypeWithParams3\") [C [LineComment \"L\"] a,C [LineComment \"M\"] b,C [LineComment \"N\"] c]), tags = OpenCommentedList [C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor1_\") []),C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor2_\") [C [] (Fix {unFix = at 87 14 87 15 (TypeVariable a)})])] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor3_\") [C [] (Fix {unFix = at 88 14 88 15 (TypeVariable b)}),C [] (Fix {unFix = at 88 16 88 17 (TypeVariable c)})]))}"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 0,
+                    "line": 0
+                },
+                "start": {
+                    "col": 0,
+                    "line": 0
+                }
+            },
+            "value": "TODO: BodyComment (LineComment \"\")"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 0,
+                    "line": 0
+                },
+                "start": {
+                    "col": 0,
+                    "line": 0
+                }
+            },
+            "value": "TODO: BodyComment (LineComment \" Type alias\")"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 0,
+                    "line": 0
+                },
+                "start": {
+                    "col": 0,
+                    "line": 0
+                }
+            },
+            "value": "TODO: BodyComment (LineComment \"\")"
+        },
+        {
+            "name": "TypeAlias1",
+            "sourceLocation": {
+                "end": {
+                    "col": 39,
+                    "line": 98
+                },
+                "start": {
+                    "col": 1,
+                    "line": 97
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "display": {
+                    "fieldOrder": [
+                        "x",
+                        "y",
+                        "z"
+                    ]
+                },
+                "fields": {
+                    "x": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 98
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 98
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "y": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 98
+                            },
+                            "start": {
+                                "col": 20,
+                                "line": 98
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "z": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 37,
+                                "line": 98
+                            },
+                            "start": {
+                                "col": 29,
+                                "line": 98
+                            }
+                        },
+                        "tag": "TupleType",
+                        "terms": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 32,
+                                        "line": 98
+                                    },
+                                    "start": {
+                                        "col": 31,
+                                        "line": 98
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            },
+                            {
+                                "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 35,
+                                        "line": 98
+                                    },
+                                    "start": {
+                                        "col": 34,
+                                        "line": 98
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            }
+                        ]
+                    }
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 39,
+                        "line": 98
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 98
+                    }
+                },
+                "tag": "RecordType"
+            }
+        },
+        {
+            "name": "TypeAliasMultiline",
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 107
+                },
+                "start": {
+                    "col": 1,
+                    "line": 101
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 107
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 107
+                    }
+                },
+                "tag": "UnitType"
+            }
+        },
+        {
+            "name": "TypeAlias2",
+            "sourceLocation": {
+                "end": {
+                    "col": 39,
+                    "line": 112
+                },
+                "start": {
+                    "col": 1,
+                    "line": 110
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "display": {
+                    "fieldOrder": [
+                        "x",
+                        "y",
+                        "z"
+                    ]
+                },
+                "fields": {
+                    "x": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 112
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 112
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "y": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 112
+                            },
+                            "start": {
+                                "col": 20,
+                                "line": 112
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "z": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 37,
+                                "line": 112
+                            },
+                            "start": {
+                                "col": 29,
+                                "line": 112
+                            }
+                        },
+                        "tag": "TupleType",
+                        "terms": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 32,
+                                        "line": 112
+                                    },
+                                    "start": {
+                                        "col": 31,
+                                        "line": 112
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            },
+                            {
+                                "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 35,
+                                        "line": 112
+                                    },
+                                    "start": {
+                                        "col": 34,
+                                        "line": 112
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            }
+                        ]
+                    }
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 39,
+                        "line": 112
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 112
+                    }
+                },
+                "tag": "RecordType"
+            }
+        },
+        {
+            "name": "TypeAlias3",
+            "sourceLocation": {
+                "end": {
+                    "col": 39,
+                    "line": 127
+                },
+                "start": {
+                    "col": 1,
+                    "line": 115
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "display": {
+                    "fieldOrder": [
+                        "x",
+                        "y",
+                        "z"
+                    ]
+                },
+                "fields": {
+                    "x": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 127
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 127
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "y": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 127
+                            },
+                            "start": {
+                                "col": 20,
+                                "line": 127
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "z": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 37,
+                                "line": 127
+                            },
+                            "start": {
+                                "col": 29,
+                                "line": 127
+                            }
+                        },
+                        "tag": "TupleType",
+                        "terms": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 32,
+                                        "line": 127
+                                    },
+                                    "start": {
+                                        "col": 31,
+                                        "line": 127
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            },
+                            {
+                                "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 35,
+                                        "line": 127
+                                    },
+                                    "start": {
+                                        "col": 34,
+                                        "line": 127
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            }
+                        ]
+                    }
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 39,
+                        "line": 127
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 127
+                    }
+                },
+                "tag": "RecordType"
+            }
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 0,
+                    "line": 0
+                },
+                "start": {
+                    "col": 0,
+                    "line": 0
+                }
+            },
+            "value": "TODO: BodyComment (LineComment \"\")"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 0,
+                    "line": 0
+                },
+                "start": {
+                    "col": 0,
+                    "line": 0
+                }
+            },
+            "value": "TODO: BodyComment (LineComment \" Expressions\")"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 0,
+                    "line": 0
+                },
+                "start": {
+                    "col": 0,
+                    "line": 0
+                }
+            },
+            "value": "TODO: BodyComment (LineComment \"\")"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 137
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 137
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "expressionDefinition",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 136
+                            },
+                            "start": {
+                                "col": 22,
+                                "line": 136
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": null
+                },
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 25,
+                                "line": 136
+                            },
+                            "start": {
+                                "col": 24,
+                                "line": 136
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 137
+                },
+                "start": {
+                    "col": 1,
+                    "line": 136
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 141
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 141
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "expressionDefinitionNoPatterns",
+            "parameters": [],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 141
+                },
+                "start": {
+                    "col": 1,
+                    "line": 140
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 146
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 146
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "expressionTypeAnnotation1",
+            "parameters": [],
+            "returnType": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 31,
+                        "line": 144
+                    },
+                    "start": {
+                        "col": 29,
+                        "line": 144
+                    }
+                },
+                "tag": "UnitType"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 146
+                },
+                "start": {
+                    "col": 1,
+                    "line": 145
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 151
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 151
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "expressionTypeAnnotation2",
+            "parameters": [],
+            "returnType": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 47,
+                        "line": 149
+                    },
+                    "start": {
+                        "col": 45,
+                        "line": 149
+                    }
+                },
+                "tag": "UnitType"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 151
+                },
+                "start": {
+                    "col": 1,
+                    "line": 150
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 160
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 160
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "expressionTypeAnnotation3",
+            "parameters": [],
+            "returnType": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 158
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 158
+                    }
+                },
+                "tag": "UnitType"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 160
+                },
+                "start": {
+                    "col": 1,
+                    "line": 159
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 167
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 167
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "expressionTypeAnnotation4",
+            "parameters": [],
+            "returnType": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 165
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 165
+                    }
+                },
+                "tag": "UnitType"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 167
+                },
+                "start": {
+                    "col": 1,
+                    "line": 166
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 175
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 175
+                    }
+                },
+                "tag": "ListLiteral",
+                "terms": []
+            },
+            "name": "expressionTypeAnnotationForcedMultiline",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 42,
+                                "line": 174
+                            },
+                            "start": {
+                                "col": 41,
+                                "line": 174
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": null
+                },
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 44,
+                                "line": 174
+                            },
+                            "start": {
+                                "col": 43,
+                                "line": 174
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": {
+                "argumentTypes": [
+                    {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 171
+                            },
+                            "start": {
+                                "col": 5,
+                                "line": 171
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    {
+                        "arguments": [
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 21,
+                                        "line": 172
+                                    },
+                                    "start": {
+                                        "col": 15,
+                                        "line": 172
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Bool",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 26,
+                                        "line": 172
+                                    },
+                                    "start": {
+                                        "col": 22,
+                                        "line": 172
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        ],
+                        "module": null,
+                        "name": "Result",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 172
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 172
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                ],
+                "returnType": {
+                    "arguments": [
+                        {
+                            "arguments": [
+                                {
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 22,
+                                            "line": 173
+                                        },
+                                        "start": {
+                                            "col": 20,
+                                            "line": 173
+                                        }
+                                    },
+                                    "tag": "UnitType"
+                                }
+                            ],
+                            "module": "Maybe",
+                            "name": "Maybe",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 23,
+                                    "line": 173
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 173
+                                }
+                            },
+                            "tag": "TypeReference"
+                        }
+                    ],
+                    "module": null,
+                    "name": "List",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 23,
+                            "line": 173
+                        },
+                        "start": {
+                            "col": 8,
+                            "line": 173
+                        }
+                    },
+                    "tag": "TypeReference"
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 23,
+                        "line": 173
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 171
+                    }
+                },
+                "tag": "FunctionType"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 175
+                },
+                "start": {
+                    "col": 1,
+                    "line": 174
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 0,
+                    "line": 0
+                },
+                "start": {
+                    "col": 0,
+                    "line": 0
+                }
+            },
+            "value": "TODO: BodyComment (LineComment \"\")"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 0,
+                    "line": 0
+                },
+                "start": {
+                    "col": 0,
+                    "line": 0
+                }
+            },
+            "value": "TODO: BodyComment (LineComment \" Declarations in let expressions\")"
+        },
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 0,
+                    "line": 0
+                },
+                "start": {
+                    "col": 0,
+                    "line": 0
+                }
+            },
+            "value": "TODO: BodyComment (LineComment \"\")"
+        },
+        {
+            "expression": {
+                "body": {
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 192
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 192
+                        }
+                    },
+                    "tag": "UnitLiteral"
+                },
+                "declarations": [
+                    {
+                        "expression": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 187
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 187
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "name": "def1",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 187
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 186
+                            }
+                        },
+                        "tag": "Definition"
+                    },
+                    {
+                        "expression": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 190
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 190
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "name": "def2",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 190
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 189
+                            }
+                        },
+                        "tag": "Definition"
+                    }
+                ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 192
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 185
+                    }
+                },
+                "tag": "LetExpression"
+            },
+            "name": "expressionDefinitionsInLet",
+            "parameters": [],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 192
+                },
+                "start": {
+                    "col": 1,
+                    "line": 184
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "body": {
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 210
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 210
+                        }
+                    },
+                    "tag": "UnitLiteral"
+                },
+                "declarations": [
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 198
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 196
+                            }
+                        },
+                        "value": "TODO: LetComment (BlockComment [\"X\"])"
+                    },
+                    {
+                        "expression": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 200
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 200
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "name": "def1",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 200
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 198
+                            }
+                        },
+                        "tag": "Definition"
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 203
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 200
+                            }
+                        },
+                        "value": "TODO: LetComment (BlockComment [\"AA\"])"
+                    },
+                    {
+                        "expression": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 205
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 205
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "name": "def2",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 205
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 203
+                            }
+                        },
+                        "tag": "Definition"
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 5,
+                                "line": 208
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 205
+                            }
+                        },
+                        "value": "TODO: LetComment (BlockComment [\"AD\"])"
+                    }
+                ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 210
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 196
+                    }
+                },
+                "tag": "LetExpression"
+            },
+            "name": "expressionDefinitionsInLet2",
+            "parameters": [],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 210
+                },
+                "start": {
+                    "col": 1,
+                    "line": 195
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "body": {
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 228
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 228
+                        }
+                    },
+                    "tag": "UnitLiteral"
+                },
+                "declarations": [
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 216
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 214
+                            }
+                        },
+                        "value": "TODO: LetComment (LineComment \"X\")"
+                    },
+                    {
+                        "expression": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 218
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 218
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "name": "def1",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 218
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 216
+                            }
+                        },
+                        "tag": "Definition"
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 221
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 218
+                            }
+                        },
+                        "value": "TODO: LetComment (LineComment \"Z\")"
+                    },
+                    {
+                        "expression": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 223
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 223
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "name": "def2",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 223
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 221
+                            }
+                        },
+                        "tag": "Definition"
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 5,
+                                "line": 226
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 223
+                            }
+                        },
+                        "value": "TODO: LetComment (LineComment \"AB\")"
+                    }
+                ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 228
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 214
+                    }
+                },
+                "tag": "LetExpression"
+            },
+            "name": "expressionDefinitionsInLet3",
+            "parameters": [],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 228
+                },
+                "start": {
+                    "col": 1,
+                    "line": 213
+                }
+            },
+            "tag": "Definition"
+        }
+    ],
+    "imports": {},
+    "moduleName": "AllSyntax.Declarations"
+}
