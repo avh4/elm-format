@@ -27,18 +27,15 @@ effect
     -- L
     exposing
     -- M
-    (  -- N
-       a
-       -- O
-
-    ,  -- P
-       b
-       -- Q
-
-    ,  -- R
-       c
-       -- S
-
+    ( -- N
+      a
+      -- O
+    , -- P
+      b
+      -- Q
+    , -- R
+      c
+      -- S
     )
 
 
