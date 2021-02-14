@@ -1,6 +1,18 @@
 {
     "body": [
-        "TODO: Entry (Fix {unFix = at 4 1 5 16 (Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"Foo\") []), tags = OpenCommentedList [] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Foo\") [C [] (Fix {unFix = at 5 11 5 13 (UnitType [])}),C [] (Fix {unFix = at 5 14 5 16 (UnitType [])})]))})})",
+        {
+            "sourceLocation": {
+                "end": {
+                    "col": 16,
+                    "line": 5
+                },
+                "start": {
+                    "col": 1,
+                    "line": 4
+                }
+            },
+            "value": "TODO: Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"Foo\") []), tags = OpenCommentedList [] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Foo\") [C [] (Fix {unFix = at 5 11 5 13 (UnitType [])}),C [] (Fix {unFix = at 5 14 5 16 (UnitType [])})]))}"
+        },
         {
             "expression": {
                 "sourceLocation": {

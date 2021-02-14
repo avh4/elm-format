@@ -7,12 +7,14 @@ module ElmFormat.AST.PublicAST where
 import ElmFormat.AST.Shared
 import AST.V0_16 (NodeKind(..), sequenceToList, Pair(..))
 import qualified AST.V0_16 as AST
+import qualified AST.Module as AST
+import qualified AST.Listing as AST
 import Reporting.Annotation (Located(A))
 import Reporting.Region (Region)
 import qualified Reporting.Region as Region
 import Text.JSON hiding (showJSON)
 import qualified Data.List as List
-import AST.Structure (ASTNS, ASTNS1)
+import AST.Structure (ASTNS, ASTNS1, mapNs)
 import Data.Indexed as I
 import Data.Maybe (listToMaybe)
 import Data.Coapplicative
@@ -20,10 +22,173 @@ import Data.ReversedList (Reversed)
 import qualified Data.ReversedList as ReversedList
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
+import qualified ElmFormat.ImportInfo as ImportInfo
+import qualified Data.Maybe as Maybe
+import Data.Maybe (mapMaybe)
+import AST.MatchReferences (fromMatched, matchReferences)
+import qualified Reporting.Annotation
 
 
 data ModuleName =
     ModuleName [UppercaseIdentifier]
+    deriving (Eq, Ord)
+
+instance Show ModuleName where
+    show (ModuleName ns) = List.intercalate "." $ fmap (\(UppercaseIdentifier v) -> v) ns
+
+
+data Module
+    = Module
+        { moduleName :: ModuleName
+        , imports :: Map ModuleName Import
+        , body :: List (Located TopLevelStructure)
+        }
+
+fromModule :: AST.Module [UppercaseIdentifier] (ASTNS Located [UppercaseIdentifier] 'TopLevelNK) -> Module
+fromModule = \case
+    modu@(AST.Module _ maybeHeader _ (C _ imports) body) ->
+        let
+            header =
+                Maybe.fromMaybe AST.defaultHeader maybeHeader
+
+            (AST.Header _ (C _ name) _ _) = header
+
+            importInfo =
+                ImportInfo.fromModule mempty modu
+
+            normalize =
+                mapNs (fromMatched []) . matchReferences importInfo
+        in
+        Module
+            (ModuleName name)
+            (Map.mapWithKey (\m (C comments i) -> fromImportMethod m i) $ Map.mapKeys ModuleName $ imports)
+            (fromTopLevelStructures $ normalize body)
+
+instance ToJSON Module where
+    showJSON c = \case
+        Module moduleName imports body ->
+            makeObj
+                [ ( "moduleName", showJSON c moduleName )
+                , ( "imports", showJSON c imports )
+                , ( "body", showJSON c body )
+                ]
+
+
+data Import
+    = Import
+        { as :: ModuleName
+        , exposing :: AST.Listing AST.DetailedListing
+        }
+
+fromImportMethod :: ModuleName -> AST.ImportMethod -> Import
+fromImportMethod moduleName (AST.ImportMethod alias (C comments exposing)) =
+    let
+        as_ =
+            case alias of
+                Nothing -> moduleName
+                Just (C c a) -> ModuleName [ a ]
+    in
+    Import as_ exposing
+
+instance ToJSON Import where
+    showJSON c = \case
+        Import as exposing ->
+            makeObj
+                [ ( "as", showJSON c as )
+                , ( "exposing", showJSON c exposing )
+                ]
+
+data TypedParameter
+    = TypedParameter
+        { pattern :: Located Pattern
+        , type_tp :: Maybe (Located Type_)
+        }
+
+instance ToJSON TypedParameter where
+    showJSON c = \case
+        TypedParameter pattern typ ->
+            makeObj
+                [ ( "pattern", showJSON c pattern )
+                , ( "type", showJSON c typ )
+                ]
+
+
+data TopLevelStructure
+    = Definition_tls
+        { name_d :: LowercaseIdentifier
+        , parameters_d :: List (TypedParameter)
+        , returnType :: Maybe (Located Type_)
+        , expression :: Located Expression
+        }
+    | TypeAlias
+        { name_ta :: UppercaseIdentifier
+        , parameters_ta :: List LowercaseIdentifier
+        , type_ta :: Located Type_
+        }
+    | TODO_TopLevelStructure String
+
+
+fromTopLevelStructures :: ASTNS Located [UppercaseIdentifier] 'TopLevelNK -> List (Located TopLevelStructure)
+fromTopLevelStructures (I.Fix (A _ (AST.TopLevel decls))) =
+    let
+        collectAnnotation :: AST.TopLevelStructure (ASTNS Located ns 'DeclarationNK) -> Maybe (LowercaseIdentifier, (Comments, Comments, ASTNS Located ns 'TypeNK))
+        collectAnnotation decl =
+            case fmap (extract . I.unFix) decl of
+                AST.Entry (AST.TypeAnnotation (C preColon (VarRef () name)) (C postColon typ)) -> Just (name, (preColon, postColon, typ))
+                _ -> Nothing
+
+        annotations :: Map.Map LowercaseIdentifier (Comments, Comments, ASTNS Located [UppercaseIdentifier] 'TypeNK)
+        annotations =
+            Map.fromList $ mapMaybe collectAnnotation decls
+
+        merge :: AST.TopLevelStructure
+                     (ASTNS Located [UppercaseIdentifier] 'DeclarationNK) -> Maybe (Located TopLevelStructure)
+        merge decl =
+            case fmap I.unFix decl of
+                AST.Entry (A region (AST.Definition (I.Fix (A _ (AST.VarPattern name))) args preEquals expr)) ->
+                    Just $ A region $ Definition_tls
+                        name
+                        -- TODO: fill in TypedParameter types from type annotation
+                        (fmap (\(C c a) -> TypedParameter (fromRawAST a) Nothing) args)
+                        (fmap (fromRawAST . (\(c1, c2, t) -> t)) $ Map.lookup name annotations)
+                        (fromRawAST expr)
+
+                AST.Entry (A _ (AST.TypeAnnotation _ _)) ->
+                    -- TODO: retain annotations that don't have a matching definition
+                    Nothing
+
+                AST.Entry (A region (AST.TypeAlias c1 (C (c2, c3) (AST.NameWithArgs name args)) (C c4 t))) ->
+                    Just $ A region $ TypeAlias name (fmap (\(C c a) -> a) args) (fromRawAST t)
+
+                AST.Entry (A region d) ->
+                    Just $ A region $ TODO_TopLevelStructure ("TODO: " ++ show d)
+
+                _ ->
+                    Just $ Reporting.Annotation.at (Region.Position 0 0) (Region.Position 0 0) $
+                        TODO_TopLevelStructure ("TODO: " ++ show decl)
+    in
+    mapMaybe merge decls
+
+instance ToJSON TopLevelStructure where
+    showJSON c = \case
+        Definition_tls name parameters returnType expression ->
+            makeObj
+                [ type_ "Definition"
+                , ( "name", showJSON c name )
+                , ( "parameters", showJSON c parameters )
+                , ( "returnType", showJSON c returnType )
+                , ( "expression", showJSON c expression )
+                ]
+
+        TypeAlias name parameters t ->
+            makeObj
+                [ type_ "TypeAlias"
+                , ( "name", showJSON c name )
+                , ( "type", showJSON c t )
+                ]
+
+        TODO_TopLevelStructure s ->
+            JSString $ toJSString s
 
 
 data Reference
@@ -141,7 +306,7 @@ instance ToJSON BinaryOperation where
 
 
 data LetDeclaration
-    = Definition
+    = Definition_ld
         { name :: LowercaseIdentifier
         , expression :: Located Expression
         }
@@ -152,7 +317,7 @@ instance ToPublicAST 'LetDeclarationNK where
 
     fromRawAST' = \case
         AST.LetDefinition (I.Fix (A region (AST.VarPattern var))) [] comments expr ->
-            Definition
+            Definition_ld
                 var
                 (fromRawAST expr)
 
@@ -161,7 +326,7 @@ instance ToPublicAST 'LetDeclarationNK where
 
 instance ToJSON LetDeclaration where
     showJSON c = \case
-        Definition name expression ->
+        Definition_ld name expression ->
             makeObj
                 [ type_ "Definition"
                 , ( "name", showJSON c name )
@@ -627,10 +792,10 @@ instance ToJSON a => ToJSON (Maybe a) where
     showJSON c (Just a) = showJSON c a
 
 
-instance ToJSON v => ToJSON (Map LowercaseIdentifier v) where
+instance (Show k, ToJSON v) => ToJSON (Map k v) where
     showJSON c =
         makeObj
-            . fmap (\((LowercaseIdentifier k), a) -> (k, showJSON c a))
+            . fmap (\(k, a) -> (show k, showJSON c a))
             . Map.toList
 
 
@@ -679,6 +844,30 @@ instance ToJSON AST.UnaryOperator where
     showJSON _ Negative = JSString $ toJSString "-"
 
 
+instance ToJSON (AST.Listing AST.DetailedListing) where
+    showJSON c = \case
+        AST.ExplicitListing a comments -> showJSON c a
+        AST.OpenListing (C comments ()) -> JSString $ toJSString "Everything"
+        AST.ClosedListing -> JSNull
+
+
+instance ToJSON AST.DetailedListing where
+    showJSON _ = \case
+        AST.DetailedListing values operators types ->
+            makeObj
+                [ ( "values", makeObj $ fmap (\(LowercaseIdentifier k) -> (k, JSBool True)) $ Map.keys values )
+                , ( "types", makeObj $ fmap (\(UppercaseIdentifier k, (C _ (C _ listing))) -> (k, showTagListingJSON listing)) $ Map.toList types )
+                ]
+
+
+showTagListingJSON :: AST.Listing (AST.CommentedMap UppercaseIdentifier ()) -> JSValue
+showTagListingJSON = \case
+    AST.ExplicitListing tags _ ->
+        makeObj $ fmap (\(UppercaseIdentifier k, C _ ()) -> (k, JSBool True)) $ Map.toList tags
+    AST.OpenListing (C _ ()) -> JSString $ toJSString "AllTags"
+    AST.ClosedListing -> JSString $ toJSString "NoTags"
+
+
 instance ToJSON IntRepresentation where
     showJSON _ DecimalInt = JSString $ toJSString "DecimalInt"
     showJSON _ HexadecimalInt = JSString $ toJSString "HexadecimalInt"
@@ -696,7 +885,7 @@ instance ToJSON StringRepresentation where
 
 instance ToJSON ModuleName where
     showJSON _ (ModuleName []) = JSNull
-    showJSON _ (ModuleName namespace) = (JSString . toJSString . List.intercalate "." . fmap (\(UppercaseIdentifier v) -> v)) namespace
+    showJSON _ namespace = JSString $ toJSString $ show namespace
 
 
 instance ToJSON AST.LiteralValue where
