@@ -409,7 +409,9 @@ data Expression
         { subject :: Located Expression
         , branches :: List (Located CaseBranch)
         }
-    | TODO_GLShader String
+    | GLShader
+        { shaderSource :: String
+        }
 
 
 data FunctionApplicationDisplay
@@ -530,8 +532,8 @@ instance ToPublicAST 'ExpressionNK where
         AST.AccessFunction field ->
             RecordAccessFunction field
 
-        other@(AST.GLShader _) ->
-            TODO_GLShader (show other)
+        AST.GLShader shader ->
+            GLShader shader
 
 
 instance ToJSON Expression where
@@ -631,8 +633,11 @@ instance ToJSON Expression where
                 , ( "branches", showJSON c branches )
                 ]
 
-        TODO_GLShader s ->
-            JSString $ toJSString s
+        GLShader shaderSource ->
+            makeObj
+                [ type_ "GLShader"
+                , ( "shaderSource", JSString $ toJSString shaderSource )
+                ]
 
 
 --
