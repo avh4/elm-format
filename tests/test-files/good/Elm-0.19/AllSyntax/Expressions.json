@@ -3860,6 +3860,8 @@
                             }
                         },
                         "name": "a",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 18,
@@ -3971,6 +3973,8 @@
                             }
                         },
                         "name": "b",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 18,
@@ -4082,6 +4086,8 @@
                             }
                         },
                         "name": "c",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 18,
@@ -4187,6 +4193,8 @@
                             "value": 1
                         },
                         "name": "x",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 14,
@@ -4218,6 +4226,8 @@
                             "value": 2
                         },
                         "name": "y",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 14,
@@ -4444,6 +4454,8 @@
                             "tag": "CaseExpression"
                         },
                         "name": "a",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 22,
@@ -4622,6 +4634,8 @@
                             "tag": "CaseExpression"
                         },
                         "name": "b",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 22,
@@ -4800,6 +4814,8 @@
                             "tag": "CaseExpression"
                         },
                         "name": "c",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 22,
