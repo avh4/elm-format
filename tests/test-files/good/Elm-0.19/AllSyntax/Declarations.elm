@@ -236,3 +236,12 @@ expressionDefinitionsInLet3 =
     in
     --AC
     ()
+
+
+typeAnnotationInLet =
+    let
+        def1 : String -> Int -> Bool
+        def1 aString =
+            False
+    in
+    ()

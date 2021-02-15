@@ -1738,6 +1738,8 @@
                             "tag": "UnitLiteral"
                         },
                         "name": "def1",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
@@ -1765,6 +1767,8 @@
                             "tag": "UnitLiteral"
                         },
                         "name": "def2",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
@@ -1853,6 +1857,8 @@
                             "tag": "UnitLiteral"
                         },
                         "name": "def1",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
@@ -1897,6 +1903,8 @@
                             "tag": "UnitLiteral"
                         },
                         "name": "def2",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
@@ -2002,6 +2010,8 @@
                             "tag": "UnitLiteral"
                         },
                         "name": "def1",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
@@ -2046,6 +2056,8 @@
                             "tag": "UnitLiteral"
                         },
                         "name": "def2",
+                        "parameters": [],
+                        "returnType": null,
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
@@ -2099,6 +2111,160 @@
                 "start": {
                     "col": 1,
                     "line": 223
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "body": {
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 247
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 247
+                        }
+                    },
+                    "tag": "UnitLiteral"
+                },
+                "declarations": [
+                    {
+                        "expression": {
+                            "identifier": "False",
+                            "module": "Basics",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 18,
+                                    "line": 245
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 245
+                                }
+                            },
+                            "tag": "ExternalReference"
+                        },
+                        "name": "def1",
+                        "parameters": [
+                            {
+                                "pattern": {
+                                    "name": "aString",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 21,
+                                            "line": 244
+                                        },
+                                        "start": {
+                                            "col": 14,
+                                            "line": 244
+                                        }
+                                    },
+                                    "tag": "VariableDefinition"
+                                },
+                                "type": {
+                                    "arguments": [],
+                                    "module": null,
+                                    "name": "String",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 22,
+                                            "line": 243
+                                        },
+                                        "start": {
+                                            "col": 16,
+                                            "line": 243
+                                        }
+                                    },
+                                    "tag": "TypeReference"
+                                }
+                            }
+                        ],
+                        "returnType": {
+                            "argumentTypes": [
+                                {
+                                    "arguments": [],
+                                    "module": null,
+                                    "name": "Int",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 29,
+                                            "line": 243
+                                        },
+                                        "start": {
+                                            "col": 26,
+                                            "line": 243
+                                        }
+                                    },
+                                    "tag": "TypeReference"
+                                }
+                            ],
+                            "returnType": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Bool",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 37,
+                                        "line": 243
+                                    },
+                                    "start": {
+                                        "col": 33,
+                                        "line": 243
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 37,
+                                    "line": 243
+                                },
+                                "start": {
+                                    "col": 16,
+                                    "line": 243
+                                }
+                            },
+                            "tag": "FunctionType"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 245
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 244
+                            }
+                        },
+                        "tag": "Definition"
+                    }
+                ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 247
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 242
+                    }
+                },
+                "tag": "LetExpression"
+            },
+            "name": "typeAnnotationInLet",
+            "parameters": [],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 247
+                },
+                "start": {
+                    "col": 1,
+                    "line": 241
                 }
             },
             "tag": "Definition"

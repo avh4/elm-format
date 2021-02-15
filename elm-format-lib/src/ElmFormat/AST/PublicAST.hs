@@ -314,7 +314,7 @@ fromTopLevelStructures :: ASTNS Located [UppercaseIdentifier] 'TopLevelNK -> Lis
 fromTopLevelStructures (I.Fix (A _ (AST.TopLevel decls))) =
     let
         toDefBuilder :: AST.TopLevelStructure
-                     (ASTNS Located [UppercaseIdentifier] 'DeclarationNK) -> (MaybeF Located (DefinitionBuilder (TopLevelStructure)))
+                     (ASTNS Located [UppercaseIdentifier] 'DeclarationNK) -> (MaybeF Located (DefinitionBuilder TopLevelStructure))
         toDefBuilder decl =
             case fmap I.unFix decl of
                 AST.Entry (A region (AST.Definition (I.Fix (A _ pat)) args preEquals expr)) ->
@@ -487,42 +487,32 @@ instance ToJSON BinaryOperation where
 
 
 data LetDeclaration
-    = Definition_ld
-        { name :: LowercaseIdentifier
-        , expression :: Located Expression
-        }
+    = LetDefinition Definition
     | Comment_ld Comment
-    | TODO_LetDeclaration String
 
-instance ToPublicAST 'LetDeclarationNK where
-    type PublicAST 'LetDeclarationNK = LetDeclaration
+mkLetDeclarations :: List (ASTNS Located [UppercaseIdentifier] 'LetDeclarationNK) -> List (MaybeF Located LetDeclaration)
+mkLetDeclarations decls =
+    let
+        toDefBuilder :: ASTNS1 Located [UppercaseIdentifier] 'LetDeclarationNK -> DefinitionBuilder LetDeclaration
+        toDefBuilder = \case
+            AST.LetDefinition (I.Fix (A _ pat)) args preEquals expr ->
+                DefDef pat args expr
 
-    fromRawAST' = \case
-        AST.LetDefinition (I.Fix (A region (AST.VarPattern var))) [] comments expr ->
-            Definition_ld
-                var
-                (fromRawAST expr)
+            AST.LetAnnotation name typ ->
+                DefAnnotation name typ
 
-        AST.LetComment comment ->
-            Comment_ld (mkComment comment)
-
-        other ->
-            TODO_LetDeclaration ("TODO: " ++ show other)
+            AST.LetComment comment ->
+                DefOpaque $ Comment_ld (mkComment comment)
+    in
+    mkDefinitions LetDefinition $ fmap (JustF . fmap toDefBuilder . I.unFix) decls
 
 instance ToJSON LetDeclaration where
     showJSON c = \case
-        Definition_ld name expression ->
-            makeObj
-                [ type_ "Definition"
-                , ( "name", showJSON c name )
-                , ( "expression", showJSON c expression )
-                ]
+        LetDefinition def ->
+            showJSON c def
 
         Comment_ld comment ->
             showJSON c comment
-
-        TODO_LetDeclaration s ->
-            JSString $ toJSString s
 
 
 data CaseBranch
@@ -590,7 +580,7 @@ data Expression
         , else_ :: MaybeF Located Expression
         }
     | LetExpression
-        { declarations :: List (Located LetDeclaration)
+        { declarations :: List (MaybeF Located LetDeclaration)
         , body :: Located Expression
         }
     | CaseExpression
@@ -719,7 +709,7 @@ instance ToPublicAST 'ExpressionNK where
 
         AST.Let decls comments body ->
             LetExpression
-                (fmap fromRawAST decls)
+                (mkLetDeclarations decls)
                 (fromRawAST body)
 
         AST.Case (C comments subject, multiline) branches ->
