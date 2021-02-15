@@ -27,6 +27,7 @@ import qualified Data.Maybe as Maybe
 import Data.Maybe (mapMaybe)
 import AST.MatchReferences (fromMatched, matchReferences)
 import qualified Reporting.Annotation
+import ElmFormat.AST.PatternMatching as PatternMatching
 
 
 data ModuleName =
@@ -190,7 +191,7 @@ mkCustomTypeVariant (AST.NameWithArgs name args) =
 data TopLevelStructure
     = Definition_tls
         { name_d :: LowercaseIdentifier
-        , parameters_d :: List (TypedParameter)
+        , parameters_d :: List TypedParameter
         , returnType :: Maybe (Located Type_)
         , expression :: Located Expression
         }
@@ -226,11 +227,17 @@ fromTopLevelStructures (I.Fix (A _ (AST.TopLevel decls))) =
         merge decl =
             case fmap I.unFix decl of
                 AST.Entry (A region (AST.Definition (I.Fix (A _ (AST.VarPattern name))) args preEquals expr)) ->
+                    let
+                        (typedParams, returnType) =
+                            maybe
+                                ( fmap (\a -> ( a, Nothing ) ) args, Nothing )
+                                ( (\(a,b) -> (fmap (fmap Just) a, Just b)) . PatternMatching.matchType args . (\(c1, c2, t) -> t))
+                                (Map.lookup name annotations)
+                    in
                     Just $ JustF $ A region $ Definition_tls
                         name
-                        -- TODO: fill in TypedParameter types from type annotation
-                        (fmap (\(C c a) -> TypedParameter (fromRawAST a) Nothing) args)
-                        (fmap (fromRawAST . (\(c1, c2, t) -> t)) $ Map.lookup name annotations)
+                        (fmap (\(C c pat, typ) -> TypedParameter (fromRawAST pat) (fmap fromRawAST typ)) typedParams)
+                        (fmap fromRawAST returnType)
                         (fromRawAST expr)
 
                 AST.Entry (A _ (AST.TypeAnnotation _ _)) ->

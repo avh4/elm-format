@@ -175,6 +175,16 @@ expressionTypeAnnotationForcedMultiline _ _ =
     []
 
 
+parametersWithTypes : Int -> String -> Bool
+parametersWithTypes anInt aString =
+    False
+
+
+parametersWithTypesCurried : Int -> String -> Bool
+parametersWithTypesCurried anInt =
+    Debug.todo
+
+
 
 --
 -- Declarations in let expressions
