@@ -1324,7 +1324,22 @@
                         },
                         "tag": "AnythingPattern"
                     },
-                    "type": null
+                    "type": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 171
+                            },
+                            "start": {
+                                "col": 5,
+                                "line": 171
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
                 },
                 {
                     "pattern": {
@@ -1340,28 +1355,7 @@
                         },
                         "tag": "AnythingPattern"
                     },
-                    "type": null
-                }
-            ],
-            "returnType": {
-                "argumentTypes": [
-                    {
-                        "arguments": [],
-                        "module": null,
-                        "name": "Int",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 8,
-                                "line": 171
-                            },
-                            "start": {
-                                "col": 5,
-                                "line": 171
-                            }
-                        },
-                        "tag": "TypeReference"
-                    },
-                    {
+                    "type": {
                         "arguments": [
                             {
                                 "arguments": [],
@@ -1410,65 +1404,54 @@
                         },
                         "tag": "TypeReference"
                     }
-                ],
-                "returnType": {
-                    "arguments": [
-                        {
-                            "arguments": [
-                                {
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 22,
-                                            "line": 173
-                                        },
-                                        "start": {
-                                            "col": 20,
-                                            "line": 173
-                                        }
+                }
+            ],
+            "returnType": {
+                "arguments": [
+                    {
+                        "arguments": [
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 22,
+                                        "line": 173
                                     },
-                                    "tag": "UnitType"
-                                }
-                            ],
-                            "module": "Maybe",
-                            "name": "Maybe",
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 23,
-                                    "line": 173
+                                    "start": {
+                                        "col": 20,
+                                        "line": 173
+                                    }
                                 },
-                                "start": {
-                                    "col": 13,
-                                    "line": 173
-                                }
+                                "tag": "UnitType"
+                            }
+                        ],
+                        "module": "Maybe",
+                        "name": "Maybe",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 173
                             },
-                            "tag": "TypeReference"
-                        }
-                    ],
-                    "module": null,
-                    "name": "List",
-                    "sourceLocation": {
-                        "end": {
-                            "col": 23,
-                            "line": 173
+                            "start": {
+                                "col": 13,
+                                "line": 173
+                            }
                         },
-                        "start": {
-                            "col": 8,
-                            "line": 173
-                        }
-                    },
-                    "tag": "TypeReference"
-                },
+                        "tag": "TypeReference"
+                    }
+                ],
+                "module": null,
+                "name": "List",
                 "sourceLocation": {
                     "end": {
                         "col": 23,
                         "line": 173
                     },
                     "start": {
-                        "col": 5,
-                        "line": 171
+                        "col": 8,
+                        "line": 173
                     }
                 },
-                "tag": "FunctionType"
+                "tag": "TypeReference"
             },
             "sourceLocation": {
                 "end": {
@@ -1478,6 +1461,227 @@
                 "start": {
                     "col": 1,
                     "line": 174
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "identifier": "False",
+                "module": "Basics",
+                "sourceLocation": {
+                    "end": {
+                        "col": 10,
+                        "line": 180
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 180
+                    }
+                },
+                "tag": "ExternalReference"
+            },
+            "name": "parametersWithTypes",
+            "parameters": [
+                {
+                    "pattern": {
+                        "name": "anInt",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 179
+                            },
+                            "start": {
+                                "col": 21,
+                                "line": 179
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
+                    "type": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 178
+                            },
+                            "start": {
+                                "col": 23,
+                                "line": 178
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                },
+                {
+                    "pattern": {
+                        "name": "aString",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 34,
+                                "line": 179
+                            },
+                            "start": {
+                                "col": 27,
+                                "line": 179
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
+                    "type": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 36,
+                                "line": 178
+                            },
+                            "start": {
+                                "col": 30,
+                                "line": 178
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                }
+            ],
+            "returnType": {
+                "arguments": [],
+                "module": null,
+                "name": "Bool",
+                "sourceLocation": {
+                    "end": {
+                        "col": 44,
+                        "line": 178
+                    },
+                    "start": {
+                        "col": 40,
+                        "line": 178
+                    }
+                },
+                "tag": "TypeReference"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 10,
+                    "line": 180
+                },
+                "start": {
+                    "col": 1,
+                    "line": 179
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "identifier": "todo",
+                "module": "Debug",
+                "sourceLocation": {
+                    "end": {
+                        "col": 15,
+                        "line": 185
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 185
+                    }
+                },
+                "tag": "ExternalReference"
+            },
+            "name": "parametersWithTypesCurried",
+            "parameters": [
+                {
+                    "pattern": {
+                        "name": "anInt",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 33,
+                                "line": 184
+                            },
+                            "start": {
+                                "col": 28,
+                                "line": 184
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
+                    "type": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 33,
+                                "line": 183
+                            },
+                            "start": {
+                                "col": 30,
+                                "line": 183
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                }
+            ],
+            "returnType": {
+                "argumentTypes": [
+                    {
+                        "arguments": [],
+                        "module": null,
+                        "name": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 43,
+                                "line": 183
+                            },
+                            "start": {
+                                "col": 37,
+                                "line": 183
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                ],
+                "returnType": {
+                    "arguments": [],
+                    "module": null,
+                    "name": "Bool",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 51,
+                            "line": 183
+                        },
+                        "start": {
+                            "col": 47,
+                            "line": 183
+                        }
+                    },
+                    "tag": "TypeReference"
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 51,
+                        "line": 183
+                    },
+                    "start": {
+                        "col": 30,
+                        "line": 183
+                    }
+                },
+                "tag": "FunctionType"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 15,
+                    "line": 185
+                },
+                "start": {
+                    "col": 1,
+                    "line": 184
                 }
             },
             "tag": "Definition"
@@ -1509,11 +1713,11 @@
                     "sourceLocation": {
                         "end": {
                             "col": 7,
-                            "line": 192
+                            "line": 202
                         },
                         "start": {
                             "col": 5,
-                            "line": 192
+                            "line": 202
                         }
                     },
                     "tag": "UnitLiteral"
@@ -1524,11 +1728,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 187
+                                    "line": 197
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 187
+                                    "line": 197
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -1537,11 +1741,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 187
+                                "line": 197
                             },
                             "start": {
                                 "col": 9,
-                                "line": 186
+                                "line": 196
                             }
                         },
                         "tag": "Definition"
@@ -1551,11 +1755,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 190
+                                    "line": 200
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 190
+                                    "line": 200
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -1564,11 +1768,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 190
+                                "line": 200
                             },
                             "start": {
                                 "col": 9,
-                                "line": 189
+                                "line": 199
                             }
                         },
                         "tag": "Definition"
@@ -1577,11 +1781,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 7,
-                        "line": 192
+                        "line": 202
                     },
                     "start": {
                         "col": 5,
-                        "line": 185
+                        "line": 195
                     }
                 },
                 "tag": "LetExpression"
@@ -1592,11 +1796,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 7,
-                    "line": 192
+                    "line": 202
                 },
                 "start": {
                     "col": 1,
-                    "line": 184
+                    "line": 194
                 }
             },
             "tag": "Definition"
@@ -1607,11 +1811,11 @@
                     "sourceLocation": {
                         "end": {
                             "col": 7,
-                            "line": 210
+                            "line": 220
                         },
                         "start": {
                             "col": 5,
-                            "line": 210
+                            "line": 220
                         }
                     },
                     "tag": "UnitLiteral"
@@ -1624,11 +1828,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 9,
-                                "line": 198
+                                "line": 208
                             },
                             "start": {
                                 "col": 8,
-                                "line": 196
+                                "line": 206
                             }
                         },
                         "tag": "Comment",
@@ -1639,11 +1843,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 200
+                                    "line": 210
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 200
+                                    "line": 210
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -1652,11 +1856,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 200
+                                "line": 210
                             },
                             "start": {
                                 "col": 9,
-                                "line": 198
+                                "line": 208
                             }
                         },
                         "tag": "Definition"
@@ -1668,11 +1872,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 9,
-                                "line": 203
+                                "line": 213
                             },
                             "start": {
                                 "col": 15,
-                                "line": 200
+                                "line": 210
                             }
                         },
                         "tag": "Comment",
@@ -1683,11 +1887,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 205
+                                    "line": 215
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 205
+                                    "line": 215
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -1696,11 +1900,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 205
+                                "line": 215
                             },
                             "start": {
                                 "col": 9,
-                                "line": 203
+                                "line": 213
                             }
                         },
                         "tag": "Definition"
@@ -1712,11 +1916,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 5,
-                                "line": 208
+                                "line": 218
                             },
                             "start": {
                                 "col": 15,
-                                "line": 205
+                                "line": 215
                             }
                         },
                         "tag": "Comment",
@@ -1726,11 +1930,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 7,
-                        "line": 210
+                        "line": 220
                     },
                     "start": {
                         "col": 5,
-                        "line": 196
+                        "line": 206
                     }
                 },
                 "tag": "LetExpression"
@@ -1741,11 +1945,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 7,
-                    "line": 210
+                    "line": 220
                 },
                 "start": {
                     "col": 1,
-                    "line": 195
+                    "line": 205
                 }
             },
             "tag": "Definition"
@@ -1756,11 +1960,11 @@
                     "sourceLocation": {
                         "end": {
                             "col": 7,
-                            "line": 228
+                            "line": 238
                         },
                         "start": {
                             "col": 5,
-                            "line": 228
+                            "line": 238
                         }
                     },
                     "tag": "UnitLiteral"
@@ -1773,11 +1977,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 9,
-                                "line": 216
+                                "line": 226
                             },
                             "start": {
                                 "col": 8,
-                                "line": 214
+                                "line": 224
                             }
                         },
                         "tag": "Comment",
@@ -1788,11 +1992,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 218
+                                    "line": 228
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 218
+                                    "line": 228
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -1801,11 +2005,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 218
+                                "line": 228
                             },
                             "start": {
                                 "col": 9,
-                                "line": 216
+                                "line": 226
                             }
                         },
                         "tag": "Definition"
@@ -1817,11 +2021,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 9,
-                                "line": 221
+                                "line": 231
                             },
                             "start": {
                                 "col": 15,
-                                "line": 218
+                                "line": 228
                             }
                         },
                         "tag": "Comment",
@@ -1832,11 +2036,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 223
+                                    "line": 233
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 223
+                                    "line": 233
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -1845,11 +2049,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 223
+                                "line": 233
                             },
                             "start": {
                                 "col": 9,
-                                "line": 221
+                                "line": 231
                             }
                         },
                         "tag": "Definition"
@@ -1861,11 +2065,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 5,
-                                "line": 226
+                                "line": 236
                             },
                             "start": {
                                 "col": 15,
-                                "line": 223
+                                "line": 233
                             }
                         },
                         "tag": "Comment",
@@ -1875,11 +2079,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 7,
-                        "line": 228
+                        "line": 238
                     },
                     "start": {
                         "col": 5,
-                        "line": 214
+                        "line": 224
                     }
                 },
                 "tag": "LetExpression"
@@ -1890,11 +2094,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 7,
-                    "line": 228
+                    "line": 238
                 },
                 "start": {
                     "col": 1,
-                    "line": 213
+                    "line": 223
                 }
             },
             "tag": "Definition"

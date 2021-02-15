@@ -1247,12 +1247,7 @@
                         },
                         "tag": "AnythingPattern"
                     },
-                    "type": null
-                }
-            ],
-            "returnType": {
-                "argumentTypes": [
-                    {
+                    "type": {
                         "display": {
                             "fieldOrder": []
                         },
@@ -1269,31 +1264,20 @@
                         },
                         "tag": "RecordType"
                     }
-                ],
-                "returnType": {
-                    "sourceLocation": {
-                        "end": {
-                            "col": 23,
-                            "line": 103
-                        },
-                        "start": {
-                            "col": 21,
-                            "line": 103
-                        }
-                    },
-                    "tag": "UnitType"
-                },
+                }
+            ],
+            "returnType": {
                 "sourceLocation": {
                     "end": {
                         "col": 23,
                         "line": 103
                     },
                     "start": {
-                        "col": 15,
+                        "col": 21,
                         "line": 103
                     }
                 },
-                "tag": "FunctionType"
+                "tag": "UnitType"
             },
             "sourceLocation": {
                 "end": {
@@ -1533,12 +1517,7 @@
                         },
                         "tag": "AnythingPattern"
                     },
-                    "type": null
-                }
-            ],
-            "returnType": {
-                "argumentTypes": [
-                    {
+                    "type": {
                         "base": "a",
                         "display": {
                             "fieldOrder": [
@@ -1592,31 +1571,20 @@
                         },
                         "tag": "RecordTypeExtension"
                     }
-                ],
-                "returnType": {
-                    "sourceLocation": {
-                        "end": {
-                            "col": 49,
-                            "line": 127
-                        },
-                        "start": {
-                            "col": 47,
-                            "line": 127
-                        }
-                    },
-                    "tag": "UnitType"
-                },
+                }
+            ],
+            "returnType": {
                 "sourceLocation": {
                     "end": {
                         "col": 49,
                         "line": 127
                     },
                     "start": {
-                        "col": 19,
+                        "col": 47,
                         "line": 127
                     }
                 },
-                "tag": "FunctionType"
+                "tag": "UnitType"
             },
             "sourceLocation": {
                 "end": {

@@ -36,6 +36,7 @@ common common-options
     other-modules:
         AST.Helpers
         Box
+        ElmFormat.AST.PatternMatching
         ElmFormat.Render.Box
         ElmFormat.Render.ElmStructure
         Parse.Binop
