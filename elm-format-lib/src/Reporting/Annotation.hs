@@ -31,6 +31,12 @@ instance Coapplicative Located where
     extract (A _ x) = x
     {-# INLINE extract #-}
 
+instance Foldable Located where
+    foldMap f (A _ a) = f a
+
+instance Traversable Located where
+    traverse f (A region a) = fmap (A region) $ f a
+
 
 -- CREATE
 
