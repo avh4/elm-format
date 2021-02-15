@@ -1,4 +1,5 @@
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DataKinds #-}
 module ElmFormat.AST.Shared where
 
 {-| This module contains types that are used by multiple versions of the Elm AST.
@@ -52,13 +53,20 @@ instance Coapplicative (Commented c) where
     extract (C _ a) = a
     {-# INLINE extract #-}
 
-type C1 l1 = Commented Comments
-type C2 l1 l2 = Commented (Comments, Comments)
-type C3 l1 l2 l3 = Commented (Comments, Comments, Comments)
+data CommentType
+    = BeforeTerm
+    | AfterTerm
+    | Inside
+    | BeforeSeparator
+    | AfterSeparator
+
+type C1 (l1 :: CommentType) = Commented Comments
+type C2 (l1 :: CommentType) (l2 :: CommentType) = Commented (Comments, Comments)
+type C3 (l1 :: CommentType) (l2 :: CommentType) (l3 :: CommentType) = Commented (Comments, Comments, Comments)
 
 type C0Eol = Commented (Maybe String)
-type C1Eol l1 = Commented (Comments, Maybe String)
-type C2Eol l1 l2 = Commented (Comments, Comments, Maybe String)
+type C1Eol (l1 :: CommentType) = Commented (Comments, Maybe String)
+type C2Eol (l1 :: CommentType) (l2 :: CommentType) = Commented (Comments, Comments, Maybe String)
 
 class ToCommentedList f where
     type CommentsFor f :: * -> *

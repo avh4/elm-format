@@ -33,9 +33,8 @@ Currently, the first item will never have leading comments.
 However, if Elm ever changes to allow optional leading delimiters, then
 comments before the first delimiter will go there.
 -}
-data BeforeSeparator; data AfterSeparator
 newtype Sequence a =
-    Sequence (List (C2Eol BeforeSeparator AfterSeparator a))
+    Sequence (List (C2Eol 'BeforeSeparator 'AfterSeparator a))
     deriving (Eq, Functor, Show)
 
 instance Foldable Sequence where
@@ -48,7 +47,7 @@ instance Monoid (Sequence a) where
     mempty = Sequence []
 
 instance ToCommentedList Sequence where
-    type CommentsFor Sequence = C2Eol BeforeSeparator AfterSeparator
+    type CommentsFor Sequence = C2Eol 'BeforeSeparator 'AfterSeparator
     toCommentedList (Sequence items) = items
 
 
@@ -61,10 +60,9 @@ For example:
 
 TODO: this should be replaced with (Sequence a, Comments)
 -}
-data Inside
 data ContainedCommentedList a
-    = Empty (C1 Inside ())
-    | Items [C2 Before After a]
+    = Empty (C1 'Inside ())
+    | Items [C2 'BeforeTerm 'AfterTerm a]
 
 
 {-| This represents a list of things that have no clear start and end
@@ -79,10 +77,9 @@ If there is only one item in the list, an end-of-line comment can appear after t
 
 TODO: this should be replaced with (Sequence a)
 -}
-data AfterFirstTerm; data BeforeLastTerm; data BeforeTerm; data AfterTerm
 data ExposedCommentedList a
     = Single (C0Eol a)
-    | Multiple (C1Eol AfterFirstTerm a) [C2Eol BeforeTerm AfterTerm a] (C1Eol BeforeLastTerm a)
+    | Multiple (C1Eol 'AfterTerm a) [C2Eol 'BeforeTerm 'AfterTerm a] (C1Eol 'BeforeTerm a)
 
 
 {-| This represents a list of things that have a clear start delimiter but no
@@ -98,14 +95,14 @@ For example:
 TODO: this should be replaced with (Sequence a)
 -}
 data OpenCommentedList a
-    = OpenCommentedList [C2Eol BeforeTerm AfterTerm a] (C1Eol BeforeLastTerm a)
+    = OpenCommentedList [C2Eol 'BeforeTerm 'AfterTerm a] (C1Eol 'BeforeTerm a)
     deriving (Eq, Show, Functor)
 
 instance Foldable OpenCommentedList where
     foldMap f (OpenCommentedList rest last) = foldMap (f . extract) rest <> (f . extract) last
 
 instance ToCommentedList OpenCommentedList where
-    type CommentsFor OpenCommentedList = C2Eol BeforeTerm AfterTerm
+    type CommentsFor OpenCommentedList = C2Eol 'BeforeTerm 'AfterTerm
     toCommentedList (OpenCommentedList rest (C (cLast, eolLast) last)) =
         rest ++ [ C (cLast, [], eolLast) last ]
 
@@ -129,11 +126,10 @@ For example:
   key = value
   key : value
 -}
-data AfterKey; data BeforeValue
 data Pair key value =
     Pair
-        { _key :: C1 AfterKey key
-        , _value :: C1 BeforeValue value
+        { _key :: C1 'AfterTerm key
+        , _value :: C1 'BeforeTerm value
         , forceMultiline :: ForceMultiline
         }
     deriving (Show, Eq, Functor)
@@ -168,7 +164,7 @@ assocToString assoc =
 
 
 data NameWithArgs name arg =
-    NameWithArgs name [C1 BeforeTerm arg]
+    NameWithArgs name [C1 'BeforeTerm arg]
     deriving (Eq, Show, Functor)
 instance Foldable (NameWithArgs name) where
     foldMap f (NameWithArgs _ args) = foldMap (f . extract) args
@@ -189,9 +185,8 @@ instance Bifunctor BinopsClause where
         BinopsClause c1 vr c2 e -> BinopsClause c1 (fvr vr) c2 (fe e)
 
 
-data BeforePredicate; data AfterPredicate; data BeforeBody; data AfterBody
 data IfClause e =
-    IfClause (C2 BeforePredicate AfterPredicate e) (C2 BeforeBody AfterBody e)
+    IfClause (C2 'BeforeTerm 'AfterTerm e) (C2 'BeforeTerm 'AfterTerm e)
     deriving (Eq, Show, Functor)
 
 
@@ -224,11 +219,6 @@ data NodeKind
     | TypeNK
 
 
--- TODO: convert comment types to DataKinds
-data Before; data After
-data BeforePattern; data BeforeArrow; data AfterArrow
-data AfterName; data BeforeType; data AfterEquals
-
 data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) where
 
     TopLevel ::
@@ -241,31 +231,31 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
 
     Definition ::
         getType 'PatternNK
-        -> [C1 BeforeTerm (getType 'PatternNK)]
+        -> [C1 'BeforeTerm (getType 'PatternNK)]
         -> Comments
         -> getType 'ExpressionNK
         -> AST typeRef ctorRef varRef getType 'DeclarationNK
     TypeAnnotation ::
-        C1 AfterName (Ref ())
-        -> C1 BeforeType (getType 'TypeNK)
+        C1 'AfterTerm (Ref ())
+        -> C1 'BeforeTerm (getType 'TypeNK)
         -> AST typeRef ctorRef varRef getType 'DeclarationNK
     Datatype ::
-        { nameWithArgs :: C2 Before After (NameWithArgs UppercaseIdentifier LowercaseIdentifier)
+        { nameWithArgs :: C2 'BeforeTerm 'AfterTerm (NameWithArgs UppercaseIdentifier LowercaseIdentifier)
         , tags :: OpenCommentedList (NameWithArgs UppercaseIdentifier (getType 'TypeNK))
         }
         -> AST typeRef ctorRef varRef getType 'DeclarationNK
     TypeAlias ::
         Comments
-        -> C2 Before After (NameWithArgs UppercaseIdentifier LowercaseIdentifier)
-        -> C1 AfterEquals (getType 'TypeNK)
+        -> C2 'BeforeTerm 'AfterTerm (NameWithArgs UppercaseIdentifier LowercaseIdentifier)
+        -> C1 'BeforeTerm (getType 'TypeNK)
         -> AST typeRef ctorRef varRef getType 'DeclarationNK
     PortAnnotation ::
-        C2 Before After LowercaseIdentifier
+        C2 'BeforeTerm 'AfterTerm LowercaseIdentifier
         -> Comments
         -> getType 'TypeNK
         -> AST typeRef ctorRef varRef getType 'DeclarationNK
     PortDefinition_until_0_16 ::
-        C2 Before After LowercaseIdentifier
+        C2 'BeforeTerm 'AfterTerm LowercaseIdentifier
         -> Comments
         -> getType 'ExpressionNK
         -> AST typeRef ctorRef varRef getType 'DeclarationNK
@@ -277,10 +267,10 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         -> varRef
         -> AST typeRef ctorRef varRef getType 'DeclarationNK
     Fixity ::
-        C1 Before Assoc
-        -> C1 Before Int
-        -> C2 Before After SymbolIdentifier
-        -> C1 Before LowercaseIdentifier
+        C1 'BeforeTerm Assoc
+        -> C1 'BeforeTerm Int
+        -> C2 'BeforeTerm 'AfterTerm SymbolIdentifier
+        -> C1 'BeforeTerm LowercaseIdentifier
         -> AST typeRef ctorRef varRef getType 'DeclarationNK
 
     --
@@ -299,7 +289,7 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
 
     App ::
         getType 'ExpressionNK
-        -> [C1 Before (getType 'ExpressionNK)]
+        -> [C1 'BeforeTerm (getType 'ExpressionNK)]
         -> FunctionApplicationMultiline
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     Unary ::
@@ -312,7 +302,7 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         -> Bool
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     Parens ::
-        C2 Before After (getType 'ExpressionNK)
+        C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
 
     ExplicitList ::
@@ -322,13 +312,13 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         }
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     Range ::
-        C2 Before After (getType 'ExpressionNK)
-        -> C2 Before After (getType 'ExpressionNK)
+        C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)
+        -> C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)
         -> Bool
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
 
     Tuple ::
-        [C2 Before After (getType 'ExpressionNK)]
+        [C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)]
         -> Bool
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     TupleFunction ::
@@ -336,7 +326,7 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
 
     Record ::
-        { base_r :: Maybe (C2 Before After LowercaseIdentifier)
+        { base_r :: Maybe (C2 'BeforeTerm 'AfterTerm LowercaseIdentifier)
         , fields_r :: Sequence (Pair LowercaseIdentifier (getType 'ExpressionNK))
         , trailingComments_r :: Comments
         , forceMultiline_r :: ForceMultiline
@@ -351,15 +341,15 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
 
     Lambda ::
-        [C1 Before (getType 'PatternNK)]
+        [C1 'BeforeTerm (getType 'PatternNK)]
         -> Comments
         -> getType 'ExpressionNK
         -> Bool
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     If ::
         IfClause (getType 'ExpressionNK)
-        -> [C1 Before (IfClause (getType 'ExpressionNK))]
-        -> C1 Before (getType 'ExpressionNK)
+        -> [C1 'BeforeTerm (IfClause (getType 'ExpressionNK))]
+        -> C1 'BeforeTerm (getType 'ExpressionNK)
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     Let ::
         [getType 'LetDeclarationNK]
@@ -368,19 +358,19 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     LetDefinition ::
         getType 'PatternNK
-        -> [C1 Before (getType 'PatternNK)]
+        -> [C1 'BeforeTerm (getType 'PatternNK)]
         -> Comments
         -> getType 'ExpressionNK
         -> AST typeRef ctorRef varRef getType 'LetDeclarationNK
     LetAnnotation ::
-        C1 After (Ref ())
-        -> C1 Before (getType 'TypeNK)
+        C1 'AfterTerm (Ref ())
+        -> C1 'BeforeTerm (getType 'TypeNK)
         -> AST typeRef ctorRef varRef getType 'LetDeclarationNK
     LetComment ::
         Comment
         -> AST typeRef ctorRef varRef getType 'LetDeclarationNK
     Case ::
-        (C2 Before After (getType 'ExpressionNK), Bool)
+        (C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK), Bool)
         -> [getType 'CaseBranchNK]
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     CaseBranch ::
@@ -418,19 +408,19 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         -> AST typeRef ctorRef varRef getType 'PatternNK
     DataPattern ::
         ctorRef
-        -> [C1 BeforeTerm (getType 'PatternNK)]
+        -> [C1 'BeforeTerm (getType 'PatternNK)]
         -> AST typeRef ctorRef varRef getType 'PatternNK
     PatternParens ::
-        C2 Before After (getType 'PatternNK)
+        C2 'BeforeTerm 'AfterTerm (getType 'PatternNK)
         -> AST typeRef ctorRef varRef getType 'PatternNK
     TuplePattern ::
-        [C2 BeforeTerm AfterTerm (getType 'PatternNK)]
+        [C2 'BeforeTerm 'AfterTerm (getType 'PatternNK)]
         -> AST typeRef ctorRef varRef getType 'PatternNK
     EmptyListPattern ::
         Comments
         -> AST typeRef ctorRef varRef getType 'PatternNK
     ListPattern ::
-        [C2 BeforeTerm AfterTerm (getType 'PatternNK)]
+        [C2 'BeforeTerm 'AfterTerm (getType 'PatternNK)]
         -> AST typeRef ctorRef varRef getType 'PatternNK
     ConsPattern ::
         { first_cp :: C0Eol (getType 'PatternNK)
@@ -441,11 +431,11 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         Comments
         -> AST typeRef ctorRef varRef getType 'PatternNK
     RecordPattern ::
-        [C2 BeforeTerm AfterTerm LowercaseIdentifier]
+        [C2 'BeforeTerm 'AfterTerm LowercaseIdentifier]
         -> AST typeRef ctorRef varRef getType 'PatternNK
     Alias ::
-        C1 After (getType 'PatternNK)
-        -> C1 Before LowercaseIdentifier
+        C1 'AfterTerm (getType 'PatternNK)
+        -> C1 'BeforeTerm LowercaseIdentifier
         -> AST typeRef ctorRef varRef getType 'PatternNK
 
 
@@ -461,18 +451,18 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         -> AST typeRef ctorRef varRef getType 'TypeNK
     TypeConstruction ::
         TypeConstructor typeRef
-        -> [C1 Before (getType 'TypeNK)]
+        -> [C1 'BeforeTerm (getType 'TypeNK)]
         -> ForceMultiline
         -> AST typeRef ctorRef varRef getType 'TypeNK
     TypeParens ::
-        C2 Before After (getType 'TypeNK)
+        C2 'BeforeTerm 'AfterTerm (getType 'TypeNK)
         -> AST typeRef ctorRef varRef getType 'TypeNK
     TupleType ::
-        [C2Eol Before After (getType 'TypeNK)]
+        [C2Eol 'BeforeTerm 'AfterTerm (getType 'TypeNK)]
         -> ForceMultiline
         -> AST typeRef ctorRef varRef getType 'TypeNK
     RecordType ::
-        { base_rt :: Maybe (C2 Before After LowercaseIdentifier)
+        { base_rt :: Maybe (C2 'BeforeTerm 'AfterTerm LowercaseIdentifier)
         , fields_rt :: Sequence (Pair LowercaseIdentifier (getType 'TypeNK))
         , trailingComments_rt :: Comments
         , forceMultiline_rt :: ForceMultiline
