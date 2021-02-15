@@ -1165,7 +1165,7 @@ formatPattern elmVersion parensRequired apattern =
             in
                 formatBinary False
                     (formatEolCommented (formatPattern elmVersion True) first)
-                    (fmap formatRight $ sequenceToList rest)
+                    (fmap formatRight $ toCommentedList rest)
                 |> if parensRequired then parens else id
 
         DataPattern (ns, tag) [] ->
@@ -2046,7 +2046,7 @@ formatType' elmVersion requireParens atype =
                 ElmStructure.forceableSpaceSepOrStack
                     forceMultiline
                     (formatEolCommented (formatType' elmVersion ForLambda) first)
-                    (fmap formatRight $ sequenceToList rest)
+                    (fmap formatRight $ toCommentedList rest)
                 |> if requireParens /= NotRequired then parens else id
 
         TypeVariable var ->

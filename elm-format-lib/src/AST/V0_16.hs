@@ -47,8 +47,9 @@ instance Semigroup (Sequence a) where
 instance Monoid (Sequence a) where
     mempty = Sequence []
 
-sequenceToList :: Sequence a -> List (C2Eol BeforeSeparator AfterSeparator a)
-sequenceToList (Sequence items) = items
+instance ToCommentedList Sequence where
+    type CommentsFor Sequence = C2Eol BeforeSeparator AfterSeparator
+    toCommentedList (Sequence items) = items
 
 
 {-| This represents a list of things between clear start and end delimiters.
