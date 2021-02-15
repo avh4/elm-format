@@ -5,7 +5,7 @@
 module ElmFormat.AST.PublicAST where
 
 import ElmFormat.AST.Shared
-import AST.V0_16 (NodeKind(..), sequenceToList, Pair(..))
+import AST.V0_16 (NodeKind(..), Pair(..))
 import qualified AST.V0_16 as AST
 import qualified AST.Module as AST
 import qualified AST.Listing as AST
@@ -513,7 +513,7 @@ instance ToPublicAST 'ExpressionNK where
 
         AST.ExplicitList terms comments multiline ->
             ListLiteral
-                (fmap (\(C comments a) -> fromRawAST a) $ sequenceToList terms)
+                (fmap (\(C comments a) -> fromRawAST a) $ toCommentedList terms)
 
         AST.Tuple terms multiline ->
             TupleLiteral
@@ -529,9 +529,9 @@ instance ToPublicAST 'ExpressionNK where
         AST.Record base fields comments multiline ->
             RecordLiteral
                 (fmap (\(C comments a) -> a) base)
-                (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, fromRawAST value)) $ sequenceToList fields)
+                (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, fromRawAST value)) $ toCommentedList fields)
                 $ RecordDisplay
-                    (fmap (extract . _key . extract) $ sequenceToList fields)
+                    (fmap (extract . _key . extract) $ toCommentedList fields)
 
         AST.Access base field ->
             FunctionApplication
@@ -737,7 +737,7 @@ instance ToPublicAST 'PatternNK where
         AST.ConsPattern (C firstEol first) rest ->
             let
                 first' = fromRawAST first
-                rest' = fmap (fromRawAST . (\(C comments a) -> a)) (sequenceToList rest)
+                rest' = fmap (fromRawAST . (\(C comments a) -> a)) (toCommentedList rest)
             in
             case reverse rest' of
                 [] -> mkListPattern [] (Just first')
@@ -782,12 +782,12 @@ instance ToPublicAST 'TypeNK where
         AST.RecordType base fields comments multiline ->
             RecordType
                 (fmap (\(C comments a) -> a) base)
-                (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, fromRawAST value)) $ sequenceToList fields)
+                (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, fromRawAST value)) $ toCommentedList fields)
                 $ RecordDisplay
-                    (fmap (extract . _key . extract) $ sequenceToList fields)
+                    (fmap (extract . _key . extract) $ toCommentedList fields)
 
         AST.FunctionType first rest multiline ->
-            case firstRestToRestLast first (sequenceToList rest) of
+            case firstRestToRestLast first (toCommentedList rest) of
                 (args, C comments last) ->
                     FunctionType
                         (fromRawAST last)
