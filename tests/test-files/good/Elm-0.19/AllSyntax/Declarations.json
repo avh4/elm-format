@@ -385,43 +385,25 @@
             ]
         },
         {
-            "sourceLocation": {
-                "end": {
-                    "col": 0,
-                    "line": 0
-                },
-                "start": {
-                    "col": 0,
-                    "line": 0
-                }
+            "display": {
+                "commentType": "BlockComment"
             },
-            "value": "TODO: BodyComment (LineComment \"\")"
+            "tag": "Comment",
+            "text": ""
         },
         {
-            "sourceLocation": {
-                "end": {
-                    "col": 0,
-                    "line": 0
-                },
-                "start": {
-                    "col": 0,
-                    "line": 0
-                }
+            "display": {
+                "commentType": "BlockComment"
             },
-            "value": "TODO: BodyComment (LineComment \" Union type with params\")"
+            "tag": "Comment",
+            "text": " Union type with params"
         },
         {
-            "sourceLocation": {
-                "end": {
-                    "col": 0,
-                    "line": 0
-                },
-                "start": {
-                    "col": 0,
-                    "line": 0
-                }
+            "display": {
+                "commentType": "BlockComment"
             },
-            "value": "TODO: BodyComment (LineComment \"\")"
+            "tag": "Comment",
+            "text": ""
         },
         {
             "name": "DataTypeWithParams1",
@@ -655,43 +637,25 @@
             ]
         },
         {
-            "sourceLocation": {
-                "end": {
-                    "col": 0,
-                    "line": 0
-                },
-                "start": {
-                    "col": 0,
-                    "line": 0
-                }
+            "display": {
+                "commentType": "BlockComment"
             },
-            "value": "TODO: BodyComment (LineComment \"\")"
+            "tag": "Comment",
+            "text": ""
         },
         {
-            "sourceLocation": {
-                "end": {
-                    "col": 0,
-                    "line": 0
-                },
-                "start": {
-                    "col": 0,
-                    "line": 0
-                }
+            "display": {
+                "commentType": "BlockComment"
             },
-            "value": "TODO: BodyComment (LineComment \" Type alias\")"
+            "tag": "Comment",
+            "text": " Type alias"
         },
         {
-            "sourceLocation": {
-                "end": {
-                    "col": 0,
-                    "line": 0
-                },
-                "start": {
-                    "col": 0,
-                    "line": 0
-                }
+            "display": {
+                "commentType": "BlockComment"
             },
-            "value": "TODO: BodyComment (LineComment \"\")"
+            "tag": "Comment",
+            "text": ""
         },
         {
             "name": "TypeAlias1",
@@ -1054,43 +1018,25 @@
             }
         },
         {
-            "sourceLocation": {
-                "end": {
-                    "col": 0,
-                    "line": 0
-                },
-                "start": {
-                    "col": 0,
-                    "line": 0
-                }
+            "display": {
+                "commentType": "BlockComment"
             },
-            "value": "TODO: BodyComment (LineComment \"\")"
+            "tag": "Comment",
+            "text": ""
         },
         {
-            "sourceLocation": {
-                "end": {
-                    "col": 0,
-                    "line": 0
-                },
-                "start": {
-                    "col": 0,
-                    "line": 0
-                }
+            "display": {
+                "commentType": "BlockComment"
             },
-            "value": "TODO: BodyComment (LineComment \" Expressions\")"
+            "tag": "Comment",
+            "text": " Expressions"
         },
         {
-            "sourceLocation": {
-                "end": {
-                    "col": 0,
-                    "line": 0
-                },
-                "start": {
-                    "col": 0,
-                    "line": 0
-                }
+            "display": {
+                "commentType": "BlockComment"
             },
-            "value": "TODO: BodyComment (LineComment \"\")"
+            "tag": "Comment",
+            "text": ""
         },
         {
             "expression": {
@@ -1537,43 +1483,25 @@
             "tag": "Definition"
         },
         {
-            "sourceLocation": {
-                "end": {
-                    "col": 0,
-                    "line": 0
-                },
-                "start": {
-                    "col": 0,
-                    "line": 0
-                }
+            "display": {
+                "commentType": "BlockComment"
             },
-            "value": "TODO: BodyComment (LineComment \"\")"
+            "tag": "Comment",
+            "text": ""
         },
         {
-            "sourceLocation": {
-                "end": {
-                    "col": 0,
-                    "line": 0
-                },
-                "start": {
-                    "col": 0,
-                    "line": 0
-                }
+            "display": {
+                "commentType": "BlockComment"
             },
-            "value": "TODO: BodyComment (LineComment \" Declarations in let expressions\")"
+            "tag": "Comment",
+            "text": " Declarations in let expressions"
         },
         {
-            "sourceLocation": {
-                "end": {
-                    "col": 0,
-                    "line": 0
-                },
-                "start": {
-                    "col": 0,
-                    "line": 0
-                }
+            "display": {
+                "commentType": "BlockComment"
             },
-            "value": "TODO: BodyComment (LineComment \"\")"
+            "tag": "Comment",
+            "text": ""
         },
         {
             "expression": {
