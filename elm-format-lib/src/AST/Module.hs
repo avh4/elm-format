@@ -2,13 +2,13 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE DataKinds #-}
 
 module AST.Module
     ( Module(..), Header(..), SourceTag(..), SourceSettings
     , UserImport, ImportMethod(..)
     , DetailedListing(..)
     , defaultHeader
-    , BeforeExposing, AfterExposing, BeforeAs, AfterAs
     ) where
 
 import AST.Listing (Listing)
@@ -22,13 +22,12 @@ import AST.V0_16
 -- MODULES
 
 
-data BeforeImports
 data Module ns body =
     Module
     { initialComments :: Comments
     , header :: Maybe Header
     , docs :: A.Located (Maybe Markdown.Blocks)
-    , imports :: C1 BeforeImports (Map ns (C1 Before ImportMethod))
+    , imports :: C1 'BeforeTerm (Map ns (C1 'BeforeTerm ImportMethod))
     , body :: body
     }
     deriving (Eq, Show, Functor)
@@ -44,12 +43,11 @@ data SourceTag
 
 
 {-| Basic info needed to identify modules and determine dependencies. -}
-data BeforeWhere; data AfterWhere
 data Header = Header
     { srcTag :: SourceTag
-    , name :: C2 Before After [UppercaseIdentifier]
-    , moduleSettings :: Maybe (C2 BeforeWhere AfterWhere SourceSettings)
-    , exports :: Maybe (C2 BeforeExposing AfterExposing (Listing DetailedListing))
+    , name :: C2 'BeforeTerm 'AfterTerm [UppercaseIdentifier]
+    , moduleSettings :: Maybe (C2 'BeforeSeparator 'AfterSeparator SourceSettings)
+    , exports :: Maybe (C2 'BeforeSeparator 'AfterSeparator (Listing DetailedListing))
     }
     deriving (Eq, Show)
 
@@ -63,11 +61,10 @@ defaultHeader =
         Nothing
 
 
-data BeforeListing
 data DetailedListing = DetailedListing
     { values :: Listing.CommentedMap LowercaseIdentifier ()
     , operators :: Listing.CommentedMap SymbolIdentifier ()
-    , types :: Listing.CommentedMap UppercaseIdentifier (C1 BeforeListing (Listing (Listing.CommentedMap UppercaseIdentifier ())))
+    , types :: Listing.CommentedMap UppercaseIdentifier (C1 'BeforeTerm (Listing (Listing.CommentedMap UppercaseIdentifier ())))
     }
     deriving (Eq, Show)
 
@@ -79,17 +76,19 @@ instance Monoid DetailedListing where
 
 
 type SourceSettings =
-  [(C2 Before After LowercaseIdentifier, C2 Before After UppercaseIdentifier)]
+    [ ( C2 'BeforeTerm 'AfterTerm LowercaseIdentifier
+      , C2 'BeforeTerm 'AfterTerm UppercaseIdentifier
+      )
+    ]
 
 -- IMPORTs
 
 type UserImport
-    = (C1 Before [UppercaseIdentifier], ImportMethod)
+    = (C1 'BeforeTerm [UppercaseIdentifier], ImportMethod)
 
 
-data BeforeAs; data AfterAs; data BeforeExposing; data AfterExposing
 data ImportMethod = ImportMethod
-    { alias :: Maybe (C2 BeforeAs AfterAs UppercaseIdentifier)
-    , exposedVars :: C2 BeforeExposing AfterExposing (Listing DetailedListing)
+    { alias :: Maybe (C2 'BeforeSeparator 'AfterSeparator UppercaseIdentifier)
+    , exposedVars :: C2 'BeforeSeparator 'AfterSeparator (Listing DetailedListing)
     }
     deriving (Eq, Show)

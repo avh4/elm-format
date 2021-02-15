@@ -9,7 +9,7 @@ import Parse.Helpers
 import qualified Parse.Declaration as Decl
 import AST.Listing (Listing(..), mergeCommentedMap, mergeListing)
 import qualified AST.Listing as Listing
-import AST.Module (DetailedListing, Module, BeforeExposing, AfterExposing, BeforeAs, AfterAs, ImportMethod)
+import AST.Module (DetailedListing, Module, ImportMethod)
 import qualified AST.Module as Module
 import AST.Structure
 import AST.V0_16
@@ -148,10 +148,10 @@ mergeDetailedListing left right =
         (mergeCommentedMap (mergePreCommented $ mergeListing $ mergeCommentedMap (<>)) (Module.types left) (Module.types right))
 
 
-imports :: ElmVersion -> IParser (Comments, Map [UppercaseIdentifier] (C1 Before ImportMethod), Comments)
+imports :: ElmVersion -> IParser (Comments, Map [UppercaseIdentifier] (C1 'BeforeTerm ImportMethod), Comments)
 imports elmVersion =
     let
-        merge :: C1 Before ImportMethod -> C1 Before ImportMethod -> C1 Before ImportMethod
+        merge :: C1 'BeforeTerm ImportMethod -> C1 'BeforeTerm ImportMethod -> C1 'BeforeTerm ImportMethod
         merge (C comments1 import1) (C comments2 import2) =
             C (comments1 ++ comments2) $
                 Module.ImportMethod
@@ -164,7 +164,7 @@ imports elmVersion =
             , post
             )
 
-        done :: [(Module.UserImport, Comments)] -> (Comments, Map [UppercaseIdentifier] (C1 Before ImportMethod), Comments)
+        done :: [(Module.UserImport, Comments)] -> (Comments, Map [UppercaseIdentifier] (C1 'BeforeTerm ImportMethod), Comments)
         done results =
             foldl step ([], empty, []) results
     in
@@ -186,13 +186,13 @@ import' elmVersion =
         <$> option Nothing (Just <$> as' originalName)
         <*> option (C ([], []) ClosedListing) (exposing <|> try (listingWithoutExposing elmVersion))
 
-    as' :: [UppercaseIdentifier] -> IParser (C2 BeforeAs AfterAs UppercaseIdentifier)
+    as' :: [UppercaseIdentifier] -> IParser (C2 'BeforeSeparator 'AfterSeparator UppercaseIdentifier)
     as' moduleName =
       do  preAs <- try (whitespace <* reserved elmVersion "as")
           postAs <- whitespace
           C (preAs, postAs) <$> capVar elmVersion <?> ("an alias for module `" ++ show moduleName ++ "`") -- TODO: do something correct instead of show
 
-    exposing :: IParser (C2 BeforeExposing AfterExposing (Listing Module.DetailedListing))
+    exposing :: IParser (C2 'BeforeSeparator 'AfterSeparator (Listing Module.DetailedListing))
     exposing =
       do  preExposing <- try (whitespace <* reserved elmVersion "exposing")
           postExposing <- whitespace
