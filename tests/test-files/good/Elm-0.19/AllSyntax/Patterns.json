@@ -1,6 +1,8 @@
 {
     "body": [
         {
+            "name": "Foo",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 16,
@@ -11,7 +13,40 @@
                     "line": 4
                 }
             },
-            "value": "TODO: Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"Foo\") []), tags = OpenCommentedList [] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Foo\") [C [] (Fix {unFix = at 5 11 5 13 (UnitType [])}),C [] (Fix {unFix = at 5 14 5 16 (UnitType [])})]))}"
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Foo",
+                    "parameterTypes": [
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 13,
+                                    "line": 5
+                                },
+                                "start": {
+                                    "col": 11,
+                                    "line": 5
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 16,
+                                    "line": 5
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 5
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                }
+            ]
         },
         {
             "expression": {

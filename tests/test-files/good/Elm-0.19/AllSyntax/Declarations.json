@@ -1,6 +1,8 @@
 {
     "body": [
         {
+            "name": "DataType1",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 25,
@@ -11,9 +13,83 @@
                     "line": 8
                 }
             },
-            "value": "TODO: Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"DataType1\") []), tags = OpenCommentedList [C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor1\") []),C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor2\") [C [] (Fix {unFix = at 10 13 10 15 (UnitType [])})])] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor3\") [C [] (Fix {unFix = at 11 13 11 22 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"List\")) [C [] (Fix {unFix = at 11 19 11 21 (UnitType [])})] (ForceMultiline False))}),C [] (Fix {unFix = at 11 23 11 25 (UnitType [])})]))}"
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2",
+                    "parameterTypes": [
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 10
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 10
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3",
+                    "parameterTypes": [
+                        {
+                            "arguments": [
+                                {
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 21,
+                                            "line": 11
+                                        },
+                                        "start": {
+                                            "col": 19,
+                                            "line": 11
+                                        }
+                                    },
+                                    "tag": "UnitType"
+                                }
+                            ],
+                            "module": null,
+                            "name": "List",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 22,
+                                    "line": 11
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 11
+                                }
+                            },
+                            "tag": "TypeReference"
+                        },
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 25,
+                                    "line": 11
+                                },
+                                "start": {
+                                    "col": 23,
+                                    "line": 11
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                }
+            ]
         },
         {
+            "name": "DataType2",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 49,
@@ -24,9 +100,83 @@
                     "line": 14
                 }
             },
-            "value": "TODO: Datatype {nameWithArgs = C ([BlockComment [\"A\"]],[BlockComment [\"B\"]]) (NameWithArgs (UppercaseIdentifier \"DataType2\") []), tags = OpenCommentedList [C ([BlockComment [\"C\"]],[BlockComment [\"D\"]],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor1\") []),C ([BlockComment [\"E\"]],[BlockComment [\"G\"]],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor2\") [C [BlockComment [\"F\"]] (Fix {unFix = at 16 29 16 31 (UnitType [])})])] (C ([BlockComment [\"H\"]],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor3\") [C [BlockComment [\"I\"]] (Fix {unFix = at 17 29 17 38 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"List\")) [C [] (Fix {unFix = at 17 35 17 37 (UnitType [])})] (ForceMultiline False))}),C [BlockComment [\"J\"]] (Fix {unFix = at 17 47 17 49 (UnitType [])})]))}"
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2",
+                    "parameterTypes": [
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 31,
+                                    "line": 16
+                                },
+                                "start": {
+                                    "col": 29,
+                                    "line": 16
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3",
+                    "parameterTypes": [
+                        {
+                            "arguments": [
+                                {
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 37,
+                                            "line": 17
+                                        },
+                                        "start": {
+                                            "col": 35,
+                                            "line": 17
+                                        }
+                                    },
+                                    "tag": "UnitType"
+                                }
+                            ],
+                            "module": null,
+                            "name": "List",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 38,
+                                    "line": 17
+                                },
+                                "start": {
+                                    "col": 29,
+                                    "line": 17
+                                }
+                            },
+                            "tag": "TypeReference"
+                        },
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 49,
+                                    "line": 17
+                                },
+                                "start": {
+                                    "col": 47,
+                                    "line": 17
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                }
+            ]
         },
         {
+            "name": "DataType3",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 11,
@@ -37,9 +187,83 @@
                     "line": 20
                 }
             },
-            "value": "TODO: Datatype {nameWithArgs = C ([LineComment \"A\"],[LineComment \"B\"]) (NameWithArgs (UppercaseIdentifier \"DataType3\") []), tags = OpenCommentedList [C ([LineComment \"C\"],[LineComment \"D\"],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor1\") []),C ([LineComment \"E\"],[LineComment \"G\"],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor2\") [C [LineComment \"F\"] (Fix {unFix = at 30 9 30 11 (UnitType [])})])] (C ([LineComment \"H\"],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor3\") [C [LineComment \"I\"] (Fix {unFix = at 35 9 35 18 (TypeConstruction (NamedConstructor ([],UppercaseIdentifier \"List\")) [C [] (Fix {unFix = at 35 15 35 17 (UnitType [])})] (ForceMultiline False))}),C [LineComment \"J\"] (Fix {unFix = at 37 9 37 11 (UnitType [])})]))}"
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2",
+                    "parameterTypes": [
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 11,
+                                    "line": 30
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 30
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3",
+                    "parameterTypes": [
+                        {
+                            "arguments": [
+                                {
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 17,
+                                            "line": 35
+                                        },
+                                        "start": {
+                                            "col": 15,
+                                            "line": 35
+                                        }
+                                    },
+                                    "tag": "UnitType"
+                                }
+                            ],
+                            "module": null,
+                            "name": "List",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 18,
+                                    "line": 35
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 35
+                                }
+                            },
+                            "tag": "TypeReference"
+                        },
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 11,
+                                    "line": 37
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 37
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                }
+            ]
         },
         {
+            "name": "DataTypeWithEolComments1",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 16,
@@ -50,9 +274,17 @@
                     "line": 40
                 }
             },
-            "value": "TODO: Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"DataTypeWithEolComments1\") []), tags = OpenCommentedList [] (C ([],Just \"A\") (NameWithArgs (UppercaseIdentifier \"Ctor1\") []))}"
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1",
+                    "parameterTypes": []
+                }
+            ]
         },
         {
+            "name": "DataTypeWithEolComments2",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 20,
@@ -63,9 +295,69 @@
                     "line": 44
                 }
             },
-            "value": "TODO: Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"DataTypeWithEolComments2\") []), tags = OpenCommentedList [C ([],[],Just \"A\") (NameWithArgs (UppercaseIdentifier \"Ctor1\") []),C ([],[],Just \"B\") (NameWithArgs (UppercaseIdentifier \"Ctor2\") [C [] (Fix {unFix = at 46 13 46 14 (TypeVariable a)})])] (C ([],Just \"C\") (NameWithArgs (UppercaseIdentifier \"Ctor3\") [C [] (Fix {unFix = at 47 13 47 14 (TypeVariable b)}),C [] (Fix {unFix = at 47 15 47 16 (TypeVariable c)})]))}"
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2",
+                    "parameterTypes": [
+                        {
+                            "name": "a",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 14,
+                                    "line": 46
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 46
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3",
+                    "parameterTypes": [
+                        {
+                            "name": "b",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 14,
+                                    "line": 47
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 47
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        },
+                        {
+                            "name": "c",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 16,
+                                    "line": 47
+                                },
+                                "start": {
+                                    "col": 15,
+                                    "line": 47
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                }
+            ]
         },
         {
+            "name": "DataTypeWithCommentedOutConstructors",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 8,
@@ -76,7 +368,21 @@
                     "line": 50
                 }
             },
-            "value": "TODO: Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"DataTypeWithCommentedOutConstructors\") []), tags = OpenCommentedList [C ([],[LineComment \" | B\",LineComment \" | C\"],Nothing) (NameWithArgs (UppercaseIdentifier \"A\") []),C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"D\") [])] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"E\") []))}"
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "A",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "D",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "E",
+                    "parameterTypes": []
+                }
+            ]
         },
         {
             "sourceLocation": {
@@ -118,6 +424,12 @@
             "value": "TODO: BodyComment (LineComment \"\")"
         },
         {
+            "name": "DataTypeWithParams1",
+            "parameters": [
+                "a",
+                "b",
+                "c"
+            ],
             "sourceLocation": {
                 "end": {
                     "col": 17,
@@ -128,9 +440,73 @@
                     "line": 64
                 }
             },
-            "value": "TODO: Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"DataTypeWithParams1\") [C [] a,C [] b,C [] c]), tags = OpenCommentedList [C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor1_\") []),C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor2_\") [C [] (Fix {unFix = at 66 14 66 15 (TypeVariable a)})])] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor3_\") [C [] (Fix {unFix = at 67 14 67 15 (TypeVariable b)}),C [] (Fix {unFix = at 67 16 67 17 (TypeVariable c)})]))}"
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1_",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2_",
+                    "parameterTypes": [
+                        {
+                            "name": "a",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 66
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 66
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3_",
+                    "parameterTypes": [
+                        {
+                            "name": "b",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 67
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 67
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        },
+                        {
+                            "name": "c",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 17,
+                                    "line": 67
+                                },
+                                "start": {
+                                    "col": 16,
+                                    "line": 67
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                }
+            ]
         },
         {
+            "name": "DataTypeWithParams2",
+            "parameters": [
+                "a",
+                "b",
+                "c"
+            ],
             "sourceLocation": {
                 "end": {
                     "col": 17,
@@ -141,9 +517,73 @@
                     "line": 70
                 }
             },
-            "value": "TODO: Datatype {nameWithArgs = C ([BlockComment [\"K\"]],[BlockComment [\"O\"]]) (NameWithArgs (UppercaseIdentifier \"DataTypeWithParams2\") [C [BlockComment [\"L\"]] a,C [BlockComment [\"M\"]] b,C [BlockComment [\"N\"]] c]), tags = OpenCommentedList [C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor1_\") []),C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor2_\") [C [] (Fix {unFix = at 72 14 72 15 (TypeVariable a)})])] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor3_\") [C [] (Fix {unFix = at 73 14 73 15 (TypeVariable b)}),C [] (Fix {unFix = at 73 16 73 17 (TypeVariable c)})]))}"
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1_",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2_",
+                    "parameterTypes": [
+                        {
+                            "name": "a",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 72
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 72
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3_",
+                    "parameterTypes": [
+                        {
+                            "name": "b",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 73
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 73
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        },
+                        {
+                            "name": "c",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 17,
+                                    "line": 73
+                                },
+                                "start": {
+                                    "col": 16,
+                                    "line": 73
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                }
+            ]
         },
         {
+            "name": "DataTypeWithParams3",
+            "parameters": [
+                "a",
+                "b",
+                "c"
+            ],
             "sourceLocation": {
                 "end": {
                     "col": 17,
@@ -154,7 +594,65 @@
                     "line": 76
                 }
             },
-            "value": "TODO: Datatype {nameWithArgs = C ([LineComment \"K\"],[LineComment \"O\"]) (NameWithArgs (UppercaseIdentifier \"DataTypeWithParams3\") [C [LineComment \"L\"] a,C [LineComment \"M\"] b,C [LineComment \"N\"] c]), tags = OpenCommentedList [C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor1_\") []),C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor2_\") [C [] (Fix {unFix = at 87 14 87 15 (TypeVariable a)})])] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"Ctor3_\") [C [] (Fix {unFix = at 88 14 88 15 (TypeVariable b)}),C [] (Fix {unFix = at 88 16 88 17 (TypeVariable c)})]))}"
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1_",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2_",
+                    "parameterTypes": [
+                        {
+                            "name": "a",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 87
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 87
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3_",
+                    "parameterTypes": [
+                        {
+                            "name": "b",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 88
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 88
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        },
+                        {
+                            "name": "c",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 17,
+                                    "line": 88
+                                },
+                                "start": {
+                                    "col": 16,
+                                    "line": 88
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                }
+            ]
         },
         {
             "sourceLocation": {

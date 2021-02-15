@@ -113,6 +113,27 @@ instance ToJSON TypedParameter where
                 ]
 
 
+data CustomTypeVariant
+    = CustomTypeVariant
+        { name :: UppercaseIdentifier
+        , parameterTypes :: List (Located Type_)
+        }
+
+instance ToJSON CustomTypeVariant where
+    showJSON c = \case
+        CustomTypeVariant name parameterTypes ->
+            makeObj
+                [ ( "name", showJSON c name )
+                , ( "parameterTypes", showJSON c parameterTypes )
+                ]
+
+mkCustomTypeVariant :: AST.NameWithArgs UppercaseIdentifier (ASTNS Located [UppercaseIdentifier] 'TypeNK) -> CustomTypeVariant
+mkCustomTypeVariant (AST.NameWithArgs name args) =
+    CustomTypeVariant
+        name
+        (fmap (\(C c a) -> fromRawAST a) args)
+
+
 data TopLevelStructure
     = Definition_tls
         { name_d :: LowercaseIdentifier
@@ -124,6 +145,11 @@ data TopLevelStructure
         { name_ta :: UppercaseIdentifier
         , parameters_ta :: List LowercaseIdentifier
         , type_ta :: Located Type_
+        }
+    | CustomType
+        { name_ct :: UppercaseIdentifier
+        , parameters_ct :: List LowercaseIdentifier
+        , variants :: List CustomTypeVariant
         }
     | TODO_TopLevelStructure String
 
@@ -160,6 +186,12 @@ fromTopLevelStructures (I.Fix (A _ (AST.TopLevel decls))) =
                 AST.Entry (A region (AST.TypeAlias c1 (C (c2, c3) (AST.NameWithArgs name args)) (C c4 t))) ->
                     Just $ A region $ TypeAlias name (fmap (\(C c a) -> a) args) (fromRawAST t)
 
+                AST.Entry (A region (AST.Datatype (C (c1, c2) (AST.NameWithArgs name args)) variants)) ->
+                    Just $ A region $ CustomType
+                        name
+                        (fmap (\(C c a) -> a) args)
+                        (fmap (\(C c a) -> mkCustomTypeVariant a) $ toCommentedList variants)
+
                 AST.Entry (A region d) ->
                     Just $ A region $ TODO_TopLevelStructure ("TODO: " ++ show d)
 
@@ -185,6 +217,14 @@ instance ToJSON TopLevelStructure where
                 [ type_ "TypeAlias"
                 , ( "name", showJSON c name )
                 , ( "type", showJSON c t )
+                ]
+
+        CustomType name parameters variants ->
+            makeObj
+                [ type_ "CustomType"
+                , ( "name", showJSON c name )
+                , ( "parameters", showJSON c parameters )
+                , ( "variants", showJSON c variants )
                 ]
 
         TODO_TopLevelStructure s ->

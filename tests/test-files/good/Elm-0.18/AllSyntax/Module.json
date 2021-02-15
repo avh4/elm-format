@@ -1,6 +1,8 @@
 {
     "body": [
         {
+            "name": "CustomType",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 11,
@@ -11,7 +13,17 @@
                     "line": 34
                 }
             },
-            "value": "TODO: Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"CustomType\") []), tags = OpenCommentedList [C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"TagA\") [])] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"TagB\") []))}"
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "TagA",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "TagB",
+                    "parameterTypes": []
+                }
+            ]
         },
         {
             "expression": {

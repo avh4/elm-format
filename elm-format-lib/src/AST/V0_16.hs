@@ -5,6 +5,7 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module AST.V0_16 (module AST.V0_16, module ElmFormat.AST.Shared) where
 
@@ -101,6 +102,11 @@ data OpenCommentedList a
 
 instance Foldable OpenCommentedList where
     foldMap f (OpenCommentedList rest last) = foldMap (f . extract) rest <> (f . extract) last
+
+instance ToCommentedList OpenCommentedList where
+    type CommentsFor OpenCommentedList = C2Eol BeforeTerm AfterTerm
+    toCommentedList (OpenCommentedList rest (C (cLast, eolLast) last)) =
+        rest ++ [ C (cLast, [], eolLast) last ]
 
 
 exposedToOpen :: Comments -> ExposedCommentedList a -> OpenCommentedList a
