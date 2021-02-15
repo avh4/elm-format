@@ -187,14 +187,65 @@ mkCustomTypeVariant (AST.NameWithArgs name args) =
         name
         (fmap (\(C c a) -> fromRawAST a) args)
 
-
-data TopLevelStructure
-    = Definition_tls
+data Definition
+    = Definition
         { name_d :: LowercaseIdentifier
         , parameters_d :: List TypedParameter
         , returnType :: Maybe (Located Type_)
         , expression :: Located Expression
         }
+    | TODO_Definition (List String)
+
+mkDefinition ::
+    ASTNS1 Located [UppercaseIdentifier] 'PatternNK
+    -> List (AST.C1 'AST.BeforeTerm (ASTNS Located [UppercaseIdentifier] 'PatternNK))
+    -> Maybe (AST.Comments, AST.Comments, ASTNS Located [UppercaseIdentifier] 'TypeNK)
+    -> ASTNS Located [UppercaseIdentifier] 'ExpressionNK
+    -> Definition
+mkDefinition pat args annotation expr =
+    case pat of
+        AST.VarPattern name ->
+            let
+                (typedParams, returnType) =
+                    maybe
+                        ( fmap (\a -> ( a, Nothing ) ) args, Nothing )
+                        ( (\(a,b) -> (fmap (fmap Just) a, Just b)) . PatternMatching.matchType args . (\(c1, c2, t) -> t))
+                        annotation
+            in
+            Definition
+                name
+                (fmap (\(C c pat, typ) -> TypedParameter (fromRawAST pat) (fmap fromRawAST typ)) typedParams)
+                (fmap fromRawAST returnType)
+                (fromRawAST expr)
+
+        _ ->
+            TODO_Definition
+                [ show pat
+                , show args
+                , show annotation
+                , show expr
+                ]
+
+instance ToJSON Definition where
+    showJSON c = \case
+        Definition name parameters returnType expression ->
+            makeObj
+                [ type_ "Definition"
+                , ( "name", showJSON c name )
+                , ( "parameters", showJSON c parameters )
+                , ( "returnType", showJSON c returnType )
+                , ( "expression", showJSON c expression )
+                ]
+
+        TODO_Definition info ->
+            makeObj
+                [ type_ "TODO: Definition"
+                , ( "$", JSArray $ fmap (JSString . toJSString) info )
+                ]
+
+
+data TopLevelStructure
+    = DefinitionStructure Definition
     | TypeAlias
         { name_ta :: UppercaseIdentifier
         , parameters_ta :: List LowercaseIdentifier
@@ -226,19 +277,16 @@ fromTopLevelStructures (I.Fix (A _ (AST.TopLevel decls))) =
                      (ASTNS Located [UppercaseIdentifier] 'DeclarationNK) -> Maybe (MaybeF Located TopLevelStructure)
         merge decl =
             case fmap I.unFix decl of
-                AST.Entry (A region (AST.Definition (I.Fix (A _ (AST.VarPattern name))) args preEquals expr)) ->
+                AST.Entry (A region (AST.Definition (I.Fix (A _ pat)) args preEquals expr)) ->
                     let
-                        (typedParams, returnType) =
-                            maybe
-                                ( fmap (\a -> ( a, Nothing ) ) args, Nothing )
-                                ( (\(a,b) -> (fmap (fmap Just) a, Just b)) . PatternMatching.matchType args . (\(c1, c2, t) -> t))
-                                (Map.lookup name annotations)
+                        annotation =
+                            case pat of
+                                AST.VarPattern name ->
+                                    Map.lookup name annotations
+                                _ -> Nothing
                     in
-                    Just $ JustF $ A region $ Definition_tls
-                        name
-                        (fmap (\(C c pat, typ) -> TypedParameter (fromRawAST pat) (fmap fromRawAST typ)) typedParams)
-                        (fmap fromRawAST returnType)
-                        (fromRawAST expr)
+                    Just $ JustF $ A region $ DefinitionStructure $
+                        mkDefinition pat args annotation expr
 
                 AST.Entry (A _ (AST.TypeAnnotation _ _)) ->
                     -- TODO: retain annotations that don't have a matching definition
@@ -267,14 +315,8 @@ fromTopLevelStructures (I.Fix (A _ (AST.TopLevel decls))) =
 
 instance ToJSON TopLevelStructure where
     showJSON c = \case
-        Definition_tls name parameters returnType expression ->
-            makeObj
-                [ type_ "Definition"
-                , ( "name", showJSON c name )
-                , ( "parameters", showJSON c parameters )
-                , ( "returnType", showJSON c returnType )
-                , ( "expression", showJSON c expression )
-                ]
+        DefinitionStructure def ->
+            showJSON c def
 
         TypeAlias name parameters t ->
             makeObj
