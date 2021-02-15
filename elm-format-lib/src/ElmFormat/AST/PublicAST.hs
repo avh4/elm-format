@@ -199,7 +199,7 @@ data Definition
 mkDefinition ::
     ASTNS1 Located [UppercaseIdentifier] 'PatternNK
     -> List (AST.C1 'AST.BeforeTerm (ASTNS Located [UppercaseIdentifier] 'PatternNK))
-    -> Maybe (AST.Comments, AST.Comments, ASTNS Located [UppercaseIdentifier] 'TypeNK)
+    -> Maybe (AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (ASTNS Located [UppercaseIdentifier] 'TypeNK))
     -> ASTNS Located [UppercaseIdentifier] 'ExpressionNK
     -> Definition
 mkDefinition pat args annotation expr =
@@ -209,7 +209,7 @@ mkDefinition pat args annotation expr =
                 (typedParams, returnType) =
                     maybe
                         ( fmap (\a -> ( a, Nothing ) ) args, Nothing )
-                        ( (\(a,b) -> (fmap (fmap Just) a, Just b)) . PatternMatching.matchType args . (\(c1, c2, t) -> t))
+                        ((\(a,b) -> ( fmap (fmap Just) a, Just b )) . PatternMatching.matchType args . (\(C (c1, c2) t) -> t))
                         annotation
             in
             Definition
@@ -225,6 +225,56 @@ mkDefinition pat args annotation expr =
                 , show annotation
                 , show expr
                 ]
+
+data DefinitionBuilder a
+    = DefDef
+        (ASTNS1 Located [UppercaseIdentifier] 'PatternNK)
+        (List (AST.C1 'AST.BeforeTerm (ASTNS Located [UppercaseIdentifier] 'PatternNK)))
+        (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+    | DefAnnotation
+        (AST.C1 'AST.AfterTerm (AST.Ref ()))
+        (AST.C1 'AST.BeforeTerm (ASTNS Located [UppercaseIdentifier] 'TypeNK))
+    | DefOpaque a
+
+mkDefinitions ::
+    forall a.
+    (Definition -> a)
+    -> List (MaybeF Located (DefinitionBuilder a))
+    -> List (MaybeF Located a)
+mkDefinitions fromDef items =
+    let
+        collectAnnotation :: DefinitionBuilder a -> Maybe (LowercaseIdentifier, AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (ASTNS Located [UppercaseIdentifier] 'TypeNK))
+        collectAnnotation decl =
+            case decl of
+                DefAnnotation (C preColon (VarRef () name)) (C postColon typ) ->
+                    Just (name, C (preColon, postColon) typ)
+                _ -> Nothing
+
+        annotations :: Map.Map LowercaseIdentifier (AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (ASTNS Located [UppercaseIdentifier] 'TypeNK))
+        annotations =
+            Map.fromList $ mapMaybe (collectAnnotation . extract) items
+
+        merge :: DefinitionBuilder a -> Maybe a
+        merge decl =
+            case decl of
+                DefDef pat args expr ->
+                    let
+                        annotation =
+                            case pat of
+                                AST.VarPattern name ->
+                                    Map.lookup name annotations
+                                _ -> Nothing
+                    in
+                    Just $ fromDef $ mkDefinition pat args annotation expr
+
+                DefAnnotation _ _ ->
+                    -- TODO: retain annotations that don't have a matching definition
+                    Nothing
+
+                DefOpaque a ->
+                    Just a
+    in
+    mapMaybe (sequenceA . fmap merge) items
 
 instance ToJSON Definition where
     showJSON c = \case
@@ -263,55 +313,37 @@ data TopLevelStructure
 fromTopLevelStructures :: ASTNS Located [UppercaseIdentifier] 'TopLevelNK -> List (MaybeF Located TopLevelStructure)
 fromTopLevelStructures (I.Fix (A _ (AST.TopLevel decls))) =
     let
-        collectAnnotation :: AST.TopLevelStructure (ASTNS Located ns 'DeclarationNK) -> Maybe (LowercaseIdentifier, (AST.Comments, AST.Comments, ASTNS Located ns 'TypeNK))
-        collectAnnotation decl =
-            case fmap (extract . I.unFix) decl of
-                AST.Entry (AST.TypeAnnotation (C preColon (VarRef () name)) (C postColon typ)) -> Just (name, (preColon, postColon, typ))
-                _ -> Nothing
-
-        annotations :: Map.Map LowercaseIdentifier (AST.Comments, AST.Comments, ASTNS Located [UppercaseIdentifier] 'TypeNK)
-        annotations =
-            Map.fromList $ mapMaybe collectAnnotation decls
-
-        merge :: AST.TopLevelStructure
-                     (ASTNS Located [UppercaseIdentifier] 'DeclarationNK) -> Maybe (MaybeF Located TopLevelStructure)
-        merge decl =
+        toDefBuilder :: AST.TopLevelStructure
+                     (ASTNS Located [UppercaseIdentifier] 'DeclarationNK) -> (MaybeF Located (DefinitionBuilder (TopLevelStructure)))
+        toDefBuilder decl =
             case fmap I.unFix decl of
                 AST.Entry (A region (AST.Definition (I.Fix (A _ pat)) args preEquals expr)) ->
-                    let
-                        annotation =
-                            case pat of
-                                AST.VarPattern name ->
-                                    Map.lookup name annotations
-                                _ -> Nothing
-                    in
-                    Just $ JustF $ A region $ DefinitionStructure $
-                        mkDefinition pat args annotation expr
+                    JustF $ A region $ DefDef pat args expr
 
-                AST.Entry (A _ (AST.TypeAnnotation _ _)) ->
-                    -- TODO: retain annotations that don't have a matching definition
-                    Nothing
+                AST.Entry (A region (AST.TypeAnnotation name typ)) ->
+                    JustF $ A region $ DefAnnotation name typ
 
                 AST.Entry (A region (AST.TypeAlias c1 (C (c2, c3) (AST.NameWithArgs name args)) (C c4 t))) ->
-                    Just $ JustF $ A region $ TypeAlias name (fmap (\(C c a) -> a) args) (fromRawAST t)
+
+                    JustF $ A region $ DefOpaque $ TypeAlias name (fmap (\(C c a) -> a) args) (fromRawAST t)
 
                 AST.Entry (A region (AST.Datatype (C (c1, c2) (AST.NameWithArgs name args)) variants)) ->
-                    Just $ JustF $ A region $ CustomType
+                    JustF $ A region $ DefOpaque $ CustomType
                         name
                         (fmap (\(C c a) -> a) args)
                         (fmap (\(C c a) -> mkCustomTypeVariant a) $ AST.toCommentedList variants)
 
                 AST.Entry (A region d) ->
-                    Just $ JustF $ A region $ TODO_TopLevelStructure ("TODO: " ++ show d)
+                    JustF $ A region $ DefOpaque $ TODO_TopLevelStructure ("TODO: " ++ show d)
 
                 AST.BodyComment comment ->
-                    Just $ NothingF $ Comment_tls (mkComment comment)
+                    NothingF $ DefOpaque $ Comment_tls (mkComment comment)
 
                 _ ->
-                    Just $ NothingF $
+                    NothingF $ DefOpaque $
                         TODO_TopLevelStructure ("TODO: " ++ show decl)
     in
-    mapMaybe merge decls
+    mkDefinitions DefinitionStructure $ fmap toDefBuilder decls
 
 instance ToJSON TopLevelStructure where
     showJSON c = \case
@@ -588,6 +620,19 @@ instance ToJSON FunctionApplicationDisplay where
 data MaybeF f a
     = JustF (f a)
     | NothingF a
+    deriving (Functor)
+
+instance Prelude.Foldable f => Prelude.Foldable (MaybeF f) where
+    foldMap f (JustF fa) = Prelude.foldMap f fa
+    foldMap f (NothingF a) = f a
+
+instance Traversable f => Traversable (MaybeF f) where
+    traverse f (JustF fa) = fmap JustF $ sequenceA $ fmap f fa
+    traverse f (NothingF a) = fmap NothingF $ f a
+
+instance Coapplicative f => Coapplicative (MaybeF f) where
+    extract (JustF fa) = extract fa
+    extract (NothingF a) = a
 
 instance (ToJSON a, ToJSON (f a)) => ToJSON (MaybeF f a) where
     showJSON c = \case
