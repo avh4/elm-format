@@ -5,7 +5,6 @@ module ElmFormat.AST.Shared where
 {-| This module contains types that are used by multiple versions of the Elm AST.
 -}
 
-import qualified Data.Maybe as Maybe
 import Data.Coapplicative
 import Data.Int (Int64)
 
@@ -31,20 +30,6 @@ data SymbolIdentifier =
     deriving (Eq, Ord, Show)
 
 
-data Comment
-    = BlockComment (List String)
-    | LineComment String
-    | CommentTrickOpener
-    | CommentTrickCloser
-    | CommentTrickBlock String
-    deriving (Eq, Ord, Show)
-type Comments = List Comment
-
-eolToComment :: Maybe String -> Comments
-eolToComment eol =
-    Maybe.maybeToList (fmap LineComment eol)
-
-
 data Commented c a =
     C c a
     deriving (Eq, Ord, Functor, Show) -- TODO: is Ord needed?
@@ -52,25 +37,6 @@ data Commented c a =
 instance Coapplicative (Commented c) where
     extract (C _ a) = a
     {-# INLINE extract #-}
-
-data CommentType
-    = BeforeTerm
-    | AfterTerm
-    | Inside
-    | BeforeSeparator
-    | AfterSeparator
-
-type C1 (l1 :: CommentType) = Commented Comments
-type C2 (l1 :: CommentType) (l2 :: CommentType) = Commented (Comments, Comments)
-type C3 (l1 :: CommentType) (l2 :: CommentType) (l3 :: CommentType) = Commented (Comments, Comments, Comments)
-
-type C0Eol = Commented (Maybe String)
-type C1Eol (l1 :: CommentType) = Commented (Comments, Maybe String)
-type C2Eol (l1 :: CommentType) (l2 :: CommentType) = Commented (Comments, Comments, Maybe String)
-
-class ToCommentedList f where
-    type CommentsFor f :: * -> *
-    toCommentedList :: f a -> List (CommentsFor f a)
 
 
 data IntRepresentation

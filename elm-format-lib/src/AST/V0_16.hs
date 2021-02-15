@@ -17,6 +17,7 @@ import Data.Functor.Compose
 import qualified Data.Indexed as I
 import qualified Cheapskate.Types as Markdown
 import ElmFormat.AST.Shared
+import qualified Data.Maybe as Maybe
 
 
 newtype ForceMultiline =
@@ -25,6 +26,41 @@ newtype ForceMultiline =
 
 instance Semigroup ForceMultiline where
     (ForceMultiline a) <> (ForceMultiline b) = ForceMultiline (a || b)
+
+
+data Comment
+    = BlockComment (List String)
+    | LineComment String
+    | CommentTrickOpener
+    | CommentTrickCloser
+    | CommentTrickBlock String
+    deriving (Eq, Ord, Show)
+
+type Comments = List Comment
+
+eolToComment :: Maybe String -> Comments
+eolToComment eol =
+    Maybe.maybeToList (fmap LineComment eol)
+
+
+data CommentType
+    = BeforeTerm
+    | AfterTerm
+    | Inside
+    | BeforeSeparator
+    | AfterSeparator
+
+type C1 (l1 :: CommentType) = Commented Comments
+type C2 (l1 :: CommentType) (l2 :: CommentType) = Commented (Comments, Comments)
+type C3 (l1 :: CommentType) (l2 :: CommentType) (l3 :: CommentType) = Commented (Comments, Comments, Comments)
+
+type C0Eol = Commented (Maybe String)
+type C1Eol (l1 :: CommentType) = Commented (Comments, Maybe String)
+type C2Eol (l1 :: CommentType) (l2 :: CommentType) = Commented (Comments, Comments, Maybe String)
+
+class ToCommentedList f where
+    type CommentsFor f :: * -> *
+    toCommentedList :: f a -> List (CommentsFor f a)
 
 
 {-| This represents a list of things separated by comments.

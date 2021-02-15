@@ -37,11 +37,64 @@ instance Show ModuleName where
     show (ModuleName ns) = List.intercalate "." $ fmap (\(UppercaseIdentifier v) -> v) ns
 
 
+data Comment
+    = Comment
+        { text :: String
+        , display :: CommentDisplay
+        }
+
+mkComment :: AST.Comment -> Comment
+mkComment = \case
+    AST.BlockComment lines ->
+        Comment
+            (List.intercalate "\n" lines)
+            (CommentDisplay BlockComment)
+
+    AST.LineComment string ->
+        Comment
+            string
+            (CommentDisplay BlockComment)
+
+    -- | CommentTrickOpener
+    -- | CommentTrickCloser
+    -- | CommentTrickBlock String
+
+instance ToJSON Comment where
+    showJSON c = \case
+        Comment text display ->
+            makeObj
+                [ type_ "Comment"
+                , ( "text", JSString $ toJSString text )
+                , ( "display", showJSON c display )
+                ]
+
+data CommentDisplay =
+    CommentDisplay
+        { commentType :: CommentType
+        }
+
+instance ToJSON CommentDisplay where
+    showJSON c = \case
+        CommentDisplay commentType ->
+            makeObj
+                [ ( "commentType", showJSON c commentType )
+                ]
+
+data CommentType
+    = BlockComment
+    | LineComment
+
+instance ToJSON CommentType where
+    showJSON _ = \case
+        BlockComment -> JSString $ toJSString "BlockComment"
+        LineComment -> JSString $ toJSString "LineComment"
+
+
 data Module
     = Module
         { moduleName :: ModuleName
         , imports :: Map ModuleName Import
-        , body :: List (Located TopLevelStructure)
+        , body :: List (MaybeF Located TopLevelStructure)
         }
 
 fromModule :: AST.Module [UppercaseIdentifier] (ASTNS Located [UppercaseIdentifier] 'TopLevelNK) -> Module
@@ -151,28 +204,29 @@ data TopLevelStructure
         , parameters_ct :: List LowercaseIdentifier
         , variants :: List CustomTypeVariant
         }
+    | Comment_tls Comment
     | TODO_TopLevelStructure String
 
 
-fromTopLevelStructures :: ASTNS Located [UppercaseIdentifier] 'TopLevelNK -> List (Located TopLevelStructure)
+fromTopLevelStructures :: ASTNS Located [UppercaseIdentifier] 'TopLevelNK -> List (MaybeF Located TopLevelStructure)
 fromTopLevelStructures (I.Fix (A _ (AST.TopLevel decls))) =
     let
-        collectAnnotation :: AST.TopLevelStructure (ASTNS Located ns 'DeclarationNK) -> Maybe (LowercaseIdentifier, (Comments, Comments, ASTNS Located ns 'TypeNK))
+        collectAnnotation :: AST.TopLevelStructure (ASTNS Located ns 'DeclarationNK) -> Maybe (LowercaseIdentifier, (AST.Comments, AST.Comments, ASTNS Located ns 'TypeNK))
         collectAnnotation decl =
             case fmap (extract . I.unFix) decl of
                 AST.Entry (AST.TypeAnnotation (C preColon (VarRef () name)) (C postColon typ)) -> Just (name, (preColon, postColon, typ))
                 _ -> Nothing
 
-        annotations :: Map.Map LowercaseIdentifier (Comments, Comments, ASTNS Located [UppercaseIdentifier] 'TypeNK)
+        annotations :: Map.Map LowercaseIdentifier (AST.Comments, AST.Comments, ASTNS Located [UppercaseIdentifier] 'TypeNK)
         annotations =
             Map.fromList $ mapMaybe collectAnnotation decls
 
         merge :: AST.TopLevelStructure
-                     (ASTNS Located [UppercaseIdentifier] 'DeclarationNK) -> Maybe (Located TopLevelStructure)
+                     (ASTNS Located [UppercaseIdentifier] 'DeclarationNK) -> Maybe (MaybeF Located TopLevelStructure)
         merge decl =
             case fmap I.unFix decl of
                 AST.Entry (A region (AST.Definition (I.Fix (A _ (AST.VarPattern name))) args preEquals expr)) ->
-                    Just $ A region $ Definition_tls
+                    Just $ JustF $ A region $ Definition_tls
                         name
                         -- TODO: fill in TypedParameter types from type annotation
                         (fmap (\(C c a) -> TypedParameter (fromRawAST a) Nothing) args)
@@ -184,19 +238,22 @@ fromTopLevelStructures (I.Fix (A _ (AST.TopLevel decls))) =
                     Nothing
 
                 AST.Entry (A region (AST.TypeAlias c1 (C (c2, c3) (AST.NameWithArgs name args)) (C c4 t))) ->
-                    Just $ A region $ TypeAlias name (fmap (\(C c a) -> a) args) (fromRawAST t)
+                    Just $ JustF $ A region $ TypeAlias name (fmap (\(C c a) -> a) args) (fromRawAST t)
 
                 AST.Entry (A region (AST.Datatype (C (c1, c2) (AST.NameWithArgs name args)) variants)) ->
-                    Just $ A region $ CustomType
+                    Just $ JustF $ A region $ CustomType
                         name
                         (fmap (\(C c a) -> a) args)
-                        (fmap (\(C c a) -> mkCustomTypeVariant a) $ toCommentedList variants)
+                        (fmap (\(C c a) -> mkCustomTypeVariant a) $ AST.toCommentedList variants)
 
                 AST.Entry (A region d) ->
-                    Just $ A region $ TODO_TopLevelStructure ("TODO: " ++ show d)
+                    Just $ JustF $ A region $ TODO_TopLevelStructure ("TODO: " ++ show d)
+
+                AST.BodyComment comment ->
+                    Just $ NothingF $ Comment_tls (mkComment comment)
 
                 _ ->
-                    Just $ Reporting.Annotation.at (Region.Position 0 0) (Region.Position 0 0) $
+                    Just $ NothingF $
                         TODO_TopLevelStructure ("TODO: " ++ show decl)
     in
     mapMaybe merge decls
@@ -226,6 +283,9 @@ instance ToJSON TopLevelStructure where
                 , ( "parameters", showJSON c parameters )
                 , ( "variants", showJSON c variants )
                 ]
+
+        Comment_tls comment ->
+            showJSON c comment
 
         TODO_TopLevelStructure s ->
             JSString $ toJSString s
@@ -513,7 +573,7 @@ instance ToPublicAST 'ExpressionNK where
 
         AST.ExplicitList terms comments multiline ->
             ListLiteral
-                (fmap (\(C comments a) -> fromRawAST a) $ toCommentedList terms)
+                (fmap (\(C comments a) -> fromRawAST a) $ AST.toCommentedList terms)
 
         AST.Tuple terms multiline ->
             TupleLiteral
@@ -529,9 +589,9 @@ instance ToPublicAST 'ExpressionNK where
         AST.Record base fields comments multiline ->
             RecordLiteral
                 (fmap (\(C comments a) -> a) base)
-                (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, fromRawAST value)) $ toCommentedList fields)
+                (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, fromRawAST value)) $ AST.toCommentedList fields)
                 $ RecordDisplay
-                    (fmap (extract . _key . extract) $ toCommentedList fields)
+                    (fmap (extract . _key . extract) $ AST.toCommentedList fields)
 
         AST.Access base field ->
             FunctionApplication
@@ -737,7 +797,7 @@ instance ToPublicAST 'PatternNK where
         AST.ConsPattern (C firstEol first) rest ->
             let
                 first' = fromRawAST first
-                rest' = fmap (fromRawAST . (\(C comments a) -> a)) (toCommentedList rest)
+                rest' = fmap (fromRawAST . (\(C comments a) -> a)) (AST.toCommentedList rest)
             in
             case reverse rest' of
                 [] -> mkListPattern [] (Just first')
@@ -782,26 +842,26 @@ instance ToPublicAST 'TypeNK where
         AST.RecordType base fields comments multiline ->
             RecordType
                 (fmap (\(C comments a) -> a) base)
-                (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, fromRawAST value)) $ toCommentedList fields)
+                (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, fromRawAST value)) $ AST.toCommentedList fields)
                 $ RecordDisplay
-                    (fmap (extract . _key . extract) $ toCommentedList fields)
+                    (fmap (extract . _key . extract) $ AST.toCommentedList fields)
 
         AST.FunctionType first rest multiline ->
-            case firstRestToRestLast first (toCommentedList rest) of
+            case firstRestToRestLast first (AST.toCommentedList rest) of
                 (args, C comments last) ->
                     FunctionType
                         (fromRawAST last)
                         (fmap (\(C comments a) -> fromRawAST a) args)
         where
-            firstRestToRestLast :: C0Eol x -> List (C2Eol a b x) -> (List (C2Eol a b x), C0Eol x)
+            firstRestToRestLast :: AST.C0Eol x -> List (AST.C2Eol a b x) -> (List (AST.C2Eol a b x), AST.C0Eol x)
             firstRestToRestLast first rest =
                 done $ foldl (flip step) (ReversedList.empty, first) rest
                 where
-                    step :: C2Eol a b x -> (Reversed (C2Eol a b x), C0Eol x) -> (Reversed (C2Eol a b x), C0Eol x)
+                    step :: AST.C2Eol a b x -> (Reversed (AST.C2Eol a b x), AST.C0Eol x) -> (Reversed (AST.C2Eol a b x), AST.C0Eol x)
                     step (C (a, b, dn) next) (acc, C dn' last) =
                         (ReversedList.push (C (a, b, dn') last) acc, C dn next)
 
-                    done :: (Reversed (C2Eol a b x), C0Eol x) -> (List (C2Eol a b x), C0Eol x)
+                    done :: (Reversed (AST.C2Eol a b x), AST.C0Eol x) -> (List (AST.C2Eol a b x), AST.C0Eol x)
                     done (acc, last) =
                         (ReversedList.toList acc, last)
 
