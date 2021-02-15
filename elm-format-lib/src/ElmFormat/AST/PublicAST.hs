@@ -410,6 +410,7 @@ data LetDeclaration
         { name :: LowercaseIdentifier
         , expression :: Located Expression
         }
+    | Comment_ld Comment
     | TODO_LetDeclaration String
 
 instance ToPublicAST 'LetDeclarationNK where
@@ -420,6 +421,9 @@ instance ToPublicAST 'LetDeclarationNK where
             Definition_ld
                 var
                 (fromRawAST expr)
+
+        AST.LetComment comment ->
+            Comment_ld (mkComment comment)
 
         other ->
             TODO_LetDeclaration ("TODO: " ++ show other)
@@ -432,6 +436,9 @@ instance ToJSON LetDeclaration where
                 , ( "name", showJSON c name )
                 , ( "expression", showJSON c expression )
                 ]
+
+        Comment_ld comment ->
+            showJSON c comment
 
         TODO_LetDeclaration s ->
             JSString $ toJSString s
