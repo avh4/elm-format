@@ -21,6 +21,7 @@ data InfoMessage
   = ProcessingFile FilePath
   | FileWouldChange FilePath
   | ParseError FilePath [A.Located Syntax.Error]
+  | JsonParseError FilePath Text
 
 
 data PromptMessage
@@ -71,6 +72,9 @@ instance ToConsole InfoMessage where
             in
             "Unable to parse file " <> location <> " To see a detailed explanation, run elm make on the file."
 
+        JsonParseError inputFile err ->
+            "Unable to parse JSON file " <> Text.pack inputFile <> "\n\n" <> err
+
 
 instance Loggable InfoMessage where
     jsonInfoMessage elmVersion =
@@ -89,6 +93,8 @@ instance Loggable InfoMessage where
                 <> " --elm-version=" <> show elmVersion
         ParseError inputFile _ ->
             Just $ fileMessage inputFile "Error parsing the file"
+        JsonParseError inputFile _ ->
+            Just $ fileMessage inputFile "Error parsing the JSON file"
 
 
 instance ToConsole ErrorMessage where
