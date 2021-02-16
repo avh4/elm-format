@@ -14,7 +14,6 @@ import ElmFormat.Messages
 import ElmVersion
 import Reporting.Annotation (Located)
 
-import qualified AST.Json
 import qualified CommandLine.Program as Program
 import qualified CommandLine.ResolveFiles as ResolveFiles
 import qualified CommandLine.TransformFiles as TransformFiles
@@ -25,6 +24,7 @@ import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.Version
 import qualified Reporting.Result as Result
 import qualified Text.JSON
+import qualified ElmFormat.AST.PublicAST as PublicAST
 
 
 data WhatToDo
@@ -179,7 +179,13 @@ format elmVersion input =
 
 toJson :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
 toJson elmVersion (inputFile, inputText) =
-    toText . Text.JSON.encode . AST.Json.showModule
+    let
+        config =
+            PublicAST.Config
+                { PublicAST.showSourceLocation = True
+                }
+    in
+    toText . Text.JSON.encode . PublicAST.showJSON config . PublicAST.fromModule
     <$> parseModule elmVersion (inputFile, inputText)
 
 

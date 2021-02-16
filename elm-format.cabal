@@ -45,7 +45,6 @@ common common-options
         generated
 
     other-modules:
-        AST.Json
         Build_elm_format
         ElmFormat.Cli
         ElmFormat.CliFlags

@@ -1165,7 +1165,7 @@ formatPattern elmVersion parensRequired apattern =
             in
                 formatBinary False
                     (formatEolCommented (formatPattern elmVersion True) first)
-                    (fmap formatRight $ sequenceToList rest)
+                    (fmap formatRight $ toCommentedList rest)
                 |> if parensRequired then parens else id
 
         DataPattern (ns, tag) [] ->
@@ -1901,15 +1901,14 @@ formatLiteral elmVersion lit =
         Chr c ->
             formatString elmVersion SChar [c]
         Str s multi ->
-            formatString elmVersion (if multi then SMulti else SString) s
+            formatString elmVersion (SString multi) s
         Boolean b ->
             line $ literal $ show b
 
 
 data StringStyle
     = SChar
-    | SString
-    | SMulti
+    | SString StringRepresentation
     deriving (Eq)
 
 
@@ -1918,9 +1917,9 @@ formatString elmVersion style s =
   case style of
       SChar ->
         stringBox "\'" id
-      SString ->
+      SString SingleQuotedString ->
         stringBox "\"" id
-      SMulti ->
+      SString TripleQuotedString ->
         stringBox "\"\"\"" escapeMultiQuote
   where
     stringBox quotes escaper =
@@ -1931,7 +1930,7 @@ formatString elmVersion style s =
           ]
 
     fix c =
-        if (style == SMulti) && c == '\n' then
+        if (style == SString TripleQuotedString) && c == '\n' then
             [c]
         else if c == '\n' then
             "\\n"
@@ -1939,7 +1938,7 @@ formatString elmVersion style s =
             "\\t"
         else if c == '\\' then
             "\\\\"
-        else if (style == SString) && c == '\"' then
+        else if (style == SString SingleQuotedString) && c == '\"' then
             "\\\""
         else if (style == SChar) && c == '\'' then
             "\\\'"
@@ -2047,7 +2046,7 @@ formatType' elmVersion requireParens atype =
                 ElmStructure.forceableSpaceSepOrStack
                     forceMultiline
                     (formatEolCommented (formatType' elmVersion ForLambda) first)
-                    (fmap formatRight $ sequenceToList rest)
+                    (fmap formatRight $ toCommentedList rest)
                 |> if requireParens /= NotRequired then parens else id
 
         TypeVariable var ->
@@ -2055,7 +2054,7 @@ formatType' elmVersion requireParens atype =
 
         TypeConstruction ctor args forceMultiline ->
             let
-                join = 
+                join =
                     case forceMultiline of
                         ForceMultiline True -> FASplitFirst
                         ForceMultiline False -> FAJoinFirst JoinAll

@@ -1,0 +1,1682 @@
+{
+    "body": [
+        {
+            "name": "Unit",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 11
+                },
+                "start": {
+                    "col": 1,
+                    "line": 6
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 11
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 7
+                    }
+                },
+                "tag": "TupleType",
+                "terms": [
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 7
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 7
+                            }
+                        },
+                        "tag": "UnitType"
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 16,
+                                "line": 8
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 8
+                            }
+                        },
+                        "tag": "UnitType"
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 10
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 9
+                            }
+                        },
+                        "tag": "UnitType"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Function",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 40
+                },
+                "start": {
+                    "col": 1,
+                    "line": 14
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 40
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 15
+                    }
+                },
+                "tag": "TupleType",
+                "terms": [
+                    {
+                        "argumentTypes": [
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 15
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 15
+                                    }
+                                },
+                                "tag": "UnitType"
+                            },
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 15
+                                    },
+                                    "start": {
+                                        "col": 13,
+                                        "line": 15
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
+                        ],
+                        "returnType": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 21,
+                                    "line": 15
+                                },
+                                "start": {
+                                    "col": 19,
+                                    "line": 15
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 21,
+                                "line": 15
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 15
+                            }
+                        },
+                        "tag": "FunctionType"
+                    },
+                    {
+                        "argumentTypes": [
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 16
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 16
+                                    }
+                                },
+                                "tag": "UnitType"
+                            },
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 17
+                                    },
+                                    "start": {
+                                        "col": 10,
+                                        "line": 17
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
+                        ],
+                        "returnType": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 12,
+                                    "line": 18
+                                },
+                                "start": {
+                                    "col": 10,
+                                    "line": 18
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 18
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 16
+                            }
+                        },
+                        "tag": "FunctionType"
+                    },
+                    {
+                        "argumentTypes": [
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 8,
+                                        "line": 20
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 19
+                                    }
+                                },
+                                "tag": "UnitType"
+                            },
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 23
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 22
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
+                        ],
+                        "returnType": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 10,
+                                    "line": 26
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 25
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 26
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 19
+                            }
+                        },
+                        "tag": "FunctionType"
+                    },
+                    {
+                        "argumentTypes": [
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 27
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 27
+                                    }
+                                },
+                                "tag": "UnitType"
+                            },
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 33,
+                                        "line": 27
+                                    },
+                                    "start": {
+                                        "col": 31,
+                                        "line": 27
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
+                        ],
+                        "returnType": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 57,
+                                    "line": 27
+                                },
+                                "start": {
+                                    "col": 55,
+                                    "line": 27
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 57,
+                                "line": 27
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 27
+                            }
+                        },
+                        "tag": "FunctionType"
+                    },
+                    {
+                        "argumentTypes": [
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 28
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 28
+                                    }
+                                },
+                                "tag": "UnitType"
+                            },
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 11,
+                                        "line": 32
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 32
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
+                        ],
+                        "returnType": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 11,
+                                    "line": 36
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 36
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 36
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 28
+                            }
+                        },
+                        "tag": "FunctionType"
+                    },
+                    {
+                        "argumentTypes": [
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 37
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 37
+                                    }
+                                },
+                                "tag": "UnitType"
+                            },
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 38
+                                    },
+                                    "start": {
+                                        "col": 10,
+                                        "line": 38
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
+                        ],
+                        "returnType": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 12,
+                                    "line": 39
+                                },
+                                "start": {
+                                    "col": 10,
+                                    "line": 39
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 16,
+                                "line": 39
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 37
+                            }
+                        },
+                        "tag": "FunctionType"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Variable",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 44
+                },
+                "start": {
+                    "col": 1,
+                    "line": 43
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "name": "a",
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 44
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 44
+                    }
+                },
+                "tag": "TypeVariable"
+            }
+        },
+        {
+            "name": "Constructor",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 60
+                },
+                "start": {
+                    "col": 1,
+                    "line": 47
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 60
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 48
+                    }
+                },
+                "tag": "TupleType",
+                "terms": [
+                    {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Bool",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 48
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 48
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    {
+                        "arguments": [
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 18,
+                                        "line": 49
+                                    },
+                                    "start": {
+                                        "col": 12,
+                                        "line": 49
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 22,
+                                        "line": 49
+                                    },
+                                    "start": {
+                                        "col": 19,
+                                        "line": 49
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        ],
+                        "module": "Dict",
+                        "name": "Dict",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 22,
+                                "line": 49
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 49
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    {
+                        "arguments": [
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 23,
+                                        "line": 50
+                                    },
+                                    "start": {
+                                        "col": 17,
+                                        "line": 50
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 27,
+                                        "line": 50
+                                    },
+                                    "start": {
+                                        "col": 24,
+                                        "line": 50
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        ],
+                        "module": "Dict",
+                        "name": "Dict",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 27,
+                                "line": 50
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 50
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    {
+                        "arguments": [
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 52
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 52
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 53
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 53
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        ],
+                        "module": "Dict",
+                        "name": "Dict",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 53
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 51
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    {
+                        "arguments": [
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 31,
+                                        "line": 54
+                                    },
+                                    "start": {
+                                        "col": 25,
+                                        "line": 54
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 43,
+                                        "line": 54
+                                    },
+                                    "start": {
+                                        "col": 40,
+                                        "line": 54
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        ],
+                        "module": "Dict",
+                        "name": "Dict",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 43,
+                                "line": 54
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 54
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    {
+                        "arguments": [
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 57
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 57
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 59
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 59
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        ],
+                        "module": "Dict",
+                        "name": "Dict",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 59
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 55
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Parens",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 69
+                },
+                "start": {
+                    "col": 1,
+                    "line": 63
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 69
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 64
+                    }
+                },
+                "tag": "TupleType",
+                "terms": [
+                    {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 28,
+                                "line": 64
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 64
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 68
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 65
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Tuple",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 85
+                },
+                "start": {
+                    "col": 1,
+                    "line": 72
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 85
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 73
+                    }
+                },
+                "tag": "TupleType",
+                "terms": [
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 73
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 73
+                            }
+                        },
+                        "tag": "TupleType",
+                        "terms": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 73
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 73
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            },
+                            {
+                                "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 13,
+                                        "line": 73
+                                    },
+                                    "start": {
+                                        "col": 12,
+                                        "line": 73
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            }
+                        ]
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 47,
+                                "line": 74
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 74
+                            }
+                        },
+                        "tag": "TupleType",
+                        "terms": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 18,
+                                        "line": 74
+                                    },
+                                    "start": {
+                                        "col": 17,
+                                        "line": 74
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            },
+                            {
+                                "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 37,
+                                        "line": 74
+                                    },
+                                    "start": {
+                                        "col": 36,
+                                        "line": 74
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            }
+                        ]
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 81
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 75
+                            }
+                        },
+                        "tag": "TupleType",
+                        "terms": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 76
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 76
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            },
+                            {
+                                "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 79
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 79
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            }
+                        ]
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 84
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 82
+                            }
+                        },
+                        "tag": "TupleType",
+                        "terms": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 82
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 82
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            },
+                            {
+                                "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 83
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 83
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "TupleWithCommentedOutTerms",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 94
+                },
+                "start": {
+                    "col": 1,
+                    "line": 88
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 94
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 89
+                    }
+                },
+                "tag": "TupleType",
+                "terms": [
+                    {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 89
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 89
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 92
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 92
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "TupleMultilineWithSingleLineChildren",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 100
+                },
+                "start": {
+                    "col": 1,
+                    "line": 97
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 100
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 98
+                    }
+                },
+                "tag": "TupleType",
+                "terms": [
+                    {
+                        "argumentTypes": [
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 98
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 98
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 17,
+                                        "line": 98
+                                    },
+                                    "start": {
+                                        "col": 14,
+                                        "line": 98
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        ],
+                        "returnType": {
+                            "arguments": [],
+                            "module": null,
+                            "name": "Int",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 24,
+                                    "line": 98
+                                },
+                                "start": {
+                                    "col": 21,
+                                    "line": 98
+                                }
+                            },
+                            "tag": "TypeReference"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 24,
+                                "line": 98
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 98
+                            }
+                        },
+                        "tag": "FunctionType"
+                    },
+                    {
+                        "argumentTypes": [
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 13,
+                                        "line": 99
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 99
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 23,
+                                        "line": 99
+                                    },
+                                    "start": {
+                                        "col": 17,
+                                        "line": 99
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        ],
+                        "returnType": {
+                            "arguments": [],
+                            "module": null,
+                            "name": "String",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 33,
+                                    "line": 99
+                                },
+                                "start": {
+                                    "col": 27,
+                                    "line": 99
+                                }
+                            },
+                            "tag": "TypeReference"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 33,
+                                "line": 99
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 99
+                            }
+                        },
+                        "tag": "FunctionType"
+                    }
+                ]
+            }
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 105
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 105
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "emptyRecord",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 104
+                            },
+                            "start": {
+                                "col": 13,
+                                "line": 104
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": {
+                        "display": {
+                            "fieldOrder": []
+                        },
+                        "fields": {},
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 103
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 103
+                            }
+                        },
+                        "tag": "RecordType"
+                    }
+                }
+            ],
+            "returnType": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 23,
+                        "line": 103
+                    },
+                    "start": {
+                        "col": 21,
+                        "line": 103
+                    }
+                },
+                "tag": "UnitType"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 105
+                },
+                "start": {
+                    "col": 1,
+                    "line": 104
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "name": "Record",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 113
+                },
+                "start": {
+                    "col": 1,
+                    "line": 108
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 113
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 109
+                    }
+                },
+                "tag": "TupleType",
+                "terms": [
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 16,
+                                        "line": 109
+                                    },
+                                    "start": {
+                                        "col": 13,
+                                        "line": 109
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            "y": {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 24,
+                                        "line": 109
+                                    },
+                                    "start": {
+                                        "col": 22,
+                                        "line": 109
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 109
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 109
+                            }
+                        },
+                        "tag": "RecordType"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 16,
+                                        "line": 110
+                                    },
+                                    "start": {
+                                        "col": 13,
+                                        "line": 110
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            "y": {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 111
+                                    },
+                                    "start": {
+                                        "col": 13,
+                                        "line": 111
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 112
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 110
+                            }
+                        },
+                        "tag": "RecordType"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "RecordWithCommentedOutTerms",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 124
+                },
+                "start": {
+                    "col": 1,
+                    "line": 116
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "display": {
+                    "fieldOrder": [
+                        "a",
+                        "d"
+                    ]
+                },
+                "fields": {
+                    "a": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 117
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 117
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "d": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 121
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 121
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 124
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 117
+                    }
+                },
+                "tag": "RecordType"
+            }
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 129
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 129
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "recordExtension",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 128
+                            },
+                            "start": {
+                                "col": 17,
+                                "line": 128
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": {
+                        "base": "a",
+                        "display": {
+                            "fieldOrder": [
+                                "x",
+                                "y"
+                            ]
+                        },
+                        "fields": {
+                            "x": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 32,
+                                        "line": 127
+                                    },
+                                    "start": {
+                                        "col": 29,
+                                        "line": 127
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            "y": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Int",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 41,
+                                        "line": 127
+                                    },
+                                    "start": {
+                                        "col": 38,
+                                        "line": 127
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 43,
+                                "line": 127
+                            },
+                            "start": {
+                                "col": 19,
+                                "line": 127
+                            }
+                        },
+                        "tag": "RecordTypeExtension"
+                    }
+                }
+            ],
+            "returnType": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 49,
+                        "line": 127
+                    },
+                    "start": {
+                        "col": 47,
+                        "line": 127
+                    }
+                },
+                "tag": "UnitType"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 129
+                },
+                "start": {
+                    "col": 1,
+                    "line": 128
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "name": "RecordExtensionWithCommentedOutTerms",
+            "sourceLocation": {
+                "end": {
+                    "col": 6,
+                    "line": 141
+                },
+                "start": {
+                    "col": 1,
+                    "line": 132
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "base": "z",
+                "display": {
+                    "fieldOrder": [
+                        "a",
+                        "d"
+                    ]
+                },
+                "fields": {
+                    "a": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 134
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 134
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "d": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 138
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 138
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 141
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 133
+                    }
+                },
+                "tag": "RecordTypeExtension"
+            }
+        }
+    ],
+    "imports": {
+        "Dict": {
+            "as": "Dict",
+            "exposing": {
+                "types": {
+                    "Dict": "NoTags"
+                },
+                "values": {}
+            }
+        }
+    },
+    "moduleName": "AllSyntax.Types"
+}

@@ -1,0 +1,2275 @@
+{
+    "body": [
+        {
+            "name": "DataType1",
+            "parameters": [],
+            "sourceLocation": {
+                "end": {
+                    "col": 25,
+                    "line": 11
+                },
+                "start": {
+                    "col": 1,
+                    "line": 8
+                }
+            },
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2",
+                    "parameterTypes": [
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 10
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 10
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3",
+                    "parameterTypes": [
+                        {
+                            "arguments": [
+                                {
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 21,
+                                            "line": 11
+                                        },
+                                        "start": {
+                                            "col": 19,
+                                            "line": 11
+                                        }
+                                    },
+                                    "tag": "UnitType"
+                                }
+                            ],
+                            "module": null,
+                            "name": "List",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 22,
+                                    "line": 11
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 11
+                                }
+                            },
+                            "tag": "TypeReference"
+                        },
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 25,
+                                    "line": 11
+                                },
+                                "start": {
+                                    "col": 23,
+                                    "line": 11
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "DataType2",
+            "parameters": [],
+            "sourceLocation": {
+                "end": {
+                    "col": 49,
+                    "line": 17
+                },
+                "start": {
+                    "col": 1,
+                    "line": 14
+                }
+            },
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2",
+                    "parameterTypes": [
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 31,
+                                    "line": 16
+                                },
+                                "start": {
+                                    "col": 29,
+                                    "line": 16
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3",
+                    "parameterTypes": [
+                        {
+                            "arguments": [
+                                {
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 37,
+                                            "line": 17
+                                        },
+                                        "start": {
+                                            "col": 35,
+                                            "line": 17
+                                        }
+                                    },
+                                    "tag": "UnitType"
+                                }
+                            ],
+                            "module": null,
+                            "name": "List",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 38,
+                                    "line": 17
+                                },
+                                "start": {
+                                    "col": 29,
+                                    "line": 17
+                                }
+                            },
+                            "tag": "TypeReference"
+                        },
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 49,
+                                    "line": 17
+                                },
+                                "start": {
+                                    "col": 47,
+                                    "line": 17
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "DataType3",
+            "parameters": [],
+            "sourceLocation": {
+                "end": {
+                    "col": 11,
+                    "line": 37
+                },
+                "start": {
+                    "col": 1,
+                    "line": 20
+                }
+            },
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2",
+                    "parameterTypes": [
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 11,
+                                    "line": 30
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 30
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3",
+                    "parameterTypes": [
+                        {
+                            "arguments": [
+                                {
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 17,
+                                            "line": 35
+                                        },
+                                        "start": {
+                                            "col": 15,
+                                            "line": 35
+                                        }
+                                    },
+                                    "tag": "UnitType"
+                                }
+                            ],
+                            "module": null,
+                            "name": "List",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 18,
+                                    "line": 35
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 35
+                                }
+                            },
+                            "tag": "TypeReference"
+                        },
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 11,
+                                    "line": 37
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 37
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "DataTypeWithEolComments1",
+            "parameters": [],
+            "sourceLocation": {
+                "end": {
+                    "col": 16,
+                    "line": 41
+                },
+                "start": {
+                    "col": 1,
+                    "line": 40
+                }
+            },
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1",
+                    "parameterTypes": []
+                }
+            ]
+        },
+        {
+            "name": "DataTypeWithEolComments2",
+            "parameters": [],
+            "sourceLocation": {
+                "end": {
+                    "col": 20,
+                    "line": 47
+                },
+                "start": {
+                    "col": 1,
+                    "line": 44
+                }
+            },
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2",
+                    "parameterTypes": [
+                        {
+                            "name": "a",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 14,
+                                    "line": 46
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 46
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3",
+                    "parameterTypes": [
+                        {
+                            "name": "b",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 14,
+                                    "line": 47
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 47
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        },
+                        {
+                            "name": "c",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 16,
+                                    "line": 47
+                                },
+                                "start": {
+                                    "col": 15,
+                                    "line": 47
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "DataTypeWithCommentedOutConstructors",
+            "parameters": [],
+            "sourceLocation": {
+                "end": {
+                    "col": 8,
+                    "line": 55
+                },
+                "start": {
+                    "col": 1,
+                    "line": 50
+                }
+            },
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "A",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "D",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "E",
+                    "parameterTypes": []
+                }
+            ]
+        },
+        {
+            "display": {
+                "commentType": "BlockComment"
+            },
+            "tag": "Comment",
+            "text": ""
+        },
+        {
+            "display": {
+                "commentType": "BlockComment"
+            },
+            "tag": "Comment",
+            "text": " Union type with params"
+        },
+        {
+            "display": {
+                "commentType": "BlockComment"
+            },
+            "tag": "Comment",
+            "text": ""
+        },
+        {
+            "name": "DataTypeWithParams1",
+            "parameters": [
+                "a",
+                "b",
+                "c"
+            ],
+            "sourceLocation": {
+                "end": {
+                    "col": 17,
+                    "line": 67
+                },
+                "start": {
+                    "col": 1,
+                    "line": 64
+                }
+            },
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1_",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2_",
+                    "parameterTypes": [
+                        {
+                            "name": "a",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 66
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 66
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3_",
+                    "parameterTypes": [
+                        {
+                            "name": "b",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 67
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 67
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        },
+                        {
+                            "name": "c",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 17,
+                                    "line": 67
+                                },
+                                "start": {
+                                    "col": 16,
+                                    "line": 67
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "DataTypeWithParams2",
+            "parameters": [
+                "a",
+                "b",
+                "c"
+            ],
+            "sourceLocation": {
+                "end": {
+                    "col": 17,
+                    "line": 73
+                },
+                "start": {
+                    "col": 1,
+                    "line": 70
+                }
+            },
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1_",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2_",
+                    "parameterTypes": [
+                        {
+                            "name": "a",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 72
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 72
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3_",
+                    "parameterTypes": [
+                        {
+                            "name": "b",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 73
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 73
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        },
+                        {
+                            "name": "c",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 17,
+                                    "line": 73
+                                },
+                                "start": {
+                                    "col": 16,
+                                    "line": 73
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "DataTypeWithParams3",
+            "parameters": [
+                "a",
+                "b",
+                "c"
+            ],
+            "sourceLocation": {
+                "end": {
+                    "col": 17,
+                    "line": 88
+                },
+                "start": {
+                    "col": 1,
+                    "line": 76
+                }
+            },
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Ctor1_",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "Ctor2_",
+                    "parameterTypes": [
+                        {
+                            "name": "a",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 87
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 87
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                },
+                {
+                    "name": "Ctor3_",
+                    "parameterTypes": [
+                        {
+                            "name": "b",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 88
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 88
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        },
+                        {
+                            "name": "c",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 17,
+                                    "line": 88
+                                },
+                                "start": {
+                                    "col": 16,
+                                    "line": 88
+                                }
+                            },
+                            "tag": "TypeVariable"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "display": {
+                "commentType": "BlockComment"
+            },
+            "tag": "Comment",
+            "text": ""
+        },
+        {
+            "display": {
+                "commentType": "BlockComment"
+            },
+            "tag": "Comment",
+            "text": " Type alias"
+        },
+        {
+            "display": {
+                "commentType": "BlockComment"
+            },
+            "tag": "Comment",
+            "text": ""
+        },
+        {
+            "name": "TypeAlias1",
+            "sourceLocation": {
+                "end": {
+                    "col": 39,
+                    "line": 98
+                },
+                "start": {
+                    "col": 1,
+                    "line": 97
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "display": {
+                    "fieldOrder": [
+                        "x",
+                        "y",
+                        "z"
+                    ]
+                },
+                "fields": {
+                    "x": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 98
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 98
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "y": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 98
+                            },
+                            "start": {
+                                "col": 20,
+                                "line": 98
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "z": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 37,
+                                "line": 98
+                            },
+                            "start": {
+                                "col": 29,
+                                "line": 98
+                            }
+                        },
+                        "tag": "TupleType",
+                        "terms": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 32,
+                                        "line": 98
+                                    },
+                                    "start": {
+                                        "col": 31,
+                                        "line": 98
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            },
+                            {
+                                "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 35,
+                                        "line": 98
+                                    },
+                                    "start": {
+                                        "col": 34,
+                                        "line": 98
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            }
+                        ]
+                    }
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 39,
+                        "line": 98
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 98
+                    }
+                },
+                "tag": "RecordType"
+            }
+        },
+        {
+            "name": "TypeAliasMultiline",
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 107
+                },
+                "start": {
+                    "col": 1,
+                    "line": 101
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 107
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 107
+                    }
+                },
+                "tag": "UnitType"
+            }
+        },
+        {
+            "name": "TypeAlias2",
+            "sourceLocation": {
+                "end": {
+                    "col": 39,
+                    "line": 112
+                },
+                "start": {
+                    "col": 1,
+                    "line": 110
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "display": {
+                    "fieldOrder": [
+                        "x",
+                        "y",
+                        "z"
+                    ]
+                },
+                "fields": {
+                    "x": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 112
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 112
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "y": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 112
+                            },
+                            "start": {
+                                "col": 20,
+                                "line": 112
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "z": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 37,
+                                "line": 112
+                            },
+                            "start": {
+                                "col": 29,
+                                "line": 112
+                            }
+                        },
+                        "tag": "TupleType",
+                        "terms": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 32,
+                                        "line": 112
+                                    },
+                                    "start": {
+                                        "col": 31,
+                                        "line": 112
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            },
+                            {
+                                "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 35,
+                                        "line": 112
+                                    },
+                                    "start": {
+                                        "col": 34,
+                                        "line": 112
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            }
+                        ]
+                    }
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 39,
+                        "line": 112
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 112
+                    }
+                },
+                "tag": "RecordType"
+            }
+        },
+        {
+            "name": "TypeAlias3",
+            "sourceLocation": {
+                "end": {
+                    "col": 39,
+                    "line": 127
+                },
+                "start": {
+                    "col": 1,
+                    "line": 115
+                }
+            },
+            "tag": "TypeAlias",
+            "type": {
+                "display": {
+                    "fieldOrder": [
+                        "x",
+                        "y",
+                        "z"
+                    ]
+                },
+                "fields": {
+                    "x": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 127
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 127
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "y": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 127
+                            },
+                            "start": {
+                                "col": 20,
+                                "line": 127
+                            }
+                        },
+                        "tag": "TypeReference"
+                    },
+                    "z": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 37,
+                                "line": 127
+                            },
+                            "start": {
+                                "col": 29,
+                                "line": 127
+                            }
+                        },
+                        "tag": "TupleType",
+                        "terms": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 32,
+                                        "line": 127
+                                    },
+                                    "start": {
+                                        "col": 31,
+                                        "line": 127
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            },
+                            {
+                                "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 35,
+                                        "line": 127
+                                    },
+                                    "start": {
+                                        "col": 34,
+                                        "line": 127
+                                    }
+                                },
+                                "tag": "TypeVariable"
+                            }
+                        ]
+                    }
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 39,
+                        "line": 127
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 127
+                    }
+                },
+                "tag": "RecordType"
+            }
+        },
+        {
+            "display": {
+                "commentType": "BlockComment"
+            },
+            "tag": "Comment",
+            "text": ""
+        },
+        {
+            "display": {
+                "commentType": "BlockComment"
+            },
+            "tag": "Comment",
+            "text": " Expressions"
+        },
+        {
+            "display": {
+                "commentType": "BlockComment"
+            },
+            "tag": "Comment",
+            "text": ""
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 137
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 137
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "expressionDefinition",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 136
+                            },
+                            "start": {
+                                "col": 22,
+                                "line": 136
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": null
+                },
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 25,
+                                "line": 136
+                            },
+                            "start": {
+                                "col": 24,
+                                "line": 136
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 137
+                },
+                "start": {
+                    "col": 1,
+                    "line": 136
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 141
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 141
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "expressionDefinitionNoPatterns",
+            "parameters": [],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 141
+                },
+                "start": {
+                    "col": 1,
+                    "line": 140
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 146
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 146
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "expressionTypeAnnotation1",
+            "parameters": [],
+            "returnType": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 31,
+                        "line": 144
+                    },
+                    "start": {
+                        "col": 29,
+                        "line": 144
+                    }
+                },
+                "tag": "UnitType"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 146
+                },
+                "start": {
+                    "col": 1,
+                    "line": 145
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 151
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 151
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "expressionTypeAnnotation2",
+            "parameters": [],
+            "returnType": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 47,
+                        "line": 149
+                    },
+                    "start": {
+                        "col": 45,
+                        "line": 149
+                    }
+                },
+                "tag": "UnitType"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 151
+                },
+                "start": {
+                    "col": 1,
+                    "line": 150
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 160
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 160
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "expressionTypeAnnotation3",
+            "parameters": [],
+            "returnType": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 158
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 158
+                    }
+                },
+                "tag": "UnitType"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 160
+                },
+                "start": {
+                    "col": 1,
+                    "line": 159
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 167
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 167
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "expressionTypeAnnotation4",
+            "parameters": [],
+            "returnType": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 165
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 165
+                    }
+                },
+                "tag": "UnitType"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 167
+                },
+                "start": {
+                    "col": 1,
+                    "line": 166
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 175
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 175
+                    }
+                },
+                "tag": "ListLiteral",
+                "terms": []
+            },
+            "name": "expressionTypeAnnotationForcedMultiline",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 42,
+                                "line": 174
+                            },
+                            "start": {
+                                "col": 41,
+                                "line": 174
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 171
+                            },
+                            "start": {
+                                "col": 5,
+                                "line": 171
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                },
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 44,
+                                "line": 174
+                            },
+                            "start": {
+                                "col": 43,
+                                "line": 174
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": {
+                        "arguments": [
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "String",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 21,
+                                        "line": 172
+                                    },
+                                    "start": {
+                                        "col": 15,
+                                        "line": 172
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Bool",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 26,
+                                        "line": 172
+                                    },
+                                    "start": {
+                                        "col": 22,
+                                        "line": 172
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        ],
+                        "module": null,
+                        "name": "Result",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 172
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 172
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                }
+            ],
+            "returnType": {
+                "arguments": [
+                    {
+                        "arguments": [
+                            {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 22,
+                                        "line": 173
+                                    },
+                                    "start": {
+                                        "col": 20,
+                                        "line": 173
+                                    }
+                                },
+                                "tag": "UnitType"
+                            }
+                        ],
+                        "module": "Maybe",
+                        "name": "Maybe",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 173
+                            },
+                            "start": {
+                                "col": 13,
+                                "line": 173
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                ],
+                "module": null,
+                "name": "List",
+                "sourceLocation": {
+                    "end": {
+                        "col": 23,
+                        "line": 173
+                    },
+                    "start": {
+                        "col": 8,
+                        "line": 173
+                    }
+                },
+                "tag": "TypeReference"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 175
+                },
+                "start": {
+                    "col": 1,
+                    "line": 174
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "identifier": "False",
+                "module": "Basics",
+                "sourceLocation": {
+                    "end": {
+                        "col": 10,
+                        "line": 180
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 180
+                    }
+                },
+                "tag": "ExternalReference"
+            },
+            "name": "parametersWithTypes",
+            "parameters": [
+                {
+                    "pattern": {
+                        "name": "anInt",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 179
+                            },
+                            "start": {
+                                "col": 21,
+                                "line": 179
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
+                    "type": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 178
+                            },
+                            "start": {
+                                "col": 23,
+                                "line": 178
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                },
+                {
+                    "pattern": {
+                        "name": "aString",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 34,
+                                "line": 179
+                            },
+                            "start": {
+                                "col": 27,
+                                "line": 179
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
+                    "type": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 36,
+                                "line": 178
+                            },
+                            "start": {
+                                "col": 30,
+                                "line": 178
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                }
+            ],
+            "returnType": {
+                "arguments": [],
+                "module": null,
+                "name": "Bool",
+                "sourceLocation": {
+                    "end": {
+                        "col": 44,
+                        "line": 178
+                    },
+                    "start": {
+                        "col": 40,
+                        "line": 178
+                    }
+                },
+                "tag": "TypeReference"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 10,
+                    "line": 180
+                },
+                "start": {
+                    "col": 1,
+                    "line": 179
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "identifier": "todo",
+                "module": "Debug",
+                "sourceLocation": {
+                    "end": {
+                        "col": 15,
+                        "line": 185
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 185
+                    }
+                },
+                "tag": "ExternalReference"
+            },
+            "name": "parametersWithTypesCurried",
+            "parameters": [
+                {
+                    "pattern": {
+                        "name": "anInt",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 33,
+                                "line": 184
+                            },
+                            "start": {
+                                "col": 28,
+                                "line": 184
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
+                    "type": {
+                        "arguments": [],
+                        "module": null,
+                        "name": "Int",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 33,
+                                "line": 183
+                            },
+                            "start": {
+                                "col": 30,
+                                "line": 183
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                }
+            ],
+            "returnType": {
+                "argumentTypes": [
+                    {
+                        "arguments": [],
+                        "module": null,
+                        "name": "String",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 43,
+                                "line": 183
+                            },
+                            "start": {
+                                "col": 37,
+                                "line": 183
+                            }
+                        },
+                        "tag": "TypeReference"
+                    }
+                ],
+                "returnType": {
+                    "arguments": [],
+                    "module": null,
+                    "name": "Bool",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 51,
+                            "line": 183
+                        },
+                        "start": {
+                            "col": 47,
+                            "line": 183
+                        }
+                    },
+                    "tag": "TypeReference"
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 51,
+                        "line": 183
+                    },
+                    "start": {
+                        "col": 30,
+                        "line": 183
+                    }
+                },
+                "tag": "FunctionType"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 15,
+                    "line": 185
+                },
+                "start": {
+                    "col": 1,
+                    "line": 184
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "display": {
+                "commentType": "BlockComment"
+            },
+            "tag": "Comment",
+            "text": ""
+        },
+        {
+            "display": {
+                "commentType": "BlockComment"
+            },
+            "tag": "Comment",
+            "text": " Declarations in let expressions"
+        },
+        {
+            "display": {
+                "commentType": "BlockComment"
+            },
+            "tag": "Comment",
+            "text": ""
+        },
+        {
+            "expression": {
+                "body": {
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 202
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 202
+                        }
+                    },
+                    "tag": "UnitLiteral"
+                },
+                "declarations": [
+                    {
+                        "expression": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 197
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 197
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "name": "def1",
+                        "parameters": [],
+                        "returnType": null,
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 197
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 196
+                            }
+                        },
+                        "tag": "Definition"
+                    },
+                    {
+                        "expression": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 200
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 200
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "name": "def2",
+                        "parameters": [],
+                        "returnType": null,
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 200
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 199
+                            }
+                        },
+                        "tag": "Definition"
+                    }
+                ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 202
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 195
+                    }
+                },
+                "tag": "LetExpression"
+            },
+            "name": "expressionDefinitionsInLet",
+            "parameters": [],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 202
+                },
+                "start": {
+                    "col": 1,
+                    "line": 194
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "body": {
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 220
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 220
+                        }
+                    },
+                    "tag": "UnitLiteral"
+                },
+                "declarations": [
+                    {
+                        "display": {
+                            "commentType": "BlockComment"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 208
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 206
+                            }
+                        },
+                        "tag": "Comment",
+                        "text": "X"
+                    },
+                    {
+                        "expression": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 210
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 210
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "name": "def1",
+                        "parameters": [],
+                        "returnType": null,
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 210
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 208
+                            }
+                        },
+                        "tag": "Definition"
+                    },
+                    {
+                        "display": {
+                            "commentType": "BlockComment"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 213
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 210
+                            }
+                        },
+                        "tag": "Comment",
+                        "text": "AA"
+                    },
+                    {
+                        "expression": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 215
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 215
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "name": "def2",
+                        "parameters": [],
+                        "returnType": null,
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 215
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 213
+                            }
+                        },
+                        "tag": "Definition"
+                    },
+                    {
+                        "display": {
+                            "commentType": "BlockComment"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 5,
+                                "line": 218
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 215
+                            }
+                        },
+                        "tag": "Comment",
+                        "text": "AD"
+                    }
+                ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 220
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 206
+                    }
+                },
+                "tag": "LetExpression"
+            },
+            "name": "expressionDefinitionsInLet2",
+            "parameters": [],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 220
+                },
+                "start": {
+                    "col": 1,
+                    "line": 205
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "body": {
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 238
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 238
+                        }
+                    },
+                    "tag": "UnitLiteral"
+                },
+                "declarations": [
+                    {
+                        "display": {
+                            "commentType": "BlockComment"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 226
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 224
+                            }
+                        },
+                        "tag": "Comment",
+                        "text": "X"
+                    },
+                    {
+                        "expression": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 228
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 228
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "name": "def1",
+                        "parameters": [],
+                        "returnType": null,
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 228
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 226
+                            }
+                        },
+                        "tag": "Definition"
+                    },
+                    {
+                        "display": {
+                            "commentType": "BlockComment"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 9,
+                                "line": 231
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 228
+                            }
+                        },
+                        "tag": "Comment",
+                        "text": "Z"
+                    },
+                    {
+                        "expression": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 233
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 233
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "name": "def2",
+                        "parameters": [],
+                        "returnType": null,
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 233
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 231
+                            }
+                        },
+                        "tag": "Definition"
+                    },
+                    {
+                        "display": {
+                            "commentType": "BlockComment"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 5,
+                                "line": 236
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 233
+                            }
+                        },
+                        "tag": "Comment",
+                        "text": "AB"
+                    }
+                ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 238
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 224
+                    }
+                },
+                "tag": "LetExpression"
+            },
+            "name": "expressionDefinitionsInLet3",
+            "parameters": [],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 238
+                },
+                "start": {
+                    "col": 1,
+                    "line": 223
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "body": {
+                    "sourceLocation": {
+                        "end": {
+                            "col": 7,
+                            "line": 247
+                        },
+                        "start": {
+                            "col": 5,
+                            "line": 247
+                        }
+                    },
+                    "tag": "UnitLiteral"
+                },
+                "declarations": [
+                    {
+                        "expression": {
+                            "identifier": "False",
+                            "module": "Basics",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 18,
+                                    "line": 245
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 245
+                                }
+                            },
+                            "tag": "ExternalReference"
+                        },
+                        "name": "def1",
+                        "parameters": [
+                            {
+                                "pattern": {
+                                    "name": "aString",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 21,
+                                            "line": 244
+                                        },
+                                        "start": {
+                                            "col": 14,
+                                            "line": 244
+                                        }
+                                    },
+                                    "tag": "VariableDefinition"
+                                },
+                                "type": {
+                                    "arguments": [],
+                                    "module": null,
+                                    "name": "String",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 22,
+                                            "line": 243
+                                        },
+                                        "start": {
+                                            "col": 16,
+                                            "line": 243
+                                        }
+                                    },
+                                    "tag": "TypeReference"
+                                }
+                            }
+                        ],
+                        "returnType": {
+                            "argumentTypes": [
+                                {
+                                    "arguments": [],
+                                    "module": null,
+                                    "name": "Int",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 29,
+                                            "line": 243
+                                        },
+                                        "start": {
+                                            "col": 26,
+                                            "line": 243
+                                        }
+                                    },
+                                    "tag": "TypeReference"
+                                }
+                            ],
+                            "returnType": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Bool",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 37,
+                                        "line": 243
+                                    },
+                                    "start": {
+                                        "col": 33,
+                                        "line": 243
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 37,
+                                    "line": 243
+                                },
+                                "start": {
+                                    "col": 16,
+                                    "line": 243
+                                }
+                            },
+                            "tag": "FunctionType"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 245
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 244
+                            }
+                        },
+                        "tag": "Definition"
+                    }
+                ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 247
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 242
+                    }
+                },
+                "tag": "LetExpression"
+            },
+            "name": "typeAnnotationInLet",
+            "parameters": [],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 247
+                },
+                "start": {
+                    "col": 1,
+                    "line": 241
+                }
+            },
+            "tag": "Definition"
+        }
+    ],
+    "imports": {},
+    "moduleName": "AllSyntax.Declarations"
+}

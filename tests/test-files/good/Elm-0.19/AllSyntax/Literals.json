@@ -41,7 +41,7 @@
                         "line": 9
                     }
                 },
-                "tag": "ListLiteral",
+                "tag": "TupleLiteral",
                 "terms": [
                     {
                         "identifier": "True",
@@ -95,7 +95,7 @@
                 "sourceLocation": {
                     "end": {
                         "col": 6,
-                        "line": 20
+                        "line": 28
                     },
                     "start": {
                         "col": 5,
@@ -127,12 +127,46 @@
                         },
                         "sourceLocation": {
                             "end": {
-                                "col": 13,
+                                "col": 11,
                                 "line": 16
                             },
                             "start": {
                                 "col": 7,
                                 "line": 16
+                            }
+                        },
+                        "tag": "IntLiteral",
+                        "value": 9
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 12,
+                                "line": 17
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 17
+                            }
+                        },
+                        "tag": "IntLiteral",
+                        "value": -9
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 13,
+                                "line": 18
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 18
                             }
                         },
                         "tag": "IntLiteral",
@@ -144,16 +178,118 @@
                         },
                         "sourceLocation": {
                             "end": {
-                                "col": 25,
-                                "line": 17
+                                "col": 14,
+                                "line": 19
                             },
                             "start": {
                                 "col": 7,
-                                "line": 17
+                                "line": 19
+                            }
+                        },
+                        "tag": "IntLiteral",
+                        "value": -3866
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 20
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 20
+                            }
+                        },
+                        "tag": "IntLiteral",
+                        "value": 129717
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 18,
+                                "line": 21
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 21
+                            }
+                        },
+                        "tag": "IntLiteral",
+                        "value": -129717
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 25,
+                                "line": 22
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 22
+                            }
+                        },
+                        "tag": "IntLiteral",
+                        "value": 4600387192
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 23
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 23
+                            }
+                        },
+                        "tag": "IntLiteral",
+                        "value": -4600387192
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 25,
+                                "line": 24
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 24
                             }
                         },
                         "tag": "IntLiteral",
                         "value": 9223372036854776000
+                    },
+                    {
+                        "display": {
+                            "representation": "HexadecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 26,
+                                "line": 25
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 25
+                            }
+                        },
+                        "tag": "IntLiteral",
+                        "value": -9223372036854776000
                     },
                     {
                         "display": {
@@ -162,11 +298,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 26,
-                                "line": 18
+                                "line": 26
                             },
                             "start": {
                                 "col": 7,
-                                "line": 18
+                                "line": 26
                             }
                         },
                         "tag": "IntLiteral",
@@ -179,11 +315,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 27,
-                                "line": 19
+                                "line": 27
                             },
                             "start": {
                                 "col": 7,
-                                "line": 19
+                                "line": 27
                             }
                         },
                         "tag": "IntLiteral",
@@ -197,7 +333,7 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 20
+                    "line": 28
                 },
                 "start": {
                     "col": 1,
@@ -211,11 +347,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 6,
-                        "line": 25
+                        "line": 33
                     },
                     "start": {
                         "col": 5,
-                        "line": 24
+                        "line": 32
                     }
                 },
                 "tag": "ListLiteral",
@@ -227,11 +363,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 10,
-                                "line": 24
+                                "line": 32
                             },
                             "start": {
                                 "col": 7,
-                                "line": 24
+                                "line": 32
                             }
                         },
                         "tag": "FloatLiteral",
@@ -245,11 +381,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 25
+                    "line": 33
                 },
                 "start": {
                     "col": 1,
-                    "line": 23
+                    "line": 31
                 }
             },
             "tag": "Definition"
@@ -262,11 +398,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 13,
-                        "line": 29
+                        "line": 37
                     },
                     "start": {
                         "col": 5,
-                        "line": 29
+                        "line": 37
                     }
                 },
                 "tag": "StringLiteral",
@@ -278,72 +414,6 @@
             "sourceLocation": {
                 "end": {
                     "col": 13,
-                    "line": 29
-                },
-                "start": {
-                    "col": 1,
-                    "line": 28
-                }
-            },
-            "tag": "Definition"
-        },
-        {
-            "expression": {
-                "display": {
-                    "representation": "SingleQuotedString"
-                },
-                "sourceLocation": {
-                    "end": {
-                        "col": 22,
-                        "line": 33
-                    },
-                    "start": {
-                        "col": 5,
-                        "line": 33
-                    }
-                },
-                "tag": "StringLiteral",
-                "value": "a b'`<>{}/\u06a5\ud83d\ude00\u3041\u2f83\ud835\udfdf"
-            },
-            "name": "stringWithUnicodeCharacters",
-            "parameters": [],
-            "returnType": null,
-            "sourceLocation": {
-                "end": {
-                    "col": 22,
-                    "line": 33
-                },
-                "start": {
-                    "col": 1,
-                    "line": 32
-                }
-            },
-            "tag": "Definition"
-        },
-        {
-            "expression": {
-                "display": {
-                    "representation": "SingleQuotedString"
-                },
-                "sourceLocation": {
-                    "end": {
-                        "col": 15,
-                        "line": 37
-                    },
-                    "start": {
-                        "col": 5,
-                        "line": 37
-                    }
-                },
-                "tag": "StringLiteral",
-                "value": "\ud83d\ude000\ud83d\ude009\ud83d\ude00a\ud83d\ude00F"
-            },
-            "name": "stringWithEscapedCharacterFollowedByHexDigit",
-            "parameters": [],
-            "returnType": null,
-            "sourceLocation": {
-                "end": {
-                    "col": 15,
                     "line": 37
                 },
                 "start": {
@@ -360,7 +430,7 @@
                 },
                 "sourceLocation": {
                     "end": {
-                        "col": 15,
+                        "col": 22,
                         "line": 41
                     },
                     "start": {
@@ -369,14 +439,14 @@
                     }
                 },
                 "tag": "StringLiteral",
-                "value": "\t\n\\\""
+                "value": "a b'`<>{}/\u06a5\ud83d\ude00\u3041\u2f83\ud835\udfdf"
             },
-            "name": "stringWithSpecialEscapedCharacters",
+            "name": "stringWithUnicodeCharacters",
             "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
-                    "col": 15,
+                    "col": 22,
                     "line": 41
                 },
                 "start": {
@@ -388,78 +458,29 @@
         },
         {
             "expression": {
+                "display": {
+                    "representation": "SingleQuotedString"
+                },
                 "sourceLocation": {
                     "end": {
-                        "col": 6,
-                        "line": 48
+                        "col": 15,
+                        "line": 45
                     },
                     "start": {
                         "col": 5,
                         "line": 45
                     }
                 },
-                "tag": "ListLiteral",
-                "terms": [
-                    {
-                        "display": {
-                            "representation": "SingleQuotedString"
-                        },
-                        "sourceLocation": {
-                            "end": {
-                                "col": 65,
-                                "line": 45
-                            },
-                            "start": {
-                                "col": 7,
-                                "line": 45
-                            }
-                        },
-                        "tag": "StringLiteral",
-                        "value": "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\u000b\f\r\u000e\u000f"
-                    },
-                    {
-                        "display": {
-                            "representation": "SingleQuotedString"
-                        },
-                        "sourceLocation": {
-                            "end": {
-                                "col": 73,
-                                "line": 46
-                            },
-                            "start": {
-                                "col": 7,
-                                "line": 46
-                            }
-                        },
-                        "tag": "StringLiteral",
-                        "value": "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f"
-                    },
-                    {
-                        "display": {
-                            "representation": "SingleQuotedString"
-                        },
-                        "sourceLocation": {
-                            "end": {
-                                "col": 13,
-                                "line": 47
-                            },
-                            "start": {
-                                "col": 7,
-                                "line": 47
-                            }
-                        },
-                        "tag": "StringLiteral",
-                        "value": "\u007f"
-                    }
-                ]
+                "tag": "StringLiteral",
+                "value": "\ud83d\ude000\ud83d\ude009\ud83d\ude00a\ud83d\ude00F"
             },
-            "name": "stringWithEscapedControlCharacters",
+            "name": "stringWithEscapedCharacterFollowedByHexDigit",
             "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
-                    "col": 6,
-                    "line": 48
+                    "col": 15,
+                    "line": 45
                 },
                 "start": {
                     "col": 1,
@@ -475,28 +496,110 @@
                 },
                 "sourceLocation": {
                     "end": {
-                        "col": 8,
-                        "line": 53
+                        "col": 15,
+                        "line": 49
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 49
+                    }
+                },
+                "tag": "StringLiteral",
+                "value": "\t\n\\\""
+            },
+            "name": "stringWithSpecialEscapedCharacters",
+            "parameters": [],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 15,
+                    "line": 49
+                },
+                "start": {
+                    "col": 1,
+                    "line": 48
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 56
                     },
                     "start": {
                         "col": 5,
                         "line": 53
                     }
                 },
-                "tag": "StringLiteral",
-                "value": "\u00a0"
+                "tag": "TupleLiteral",
+                "terms": [
+                    {
+                        "display": {
+                            "representation": "SingleQuotedString"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 121,
+                                "line": 53
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 53
+                            }
+                        },
+                        "tag": "StringLiteral",
+                        "value": "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\u000b\f\r\u000e\u000f"
+                    },
+                    {
+                        "display": {
+                            "representation": "SingleQuotedString"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 137,
+                                "line": 54
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 54
+                            }
+                        },
+                        "tag": "StringLiteral",
+                        "value": "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f"
+                    },
+                    {
+                        "display": {
+                            "representation": "SingleQuotedString"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 55
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 55
+                            }
+                        },
+                        "tag": "StringLiteral",
+                        "value": "\u007f"
+                    }
+                ]
             },
-            "name": "stringWithWindowsWorkaroundCharacters",
+            "name": "stringWithEscapedControlCharacters",
             "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
-                    "col": 8,
-                    "line": 53
+                    "col": 6,
+                    "line": 56
                 },
                 "start": {
                     "col": 1,
-                    "line": 51
+                    "line": 52
                 }
             },
             "tag": "Definition"
@@ -508,12 +611,12 @@
                 },
                 "sourceLocation": {
                     "end": {
-                        "col": 33,
-                        "line": 57
+                        "col": 41,
+                        "line": 60
                     },
                     "start": {
                         "col": 5,
-                        "line": 57
+                        "line": 60
                     }
                 },
                 "tag": "StringLiteral",
@@ -524,12 +627,12 @@
             "returnType": null,
             "sourceLocation": {
                 "end": {
-                    "col": 33,
-                    "line": 57
+                    "col": 41,
+                    "line": 60
                 },
                 "start": {
                     "col": 1,
-                    "line": 56
+                    "line": 59
                 }
             },
             "tag": "Definition"
@@ -541,28 +644,28 @@
                 },
                 "sourceLocation": {
                     "end": {
-                        "col": 20,
-                        "line": 61
+                        "col": 32,
+                        "line": 64
                     },
                     "start": {
                         "col": 5,
-                        "line": 61
+                        "line": 64
                     }
                 },
                 "tag": "StringLiteral",
-                "value": "\u00a0\u2000\u205f"
+                "value": " \u00a0\u2000\u205f"
             },
             "name": "stringWithWhitespace",
             "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
-                    "col": 20,
-                    "line": 61
+                    "col": 32,
+                    "line": 64
                 },
                 "start": {
                     "col": 1,
-                    "line": 60
+                    "line": 63
                 }
             },
             "tag": "Definition"
@@ -572,11 +675,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 8,
-                        "line": 65
+                        "line": 68
                     },
                     "start": {
                         "col": 5,
-                        "line": 65
+                        "line": 68
                     }
                 },
                 "tag": "CharLiteral",
@@ -588,11 +691,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 8,
-                    "line": 65
+                    "line": 68
                 },
                 "start": {
                     "col": 1,
-                    "line": 64
+                    "line": 67
                 }
             },
             "tag": "Definition"
@@ -602,11 +705,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 52,
-                        "line": 69
+                        "line": 72
                     },
                     "start": {
                         "col": 5,
-                        "line": 69
+                        "line": 72
                     }
                 },
                 "tag": "ListLiteral",
@@ -615,11 +718,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 10,
-                                "line": 69
+                                "line": 72
                             },
                             "start": {
                                 "col": 7,
-                                "line": 69
+                                "line": 72
                             }
                         },
                         "tag": "CharLiteral",
@@ -629,11 +732,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 69
+                                "line": 72
                             },
                             "start": {
                                 "col": 12,
-                                "line": 69
+                                "line": 72
                             }
                         },
                         "tag": "CharLiteral",
@@ -643,11 +746,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 20,
-                                "line": 69
+                                "line": 72
                             },
                             "start": {
                                 "col": 17,
-                                "line": 69
+                                "line": 72
                             }
                         },
                         "tag": "CharLiteral",
@@ -657,11 +760,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 25,
-                                "line": 69
+                                "line": 72
                             },
                             "start": {
                                 "col": 22,
-                                "line": 69
+                                "line": 72
                             }
                         },
                         "tag": "CharLiteral",
@@ -671,11 +774,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 30,
-                                "line": 69
+                                "line": 72
                             },
                             "start": {
                                 "col": 27,
-                                "line": 69
+                                "line": 72
                             }
                         },
                         "tag": "CharLiteral",
@@ -685,11 +788,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 35,
-                                "line": 69
+                                "line": 72
                             },
                             "start": {
                                 "col": 32,
-                                "line": 69
+                                "line": 72
                             }
                         },
                         "tag": "CharLiteral",
@@ -699,11 +802,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 40,
-                                "line": 69
+                                "line": 72
                             },
                             "start": {
                                 "col": 37,
-                                "line": 69
+                                "line": 72
                             }
                         },
                         "tag": "CharLiteral",
@@ -713,11 +816,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 45,
-                                "line": 69
+                                "line": 72
                             },
                             "start": {
                                 "col": 42,
-                                "line": 69
+                                "line": 72
                             }
                         },
                         "tag": "CharLiteral",
@@ -727,11 +830,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 50,
-                                "line": 69
+                                "line": 72
                             },
                             "start": {
                                 "col": 47,
-                                "line": 69
+                                "line": 72
                             }
                         },
                         "tag": "CharLiteral",
@@ -745,11 +848,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 52,
-                    "line": 69
+                    "line": 72
                 },
                 "start": {
                     "col": 1,
-                    "line": 68
+                    "line": 71
                 }
             },
             "tag": "Definition"
@@ -759,11 +862,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 31,
-                        "line": 73
+                        "line": 76
                     },
                     "start": {
                         "col": 5,
-                        "line": 73
+                        "line": 76
                     }
                 },
                 "tag": "ListLiteral",
@@ -772,11 +875,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 11,
-                                "line": 73
+                                "line": 76
                             },
                             "start": {
                                 "col": 7,
-                                "line": 73
+                                "line": 76
                             }
                         },
                         "tag": "CharLiteral",
@@ -786,11 +889,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 17,
-                                "line": 73
+                                "line": 76
                             },
                             "start": {
                                 "col": 13,
-                                "line": 73
+                                "line": 76
                             }
                         },
                         "tag": "CharLiteral",
@@ -800,11 +903,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 23,
-                                "line": 73
+                                "line": 76
                             },
                             "start": {
                                 "col": 19,
-                                "line": 73
+                                "line": 76
                             }
                         },
                         "tag": "CharLiteral",
@@ -814,11 +917,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 29,
-                                "line": 73
+                                "line": 76
                             },
                             "start": {
                                 "col": 25,
-                                "line": 73
+                                "line": 76
                             }
                         },
                         "tag": "CharLiteral",
@@ -832,11 +935,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 31,
-                    "line": 73
+                    "line": 76
                 },
                 "start": {
                     "col": 1,
-                    "line": 72
+                    "line": 75
                 }
             },
             "tag": "Definition"
@@ -845,12 +948,12 @@
             "expression": {
                 "sourceLocation": {
                     "end": {
-                        "col": 31,
-                        "line": 77
+                        "col": 43,
+                        "line": 80
                     },
                     "start": {
                         "col": 5,
-                        "line": 77
+                        "line": 80
                     }
                 },
                 "tag": "ListLiteral",
@@ -858,12 +961,12 @@
                     {
                         "sourceLocation": {
                             "end": {
-                                "col": 13,
-                                "line": 77
+                                "col": 17,
+                                "line": 80
                             },
                             "start": {
                                 "col": 7,
-                                "line": 77
+                                "line": 80
                             }
                         },
                         "tag": "CharLiteral",
@@ -872,12 +975,12 @@
                     {
                         "sourceLocation": {
                             "end": {
-                                "col": 21,
-                                "line": 77
+                                "col": 29,
+                                "line": 80
                             },
                             "start": {
-                                "col": 15,
-                                "line": 77
+                                "col": 19,
+                                "line": 80
                             }
                         },
                         "tag": "CharLiteral",
@@ -886,12 +989,12 @@
                     {
                         "sourceLocation": {
                             "end": {
-                                "col": 29,
-                                "line": 77
+                                "col": 41,
+                                "line": 80
                             },
                             "start": {
-                                "col": 23,
-                                "line": 77
+                                "col": 31,
+                                "line": 80
                             }
                         },
                         "tag": "CharLiteral",
@@ -904,12 +1007,12 @@
             "returnType": null,
             "sourceLocation": {
                 "end": {
-                    "col": 31,
-                    "line": 77
+                    "col": 43,
+                    "line": 80
                 },
                 "start": {
                     "col": 1,
-                    "line": 76
+                    "line": 79
                 }
             },
             "tag": "Definition"
@@ -918,12 +1021,12 @@
             "expression": {
                 "sourceLocation": {
                     "end": {
-                        "col": 49,
-                        "line": 81
+                        "col": 57,
+                        "line": 84
                     },
                     "start": {
                         "col": 5,
-                        "line": 81
+                        "line": 84
                     }
                 },
                 "tag": "ListLiteral",
@@ -931,12 +1034,12 @@
                     {
                         "sourceLocation": {
                             "end": {
-                                "col": 15,
-                                "line": 81
+                                "col": 17,
+                                "line": 84
                             },
                             "start": {
                                 "col": 7,
-                                "line": 81
+                                "line": 84
                             }
                         },
                         "tag": "CharLiteral",
@@ -945,12 +1048,12 @@
                     {
                         "sourceLocation": {
                             "end": {
-                                "col": 25,
-                                "line": 81
+                                "col": 29,
+                                "line": 84
                             },
                             "start": {
-                                "col": 17,
-                                "line": 81
+                                "col": 19,
+                                "line": 84
                             }
                         },
                         "tag": "CharLiteral",
@@ -959,12 +1062,12 @@
                     {
                         "sourceLocation": {
                             "end": {
-                                "col": 36,
-                                "line": 81
+                                "col": 42,
+                                "line": 84
                             },
                             "start": {
-                                "col": 27,
-                                "line": 81
+                                "col": 31,
+                                "line": 84
                             }
                         },
                         "tag": "CharLiteral",
@@ -973,12 +1076,12 @@
                     {
                         "sourceLocation": {
                             "end": {
-                                "col": 47,
-                                "line": 81
+                                "col": 55,
+                                "line": 84
                             },
                             "start": {
-                                "col": 38,
-                                "line": 81
+                                "col": 44,
+                                "line": 84
                             }
                         },
                         "tag": "CharLiteral",
@@ -991,12 +1094,12 @@
             "returnType": null,
             "sourceLocation": {
                 "end": {
-                    "col": 49,
-                    "line": 81
+                    "col": 57,
+                    "line": 84
                 },
                 "start": {
                     "col": 1,
-                    "line": 80
+                    "line": 83
                 }
             },
             "tag": "Definition"
@@ -1005,12 +1108,12 @@
             "expression": {
                 "sourceLocation": {
                     "end": {
-                        "col": 32,
-                        "line": 85
+                        "col": 48,
+                        "line": 88
                     },
                     "start": {
                         "col": 5,
-                        "line": 85
+                        "line": 88
                     }
                 },
                 "tag": "ListLiteral",
@@ -1019,11 +1122,25 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 10,
-                                "line": 85
+                                "line": 88
                             },
                             "start": {
                                 "col": 7,
-                                "line": 85
+                                "line": 88
+                            }
+                        },
+                        "tag": "CharLiteral",
+                        "value": " "
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 22,
+                                "line": 88
+                            },
+                            "start": {
+                                "col": 12,
+                                "line": 88
                             }
                         },
                         "tag": "CharLiteral",
@@ -1032,12 +1149,12 @@
                     {
                         "sourceLocation": {
                             "end": {
-                                "col": 20,
-                                "line": 85
+                                "col": 34,
+                                "line": 88
                             },
                             "start": {
-                                "col": 12,
-                                "line": 85
+                                "col": 24,
+                                "line": 88
                             }
                         },
                         "tag": "CharLiteral",
@@ -1046,12 +1163,12 @@
                     {
                         "sourceLocation": {
                             "end": {
-                                "col": 30,
-                                "line": 85
+                                "col": 46,
+                                "line": 88
                             },
                             "start": {
-                                "col": 22,
-                                "line": 85
+                                "col": 36,
+                                "line": 88
                             }
                         },
                         "tag": "CharLiteral",
@@ -1064,12 +1181,12 @@
             "returnType": null,
             "sourceLocation": {
                 "end": {
-                    "col": 32,
-                    "line": 85
+                    "col": 48,
+                    "line": 88
                 },
                 "start": {
                     "col": 1,
-                    "line": 84
+                    "line": 87
                 }
             },
             "tag": "Definition"
@@ -1082,11 +1199,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 4,
-                        "line": 99
+                        "line": 102
                     },
                     "start": {
                         "col": 5,
-                        "line": 89
+                        "line": 92
                     }
                 },
                 "tag": "StringLiteral",
@@ -1098,11 +1215,44 @@
             "sourceLocation": {
                 "end": {
                     "col": 4,
-                    "line": 99
+                    "line": 102
                 },
                 "start": {
                     "col": 1,
-                    "line": 88
+                    "line": 91
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "display": {
+                    "representation": "TripleQuotedString"
+                },
+                "sourceLocation": {
+                    "end": {
+                        "col": 4,
+                        "line": 109
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 106
+                    }
+                },
+                "tag": "StringLiteral",
+                "value": "   3   \n  2  \n 1 \n"
+            },
+            "name": "multilineString_keepsTrailingWhitespace",
+            "parameters": [],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 4,
+                    "line": 109
+                },
+                "start": {
+                    "col": 1,
+                    "line": 105
                 }
             },
             "tag": "Definition"
@@ -1112,11 +1262,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 6,
-                        "line": 112
+                        "line": 122
                     },
                     "start": {
                         "col": 5,
-                        "line": 103
+                        "line": 113
                     }
                 },
                 "tag": "ListLiteral",
@@ -1128,11 +1278,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 36,
-                                "line": 103
+                                "line": 113
                             },
                             "start": {
                                 "col": 7,
-                                "line": 103
+                                "line": 113
                             }
                         },
                         "tag": "StringLiteral",
@@ -1145,11 +1295,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 40,
-                                "line": 104
+                                "line": 114
                             },
                             "start": {
                                 "col": 7,
-                                "line": 104
+                                "line": 114
                             }
                         },
                         "tag": "StringLiteral",
@@ -1162,11 +1312,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 42,
-                                "line": 105
+                                "line": 115
                             },
                             "start": {
                                 "col": 7,
-                                "line": 105
+                                "line": 115
                             }
                         },
                         "tag": "StringLiteral",
@@ -1179,11 +1329,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 44,
-                                "line": 106
+                                "line": 116
                             },
                             "start": {
                                 "col": 7,
-                                "line": 106
+                                "line": 116
                             }
                         },
                         "tag": "StringLiteral",
@@ -1196,11 +1346,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 51,
-                                "line": 107
+                                "line": 117
                             },
                             "start": {
                                 "col": 7,
-                                "line": 107
+                                "line": 117
                             }
                         },
                         "tag": "StringLiteral",
@@ -1213,11 +1363,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 62,
-                                "line": 108
+                                "line": 118
                             },
                             "start": {
                                 "col": 7,
-                                "line": 108
+                                "line": 118
                             }
                         },
                         "tag": "StringLiteral",
@@ -1230,11 +1380,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 37,
-                                "line": 109
+                                "line": 119
                             },
                             "start": {
                                 "col": 7,
-                                "line": 109
+                                "line": 119
                             }
                         },
                         "tag": "StringLiteral",
@@ -1247,11 +1397,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 42,
-                                "line": 110
+                                "line": 120
                             },
                             "start": {
                                 "col": 7,
-                                "line": 110
+                                "line": 120
                             }
                         },
                         "tag": "StringLiteral",
@@ -1264,11 +1414,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 44,
-                                "line": 111
+                                "line": 121
                             },
                             "start": {
                                 "col": 7,
-                                "line": 111
+                                "line": 121
                             }
                         },
                         "tag": "StringLiteral",
@@ -1282,11 +1432,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 112
+                    "line": 122
                 },
                 "start": {
                     "col": 1,
-                    "line": 102
+                    "line": 112
                 }
             },
             "tag": "Definition"

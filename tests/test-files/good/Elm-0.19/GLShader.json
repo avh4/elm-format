@@ -1,0 +1,178 @@
+{
+    "body": [
+        {
+            "expression": {
+                "shaderSource": "\n\nattribute vec3 position;\nattribute vec3 coord;\nuniform   mat4 view;\nvarying   vec2 vcoord;\n\nvoid main () {\n  gl_Position = view * vec4(position, 1.0);\n  vcoord = coord.xy;\n}\n\n",
+                "sourceLocation": {
+                    "end": {
+                        "col": 3,
+                        "line": 18
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 6
+                    }
+                },
+                "tag": "GLShader"
+            },
+            "name": "vertexShader",
+            "parameters": [],
+            "returnType": {
+                "arguments": [
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "position",
+                                "coord"
+                            ]
+                        },
+                        "fields": {
+                            "coord": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Vec3",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 54,
+                                        "line": 4
+                                    },
+                                    "start": {
+                                        "col": 50,
+                                        "line": 4
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            },
+                            "position": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Vec3",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 40,
+                                        "line": 4
+                                    },
+                                    "start": {
+                                        "col": 36,
+                                        "line": 4
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 56,
+                                "line": 4
+                            },
+                            "start": {
+                                "col": 23,
+                                "line": 4
+                            }
+                        },
+                        "tag": "RecordType"
+                    },
+                    {
+                        "base": "u",
+                        "display": {
+                            "fieldOrder": [
+                                "view"
+                            ]
+                        },
+                        "fields": {
+                            "view": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Mat4",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 74,
+                                        "line": 4
+                                    },
+                                    "start": {
+                                        "col": 70,
+                                        "line": 4
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 76,
+                                "line": 4
+                            },
+                            "start": {
+                                "col": 57,
+                                "line": 4
+                            }
+                        },
+                        "tag": "RecordTypeExtension"
+                    },
+                    {
+                        "display": {
+                            "fieldOrder": [
+                                "vcoord"
+                            ]
+                        },
+                        "fields": {
+                            "vcoord": {
+                                "arguments": [],
+                                "module": null,
+                                "name": "Vec2",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 92,
+                                        "line": 4
+                                    },
+                                    "start": {
+                                        "col": 88,
+                                        "line": 4
+                                    }
+                                },
+                                "tag": "TypeReference"
+                            }
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 94,
+                                "line": 4
+                            },
+                            "start": {
+                                "col": 77,
+                                "line": 4
+                            }
+                        },
+                        "tag": "RecordType"
+                    }
+                ],
+                "module": null,
+                "name": "Shader",
+                "sourceLocation": {
+                    "end": {
+                        "col": 94,
+                        "line": 4
+                    },
+                    "start": {
+                        "col": 16,
+                        "line": 4
+                    }
+                },
+                "tag": "TypeReference"
+            },
+            "sourceLocation": {
+                "end": {
+                    "col": 3,
+                    "line": 18
+                },
+                "start": {
+                    "col": 1,
+                    "line": 5
+                }
+            },
+            "tag": "Definition"
+        }
+    ],
+    "imports": {},
+    "moduleName": "AllSyntax.GLShader"
+}
