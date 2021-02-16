@@ -1,15 +1,50 @@
 {
     "body": [
-        "TODO: Entry (Fix {unFix = at 34 1 36 11 (Datatype {nameWithArgs = C ([],[]) (NameWithArgs (UppercaseIdentifier \"CustomType\") []), tags = OpenCommentedList [C ([],[],Nothing) (NameWithArgs (UppercaseIdentifier \"TagA\") [])] (C ([],Nothing) (NameWithArgs (UppercaseIdentifier \"TagB\") []))})})",
+        {
+            "name": "CustomType",
+            "parameters": [],
+            "sourceLocation": {
+                "end": {
+                    "col": 11,
+                    "line": 36
+                },
+                "start": {
+                    "col": 1,
+                    "line": 34
+                }
+            },
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "TagA",
+                    "parameterTypes": []
+                },
+                {
+                    "name": "TagB",
+                    "parameterTypes": []
+                }
+            ]
+        },
         {
             "expression": {
                 "display": {
                     "representation": "DecimalInt"
                 },
-                "type": "IntLiteral",
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 40
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 40
+                    }
+                },
+                "tag": "IntLiteral",
                 "value": 1
             },
             "name": "a",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -21,17 +56,28 @@
                     "line": 39
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
                 "display": {
                     "representation": "DecimalInt"
                 },
-                "type": "IntLiteral",
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 44
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 44
+                    }
+                },
+                "tag": "IntLiteral",
                 "value": 2
             },
             "name": "b",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -43,17 +89,28 @@
                     "line": 43
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
                 "display": {
                     "representation": "DecimalInt"
                 },
-                "type": "IntLiteral",
+                "sourceLocation": {
+                    "end": {
+                        "col": 6,
+                        "line": 48
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 48
+                    }
+                },
+                "tag": "IntLiteral",
                 "value": 3
             },
             "name": "c",
+            "parameters": [],
             "returnType": null,
             "sourceLocation": {
                 "end": {
@@ -65,7 +122,7 @@
                     "line": 47
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         }
     ],
     "imports": {

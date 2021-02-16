@@ -25,7 +25,7 @@ unit () =
     ()
 
 
-parens v =
+parens ({- A -} v {- B -}) =
     ()
 
 
@@ -60,6 +60,16 @@ consList
     , d --D
         :: e --E
         :: f --F
+    )
+    =
+    ()
+
+
+equivalentCons
+    ( [ y, x ]
+    , y :: [ x ]
+    , y :: x :: []
+      -- keep multiline
     )
     =
     ()

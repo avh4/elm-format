@@ -2,7 +2,9 @@
     "body": [
         {
             "expression": {
-                "module": "String",
+                "display": {
+                    "representation": "SingleQuotedString"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 12,
@@ -13,15 +15,26 @@
                         "line": 13
                     }
                 },
-                "type": "StringLiteral",
+                "tag": "StringLiteral",
                 "value": "XYZZY"
             },
             "name": "token",
+            "parameters": [],
             "returnType": {
                 "arguments": [],
                 "module": null,
                 "name": "String",
-                "type": "TypeReference"
+                "sourceLocation": {
+                    "end": {
+                        "col": 15,
+                        "line": 11
+                    },
+                    "start": {
+                        "col": 9,
+                        "line": 11
+                    }
+                },
+                "tag": "TypeReference"
             },
             "sourceLocation": {
                 "end": {
@@ -33,7 +46,7 @@
                     "line": 12
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -50,7 +63,7 @@
                                 "line": 18
                             }
                         },
-                        "type": "VariableReference"
+                        "tag": "VariableReference"
                     }
                 ],
                 "function": {
@@ -66,21 +79,52 @@
                             "line": 18
                         }
                     },
-                    "type": "ExternalReference"
+                    "tag": "ExternalReference"
                 },
-                "type": "FunctionApplication"
+                "sourceLocation": {
+                    "end": {
+                        "col": 21,
+                        "line": 18
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 18
+                    }
+                },
+                "tag": "FunctionApplication"
             },
             "name": "theBestClass",
+            "parameters": [],
             "returnType": {
                 "arguments": [
                     {
                         "name": "msg",
-                        "type": "TypeVariable"
+                        "sourceLocation": {
+                            "end": {
+                                "col": 34,
+                                "line": 16
+                            },
+                            "start": {
+                                "col": 31,
+                                "line": 16
+                            }
+                        },
+                        "tag": "TypeVariable"
                     }
                 ],
                 "module": "Html.Attributes",
                 "name": "Attribute",
-                "type": "TypeReference"
+                "sourceLocation": {
+                    "end": {
+                        "col": 34,
+                        "line": 16
+                    },
+                    "start": {
+                        "col": 16,
+                        "line": 16
+                    }
+                },
+                "tag": "TypeReference"
             },
             "sourceLocation": {
                 "end": {
@@ -92,7 +136,7 @@
                     "line": 17
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
@@ -108,30 +152,71 @@
                         "line": 23
                     }
                 },
-                "type": "ExternalReference"
+                "tag": "ExternalReference"
             },
             "name": "text",
+            "parameters": [],
             "returnType": {
                 "argumentTypes": [
                     {
                         "arguments": [],
                         "module": null,
                         "name": "String",
-                        "type": "TypeReference"
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 21
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 21
+                            }
+                        },
+                        "tag": "TypeReference"
                     }
                 ],
                 "returnType": {
                     "arguments": [
                         {
                             "name": "msg",
-                            "type": "TypeVariable"
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 26,
+                                    "line": 21
+                                },
+                                "start": {
+                                    "col": 23,
+                                    "line": 21
+                                }
+                            },
+                            "tag": "TypeVariable"
                         }
                     ],
                     "module": null,
                     "name": "Html",
-                    "type": "TypeReference"
+                    "sourceLocation": {
+                        "end": {
+                            "col": 26,
+                            "line": 21
+                        },
+                        "start": {
+                            "col": 18,
+                            "line": 21
+                        }
+                    },
+                    "tag": "TypeReference"
                 },
-                "type": "FunctionType"
+                "sourceLocation": {
+                    "end": {
+                        "col": 26,
+                        "line": 21
+                    },
+                    "start": {
+                        "col": 8,
+                        "line": 21
+                    }
+                },
+                "tag": "FunctionType"
             },
             "sourceLocation": {
                 "end": {
@@ -143,12 +228,23 @@
                     "line": 22
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         },
         {
             "expression": {
                 "arguments": [
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 25,
+                                "line": 29
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 29
+                            }
+                        },
+                        "tag": "ListLiteral",
                         "terms": [
                             {
                                 "name": "theBestClass",
@@ -162,12 +258,22 @@
                                         "line": 29
                                     }
                                 },
-                                "type": "VariableReference"
+                                "tag": "VariableReference"
                             }
-                        ],
-                        "type": "ListLiteral"
+                        ]
                     },
                     {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 32
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 30
+                            }
+                        },
+                        "tag": "ListLiteral",
                         "terms": [
                             {
                                 "arguments": [
@@ -183,7 +289,7 @@
                                                 "line": 30
                                             }
                                         },
-                                        "type": "VariableReference"
+                                        "tag": "VariableReference"
                                     }
                                 ],
                                 "function": {
@@ -199,9 +305,19 @@
                                             "line": 30
                                         }
                                     },
-                                    "type": "ExternalReference"
+                                    "tag": "ExternalReference"
                                 },
-                                "type": "FunctionApplication"
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 26,
+                                        "line": 30
+                                    },
+                                    "start": {
+                                        "col": 11,
+                                        "line": 30
+                                    }
+                                },
+                                "tag": "FunctionApplication"
                             },
                             {
                                 "first": {
@@ -217,28 +333,29 @@
                                             "line": 31
                                         }
                                     },
-                                    "type": "ExternalReference"
+                                    "tag": "ExternalReference"
                                 },
                                 "operations": [
                                     {
                                         "operator": {
                                             "name": "<|",
-                                            "sourceLocation": {
-                                                "end": {
-                                                    "col": 0,
-                                                    "line": 0
-                                                },
-                                                "start": {
-                                                    "col": 0,
-                                                    "line": 0
-                                                }
-                                            },
-                                            "type": "VariableReference"
+                                            "tag": "VariableReference"
                                         },
                                         "term": {
                                             "arguments": [
                                                 {
                                                     "operator": "-",
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 36,
+                                                            "line": 31
+                                                        },
+                                                        "start": {
+                                                            "col": 33,
+                                                            "line": 31
+                                                        }
+                                                    },
+                                                    "tag": "UnaryOperator",
                                                     "term": {
                                                         "name": "pi",
                                                         "sourceLocation": {
@@ -251,9 +368,8 @@
                                                                 "line": 31
                                                             }
                                                         },
-                                                        "type": "VariableReference"
-                                                    },
-                                                    "type": "UnaryOperator"
+                                                        "tag": "VariableReference"
+                                                    }
                                                 }
                                             ],
                                             "function": {
@@ -268,16 +384,35 @@
                                                         "line": 31
                                                     }
                                                 },
-                                                "type": "VariableReference"
+                                                "tag": "VariableReference"
                                             },
-                                            "type": "FunctionApplication"
+                                            "sourceLocation": {
+                                                "end": {
+                                                    "col": 36,
+                                                    "line": 31
+                                                },
+                                                "start": {
+                                                    "col": 24,
+                                                    "line": 31
+                                                }
+                                            },
+                                            "tag": "FunctionApplication"
                                         }
                                     }
                                 ],
-                                "type": "BinaryOperatorList"
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 36,
+                                        "line": 31
+                                    },
+                                    "start": {
+                                        "col": 11,
+                                        "line": 31
+                                    }
+                                },
+                                "tag": "BinaryOperatorList"
                             }
-                        ],
-                        "type": "ListLiteral"
+                        ]
                     }
                 ],
                 "function": {
@@ -293,21 +428,52 @@
                             "line": 28
                         }
                     },
-                    "type": "ExternalReference"
+                    "tag": "ExternalReference"
                 },
-                "type": "FunctionApplication"
+                "sourceLocation": {
+                    "end": {
+                        "col": 10,
+                        "line": 32
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 28
+                    }
+                },
+                "tag": "FunctionApplication"
             },
             "name": "main",
+            "parameters": [],
             "returnType": {
                 "arguments": [
                     {
                         "name": "msg",
-                        "type": "TypeVariable"
+                        "sourceLocation": {
+                            "end": {
+                                "col": 16,
+                                "line": 26
+                            },
+                            "start": {
+                                "col": 13,
+                                "line": 26
+                            }
+                        },
+                        "tag": "TypeVariable"
                     }
                 ],
                 "module": null,
                 "name": "Html",
-                "type": "TypeReference"
+                "sourceLocation": {
+                    "end": {
+                        "col": 16,
+                        "line": 26
+                    },
+                    "start": {
+                        "col": 8,
+                        "line": 26
+                    }
+                },
+                "tag": "TypeReference"
             },
             "sourceLocation": {
                 "end": {
@@ -319,7 +485,7 @@
                     "line": 27
                 }
             },
-            "type": "Definition"
+            "tag": "Definition"
         }
     ],
     "imports": {

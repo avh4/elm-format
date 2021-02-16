@@ -1,0 +1,2100 @@
+{
+    "body": [
+        {
+            "name": "Foo",
+            "parameters": [],
+            "sourceLocation": {
+                "end": {
+                    "col": 16,
+                    "line": 5
+                },
+                "start": {
+                    "col": 1,
+                    "line": 4
+                }
+            },
+            "tag": "CustomType",
+            "variants": [
+                {
+                    "name": "Foo",
+                    "parameterTypes": [
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 13,
+                                    "line": 5
+                                },
+                                "start": {
+                                    "col": 11,
+                                    "line": 5
+                                }
+                            },
+                            "tag": "UnitType"
+                        },
+                        {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 16,
+                                    "line": 5
+                                },
+                                "start": {
+                                    "col": 14,
+                                    "line": 5
+                                }
+                            },
+                            "tag": "UnitType"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 9
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 9
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "wildcard",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 8
+                            },
+                            "start": {
+                                "col": 10,
+                                "line": 8
+                            }
+                        },
+                        "tag": "AnythingPattern"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 9
+                },
+                "start": {
+                    "col": 1,
+                    "line": 8
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 13
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 13
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "literal",
+            "parameters": [
+                {
+                    "pattern": {
+                        "display": {
+                            "representation": "DecimalInt"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 12
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 12
+                            }
+                        },
+                        "tag": "IntLiteral",
+                        "value": 1
+                    },
+                    "type": null
+                },
+                {
+                    "pattern": {
+                        "display": {
+                            "representation": "DecimalFloat"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 12
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 12
+                            }
+                        },
+                        "tag": "FloatLiteral",
+                        "value": 2
+                    },
+                    "type": null
+                },
+                {
+                    "pattern": {
+                        "display": {
+                            "representation": "SingleQuotedString"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 12
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 12
+                            }
+                        },
+                        "tag": "StringLiteral",
+                        "value": "string"
+                    },
+                    "type": null
+                },
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 27,
+                                "line": 12
+                            },
+                            "start": {
+                                "col": 24,
+                                "line": 12
+                            }
+                        },
+                        "tag": "CharLiteral",
+                        "value": "c"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 13
+                },
+                "start": {
+                    "col": 1,
+                    "line": 12
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 17
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 17
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "variable",
+            "parameters": [
+                {
+                    "pattern": {
+                        "name": "v",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 11,
+                                "line": 16
+                            },
+                            "start": {
+                                "col": 10,
+                                "line": 16
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 17
+                },
+                "start": {
+                    "col": 1,
+                    "line": 16
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 21
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 21
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "data",
+            "parameters": [
+                {
+                    "pattern": {
+                        "arguments": [
+                            {
+                                "name": "x",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 20
+                                    },
+                                    "start": {
+                                        "col": 11,
+                                        "line": 20
+                                    }
+                                },
+                                "tag": "VariableDefinition"
+                            },
+                            {
+                                "name": "y",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 14,
+                                        "line": 20
+                                    },
+                                    "start": {
+                                        "col": 13,
+                                        "line": 20
+                                    }
+                                },
+                                "tag": "VariableDefinition"
+                            }
+                        ],
+                        "constructor": {
+                            "name": "Foo",
+                            "tag": "VariableReference"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 20
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 20
+                            }
+                        },
+                        "tag": "DataPattern"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 21
+                },
+                "start": {
+                    "col": 1,
+                    "line": 20
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 25
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 25
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "unit",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 8,
+                                "line": 24
+                            },
+                            "start": {
+                                "col": 6,
+                                "line": 24
+                            }
+                        },
+                        "tag": "UnitPattern"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 25
+                },
+                "start": {
+                    "col": 1,
+                    "line": 24
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 29
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 29
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "parens",
+            "parameters": [
+                {
+                    "pattern": {
+                        "name": "v",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 27,
+                                "line": 28
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 28
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 29
+                },
+                "start": {
+                    "col": 1,
+                    "line": 28
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 33
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 33
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "tuple",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 32
+                            },
+                            "start": {
+                                "col": 7,
+                                "line": 32
+                            }
+                        },
+                        "tag": "TuplePattern",
+                        "terms": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 32
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 32
+                                    }
+                                },
+                                "tag": "VariableDefinition"
+                            },
+                            {
+                                "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 13,
+                                        "line": 32
+                                    },
+                                    "start": {
+                                        "col": 12,
+                                        "line": 32
+                                    }
+                                },
+                                "tag": "VariableDefinition"
+                            }
+                        ]
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 33
+                },
+                "start": {
+                    "col": 1,
+                    "line": 32
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 37
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 37
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "emptyList",
+            "parameters": [
+                {
+                    "pattern": {
+                        "prefix": [],
+                        "rest": null,
+                        "sourceLocation": {
+                            "end": {
+                                "col": 13,
+                                "line": 36
+                            },
+                            "start": {
+                                "col": 11,
+                                "line": 36
+                            }
+                        },
+                        "tag": "ListPattern"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 37
+                },
+                "start": {
+                    "col": 1,
+                    "line": 36
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 41
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 41
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "list",
+            "parameters": [
+                {
+                    "pattern": {
+                        "prefix": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 9,
+                                        "line": 40
+                                    },
+                                    "start": {
+                                        "col": 8,
+                                        "line": 40
+                                    }
+                                },
+                                "tag": "VariableDefinition"
+                            },
+                            {
+                                "name": "b",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 40
+                                    },
+                                    "start": {
+                                        "col": 11,
+                                        "line": 40
+                                    }
+                                },
+                                "tag": "VariableDefinition"
+                            }
+                        ],
+                        "rest": null,
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 40
+                            },
+                            "start": {
+                                "col": 6,
+                                "line": 40
+                            }
+                        },
+                        "tag": "ListPattern"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 41
+                },
+                "start": {
+                    "col": 1,
+                    "line": 40
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 65
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 65
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "consList",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 6,
+                                "line": 63
+                            },
+                            "start": {
+                                "col": 5,
+                                "line": 45
+                            }
+                        },
+                        "tag": "TuplePattern",
+                        "terms": [
+                            {
+                                "prefix": [
+                                    {
+                                        "name": "a",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 45
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 45
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "b",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 13,
+                                                "line": 45
+                                            },
+                                            "start": {
+                                                "col": 12,
+                                                "line": 45
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": {
+                                    "name": "c",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 18,
+                                            "line": 45
+                                        },
+                                        "start": {
+                                            "col": 17,
+                                            "line": 45
+                                        }
+                                    },
+                                    "tag": "VariableDefinition"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 18,
+                                        "line": 45
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 45
+                                    }
+                                },
+                                "tag": "ListPattern"
+                            },
+                            {
+                                "prefix": [
+                                    {
+                                        "name": "a",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 46
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 46
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "b",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 29,
+                                                "line": 46
+                                            },
+                                            "start": {
+                                                "col": 28,
+                                                "line": 46
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": {
+                                    "name": "c",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 50,
+                                            "line": 46
+                                        },
+                                        "start": {
+                                            "col": 49,
+                                            "line": 46
+                                        }
+                                    },
+                                    "tag": "VariableDefinition"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 50,
+                                        "line": 46
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 46
+                                    }
+                                },
+                                "tag": "ListPattern"
+                            },
+                            {
+                                "prefix": [
+                                    {
+                                        "name": "d",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 48
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 48
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "e",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 13,
+                                                "line": 50
+                                            },
+                                            "start": {
+                                                "col": 12,
+                                                "line": 50
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": {
+                                    "name": "f",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 13,
+                                            "line": 53
+                                        },
+                                        "start": {
+                                            "col": 12,
+                                            "line": 53
+                                        }
+                                    },
+                                    "tag": "VariableDefinition"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 13,
+                                        "line": 53
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 48
+                                    }
+                                },
+                                "tag": "ListPattern"
+                            },
+                            {
+                                "prefix": [
+                                    {
+                                        "name": "d",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 55
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 55
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "e",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 13,
+                                                "line": 57
+                                            },
+                                            "start": {
+                                                "col": 12,
+                                                "line": 57
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": {
+                                    "name": "f",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 13,
+                                            "line": 59
+                                        },
+                                        "start": {
+                                            "col": 12,
+                                            "line": 59
+                                        }
+                                    },
+                                    "tag": "VariableDefinition"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 13,
+                                        "line": 59
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 55
+                                    }
+                                },
+                                "tag": "ListPattern"
+                            },
+                            {
+                                "prefix": [
+                                    {
+                                        "name": "d",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 60
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 60
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "e",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 13,
+                                                "line": 61
+                                            },
+                                            "start": {
+                                                "col": 12,
+                                                "line": 61
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": {
+                                    "name": "f",
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 13,
+                                            "line": 62
+                                        },
+                                        "start": {
+                                            "col": 12,
+                                            "line": 62
+                                        }
+                                    },
+                                    "tag": "VariableDefinition"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 17,
+                                        "line": 62
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 60
+                                    }
+                                },
+                                "tag": "ListPattern"
+                            }
+                        ]
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 65
+                },
+                "start": {
+                    "col": 1,
+                    "line": 44
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 75
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 75
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "equivalentCons",
+            "parameters": [
+                {
+                    "pattern": {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 6,
+                                "line": 73
+                            },
+                            "start": {
+                                "col": 5,
+                                "line": 69
+                            }
+                        },
+                        "tag": "TuplePattern",
+                        "terms": [
+                            {
+                                "prefix": [
+                                    {
+                                        "name": "y",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 10,
+                                                "line": 69
+                                            },
+                                            "start": {
+                                                "col": 9,
+                                                "line": 69
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "x",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 13,
+                                                "line": 69
+                                            },
+                                            "start": {
+                                                "col": 12,
+                                                "line": 69
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": null,
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 69
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 69
+                                    }
+                                },
+                                "tag": "ListPattern"
+                            },
+                            {
+                                "prefix": [
+                                    {
+                                        "name": "y",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 70
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 70
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "x",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 15,
+                                                "line": 70
+                                            },
+                                            "start": {
+                                                "col": 14,
+                                                "line": 70
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": null,
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 17,
+                                        "line": 70
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 70
+                                    }
+                                },
+                                "tag": "ListPattern"
+                            },
+                            {
+                                "prefix": [
+                                    {
+                                        "name": "y",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 8,
+                                                "line": 71
+                                            },
+                                            "start": {
+                                                "col": 7,
+                                                "line": 71
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    },
+                                    {
+                                        "name": "x",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 13,
+                                                "line": 71
+                                            },
+                                            "start": {
+                                                "col": 12,
+                                                "line": 71
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": null,
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 19,
+                                        "line": 71
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 71
+                                    }
+                                },
+                                "tag": "ListPattern"
+                            }
+                        ]
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 75
+                },
+                "start": {
+                    "col": 1,
+                    "line": 68
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 79
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 79
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "complexCons",
+            "parameters": [
+                {
+                    "pattern": {
+                        "prefix": [
+                            {
+                                "name": "a",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 15,
+                                        "line": 78
+                                    },
+                                    "start": {
+                                        "col": 14,
+                                        "line": 78
+                                    }
+                                },
+                                "tag": "VariableDefinition"
+                            },
+                            {
+                                "prefix": [
+                                    {
+                                        "name": "x",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 21,
+                                                "line": 78
+                                            },
+                                            "start": {
+                                                "col": 20,
+                                                "line": 78
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": null,
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 27,
+                                        "line": 78
+                                    },
+                                    "start": {
+                                        "col": 20,
+                                        "line": 78
+                                    }
+                                },
+                                "tag": "ListPattern"
+                            }
+                        ],
+                        "rest": {
+                            "alias": {
+                                "name": "blah",
+                                "tag": "VariableDefinition"
+                            },
+                            "pattern": {
+                                "prefix": [
+                                    {
+                                        "name": "b",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 35,
+                                                "line": 78
+                                            },
+                                            "start": {
+                                                "col": 34,
+                                                "line": 78
+                                            }
+                                        },
+                                        "tag": "VariableDefinition"
+                                    }
+                                ],
+                                "rest": {
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 40,
+                                            "line": 78
+                                        },
+                                        "start": {
+                                            "col": 39,
+                                            "line": 78
+                                        }
+                                    },
+                                    "tag": "AnythingPattern"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 40,
+                                        "line": 78
+                                    },
+                                    "start": {
+                                        "col": 34,
+                                        "line": 78
+                                    }
+                                },
+                                "tag": "ListPattern"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 49,
+                                    "line": 78
+                                },
+                                "start": {
+                                    "col": 33,
+                                    "line": 78
+                                }
+                            },
+                            "tag": "PatternAlias"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 50,
+                                "line": 78
+                            },
+                            "start": {
+                                "col": 14,
+                                "line": 78
+                            }
+                        },
+                        "tag": "ListPattern"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 79
+                },
+                "start": {
+                    "col": 1,
+                    "line": 78
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 83
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 83
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "record",
+            "parameters": [
+                {
+                    "pattern": {
+                        "fields": [
+                            {
+                                "name": "a",
+                                "tag": "VariableDefinition"
+                            },
+                            {
+                                "name": "b",
+                                "tag": "VariableDefinition"
+                            }
+                        ],
+                        "sourceLocation": {
+                            "end": {
+                                "col": 16,
+                                "line": 82
+                            },
+                            "start": {
+                                "col": 8,
+                                "line": 82
+                            }
+                        },
+                        "tag": "RecordPattern"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 83
+                },
+                "start": {
+                    "col": 1,
+                    "line": 82
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 91
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 91
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "emptyRecord",
+            "parameters": [
+                {
+                    "pattern": {
+                        "fields": [],
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 86
+                            },
+                            "start": {
+                                "col": 13,
+                                "line": 86
+                            }
+                        },
+                        "tag": "RecordPattern"
+                    },
+                    "type": null
+                },
+                {
+                    "pattern": {
+                        "fields": [],
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 87
+                            },
+                            "start": {
+                                "col": 5,
+                                "line": 87
+                            }
+                        },
+                        "tag": "RecordPattern"
+                    },
+                    "type": null
+                },
+                {
+                    "pattern": {
+                        "fields": [],
+                        "sourceLocation": {
+                            "end": {
+                                "col": 6,
+                                "line": 89
+                            },
+                            "start": {
+                                "col": 5,
+                                "line": 88
+                            }
+                        },
+                        "tag": "RecordPattern"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 91
+                },
+                "start": {
+                    "col": 1,
+                    "line": 86
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "sourceLocation": {
+                    "end": {
+                        "col": 7,
+                        "line": 95
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 95
+                    }
+                },
+                "tag": "UnitLiteral"
+            },
+            "name": "asAlias",
+            "parameters": [
+                {
+                    "pattern": {
+                        "alias": {
+                            "name": "x",
+                            "tag": "VariableDefinition"
+                        },
+                        "pattern": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 12,
+                                    "line": 94
+                                },
+                                "start": {
+                                    "col": 10,
+                                    "line": 94
+                                }
+                            },
+                            "tag": "UnitPattern"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 17,
+                                "line": 94
+                            },
+                            "start": {
+                                "col": 10,
+                                "line": 94
+                            }
+                        },
+                        "tag": "PatternAlias"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 7,
+                    "line": 95
+                },
+                "start": {
+                    "col": 1,
+                    "line": 94
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "branches": [
+                    {
+                        "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 101
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 101
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "pattern": {
+                            "arguments": [
+                                {
+                                    "arguments": [],
+                                    "constructor": {
+                                        "identifier": "Nothing",
+                                        "module": "Maybe",
+                                        "tag": "ExternalReference"
+                                    },
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 33,
+                                            "line": 100
+                                        },
+                                        "start": {
+                                            "col": 20,
+                                            "line": 100
+                                        }
+                                    },
+                                    "tag": "DataPattern"
+                                }
+                            ],
+                            "constructor": {
+                                "identifier": "Just",
+                                "module": "Maybe",
+                                "tag": "ExternalReference"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 33,
+                                    "line": 100
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 100
+                                }
+                            },
+                            "tag": "DataPattern"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 101
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 100
+                            }
+                        }
+                    },
+                    {
+                        "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 104
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 104
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "pattern": {
+                            "arguments": [
+                                {
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 21,
+                                            "line": 103
+                                        },
+                                        "start": {
+                                            "col": 20,
+                                            "line": 103
+                                        }
+                                    },
+                                    "tag": "AnythingPattern"
+                                }
+                            ],
+                            "constructor": {
+                                "identifier": "Just",
+                                "module": "Maybe",
+                                "tag": "ExternalReference"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 21,
+                                    "line": 103
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 103
+                                }
+                            },
+                            "tag": "DataPattern"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 104
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 101
+                            }
+                        }
+                    },
+                    {
+                        "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 107
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 107
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "pattern": {
+                            "arguments": [],
+                            "constructor": {
+                                "identifier": "Nothing",
+                                "module": "Maybe",
+                                "tag": "ExternalReference"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 22,
+                                    "line": 106
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 106
+                                }
+                            },
+                            "tag": "DataPattern"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 107
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 104
+                            }
+                        }
+                    }
+                ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 15,
+                        "line": 107
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 99
+                    }
+                },
+                "subject": {
+                    "name": "m",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 11,
+                            "line": 99
+                        },
+                        "start": {
+                            "col": 10,
+                            "line": 99
+                        }
+                    },
+                    "tag": "VariableReference"
+                },
+                "tag": "CaseExpression"
+            },
+            "name": "patternWithQualifiedConstructorAsCosntructorArgument",
+            "parameters": [
+                {
+                    "pattern": {
+                        "name": "m",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 55,
+                                "line": 98
+                            },
+                            "start": {
+                                "col": 54,
+                                "line": 98
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 15,
+                    "line": 107
+                },
+                "start": {
+                    "col": 1,
+                    "line": 98
+                }
+            },
+            "tag": "Definition"
+        },
+        {
+            "expression": {
+                "branches": [
+                    {
+                        "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 113
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 113
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "pattern": {
+                            "arguments": [
+                                {
+                                    "arguments": [],
+                                    "constructor": {
+                                        "identifier": "Nothing",
+                                        "module": "Maybe",
+                                        "tag": "ExternalReference"
+                                    },
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 27,
+                                            "line": 112
+                                        },
+                                        "start": {
+                                            "col": 20,
+                                            "line": 112
+                                        }
+                                    },
+                                    "tag": "DataPattern"
+                                }
+                            ],
+                            "constructor": {
+                                "identifier": "Just",
+                                "module": "Maybe",
+                                "tag": "ExternalReference"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 27,
+                                    "line": 112
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 112
+                                }
+                            },
+                            "tag": "DataPattern"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 113
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 112
+                            }
+                        }
+                    },
+                    {
+                        "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 116
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 116
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "pattern": {
+                            "alias": {
+                                "name": "x",
+                                "tag": "VariableDefinition"
+                            },
+                            "pattern": {
+                                "arguments": [
+                                    {
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 16,
+                                                "line": 115
+                                            },
+                                            "start": {
+                                                "col": 15,
+                                                "line": 115
+                                            }
+                                        },
+                                        "tag": "AnythingPattern"
+                                    }
+                                ],
+                                "constructor": {
+                                    "identifier": "Just",
+                                    "module": "Maybe",
+                                    "tag": "ExternalReference"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 16,
+                                        "line": 115
+                                    },
+                                    "start": {
+                                        "col": 10,
+                                        "line": 115
+                                    }
+                                },
+                                "tag": "DataPattern"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 22,
+                                    "line": 115
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 115
+                                }
+                            },
+                            "tag": "PatternAlias"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 116
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 113
+                            }
+                        }
+                    },
+                    {
+                        "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 119
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 119
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "pattern": {
+                            "alias": {
+                                "name": "x",
+                                "tag": "VariableDefinition"
+                            },
+                            "pattern": {
+                                "arguments": [],
+                                "constructor": {
+                                    "identifier": "Nothing",
+                                    "module": "Maybe",
+                                    "tag": "ExternalReference"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 16,
+                                        "line": 118
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 118
+                                    }
+                                },
+                                "tag": "DataPattern"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 21,
+                                    "line": 118
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 118
+                                }
+                            },
+                            "tag": "PatternAlias"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 119
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 116
+                            }
+                        }
+                    },
+                    {
+                        "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 122
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 122
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "pattern": {
+                            "alias": {
+                                "name": "x",
+                                "tag": "VariableDefinition"
+                            },
+                            "pattern": {
+                                "alias": {
+                                    "name": "y",
+                                    "tag": "VariableDefinition"
+                                },
+                                "pattern": {
+                                    "arguments": [],
+                                    "constructor": {
+                                        "identifier": "Nothing",
+                                        "module": "Maybe",
+                                        "tag": "ExternalReference"
+                                    },
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 23,
+                                            "line": 121
+                                        },
+                                        "start": {
+                                            "col": 10,
+                                            "line": 121
+                                        }
+                                    },
+                                    "tag": "DataPattern"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 28,
+                                        "line": 121
+                                    },
+                                    "start": {
+                                        "col": 10,
+                                        "line": 121
+                                    }
+                                },
+                                "tag": "PatternAlias"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 34,
+                                    "line": 121
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 121
+                                }
+                            },
+                            "tag": "PatternAlias"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 122
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 119
+                            }
+                        }
+                    },
+                    {
+                        "body": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 125
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 125
+                                }
+                            },
+                            "tag": "UnitLiteral"
+                        },
+                        "pattern": {
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 10,
+                                    "line": 124
+                                },
+                                "start": {
+                                    "col": 9,
+                                    "line": 124
+                                }
+                            },
+                            "tag": "AnythingPattern"
+                        },
+                        "sourceLocation": {
+                            "end": {
+                                "col": 15,
+                                "line": 125
+                            },
+                            "start": {
+                                "col": 15,
+                                "line": 122
+                            }
+                        }
+                    }
+                ],
+                "sourceLocation": {
+                    "end": {
+                        "col": 15,
+                        "line": 125
+                    },
+                    "start": {
+                        "col": 5,
+                        "line": 111
+                    }
+                },
+                "subject": {
+                    "name": "m",
+                    "sourceLocation": {
+                        "end": {
+                            "col": 11,
+                            "line": 111
+                        },
+                        "start": {
+                            "col": 10,
+                            "line": 111
+                        }
+                    },
+                    "tag": "VariableReference"
+                },
+                "tag": "CaseExpression"
+            },
+            "name": "patternWithUnqualifiedConstructorAsCosntructorArgument",
+            "parameters": [
+                {
+                    "pattern": {
+                        "name": "m",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 57,
+                                "line": 110
+                            },
+                            "start": {
+                                "col": 56,
+                                "line": 110
+                            }
+                        },
+                        "tag": "VariableDefinition"
+                    },
+                    "type": null
+                }
+            ],
+            "returnType": null,
+            "sourceLocation": {
+                "end": {
+                    "col": 15,
+                    "line": 125
+                },
+                "start": {
+                    "col": 1,
+                    "line": 110
+                }
+            },
+            "tag": "Definition"
+        }
+    ],
+    "imports": {},
+    "moduleName": "AllSyntax.Patterns"
+}

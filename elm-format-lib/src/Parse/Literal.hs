@@ -76,22 +76,22 @@ exponent =
       return ('e' : op ++ n)
 
 
-str :: IParser (String, Bool)
+str :: IParser (String, StringRepresentation)
 str =
   expecting "a string" $
-  do  (s, multi) <- choice [ multiStr, singleStr ]
+  do  (s, representation) <- choice [ multiStr, singleStr ]
       result <- processAs stringLiteral . sandwich '\"' $ concat s
-      return (result, multi)
+      return (result, representation)
   where
     rawString quote insides =
         quote >> manyTill insides quote
 
     multiStr  =
         do  result <- rawString (try (string "\"\"\"")) multilineStringChar
-            return (result, True)
+            return (result, TripleQuotedString)
     singleStr =
         do  result <- rawString (char '"') stringChar
-            return (result, False)
+            return (result, SingleQuotedString)
 
     stringChar :: IParser String
     stringChar = choice [ newlineChar, escaped '\"', (:[]) <$> satisfy (/= '\"') ]

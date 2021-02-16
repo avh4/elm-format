@@ -1,9 +1,9 @@
-name: Build release
+name: Snapshot release
 
 on:
   push:
-    tags: '*'
-    branches: 'release/*'
+    branches:
+      - 'json'
 
 defaults:
   run:
@@ -15,23 +15,22 @@ jobs:
       fail-fast: false
       matrix:
         os:
-        - windows-latest
+        - ubuntu-latest
         - macOS-latest
+        # - windows-latest
 
-    name: release-${{ matrix.os }}
+    name: snapshot-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     steps:
     - name: Configure environment
       run: |
         git config --global core.autocrlf false
-    - name: Configure GPG Key
-      run: |
-        echo "$GPG_SIGNING_KEY" | base64 --decode > private.key
-        gpg --import private.key
-        rm private.key
-      env:
-        GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+    - name: Configure SSH
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SNAPSHOT_SSH_KEY }}
+        known_hosts: ${{ secrets.SNAPSHOT_KNOWN_HOSTS }}
     - uses: actions/checkout@v2
     - name: Workaround for https://github.com/actions/checkout/issues/290
       run: git fetch --tags --prune --unshallow --force
@@ -53,12 +52,7 @@ jobs:
     - run: cabal v2-update
     - run: ./build.sh -- dist-dependencies
     - run: ./build.sh -- dist
-    - name: Sign artifacts
-      run: |
-        for i in dist/*; do
-          gpg --verbose --local-user 1508E30E65C8C21F --output "$i".sig --detach-sig "$i"
-        done
-    - uses: actions/upload-artifact@v2
-      with:
-        name: elm-format-${{ github.sha }}-${{ runner.os }}
-        path: dist/
+    - name: Upload snapshot
+      run: rsync -va dist/ "${{ secrets.SNAPSHOT_DEST }}/${BRANCH#refs/heads/}/$(git describe)/"
+      env:
+        BRANCH: ${{ github.ref }}

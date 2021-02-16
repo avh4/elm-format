@@ -28,6 +28,7 @@ common common-options
         LambdaCase
         OverloadedStrings
         ScopedTypeVariables
+        FlexibleInstances
 
     hs-source-dirs:
         src
@@ -35,6 +36,7 @@ common common-options
     other-modules:
         AST.Helpers
         Box
+        ElmFormat.AST.PatternMatching
         ElmFormat.Render.Box
         ElmFormat.Render.ElmStructure
         Parse.Binop
@@ -88,6 +90,8 @@ library
         CommandLine.Program
         CommandLine.ResolveFiles
         CommandLine.TransformFiles
+        ElmFormat.AST.PublicAST
+        ElmFormat.AST.Shared
         ElmFormat.ImportInfo
         ElmFormat.KnownContents
         ElmFormat.Parse
@@ -115,6 +119,8 @@ test-suite efl-tests
         AST.Structure
         AST.V0_16
         CommandLine.InfoFormatter
+        ElmFormat.AST.PublicAST
+        ElmFormat.AST.Shared
         ElmFormat.ImportInfo
         ElmFormat.KnownContents
         ElmFormat.Parse

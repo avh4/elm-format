@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 module AST.Listing where
 
 import AST.V0_16
@@ -5,10 +6,9 @@ import Data.Map.Strict
 
 
 -- | A listing of values. Something like (a,b,c) or (..) or (a,b,..)
-data BeforeDots; data AfterDots
 data Listing a
     = ExplicitListing a Bool
-    | OpenListing (C2 BeforeDots AfterDots ())
+    | OpenListing (C2 'BeforeTerm 'AfterTerm ())
     | ClosedListing
     deriving (Eq, Ord, Show) -- TODO: is Ord needed?
 
@@ -26,9 +26,8 @@ mergeListing merge left right =
         (ExplicitListing a multiline1, ExplicitListing b multiline2) -> ExplicitListing (merge a b) (multiline1 || multiline2)
 
 
-data AfterValue
 type CommentedMap k v =
-    Map k (C2 BeforeValue AfterValue v)
+    Map k (C2 'BeforeTerm 'AfterTerm v)
 
 mergeCommentedMap :: Ord k => (v -> v -> v) -> CommentedMap k v -> CommentedMap k v -> CommentedMap k v
 mergeCommentedMap merge left right =
@@ -43,5 +42,5 @@ mergeCommentedMap merge left right =
 data Value
     = Value !LowercaseIdentifier
     | OpValue SymbolIdentifier
-    | Union (C1 After UppercaseIdentifier) (Listing (CommentedMap UppercaseIdentifier ()))
+    | Union (C1 'AfterTerm UppercaseIdentifier) (Listing (CommentedMap UppercaseIdentifier ()))
     deriving (Eq, Ord, Show) -- TODO: is Ord needed?

@@ -8,7 +8,7 @@
 {-# LANGUAGE PolyKinds #-}
 
 module AST.Structure
-    ( FixAST, ASTNS
+    ( FixAST, ASTNS, ASTNS1
     , foldReferences
     , bottomUpReferences
     , mapNs
@@ -29,6 +29,15 @@ type FixAST annf typeRef ctorRef varRef =
 -- ASTNS :: (* -> *) -> * -> NodeKind -> *
 type ASTNS annf ns =
     FixAST annf (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)
+
+-- This is the same as ASTNS, but with the first level unFix'ed
+-- ASTNS1 :: (* -> *) -> * -> NodeKind -> *
+type ASTNS1 annf ns =
+    AST
+        (ns, UppercaseIdentifier)
+        (ns, UppercaseIdentifier)
+        (Ref ns)
+        (ASTNS annf ns)
 
 
 bottomUpReferences ::
