@@ -30,6 +30,7 @@ import qualified ElmFormat.AST.PublicAST as PublicAST
 data WhatToDo
     = Format TransformMode
     | ConvertToJson TransformMode
+    | ConvertFromJson TransformMode
     | Validate ValidateMode
 
 
@@ -45,7 +46,7 @@ data Destination
 
 data Mode
     = FormatMode
-    | JsonMode
+    | JsonMode Flags.JsonMode
     | ValidateMode
 
 
@@ -66,12 +67,12 @@ determineDestination output =
         Just path -> Right $ ToFile path
 
 
-determineMode :: Bool -> Bool -> Either ErrorMessage Mode
+determineMode :: Bool -> Maybe Flags.JsonMode -> Either ErrorMessage Mode
 determineMode doValidate json =
     case ( doValidate, json ) of
-        ( False, False ) -> Right FormatMode
-        ( True, False ) -> Right ValidateMode
-        ( False, True ) -> Right JsonMode
+        ( False, Nothing ) -> Right FormatMode
+        ( True, Nothing ) -> Right ValidateMode
+        ( False, Just jsonMode ) -> Right (JsonMode jsonMode)
         _ -> Left OutputAndValidate
 
 
@@ -85,10 +86,14 @@ determineWhatToDo source destination mode =
         ( FormatMode, Stdin, ToFile output ) -> Right $ Format (StdinToFile output)
         ( FormatMode, FromFiles first [], ToFile output ) -> Right $ Format (FileToFile first output)
         ( FormatMode, FromFiles first rest, InPlace ) -> Right $ Format (FilesInPlace first rest)
-        ( JsonMode, Stdin, InPlace ) -> Right $ ConvertToJson StdinToStdout
-        ( JsonMode, Stdin, ToFile output ) -> Right $ ConvertToJson (StdinToFile output)
-        ( JsonMode, FromFiles first [], InPlace ) -> Right $ ConvertToJson (FileToStdout first)
-        ( JsonMode, FromFiles _ (_:_), _ ) -> error "TODO: --json with multiple files is not supported"
+        ( JsonMode Flags.ElmToJson, Stdin, InPlace ) -> Right $ ConvertToJson StdinToStdout
+        ( JsonMode Flags.ElmToJson, Stdin, ToFile output ) -> Right $ ConvertToJson (StdinToFile output)
+        ( JsonMode Flags.ElmToJson, FromFiles first [], InPlace ) -> Right $ ConvertToJson (FileToStdout first)
+        ( JsonMode Flags.ElmToJson, FromFiles _ (_:_), _ ) -> error "TODO: --json with multiple files is not supported"
+        ( JsonMode Flags.JsonToElm, Stdin, InPlace ) -> Right $ ConvertFromJson StdinToStdout
+        ( JsonMode Flags.JsonToElm, Stdin, ToFile output ) -> Right $ ConvertFromJson (StdinToFile output)
+        ( JsonMode Flags.JsonToElm, FromFiles first [], InPlace ) -> Right $ ConvertFromJson (FileToStdout first)
+        ( JsonMode Flags.JsonToElm, FromFiles _ (_:_), _ ) -> error "TODO: --from-json with multiple files is not supported"
         ( _, FromFiles _ _, ToFile _ ) -> Left SingleOutputWithMultipleInputs
 
 
@@ -172,6 +177,19 @@ parseModule elmVersion (inputFile, inputText) =
             Left $ ParseError inputFile errs
 
 
+parseJson :: (FilePath, Text.Text)
+    -> Either InfoMessage (Module [UppercaseIdentifier] (ASTNS Identity [UppercaseIdentifier] 'TopLevelNK))
+parseJson (inputFile, inputText) =
+    case Text.JSON.decode (Text.unpack inputText) of
+        Text.JSON.Ok json ->
+            case PublicAST.readJSON json of
+                Right modu -> Right $ PublicAST.toModule modu
+                Left message -> Left $ JsonParseError inputFile message
+
+        Text.JSON.Error message ->
+            Left $ JsonParseError inputFile (Text.pack message)
+
+
 format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
 format elmVersion input =
     Render.render elmVersion <$> parseModule elmVersion input
@@ -187,6 +205,11 @@ toJson elmVersion (inputFile, inputText) =
     in
     toText . Text.JSON.encode . PublicAST.showJSON config . PublicAST.fromModule
     <$> parseModule elmVersion (inputFile, inputText)
+
+
+fromJson :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
+fromJson elmVersion input =
+    Render.render elmVersion <$> parseJson input
 
 
 doIt :: World m => ElmVersion -> Bool -> WhatToDo -> m Bool
@@ -208,4 +231,10 @@ doIt elmVersion autoYes whatToDo =
             TransformFiles.applyTransformation
                 ProcessingFile autoYes FilesWillBeOverwritten
                 (toJson elmVersion)
+                transformMode
+
+        ConvertFromJson transformMode ->
+            TransformFiles.applyTransformation
+                ProcessingFile autoYes FilesWillBeOverwritten
+                (fromJson elmVersion)
                 transformMode

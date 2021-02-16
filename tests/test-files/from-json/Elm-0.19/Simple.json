@@ -1,0 +1,13 @@
+{
+    "moduleName": "Simple",
+    "body": [
+        {
+            "tag": "Definition",
+            "name": "f",
+            "parameters": [],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        }
+    ]
+}

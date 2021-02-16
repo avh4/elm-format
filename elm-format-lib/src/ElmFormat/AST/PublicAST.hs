@@ -28,6 +28,8 @@ import Data.Maybe (mapMaybe)
 import AST.MatchReferences (fromMatched, matchReferences)
 import qualified Reporting.Annotation
 import ElmFormat.AST.PatternMatching as PatternMatching
+import Data.Functor.Identity
+import Data.Text (Text)
 
 
 data ModuleName =
@@ -118,6 +120,30 @@ fromModule = \case
             (Map.mapWithKey (\m (C comments i) -> fromImportMethod m i) $ Map.mapKeys ModuleName $ imports)
             (fromTopLevelStructures $ normalize body)
 
+toModule :: Module -> AST.Module [UppercaseIdentifier] (ASTNS Identity [UppercaseIdentifier] 'TopLevelNK)
+toModule (Module (ModuleName name) imports body) =
+    -- TODO: remove this placeholder
+    AST.Module
+        []
+        (Just $ AST.Header
+            AST.Normal
+            (C ([], []) name)
+            Nothing
+            (Just $ C ([], []) $ AST.OpenListing (C ([], []) ()))
+        )
+        (noRegion Nothing)
+        (C [] mempty)
+        (f $ AST.TopLevel
+            [ AST.Entry $ f $ AST.Definition
+                (f $ AST.VarPattern $ LowercaseIdentifier "f")
+                []
+                []
+                (f $ AST.Unit [])
+            ]
+        )
+    where
+        f = I.Fix . Identity
+
 instance ToJSON Module where
     showJSON c = \case
         Module moduleName imports body ->
@@ -126,6 +152,14 @@ instance ToJSON Module where
                 , ( "imports", showJSON c imports )
                 , ( "body", showJSON c body )
                 ]
+
+instance FromJSON Module where
+    readJSON _ =
+        -- TODO: remove this placeholder
+        Right $ Module
+            (ModuleName [ UppercaseIdentifier "Simple" ])
+            mempty
+            []
 
 
 data Import
@@ -971,6 +1005,9 @@ data Config =
 class ToJSON a where
   showJSON :: Config -> a -> JSValue
 
+class FromJSON a where
+    readJSON :: JSValue -> Either Text a
+
 
 addField :: ( String, JSValue ) -> JSValue -> JSValue
 addField field = \case
@@ -1286,3 +1323,13 @@ instance ToJSON VariableDefinition where
             [ type_ "VariableDefinition"
             , ( "name" , showJSON c name )
             ]
+
+
+nowhere :: Region.Position
+nowhere =
+    Region.Position 0 0
+
+
+noRegion :: a -> Reporting.Annotation.Located a
+noRegion =
+    Reporting.Annotation.at nowhere nowhere
