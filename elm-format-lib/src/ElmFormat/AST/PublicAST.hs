@@ -30,6 +30,7 @@ import qualified Reporting.Annotation
 import ElmFormat.AST.PatternMatching as PatternMatching
 import Data.Functor.Identity
 import Data.Text (Text)
+import Data.Aeson hiding (ToJSON)
 
 
 data ModuleName =
@@ -154,10 +155,12 @@ instance ToJSON Module where
                 ]
 
 instance FromJSON Module where
-    readJSON _ =
-        -- TODO: remove this placeholder
-        Right $ Module
-            (ModuleName [ UppercaseIdentifier "Simple" ])
+    parseJSON = withObject "Module" $ \obj -> do
+        moduleName <- obj .: "moduleName"
+        -- TODO: parse imports
+        -- TODO: parse body
+        return $ Module
+            (ModuleName [ UppercaseIdentifier moduleName ])
             mempty
             []
 
@@ -1004,9 +1007,6 @@ data Config =
 
 class ToJSON a where
   showJSON :: Config -> a -> JSValue
-
-class FromJSON a where
-    readJSON :: JSValue -> Either Text a
 
 
 addField :: ( String, JSValue ) -> JSValue -> JSValue
