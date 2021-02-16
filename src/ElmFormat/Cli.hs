@@ -25,6 +25,8 @@ import qualified ElmFormat.Version
 import qualified Reporting.Result as Result
 import qualified Text.JSON
 import qualified ElmFormat.AST.PublicAST as PublicAST
+import qualified Data.Aeson as Aeson
+import qualified Data.ByteString.Lazy.Char8 as LB
 
 
 data WhatToDo
@@ -180,13 +182,10 @@ parseModule elmVersion (inputFile, inputText) =
 parseJson :: (FilePath, Text.Text)
     -> Either InfoMessage (Module [UppercaseIdentifier] (ASTNS Identity [UppercaseIdentifier] 'TopLevelNK))
 parseJson (inputFile, inputText) =
-    case Text.JSON.decode (Text.unpack inputText) of
-        Text.JSON.Ok json ->
-            case PublicAST.readJSON json of
-                Right modu -> Right $ PublicAST.toModule modu
-                Left message -> Left $ JsonParseError inputFile message
+    case Aeson.eitherDecode (LB.fromChunks . return . encodeUtf8 $ inputText) of
+        Right modu -> Right $ PublicAST.toModule modu
 
-        Text.JSON.Error message ->
+        Left message ->
             Left $ JsonParseError inputFile (Text.pack message)
 
 
