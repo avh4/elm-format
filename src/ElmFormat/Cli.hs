@@ -202,7 +202,7 @@ toJson elmVersion (inputFile, inputText) =
                 { PublicAST.showSourceLocation = True
                 }
     in
-    toText . Text.JSON.encode . PublicAST.showJSON config . PublicAST.fromModule
+    toText . Text.JSON.encode . PublicAST.showJSON . PublicAST.fromModule config
     <$> parseModule elmVersion (inputFile, inputText)
 
 
