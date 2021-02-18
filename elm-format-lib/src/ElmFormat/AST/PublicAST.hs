@@ -160,7 +160,7 @@ toModule (Module (ModuleName name) imports body) =
             AST.Normal
             (C ([], []) name)
             Nothing
-            (Just $ C ([], []) $ AST.OpenListing (C ([], []) ()))
+            Nothing
         )
         (noRegion Nothing)
         (C [] mempty)
