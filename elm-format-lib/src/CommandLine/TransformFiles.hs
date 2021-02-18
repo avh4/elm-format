@@ -13,7 +13,6 @@ import CommandLine.World (World)
 import qualified CommandLine.World as World
 import Control.Monad.State hiding (runState)
 import Data.Text (Text)
-import ElmVersion
 
 
 
@@ -113,14 +112,13 @@ data ValidateMode
 validateNoChanges ::
     World m =>
     InfoFormatter.Loggable info =>
-    ElmVersion
-    -> (FilePath -> info)
+    (FilePath -> info)
     -> ((FilePath, Text) -> Either info ())
     -> ValidateMode
     -> m Bool
-validateNoChanges elmVersion processingFile validate mode =
+validateNoChanges processingFile validate mode =
     let
-        infoMode = ForMachine elmVersion
+        infoMode = ForMachine
         onInfo = InfoFormatter.onInfo infoMode
     in
     runState (InfoFormatter.init infoMode) (InfoFormatter.done infoMode) $

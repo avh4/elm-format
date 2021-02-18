@@ -20,7 +20,7 @@ import Data.Aeson ((.=))
 
 data InfoMessage
   = ProcessingFile FilePath
-  | FileWouldChange FilePath
+  | FileWouldChange ElmVersion FilePath
   | ParseError FilePath [A.Located Syntax.Error]
   | JsonParseError FilePath Text
 
@@ -60,7 +60,7 @@ instance ToConsole InfoMessage where
         ProcessingFile file ->
             "Processing file " <> Text.pack file
 
-        FileWouldChange file ->
+        FileWouldChange _ file ->
             "File would be changed " <> Text.pack file
 
         ParseError inputFile errs ->
@@ -78,7 +78,7 @@ instance ToConsole InfoMessage where
 
 
 instance Loggable InfoMessage where
-    jsonInfoMessage elmVersion =
+    jsonInfoMessage =
         let
             fileMessage filename message =
                 Aeson.pairs $ mconcat
@@ -88,7 +88,7 @@ instance Loggable InfoMessage where
         in
         \case
         ProcessingFile _ -> Nothing
-        FileWouldChange file ->
+        FileWouldChange elmVersion file ->
             Just $ fileMessage file $
                 "File is not formatted with elm-format-" <> ElmFormat.Version.asString
                 <> " --elm-version=" <> show elmVersion
