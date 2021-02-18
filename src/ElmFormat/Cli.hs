@@ -158,7 +158,7 @@ validate elmVersion input@(inputFile, inputText) =
     case parseModule elmVersion input of
         Right modu ->
             if inputText /= Render.render elmVersion modu then
-                Left $ FileWouldChange inputFile
+                Left $ FileWouldChange elmVersion inputFile
             else
                 Right ()
 
@@ -216,7 +216,7 @@ doIt elmVersion autoYes whatToDo =
     case whatToDo of
         Validate validateMode ->
             TransformFiles.validateNoChanges
-                elmVersion ProcessingFile
+                ProcessingFile
                 (validate elmVersion)
                 validateMode
 

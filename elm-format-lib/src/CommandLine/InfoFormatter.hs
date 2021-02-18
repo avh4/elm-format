@@ -11,7 +11,6 @@ import qualified CommandLine.World as World
 import Control.Monad.State
 import Data.Text (Text)
 import qualified Data.Text.Encoding as T
-import ElmVersion (ElmVersion)
 import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as LB
@@ -23,14 +22,14 @@ class ToConsole a where
 
 
 class ToConsole a => Loggable a where
-    jsonInfoMessage :: ElmVersion -> a -> Maybe Aeson.Encoding -- TODO: remove ElmVersion
+    jsonInfoMessage :: a -> Maybe Aeson.Encoding
 
 
 onInfo :: (World m, Loggable info) => ExecuteMode -> info -> StateT Bool m ()
 onInfo mode info =
     case mode of
-        ForMachine elmVersion ->
-            maybe (lift $ return ()) json $ jsonInfoMessage elmVersion info
+        ForMachine ->
+            maybe (lift $ return ()) json $ jsonInfoMessage info
 
         ForHuman usingStdout ->
             lift $ putStrLn' usingStdout (toConsole info)
@@ -43,24 +42,24 @@ approve mode autoYes prompt =
 
         False ->
             case mode of
-                ForMachine _ -> return False
+                ForMachine -> return False
 
                 ForHuman usingStdout ->
                     putStrLn' usingStdout (toConsole prompt) *> World.getYesOrNo
 
 
 data ExecuteMode
-    = ForMachine ElmVersion
+    = ForMachine
     | ForHuman { _usingStdout :: Bool }
 
 
 init :: World m => ExecuteMode -> (m (), Bool)
-init (ForMachine _) = (World.putStr "[", False)
+init ForMachine = (World.putStr "[", False)
 init (ForHuman _) = (return (), undefined)
 
 
 done :: World m => ExecuteMode -> Bool -> m ()
-done (ForMachine _) _ = World.putStrLn "]"
+done ForMachine _ = World.putStrLn "]"
 done (ForHuman _) _ = return ()
 
 
