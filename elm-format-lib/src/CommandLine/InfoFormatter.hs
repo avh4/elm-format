@@ -10,9 +10,12 @@ import CommandLine.World (World)
 import qualified CommandLine.World as World
 import Control.Monad.State
 import Data.Text (Text)
-import qualified Data.Text as Text
+import qualified Data.Text.Encoding as T
 import ElmVersion (ElmVersion)
-import qualified Text.JSON as Json
+import qualified Data.Aeson as Aeson
+import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.Lazy.Char8 as LB
+import qualified Data.Aeson.Encoding.Internal as AesonInternal
 
 
 class ToConsole a where
@@ -20,7 +23,7 @@ class ToConsole a where
 
 
 class ToConsole a => Loggable a where
-    jsonInfoMessage :: ElmVersion -> a -> Maybe Json.JSValue -- TODO: remove ElmVersion
+    jsonInfoMessage :: ElmVersion -> a -> Maybe Aeson.Encoding -- TODO: remove ElmVersion
 
 
 onInfo :: (World m, Loggable info) => ExecuteMode -> info -> StateT Bool m ()
@@ -69,10 +72,10 @@ putStrLn' usingStdout =
         False -> World.putStrLn
 
 
-json :: World m => Json.JSValue -> StateT Bool m ()
+json :: World m => Aeson.Encoding -> StateT Bool m ()
 json jsvalue =
     do
         printComma <- get
         when printComma (lift $ World.putStr ",")
-        lift $ World.putStrLn $ Text.pack $ Json.encode jsvalue
+        lift $ World.putStrLn $ T.decodeUtf8 $ B.concat $ LB.toChunks $ AesonInternal.encodingToLazyByteString jsvalue
         put True
