@@ -429,6 +429,7 @@ instance ToPairs TopLevelStructure where
             mconcat
                 [ type_ "TypeAlias"
                 , "name" .= name
+                , "parameters" .= parameters
                 , "type" .= t
                 ]
 
