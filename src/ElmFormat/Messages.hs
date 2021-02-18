@@ -14,7 +14,8 @@ import ElmVersion
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
 import Reporting.Region (Region(..), Position(..))
-import qualified Text.JSON as Json
+import qualified Data.Aeson as Aeson
+import Data.Aeson ((.=))
 
 
 data InfoMessage
@@ -80,9 +81,9 @@ instance Loggable InfoMessage where
     jsonInfoMessage elmVersion =
         let
             fileMessage filename message =
-                Json.makeObj
-                    [ ( "path", Json.JSString $ Json.toJSString filename )
-                    , ( "message", Json.JSString $ Json.toJSString message )
+                Aeson.pairs $ mconcat
+                    [ "path" .= (filename :: FilePath)
+                    , "message" .= (message :: String)
                     ]
         in
         \case
