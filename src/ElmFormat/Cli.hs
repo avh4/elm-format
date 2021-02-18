@@ -23,9 +23,9 @@ import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.Version
 import qualified Reporting.Result as Result
-import qualified Text.JSON
 import qualified ElmFormat.AST.PublicAST as PublicAST
 import qualified Data.Aeson as Aeson
+import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as LB
 
 
@@ -202,7 +202,7 @@ toJson elmVersion (inputFile, inputText) =
                 { PublicAST.showSourceLocation = True
                 }
     in
-    toText . Text.JSON.encode . PublicAST.showJSON . PublicAST.fromModule config
+    decodeUtf8 . B.concat . LB.toChunks . Aeson.encode . PublicAST.fromModule config
     <$> parseModule elmVersion (inputFile, inputText)
 
 

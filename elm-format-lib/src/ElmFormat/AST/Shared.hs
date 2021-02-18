@@ -1,5 +1,6 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
 module ElmFormat.AST.Shared where
 
 {-| This module contains types that are used by multiple versions of the Elm AST.
@@ -7,6 +8,7 @@ module ElmFormat.AST.Shared where
 
 import Data.Coapplicative
 import Data.Int (Int64)
+import GHC.Generics
 
 
 type List a = [a]
@@ -42,19 +44,19 @@ instance Coapplicative (Commented c) where
 data IntRepresentation
   = DecimalInt
   | HexadecimalInt
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
 
 
 data FloatRepresentation
   = DecimalFloat
   | ExponentFloat
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
 
 
 data StringRepresentation
     = SingleQuotedString
     | TripleQuotedString
-    deriving (Eq, Show)
+    deriving (Eq, Show, Generic)
 
 
 data LiteralValue
