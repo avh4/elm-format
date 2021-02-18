@@ -2,6 +2,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE DeriveGeneric #-}
 module ElmFormat.AST.PublicAST where
 
 import ElmFormat.AST.Shared
@@ -12,7 +13,6 @@ import qualified AST.Listing as AST
 import Reporting.Annotation (Located(A))
 import Reporting.Region (Region)
 import qualified Reporting.Region as Region
-import Text.JSON hiding (showJSON)
 import qualified Data.List as List
 import AST.Structure (ASTNS, ASTNS1, mapNs)
 import Data.Indexed as I
@@ -30,7 +30,11 @@ import qualified Reporting.Annotation
 import ElmFormat.AST.PatternMatching as PatternMatching
 import Data.Functor.Identity
 import Data.Text (Text)
-import Data.Aeson hiding (ToJSON)
+import qualified Data.Text as Text
+import Data.Aeson
+import Data.Aeson.Encoding.Internal (pair)
+import qualified Data.Aeson.Encoding.Internal as AesonInternal
+import GHC.Generics
 
 
 data LocatedIfRequested a
@@ -59,6 +63,12 @@ data ModuleName =
 instance Show ModuleName where
     show (ModuleName ns) = List.intercalate "." $ fmap (\(UppercaseIdentifier v) -> v) ns
 
+instance ToJSONKey ModuleName where
+    toJSONKey =
+        ToJSONKeyText
+            (Text.pack . show)
+            (AesonInternal.string . show)
+
 
 data Comment
     = Comment
@@ -83,34 +93,35 @@ mkComment = \case
     -- | CommentTrickBlock String
 
 instance ToJSON Comment where
-    showJSON = \case
+    toJSON = undefined
+    toEncoding = pairs . toPairs
+
+instance ToPairs Comment where
+    toPairs = \case
         Comment text display ->
-            makeObj
+            mconcat
                 [ type_ "Comment"
-                , ( "text", JSString $ toJSString text )
-                , ( "display", showJSON display )
+                , "text" .= text
+                , "display" .= display
                 ]
 
 data CommentDisplay =
     CommentDisplay
         { commentType :: CommentType
         }
+    deriving (Generic)
 
 instance ToJSON CommentDisplay where
-    showJSON = \case
-        CommentDisplay commentType ->
-            makeObj
-                [ ( "commentType", showJSON commentType )
-                ]
+    toEncoding = genericToEncoding defaultOptions
+
 
 data CommentType
     = BlockComment
     | LineComment
+    deriving (Generic)
 
 instance ToJSON CommentType where
-    showJSON = \case
-        BlockComment -> JSString $ toJSString "BlockComment"
-        LineComment -> JSString $ toJSString "LineComment"
+    toEncoding = genericToEncoding defaultOptions
 
 
 data Module
@@ -165,12 +176,13 @@ toModule (Module (ModuleName name) imports body) =
         f = I.Fix . Identity
 
 instance ToJSON Module where
-    showJSON = \case
+    toJSON = undefined
+    toEncoding = \case
         Module moduleName imports body ->
-            makeObj
-                [ ( "moduleName", showJSON moduleName )
-                , ( "imports", showJSON imports )
-                , ( "body", showJSON body )
+            pairs $ mconcat
+                [ "moduleName" .= moduleName
+                , "imports" .= imports
+                , "body" .= body
                 ]
 
 instance FromJSON Module where
@@ -189,6 +201,7 @@ data Import
         { as :: ModuleName
         , exposing :: AST.Listing AST.DetailedListing
         }
+    deriving (Generic)
 
 fromImportMethod :: ModuleName -> AST.ImportMethod -> Import
 fromImportMethod moduleName (AST.ImportMethod alias (C comments exposing)) =
@@ -201,12 +214,8 @@ fromImportMethod moduleName (AST.ImportMethod alias (C comments exposing)) =
     Import as_ exposing
 
 instance ToJSON Import where
-    showJSON = \case
-        Import as exposing ->
-            makeObj
-                [ ( "as", showJSON as )
-                , ( "exposing", showJSON exposing )
-                ]
+    toEncoding = genericToEncoding defaultOptions
+
 
 data TypedParameter
     = TypedParameter
@@ -215,11 +224,12 @@ data TypedParameter
         }
 
 instance ToJSON TypedParameter where
-    showJSON = \case
+    toJSON = undefined
+    toEncoding = \case
         TypedParameter pattern typ ->
-            makeObj
-                [ ( "pattern", showJSON pattern )
-                , ( "type", showJSON typ )
+            pairs $ mconcat
+                [ "pattern" .= pattern
+                , "type" .= typ
                 ]
 
 
@@ -228,14 +238,10 @@ data CustomTypeVariant
         { name :: UppercaseIdentifier
         , parameterTypes :: List (LocatedIfRequested Type_)
         }
+    deriving (Generic)
 
 instance ToJSON CustomTypeVariant where
-    showJSON = \case
-        CustomTypeVariant name parameterTypes ->
-            makeObj
-                [ ( "name", showJSON name )
-                , ( "parameterTypes", showJSON parameterTypes )
-                ]
+    toEncoding = genericToEncoding defaultOptions
 
 mkCustomTypeVariant :: Config -> AST.NameWithArgs UppercaseIdentifier (ASTNS Located [UppercaseIdentifier] 'TypeNK) -> CustomTypeVariant
 mkCustomTypeVariant config (AST.NameWithArgs name args) =
@@ -335,20 +341,24 @@ mkDefinitions config fromDef items =
     mapMaybe (sequenceA . fmap merge) items
 
 instance ToJSON Definition where
-    showJSON = \case
+    toJSON = undefined
+    toEncoding = pairs . toPairs
+
+instance ToPairs Definition where
+    toPairs = \case
         Definition name parameters returnType expression ->
-            makeObj
+            mconcat
                 [ type_ "Definition"
-                , ( "name", showJSON name )
-                , ( "parameters", showJSON parameters )
-                , ( "returnType", showJSON returnType )
-                , ( "expression", showJSON expression )
+                , "name" .= name
+                , "parameters" .= parameters
+                , "returnType" .= returnType
+                , "expression" .= expression
                 ]
 
         TODO_Definition info ->
-            makeObj
+            mconcat
                 [ type_ "TODO: Definition"
-                , ( "$", JSArray $ fmap (JSString . toJSString) info )
+                , "$" .= info
                 ]
 
 
@@ -407,30 +417,34 @@ fromTopLevelStructures config (I.Fix (A _ (AST.TopLevel decls))) =
     mkDefinitions config DefinitionStructure $ fmap toDefBuilder decls
 
 instance ToJSON TopLevelStructure where
-    showJSON = \case
+    toJSON = undefined
+    toEncoding = pairs . toPairs
+
+instance ToPairs TopLevelStructure where
+    toPairs = \case
         DefinitionStructure def ->
-            showJSON def
+            toPairs def
 
         TypeAlias name parameters t ->
-            makeObj
+            mconcat
                 [ type_ "TypeAlias"
-                , ( "name", showJSON name )
-                , ( "type", showJSON t )
+                , "name" .= name
+                , "type" .= t
                 ]
 
         CustomType name parameters variants ->
-            makeObj
+            mconcat
                 [ type_ "CustomType"
-                , ( "name", showJSON name )
-                , ( "parameters", showJSON parameters )
-                , ( "variants", showJSON variants )
+                , "name" .= name
+                , "parameters" .= parameters
+                , "variants" .= variants
                 ]
 
         Comment_tls comment ->
-            showJSON comment
+            toPairs comment
 
         TODO_TopLevelStructure s ->
-            JSString $ toJSString s
+            "TODO" .= s
 
 
 data Reference
@@ -441,7 +455,6 @@ data Reference
     | VariableReference
         { name :: Ref ()
         }
-
 
 mkReference :: Ref [UppercaseIdentifier] -> Reference
 mkReference = \case
@@ -464,11 +477,41 @@ mkReference = \case
     OpRef sym ->
         VariableReference $ OpRef sym
 
+instance ToJSON Reference where
+    toJSON = undefined
+    toEncoding = pairs . toPairs
+
+instance ToPairs Reference where
+    toPairs = \case
+        ExternalReference module_ identifier ->
+            mconcat
+                [ type_ "ExternalReference"
+                , "module" .= module_
+                , "identifier" .= identifier
+                ]
+
+        VariableReference name ->
+            mconcat
+                [ type_ "VariableReference"
+                , "name" .= name
+                ]
+
 
 data VariableDefinition
     = VariableDefinition
         { name :: LowercaseIdentifier
         }
+
+instance ToJSON VariableDefinition where
+    toJSON = undefined
+    toEncoding = pairs . toPairs
+
+instance ToPairs VariableDefinition where
+    toPairs (VariableDefinition name) =
+        mconcat
+            [ type_ "VariableDefinition"
+            , "name" .= name
+            ]
 
 
 data Pattern
@@ -495,7 +538,6 @@ data Pattern
         , pattern :: LocatedIfRequested Pattern
         }
 
-
 mkListPattern :: List (LocatedIfRequested Pattern) -> Maybe (LocatedIfRequested Pattern) -> Pattern
 mkListPattern prefix rest =
     case fmap extract rest of
@@ -504,6 +546,62 @@ mkListPattern prefix rest =
 
         _ ->
             ListPattern prefix rest
+
+instance ToJSON Pattern where
+    toJSON = undefined
+    toEncoding = pairs . toPairs
+
+instance ToPairs Pattern where
+    toPairs = \case
+        AnythingPattern ->
+            mconcat
+                [ type_ "AnythingPattern"
+                ]
+
+        UnitPattern ->
+            mconcat
+                [ type_ "UnitPattern"
+                ]
+
+        LiteralPattern lit ->
+            toPairs lit
+
+        VariablePattern def ->
+            toPairs def
+
+        DataPattern constructor arguments ->
+            mconcat
+                [ type_ "DataPattern"
+                , "constructor" .= constructor
+                , "arguments" .= arguments
+                ]
+
+        TuplePattern terms ->
+            mconcat
+                [ type_ "TuplePattern"
+                , "terms" .= terms
+                ]
+
+        ListPattern prefix rest ->
+            mconcat
+                [ type_ "ListPattern"
+                , "prefix" .= prefix
+                , "rest" .= rest
+                ]
+
+        RecordPattern fields ->
+            mconcat
+                [ type_ "RecordPattern"
+                , "fields" .= fields
+                ]
+
+        PatternAlias alias pat ->
+            mconcat
+                [ type_ "PatternAlias"
+                , "alias" .= alias
+                , "pattern" .= pat
+                ]
+
 
 data Type_
     = UnitType
@@ -528,11 +626,68 @@ data Type_
         , argumentTypes :: List (LocatedIfRequested Type_) -- Non-empty
         }
 
+instance ToJSON Type_ where
+    toJSON = undefined
+    toEncoding = pairs . toPairs
+
+instance ToPairs Type_ where
+    toPairs = \case
+        UnitType ->
+            mconcat
+                [ type_ "UnitType"
+                ]
+
+        TypeReference name module_ arguments ->
+            mconcat
+                [ type_ "TypeReference"
+                , "name" .= name
+                , "module" .= module_
+                , "arguments" .= arguments
+                ]
+
+        TypeVariable name ->
+            mconcat
+                [ type_ "TypeVariable"
+                , "name" .= name
+                ]
+
+        TupleType terms ->
+            mconcat
+                [ type_ "TupleType"
+                , "terms" .= terms
+                ]
+
+        RecordType Nothing fields display ->
+            mconcat
+                [ type_ "RecordType"
+                , "fields" .= fields
+                , "display" .= display
+                ]
+
+        RecordType (Just base) fields display ->
+            mconcat
+                [ type_ "RecordTypeExtension"
+                , "base" .= base
+                , "fields" .= fields
+                , "display" .= display
+                ]
+
+        FunctionType returnType argumentTypes ->
+            mconcat
+                [ type_ "FunctionType"
+                , "returnType" .= returnType
+                , "argumentTypes" .= argumentTypes
+                ]
+
 
 newtype RecordDisplay
     = RecordDisplay
         { fieldOrder :: List LowercaseIdentifier
         }
+    deriving (Generic)
+
+instance ToJSON RecordDisplay where
+    toEncoding = genericToEncoding defaultOptions
 
 
 data BinaryOperation
@@ -542,11 +697,12 @@ data BinaryOperation
         }
 
 instance ToJSON BinaryOperation where
-    showJSON = \case
+    toJSON = undefined
+    toEncoding = \case
         BinaryOperation operator term ->
-            makeObj
-                [ ( "operator", showJSON operator )
-                , ( "term", showJSON term )
+            pairs $ mconcat
+                [ "operator" .= operator
+                , "term" .= term
                 ]
 
 
@@ -571,12 +727,16 @@ mkLetDeclarations config decls =
     mkDefinitions config LetDefinition $ fmap (JustF . fmap toDefBuilder . fromLocated config . I.unFix) decls
 
 instance ToJSON LetDeclaration where
-    showJSON = \case
+    toJSON = undefined
+    toEncoding = pairs . toPairs
+
+instance ToPairs LetDeclaration where
+    toPairs = \case
         LetDefinition def ->
-            showJSON def
+            toPairs def
 
         Comment_ld comment ->
-            showJSON comment
+            toPairs comment
 
 
 data CaseBranch
@@ -594,13 +754,17 @@ instance ToPublicAST 'CaseBranchNK where
                 (fromRawAST config pat)
                 (fromRawAST config body)
 
-instance ToJSON CaseBranch where
-    showJSON = \case
+instance ToPairs CaseBranch where
+    toPairs = \case
         CaseBranch pattern body ->
-            makeObj
-                [ ( "pattern", showJSON pattern )
-                , ( "body", showJSON body )
+            mconcat
+                [ "pattern" .= pattern
+                , "body" .= body
                 ]
+
+instance ToJSON CaseBranch where
+    toJSON = undefined
+    toEncoding = pairs . toPairs
 
 
 data Expression
@@ -661,14 +825,18 @@ data FunctionApplicationDisplay
         { showAsRecordAccess :: Bool
         }
 
-instance ToJSON FunctionApplicationDisplay where
-    showJSON = \case
+instance ToMaybeJSON FunctionApplicationDisplay where
+    toMaybeEncoding = \case
         FunctionApplicationDisplay showAsRecordAccess ->
-            makeObj $ Maybe.catMaybes
-                [ if showAsRecordAccess
-                    then Just ( "showAsRecordAccess", JSBool True )
-                    else Nothing
-                ]
+            case
+                Maybe.catMaybes
+                    [ if showAsRecordAccess
+                        then Just ("showAsRecordAccess" .= True)
+                        else Nothing
+                    ]
+            of
+                [] -> Nothing
+                some -> Just $ pairs $ mconcat some
 
 
 data MaybeF f a
@@ -689,9 +857,10 @@ instance Coapplicative f => Coapplicative (MaybeF f) where
     extract (NothingF a) = a
 
 instance (ToJSON a, ToJSON (f a)) => ToJSON (MaybeF f a) where
-    showJSON = \case
-        JustF fa -> showJSON fa
-        NothingF a -> showJSON a
+    toJSON = undefined
+    toEncoding = \case
+        JustF fa -> toEncoding fa
+        NothingF a -> toEncoding a
 
 
 instance ToPublicAST 'ExpressionNK where
@@ -792,106 +961,110 @@ instance ToPublicAST 'ExpressionNK where
 
 
 instance ToJSON Expression where
-    showJSON = \case
+    toJSON = undefined
+    toEncoding = pairs . toPairs
+
+instance ToPairs Expression where
+    toPairs = \case
         UnitLiteral ->
-            makeObj
+            mconcat
                 [ type_ "UnitLiteral"
                 ]
 
         LiteralExpression lit ->
-            showJSON lit
+            toPairs lit
 
         VariableReferenceExpression ref ->
-            showJSON ref
+            toPairs ref
 
         FunctionApplication function arguments display ->
-            makeObj $ mapMaybe removeEmpty
-                [ type_ "FunctionApplication"
-                , ( "function", showJSON function )
-                , ( "arguments", showJSON arguments)
-                , ( "display", showJSON display )
+            mconcat $ Maybe.catMaybes
+                [ Just $ type_ "FunctionApplication"
+                , Just $ "function" .= function
+                , Just $ "arguments" .= arguments
+                , fmap (pair "display") $ toMaybeEncoding display
                 ]
 
         BinaryOperatorList first operations ->
-            makeObj
+            mconcat
                 [ type_ "BinaryOperatorList"
-                , ( "first", showJSON first )
-                , ( "operations", showJSON operations )
+                , "first" .= first
+                , "operations" .= operations
                 ]
 
         UnaryOperator operator term ->
-            makeObj
+            mconcat
                 [ type_ "UnaryOperator"
-                , ( "operator", showJSON operator )
-                , ( "term", showJSON term )
+                , "operator" .= operator
+                , "term" .= term
                 ]
 
         ListLiteral terms ->
-            makeObj
+            mconcat
                 [ type_ "ListLiteral"
-                , ( "terms", showJSON terms)
+                , "terms" .= terms
                 ]
 
         TupleLiteral terms ->
-            makeObj
+            mconcat
                 [ type_ "TupleLiteral"
-                , ( "terms", showJSON terms)
+                , "terms" .= terms
                 ]
 
         RecordLiteral Nothing fields display ->
-            makeObj
+            mconcat
                 [ type_ "RecordLiteral"
-                , ( "fields", showJSON fields )
-                , ( "display", showJSON display )
+                , "fields" .= fields
+                , "display" .= display
                 ]
 
         RecordLiteral (Just base) fields display ->
-            makeObj
+            mconcat
                 [ type_ "RecordUpdate"
-                , ( "base", showJSON base )
-                , ( "fields", showJSON fields )
-                , ( "display", showJSON display )
+                , "base" .= base
+                , "fields" .= fields
+                , "display" .= display
                 ]
 
         RecordAccessFunction field ->
-            makeObj
+            mconcat
                 [ type_ "RecordAccessFunction"
-                , ( "field", showJSON field )
+                , "field" .= field
                 ]
 
         AnonymousFunction parameters body ->
-            makeObj
+            mconcat
                 [ type_ "AnonymousFunction"
-                , ( "parameters", showJSON parameters )
-                , ( "body", showJSON body )
+                , "parameters" .= parameters
+                , "body" .= body
                 ]
 
         IfExpression if_ then_ else_ ->
-            makeObj
+            mconcat
                 [ type_ "IfExpression"
-                , ( "if", showJSON if_ )
-                , ( "then", showJSON then_ )
-                , ( "else", showJSON else_ )
+                , "if" .= if_
+                , "then" .= then_
+                , "else" .= else_
                 ]
 
         LetExpression declarations body ->
-            makeObj
+            mconcat
                 [ type_ "LetExpression"
-                , ( "declarations", showJSON declarations )
-                , ( "body", showJSON body )
+                , "declarations" .= declarations
+                , "body" .= body
                 ]
 
         CaseExpression subject branches ->
-            makeObj
+            mconcat
                 [ type_ "CaseExpression"
-                , ( "subject", showJSON subject )
-                , ( "branches", showJSON branches )
+                , "subject" .= subject
+                , "branches" .= branches
                 ]
 
         GLShader shaderSource ->
-            makeObj
+            mconcat
                 [ type_ "GLShader"
-                , ( "shaderSource", JSString $ toJSString shaderSource )
+                , "shaderSource" .= shaderSource
                 ]
 
 
@@ -1032,329 +1205,169 @@ data Config =
         }
 
 
-class ToJSON a where
-  showJSON :: a -> JSValue
+class ToPairs a where
+    toPairs :: a -> Series
 
 
-addField :: ( String, JSValue ) -> JSValue -> JSValue
-addField field = \case
-    JSObject obj ->
-        JSObject
-            $ toJSObject
-            $ (++ [ field ])
-            $ fromJSObject obj
-
-    otherJson ->
-        makeObj
-            [ ( "value", otherJson )
-            , field
-            ]
+class ToMaybeJSON a where
+    toMaybeEncoding :: a -> Maybe Encoding
 
 
-removeEmpty :: ( String, JSValue ) -> Maybe ( String, JSValue )
-removeEmpty (key, val) =
-    case val of
-        JSObject obj ->
-            case fromJSObject obj of
-                [] -> Nothing
-                _ -> Just (key, val)
-        _ -> Just (key, val)
-
-
-type_ :: String -> (String, JSValue)
+type_ :: String -> Series
 type_ t =
-    ("tag", JSString $ toJSString t)
+    "tag" .= t
 
 
-instance ToJSON a => ToJSON [a] where
-    showJSON = JSArray . fmap (showJSON)
-
-
-instance ToJSON a => ToJSON (Maybe a) where
-    showJSON Nothing = JSNull
-    showJSON (Just a) = showJSON a
-
-
-instance (Show k, ToJSON v) => ToJSON (Map k v) where
-    showJSON =
-        makeObj
-            . fmap (\(k, a) -> (show k, showJSON a))
-            . Map.toList
-
-
-instance ToJSON a => ToJSON (Located a) where
-    showJSON (A region a) =
-        addField ( "sourceLocation", showJSON region ) (showJSON a)
+instance ToPairs a => ToJSON (Located a) where
+    toJSON = undefined
+    toEncoding (A region a) =
+        pairs (toPairs a <> "sourceLocation" .= region)
 
 
 instance ToJSON Region where
-    showJSON region =
-        makeObj
-            [ ( "start", showJSON $ Region.start region )
-            , ( "end", showJSON $ Region.end region )
+    toJSON = undefined
+    toEncoding region =
+        pairs $ mconcat
+            [ "start" .= Region.start region
+            , "end" .= Region.end region
             ]
 
 
-instance ToJSON a => ToJSON (LocatedIfRequested a) where
-    showJSON (LocatedIfRequested showSourceLocation (A region a)) =
+instance (ToPairs a, ToJSON a) => ToJSON (LocatedIfRequested a) where
+    toJSON = undefined
+    toEncoding (LocatedIfRequested showSourceLocation (A region a)) =
         if showSourceLocation
-            then showJSON (A region a)
-            else showJSON a
+            then toEncoding (A region a)
+            else toEncoding a
 
 
 instance ToJSON Region.Position where
-    showJSON pos =
-        makeObj
-            [ ( "line", JSRational False $ toRational $ Region.line pos )
-            , ( "col", JSRational False $ toRational $ Region.column pos )
+    toJSON = undefined
+    toEncoding pos =
+        pairs $ mconcat
+            [ "line" .= Region.line pos
+            , "col" .= Region.column pos
             ]
 
 
 instance ToJSON UppercaseIdentifier where
-    showJSON (UppercaseIdentifier name) = JSString $ toJSString name
+    toJSON = undefined
+    toEncoding (UppercaseIdentifier name) = toEncoding name
 
 
 instance ToJSON LowercaseIdentifier where
-    showJSON (LowercaseIdentifier name) = JSString $ toJSString name
+    toJSON = undefined
+    toEncoding (LowercaseIdentifier name) = toEncoding name
+instance ToJSONKey LowercaseIdentifier where
+    toJSONKey =
+        ToJSONKeyText
+            (\(LowercaseIdentifier name) -> Text.pack name)
+            (\(LowercaseIdentifier name) -> AesonInternal.string name)
 
 
 instance ToJSON SymbolIdentifier where
-    showJSON (SymbolIdentifier sym) = JSString $ toJSString sym
+    toJSON = undefined
+    toEncoding (SymbolIdentifier sym) = toEncoding sym
 
 
 instance ToJSON (Ref ()) where
-    showJSON (VarRef () var) = showJSON var
-    showJSON (TagRef () tag) = showJSON tag
-    showJSON (OpRef sym) = showJSON sym
+    toJSON = undefined
+    toEncoding (VarRef () var) = toEncoding var
+    toEncoding (TagRef () tag) = toEncoding tag
+    toEncoding (OpRef sym) = toEncoding sym
 
 
 instance ToJSON AST.UnaryOperator where
-    showJSON Negative = JSString $ toJSString "-"
+    toJSON = undefined
+    toEncoding Negative = toEncoding ("-" :: Text)
 
 
 instance ToJSON (AST.Listing AST.DetailedListing) where
-    showJSON = \case
-        AST.ExplicitListing a comments -> showJSON a
-        AST.OpenListing (C comments ()) -> JSString $ toJSString "Everything"
-        AST.ClosedListing -> JSNull
+    toJSON = undefined
+    toEncoding = \case
+        AST.ExplicitListing a comments -> toEncoding a
+        AST.OpenListing (C comments ()) -> toEncoding ("Everything" :: Text)
+        AST.ClosedListing -> toEncoding Null
 
 
 instance ToJSON AST.DetailedListing where
-    showJSON = \case
+    toJSON = undefined
+    toEncoding = \case
         AST.DetailedListing values operators types ->
-            makeObj
-                [ ( "values", makeObj $ fmap (\(LowercaseIdentifier k) -> (k, JSBool True)) $ Map.keys values )
-                , ( "types", makeObj $ fmap (\(UppercaseIdentifier k, (C _ (C _ listing))) -> (k, showTagListingJSON listing)) $ Map.toList types )
+            pairs $ mconcat
+                [ "values" .= Map.fromList (fmap (\(LowercaseIdentifier k) -> (k, True)) (Map.keys values))
+                , "types" .= Map.fromList (fmap (\(UppercaseIdentifier k, (C _ (C _ listing))) -> (k, listing)) (Map.toList types))
                 ]
 
 
-showTagListingJSON :: AST.Listing (AST.CommentedMap UppercaseIdentifier ()) -> JSValue
-showTagListingJSON = \case
-    AST.ExplicitListing tags _ ->
-        makeObj $ fmap (\(UppercaseIdentifier k, C _ ()) -> (k, JSBool True)) $ Map.toList tags
-    AST.OpenListing (C _ ()) -> JSString $ toJSString "AllTags"
-    AST.ClosedListing -> JSString $ toJSString "NoTags"
+instance ToJSON (AST.Listing (AST.CommentedMap UppercaseIdentifier ())) where
+    toJSON = undefined
+    toEncoding = \case
+        AST.ExplicitListing tags _ ->
+            toEncoding $ Map.fromList $ fmap (\(UppercaseIdentifier k, C _ ()) -> (k, True)) $ Map.toList tags
+        AST.OpenListing (C _ ()) -> toEncoding ("AllTags" :: Text)
+        AST.ClosedListing -> toEncoding ("NoTags" :: Text)
 
 
 instance ToJSON IntRepresentation where
-    showJSON DecimalInt = JSString $ toJSString "DecimalInt"
-    showJSON HexadecimalInt = JSString $ toJSString "HexadecimalInt"
+    toEncoding = genericToEncoding defaultOptions
 
 
 instance ToJSON FloatRepresentation where
-    showJSON DecimalFloat = JSString $ toJSString "DecimalFloat"
-    showJSON ExponentFloat = JSString $ toJSString "ExponentFloat"
+    toEncoding = genericToEncoding defaultOptions
 
 
 instance ToJSON StringRepresentation where
-    showJSON SingleQuotedString = JSString $ toJSString "SingleQuotedString"
-    showJSON TripleQuotedString = JSString $ toJSString "TripleQuotedString"
+    toEncoding = genericToEncoding defaultOptions
 
 
 instance ToJSON ModuleName where
-    showJSON (ModuleName []) = JSNull
-    showJSON namespace = JSString $ toJSString $ show namespace
+    toJSON = undefined
+    toEncoding (ModuleName []) = toEncoding Null
+    toEncoding namespace = toEncoding $ show namespace
 
 
 instance ToJSON AST.LiteralValue where
-    showJSON = \case
+    toJSON = undefined
+    toEncoding = pairs . toPairs
+
+instance ToPairs AST.LiteralValue where
+    toPairs = \case
         IntNum value repr ->
-            makeObj
+            mconcat
                 [ type_ "IntLiteral"
-                , ("value", JSRational False $ toRational value)
-                , ("display"
-                , makeObj
-                    [ ("representation", showJSON repr)
-                    ]
-                )
+                , "value" .= value
+                , pair "display" $ pairs
+                    ("representation" .= repr)
                 ]
 
         FloatNum value repr ->
-            makeObj
+            mconcat
                 [ type_ "FloatLiteral"
-                , ("value", JSRational False $ toRational value)
-                , ("display"
-                , makeObj
-                    [ ("representation", showJSON repr)
-                    ]
-                )
+                , "value" .= value
+                , pair "display" $ pairs
+                    ("representation" .= repr)
                 ]
 
         Boolean value ->
-            showJSON $
+            toPairs $
                 ExternalReference
                     (ModuleName [UppercaseIdentifier "Basics"])
                     (TagRef () $ UppercaseIdentifier $ show value)
 
         Chr chr ->
-            makeObj
+            mconcat
                 [ type_ "CharLiteral"
-                , ("value", JSString $ toJSString [chr])
+                , "value" .= chr
                 ]
 
         Str str repr ->
-            makeObj
+            mconcat
                 [ type_ "StringLiteral"
-                , ("value", JSString $ toJSString str)
-                , ( "display"
-                , makeObj
-                    [ ( "representation", showJSON repr )
-                    ]
-                )
+                , "value" .= str
+                , pair "display" $ pairs
+                    ("representation" .= repr)
                 ]
-
-
-instance ToJSON Pattern where
-    showJSON = \case
-        AnythingPattern ->
-            makeObj
-                [ type_ "AnythingPattern"
-                ]
-
-        UnitPattern ->
-            makeObj
-                [ type_ "UnitPattern"
-                ]
-
-        LiteralPattern lit ->
-            showJSON lit
-
-        VariablePattern def ->
-            showJSON def
-
-        DataPattern constructor arguments ->
-            makeObj
-                [ type_ "DataPattern"
-                , ( "constructor", showJSON constructor )
-                , ( "arguments", showJSON arguments )
-                ]
-
-        TuplePattern terms ->
-            makeObj
-                [ type_ "TuplePattern"
-                , ( "terms", showJSON terms )
-                ]
-
-        ListPattern prefix rest ->
-            makeObj
-                [ type_ "ListPattern"
-                , ( "prefix", showJSON prefix )
-                , ( "rest", showJSON rest )
-                ]
-
-        RecordPattern fields ->
-            makeObj
-                [ type_ "RecordPattern"
-                , ( "fields", showJSON fields )
-                ]
-
-        PatternAlias alias pat ->
-            makeObj
-                [ type_ "PatternAlias"
-                , ( "alias", showJSON alias )
-                , ( "pattern", showJSON pat )
-                ]
-
-
-instance ToJSON Type_ where
-    showJSON = \case
-        UnitType ->
-            makeObj
-                [ type_ "UnitType"
-                ]
-
-        TypeReference name module_ arguments ->
-            makeObj
-                [ type_ "TypeReference"
-                , ( "name", showJSON name )
-                , ( "module", showJSON module_ )
-                , ( "arguments", showJSON arguments )
-                ]
-
-        TypeVariable name ->
-            makeObj
-                [ type_ "TypeVariable"
-                , ( "name", showJSON name )
-                ]
-
-        TupleType terms ->
-            makeObj
-                [ type_ "TupleType"
-                , ( "terms", showJSON terms )
-                ]
-
-        RecordType Nothing fields display ->
-            makeObj
-                [ type_ "RecordType"
-                , ( "fields", showJSON fields )
-                , ( "display", showJSON display )
-                ]
-
-        RecordType (Just base) fields display ->
-            makeObj
-                [ type_ "RecordTypeExtension"
-                , ( "base", showJSON base )
-                , ( "fields", showJSON fields )
-                , ( "display", showJSON display )
-                ]
-
-        FunctionType returnType argumentTypes ->
-            makeObj
-                [ type_ "FunctionType"
-                , ( "returnType", showJSON returnType )
-                , ( "argumentTypes", showJSON argumentTypes )
-                ]
-
-
-instance ToJSON RecordDisplay where
-    showJSON (RecordDisplay fieldOrder) =
-        makeObj
-            [ ( "fieldOrder", showJSON fieldOrder )
-            ]
-
-
-instance ToJSON Reference where
-    showJSON = \case
-        ExternalReference module_ identifier ->
-            makeObj
-                [ type_ "ExternalReference"
-                , ("module", showJSON module_)
-                , ("identifier", showJSON identifier)
-                ]
-
-        VariableReference name ->
-            makeObj
-                [ type_ "VariableReference"
-                , ( "name", showJSON name )
-                ]
-
-
-instance ToJSON VariableDefinition where
-    showJSON (VariableDefinition name) =
-        makeObj
-            [ type_ "VariableDefinition"
-            , ( "name" , showJSON name )
-            ]
 
 
 nowhere :: Region.Position
