@@ -659,6 +659,10 @@
         },
         {
             "name": "TypeAlias1",
+            "parameters": [
+                "a",
+                "b"
+            ],
             "sourceLocation": {
                 "end": {
                     "col": 39,
@@ -770,6 +774,10 @@
         },
         {
             "name": "TypeAliasMultiline",
+            "parameters": [
+                "a",
+                "b"
+            ],
             "sourceLocation": {
                 "end": {
                     "col": 7,
@@ -797,6 +805,10 @@
         },
         {
             "name": "TypeAlias2",
+            "parameters": [
+                "a",
+                "b"
+            ],
             "sourceLocation": {
                 "end": {
                     "col": 39,
@@ -908,6 +920,10 @@
         },
         {
             "name": "TypeAlias3",
+            "parameters": [
+                "a",
+                "b"
+            ],
             "sourceLocation": {
                 "end": {
                     "col": 39,
