@@ -1,9 +1,17 @@
-module Declarations exposing (TypeVariable, Unit)
+module Declarations exposing (MyTypeReference, MyTypeReferenceWithArguments, MyTypeVariable, MyUnit)
 
 
-type alias Unit =
+type alias MyUnit =
     ()
 
 
-type alias TypeVariable a =
+type alias MyTypeReference =
+    Basics.String
+
+
+type alias MyTypeReferenceWithArguments =
+    Result.Result () ()
+
+
+type alias MyTypeVariable a =
     a

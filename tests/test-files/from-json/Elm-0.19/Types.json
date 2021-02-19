@@ -3,7 +3,7 @@
     "body": [
         {
             "tag": "TypeAlias",
-            "name": "Unit",
+            "name": "MyUnit",
             "parameters": [],
             "type": {
                 "tag": "UnitType"
@@ -11,7 +11,32 @@
         },
         {
             "tag": "TypeAlias",
-            "name": "TypeVariable",
+            "name": "MyTypeReference",
+            "parameters": [],
+            "type": {
+                "tag": "TypeReference",
+                "module": "Basics",
+                "name": "String",
+                "arguments": []
+            }
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyTypeReferenceWithArguments",
+            "parameters": [],
+            "type": {
+                "tag": "TypeReference",
+                "module": "Result",
+                "name": "Result",
+                "arguments": [
+                    { "tag": "UnitType" },
+                    { "tag": "UnitType" }
+                ]
+            }
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyTypeVariable",
             "parameters": [ "a" ],
             "type": {
                 "tag": "TypeVariable",

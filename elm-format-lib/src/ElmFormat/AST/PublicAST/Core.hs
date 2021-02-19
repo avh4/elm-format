@@ -107,6 +107,10 @@ instance ToJSONKey ModuleName where
             (Text.pack . show)
             (AesonInternal.string . show)
 
+instance FromJSON ModuleName where
+    parseJSON = withText "ModuleName" $
+        return . ModuleName . fmap (UppercaseIdentifier . Text.unpack) . Text.splitOn "."
+
 
 newtype VariableDefinition
     = VariableDefinition
