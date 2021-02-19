@@ -8,6 +8,14 @@
             "type": {
                 "tag": "UnitType"
             }
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyTypeAliasWithParameters",
+            "parameters": [ "x", "y" ],
+            "type": {
+                "tag": "UnitType"
+            }
         }
     ]
 }
