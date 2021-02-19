@@ -98,6 +98,11 @@ instance FromPublicAST 'TypeNK where
         TypeVariable name ->
             AST.TypeVariable name
 
+        TupleType terms ->
+            AST.TupleType
+                (C ([], [], Nothing) . toRawAST <$> terms)
+                (AST.ForceMultiline False)
+
 instance ToJSON Type_ where
     toJSON = undefined
     toEncoding = pairs . toPairs
@@ -167,6 +172,10 @@ instance FromJSON Type_ where
             "TypeVariable" ->
                 TypeVariable
                     <$> obj .: "name"
+
+            "TupleType" ->
+                TupleType
+                    <$> obj .: "terms"
 
             _ ->
                 fail ("unexpected Type tag: \"" <> tag <> "\"")

@@ -1,4 +1,4 @@
-module Declarations exposing (MyTypeReference, MyTypeReferenceWithArguments, MyTypeVariable, MyUnit)
+module Declarations exposing (MyTupleType, MyTypeReference, MyTypeReferenceWithArguments, MyTypeVariable, MyUnit)
 
 
 type alias MyUnit =
@@ -15,3 +15,7 @@ type alias MyTypeReferenceWithArguments =
 
 type alias MyTypeVariable a =
     a
+
+
+type alias MyTupleType =
+    ( (), () )
