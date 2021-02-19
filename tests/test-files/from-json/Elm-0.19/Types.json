@@ -1,0 +1,22 @@
+{
+    "moduleName": "Declarations",
+    "body": [
+        {
+            "tag": "TypeAlias",
+            "name": "Unit",
+            "parameters": [],
+            "type": {
+                "tag": "UnitType"
+            }
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "TypeVariable",
+            "parameters": [ "a" ],
+            "type": {
+                "tag": "TypeVariable",
+                "name": "a"
+            }
+        }
+    ]
+}
