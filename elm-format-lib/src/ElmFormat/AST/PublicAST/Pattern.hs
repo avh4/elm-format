@@ -1,0 +1,157 @@
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DataKinds #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+module ElmFormat.AST.PublicAST.Pattern (Pattern(..), mkListPattern) where
+
+import ElmFormat.AST.PublicAST.Core
+import ElmFormat.AST.PublicAST.Reference
+import qualified AST.V0_16 as AST
+
+
+data Pattern
+    = AnythingPattern
+    | UnitPattern
+    | LiteralPattern LiteralValue
+    | VariablePattern VariableDefinition
+    | DataPattern
+        { constructor :: Reference
+        , arguments :: List (LocatedIfRequested Pattern) -- Non-empty
+        }
+    | TuplePattern
+        { terms :: List (LocatedIfRequested Pattern) -- At least two items
+        }
+    | ListPattern -- Construct with mkListPattern
+        { prefix :: List (LocatedIfRequested Pattern)
+        , rest :: Maybe (LocatedIfRequested Pattern) -- Must not be a ListPattern
+        }
+    | RecordPattern
+        { fields :: List VariableDefinition
+        }
+    | PatternAlias
+        { alias :: VariableDefinition
+        , pattern :: LocatedIfRequested Pattern
+        }
+
+mkListPattern :: List (LocatedIfRequested Pattern) -> Maybe (LocatedIfRequested Pattern) -> Pattern
+mkListPattern prefix rest =
+    case fmap extract rest of
+        Just (ListPattern prefix2 rest2) ->
+            ListPattern (prefix ++ prefix2) rest2
+
+        _ ->
+            ListPattern prefix rest
+
+instance ToPublicAST 'PatternNK where
+    type PublicAST 'PatternNK = Pattern
+
+    fromRawAST' config = \case
+        AST.Anything ->
+            AnythingPattern
+
+        AST.UnitPattern comments ->
+            UnitPattern
+
+        AST.LiteralPattern lit ->
+            LiteralPattern lit
+
+        AST.VarPattern name ->
+            VariablePattern $ VariableDefinition name
+
+        AST.OpPattern _ ->
+            error "PublicAST: OpPattern is not supported in Elm 0.19"
+
+        AST.DataPattern (namespace, tag) args ->
+            DataPattern
+                (mkReference (TagRef namespace tag))
+                (fmap (fromRawAST config . (\(C comments a) -> a)) args)
+
+        AST.PatternParens (C (pre, post) pat) ->
+            extract $ fromRawAST config pat
+
+        AST.TuplePattern terms ->
+            TuplePattern
+                (fmap (fromRawAST config . (\(C comments a) -> a)) terms)
+
+        AST.EmptyListPattern comments ->
+            mkListPattern [] Nothing
+
+        AST.ListPattern terms ->
+            mkListPattern
+                (fmap (fromRawAST config . (\(C comments a) -> a)) terms)
+                Nothing
+
+        AST.ConsPattern (C firstEol first) rest ->
+            let
+                first' = fromRawAST config first
+                rest' = fmap (fromRawAST config . (\(C comments a) -> a)) (AST.toCommentedList rest)
+            in
+            case reverse rest' of
+                [] -> mkListPattern [] (Just first')
+                last : mid -> mkListPattern (first' : reverse mid) (Just last)
+
+        AST.EmptyRecordPattern comment ->
+            RecordPattern []
+
+        AST.RecordPattern fields ->
+            RecordPattern
+                (fmap (VariableDefinition . (\(C comments a) -> a)) fields)
+
+        AST.Alias (C comments1 pat) (C comments2 name) ->
+            PatternAlias
+                (VariableDefinition name)
+                (fromRawAST config pat)
+
+instance ToJSON Pattern where
+    toJSON = undefined
+    toEncoding = pairs . toPairs
+
+instance ToPairs Pattern where
+    toPairs = \case
+        AnythingPattern ->
+            mconcat
+                [ type_ "AnythingPattern"
+                ]
+
+        UnitPattern ->
+            mconcat
+                [ type_ "UnitPattern"
+                ]
+
+        LiteralPattern lit ->
+            toPairs lit
+
+        VariablePattern def ->
+            toPairs def
+
+        DataPattern constructor arguments ->
+            mconcat
+                [ type_ "DataPattern"
+                , "constructor" .= constructor
+                , "arguments" .= arguments
+                ]
+
+        TuplePattern terms ->
+            mconcat
+                [ type_ "TuplePattern"
+                , "terms" .= terms
+                ]
+
+        ListPattern prefix rest ->
+            mconcat
+                [ type_ "ListPattern"
+                , "prefix" .= prefix
+                , "rest" .= rest
+                ]
+
+        RecordPattern fields ->
+            mconcat
+                [ type_ "RecordPattern"
+                , "fields" .= fields
+                ]
+
+        PatternAlias alias pat ->
+            mconcat
+                [ type_ "PatternAlias"
+                , "alias" .= alias
+                , "pattern" .= pat
+                ]

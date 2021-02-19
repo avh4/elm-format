@@ -3,18 +3,18 @@
 {-# LANGUAGE DeriveGeneric #-}
 module ElmFormat.AST.Shared where
 
-{-| This module contains types that are used by multiple versions of the Elm AST.
--}
-
 import Data.Coapplicative
 import Data.Int (Int64)
 import GHC.Generics
+
+{-| This module contains types that are used by multiple versions of the Elm AST.
+-}
 
 
 type List a = [a]
 
 
-data LowercaseIdentifier =
+newtype LowercaseIdentifier =
     LowercaseIdentifier String
     deriving (Eq, Ord)
 
@@ -22,12 +22,12 @@ instance Show LowercaseIdentifier where
     show (LowercaseIdentifier name) = name
 
 
-data UppercaseIdentifier =
+newtype UppercaseIdentifier =
     UppercaseIdentifier String
     deriving (Eq, Ord, Show)
 
 
-data SymbolIdentifier =
+newtype SymbolIdentifier =
     SymbolIdentifier String
     deriving (Eq, Ord, Show)
 
