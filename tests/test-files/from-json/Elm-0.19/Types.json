@@ -42,6 +42,18 @@
                 "tag": "TypeVariable",
                 "name": "a"
             }
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyTupleType",
+            "parameters": [],
+            "type": {
+                "tag": "TupleType",
+                "terms": [
+                    { "tag": "UnitType" },
+                    { "tag": "UnitType" }
+                ]
+            }
         }
     ]
 }
