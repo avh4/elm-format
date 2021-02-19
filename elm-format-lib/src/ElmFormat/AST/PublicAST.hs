@@ -737,6 +737,10 @@ instance FromJSON Type_ where
             "UnitType" ->
                 return UnitType
 
+            "TypeVariable" ->
+                TypeVariable
+                    <$> obj .: "name"
+
             _ ->
                 fail ("unexpected Type tag: " <> tag)
 
@@ -1284,6 +1288,9 @@ instance FromPublicAST 'TypeNK where
     toRawAST' = \case
         UnitType ->
             AST.UnitType []
+
+        TypeVariable name ->
+            AST.TypeVariable name
 
 
 --
