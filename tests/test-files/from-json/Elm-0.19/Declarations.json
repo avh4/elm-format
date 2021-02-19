@@ -1,0 +1,13 @@
+{
+    "moduleName": "Declarations",
+    "body": [
+        {
+            "tag": "TypeAlias",
+            "name": "MyTypeAlias",
+            "parameters": [],
+            "type": {
+                "tag": "UnitType"
+            }
+        }
+    ]
+}
