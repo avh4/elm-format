@@ -200,8 +200,8 @@ makeImportInfo knownContentsRaw imports =
 
 makeKnownContent :: (String, List String) -> (List UppercaseIdentifier, List LocalName)
 makeKnownContent (moduleName, known) =
-    ( fmap UppercaseIdentifier $ splitOn "." moduleName
-    , fmap (VarName . LowercaseIdentifier) known
+    ( UppercaseIdentifier <$> splitOn "." moduleName
+    , VarName . LowercaseIdentifier <$> known
     )
 
 
