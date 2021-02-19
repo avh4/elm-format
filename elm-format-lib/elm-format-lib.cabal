@@ -37,6 +37,15 @@ common common-options
         AST.Helpers
         Box
         ElmFormat.AST.PatternMatching
+        ElmFormat.AST.PublicAST.Comment
+        ElmFormat.AST.PublicAST.Config
+        ElmFormat.AST.PublicAST.Core
+        ElmFormat.AST.PublicAST.Expression
+        ElmFormat.AST.PublicAST.MaybeF
+        ElmFormat.AST.PublicAST.Module
+        ElmFormat.AST.PublicAST.Pattern
+        ElmFormat.AST.PublicAST.Reference
+        ElmFormat.AST.PublicAST.Type
         ElmFormat.Render.Box
         ElmFormat.Render.ElmStructure
         Parse.Binop
