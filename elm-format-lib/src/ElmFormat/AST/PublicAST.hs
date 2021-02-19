@@ -35,6 +35,7 @@ import Data.Aeson
 import Data.Aeson.Encoding.Internal (pair)
 import qualified Data.Aeson.Encoding.Internal as AesonInternal
 import GHC.Generics
+import qualified Data.Char as Char
 
 
 data LocatedIfRequested a
@@ -54,6 +55,18 @@ instance Traversable LocatedIfRequested where
 fromLocated :: Config -> Located a -> LocatedIfRequested a
 fromLocated config =
     LocatedIfRequested (showSourceLocation config)
+
+instance (ToPairs a, ToJSON a) => ToJSON (LocatedIfRequested a) where
+    toJSON = undefined
+    toEncoding (LocatedIfRequested showSourceLocation (A region a)) =
+        if showSourceLocation
+            then toEncoding (A region a)
+            else toEncoding a
+
+instance (FromJSON a) => FromJSON (LocatedIfRequested a) where
+    parseJSON json =
+        -- TODO: should refactor LocatedIfRequested to use Maybe Region instead of (Bool, Region)
+        (LocatedIfRequested False . noRegion) <$> parseJSON json
 
 
 data ModuleName =
@@ -164,14 +177,7 @@ toModule (Module (ModuleName name) imports body) =
         )
         (noRegion Nothing)
         (C [] mempty)
-        (f $ AST.TopLevel
-            [ AST.Entry $ f $ AST.Definition
-                (f $ AST.VarPattern $ LowercaseIdentifier "f")
-                []
-                []
-                (f $ AST.Unit [])
-            ]
-        )
+        (f $ AST.TopLevel $ mconcat $ fmap (toTopLevelStructures . extract) body)
     where
         f = I.Fix . Identity
 
@@ -190,10 +196,10 @@ instance FromJSON Module where
         moduleName <- obj .: "moduleName"
         -- TODO: parse imports
         -- TODO: parse body
-        return $ Module
+        Module
             (ModuleName [ UppercaseIdentifier moduleName ])
             mempty
-            []
+            <$> obj .: "body"
 
 
 data Import
@@ -361,6 +367,20 @@ instance ToPairs Definition where
                 , "$" .= info
                 ]
 
+instance FromJSON Definition where
+    parseJSON = withObject "Definition" $ \obj -> do
+        tag <- obj .: "tag"
+        case tag of
+            "Definition" ->
+                Definition
+                    <$> obj .: "name"
+                    <*> return [] -- TODO
+                    <*> return Nothing -- TODO
+                    <*> obj .: "expression"
+
+            _ ->
+                fail ("unexpected Definition tag: " <> tag)
+
 
 data TopLevelStructure
     = DefinitionStructure Definition
@@ -376,7 +396,6 @@ data TopLevelStructure
         }
     | Comment_tls Comment
     | TODO_TopLevelStructure String
-
 
 fromTopLevelStructures :: Config -> ASTNS Located [UppercaseIdentifier] 'TopLevelNK -> List (MaybeF LocatedIfRequested TopLevelStructure)
 fromTopLevelStructures config (I.Fix (A _ (AST.TopLevel decls))) =
@@ -416,6 +435,21 @@ fromTopLevelStructures config (I.Fix (A _ (AST.TopLevel decls))) =
     in
     mkDefinitions config DefinitionStructure $ fmap toDefBuilder decls
 
+toTopLevelStructures :: TopLevelStructure -> List (AST.TopLevelStructure (ASTNS Identity [UppercaseIdentifier] 'DeclarationNK))
+toTopLevelStructures = \case
+    DefinitionStructure (Definition name parameters returnType expression) ->
+        pure $ AST.Entry $ I.Fix $ Identity $ AST.Definition
+            (I.Fix $ Identity $ AST.VarPattern name)
+            [] -- TODO
+            []
+            (toRawAST expression)
+
+    TypeAlias name parameters typ ->
+        pure $ AST.Entry $ I.Fix $ Identity $ AST.TypeAlias
+            []
+            (C ([], []) (AST.NameWithArgs name (fmap (C []) parameters)))
+            (C [] $ toRawAST typ)
+
 instance ToJSON TopLevelStructure where
     toJSON = undefined
     toEncoding = pairs . toPairs
@@ -446,6 +480,22 @@ instance ToPairs TopLevelStructure where
 
         TODO_TopLevelStructure s ->
             "TODO" .= s
+
+instance FromJSON TopLevelStructure where
+    parseJSON = withObject "TopLevelStructure" $ \obj -> do
+        tag <- obj .: "tag"
+        case tag of
+            "Definition" ->
+                DefinitionStructure <$> parseJSON (Object obj)
+
+            "TypeAlias" ->
+                TypeAlias
+                    <$> obj .: "name"
+                    <*> obj .: "parameters"
+                    <*> obj .: "type"
+
+            other ->
+                fail ("unexpected TopLevelStructure tag: " <> tag)
 
 
 data Reference
@@ -680,6 +730,16 @@ instance ToPairs Type_ where
                 , "argumentTypes" .= argumentTypes
                 ]
 
+instance FromJSON Type_ where
+    parseJSON = withObject "Type" $ \obj -> do
+        tag <- obj .: "tag"
+        case tag of
+            "UnitType" ->
+                return UnitType
+
+            _ ->
+                fail ("unexpected Type tag: " <> tag)
+
 
 newtype RecordDisplay
     = RecordDisplay
@@ -863,6 +923,11 @@ instance (ToJSON a, ToJSON (f a)) => ToJSON (MaybeF f a) where
         JustF fa -> toEncoding fa
         NothingF a -> toEncoding a
 
+instance (FromJSON (f a)) => FromJSON (MaybeF f a) where
+    parseJSON json =
+        -- TODO: should this fall back to parsing an `a`?
+        JustF <$> parseJSON json
+
 
 instance ToPublicAST 'ExpressionNK where
     type PublicAST 'ExpressionNK = Expression
@@ -960,6 +1025,10 @@ instance ToPublicAST 'ExpressionNK where
         AST.GLShader shader ->
             GLShader shader
 
+instance FromPublicAST 'ExpressionNK where
+    toRawAST' = \case
+        UnitLiteral ->
+            AST.Unit []
 
 instance ToJSON Expression where
     toJSON = undefined
@@ -1068,6 +1137,16 @@ instance ToPairs Expression where
                 , "shaderSource" .= shaderSource
                 ]
 
+instance FromJSON Expression where
+    parseJSON = withObject "Expression" $ \obj -> do
+        tag <- obj .: "tag"
+        case tag of
+            "UnitLiteral" ->
+                return UnitLiteral
+
+            _ ->
+                fail ("unexpected Expression tag: " <> tag)
+
 
 --
 -- Transformation from raw AST to PublicAST
@@ -1078,10 +1157,17 @@ class ToPublicAST (nk :: NodeKind) where
     type PublicAST nk
     fromRawAST' :: Config -> ASTNS1 Located [UppercaseIdentifier] nk -> PublicAST nk
 
-
 fromRawAST :: ToPublicAST nk => Config -> ASTNS Located [UppercaseIdentifier] nk -> LocatedIfRequested (PublicAST nk)
 fromRawAST config =
     fmap (fromRawAST' config) . fromLocated config . I.unFix
+
+
+class ToPublicAST nk => FromPublicAST (nk :: NodeKind) where
+    toRawAST' :: PublicAST nk -> ASTNS1 Identity [UppercaseIdentifier] nk
+
+toRawAST :: FromPublicAST nk => LocatedIfRequested (PublicAST nk) -> ASTNS Identity [UppercaseIdentifier] nk
+toRawAST =
+    I.Fix . Identity . toRawAST' . extract
 
 
 instance ToPublicAST 'PatternNK where
@@ -1194,6 +1280,11 @@ instance ToPublicAST 'TypeNK where
                     done (acc, last) =
                         (ReversedList.toList acc, last)
 
+instance FromPublicAST 'TypeNK where
+    toRawAST' = \case
+        UnitType ->
+            AST.UnitType []
+
 
 --
 -- JSON serialization
@@ -1234,14 +1325,6 @@ instance ToJSON Region where
             ]
 
 
-instance (ToPairs a, ToJSON a) => ToJSON (LocatedIfRequested a) where
-    toJSON = undefined
-    toEncoding (LocatedIfRequested showSourceLocation (A region a)) =
-        if showSourceLocation
-            then toEncoding (A region a)
-            else toEncoding a
-
-
 instance ToJSON Region.Position where
     toJSON = undefined
     toEncoding pos =
@@ -1255,6 +1338,15 @@ instance ToJSON UppercaseIdentifier where
     toJSON = undefined
     toEncoding (UppercaseIdentifier name) = toEncoding name
 
+instance FromJSON UppercaseIdentifier where
+    parseJSON = withText "UppercaseIdentifier" $ \case
+        -- XXX: shouldn't crash on empty string
+        text | Char.isUpper $ Text.head text ->
+            return $ UppercaseIdentifier $ Text.unpack text
+
+        _ ->
+            fail "expected a string starting with an uppercase letter"
+
 
 instance ToJSON LowercaseIdentifier where
     toJSON = undefined
@@ -1264,6 +1356,15 @@ instance ToJSONKey LowercaseIdentifier where
         ToJSONKeyText
             (\(LowercaseIdentifier name) -> Text.pack name)
             (\(LowercaseIdentifier name) -> AesonInternal.string name)
+
+instance FromJSON LowercaseIdentifier where
+    parseJSON = withText "LowercaseIdentifier" $ \case
+        -- XXX: shouldn't crash on empty string
+        text | Char.isLower $ Text.head text ->
+            return $ LowercaseIdentifier $ Text.unpack text
+
+        _ ->
+            fail "expected a string starting with a lowercase letter"
 
 
 instance ToJSON SymbolIdentifier where
