@@ -47,6 +47,21 @@
             "expression": {
                 "tag": "UnitLiteral"
             }
+        },
+        {
+            "tag": "Definition",
+            "name": "variables",
+            "parameters": [
+                {
+                    "pattern": {
+                        "tag": "VariableDefinition",
+                        "name": "x"
+                    }
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
         }
     ]
 }

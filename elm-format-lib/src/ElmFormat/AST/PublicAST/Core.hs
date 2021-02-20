@@ -128,6 +128,11 @@ instance ToPairs VariableDefinition where
             , "name" .= name
             ]
 
+instance FromJSON VariableDefinition where
+    parseJSON = withObject "VariableDefinition" $ \obj -> do
+        VariableDefinition
+            <$> obj .: "name"
+
 
 newtype RecordDisplay
     = RecordDisplay

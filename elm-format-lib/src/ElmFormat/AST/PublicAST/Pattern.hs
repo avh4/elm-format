@@ -109,6 +109,9 @@ instance FromPublicAST 'PatternNK where
         LiteralPattern lit ->
             AST.LiteralPattern lit
 
+        VariablePattern (VariableDefinition name) ->
+            AST.VarPattern name
+
 instance ToJSON Pattern where
     toJSON = undefined
     toEncoding = pairs . toPairs
@@ -182,6 +185,9 @@ instance FromJSON Pattern where
 
             "CharLiteral" ->
                 LiteralPattern <$> parseJSON (Object obj)
+
+            "VariableDefinition" ->
+                VariablePattern <$> parseJSON (Object obj)
 
             _ ->
                 fail ("unexpected Pattern tag: " <> tag)
