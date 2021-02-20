@@ -231,6 +231,8 @@ instance FromJSON LowercaseIdentifier where
 
         _ ->
             fail "expected a string starting with a lowercase letter"
+instance FromJSONKey LowercaseIdentifier where
+    fromJSONKey = FromJSONKeyText (LowercaseIdentifier . Text.unpack)
 
 
 instance ToJSON SymbolIdentifier where
