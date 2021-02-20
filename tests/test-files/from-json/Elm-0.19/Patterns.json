@@ -170,6 +170,45 @@
             "expression": {
                 "tag": "UnitLiteral"
             }
+        },
+        {
+            "tag": "Definition",
+            "name": "emptyRecord",
+            "parameters": [
+                {
+                    "pattern": {
+                        "tag": "RecordPattern",
+                        "fields": []
+                    }
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "record",
+            "parameters": [
+                {
+                    "pattern": {
+                        "tag": "RecordPattern",
+                        "fields": [
+                            {
+                                "name": "x",
+                                "tag": "VariableDefinition"
+                            },
+                            {
+                                "name": "y",
+                                "tag": "VariableDefinition"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
         }
     ]
 }
