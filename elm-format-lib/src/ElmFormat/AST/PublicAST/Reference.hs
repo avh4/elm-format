@@ -1,7 +1,6 @@
 module ElmFormat.AST.PublicAST.Reference (Reference(..),mkReference,toRef) where
 
 import ElmFormat.AST.PublicAST.Core
-import qualified Data.Text as Text
 
 
 data Reference
@@ -45,6 +44,15 @@ toRef = \case
     VariableReference (OpRef sym) ->
         OpRef sym
 
+    ExternalReference (ModuleName mod) (VarRef () var) ->
+        VarRef mod var
+
+    ExternalReference (ModuleName mod) (TagRef () tag) ->
+        TagRef mod tag
+
+    ExternalReference (ModuleName mod) (OpRef sym) ->
+        OpRef sym
+
 
 instance ToJSON Reference where
     toJSON = undefined
@@ -70,13 +78,13 @@ instance FromJSON Reference where
         tag <- obj .: "tag"
         case tag of
             "VariableReference" -> do
-                name <- obj .: "name"
-                case refFromText name of
-                    Nothing ->
-                        fail ("invalid Reference name: " <> Text.unpack name)
+                VariableReference
+                    <$> obj .: "name"
 
-                    Just ref ->
-                        return $ VariableReference ref
+            "ExternalReference" ->
+                ExternalReference
+                    <$> obj .: "module"
+                    <*> obj .: "identifier"
 
             _ ->
                 fail ("unexpected Reference tag: " <> tag)

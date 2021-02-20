@@ -79,6 +79,20 @@
                             { "tag": "AnythingPattern" }
                         ]
                     }
+                },
+                {
+                    "pattern": {
+                        "tag": "DataPattern",
+                        "constructor": {
+                            "tag": "ExternalReference",
+                            "module": "Maybe",
+                            "identifier": "Just"
+                        },
+                        "arguments": [
+                            { "tag": "AnythingPattern" },
+                            { "tag": "AnythingPattern" }
+                        ]
+                    }
                 }
             ],
             "expression": {
