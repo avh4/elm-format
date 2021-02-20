@@ -18,6 +18,7 @@ import qualified Data.Indexed as I
 import qualified Cheapskate.Types as Markdown
 import ElmFormat.AST.Shared
 import qualified Data.Maybe as Maybe
+import Data.Text (Text)
 
 
 newtype ForceMultiline =
@@ -58,9 +59,10 @@ type C0Eol = Commented (Maybe String)
 type C1Eol (l1 :: CommentType) = Commented (Comments, Maybe String)
 type C2Eol (l1 :: CommentType) (l2 :: CommentType) = Commented (Comments, Comments, Maybe String)
 
-class ToCommentedList f where
+class AsCommentedList f where
     type CommentsFor f :: * -> *
     toCommentedList :: f a -> List (CommentsFor f a)
+    fromCommentedList :: List (CommentsFor f a) -> Either Text (f a)
 
 
 {-| This represents a list of things separated by comments.
@@ -82,9 +84,10 @@ instance Semigroup (Sequence a) where
 instance Monoid (Sequence a) where
     mempty = Sequence []
 
-instance ToCommentedList Sequence where
+instance AsCommentedList Sequence where
     type CommentsFor Sequence = C2Eol 'BeforeSeparator 'AfterSeparator
     toCommentedList (Sequence items) = items
+    fromCommentedList = Right . Sequence
 
 
 {-| This represents a list of things between clear start and end delimiters.
@@ -137,10 +140,19 @@ data OpenCommentedList a
 instance Foldable OpenCommentedList where
     foldMap f (OpenCommentedList rest last) = foldMap (f . extract) rest <> (f . extract) last
 
-instance ToCommentedList OpenCommentedList where
+instance AsCommentedList OpenCommentedList where
     type CommentsFor OpenCommentedList = C2Eol 'BeforeTerm 'AfterTerm
     toCommentedList (OpenCommentedList rest (C (cLast, eolLast) last)) =
         rest ++ [ C (cLast, [], eolLast) last ]
+    fromCommentedList list =
+        case reverse list of
+            C (cLast, cLastInvalid, eolLast) last : revRest ->
+                Right $ OpenCommentedList
+                    (reverse revRest)
+                    (C (cLast ++ cLastInvalid, eolLast) last)
+
+            [] ->
+                Left "AsCommentedList may not be empty"
 
 
 exposedToOpen :: Comments -> ExposedCommentedList a -> OpenCommentedList a

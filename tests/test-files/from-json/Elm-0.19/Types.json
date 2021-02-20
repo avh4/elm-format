@@ -54,6 +54,19 @@
                     { "tag": "UnitType" }
                 ]
             }
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyFunctionType",
+            "parameters": [],
+            "type": {
+                "tag": "FunctionType",
+                "returnType": { "tag": "UnitType" },
+                "argumentTypes": [
+                    { "tag": "UnitType" },
+                    { "tag": "UnitType" }
+                ]
+            }
         }
     ]
 }
