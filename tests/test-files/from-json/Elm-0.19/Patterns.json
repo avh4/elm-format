@@ -116,6 +116,60 @@
             "expression": {
                 "tag": "UnitLiteral"
             }
+        },
+        {
+            "tag": "Definition",
+            "name": "emptyList",
+            "parameters": [
+                {
+                    "pattern": {
+                        "tag": "ListPattern",
+                        "prefix": [],
+                        "rest": null
+                    }
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "closedList",
+            "parameters": [
+                {
+                    "pattern": {
+                        "tag": "ListPattern",
+                        "prefix": [
+                            { "tag": "AnythingPattern" },
+                            { "tag": "AnythingPattern" }
+                        ],
+                        "rest": null
+                    }
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "openList",
+            "parameters": [
+                {
+                    "pattern": {
+                        "tag": "ListPattern",
+                        "prefix": [
+                            { "tag": "AnythingPattern" },
+                            { "tag": "AnythingPattern" }
+                        ],
+                        "rest": { "tag": "AnythingPattern" }
+                    }
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
         }
     ]
 }
