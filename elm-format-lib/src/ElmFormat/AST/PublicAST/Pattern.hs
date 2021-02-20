@@ -112,6 +112,16 @@ instance FromPublicAST 'PatternNK where
         VariablePattern (VariableDefinition name) ->
             AST.VarPattern name
 
+        DataPattern constructor arguments ->
+            case toRef constructor of
+                TagRef ns tag ->
+                    AST.DataPattern
+                        (ns, tag)
+                        (C [] . toRawAST <$> arguments)
+
+                ref ->
+                    error ("invalid DataPattern constructor: " <> show ref)
+
 instance ToJSON Pattern where
     toJSON = undefined
     toEncoding = pairs . toPairs
@@ -188,6 +198,11 @@ instance FromJSON Pattern where
 
             "VariableDefinition" ->
                 VariablePattern <$> parseJSON (Object obj)
+
+            "DataPattern" ->
+                DataPattern
+                    <$> obj .: "constructor"
+                    <*> obj .: "arguments"
 
             _ ->
                 fail ("unexpected Pattern tag: " <> tag)

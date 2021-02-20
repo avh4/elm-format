@@ -6,6 +6,10 @@ module ElmFormat.AST.Shared where
 import Data.Coapplicative
 import Data.Int (Int64)
 import GHC.Generics
+import Data.Text (Text)
+import qualified Data.Text as Text
+import qualified Data.Tuple as Tuple
+import qualified Data.Char as Char
 
 {-| This module contains types that are used by multiple versions of the Elm AST.
 -}
@@ -73,6 +77,21 @@ data Ref ns
     | TagRef ns UppercaseIdentifier
     | OpRef SymbolIdentifier
     deriving (Eq, Ord, Show, Functor)
+
+refFromText :: Text -> Maybe (Ref ())
+refFromText text =
+    case Tuple.fst <$> Text.uncons text of
+        Just first | Char.isUpper first ->
+            Just $ TagRef () (UppercaseIdentifier $ Text.unpack text)
+
+        Just first | Char.isLower first ->
+            Just $ VarRef () (LowercaseIdentifier $ Text.unpack text)
+
+        Just _ ->
+            Just $ OpRef (SymbolIdentifier $ Text.unpack text)
+
+        Nothing ->
+            Nothing
 
 
 data UnaryOperator =
