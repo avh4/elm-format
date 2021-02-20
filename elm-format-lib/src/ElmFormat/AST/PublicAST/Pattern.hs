@@ -6,8 +6,8 @@ module ElmFormat.AST.PublicAST.Pattern (Pattern(..), mkListPattern) where
 import ElmFormat.AST.PublicAST.Core
 import ElmFormat.AST.PublicAST.Reference
 import qualified AST.V0_16 as AST
-import qualified Data.Indexed as I
 import qualified Data.Either as Either
+import qualified ElmFormat.AST.PublicAST.Core as Core
 
 
 data Pattern
@@ -96,7 +96,7 @@ instance ToPublicAST 'PatternNK where
 
         AST.RecordPattern fields ->
             RecordPattern
-                (fmap (VariableDefinition . (\(C comments a) -> a)) fields)
+                (VariableDefinition . (\(C comments a) -> a) <$> fields)
 
         AST.Alias (C comments1 pat) (C comments2 name) ->
             PatternAlias
@@ -148,6 +148,13 @@ instance FromPublicAST 'PatternNK where
                     AST.ConsPattern
                         (C Nothing first)
                         (Either.fromRight undefined $ AST.fromCommentedList $ C ([], [], Nothing) <$> rest)
+
+        RecordPattern [] ->
+            AST.EmptyRecordPattern []
+
+        RecordPattern some ->
+            AST.RecordPattern
+                (C ([], []) . Core.name <$> some)
 
 
 instance ToJSON Pattern where
@@ -243,6 +250,10 @@ instance FromJSON Pattern where
                 ListPattern
                     <$> obj .: "prefix"
                     <*> obj .: "rest"
+
+            "RecordPattern" ->
+                RecordPattern
+                    <$> obj .: "fields"
 
             _ ->
                 fail ("unexpected Pattern tag: " <> tag)
