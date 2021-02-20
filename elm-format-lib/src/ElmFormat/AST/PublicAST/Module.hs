@@ -163,7 +163,7 @@ toTopLevelStructures = \case
     DefinitionStructure (Definition name parameters returnType expression) ->
         pure $ AST.Entry $ I.Fix $ Identity $ AST.Definition
             (I.Fix $ Identity $ AST.VarPattern name)
-            [] -- TODO
+            (C [] . toRawAST . pattern <$> parameters)
             []
             (toRawAST expression)
 
