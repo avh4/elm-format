@@ -106,6 +106,9 @@ instance FromPublicAST 'PatternNK where
         AnythingPattern ->
             AST.Anything
 
+        LiteralPattern lit ->
+            AST.LiteralPattern lit
+
 instance ToJSON Pattern where
     toJSON = undefined
     toEncoding = pairs . toPairs
@@ -167,6 +170,18 @@ instance FromJSON Pattern where
         case tag of
             "AnythingPattern" ->
                 return AnythingPattern
+
+            "IntLiteral" ->
+                LiteralPattern <$> parseJSON (Object obj)
+
+            "FloatLiteral" ->
+                LiteralPattern <$> parseJSON (Object obj)
+
+            "StringLiteral" ->
+                LiteralPattern <$> parseJSON (Object obj)
+
+            "CharLiteral" ->
+                LiteralPattern <$> parseJSON (Object obj)
 
             _ ->
                 fail ("unexpected Pattern tag: " <> tag)

@@ -1,0 +1,52 @@
+{
+    "moduleName": "Patterns",
+    "body": [
+        {
+            "tag": "Definition",
+            "name": "wildcard",
+            "parameters": [
+                {
+                    "pattern": {
+                        "tag": "AnythingPattern"
+                    }
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "literals",
+            "parameters": [
+                {
+                    "pattern": {
+                        "tag": "IntLiteral",
+                        "value": 1
+                    }
+                },
+                {
+                    "pattern": {
+                        "tag": "FloatLiteral",
+                        "value": 2
+                    }
+                },
+                {
+                    "pattern": {
+                        "tag": "StringLiteral",
+                        "value": "string"
+                    }
+                },
+                {
+                    "pattern": {
+                        "tag": "CharLiteral",
+                        "value": "c"
+                    }
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        }
+    ]
+}

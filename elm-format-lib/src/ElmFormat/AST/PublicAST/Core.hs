@@ -323,6 +323,32 @@ instance ToPairs AST.LiteralValue where
                     ("representation" .= repr)
                 ]
 
+instance FromJSON AST.LiteralValue  where
+    parseJSON = withObject "LiteralValue" $ \obj -> do
+        tag <- obj .: "tag"
+        case tag of
+            "IntLiteral" ->
+                AST.IntNum
+                    <$> obj .: "value"
+                    <*> return DecimalInt
+
+            "FloatLiteral" ->
+                AST.FloatNum
+                    <$> obj .: "value"
+                    <*> return DecimalFloat
+
+            "CharLiteral" ->
+                AST.Chr
+                    <$> obj .: "value"
+
+            "StringLiteral" ->
+                AST.Str
+                    <$> obj .: "value"
+                    <*> return SingleQuotedString
+
+            _ ->
+                fail ("unexpected LiteralValue tag: " <> tag)
+
 
 instance ToJSON IntRepresentation where
     toEncoding = genericToEncoding defaultOptions
