@@ -1,6 +1,7 @@
-module ElmFormat.AST.PublicAST.Reference (Reference(..),mkReference) where
+module ElmFormat.AST.PublicAST.Reference (Reference(..),mkReference,toRef) where
 
 import ElmFormat.AST.PublicAST.Core
+import qualified Data.Text as Text
 
 
 data Reference
@@ -33,6 +34,18 @@ mkReference = \case
     OpRef sym ->
         VariableReference $ OpRef sym
 
+toRef :: Reference -> Ref [UppercaseIdentifier]
+toRef = \case
+    VariableReference (VarRef () var) ->
+        VarRef [] var
+
+    VariableReference (TagRef () tag) ->
+        TagRef [] tag
+
+    VariableReference (OpRef sym) ->
+        OpRef sym
+
+
 instance ToJSON Reference where
     toJSON = undefined
     toEncoding = pairs . toPairs
@@ -52,4 +65,18 @@ instance ToPairs Reference where
                 , "name" .= name
                 ]
 
+instance FromJSON Reference where
+    parseJSON = withObject "Reference" $ \obj -> do
+        tag <- obj .: "tag"
+        case tag of
+            "VariableReference" -> do
+                name <- obj .: "name"
+                case refFromText name of
+                    Nothing ->
+                        fail ("invalid Reference name: " <> Text.unpack name)
 
+                    Just ref ->
+                        return $ VariableReference ref
+
+            _ ->
+                fail ("unexpected Reference tag: " <> tag)
