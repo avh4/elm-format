@@ -84,6 +84,38 @@
             "expression": {
                 "tag": "UnitLiteral"
             }
+        },
+        {
+            "tag": "Definition",
+            "name": "unit",
+            "parameters": [
+                {
+                    "pattern": {
+                        "tag": "UnitPattern"
+                    }
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "tuple",
+            "parameters": [
+                {
+                    "pattern": {
+                        "tag": "TuplePattern",
+                        "terms": [
+                            { "tag": "AnythingPattern" },
+                            { "tag": "AnythingPattern" }
+                        ]
+                    }
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
         }
     ]
 }

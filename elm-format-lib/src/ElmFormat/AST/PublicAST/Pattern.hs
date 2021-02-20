@@ -62,15 +62,15 @@ instance ToPublicAST 'PatternNK where
 
         AST.DataPattern (namespace, tag) args ->
             DataPattern
-                (mkReference (TagRef namespace tag))
-                (fmap (fromRawAST config . (\(C comments a) -> a)) args)
+                (mkReference $ TagRef namespace tag)
+                (fromRawAST config . (\(C comments a) -> a) <$> args)
 
         AST.PatternParens (C (pre, post) pat) ->
             extract $ fromRawAST config pat
 
         AST.TuplePattern terms ->
             TuplePattern
-                (fmap (fromRawAST config . (\(C comments a) -> a)) terms)
+                (fromRawAST config . (\(C (c1, c2) a) -> a) <$> terms)
 
         AST.EmptyListPattern comments ->
             mkListPattern [] Nothing
@@ -106,6 +106,9 @@ instance FromPublicAST 'PatternNK where
         AnythingPattern ->
             AST.Anything
 
+        UnitPattern ->
+            AST.UnitPattern []
+
         LiteralPattern lit ->
             AST.LiteralPattern lit
 
@@ -121,6 +124,10 @@ instance FromPublicAST 'PatternNK where
 
                 ref ->
                     error ("invalid DataPattern constructor: " <> show ref)
+
+        TuplePattern terms ->
+            AST.TuplePattern
+                (C ([], []) . toRawAST <$> terms)
 
 instance ToJSON Pattern where
     toJSON = undefined
@@ -184,6 +191,9 @@ instance FromJSON Pattern where
             "AnythingPattern" ->
                 return AnythingPattern
 
+            "UnitPattern" ->
+                return UnitPattern
+
             "IntLiteral" ->
                 LiteralPattern <$> parseJSON (Object obj)
 
@@ -203,6 +213,10 @@ instance FromJSON Pattern where
                 DataPattern
                     <$> obj .: "constructor"
                     <*> obj .: "arguments"
+
+            "TuplePattern" ->
+                TuplePattern
+                    <$> obj .: "terms"
 
             _ ->
                 fail ("unexpected Pattern tag: " <> tag)
