@@ -1,4 +1,4 @@
-module Patterns exposing (literals, wildcard)
+module Patterns exposing (literals, variables, wildcard)
 
 
 wildcard _ =
@@ -6,4 +6,8 @@ wildcard _ =
 
 
 literals 1 2.0 "string" 'c' =
+    ()
+
+
+variables x =
     ()
