@@ -223,6 +223,27 @@
             "expression": {
                 "tag": "UnitLiteral"
             }
+        },
+        {
+            "tag": "Definition",
+            "name": "alias",
+            "parameters": [
+                {
+                    "pattern": {
+                        "tag": "PatternAlias",
+                        "alias": {
+                            "name": "x",
+                            "tag": "VariableDefinition"
+                        },
+                        "pattern": {
+                            "tag": "AnythingPattern"
+                        }
+                    }
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
         }
     ]
 }

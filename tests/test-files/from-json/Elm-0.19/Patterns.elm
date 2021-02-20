@@ -1,4 +1,4 @@
-module Patterns exposing (closedList, data, emptyList, emptyRecord, literals, openList, record, tuple, unit, variables, wildcard)
+module Patterns exposing (alias, closedList, data, emptyList, emptyRecord, literals, openList, record, tuple, unit, variables, wildcard)
 
 
 wildcard _ =
@@ -42,4 +42,8 @@ emptyRecord {} =
 
 
 record { x, y } =
+    ()
+
+
+alias (_ as x) =
     ()

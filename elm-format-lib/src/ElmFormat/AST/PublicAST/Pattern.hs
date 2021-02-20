@@ -156,6 +156,11 @@ instance FromPublicAST 'PatternNK where
             AST.RecordPattern
                 (C ([], []) . Core.name <$> some)
 
+        PatternAlias alias pattern  ->
+            AST.Alias
+                (C [] $ toRawAST pattern)
+                (C [] $ Core.name alias)
+
 
 instance ToJSON Pattern where
     toJSON = undefined
@@ -254,6 +259,11 @@ instance FromJSON Pattern where
             "RecordPattern" ->
                 RecordPattern
                     <$> obj .: "fields"
+
+            "PatternAlias" ->
+                PatternAlias
+                    <$> obj .: "alias"
+                    <*> obj .: "pattern"
 
             _ ->
                 fail ("unexpected Pattern tag: " <> tag)
