@@ -1,4 +1,4 @@
-module Patterns exposing (data, literals, variables, wildcard)
+module Patterns exposing (data, literals, tuple, unit, variables, wildcard)
 
 
 wildcard _ =
@@ -14,4 +14,12 @@ variables x =
 
 
 data (Foo _ _) =
+    ()
+
+
+unit () =
+    ()
+
+
+tuple ( _, _ ) =
     ()
