@@ -13,7 +13,7 @@ variables x =
     ()
 
 
-data (Foo _ _) =
+data (Foo _ _) (Maybe.Just _ _) =
     ()
 
 

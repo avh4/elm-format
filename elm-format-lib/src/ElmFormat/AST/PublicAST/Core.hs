@@ -355,6 +355,16 @@ instance FromJSON AST.LiteralValue  where
                 fail ("unexpected LiteralValue tag: " <> tag)
 
 
+instance FromJSON (Ref ()) where
+    parseJSON = withText "Ref" $ \text ->
+        case refFromText text of
+            Nothing ->
+                fail ("invalid Reference name: " <> Text.unpack text)
+
+            Just ref ->
+                return ref
+
+
 instance ToJSON IntRepresentation where
     toEncoding = genericToEncoding defaultOptions
 
