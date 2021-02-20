@@ -6,6 +6,8 @@ module ElmFormat.AST.PublicAST.Pattern (Pattern(..), mkListPattern) where
 import ElmFormat.AST.PublicAST.Core
 import ElmFormat.AST.PublicAST.Reference
 import qualified AST.V0_16 as AST
+import qualified Data.Indexed as I
+import qualified Data.Either as Either
 
 
 data Pattern
@@ -129,6 +131,25 @@ instance FromPublicAST 'PatternNK where
             AST.TuplePattern
                 (C ([], []) . toRawAST <$> terms)
 
+        ListPattern [] Nothing ->
+            AST.EmptyListPattern []
+
+        ListPattern some Nothing ->
+            AST.ListPattern
+                (C ([], []) . toRawAST <$> some)
+
+        ListPattern prefix (Just rest) ->
+            done $ foldr step (toRawAST rest, []) (toRawAST <$> prefix)
+            where
+                step next (first, rest) =
+                    (next, first : rest)
+
+                done (first, rest) =
+                    AST.ConsPattern
+                        (C Nothing first)
+                        (Either.fromRight undefined $ AST.fromCommentedList $ C ([], [], Nothing) <$> rest)
+
+
 instance ToJSON Pattern where
     toJSON = undefined
     toEncoding = pairs . toPairs
@@ -217,6 +238,11 @@ instance FromJSON Pattern where
             "TuplePattern" ->
                 TuplePattern
                     <$> obj .: "terms"
+
+            "ListPattern" ->
+                ListPattern
+                    <$> obj .: "prefix"
+                    <*> obj .: "rest"
 
             _ ->
                 fail ("unexpected Pattern tag: " <> tag)

@@ -1,4 +1,4 @@
-module Patterns exposing (data, literals, tuple, unit, variables, wildcard)
+module Patterns exposing (closedList, data, emptyList, literals, openList, tuple, unit, variables, wildcard)
 
 
 wildcard _ =
@@ -22,4 +22,16 @@ unit () =
 
 
 tuple ( _, _ ) =
+    ()
+
+
+emptyList [] =
+    ()
+
+
+closedList [ _, _ ] =
+    ()
+
+
+openList (_ :: _ :: _) =
     ()
