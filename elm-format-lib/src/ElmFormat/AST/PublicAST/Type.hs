@@ -10,6 +10,7 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Indexed as I
 import qualified Data.ReversedList as ReversedList
 import Data.ReversedList (Reversed)
+import qualified Data.Either as Either
 
 
 data Type_
@@ -103,6 +104,17 @@ instance FromPublicAST 'TypeNK where
                 (C ([], [], Nothing) . toRawAST <$> terms)
                 (AST.ForceMultiline False)
 
+        FunctionType returnType argumentTypes ->
+            case argumentTypes ++ [ returnType ] of
+                first : rest ->
+                    AST.FunctionType
+                        (C Nothing $ toRawAST first)
+                        (Either.fromRight undefined $ AST.fromCommentedList $ fmap (C ([], [], Nothing) . toRawAST) rest)
+                        (AST.ForceMultiline False)
+
+                [] ->
+                    undefined
+
 instance ToJSON Type_ where
     toJSON = undefined
     toEncoding = pairs . toPairs
@@ -176,6 +188,11 @@ instance FromJSON Type_ where
             "TupleType" ->
                 TupleType
                     <$> obj .: "terms"
+
+            "FunctionType" ->
+                FunctionType
+                    <$> obj .: "returnType"
+                    <*> obj .: "argumentTypes"
 
             _ ->
                 fail ("unexpected Type tag: \"" <> tag <> "\"")
