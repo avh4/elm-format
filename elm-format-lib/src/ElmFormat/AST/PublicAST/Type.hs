@@ -49,6 +49,9 @@ instance ToPublicAST 'TypeNK where
                 (ModuleName namespace)
                 (fmap (\(C comments a) -> fromRawAST config a) args)
 
+        AST.TypeConstruction (AST.TupleConstructor _) _ _ ->
+            error "TODO"
+
         AST.TypeVariable name ->
             TypeVariable name
 
@@ -62,9 +65,9 @@ instance ToPublicAST 'TypeNK where
         AST.RecordType base fields comments multiline ->
             RecordType
                 (fmap (\(C comments a) -> a) base)
-                (Map.fromList $ fmap (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, fromRawAST config value)) $ AST.toCommentedList fields)
+                (Map.fromList $ (\(C cp (Pair (C ck key) (C cv value) ml)) -> (key, fromRawAST config value)) <$> AST.toCommentedList fields)
                 $ RecordDisplay
-                    (fmap (extract . _key . extract) $ AST.toCommentedList fields)
+                    (extract . _key . extract <$> AST.toCommentedList fields)
 
         AST.FunctionType first rest multiline ->
             case firstRestToRestLast first (AST.toCommentedList rest) of
