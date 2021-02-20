@@ -1,4 +1,4 @@
-module Declarations exposing (MyFunctionType, MyTupleType, MyTypeReference, MyTypeReferenceWithArguments, MyTypeVariable, MyUnit)
+module Declarations exposing (MyFunctionType, MyRecordType, MyRecordTypeExtension, MyTupleType, MyTypeReference, MyTypeReferenceWithArguments, MyTypeVariable, MyUnit)
 
 
 type alias MyUnit =
@@ -19,6 +19,19 @@ type alias MyTypeVariable a =
 
 type alias MyTupleType =
     ( (), () )
+
+
+type alias MyRecordType =
+    { x : ()
+    , y : ()
+    }
+
+
+type alias MyRecordTypeExtension r =
+    { r
+        | x : ()
+        , y : ()
+    }
 
 
 type alias MyFunctionType =

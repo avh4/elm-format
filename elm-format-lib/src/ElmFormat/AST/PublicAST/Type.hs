@@ -104,6 +104,13 @@ instance FromPublicAST 'TypeNK where
                 (C ([], [], Nothing) . toRawAST <$> terms)
                 (AST.ForceMultiline False)
 
+        RecordType base fields display ->
+            AST.RecordType
+                (C ([], []) <$> base)
+                (Either.fromRight undefined $ AST.fromCommentedList ((\(key, value) -> C ([], [], Nothing) $ Pair (C [] key) (C [] $ toRawAST value) (AST.ForceMultiline False)) <$> Map.toList fields))
+                []
+                (AST.ForceMultiline True)
+
         FunctionType returnType argumentTypes ->
             case argumentTypes ++ [ returnType ] of
                 first : rest ->
@@ -188,6 +195,17 @@ instance FromJSON Type_ where
             "TupleType" ->
                 TupleType
                     <$> obj .: "terms"
+
+            "RecordType" ->
+                RecordType Nothing
+                    <$> obj .: "fields"
+                    <*> return (RecordDisplay [])
+
+            "RecordTypeExtension" ->
+                RecordType
+                    <$> (Just <$> obj .: "base")
+                    <*> obj .: "fields"
+                    <*> return (RecordDisplay [])
 
             "FunctionType" ->
                 FunctionType

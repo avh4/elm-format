@@ -57,6 +57,31 @@
         },
         {
             "tag": "TypeAlias",
+            "name": "MyRecordType",
+            "parameters": [],
+            "type": {
+                "tag": "RecordType",
+                "fields": {
+                    "x": { "tag": "UnitType" },
+                    "y": { "tag": "UnitType" }
+                }
+            }
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyRecordTypeExtension",
+            "parameters": [ "r" ],
+            "type": {
+                "tag": "RecordTypeExtension",
+                "base": "r",
+                "fields": {
+                    "x": { "tag": "UnitType" },
+                    "y": { "tag": "UnitType" }
+                }
+            }
+        },
+        {
+            "tag": "TypeAlias",
             "name": "MyFunctionType",
             "parameters": [],
             "type": {
