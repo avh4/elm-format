@@ -101,6 +101,11 @@ instance ToPublicAST 'PatternNK where
                 (VariableDefinition name)
                 (fromRawAST config pat)
 
+instance FromPublicAST 'PatternNK where
+    toRawAST' = \case
+        AnythingPattern ->
+            AST.Anything
+
 instance ToJSON Pattern where
     toJSON = undefined
     toEncoding = pairs . toPairs
@@ -155,3 +160,13 @@ instance ToPairs Pattern where
                 , "alias" .= alias
                 , "pattern" .= pat
                 ]
+
+instance FromJSON Pattern where
+    parseJSON = withObject "Pattern" $ \obj -> do
+        tag <- obj .: "tag"
+        case tag of
+            "AnythingPattern" ->
+                return AnythingPattern
+
+            _ ->
+                fail ("unexpected Pattern tag: " <> tag)

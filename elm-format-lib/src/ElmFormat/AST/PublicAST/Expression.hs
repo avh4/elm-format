@@ -4,7 +4,7 @@
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
-module ElmFormat.AST.PublicAST.Expression (Expression(..), Definition(..), DefinitionBuilder(..), CustomTypeVariant(..), mkDefinitions, mkCustomTypeVariant) where
+module ElmFormat.AST.PublicAST.Expression (Expression(..), Definition(..), DefinitionBuilder(..), TypedParameter(..), CustomTypeVariant(..), mkDefinitions, mkCustomTypeVariant) where
 
 import ElmFormat.AST.PublicAST.Core
 import ElmFormat.AST.PublicAST.Reference
@@ -409,6 +409,12 @@ instance ToJSON TypedParameter where
                 , "type" .= typ
                 ]
 
+instance FromJSON TypedParameter where
+    parseJSON = withObject "TypedParameter" $ \obj ->
+        TypedParameter
+            <$> obj .: "pattern"
+            <*> return Nothing
+
 
 data CustomTypeVariant
     = CustomTypeVariant
@@ -545,7 +551,7 @@ instance FromJSON Definition where
             "Definition" ->
                 Definition
                     <$> obj .: "name"
-                    <*> return [] -- TODO
+                    <*> obj .: "parameters"
                     <*> return Nothing -- TODO
                     <*> obj .: "expression"
 
