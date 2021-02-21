@@ -58,7 +58,7 @@ toModule (Module (ModuleName name) imports body) =
             Nothing
         )
         (noRegion Nothing)
-        (C [] mempty)
+        (C [] $ Map.mapKeys (\(ModuleName ns) -> ns) $ C [] . toImportMethod <$> imports)
         (f $ AST.TopLevel $ mconcat $ fmap (toTopLevelStructures . extract) body)
     where
         f = I.Fix . Identity
@@ -74,14 +74,11 @@ instance ToJSON Module where
                 ]
 
 instance FromJSON Module where
-    parseJSON = withObject "Module" $ \obj -> do
-        moduleName <- obj .: "moduleName"
-        -- TODO: parse imports
-        -- TODO: parse body
-        Module
-            (ModuleName [ UppercaseIdentifier moduleName ])
-            mempty
-            <$> obj .: "body"
+    parseJSON = withObject "Module" $ \obj ->
+        (\moduleName makeImports -> Module moduleName (Map.mapWithKey (\importModuleName makeImport -> makeImport importModuleName) makeImports))
+            <$> obj .: "moduleName"
+            <*> obj .:? "imports" .!= mempty
+            <*> obj .: "body"
 
 
 data Import
@@ -101,8 +98,26 @@ fromImportMethod moduleName (AST.ImportMethod alias (C comments exposing)) =
     in
     Import as_ exposing
 
+toImportMethod :: Import -> AST.ImportMethod
+toImportMethod (Import alias exposing) =
+    AST.ImportMethod
+        (case alias of
+            ModuleName [single] ->
+                Just $ C ([], []) single
+            _ ->
+                Nothing
+        )
+        (C ([], []) exposing)
+
 instance ToJSON Import where
     toEncoding = genericToEncoding defaultOptions
+
+instance FromJSON (ModuleName -> Import) where
+    -- This results in a function that when given that actual name of the module, returns the Import
+    parseJSON = withObject "Import" $ \obj ->
+        (\makeAs exposing moduleName -> Import (makeAs moduleName) exposing)
+            <$> (fmap const <$> obj .:? "as") .!= id
+            <*> obj .:? "exposing" .!= AST.ClosedListing
 
 
 data TopLevelStructure
