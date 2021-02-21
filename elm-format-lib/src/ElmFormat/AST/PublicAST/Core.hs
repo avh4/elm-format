@@ -111,6 +111,9 @@ instance FromJSON ModuleName where
     parseJSON = withText "ModuleName" $
         return . ModuleName . fmap (UppercaseIdentifier . Text.unpack) . Text.splitOn "."
 
+instance FromJSONKey ModuleName where
+    fromJSONKey = FromJSONKeyText (ModuleName . fmap (UppercaseIdentifier . Text.unpack) . Text.splitOn ".")
+
 
 newtype VariableDefinition
     = VariableDefinition
@@ -263,6 +266,10 @@ instance ToJSON (AST.Listing AST.DetailedListing) where
         AST.ExplicitListing a comments -> toEncoding a
         AST.OpenListing (C comments ()) -> toEncoding ("Everything" :: Text)
         AST.ClosedListing -> toEncoding Null
+
+instance FromJSON (AST.Listing AST.DetailedListing) where
+    parseJSON =
+        \_ -> return AST.ClosedListing -- TODO
 
 
 instance ToJSON AST.DetailedListing where

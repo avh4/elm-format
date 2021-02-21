@@ -1,0 +1,19 @@
+{
+    "moduleName": "ModuleImports",
+    "imports": {
+        "SingleWordNoAlias": {},
+        "Multi.Word.NoAlias": {},
+        "SingleWordAlias": { "as": "S" },
+        "Multi.Word.Alias": { "as": "WordAlias" }
+    },
+    "body": [
+        {
+            "tag": "Definition",
+            "name": "f",
+            "parameters": [],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        }
+    ]
+}

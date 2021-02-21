@@ -723,14 +723,19 @@ formatDocCommentString docs =
 
 
 formatImport :: ElmVersion -> AST.Module.UserImport -> Box
-formatImport elmVersion (name, method) =
+formatImport elmVersion (name@(C _ rawName), method) =
     let
+        requestedAs =
+            case AST.Module.alias method of
+                Just (C _ aliasName) | [aliasName] == rawName -> Nothing
+                other -> other
+
         as =
-          (AST.Module.alias method)
-            |> fmap (formatImportClause
-            (Just . line . formatUppercaseIdentifier elmVersion)
-            "as")
-            |> Monad.join
+            requestedAs
+                |> fmap (formatImportClause
+                (Just . line . formatUppercaseIdentifier elmVersion)
+                "as")
+                |> Monad.join
 
         exposing =
           formatImportClause
@@ -738,7 +743,7 @@ formatImport elmVersion (name, method) =
             "exposing"
             (AST.Module.exposedVars method)
 
-        formatImportClause :: (a -> Maybe Box) -> String -> (C2 beforeKeyword afterKeyword a) -> Maybe Box
+        formatImportClause :: (a -> Maybe Box) -> String -> C2 beforeKeyword afterKeyword a -> Maybe Box
         formatImportClause format keyw input =
           case fmap format input of
             C ([], []) Nothing ->
