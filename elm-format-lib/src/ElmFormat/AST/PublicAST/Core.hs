@@ -1,3 +1,4 @@
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -52,6 +53,7 @@ import qualified Data.Map.Strict as Map
 import ElmFormat.AST.PublicAST.Config (Config)
 import qualified ElmFormat.AST.PublicAST.Config as Config
 import ElmFormat.AST.PublicAST.MaybeF
+import qualified Data.Aeson as Aeson
 
 
 class ToPairs a where
@@ -220,6 +222,8 @@ instance FromJSON UppercaseIdentifier where
 
         _ ->
             fail "expected a string starting with an uppercase letter"
+instance FromJSONKey UppercaseIdentifier where
+    fromJSONKey = FromJSONKeyText (UppercaseIdentifier . Text.unpack)
 
 
 instance ToJSON LowercaseIdentifier where
@@ -263,13 +267,28 @@ instance ToJSON AST.UnaryOperator where
 instance ToJSON (AST.Listing AST.DetailedListing) where
     toJSON = undefined
     toEncoding = \case
-        AST.ExplicitListing a comments -> toEncoding a
+        AST.ExplicitListing a multiline -> toEncoding a
         AST.OpenListing (C comments ()) -> toEncoding ("Everything" :: Text)
         AST.ClosedListing -> toEncoding Null
 
 instance FromJSON (AST.Listing AST.DetailedListing) where
-    parseJSON =
-        \_ -> return AST.ClosedListing -- TODO
+    parseJSON = \case
+        Aeson.String "Everything" ->
+            return $ AST.OpenListing (C ([], []) ())
+
+        Aeson.Bool True ->
+            return $ AST.OpenListing (C ([], []) ())
+
+        Aeson.Null ->
+            return AST.ClosedListing
+
+        Aeson.Bool False ->
+            return AST.ClosedListing
+
+        json ->
+            AST.ExplicitListing
+                <$> parseJSON json
+                <*> return False
 
 
 instance ToJSON AST.DetailedListing where
@@ -281,6 +300,13 @@ instance ToJSON AST.DetailedListing where
                 , "types" .= Map.fromList (fmap (\(UppercaseIdentifier k, C _ (C _ listing)) -> (k, listing)) (Map.toList types))
                 ]
 
+instance FromJSON AST.DetailedListing  where
+    parseJSON = withObject "DetailedListing" $ \obj ->
+        AST.DetailedListing
+            <$> (Map.fromList . fmap (, C ([], []) ()) <$> obj .:? "values" .!= mempty)
+            <*> return mempty
+            <*> (fmap (C ([], []) . C []) <$> (obj .:? "types" .!= mempty))
+
 
 instance ToJSON (AST.Listing (AST.CommentedMap UppercaseIdentifier ())) where
     toJSON = undefined
@@ -290,6 +316,25 @@ instance ToJSON (AST.Listing (AST.CommentedMap UppercaseIdentifier ())) where
         AST.OpenListing (C _ ()) -> toEncoding ("AllTags" :: Text)
         AST.ClosedListing -> toEncoding ("NoTags" :: Text)
 
+instance FromJSON (AST.Listing (AST.CommentedMap UppercaseIdentifier ())) where
+    parseJSON = \case
+        Aeson.String "AllTags" ->
+            return $ AST.OpenListing (C ([], []) ())
+
+        Aeson.Bool True ->
+            return $ AST.OpenListing (C ([], []) ())
+
+        Aeson.String "NoTags" ->
+            return AST.ClosedListing
+
+        Aeson.Bool False ->
+            return AST.ClosedListing
+
+        Aeson.Null ->
+            return AST.ClosedListing
+
+        json ->
+            fail ("unexpected TagListing: " <> show json)
 
 
 instance ToJSON AST.LiteralValue where
