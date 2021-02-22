@@ -1,0 +1,5 @@
+module AllSyntax.GLShader exposing (vertexShader)
+
+
+vertexShader =
+    "TODO: Object (fromList [(\"tag\",String \"GLShader\"),(\"shaderSource\",String \"\\n\\nattribute vec3 position;\\nattribute vec3 coord;\\nuniform   mat4 view;\\nvarying   vec2 vcoord;\\n\\nvoid main () {\\n  gl_Position = view * vec4(position, 1.0);\\n  vcoord = coord.xy;\\n}\\n\\n\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 6.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 18.0),(\"col\",Number 3.0)]))]))])"

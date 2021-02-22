@@ -17,6 +17,7 @@ import qualified ElmFormat.ImportInfo as ImportInfo
 import qualified Data.Map.Strict as Map
 import qualified Data.Indexed as I
 import AST.MatchReferences (fromMatched, matchReferences)
+import Data.Text (Text)
 
 
 data Module
@@ -188,6 +189,9 @@ toTopLevelStructures = \case
             (C ([], []) (AST.NameWithArgs name (fmap (C []) parameters)))
             (C [] $ toRawAST typ)
 
+    Comment_tls comment ->
+        pure $ AST.BodyComment $ AST.LineComment ("TODO: " <> show comment)
+
 instance ToJSON TopLevelStructure where
     toJSON = undefined
     toEncoding = pairs . toPairs
@@ -221,7 +225,7 @@ instance ToPairs TopLevelStructure where
 
 instance FromJSON TopLevelStructure where
     parseJSON = withObject "TopLevelStructure" $ \obj -> do
-        tag <- obj .: "tag"
+        tag :: Text <- obj .: "tag"
         case tag of
             "Definition" ->
                 DefinitionStructure <$> parseJSON (Object obj)
@@ -233,4 +237,5 @@ instance FromJSON TopLevelStructure where
                     <*> obj .: "type"
 
             _ ->
-                fail ("unexpected TopLevelStructure tag: " <> tag)
+                return $ Comment_tls $ Comment ("TODO: " <> show (Object obj)) (CommentDisplay LineComment)
+                -- fail ("unexpected TopLevelStructure tag: " <> tag)

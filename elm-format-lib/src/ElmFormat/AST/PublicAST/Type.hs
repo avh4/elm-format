@@ -11,6 +11,7 @@ import qualified Data.Indexed as I
 import qualified Data.ReversedList as ReversedList
 import Data.ReversedList (Reversed)
 import qualified Data.Either as Either
+import Data.Maybe (fromMaybe)
 
 
 data Type_
@@ -188,7 +189,7 @@ instance FromJSON Type_ where
             "TypeReference" ->
                 TypeReference
                     <$> obj .: "name"
-                    <*> obj .: "module"
+                    <*> (fromMaybe (ModuleName []) <$> obj .:? "module")
                     <*> obj .: "arguments"
 
             "TypeVariable" ->

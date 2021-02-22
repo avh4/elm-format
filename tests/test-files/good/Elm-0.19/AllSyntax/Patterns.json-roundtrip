@@ -1,0 +1,73 @@
+module AllSyntax.Patterns exposing (asAlias, complexCons, consList, data, emptyList, emptyRecord, equivalentCons, list, literal, parens, patternWithQualifiedConstructorAsCosntructorArgument, patternWithUnqualifiedConstructorAsCosntructorArgument, record, tuple, unit, variable, wildcard)
+
+
+
+--TODO: Comment {text = "TODO: Object (fromList [(\"variants\",Array [Object (fromList [(\"parameterTypes\",Array [Object (fromList [(\"tag\",String \"UnitType\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 5.0),(\"col\",Number 11.0)])),(\"end\",Object (fromList [(\"line\",Number 5.0),(\"col\",Number 13.0)]))]))]),Object (fromList [(\"tag\",String \"UnitType\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 5.0),(\"col\",Number 14.0)])),(\"end\",Object (fromList [(\"line\",Number 5.0),(\"col\",Number 16.0)]))]))])]),(\"name\",String \"Foo\")])]),(\"tag\",String \"CustomType\"),(\"name\",String \"Foo\"),(\"parameters\",Array []),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 4.0),(\"col\",Number 1.0)])),(\"end\",Object (fromList [(\"line\",Number 5.0),(\"col\",Number 16.0)]))]))])", display = CommentDisplay {commentType = LineComment}}
+
+
+wildcard _ =
+    ()
+
+
+literal 1 2.0 "string" 'c' =
+    ()
+
+
+variable v =
+    ()
+
+
+data (Foo x y) =
+    ()
+
+
+unit () =
+    ()
+
+
+parens v =
+    ()
+
+
+tuple ( a, b ) =
+    ()
+
+
+emptyList [] =
+    ()
+
+
+list [ a, b ] =
+    ()
+
+
+consList ( a :: b :: c, a :: b :: c, d :: e :: f, d :: e :: f, d :: e :: f ) =
+    ()
+
+
+equivalentCons ( [ y, x ], [ y, x ], [ y, x ] ) =
+    ()
+
+
+complexCons (a :: [ x ] :: ((b :: _) as blah)) =
+    ()
+
+
+record { a, b } =
+    ()
+
+
+emptyRecord {} {} {} =
+    ()
+
+
+asAlias (() as x) =
+    ()
+
+
+patternWithQualifiedConstructorAsCosntructorArgument m =
+    "TODO: Object (fromList [(\"subject\",Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"m\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 99.0),(\"col\",Number 10.0)])),(\"end\",Object (fromList [(\"line\",Number 99.0),(\"col\",Number 11.0)]))]))])),(\"branches\",Array [Object (fromList [(\"pattern\",Object (fromList [(\"tag\",String \"DataPattern\"),(\"arguments\",Array [Object (fromList [(\"tag\",String \"DataPattern\"),(\"arguments\",Array []),(\"constructor\",Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"Nothing\"),(\"module\",String \"Maybe\")])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 100.0),(\"col\",Number 20.0)])),(\"end\",Object (fromList [(\"line\",Number 100.0),(\"col\",Number 33.0)]))]))])]),(\"constructor\",Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"Just\"),(\"module\",String \"Maybe\")])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 100.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 100.0),(\"col\",Number 33.0)]))]))])),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 101.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 101.0),(\"col\",Number 15.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 100.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 101.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"pattern\",Object (fromList [(\"tag\",String \"DataPattern\"),(\"arguments\",Array [Object (fromList [(\"tag\",String \"AnythingPattern\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 103.0),(\"col\",Number 20.0)])),(\"end\",Object (fromList [(\"line\",Number 103.0),(\"col\",Number 21.0)]))]))])]),(\"constructor\",Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"Just\"),(\"module\",String \"Maybe\")])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 103.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 103.0),(\"col\",Number 21.0)]))]))])),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 104.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 104.0),(\"col\",Number 15.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 101.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 104.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"pattern\",Object (fromList [(\"tag\",String \"DataPattern\"),(\"arguments\",Array []),(\"constructor\",Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"Nothing\"),(\"module\",String \"Maybe\")])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 106.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 106.0),(\"col\",Number 22.0)]))]))])),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 107.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 107.0),(\"col\",Number 15.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 104.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 107.0),(\"col\",Number 15.0)]))]))])]),(\"tag\",String \"CaseExpression\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 99.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 107.0),(\"col\",Number 15.0)]))]))])"
+
+
+patternWithUnqualifiedConstructorAsCosntructorArgument m =
+    "TODO: Object (fromList [(\"subject\",Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"m\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 111.0),(\"col\",Number 10.0)])),(\"end\",Object (fromList [(\"line\",Number 111.0),(\"col\",Number 11.0)]))]))])),(\"branches\",Array [Object (fromList [(\"pattern\",Object (fromList [(\"tag\",String \"DataPattern\"),(\"arguments\",Array [Object (fromList [(\"tag\",String \"DataPattern\"),(\"arguments\",Array []),(\"constructor\",Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"Nothing\"),(\"module\",String \"Maybe\")])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 112.0),(\"col\",Number 20.0)])),(\"end\",Object (fromList [(\"line\",Number 112.0),(\"col\",Number 27.0)]))]))])]),(\"constructor\",Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"Just\"),(\"module\",String \"Maybe\")])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 112.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 112.0),(\"col\",Number 27.0)]))]))])),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 113.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 113.0),(\"col\",Number 15.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 112.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 113.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"pattern\",Object (fromList [(\"tag\",String \"PatternAlias\"),(\"pattern\",Object (fromList [(\"tag\",String \"DataPattern\"),(\"arguments\",Array [Object (fromList [(\"tag\",String \"AnythingPattern\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 115.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 115.0),(\"col\",Number 16.0)]))]))])]),(\"constructor\",Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"Just\"),(\"module\",String \"Maybe\")])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 115.0),(\"col\",Number 10.0)])),(\"end\",Object (fromList [(\"line\",Number 115.0),(\"col\",Number 16.0)]))]))])),(\"alias\",Object (fromList [(\"tag\",String \"VariableDefinition\"),(\"name\",String \"x\")])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 115.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 115.0),(\"col\",Number 22.0)]))]))])),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 116.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 116.0),(\"col\",Number 15.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 113.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 116.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"pattern\",Object (fromList [(\"tag\",String \"PatternAlias\"),(\"pattern\",Object (fromList [(\"tag\",String \"DataPattern\"),(\"arguments\",Array []),(\"constructor\",Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"Nothing\"),(\"module\",String \"Maybe\")])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 118.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 118.0),(\"col\",Number 16.0)]))]))])),(\"alias\",Object (fromList [(\"tag\",String \"VariableDefinition\"),(\"name\",String \"x\")])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 118.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 118.0),(\"col\",Number 21.0)]))]))])),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 119.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 119.0),(\"col\",Number 15.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 116.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 119.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"pattern\",Object (fromList [(\"tag\",String \"PatternAlias\"),(\"pattern\",Object (fromList [(\"tag\",String \"PatternAlias\"),(\"pattern\",Object (fromList [(\"tag\",String \"DataPattern\"),(\"arguments\",Array []),(\"constructor\",Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"Nothing\"),(\"module\",String \"Maybe\")])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 121.0),(\"col\",Number 10.0)])),(\"end\",Object (fromList [(\"line\",Number 121.0),(\"col\",Number 23.0)]))]))])),(\"alias\",Object (fromList [(\"tag\",String \"VariableDefinition\"),(\"name\",String \"y\")])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 121.0),(\"col\",Number 10.0)])),(\"end\",Object (fromList [(\"line\",Number 121.0),(\"col\",Number 28.0)]))]))])),(\"alias\",Object (fromList [(\"tag\",String \"VariableDefinition\"),(\"name\",String \"x\")])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 121.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 121.0),(\"col\",Number 34.0)]))]))])),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 122.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 122.0),(\"col\",Number 15.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 119.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 122.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"pattern\",Object (fromList [(\"tag\",String \"AnythingPattern\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 124.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 124.0),(\"col\",Number 10.0)]))]))])),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 125.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 125.0),(\"col\",Number 15.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 122.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 125.0),(\"col\",Number 15.0)]))]))])]),(\"tag\",String \"CaseExpression\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 111.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 125.0),(\"col\",Number 15.0)]))]))])"

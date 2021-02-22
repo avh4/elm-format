@@ -303,9 +303,20 @@ instance ToJSON AST.DetailedListing where
 instance FromJSON AST.DetailedListing  where
     parseJSON = withObject "DetailedListing" $ \obj ->
         AST.DetailedListing
-            <$> (Map.fromList . fmap (, C ([], []) ()) <$> obj .:? "values" .!= mempty)
+            <$> ((obj .:? "values" .!= Null) >>= parseValues)
             <*> return mempty
             <*> (fmap (C ([], []) . C []) <$> (obj .:? "types" .!= mempty))
+        where
+            parseValues = \case
+                Aeson.Array json ->
+                    Map.fromList . fmap (, C ([], []) ()) <$> parseJSON (Array json)
+
+                Aeson.Null ->
+                    return mempty
+
+                json ->
+                    -- TODO: ignore entries where value is False
+                    fmap (C ([], []) . (\(b :: Bool) -> ())) <$> parseJSON json
 
 
 instance ToJSON (AST.Listing (AST.CommentedMap UppercaseIdentifier ())) where
