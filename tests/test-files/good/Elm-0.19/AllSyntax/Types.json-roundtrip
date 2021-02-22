@@ -1,0 +1,66 @@
+module AllSyntax.Types exposing (Constructor, Function, Parens, Record, RecordExtensionWithCommentedOutTerms, RecordWithCommentedOutTerms, Tuple, TupleMultilineWithSingleLineChildren, TupleWithCommentedOutTerms, Unit, Variable, emptyRecord, recordExtension)
+
+import Dict exposing (Dict)
+
+
+type alias Unit =
+    ( (), (), () )
+
+
+type alias Function =
+    ( () -> () -> (), () -> () -> (), () -> () -> (), () -> () -> (), () -> () -> (), () -> () -> () )
+
+
+type alias Variable a =
+    a
+
+
+type alias Constructor =
+    ( Bool, Dict.Dict String Int, Dict.Dict String Int, Dict.Dict String Int, Dict.Dict String Int, Dict.Dict String Int )
+
+
+type alias Parens =
+    ( Int, Int )
+
+
+type alias Tuple =
+    ( ( a, b ), ( a, b ), ( a, b ), ( a, b ) )
+
+
+type alias TupleWithCommentedOutTerms =
+    ( Int, Int )
+
+
+type alias TupleMultilineWithSingleLineChildren =
+    ( Int -> Int -> Int, String -> String -> String )
+
+
+emptyRecord _ =
+    ()
+
+
+type alias Record =
+    ( { x : Int
+      , y : ()
+      }
+    , { x : Int
+      , y : ()
+      }
+    )
+
+
+type alias RecordWithCommentedOutTerms =
+    { a : Int
+    , d : Int
+    }
+
+
+recordExtension _ =
+    ()
+
+
+type alias RecordExtensionWithCommentedOutTerms z =
+    { z
+        | a : Int
+        , d : Int
+    }

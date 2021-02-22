@@ -18,6 +18,7 @@ import ElmFormat.AST.PublicAST.Pattern
 import ElmFormat.AST.PublicAST.Type
 import ElmFormat.AST.PublicAST.Comment
 import Data.Maybe (mapMaybe)
+import Data.Text (Text)
 
 
 data BinaryOperation
@@ -251,6 +252,9 @@ instance FromPublicAST 'ExpressionNK where
         UnitLiteral ->
             AST.Unit []
 
+        LiteralExpression lit ->
+            AST.Literal lit
+
 instance ToJSON Expression where
     toJSON = undefined
     toEncoding = pairs . toPairs
@@ -360,13 +364,13 @@ instance ToPairs Expression where
 
 instance FromJSON Expression where
     parseJSON = withObject "Expression" $ \obj -> do
-        tag <- obj .: "tag"
+        tag :: Text <- obj .: "tag"
         case tag of
             "UnitLiteral" ->
                 return UnitLiteral
 
             _ ->
-                fail ("unexpected Expression tag: " <> tag)
+                return $ LiteralExpression $ Str ("TODO: " <> show (Object obj)) SingleQuotedString
 
 
 newtype FunctionApplicationDisplay

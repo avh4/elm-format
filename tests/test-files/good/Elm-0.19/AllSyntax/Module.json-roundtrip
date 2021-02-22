@@ -1,0 +1,25 @@
+module AllSyntax.Module exposing (a, b, c)
+
+import Dict as D exposing (Dict, empty, fromList)
+import Json.Decode as Json
+import Maybe exposing (Maybe(..), map)
+import Result exposing (Result(..))
+import Signal exposing (..)
+import String
+import Task exposing (andMap, andThen, fail, fromMaybe, fromResult, map, map2, map3, map4, map5, mapError, onError, succeed, toMaybe, toResult)
+
+
+
+--TODO: Comment {text = "TODO: Object (fromList [(\"variants\",Array [Object (fromList [(\"parameterTypes\",Array []),(\"name\",String \"TagA\")]),Object (fromList [(\"parameterTypes\",Array []),(\"name\",String \"TagB\")])]),(\"tag\",String \"CustomType\"),(\"name\",String \"CustomType\"),(\"parameters\",Array []),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 34.0),(\"col\",Number 1.0)])),(\"end\",Object (fromList [(\"line\",Number 36.0),(\"col\",Number 11.0)]))]))])", display = CommentDisplay {commentType = LineComment}}
+
+
+a =
+    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 1.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 40.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 40.0),(\"col\",Number 6.0)]))]))])"
+
+
+b =
+    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 2.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 44.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 44.0),(\"col\",Number 6.0)]))]))])"
+
+
+c =
+    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 3.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 48.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 48.0),(\"col\",Number 6.0)]))]))])"
