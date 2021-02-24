@@ -386,21 +386,21 @@
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": " Union type with params"
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
@@ -638,21 +638,21 @@
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": " Type alias"
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
@@ -1035,21 +1035,21 @@
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": " Expressions"
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
@@ -1704,21 +1704,21 @@
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": " Declarations in let expressions"
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
@@ -1996,7 +1996,7 @@
                 "declarations": [
                     {
                         "display": {
-                            "commentType": "BlockComment"
+                            "commentType": "LineComment"
                         },
                         "sourceLocation": {
                             "end": {
@@ -2042,7 +2042,7 @@
                     },
                     {
                         "display": {
-                            "commentType": "BlockComment"
+                            "commentType": "LineComment"
                         },
                         "sourceLocation": {
                             "end": {
@@ -2088,7 +2088,7 @@
                     },
                     {
                         "display": {
-                            "commentType": "BlockComment"
+                            "commentType": "LineComment"
                         },
                         "sourceLocation": {
                             "end": {

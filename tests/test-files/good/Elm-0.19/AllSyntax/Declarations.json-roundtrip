@@ -36,9 +36,9 @@ type DataTypeWithCommentedOutConstructors
 
 
 
---TODO: Comment {text = "TODO: Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"\")])", display = CommentDisplay {commentType = LineComment}}
---TODO: Comment {text = "TODO: Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \" Union type with params\")])", display = CommentDisplay {commentType = LineComment}}
---TODO: Comment {text = "TODO: Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"\")])", display = CommentDisplay {commentType = LineComment}}
+--
+-- Union type with params
+--
 
 
 type DataTypeWithParams1 a b c
@@ -60,9 +60,9 @@ type DataTypeWithParams3 a b c
 
 
 
---TODO: Comment {text = "TODO: Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"\")])", display = CommentDisplay {commentType = LineComment}}
---TODO: Comment {text = "TODO: Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \" Type alias\")])", display = CommentDisplay {commentType = LineComment}}
---TODO: Comment {text = "TODO: Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"\")])", display = CommentDisplay {commentType = LineComment}}
+--
+-- Type alias
+--
 
 
 type alias TypeAlias1 a b =
@@ -91,9 +91,9 @@ type alias TypeAlias3 a b =
 
 
 
---TODO: Comment {text = "TODO: Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"\")])", display = CommentDisplay {commentType = LineComment}}
---TODO: Comment {text = "TODO: Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \" Expressions\")])", display = CommentDisplay {commentType = LineComment}}
---TODO: Comment {text = "TODO: Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"\")])", display = CommentDisplay {commentType = LineComment}}
+--
+-- Expressions
+--
 
 
 expressionDefinition _ _ =
@@ -133,9 +133,9 @@ parametersWithTypesCurried anInt =
 
 
 
---TODO: Comment {text = "TODO: Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"\")])", display = CommentDisplay {commentType = LineComment}}
---TODO: Comment {text = "TODO: Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \" Declarations in let expressions\")])", display = CommentDisplay {commentType = LineComment}}
---TODO: Comment {text = "TODO: Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"\")])", display = CommentDisplay {commentType = LineComment}}
+--
+-- Declarations in let expressions
+--
 
 
 expressionDefinitionsInLet =
@@ -147,7 +147,7 @@ expressionDefinitionsInLet2 =
 
 
 expressionDefinitionsInLet3 =
-    "TODO: Object (fromList [(\"tag\",String \"LetExpression\"),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 238.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 238.0),(\"col\",Number 7.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 224.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 238.0),(\"col\",Number 7.0)]))])),(\"declarations\",Array [Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"X\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 224.0),(\"col\",Number 8.0)])),(\"end\",Object (fromList [(\"line\",Number 226.0),(\"col\",Number 9.0)]))]))]),Object (fromList [(\"tag\",String \"Definition\"),(\"name\",String \"def1\"),(\"expression\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 228.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 228.0),(\"col\",Number 15.0)]))]))])),(\"parameters\",Array []),(\"returnType\",Null),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 226.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 228.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"Z\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 228.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 231.0),(\"col\",Number 9.0)]))]))]),Object (fromList [(\"tag\",String \"Definition\"),(\"name\",String \"def2\"),(\"expression\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 233.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 233.0),(\"col\",Number 15.0)]))]))])),(\"parameters\",Array []),(\"returnType\",Null),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 231.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 233.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"AB\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 233.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 236.0),(\"col\",Number 5.0)]))]))])])])"
+    "TODO: Object (fromList [(\"tag\",String \"LetExpression\"),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 238.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 238.0),(\"col\",Number 7.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 224.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 238.0),(\"col\",Number 7.0)]))])),(\"declarations\",Array [Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"LineComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"X\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 224.0),(\"col\",Number 8.0)])),(\"end\",Object (fromList [(\"line\",Number 226.0),(\"col\",Number 9.0)]))]))]),Object (fromList [(\"tag\",String \"Definition\"),(\"name\",String \"def1\"),(\"expression\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 228.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 228.0),(\"col\",Number 15.0)]))]))])),(\"parameters\",Array []),(\"returnType\",Null),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 226.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 228.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"LineComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"Z\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 228.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 231.0),(\"col\",Number 9.0)]))]))]),Object (fromList [(\"tag\",String \"Definition\"),(\"name\",String \"def2\"),(\"expression\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 233.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 233.0),(\"col\",Number 15.0)]))]))])),(\"parameters\",Array []),(\"returnType\",Null),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 231.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 233.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"LineComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"AB\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 233.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 236.0),(\"col\",Number 5.0)]))]))])])])"
 
 
 typeAnnotationInLet =

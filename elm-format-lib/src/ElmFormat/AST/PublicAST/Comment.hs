@@ -1,14 +1,16 @@
 {-# LANGUAGE DeriveGeneric #-}
-module ElmFormat.AST.PublicAST.Comment (Comment(..), mkComment, CommentDisplay(..), CommentType(..)) where
+module ElmFormat.AST.PublicAST.Comment (Comment(..), mkComment, fromComment, CommentDisplay(..), CommentType(..)) where
 
 import ElmFormat.AST.PublicAST.Core
 import qualified AST.V0_16 as AST
 import qualified Data.List as List
+import Data.Text (Text)
+import qualified Data.Text as Text
 
 
 data Comment
     = Comment
-        { text :: String
+        { text :: Text
         , display :: CommentDisplay
         }
     deriving (Show)
@@ -17,13 +19,13 @@ mkComment :: AST.Comment -> Comment
 mkComment = \case
     AST.BlockComment lines ->
         Comment
-            (List.intercalate "\n" lines)
+            (Text.pack $ List.intercalate "\n" lines)
             (CommentDisplay BlockComment)
 
     AST.LineComment string ->
         Comment
-            string
-            (CommentDisplay BlockComment)
+            (Text.pack string)
+            (CommentDisplay LineComment)
 
     AST.CommentTrickOpener ->
         error "TODO: CommentTrickOpener"
@@ -33,6 +35,14 @@ mkComment = \case
 
     AST.CommentTrickBlock _ ->
         error "TODO: CommentTrickCloser"
+
+fromComment :: Comment -> AST.Comment
+fromComment = \case
+    Comment text (CommentDisplay BlockComment) ->
+        AST.BlockComment (Text.unpack <$> Text.splitOn "\n" text)
+
+    Comment text (CommentDisplay LineComment) ->
+        AST.LineComment (Text.unpack text)
 
 
 instance ToJSON Comment where
@@ -48,6 +58,13 @@ instance ToPairs Comment where
                 , "display" .= display
                 ]
 
+instance FromJSON Comment where
+    parseJSON = withObject "Comment" $ \obj ->
+        Comment
+            <$> obj .: "text"
+            <*> obj .:? "display" .!= CommentDisplay LineComment
+
+
 newtype CommentDisplay =
     CommentDisplay
         { commentType :: CommentType
@@ -57,6 +74,8 @@ newtype CommentDisplay =
 instance ToJSON CommentDisplay where
     toEncoding = genericToEncoding defaultOptions
 
+instance FromJSON CommentDisplay
+
 
 data CommentType
     = BlockComment
@@ -65,3 +84,5 @@ data CommentType
 
 instance ToJSON CommentType where
     toEncoding = genericToEncoding defaultOptions
+
+instance FromJSON CommentType

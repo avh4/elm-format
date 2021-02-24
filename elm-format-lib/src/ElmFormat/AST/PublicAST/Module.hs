@@ -19,6 +19,7 @@ import qualified Data.Indexed as I
 import AST.MatchReferences (fromMatched, matchReferences)
 import Data.Text (Text)
 import qualified Data.Either as Either
+import qualified Data.Text as Text
 
 
 data Module
@@ -196,7 +197,7 @@ toTopLevelStructures = \case
             (Either.fromRight undefined $ AST.fromCommentedList (C ([], [], Nothing) . fromCustomTypeVariant <$> variants))
 
     Comment_tls comment ->
-        pure $ AST.BodyComment $ AST.LineComment ("TODO: " <> show comment)
+        pure $ AST.BodyComment $ fromComment comment
 
 instance ToJSON TopLevelStructure where
     toJSON = undefined
@@ -248,6 +249,8 @@ instance FromJSON TopLevelStructure where
                     <*> obj .: "parameters"
                     <*> obj .: "variants"
 
+            "Comment" ->
+                Comment_tls <$> parseJSON (Object obj)
+
             _ ->
-                return $ Comment_tls $ Comment ("TODO: " <> show (Object obj)) (CommentDisplay LineComment)
-                -- fail ("unexpected TopLevelStructure tag: " <> tag)
+                fail ("unexpected TopLevelStructure tag: " <> Text.unpack tag)
