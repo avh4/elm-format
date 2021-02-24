@@ -149,35 +149,35 @@ instance ToJSON RecordDisplay where
     toEncoding = genericToEncoding defaultOptions
 
 
-data LocatedIfRequested a
-    = LocatedIfRequested Bool (Located a)
+newtype LocatedIfRequested a
+    = LocatedIfRequested (MaybeF Located a)
     deriving (Functor)
 
 instance Coapplicative LocatedIfRequested where
-    extract (LocatedIfRequested _ (A _ a)) = a
+    extract (LocatedIfRequested a) = extract a
 
 instance Prelude.Foldable LocatedIfRequested where
-    foldMap f (LocatedIfRequested _ (A _ a)) = f a
+    foldMap f (LocatedIfRequested a) = Prelude.foldMap f a
 
 instance Traversable LocatedIfRequested where
-    traverse f (LocatedIfRequested b (A region a)) =
-        LocatedIfRequested b . A region <$> f a
+    traverse f (LocatedIfRequested a) =
+        LocatedIfRequested <$> traverse f a
 
 fromLocated :: Config -> Located a -> LocatedIfRequested a
-fromLocated config =
-    LocatedIfRequested (Config.showSourceLocation config)
+fromLocated config la =
+    if Config.showSourceLocation config
+        then LocatedIfRequested $ JustF la
+        else LocatedIfRequested $ NothingF $ extract la
 
 instance (ToPairs a, ToJSON a) => ToJSON (LocatedIfRequested a) where
     toJSON = undefined
-    toEncoding (LocatedIfRequested showSourceLocation (A region a)) =
-        if showSourceLocation
-            then toEncoding (A region a)
-            else toEncoding a
+    toEncoding = \case
+        LocatedIfRequested (JustF la) -> toEncoding la
+        LocatedIfRequested (NothingF a) -> toEncoding a
 
 instance (FromJSON a) => FromJSON (LocatedIfRequested a) where
     parseJSON json =
-        -- TODO: should refactor LocatedIfRequested to use Maybe Region instead of (Bool, Region)
-        LocatedIfRequested False . noRegion <$> parseJSON json
+        LocatedIfRequested . NothingF <$> parseJSON json
 
 
 
