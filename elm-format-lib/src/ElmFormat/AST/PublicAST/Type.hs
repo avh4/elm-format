@@ -191,7 +191,7 @@ instance FromJSON Type_ where
                 TypeReference
                     <$> obj .: "name"
                     <*> (fromMaybe (ModuleName []) <$> obj .:? "module")
-                    <*> obj .: "arguments"
+                    <*> obj .:? "arguments" .!= []
 
             "TypeVariable" ->
                 TypeVariable

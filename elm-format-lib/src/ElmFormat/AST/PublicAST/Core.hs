@@ -20,7 +20,7 @@ module ElmFormat.AST.PublicAST.Core
     , ToPairs(..)
     , ToMaybeJSON(..)
     , type_
-    , LocatedIfRequested
+    , LocatedIfRequested(..)
     , ModuleName(..)
     , FromPublicAST(..)
     , ToPublicAST(..)

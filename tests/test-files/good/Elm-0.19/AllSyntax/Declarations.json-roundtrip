@@ -104,30 +104,37 @@ expressionDefinitionNoPatterns =
     ()
 
 
+expressionTypeAnnotation1 : ()
 expressionTypeAnnotation1 =
     ()
 
 
+expressionTypeAnnotation2 : ()
 expressionTypeAnnotation2 =
     ()
 
 
+expressionTypeAnnotation3 : ()
 expressionTypeAnnotation3 =
     ()
 
 
+expressionTypeAnnotation4 : ()
 expressionTypeAnnotation4 =
     ()
 
 
+expressionTypeAnnotationForcedMultiline : Int -> Result String Bool -> List (Maybe.Maybe ())
 expressionTypeAnnotationForcedMultiline _ _ =
     "TODO: Object (fromList [(\"tag\",String \"ListLiteral\"),(\"terms\",Array []),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 175.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 175.0),(\"col\",Number 7.0)]))]))])"
 
 
+parametersWithTypes : Int -> String -> Bool
 parametersWithTypes anInt aString =
     "TODO: Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"False\"),(\"module\",String \"Basics\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 180.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 180.0),(\"col\",Number 10.0)]))]))])"
 
 
+parametersWithTypesCurried : Int -> (String -> Bool)
 parametersWithTypesCurried anInt =
     "TODO: Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"todo\"),(\"module\",String \"Debug\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 185.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 185.0),(\"col\",Number 15.0)]))]))])"
 
