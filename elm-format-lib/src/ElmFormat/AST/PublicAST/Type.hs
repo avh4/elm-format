@@ -1,7 +1,8 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DataKinds #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
-module ElmFormat.AST.PublicAST.Type (Type_(..)) where
+module ElmFormat.AST.PublicAST.Type (Type_(..), CustomTypeVariant(..), mkCustomTypeVariant, fromCustomTypeVariant) where
 
 import ElmFormat.AST.PublicAST.Core
 import qualified AST.V0_16 as AST
@@ -218,3 +219,33 @@ instance FromJSON Type_ where
 
             _ ->
                 fail ("unexpected Type tag: \"" <> tag <> "\"")
+
+
+data CustomTypeVariant
+    = CustomTypeVariant
+        { name :: UppercaseIdentifier
+        , parameterTypes :: List (LocatedIfRequested Type_)
+        }
+    deriving (Generic)
+
+mkCustomTypeVariant :: Config -> AST.NameWithArgs UppercaseIdentifier (ASTNS Located [UppercaseIdentifier] 'TypeNK) -> CustomTypeVariant
+mkCustomTypeVariant config (AST.NameWithArgs name args) =
+    CustomTypeVariant
+        name
+        ((\(C c a) -> fromRawAST config a) <$> args)
+
+fromCustomTypeVariant :: CustomTypeVariant -> AST.NameWithArgs UppercaseIdentifier (ASTNS Identity [UppercaseIdentifier] 'TypeNK)
+fromCustomTypeVariant = \case
+    CustomTypeVariant name parameterTypes ->
+        AST.NameWithArgs
+            name
+            (C [] . toRawAST <$> parameterTypes)
+
+instance ToJSON CustomTypeVariant where
+    toEncoding = genericToEncoding defaultOptions
+
+instance FromJSON CustomTypeVariant where
+    parseJSON = withObject "CustomTypeVariant" $ \obj ->
+        CustomTypeVariant
+            <$> obj .: "name"
+            <*> obj .: "parameterTypes"
