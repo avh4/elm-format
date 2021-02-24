@@ -417,7 +417,7 @@ instance FromJSON TypedParameter where
     parseJSON = withObject "TypedParameter" $ \obj ->
         TypedParameter
             <$> obj .: "pattern"
-            <*> return Nothing
+            <*> obj .:? "type"
 
 
 data Definition
@@ -540,7 +540,7 @@ instance FromJSON Definition where
                 Definition
                     <$> obj .: "name"
                     <*> obj .: "parameters"
-                    <*> return Nothing -- TODO
+                    <*> obj .:? "returnType"
                     <*> obj .: "expression"
 
             _ ->

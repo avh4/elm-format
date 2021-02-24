@@ -20,6 +20,7 @@ import AST.MatchReferences (fromMatched, matchReferences)
 import Data.Text (Text)
 import qualified Data.Either as Either
 import qualified Data.Text as Text
+import Data.Maybe (fromMaybe)
 
 
 data Module
@@ -178,12 +179,34 @@ fromTopLevelStructures config (I.Fix (A _ (AST.TopLevel decls))) =
 
 toTopLevelStructures :: TopLevelStructure -> List (AST.TopLevelStructure (ASTNS Identity [UppercaseIdentifier] 'DeclarationNK))
 toTopLevelStructures = \case
-    DefinitionStructure (Definition name parameters returnType expression) ->
+    DefinitionStructure (Definition name parameters Nothing expression) ->
         pure $ AST.Entry $ I.Fix $ Identity $ AST.Definition
             (I.Fix $ Identity $ AST.VarPattern name)
             (C [] . toRawAST . pattern <$> parameters)
             []
             (toRawAST expression)
+
+    DefinitionStructure (Definition name [] (Just typ) expression) ->
+        [ AST.Entry $ I.Fix $ Identity $ AST.TypeAnnotation
+            (C [] $ VarRef () name)
+            (C [] $ toRawAST typ)
+        , AST.Entry $ I.Fix $ Identity $ AST.Definition
+            (I.Fix $ Identity $ AST.VarPattern name)
+            []
+            []
+            (toRawAST expression)
+        ]
+
+    DefinitionStructure (Definition name parameters (Just typ) expression) ->
+        [ AST.Entry $ I.Fix $ Identity $ AST.TypeAnnotation
+            (C [] $ VarRef () name)
+            (C [] $ toRawAST $ LocatedIfRequested False $ noRegion $ FunctionType typ (fromMaybe (LocatedIfRequested False $ noRegion UnitType) . type_tp <$> parameters))
+        , AST.Entry $ I.Fix $ Identity $ AST.Definition
+            (I.Fix $ Identity $ AST.VarPattern name)
+            (C [] . toRawAST . pattern <$> parameters)
+            []
+            (toRawAST expression)
+        ]
 
     TypeAlias name parameters typ ->
         pure $ AST.Entry $ I.Fix $ Identity $ AST.TypeAlias

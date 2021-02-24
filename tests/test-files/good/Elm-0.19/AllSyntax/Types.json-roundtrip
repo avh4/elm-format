@@ -35,6 +35,7 @@ type alias TupleMultilineWithSingleLineChildren =
     ( Int -> Int -> Int, String -> String -> String )
 
 
+emptyRecord : {} -> ()
 emptyRecord _ =
     ()
 
@@ -55,6 +56,12 @@ type alias RecordWithCommentedOutTerms =
     }
 
 
+recordExtension :
+    { a
+        | x : Int
+        , y : Int
+    }
+    -> ()
 recordExtension _ =
     ()
 

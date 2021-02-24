@@ -34,6 +34,37 @@
                     "parameterTypes": []
                 }
             ]
+        },
+        {
+            "tag": "Definition",
+            "name": "noTypeAnnotation",
+            "parameters": [],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "withTypeAnnotation",
+            "parameters": [],
+            "returnType": { "tag": "UnitType" },
+            "expression": { "tag": "UnitLiteral" }
+        },
+        {
+            "tag": "Definition",
+            "name": "withParametersAndTypeAnnotation",
+            "parameters": [
+                {
+                    "pattern": { "tag": "VariableDefinition", "name": "a" },
+                    "type": { "tag": "TypeReference", "name": "Int" }
+                },
+                {
+                    "pattern": { "tag": "VariableDefinition", "name": "b" },
+                    "type": { "tag": "TypeReference", "name": "String" }
+                }
+            ],
+            "returnType": { "tag": "UnitType" },
+            "expression": { "tag": "UnitLiteral" }
         }
     ]
 }
