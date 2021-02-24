@@ -200,7 +200,7 @@ toTopLevelStructures = \case
     DefinitionStructure (Definition name parameters (Just typ) expression) ->
         [ AST.Entry $ I.Fix $ Identity $ AST.TypeAnnotation
             (C [] $ VarRef () name)
-            (C [] $ toRawAST $ LocatedIfRequested False $ noRegion $ FunctionType typ (fromMaybe (LocatedIfRequested False $ noRegion UnitType) . type_tp <$> parameters))
+            (C [] $ toRawAST $ LocatedIfRequested $ NothingF $ FunctionType typ (fromMaybe (LocatedIfRequested $ NothingF UnitType) . type_tp <$> parameters))
         , AST.Entry $ I.Fix $ Identity $ AST.Definition
             (I.Fix $ Identity $ AST.VarPattern name)
             (C [] . toRawAST . pattern <$> parameters)
