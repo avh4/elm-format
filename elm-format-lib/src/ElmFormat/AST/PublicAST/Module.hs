@@ -18,6 +18,7 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Indexed as I
 import AST.MatchReferences (fromMatched, matchReferences)
 import Data.Text (Text)
+import qualified Data.Either as Either
 
 
 data Module
@@ -189,6 +190,11 @@ toTopLevelStructures = \case
             (C ([], []) (AST.NameWithArgs name (fmap (C []) parameters)))
             (C [] $ toRawAST typ)
 
+    CustomType name parameters variants ->
+        pure $ AST.Entry $ I.Fix $ Identity $ AST.Datatype
+            (C ([], []) (AST.NameWithArgs name (fmap (C []) parameters)))
+            (Either.fromRight undefined $ AST.fromCommentedList (C ([], [], Nothing) . fromCustomTypeVariant <$> variants))
+
     Comment_tls comment ->
         pure $ AST.BodyComment $ AST.LineComment ("TODO: " <> show comment)
 
@@ -235,6 +241,12 @@ instance FromJSON TopLevelStructure where
                     <$> obj .: "name"
                     <*> obj .: "parameters"
                     <*> obj .: "type"
+
+            "CustomType" ->
+                CustomType
+                    <$> obj .: "name"
+                    <*> obj .: "parameters"
+                    <*> obj .: "variants"
 
             _ ->
                 return $ Comment_tls $ Comment ("TODO: " <> show (Object obj)) (CommentDisplay LineComment)

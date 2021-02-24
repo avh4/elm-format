@@ -1,8 +1,8 @@
-module AllSyntax.Patterns exposing (asAlias, complexCons, consList, data, emptyList, emptyRecord, equivalentCons, list, literal, parens, patternWithQualifiedConstructorAsCosntructorArgument, patternWithUnqualifiedConstructorAsCosntructorArgument, record, tuple, unit, variable, wildcard)
+module AllSyntax.Patterns exposing (Foo(..), asAlias, complexCons, consList, data, emptyList, emptyRecord, equivalentCons, list, literal, parens, patternWithQualifiedConstructorAsCosntructorArgument, patternWithUnqualifiedConstructorAsCosntructorArgument, record, tuple, unit, variable, wildcard)
 
 
-
---TODO: Comment {text = "TODO: Object (fromList [(\"variants\",Array [Object (fromList [(\"parameterTypes\",Array [Object (fromList [(\"tag\",String \"UnitType\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 5.0),(\"col\",Number 11.0)])),(\"end\",Object (fromList [(\"line\",Number 5.0),(\"col\",Number 13.0)]))]))]),Object (fromList [(\"tag\",String \"UnitType\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 5.0),(\"col\",Number 14.0)])),(\"end\",Object (fromList [(\"line\",Number 5.0),(\"col\",Number 16.0)]))]))])]),(\"name\",String \"Foo\")])]),(\"tag\",String \"CustomType\"),(\"name\",String \"Foo\"),(\"parameters\",Array []),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 4.0),(\"col\",Number 1.0)])),(\"end\",Object (fromList [(\"line\",Number 5.0),(\"col\",Number 16.0)]))]))])", display = CommentDisplay {commentType = LineComment}}
+type Foo
+    = Foo () ()
 
 
 wildcard _ =

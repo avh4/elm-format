@@ -16,6 +16,24 @@
             "type": {
                 "tag": "UnitType"
             }
+        },
+        {
+            "tag": "CustomType",
+            "name": "MyCustomType",
+            "parameters": [ "a", "b" ],
+            "variants": [
+                {
+                    "name": "Both",
+                    "parameterTypes": [
+                        { "tag": "TypeVariable", "name": "a" },
+                        { "tag": "TypeVariable", "name": "b" }
+                    ]
+                },
+                {
+                    "name": "None",
+                    "parameterTypes": []
+                }
+            ]
         }
     ]
 }

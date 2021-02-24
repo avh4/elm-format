@@ -4,7 +4,7 @@
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
-module ElmFormat.AST.PublicAST.Expression (Expression(..), Definition(..), DefinitionBuilder(..), TypedParameter(..), CustomTypeVariant(..), mkDefinitions, mkCustomTypeVariant) where
+module ElmFormat.AST.PublicAST.Expression (Expression(..), Definition(..), DefinitionBuilder(..), TypedParameter(..), mkDefinitions) where
 
 import ElmFormat.AST.PublicAST.Core
 import ElmFormat.AST.PublicAST.Reference
@@ -419,22 +419,6 @@ instance FromJSON TypedParameter where
             <$> obj .: "pattern"
             <*> return Nothing
 
-
-data CustomTypeVariant
-    = CustomTypeVariant
-        { name :: UppercaseIdentifier
-        , parameterTypes :: List (LocatedIfRequested Type_)
-        }
-    deriving (Generic)
-
-instance ToJSON CustomTypeVariant where
-    toEncoding = genericToEncoding defaultOptions
-
-mkCustomTypeVariant :: Config -> AST.NameWithArgs UppercaseIdentifier (ASTNS Located [UppercaseIdentifier] 'TypeNK) -> CustomTypeVariant
-mkCustomTypeVariant config (AST.NameWithArgs name args) =
-    CustomTypeVariant
-        name
-        (fmap (\(C c a) -> fromRawAST config a) args)
 
 data Definition
     = Definition
