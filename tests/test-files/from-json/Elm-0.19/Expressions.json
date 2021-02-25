@@ -71,6 +71,27 @@
                 "tag": "VariableReference",
                 "name": "MyTag"
             }
+        },
+        {
+            "tag": "Definition",
+            "name": "emptyList",
+            "parameters": [],
+            "expression": {
+                "tag": "ListLiteral",
+                "terms": []
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "list",
+            "parameters": [],
+            "expression": {
+                "tag": "ListLiteral",
+                "terms": [
+                    { "tag": "UnitLiteral" },
+                    { "tag": "UnitLiteral" }
+                ]
+            }
         }
     ]
 }

@@ -54,6 +54,7 @@ import ElmFormat.AST.PublicAST.Config (Config)
 import qualified ElmFormat.AST.PublicAST.Config as Config
 import ElmFormat.AST.PublicAST.MaybeF
 import qualified Data.Aeson as Aeson
+import Data.Int (Int64)
 
 
 class ToPairs a where
@@ -347,6 +348,24 @@ instance FromJSON (AST.Listing (AST.CommentedMap UppercaseIdentifier ())) where
         json ->
             fail ("unexpected TagListing: " <> show json)
 
+{-| An Int64 that encodes to a JSON String if necessary to preserve accuracy. -}
+newtype SafeInt
+    = SafeInt { fromSafeInt :: Int64 }
+
+instance ToJSON SafeInt where
+    toJSON = undefined
+    toEncoding = \case
+        SafeInt value ->
+            if value <= 9007199254740991 && value >= -9007199254740991
+                then toEncoding value
+                else toEncoding $ show value
+
+instance FromJSON SafeInt where
+    parseJSON = \case
+        Aeson.Number n -> SafeInt <$> parseJSON (Aeson.Number n)
+        Aeson.String s -> SafeInt . read <$> parseJSON (Aeson.String s)
+        _ -> fail "expected an integer (or a string representing an integer)"
+
 
 instance ToJSON AST.LiteralValue where
     toJSON = undefined
@@ -357,7 +376,7 @@ instance ToPairs AST.LiteralValue where
         IntNum value repr ->
             mconcat
                 [ type_ "IntLiteral"
-                , "value" .= value
+                , "value" .= SafeInt value
                 , pair "display" $ pairs
                     ("representation" .= repr)
                 ]
@@ -397,7 +416,7 @@ instance FromJSON AST.LiteralValue  where
         case tag of
             "IntLiteral" ->
                 AST.IntNum
-                    <$> obj .: "value"
+                    <$> (fromSafeInt <$> obj .: "value")
                     <*> return DecimalInt
 
             "FloatLiteral" ->

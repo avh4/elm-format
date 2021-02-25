@@ -10,11 +10,25 @@ boolean =
 
 
 integer =
-    "TODO: Object (fromList [(\"tag\",String \"ListLiteral\"),(\"terms\",Array [Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 1.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 15.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 15.0),(\"col\",Number 8.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"HexadecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 9.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 16.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 16.0),(\"col\",Number 11.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"HexadecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number -9.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 17.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 17.0),(\"col\",Number 12.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"HexadecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 3866.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 18.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 18.0),(\"col\",Number 13.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"HexadecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number -3866.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 19.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 19.0),(\"col\",Number 14.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"HexadecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 129717.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 20.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 20.0),(\"col\",Number 17.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"HexadecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number -129717.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 21.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 21.0),(\"col\",Number 18.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"HexadecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 4.600387192e9),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 22.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 22.0),(\"col\",Number 25.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"HexadecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number -4.600387192e9),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 23.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 23.0),(\"col\",Number 26.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"HexadecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 9.223372036854776e18),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 24.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 24.0),(\"col\",Number 25.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"HexadecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number -9.223372036854776e18),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 25.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 25.0),(\"col\",Number 26.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 9.223372036854776e18),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 26.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 26.0),(\"col\",Number 26.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number -9.223372036854776e18),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 27.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 27.0),(\"col\",Number 27.0)]))]))])]),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 15.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 28.0),(\"col\",Number 6.0)]))]))])"
+    [ 1
+    , 9
+    , -9
+    , 3866
+    , -3866
+    , 129717
+    , -129717
+    , 4600387192
+    , -4600387192
+    , 9223372036854775807
+    , -9223372036854775807
+    , 9223372036854775807
+    , -9223372036854775808
+    ]
 
 
 float =
-    "TODO: Object (fromList [(\"tag\",String \"ListLiteral\"),(\"terms\",Array [Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalFloat\")])),(\"tag\",String \"FloatLiteral\"),(\"value\",Number 2.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 32.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 32.0),(\"col\",Number 10.0)]))]))])]),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 32.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 33.0),(\"col\",Number 6.0)]))]))])"
+    [ 2.0
+    ]
 
 
 string =
@@ -50,23 +64,47 @@ char =
 
 
 unicodeChars =
-    "TODO: Object (fromList [(\"tag\",String \"ListLiteral\"),(\"terms\",Array [Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"a\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 10.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \" \"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 12.0)])),(\"end\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"/\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 17.0)])),(\"end\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 20.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\\"\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 22.0)])),(\"end\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 25.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\1701\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 27.0)])),(\"end\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 30.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\128512\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 32.0)])),(\"end\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 35.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\12353\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 37.0)])),(\"end\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 40.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\12163\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 42.0)])),(\"end\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 45.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\120799\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 47.0)])),(\"end\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 50.0)]))]))])]),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 72.0),(\"col\",Number 52.0)]))]))])"
+    [ 'a'
+    , ' '
+    , '/'
+    , '"'
+    , 'ڥ'
+    , '😀'
+    , 'ぁ'
+    , '⾃'
+    , '𝟟'
+    ]
 
 
 escapedSpecialChars =
-    "TODO: Object (fromList [(\"tag\",String \"ListLiteral\"),(\"terms\",Array [Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\t\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 76.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 76.0),(\"col\",Number 11.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\n\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 76.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 76.0),(\"col\",Number 17.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\\\\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 76.0),(\"col\",Number 19.0)])),(\"end\",Object (fromList [(\"line\",Number 76.0),(\"col\",Number 23.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"'\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 76.0),(\"col\",Number 25.0)])),(\"end\",Object (fromList [(\"line\",Number 76.0),(\"col\",Number 29.0)]))]))])]),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 76.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 76.0),(\"col\",Number 31.0)]))]))])"
+    [ '\t'
+    , '\n'
+    , '\\'
+    , '\''
+    ]
 
 
 escapedControlChars =
-    "TODO: Object (fromList [(\"tag\",String \"ListLiteral\"),(\"terms\",Array [Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\NUL\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 80.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 80.0),(\"col\",Number 17.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\US\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 80.0),(\"col\",Number 19.0)])),(\"end\",Object (fromList [(\"line\",Number 80.0),(\"col\",Number 29.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\DEL\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 80.0),(\"col\",Number 31.0)])),(\"end\",Object (fromList [(\"line\",Number 80.0),(\"col\",Number 41.0)]))]))])]),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 80.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 80.0),(\"col\",Number 43.0)]))]))])"
+    [ '\u{0000}'
+    , '\u{001F}'
+    , '\u{007F}'
+    ]
 
 
 escapedNonPrintChars =
-    "TODO: Object (fromList [(\"tag\",String \"ListLiteral\"),(\"terms\",Array [Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\1757\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 84.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 84.0),(\"col\",Number 17.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\65531\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 84.0),(\"col\",Number 19.0)])),(\"end\",Object (fromList [(\"line\",Number 84.0),(\"col\",Number 29.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\69821\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 84.0),(\"col\",Number 31.0)])),(\"end\",Object (fromList [(\"line\",Number 84.0),(\"col\",Number 42.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\917631\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 84.0),(\"col\",Number 44.0)])),(\"end\",Object (fromList [(\"line\",Number 84.0),(\"col\",Number 55.0)]))]))])]),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 84.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 84.0),(\"col\",Number 57.0)]))]))])"
+    [ '\u{06DD}'
+    , '\u{FFFB}'
+    , '\u{110BD}'
+    , '\u{E007F}'
+    ]
 
 
 whitespaceChars =
-    "TODO: Object (fromList [(\"tag\",String \"ListLiteral\"),(\"terms\",Array [Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \" \"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 88.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 88.0),(\"col\",Number 10.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\160\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 88.0),(\"col\",Number 12.0)])),(\"end\",Object (fromList [(\"line\",Number 88.0),(\"col\",Number 22.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\8192\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 88.0),(\"col\",Number 24.0)])),(\"end\",Object (fromList [(\"line\",Number 88.0),(\"col\",Number 34.0)]))]))]),Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"\\8287\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 88.0),(\"col\",Number 36.0)])),(\"end\",Object (fromList [(\"line\",Number 88.0),(\"col\",Number 46.0)]))]))])]),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 88.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 88.0),(\"col\",Number 48.0)]))]))])"
+    [ ' '
+    , '\u{00A0}'
+    , '\u{2000}'
+    , '\u{205F}'
+    ]
 
 
 multilineString =
@@ -78,4 +116,13 @@ multilineString_keepsTrailingWhitespace =
 
 
 multilineStringQuoteHandling =
-    "TODO: Object (fromList [(\"tag\",String \"ListLiteral\"),(\"terms\",Array [Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"TripleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"trailing double quote\\\"\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 113.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 113.0),(\"col\",Number 36.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"TripleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"trailing double quote 2\\\"\\\"\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 114.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 114.0),(\"col\",Number 40.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"TripleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"trailing double quote 3\\\"\\\"\\\"\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 115.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 115.0),(\"col\",Number 42.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"TripleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"trailing double quote 4\\\"\\\"\\\"\\\"\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 116.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 116.0),(\"col\",Number 44.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"TripleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"embedded triple double quotes (\\\"\\\"\\\")\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 117.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 117.0),(\"col\",Number 51.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"TripleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"embedded triple double quotes (\\\"\\\"\\\") (\\\"\\\"\\\"\\\")\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 118.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 118.0),(\"col\",Number 62.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"TripleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"\\\"\\\"leading double quote 2\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 119.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 119.0),(\"col\",Number 37.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"TripleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"\\\"\\\"\\\" leading double quote 3\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 120.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 120.0),(\"col\",Number 42.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"TripleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"\\\"\\\"\\\"\\\" leading double quote 4\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 121.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 121.0),(\"col\",Number 44.0)]))]))])]),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 113.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 122.0),(\"col\",Number 6.0)]))]))])"
+    [ "trailing double quote\""
+    , "trailing double quote 2\"\""
+    , "trailing double quote 3\"\"\""
+    , "trailing double quote 4\"\"\"\""
+    , "embedded triple double quotes (\"\"\")"
+    , "embedded triple double quotes (\"\"\") (\"\"\"\")"
+    , "\"\"leading double quote 2"
+    , "\"\"\" leading double quote 3"
+    , "\"\"\"\" leading double quote 4"
+    ]

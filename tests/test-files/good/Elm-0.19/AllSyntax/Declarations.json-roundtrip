@@ -126,7 +126,7 @@ expressionTypeAnnotation4 =
 
 expressionTypeAnnotationForcedMultiline : Int -> Result String Bool -> List (Maybe.Maybe ())
 expressionTypeAnnotationForcedMultiline _ _ =
-    "TODO: Object (fromList [(\"tag\",String \"ListLiteral\"),(\"terms\",Array []),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 175.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 175.0),(\"col\",Number 7.0)]))]))])"
+    []
 
 
 parametersWithTypes : Int -> String -> Bool
