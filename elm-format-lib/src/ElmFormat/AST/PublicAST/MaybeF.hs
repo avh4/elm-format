@@ -18,3 +18,7 @@ instance Traversable f => Traversable (MaybeF f) where
 instance Coapplicative f => Coapplicative (MaybeF f) where
     extract (JustF fa) = extract fa
     extract (NothingF a) = a
+
+maybeF :: (a -> x) -> (f a -> x) -> MaybeF f a -> x
+maybeF fromA _ (NothingF a) = fromA a
+maybeF _ fromFa (JustF fa) = fromFa fa
