@@ -248,4 +248,4 @@ instance FromJSON CustomTypeVariant where
     parseJSON = withObject "CustomTypeVariant" $ \obj ->
         CustomTypeVariant
             <$> obj .: "name"
-            <*> obj .: "parameterTypes"
+            <*> obj .:? "parameterTypes" .!= []
