@@ -292,6 +292,13 @@ instance FromPublicAST 'ExpressionNK where
                 (C ([], []) . toRawAST <$> terms)
                 True
 
+        RecordLiteral base fields display ->
+            AST.Record
+                (C ([], []) <$> base)
+                (Either.fromRight undefined $ AST.fromCommentedList $ C ([], [], Nothing) . (\(field, expression) -> Pair (C [] field) (C [] $ toRawAST expression) (AST.ForceMultiline False)) <$> Map.toList fields)
+                []
+                (AST.ForceMultiline True)
+
 
 instance ToJSON Expression where
     toJSON = undefined
@@ -438,6 +445,17 @@ instance FromJSON Expression where
             "TupleLiteral" ->
                 TupleLiteral
                     <$> obj .: "terms"
+
+            "RecordLiteral" ->
+                RecordLiteral Nothing
+                    <$> obj .: "fields"
+                    <*> return (RecordDisplay [])
+
+            "RecordUpdate" ->
+                RecordLiteral
+                    <$> (Just <$> obj .: "base")
+                    <*> obj .: "fields"
+                    <*> return (RecordDisplay [])
 
             _ ->
                 return $ LiteralExpression $ Str ("TODO: " <> show (Object obj)) SingleQuotedString

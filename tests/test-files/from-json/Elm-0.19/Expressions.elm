@@ -1,4 +1,4 @@
-module Expressions exposing (charLiteral, emptyList, floatLiteral, functionApplication, intLiteral, list, operator, parensAreAddedWhereNeeded, stringLiteral, tag, tuple, unary, unit, var)
+module Expressions exposing (charLiteral, emptyList, floatLiteral, functionApplication, intLiteral, list, operator, parensAreAddedWhereNeeded, record, recordUpdate, stringLiteral, tag, tuple, unary, unit, var)
 
 
 unit =
@@ -59,3 +59,16 @@ tuple =
     ( ()
     , ()
     )
+
+
+record =
+    { x = ()
+    , y = ()
+    }
+
+
+recordUpdate =
+    { r
+        | x = ()
+        , y = ()
+    }
