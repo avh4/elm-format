@@ -12,11 +12,11 @@ literal =
 
 
 var x =
-    "TODO: Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"x\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 23.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 23.0),(\"col\",Number 6.0)]))]))])"
+    x
 
 
 operator =
-    "TODO: Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"+\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 27.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 27.0),(\"col\",Number 8.0)]))]))])"
+    (+)
 
 
 infixPipeLeft x y z =

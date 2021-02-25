@@ -255,6 +255,10 @@ instance FromPublicAST 'ExpressionNK where
         LiteralExpression lit ->
             AST.Literal lit
 
+        VariableReferenceExpression var ->
+            AST.VarExpr $ toRef var
+
+
 instance ToJSON Expression where
     toJSON = undefined
     toEncoding = pairs . toPairs
@@ -380,6 +384,9 @@ instance FromJSON Expression where
 
             "CharLiteral" ->
                 LiteralExpression <$> parseJSON (Object obj)
+
+            "VariableReference" ->
+                VariableReferenceExpression <$> parseJSON (Object obj)
 
             _ ->
                 return $ LiteralExpression $ Str ("TODO: " <> show (Object obj)) SingleQuotedString
