@@ -10,7 +10,7 @@ import Html.Events as Event exposing (onClick)
 
 token : String
 token =
-    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"SingleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"XYZZY\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 13.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 13.0),(\"col\",Number 12.0)]))]))])"
+    "XYZZY"
 
 
 theBestClass : Html.Attributes.Attribute msg
