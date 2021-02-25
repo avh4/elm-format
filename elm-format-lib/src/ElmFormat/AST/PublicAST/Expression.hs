@@ -19,6 +19,7 @@ import ElmFormat.AST.PublicAST.Type
 import ElmFormat.AST.PublicAST.Comment
 import Data.Maybe (mapMaybe)
 import Data.Text (Text)
+import qualified Data.Either as Either
 
 
 data BinaryOperation
@@ -258,6 +259,12 @@ instance FromPublicAST 'ExpressionNK where
         VariableReferenceExpression var ->
             AST.VarExpr $ toRef var
 
+        ListLiteral terms ->
+            AST.ExplicitList
+                (Either.fromRight undefined $ AST.fromCommentedList $ C ([], [], Nothing) . toRawAST <$> terms)
+                []
+                (AST.ForceMultiline True)
+
 
 instance ToJSON Expression where
     toJSON = undefined
@@ -387,6 +394,10 @@ instance FromJSON Expression where
 
             "VariableReference" ->
                 VariableReferenceExpression <$> parseJSON (Object obj)
+
+            "ListLiteral" ->
+                ListLiteral
+                    <$> obj .: "terms"
 
             _ ->
                 return $ LiteralExpression $ Str ("TODO: " <> show (Object obj)) SingleQuotedString

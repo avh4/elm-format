@@ -1,4 +1,4 @@
-module Expressions exposing (charLiteral, floatLiteral, intLiteral, operator, stringLiteral, tag, unit, var)
+module Expressions exposing (charLiteral, emptyList, floatLiteral, intLiteral, list, operator, stringLiteral, tag, unit, var)
 
 
 unit =
@@ -31,3 +31,13 @@ operator =
 
 tag =
     MyTag
+
+
+emptyList =
+    []
+
+
+list =
+    [ ()
+    , ()
+    ]
