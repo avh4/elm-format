@@ -74,6 +74,46 @@
         },
         {
             "tag": "Definition",
+            "name": "functionApplication",
+            "parameters": [],
+            "expression": {
+                "tag": "FunctionApplication",
+                "function": {
+                    "tag": "VariableReference",
+                    "name": "f"
+                },
+                "arguments": [
+                    {
+                        "tag": "FunctionApplication",
+                        "function": {
+                            "tag": "VariableReference",
+                            "name": "g"
+                        },
+                        "arguments": [
+                            { "tag": "UnitLiteral" }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "parensAreAddedWhereNeeded",
+            "parameters": [],
+            "expression": {
+                "tag": "FunctionApplication",
+                "function": {
+                    "tag": "VariableReference",
+                    "name": "f"
+                },
+                "arguments": [
+                    { "tag": "UnitLiteral" },
+                    { "tag": "UnitLiteral" }
+                ]
+            }
+        },
+        {
+            "tag": "Definition",
             "name": "emptyList",
             "parameters": [],
             "expression": {

@@ -259,6 +259,12 @@ instance FromPublicAST 'ExpressionNK where
         VariableReferenceExpression var ->
             AST.VarExpr $ toRef var
 
+        FunctionApplication function args display ->
+            AST.App
+                (maybeF (I.Fix . Identity . toRawAST') toRawAST function)
+                (C [] . toRawAST <$> args)
+                (AST.FAJoinFirst AST.JoinAll)
+
         ListLiteral terms ->
             AST.ExplicitList
                 (Either.fromRight undefined $ AST.fromCommentedList $ C ([], [], Nothing) . toRawAST <$> terms)
@@ -394,6 +400,12 @@ instance FromJSON Expression where
 
             "VariableReference" ->
                 VariableReferenceExpression <$> parseJSON (Object obj)
+
+            "FunctionApplication" ->
+                FunctionApplication
+                    <$> obj .: "function"
+                    <*> obj .: "arguments"
+                    <*> return (FunctionApplicationDisplay False)
 
             "ListLiteral" ->
                 ListLiteral
