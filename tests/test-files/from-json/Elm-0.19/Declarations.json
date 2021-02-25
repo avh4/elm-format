@@ -4,7 +4,6 @@
         {
             "tag": "TypeAlias",
             "name": "MyTypeAlias",
-            "parameters": [],
             "type": {
                 "tag": "UnitType"
             }
@@ -19,6 +18,13 @@
         },
         {
             "tag": "CustomType",
+            "name": "MyCustomTypeNoParameters",
+            "variants": [
+                { "name": "MyCustomTypeNoParameters" }
+            ]
+        },
+        {
+            "tag": "CustomType",
             "name": "MyCustomType",
             "parameters": [ "a", "b" ],
             "variants": [
@@ -30,15 +36,13 @@
                     ]
                 },
                 {
-                    "name": "None",
-                    "parameterTypes": []
+                    "name": "None"
                 }
             ]
         },
         {
             "tag": "Definition",
             "name": "noTypeAnnotation",
-            "parameters": [],
             "expression": {
                 "tag": "UnitLiteral"
             }
@@ -46,7 +50,6 @@
         {
             "tag": "Definition",
             "name": "withTypeAnnotation",
-            "parameters": [],
             "returnType": { "tag": "UnitType" },
             "expression": { "tag": "UnitLiteral" }
         },

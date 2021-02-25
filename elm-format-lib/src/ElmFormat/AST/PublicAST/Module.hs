@@ -263,13 +263,13 @@ instance FromJSON TopLevelStructure where
             "TypeAlias" ->
                 TypeAlias
                     <$> obj .: "name"
-                    <*> obj .: "parameters"
+                    <*> obj .:? "parameters" .!= []
                     <*> obj .: "type"
 
             "CustomType" ->
                 CustomType
                     <$> obj .: "name"
-                    <*> obj .: "parameters"
+                    <*> obj .:? "parameters" .!= []
                     <*> obj .: "variants"
 
             "Comment" ->

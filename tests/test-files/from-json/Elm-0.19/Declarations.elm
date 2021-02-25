@@ -1,4 +1,4 @@
-module Declarations exposing (MyCustomType(..), MyTypeAlias, MyTypeAliasWithParameters, noTypeAnnotation, withParametersAndTypeAnnotation, withTypeAnnotation)
+module Declarations exposing (MyCustomType(..), MyCustomTypeNoParameters(..), MyTypeAlias, MyTypeAliasWithParameters, noTypeAnnotation, withParametersAndTypeAnnotation, withTypeAnnotation)
 
 
 type alias MyTypeAlias =
@@ -7,6 +7,10 @@ type alias MyTypeAlias =
 
 type alias MyTypeAliasWithParameters x y =
     ()
+
+
+type MyCustomTypeNoParameters
+    = MyCustomTypeNoParameters
 
 
 type MyCustomType a b

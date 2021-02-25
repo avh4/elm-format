@@ -627,7 +627,7 @@ instance FromJSON Definition where
             "Definition" ->
                 Definition
                     <$> obj .: "name"
-                    <*> obj .: "parameters"
+                    <*> obj .:? "parameters" .!= []
                     <*> obj .:? "returnType"
                     <*> obj .: "expression"
 
