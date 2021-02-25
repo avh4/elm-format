@@ -6,7 +6,9 @@ unit =
 
 
 boolean =
-    "TODO: Object (fromList [(\"tag\",String \"TupleLiteral\"),(\"terms\",Array [Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"True\"),(\"module\",String \"Basics\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 9.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 9.0),(\"col\",Number 11.0)]))]))]),Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"False\"),(\"module\",String \"Basics\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 10.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 10.0),(\"col\",Number 12.0)]))]))])]),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 9.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 11.0),(\"col\",Number 6.0)]))]))])"
+    ( "TODO: Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"True\"),(\"module\",String \"Basics\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 9.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 9.0),(\"col\",Number 11.0)]))]))])"
+    , "TODO: Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"False\"),(\"module\",String \"Basics\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 10.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 10.0),(\"col\",Number 12.0)]))]))])"
+    )
 
 
 integer =
@@ -48,7 +50,10 @@ stringWithSpecialEscapedCharacters =
 
 
 stringWithEscapedControlCharacters =
-    "TODO: Object (fromList [(\"tag\",String \"TupleLiteral\"),(\"terms\",Array [Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"SingleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"\\NUL\\SOH\\STX\\ETX\\EOT\\ENQ\\ACK\\a\\b\\v\\f\\r\\SO\\SI\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 53.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 53.0),(\"col\",Number 121.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"SingleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"\\DLE\\DC1\\DC2\\DC3\\DC4\\NAK\\SYN\\ETB\\CAN\\EM\\SUB\\ESC\\FS\\GS\\RS\\US\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 54.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 54.0),(\"col\",Number 137.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"SingleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"\\DEL\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 55.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 55.0),(\"col\",Number 17.0)]))]))])]),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 53.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 56.0),(\"col\",Number 6.0)]))]))])"
+    ( "\u{0000}\u{0001}\u{0002}\u{0003}\u{0004}\u{0005}\u{0006}\u{0007}\u{0008}\u{000B}\u{000C}\u{000D}\u{000E}\u{000F}"
+    , "\u{0010}\u{0011}\u{0012}\u{0013}\u{0014}\u{0015}\u{0016}\u{0017}\u{0018}\u{0019}\u{001A}\u{001B}\u{001C}\u{001D}\u{001E}\u{001F}"
+    , "\u{007F}"
+    )
 
 
 stringWithEscapedNonPrintCharacters =

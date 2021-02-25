@@ -271,6 +271,11 @@ instance FromPublicAST 'ExpressionNK where
                 []
                 (AST.ForceMultiline True)
 
+        TupleLiteral terms ->
+            AST.Tuple
+                (C ([], []) . toRawAST <$> terms)
+                True
+
 
 instance ToJSON Expression where
     toJSON = undefined
@@ -409,6 +414,10 @@ instance FromJSON Expression where
 
             "ListLiteral" ->
                 ListLiteral
+                    <$> obj .: "terms"
+
+            "TupleLiteral" ->
+                TupleLiteral
                     <$> obj .: "terms"
 
             _ ->
