@@ -1,4 +1,4 @@
-module Expressions exposing (charLiteral, emptyList, floatLiteral, functionApplication, intLiteral, list, operator, parensAreAddedWhereNeeded, stringLiteral, tag, unit, var)
+module Expressions exposing (charLiteral, emptyList, floatLiteral, functionApplication, intLiteral, list, operator, parensAreAddedWhereNeeded, stringLiteral, tag, tuple, unit, var)
 
 
 unit =
@@ -49,3 +49,9 @@ list =
     [ ()
     , ()
     ]
+
+
+tuple =
+    ( ()
+    , ()
+    )
