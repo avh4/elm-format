@@ -260,10 +260,26 @@ instance FromPublicAST 'ExpressionNK where
             AST.VarExpr $ toRef var
 
         FunctionApplication function args display ->
-            AST.App
-                (maybeF (I.Fix . Identity . toRawAST') toRawAST function)
-                (C [] . toRawAST <$> args)
-                (AST.FAJoinFirst AST.JoinAll)
+            case (extract function, args) of
+                (UnaryOperator operator, [ single ]) ->
+                    AST.Unary
+                        operator
+                        (toRawAST single)
+
+                (UnaryOperator _, []) ->
+                    undefined
+
+                (UnaryOperator _, _) ->
+                    error "TODO: UnaryOperator with extra arguments"
+
+                _ ->
+                    AST.App
+                        (maybeF (I.Fix . Identity . toRawAST') toRawAST function)
+                        (C [] . toRawAST <$> args)
+                        (AST.FAJoinFirst AST.JoinAll)
+
+        UnaryOperator _ ->
+            error "UnaryOperator is only valid as the \"function\" of a FunctionApplication node"
 
         ListLiteral terms ->
             AST.ExplicitList
@@ -410,6 +426,10 @@ instance FromJSON Expression where
                     <$> obj .: "function"
                     <*> obj .: "arguments"
                     <*> return (FunctionApplicationDisplay False)
+
+            "UnaryOperator" ->
+                UnaryOperator
+                    <$> obj .: "operator"
 
             "ListLiteral" ->
                 ListLiteral

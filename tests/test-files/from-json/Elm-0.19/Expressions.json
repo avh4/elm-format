@@ -114,6 +114,24 @@
         },
         {
             "tag": "Definition",
+            "name": "unary",
+            "parameters": [],
+            "expression": {
+                "tag": "FunctionApplication",
+                "function": {
+                    "tag": "UnaryOperator",
+                    "operator": "-"
+                },
+                "arguments": [
+                    {
+                        "tag": "VariableReference",
+                        "name": "x"
+                    }
+                ]
+            }
+        },
+        {
+            "tag": "Definition",
             "name": "emptyList",
             "parameters": [],
             "expression": {
