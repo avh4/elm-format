@@ -162,6 +162,31 @@
                     { "tag": "UnitLiteral" }
                 ]
             }
+        },
+        {
+            "tag": "Definition",
+            "name": "record",
+            "parameters": [],
+            "expression": {
+                "tag": "RecordLiteral",
+                "fields": {
+                    "x": { "tag": "UnitLiteral" },
+                    "y": { "tag": "UnitLiteral" }
+                }
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "recordUpdate",
+            "parameters": [],
+            "expression": {
+                "tag": "RecordUpdate",
+                "base": "r",
+                "fields": {
+                    "x": { "tag": "UnitLiteral" },
+                    "y": { "tag": "UnitLiteral" }
+                }
+            }
         }
     ]
 }
