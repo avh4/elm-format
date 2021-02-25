@@ -44,6 +44,33 @@
                 "tag": "CharLiteral",
                 "value": "c"
             }
+        },
+        {
+            "tag": "Definition",
+            "name": "var",
+            "parameters": [],
+            "expression": {
+                "tag": "VariableReference",
+                "name": "x"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "operator",
+            "parameters": [],
+            "expression": {
+                "tag": "VariableReference",
+                "name": "+"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "tag",
+            "parameters": [],
+            "expression": {
+                "tag": "VariableReference",
+                "name": "MyTag"
+            }
         }
     ]
 }

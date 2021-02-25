@@ -1,4 +1,4 @@
-module Expressions exposing (charLiteral, floatLiteral, intLiteral, stringLiteral, unit)
+module Expressions exposing (charLiteral, floatLiteral, intLiteral, operator, stringLiteral, tag, unit, var)
 
 
 unit =
@@ -19,3 +19,15 @@ stringLiteral =
 
 charLiteral =
     'c'
+
+
+var =
+    x
+
+
+operator =
+    (+)
+
+
+tag =
+    MyTag
