@@ -344,7 +344,26 @@
                                         "term": {
                                             "arguments": [
                                                 {
-                                                    "operator": "-",
+                                                    "arguments": [
+                                                        {
+                                                            "name": "pi",
+                                                            "sourceLocation": {
+                                                                "end": {
+                                                                    "col": 36,
+                                                                    "line": 31
+                                                                },
+                                                                "start": {
+                                                                    "col": 34,
+                                                                    "line": 31
+                                                                }
+                                                            },
+                                                            "tag": "VariableReference"
+                                                        }
+                                                    ],
+                                                    "function": {
+                                                        "operator": "-",
+                                                        "tag": "UnaryOperator"
+                                                    },
                                                     "sourceLocation": {
                                                         "end": {
                                                             "col": 36,
@@ -355,21 +374,7 @@
                                                             "line": 31
                                                         }
                                                     },
-                                                    "tag": "UnaryOperator",
-                                                    "term": {
-                                                        "name": "pi",
-                                                        "sourceLocation": {
-                                                            "end": {
-                                                                "col": 36,
-                                                                "line": 31
-                                                            },
-                                                            "start": {
-                                                                "col": 34,
-                                                                "line": 31
-                                                            }
-                                                        },
-                                                        "tag": "VariableReference"
-                                                    }
+                                                    "tag": "FunctionApplication"
                                                 }
                                             ],
                                             "function": {

@@ -790,7 +790,26 @@
         },
         {
             "expression": {
-                "operator": "-",
+                "arguments": [
+                    {
+                        "name": "x",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 7,
+                                "line": 62
+                            },
+                            "start": {
+                                "col": 6,
+                                "line": 62
+                            }
+                        },
+                        "tag": "VariableReference"
+                    }
+                ],
+                "function": {
+                    "operator": "-",
+                    "tag": "UnaryOperator"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 7,
@@ -801,21 +820,7 @@
                         "line": 62
                     }
                 },
-                "tag": "UnaryOperator",
-                "term": {
-                    "name": "x",
-                    "sourceLocation": {
-                        "end": {
-                            "col": 7,
-                            "line": 62
-                        },
-                        "start": {
-                            "col": 6,
-                            "line": 62
-                        }
-                    },
-                    "tag": "VariableReference"
-                }
+                "tag": "FunctionApplication"
             },
             "name": "unary",
             "parameters": [
