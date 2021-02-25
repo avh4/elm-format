@@ -264,6 +264,11 @@ instance ToJSON AST.UnaryOperator where
     toJSON = undefined
     toEncoding Negative = toEncoding ("-" :: Text)
 
+instance FromJSON AST.UnaryOperator where
+    parseJSON = withText "UnaryOperator" $ \case
+        "-" -> return AST.Negative
+        other -> fail ("unexpected UnaryOperator (\"-\" is the only valid one): " <> show other)
+
 
 instance ToJSON (AST.Listing AST.DetailedListing) where
     toJSON = undefined

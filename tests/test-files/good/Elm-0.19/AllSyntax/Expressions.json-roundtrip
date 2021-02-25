@@ -47,7 +47,7 @@ functionApplicationMultiline =
 
 
 unary x =
-    "TODO: Object (fromList [(\"tag\",String \"UnaryOperator\"),(\"operator\",String \"-\")])" x
+    -x
 
 
 binary =
