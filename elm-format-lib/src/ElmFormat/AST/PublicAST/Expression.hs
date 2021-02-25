@@ -114,7 +114,6 @@ data Expression
         }
     | UnaryOperator
         { operator :: AST.UnaryOperator
-        , term :: LocatedIfRequested Expression
         }
     | ListLiteral
         { terms :: List (LocatedIfRequested Expression)
@@ -177,9 +176,10 @@ instance ToPublicAST 'ExpressionNK where
                 (fmap (\(AST.BinopsClause c1 op c2 expr) -> BinaryOperation (mkReference op) (fromRawAST config expr)) rest)
 
         AST.Unary op expr ->
-            UnaryOperator
-                op
-                (fromRawAST config expr)
+            FunctionApplication
+                (NothingF $ UnaryOperator op)
+                [ fromRawAST config expr ]
+                (FunctionApplicationDisplay False)
 
         AST.Parens (C comments expr) ->
             fromRawAST' config $ extract $ I.unFix expr
@@ -309,11 +309,10 @@ instance ToPairs Expression where
                 , "operations" .= operations
                 ]
 
-        UnaryOperator operator term ->
+        UnaryOperator operator ->
             mconcat
                 [ type_ "UnaryOperator"
                 , "operator" .= operator
-                , "term" .= term
                 ]
 
         ListLiteral terms ->

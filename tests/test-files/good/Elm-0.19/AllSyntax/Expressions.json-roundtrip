@@ -47,7 +47,7 @@ functionApplicationMultiline =
 
 
 unary x =
-    "TODO: Object (fromList [(\"tag\",String \"UnaryOperator\"),(\"operator\",String \"-\"),(\"term\",Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"x\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 62.0),(\"col\",Number 6.0)])),(\"end\",Object (fromList [(\"line\",Number 62.0),(\"col\",Number 7.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 62.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 62.0),(\"col\",Number 7.0)]))]))])"
+    "TODO: Object (fromList [(\"tag\",String \"UnaryOperator\"),(\"operator\",String \"-\")])" x
 
 
 binary =
