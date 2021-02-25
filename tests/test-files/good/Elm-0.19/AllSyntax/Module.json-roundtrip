@@ -15,12 +15,12 @@ type CustomType
 
 
 a =
-    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 1.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 40.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 40.0),(\"col\",Number 6.0)]))]))])"
+    1
 
 
 b =
-    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 2.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 44.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 44.0),(\"col\",Number 6.0)]))]))])"
+    2
 
 
 c =
-    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 3.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 48.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 48.0),(\"col\",Number 6.0)]))]))])"
+    3

@@ -1,0 +1,49 @@
+{
+    "moduleName": "Expressions",
+    "body": [
+        {
+            "tag": "Definition",
+            "name": "unit",
+            "parameters": [],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "intLiteral",
+            "parameters": [],
+            "expression": {
+                "tag": "IntLiteral",
+                "value": 1
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "floatLiteral",
+            "parameters": [],
+            "expression": {
+                "tag": "FloatLiteral",
+                "value": 2
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "stringLiteral",
+            "parameters": [],
+            "expression": {
+                "tag": "StringLiteral",
+                "value": "string"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "charLiteral",
+            "parameters": [],
+            "expression": {
+                "tag": "CharLiteral",
+                "value": "c"
+            }
+        }
+    ]
+}

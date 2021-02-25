@@ -369,6 +369,18 @@ instance FromJSON Expression where
             "UnitLiteral" ->
                 return UnitLiteral
 
+            "IntLiteral" ->
+                LiteralExpression <$> parseJSON (Object obj)
+
+            "FloatLiteral" ->
+                LiteralExpression <$> parseJSON (Object obj)
+
+            "StringLiteral" ->
+                LiteralExpression <$> parseJSON (Object obj)
+
+            "CharLiteral" ->
+                LiteralExpression <$> parseJSON (Object obj)
+
             _ ->
                 return $ LiteralExpression $ Str ("TODO: " <> show (Object obj)) SingleQuotedString
 

@@ -18,19 +18,19 @@ float =
 
 
 string =
-    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"SingleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"string\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 37.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 37.0),(\"col\",Number 13.0)]))]))])"
+    "string"
 
 
 stringWithUnicodeCharacters =
-    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"SingleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"a b'`<>{}/\\1701\\128512\\12353\\12163\\120799\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 41.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 41.0),(\"col\",Number 22.0)]))]))])"
+    "a b'`<>{}/ڥ😀ぁ⾃𝟟"
 
 
 stringWithEscapedCharacterFollowedByHexDigit =
-    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"SingleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"\\128512\\&0\\128512\\&9\\128512a\\128512F\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 45.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 45.0),(\"col\",Number 15.0)]))]))])"
+    "😀0😀9😀a😀F"
 
 
 stringWithSpecialEscapedCharacters =
-    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"SingleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"\\t\\n\\\\\\\"\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 49.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 49.0),(\"col\",Number 15.0)]))]))])"
+    "\t\n\\\""
 
 
 stringWithEscapedControlCharacters =
@@ -38,15 +38,15 @@ stringWithEscapedControlCharacters =
 
 
 stringWithEscapedNonPrintCharacters =
-    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"SingleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"\\1757\\65531\\69821\\917631\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 60.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 60.0),(\"col\",Number 41.0)]))]))])"
+    "\u{06DD}\u{FFFB}\u{110BD}\u{E007F}"
 
 
 stringWithWhitespace =
-    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"SingleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \" \\160\\8192\\8287\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 64.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 64.0),(\"col\",Number 32.0)]))]))])"
+    " \u{00A0}\u{2000}\u{205F}"
 
 
 char =
-    "TODO: Object (fromList [(\"tag\",String \"CharLiteral\"),(\"value\",String \"c\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 68.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 68.0),(\"col\",Number 8.0)]))]))])"
+    'c'
 
 
 unicodeChars =
@@ -70,11 +70,11 @@ whitespaceChars =
 
 
 multilineString =
-    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"TripleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"normals = \\\"a b'`<>{}/\\1701\\128512\\12353\\12163\\120799\\\"\\n\\\"\\t\\\\\\n\\\"\\\"\\n\\\"\\\"\\\"\\n\\\"\\\"\\\"\\\"\\n\\NUL\\SOH\\STX\\ETX\\EOT\\ENQ\\ACK\\a\\b\\v\\f\\r\\SO\\SI\\n\\DLE\\DC1\\DC2\\DC3\\DC4\\NAK\\SYN\\ETB\\CAN\\EM\\SUB\\ESC\\FS\\GS\\RS\\US\\n\\DEL\\n\\1757\\65531\\69821\\917631\\n\\160\\8192\\8287\\n\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 92.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 102.0),(\"col\",Number 4.0)]))]))])"
+    "normals = \"a b'`<>{}/ڥ😀ぁ⾃𝟟\"\n\"\t\\\n\"\"\n\"\"\"\n\"\"\"\"\n\u{0000}\u{0001}\u{0002}\u{0003}\u{0004}\u{0005}\u{0006}\u{0007}\u{0008}\u{000B}\u{000C}\u{000D}\u{000E}\u{000F}\n\u{0010}\u{0011}\u{0012}\u{0013}\u{0014}\u{0015}\u{0016}\u{0017}\u{0018}\u{0019}\u{001A}\u{001B}\u{001C}\u{001D}\u{001E}\u{001F}\n\u{007F}\n\u{06DD}\u{FFFB}\u{110BD}\u{E007F}\n\u{00A0}\u{2000}\u{205F}\n"
 
 
 multilineString_keepsTrailingWhitespace =
-    "TODO: Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"TripleQuotedString\")])),(\"tag\",String \"StringLiteral\"),(\"value\",String \"   3   \\n  2  \\n 1 \\n\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 106.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 109.0),(\"col\",Number 4.0)]))]))])"
+    "   3   \n  2  \n 1 \n"
 
 
 multilineStringQuoteHandling =
