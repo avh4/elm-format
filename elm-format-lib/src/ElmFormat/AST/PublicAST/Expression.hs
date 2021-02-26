@@ -302,6 +302,13 @@ instance FromPublicAST 'ExpressionNK where
         RecordAccessFunction field ->
             AST.AccessFunction  field
 
+        AnonymousFunction parameters body ->
+            AST.Lambda
+                (C [] . toRawAST <$> parameters)
+                []
+                (toRawAST body)
+                False
+
 
 instance ToJSON Expression where
     toJSON = undefined
@@ -466,6 +473,11 @@ instance FromJSON Expression where
             "RecordAccessFunction" ->
                 RecordAccessFunction
                     <$> obj .: "field"
+
+            "AnonymousFunction" ->
+                AnonymousFunction
+                    <$> obj .: "parameters"
+                    <*> obj .: "body"
 
             _ ->
                 return $ LiteralExpression $ Str ("TODO: " <> show (Object obj)) SingleQuotedString
