@@ -1,4 +1,4 @@
-module Expressions exposing (charLiteral, emptyList, floatLiteral, functionApplication, intLiteral, list, operator, parensAreAddedWhereNeeded, record, recordAccessFunction, recordUpdate, stringLiteral, tag, tuple, unary, unit, var)
+module Expressions exposing (charLiteral, emptyList, externalReference, floatLiteral, functionApplication, intLiteral, list, operator, parensAreAddedWhereNeeded, record, recordAccessFunction, recordUpdate, stringLiteral, tag, tuple, unary, unit, var)
 
 
 unit =
@@ -31,6 +31,10 @@ operator =
 
 tag =
     MyTag
+
+
+externalReference =
+    List.map
 
 
 functionApplication =

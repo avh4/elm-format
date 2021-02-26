@@ -131,12 +131,12 @@ expressionTypeAnnotationForcedMultiline _ _ =
 
 parametersWithTypes : Int -> String -> Bool
 parametersWithTypes anInt aString =
-    "TODO: Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"False\"),(\"module\",String \"Basics\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 180.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 180.0),(\"col\",Number 10.0)]))]))])"
+    Basics.False
 
 
 parametersWithTypesCurried : Int -> (String -> Bool)
 parametersWithTypesCurried anInt =
-    "TODO: Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"todo\"),(\"module\",String \"Debug\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 185.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 185.0),(\"col\",Number 15.0)]))]))])"
+    Debug.todo
 
 
 
