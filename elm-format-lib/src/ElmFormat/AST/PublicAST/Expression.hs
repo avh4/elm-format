@@ -431,6 +431,9 @@ instance FromJSON Expression where
             "VariableReference" ->
                 VariableReferenceExpression <$> parseJSON (Object obj)
 
+            "ExternalReference" ->
+                VariableReferenceExpression <$> parseJSON (Object obj)
+
             "FunctionApplication" ->
                 FunctionApplication
                     <$> obj .: "function"

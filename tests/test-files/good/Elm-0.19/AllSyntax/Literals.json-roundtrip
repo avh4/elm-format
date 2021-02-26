@@ -6,8 +6,8 @@ unit =
 
 
 boolean =
-    ( "TODO: Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"True\"),(\"module\",String \"Basics\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 9.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 9.0),(\"col\",Number 11.0)]))]))])"
-    , "TODO: Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"False\"),(\"module\",String \"Basics\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 10.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 10.0),(\"col\",Number 12.0)]))]))])"
+    ( Basics.True
+    , Basics.False
     )
 
 

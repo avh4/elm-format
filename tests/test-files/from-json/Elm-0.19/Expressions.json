@@ -66,6 +66,15 @@
         },
         {
             "tag": "Definition",
+            "name": "externalReference",
+            "expression": {
+                "tag": "ExternalReference",
+                "module": "List",
+                "identifier": "map"
+            }
+        },
+        {
+            "tag": "Definition",
             "name": "functionApplication",
             "expression": {
                 "tag": "FunctionApplication",

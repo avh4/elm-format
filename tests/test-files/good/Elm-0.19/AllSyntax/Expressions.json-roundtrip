@@ -205,7 +205,7 @@ recordAccess f a b r =
             | x = 1
         }
     , .y (.x a)
-    , .x "TODO: Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"record\"),(\"module\",String \"Foo\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 252.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 252.0),(\"col\",Number 17.0)]))]))])"
+    , .x Foo.record
     )
 
 
