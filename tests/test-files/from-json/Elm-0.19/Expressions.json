@@ -171,6 +171,14 @@
                     "y": { "tag": "UnitLiteral" }
                 }
             }
+        },
+        {
+            "tag": "Definition",
+            "name": "recordAccessFunction",
+            "expression": {
+                "tag": "RecordAccessFunction",
+                "field": "x"
+            }
         }
     ]
 }

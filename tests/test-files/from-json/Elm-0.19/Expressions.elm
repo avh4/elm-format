@@ -1,4 +1,4 @@
-module Expressions exposing (charLiteral, emptyList, floatLiteral, functionApplication, intLiteral, list, operator, parensAreAddedWhereNeeded, record, recordUpdate, stringLiteral, tag, tuple, unary, unit, var)
+module Expressions exposing (charLiteral, emptyList, floatLiteral, functionApplication, intLiteral, list, operator, parensAreAddedWhereNeeded, record, recordAccessFunction, recordUpdate, stringLiteral, tag, tuple, unary, unit, var)
 
 
 unit =
@@ -72,3 +72,7 @@ recordUpdate =
         | x = ()
         , y = ()
     }
+
+
+recordAccessFunction =
+    .x

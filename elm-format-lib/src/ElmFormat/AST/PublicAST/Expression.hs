@@ -212,6 +212,9 @@ instance ToPublicAST 'ExpressionNK where
                 [ fromRawAST config base ]
                 (FunctionApplicationDisplay True)
 
+        AST.AccessFunction field ->
+            RecordAccessFunction field
+
         AST.Lambda parameters comments body multiline ->
             AnonymousFunction
                 (fmap (\(C c a) -> fromRawAST config a) parameters)
@@ -241,9 +244,6 @@ instance ToPublicAST 'ExpressionNK where
 
         AST.Range _ _ _ ->
             error "Range syntax is not supported in Elm 0.19"
-
-        AST.AccessFunction field ->
-            RecordAccessFunction field
 
         AST.GLShader shader ->
             GLShader shader
@@ -298,6 +298,9 @@ instance FromPublicAST 'ExpressionNK where
                 (Either.fromRight undefined $ AST.fromCommentedList $ C ([], [], Nothing) . (\(field, expression) -> Pair (C [] field) (C [] $ toRawAST expression) (AST.ForceMultiline False)) <$> Map.toList fields)
                 []
                 (AST.ForceMultiline True)
+
+        RecordAccessFunction field ->
+            AST.AccessFunction  field
 
 
 instance ToJSON Expression where
@@ -456,6 +459,10 @@ instance FromJSON Expression where
                     <$> (Just <$> obj .: "base")
                     <*> obj .: "fields"
                     <*> return (RecordDisplay [])
+
+            "RecordAccessFunction" ->
+                RecordAccessFunction
+                    <$> obj .: "field"
 
             _ ->
                 return $ LiteralExpression $ Str ("TODO: " <> show (Object obj)) SingleQuotedString
