@@ -188,6 +188,20 @@
                 "tag": "RecordAccessFunction",
                 "field": "x"
             }
+        },
+        {
+            "tag": "Definition",
+            "name": "lambda",
+            "expression": {
+                "tag": "AnonymousFunction",
+                "parameters": [
+                    { "tag": "VariableDefinition", "name": "a" },
+                    { "tag": "VariableDefinition", "name": "b" }
+                ],
+                "body": {
+                    "tag": "UnitLiteral"
+                }
+            }
         }
     ]
 }
