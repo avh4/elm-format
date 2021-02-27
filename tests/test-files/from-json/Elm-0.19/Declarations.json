@@ -1,0 +1,73 @@
+{
+    "moduleName": "Declarations",
+    "body": [
+        {
+            "tag": "TypeAlias",
+            "name": "MyTypeAlias",
+            "type": {
+                "tag": "UnitType"
+            }
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyTypeAliasWithParameters",
+            "parameters": [ "x", "y" ],
+            "type": {
+                "tag": "UnitType"
+            }
+        },
+        {
+            "tag": "CustomType",
+            "name": "MyCustomTypeNoParameters",
+            "variants": [
+                { "name": "MyCustomTypeNoParameters" }
+            ]
+        },
+        {
+            "tag": "CustomType",
+            "name": "MyCustomType",
+            "parameters": [ "a", "b" ],
+            "variants": [
+                {
+                    "name": "Both",
+                    "parameterTypes": [
+                        { "tag": "TypeVariable", "name": "a" },
+                        { "tag": "TypeVariable", "name": "b" }
+                    ]
+                },
+                {
+                    "name": "None"
+                }
+            ]
+        },
+        {
+            "tag": "Definition",
+            "name": "noTypeAnnotation",
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "withTypeAnnotation",
+            "returnType": { "tag": "UnitType" },
+            "expression": { "tag": "UnitLiteral" }
+        },
+        {
+            "tag": "Definition",
+            "name": "withParametersAndTypeAnnotation",
+            "parameters": [
+                {
+                    "pattern": { "tag": "VariableDefinition", "name": "a" },
+                    "type": { "tag": "TypeReference", "name": "Int" }
+                },
+                {
+                    "pattern": { "tag": "VariableDefinition", "name": "b" },
+                    "type": { "tag": "TypeReference", "name": "String" }
+                }
+            ],
+            "returnType": { "tag": "UnitType" },
+            "expression": { "tag": "UnitLiteral" }
+        }
+    ]
+}

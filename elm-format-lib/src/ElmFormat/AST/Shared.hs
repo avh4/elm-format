@@ -1,18 +1,24 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
 module ElmFormat.AST.Shared where
-
-{-| This module contains types that are used by multiple versions of the Elm AST.
--}
 
 import Data.Coapplicative
 import Data.Int (Int64)
+import GHC.Generics
+import Data.Text (Text)
+import qualified Data.Text as Text
+import qualified Data.Tuple as Tuple
+import qualified Data.Char as Char
+
+{-| This module contains types that are used by multiple versions of the Elm AST.
+-}
 
 
 type List a = [a]
 
 
-data LowercaseIdentifier =
+newtype LowercaseIdentifier =
     LowercaseIdentifier String
     deriving (Eq, Ord)
 
@@ -20,12 +26,12 @@ instance Show LowercaseIdentifier where
     show (LowercaseIdentifier name) = name
 
 
-data UppercaseIdentifier =
+newtype UppercaseIdentifier =
     UppercaseIdentifier String
     deriving (Eq, Ord, Show)
 
 
-data SymbolIdentifier =
+newtype SymbolIdentifier =
     SymbolIdentifier String
     deriving (Eq, Ord, Show)
 
@@ -42,19 +48,19 @@ instance Coapplicative (Commented c) where
 data IntRepresentation
   = DecimalInt
   | HexadecimalInt
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
 
 
 data FloatRepresentation
   = DecimalFloat
   | ExponentFloat
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
 
 
 data StringRepresentation
     = SingleQuotedString
     | TripleQuotedString
-    deriving (Eq, Show)
+    deriving (Eq, Show, Generic)
 
 
 data LiteralValue
@@ -71,6 +77,21 @@ data Ref ns
     | TagRef ns UppercaseIdentifier
     | OpRef SymbolIdentifier
     deriving (Eq, Ord, Show, Functor)
+
+refFromText :: Text -> Maybe (Ref ())
+refFromText text =
+    case Tuple.fst <$> Text.uncons text of
+        Just first | Char.isUpper first ->
+            Just $ TagRef () (UppercaseIdentifier $ Text.unpack text)
+
+        Just first | Char.isLower first ->
+            Just $ VarRef () (LowercaseIdentifier $ Text.unpack text)
+
+        Just _ ->
+            Just $ OpRef (SymbolIdentifier $ Text.unpack text)
+
+        Nothing ->
+            Nothing
 
 
 data UnaryOperator =

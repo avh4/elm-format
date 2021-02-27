@@ -18,6 +18,7 @@ import qualified Data.Indexed as I
 import qualified Cheapskate.Types as Markdown
 import ElmFormat.AST.Shared
 import qualified Data.Maybe as Maybe
+import Data.Text (Text)
 
 
 newtype ForceMultiline =
@@ -58,9 +59,10 @@ type C0Eol = Commented (Maybe String)
 type C1Eol (l1 :: CommentType) = Commented (Comments, Maybe String)
 type C2Eol (l1 :: CommentType) (l2 :: CommentType) = Commented (Comments, Comments, Maybe String)
 
-class ToCommentedList f where
+class AsCommentedList f where
     type CommentsFor f :: * -> *
     toCommentedList :: f a -> List (CommentsFor f a)
+    fromCommentedList :: List (CommentsFor f a) -> Either Text (f a)
 
 
 {-| This represents a list of things separated by comments.
@@ -82,9 +84,10 @@ instance Semigroup (Sequence a) where
 instance Monoid (Sequence a) where
     mempty = Sequence []
 
-instance ToCommentedList Sequence where
+instance AsCommentedList Sequence where
     type CommentsFor Sequence = C2Eol 'BeforeSeparator 'AfterSeparator
     toCommentedList (Sequence items) = items
+    fromCommentedList = Right . Sequence
 
 
 {-| This represents a list of things between clear start and end delimiters.
@@ -137,10 +140,19 @@ data OpenCommentedList a
 instance Foldable OpenCommentedList where
     foldMap f (OpenCommentedList rest last) = foldMap (f . extract) rest <> (f . extract) last
 
-instance ToCommentedList OpenCommentedList where
+instance AsCommentedList OpenCommentedList where
     type CommentsFor OpenCommentedList = C2Eol 'BeforeTerm 'AfterTerm
     toCommentedList (OpenCommentedList rest (C (cLast, eolLast) last)) =
         rest ++ [ C (cLast, [], eolLast) last ]
+    fromCommentedList list =
+        case reverse list of
+            C (cLast, cLastInvalid, eolLast) last : revRest ->
+                Right $ OpenCommentedList
+                    (reverse revRest)
+                    (C (cLast ++ cLastInvalid, eolLast) last)
+
+            [] ->
+                Left "AsCommentedList may not be empty"
 
 
 exposedToOpen :: Comments -> ExposedCommentedList a -> OpenCommentedList a
@@ -247,7 +259,8 @@ data LocalName
 
 data NodeKind
     = TopLevelNK
-    | DeclarationNK
+    | CommonDeclarationNK
+    | TopLevelDeclarationNK
     | ExpressionNK
     | LetDeclarationNK
     | CaseBranchNK
@@ -258,7 +271,7 @@ data NodeKind
 data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) where
 
     TopLevel ::
-        [TopLevelStructure (getType 'DeclarationNK)]
+        [TopLevelStructure (getType 'TopLevelDeclarationNK)]
         -> AST typeRef ctorRef varRef getType 'TopLevelNK
 
     --
@@ -270,44 +283,47 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         -> [C1 'BeforeTerm (getType 'PatternNK)]
         -> Comments
         -> getType 'ExpressionNK
-        -> AST typeRef ctorRef varRef getType 'DeclarationNK
+        -> AST typeRef ctorRef varRef getType 'CommonDeclarationNK
     TypeAnnotation ::
         C1 'AfterTerm (Ref ())
         -> C1 'BeforeTerm (getType 'TypeNK)
-        -> AST typeRef ctorRef varRef getType 'DeclarationNK
+        -> AST typeRef ctorRef varRef getType 'CommonDeclarationNK
+    CommonDeclaration ::
+        getType 'CommonDeclarationNK
+        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
     Datatype ::
         { nameWithArgs :: C2 'BeforeTerm 'AfterTerm (NameWithArgs UppercaseIdentifier LowercaseIdentifier)
         , tags :: OpenCommentedList (NameWithArgs UppercaseIdentifier (getType 'TypeNK))
         }
-        -> AST typeRef ctorRef varRef getType 'DeclarationNK
+        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
     TypeAlias ::
         Comments
         -> C2 'BeforeTerm 'AfterTerm (NameWithArgs UppercaseIdentifier LowercaseIdentifier)
         -> C1 'BeforeTerm (getType 'TypeNK)
-        -> AST typeRef ctorRef varRef getType 'DeclarationNK
+        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
     PortAnnotation ::
         C2 'BeforeTerm 'AfterTerm LowercaseIdentifier
         -> Comments
         -> getType 'TypeNK
-        -> AST typeRef ctorRef varRef getType 'DeclarationNK
+        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
     PortDefinition_until_0_16 ::
         C2 'BeforeTerm 'AfterTerm LowercaseIdentifier
         -> Comments
         -> getType 'ExpressionNK
-        -> AST typeRef ctorRef varRef getType 'DeclarationNK
+        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
     Fixity_until_0_18 ::
         Assoc
         -> Comments
         -> Int
         -> Comments
         -> varRef
-        -> AST typeRef ctorRef varRef getType 'DeclarationNK
+        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
     Fixity ::
         C1 'BeforeTerm Assoc
         -> C1 'BeforeTerm Int
         -> C2 'BeforeTerm 'AfterTerm SymbolIdentifier
         -> C1 'BeforeTerm LowercaseIdentifier
-        -> AST typeRef ctorRef varRef getType 'DeclarationNK
+        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
 
     --
     -- Expressions
@@ -334,7 +350,7 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     Binops ::
         getType 'ExpressionNK
-        -> [BinopsClause varRef (getType 'ExpressionNK)]
+        -> List (BinopsClause varRef (getType 'ExpressionNK)) -- Non-empty
         -> Bool
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     Parens ::
@@ -392,15 +408,8 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         -> Comments
         -> getType 'ExpressionNK
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
-    LetDefinition ::
-        getType 'PatternNK
-        -> [C1 'BeforeTerm (getType 'PatternNK)]
-        -> Comments
-        -> getType 'ExpressionNK
-        -> AST typeRef ctorRef varRef getType 'LetDeclarationNK
-    LetAnnotation ::
-        C1 'AfterTerm (Ref ())
-        -> C1 'BeforeTerm (getType 'TypeNK)
+    LetCommonDeclaration ::
+        getType 'CommonDeclarationNK
         -> AST typeRef ctorRef varRef getType 'LetDeclarationNK
     LetComment ::
         Comment
@@ -513,7 +522,8 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
 
 deriving instance
     ( Eq typeRef, Eq ctorRef, Eq varRef
-    , Eq (getType 'DeclarationNK)
+    , Eq (getType 'CommonDeclarationNK)
+    , Eq (getType 'TopLevelDeclarationNK)
     , Eq (getType 'ExpressionNK)
     , Eq (getType 'LetDeclarationNK)
     , Eq (getType 'CaseBranchNK)
@@ -523,7 +533,8 @@ deriving instance
     Eq (AST typeRef ctorRef varRef getType kind)
 deriving instance
     ( Show typeRef, Show ctorRef, Show varRef
-    , Show (getType 'DeclarationNK)
+    , Show (getType 'CommonDeclarationNK)
+    , Show (getType 'TopLevelDeclarationNK)
     , Show (getType 'ExpressionNK)
     , Show (getType 'LetDeclarationNK)
     , Show (getType 'CaseBranchNK)
@@ -546,6 +557,7 @@ mapAll ftyp fctor fvar fast = \case
     -- Declaration
     Definition name args c e -> Definition (fast name) (fmap (fmap fast) args) c (fast e)
     TypeAnnotation name t -> TypeAnnotation name (fmap fast t)
+    CommonDeclaration d -> CommonDeclaration (fast d)
     Datatype nameWithArgs ctors -> Datatype nameWithArgs (fmap (fmap fast) ctors)
     TypeAlias c nameWithArgs t -> TypeAlias c nameWithArgs (fmap fast t)
     PortAnnotation name c t -> PortAnnotation name c (fast t)
@@ -571,8 +583,7 @@ mapAll ftyp fctor fvar fast = \case
     Lambda args c e ml -> Lambda (fmap (fmap fast) args) c (fast e) ml
     If cond elsifs els -> If (fmap fast cond) (fmap (fmap $ fmap fast) elsifs) (fmap fast els)
     Let decls c e -> Let (fmap fast decls) c (fast e)
-    LetDefinition first rest c e -> LetDefinition (fast first) (fmap (fmap fast) rest) c (fast e)
-    LetAnnotation name typ -> LetAnnotation name (fmap fast typ)
+    LetCommonDeclaration d -> LetCommonDeclaration (fast d)
     LetComment c -> LetComment c
     Case (cond, ml) branches -> Case (fmap fast cond, ml) (fmap fast branches)
     CaseBranch c1 c2 c3 p e -> CaseBranch c1 c2 c3 (fast p) (fast e)
@@ -653,37 +664,32 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
 
         namesFromPattern ::
             Coapplicative ann' =>
-            I.Fix ann' (AST a b c) 'PatternNK
+            I.Fix ann' (AST a b c) kind'
             -> [LocalName]
         namesFromPattern =
             getConst . I.cata (namesFromPattern' . extract)
 
-        namesFromLetDeclaration ::
+        namesFrom ::
             Coapplicative ann' =>
-            I.Fix ann' (AST a b c) 'LetDeclarationNK
+            I.Fix ann' (AST a b c) kind'
             -> [LocalName]
-        namesFromLetDeclaration decl =
+        namesFrom decl =
             case extract $ I.unFix decl of
-                LetDefinition p _ _ _ -> namesFromPattern p
-                LetAnnotation _ _ -> mempty
-                LetComment _ -> mempty
+                Definition p _ _ _ -> namesFromPattern p
+                TypeAnnotation _ _ -> mempty
 
-        namesFromDeclaration ::
-            Coapplicative ann' =>
-            I.Fix ann' (AST a b c) 'DeclarationNK
-            -> [LocalName]
-        namesFromDeclaration decl =
-            case extract $ I.unFix decl of
-               Definition p _ _ _ -> namesFromPattern p
-               TypeAnnotation _ _ -> []
-               Datatype (C _ (NameWithArgs name _)) tags ->
-                   TypeName name
-                   : fmap (\(NameWithArgs name _) -> CtorName name) (toList tags)
-               TypeAlias _ (C _ (NameWithArgs name _)) _ -> [TypeName name]
-               PortAnnotation (C _ name) _ _ -> [VarName name]
-               PortDefinition_until_0_16 (C _ name) _ _ -> [VarName name]
-               Fixity_until_0_18 _ _ _ _ _ -> []
-               Fixity _ _ _ _ -> []
+                CommonDeclaration d -> namesFrom d
+                Datatype (C _ (NameWithArgs name _)) tags ->
+                    TypeName name
+                    : fmap (\(NameWithArgs name _) -> CtorName name) (toList tags)
+                TypeAlias _ (C _ (NameWithArgs name _)) _ -> [TypeName name]
+                PortAnnotation (C _ name) _ _ -> [VarName name]
+                PortDefinition_until_0_16 (C _ name) _ _ -> [VarName name]
+                Fixity_until_0_18 _ _ _ _ _ -> []
+                Fixity _ _ _ _ -> []
+
+                LetCommonDeclaration d -> namesFrom d
+                LetComment _ -> mempty
 
         newDefinitionsAtNode ::
             forall kind'.
@@ -694,19 +700,22 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
         newDefinitionsAtNode node =
             case node of
                 TopLevel decls ->
-                    foldMap (foldMap namesFromDeclaration) decls
+                    foldMap (foldMap namesFrom) decls
+
+                CommonDeclaration d ->
+                    newDefinitionsAtNode (extract $ I.unFix d)
 
                 Definition first rest _ _ ->
                     foldMap namesFromPattern (first : fmap extract rest)
 
                 Lambda args _ _ _ ->
-                    foldMap namesFromPattern (fmap extract args)
+                    foldMap (namesFromPattern . extract) args
 
                 Let decls _ _ ->
-                    foldMap namesFromLetDeclaration decls
+                    foldMap namesFrom decls
 
-                LetDefinition first rest _ _ ->
-                    foldMap namesFromPattern (first : fmap extract rest)
+                LetCommonDeclaration d ->
+                    newDefinitionsAtNode (extract $ I.unFix d)
 
                 CaseBranch _ _ _ p _ ->
                     namesFromPattern p
@@ -731,8 +740,8 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
                 context' = foldl (flip defineLocal) context (newDefinitionsAtNode node)
             in
             mapAll (fType context') (fCtor context') (fVar context') id
-                $ (I.imap (Compose . (,) context')) node
+                $ I.imap (Compose . (,) context') node
     in
     I.ana
-        (\(Compose (context, ast)) -> fmap (step context) $ I.unFix ast)
+        (\(Compose (context, ast)) -> step context <$> I.unFix ast)
         (Compose (initialContext, initialAst))

@@ -132,6 +132,7 @@ main = do
         need
             [ "_build/run-tests.ok"
             , "_build/tests/test-files/good-json.ok"
+            , "_build/tests/test-files/good-json-roundtrip.ok"
             , "_build/tests/test-files/good/Elm-0.19.ok"
             , "_build/tests/test-files/good/Elm-0.18.ok"
             , "_build/tests/test-files/good/Elm-0.17.ok"
@@ -141,6 +142,7 @@ main = do
             , "_build/tests/test-files/bad/Elm-0.19.ok"
             , "_build/tests/test-files/bad/Elm-0.18.ok"
             , "_build/tests/test-files/bad/Elm-0.17.ok"
+            , "_build/tests/test-files/from-json/Elm-0.19.ok"
             ]
 
     "_build/run-tests.ok" %> \out -> do
@@ -221,6 +223,19 @@ main = do
             need oks
             writeFile' out (unlines elmFiles)
 
+        ("_build/tests/test-files/from-json/Elm-" ++ elmVersion ++ ".ok") %> \out -> do
+            jsonFiles <- getDirectoryFiles ""
+                [ "tests/test-files/from-json/Elm-" ++ elmVersion ++ "//*.json"
+                ]
+            let oks = ["_build" </> f -<.> "elm_from_json_matches" | f <- jsonFiles ]
+            need oks
+            writeFile' out (unlines oks)
+
+    "_build/tests//*.elm_from_json" %> \out -> do
+        let source = dropDirectory1 $ out -<.> "json"
+        need [ elmFormat, source ]
+        cmd_ (FileStdout out) elmFormat "--from-json" source
+
     "_build/tests//*.elm_matches" %> \out -> do
         let actual = out -<.> "elm_formatted"
         let expected = dropDirectory1 $ out -<.> "elm"
@@ -238,6 +253,13 @@ main = do
     "_build/tests//*.elm_bad_matches" %> \out -> do
         let actual = out -<.> "elm_stderr"
         let expected = dropDirectory1 $ out -<.> "output.txt"
+        need [ actual, expected ]
+        cmd_ "diff" "--strip-trailing-cr" "-u" actual expected
+        writeFile' out ""
+
+    "_build/tests//*.elm_from_json_matches" %> \out -> do
+        let actual = out -<.> "elm_from_json"
+        let expected = dropDirectory1 $ out -<.> "elm"
         need [ actual, expected ]
         cmd_ "diff" "--strip-trailing-cr" "-u" actual expected
         writeFile' out ""
@@ -263,6 +285,26 @@ main = do
     "_build/tests//*.json_matches" %> \out -> do
         let actual = out -<.> "json_formatted"
         let expected = dropDirectory1 $ out -<.> "json"
+        need [ actual, expected ]
+        cmd_ "diff" "--strip-trailing-cr" "-u" actual expected
+        writeFile' out ""
+
+    "_build/tests/test-files/good-json-roundtrip.ok" %> \out -> do
+        jsonFiles <- getDirectoryFiles ""
+            [ "tests/test-files/good//*.json"
+            ]
+        let oks = ["_build" </> f -<.> "json_roundtrip_matches" | f <- jsonFiles]
+        need oks
+        writeFile' out (unlines jsonFiles)
+
+    "_build/tests//*.json_roundtrip_formatted" %> \out -> do
+        let source = out -<.> "json_formatted"
+        need [ elmFormat, source ]
+        cmd_ (FileStdout out) elmFormat "--elm-version=0.19" "--from-json" source
+
+    "_build/tests//*.json_roundtrip_matches" %> \out -> do
+        let actual = out -<.> "json_roundtrip_formatted"
+        let expected = dropDirectory1 $ out -<.> "json-roundtrip"
         need [ actual, expected ]
         cmd_ "diff" "--strip-trailing-cr" "-u" actual expected
         writeFile' out ""

@@ -1,0 +1,33 @@
+{
+    "moduleName": "ModuleImports",
+    "imports": {
+        "SingleWordNoAlias": {},
+        "Multi.Word.NoAlias": {},
+        "SingleWordAlias": { "as": "S" },
+        "Multi.Word.Alias": { "as": "WordAlias" },
+        "Exposing.Everything": { "exposing": "Everything" },
+        "Exposing.Values": {
+            "exposing": {
+                "values": ["a", "b"]
+            }
+        },
+        "Exposing.Types": {
+            "exposing": {
+                "types": {
+                    "ExposeAllTags": "AllTags",
+                    "ExposeNoTags": "NoTags"
+                }
+            }
+        }
+    },
+    "body": [
+        {
+            "tag": "Definition",
+            "name": "f",
+            "parameters": [],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        }
+    ]
+}

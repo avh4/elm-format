@@ -1,4 +1,4 @@
-module ElmFormat.CliFlags (Config(..), parser) where
+module ElmFormat.CliFlags (Config(..), JsonMode(..), parser) where
 
 import Prelude ()
 import Relude hiding (stdin)
@@ -18,8 +18,12 @@ data Config = Config
     , _validate :: Bool
     , _stdin :: Bool
     , _elmVersion :: Maybe ElmVersion
-    , _json :: Bool
+    , _json :: Maybe JsonMode
     }
+
+data JsonMode
+    = ElmToJson
+    | JsonToElm
 
 
 parser :: String -> Maybe String -> Opt.ParserInfo Config
@@ -144,11 +148,20 @@ elmVersion =
       ]
 
 
-json :: Opt.Parser Bool
+json :: Opt.Parser (Maybe JsonMode)
 json =
-    Opt.switch $
+    (Opt.flag Nothing (Just ElmToJson) $
         mconcat
             [ Opt.long "json"
             , Opt.help "Instead of formatting, write the AST to stdout."
             , Opt.internal
             ]
+    )
+    <|>
+    (Opt.flag' (Just JsonToElm) $
+        mconcat
+            [ Opt.long "from-json"
+            , Opt.help "Read the JSON AST input from stdout."
+            , Opt.internal
+            ]
+    )

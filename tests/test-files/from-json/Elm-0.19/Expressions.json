@@ -1,0 +1,250 @@
+{
+    "moduleName": "Expressions",
+    "body": [
+        {
+            "tag": "Definition",
+            "name": "unit",
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "intLiteral",
+            "expression": {
+                "tag": "IntLiteral",
+                "value": 1
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "floatLiteral",
+            "expression": {
+                "tag": "FloatLiteral",
+                "value": 2
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "stringLiteral",
+            "expression": {
+                "tag": "StringLiteral",
+                "value": "string"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "charLiteral",
+            "expression": {
+                "tag": "CharLiteral",
+                "value": "c"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "var",
+            "expression": {
+                "tag": "VariableReference",
+                "name": "x"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "operator",
+            "expression": {
+                "tag": "VariableReference",
+                "name": "+"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "tag",
+            "expression": {
+                "tag": "VariableReference",
+                "name": "MyTag"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "externalReference",
+            "expression": {
+                "tag": "ExternalReference",
+                "module": "List",
+                "identifier": "map"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "functionApplication",
+            "expression": {
+                "tag": "FunctionApplication",
+                "function": {
+                    "tag": "VariableReference",
+                    "name": "f"
+                },
+                "arguments": [
+                    {
+                        "tag": "FunctionApplication",
+                        "function": {
+                            "tag": "VariableReference",
+                            "name": "g"
+                        },
+                        "arguments": [
+                            { "tag": "UnitLiteral" }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "parensAreAddedWhereNeeded",
+            "expression": {
+                "tag": "FunctionApplication",
+                "function": {
+                    "tag": "VariableReference",
+                    "name": "f"
+                },
+                "arguments": [
+                    { "tag": "UnitLiteral" },
+                    { "tag": "UnitLiteral" }
+                ]
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "unary",
+            "expression": {
+                "tag": "FunctionApplication",
+                "function": {
+                    "tag": "UnaryOperator",
+                    "operator": "-"
+                },
+                "arguments": [
+                    {
+                        "tag": "VariableReference",
+                        "name": "x"
+                    }
+                ]
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "emptyList",
+            "expression": {
+                "tag": "ListLiteral",
+                "terms": []
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "list",
+            "expression": {
+                "tag": "ListLiteral",
+                "terms": [
+                    { "tag": "UnitLiteral" },
+                    { "tag": "UnitLiteral" }
+                ]
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "tuple",
+            "expression": {
+                "tag": "TupleLiteral",
+                "terms": [
+                    { "tag": "UnitLiteral" },
+                    { "tag": "UnitLiteral" }
+                ]
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "record",
+            "expression": {
+                "tag": "RecordLiteral",
+                "fields": {
+                    "x": { "tag": "UnitLiteral" },
+                    "y": { "tag": "UnitLiteral" }
+                }
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "recordUpdate",
+            "expression": {
+                "tag": "RecordUpdate",
+                "base": "r",
+                "fields": {
+                    "x": { "tag": "UnitLiteral" },
+                    "y": { "tag": "UnitLiteral" }
+                }
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "recordAccessFunction",
+            "expression": {
+                "tag": "RecordAccessFunction",
+                "field": "x"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "lambda",
+            "expression": {
+                "tag": "AnonymousFunction",
+                "parameters": [
+                    { "tag": "VariableDefinition", "name": "a" },
+                    { "tag": "VariableDefinition", "name": "b" }
+                ],
+                "body": {
+                    "tag": "UnitLiteral"
+                }
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "caseExpression",
+            "expression": {
+                "tag": "CaseExpression",
+                "subject": { "tag": "VariableReference", "name": "x" },
+                "branches": [
+                    {
+                        "pattern": { "tag": "UnitPattern" },
+                        "body": { "tag": "UnitLiteral" }
+                    },
+                    {
+                        "pattern": { "tag": "AnythingPattern" },
+                        "body": { "tag": "UnitLiteral" }
+                    }
+                ]
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "letExpression",
+            "expression": {
+                "tag": "LetExpression",
+                "declarations": [
+                    {
+                        "tag": "Definition",
+                        "name": "x",
+                        "expression": { "tag": "UnitLiteral" }
+                    }
+                ],
+                "body": {
+                    "tag": "UnitLiteral"
+                }
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "glShader",
+            "expression": {
+                "tag": "GLShader",
+                "shaderSource": "\n\nattribute vec3 position;\nattribute vec3 coord;\nuniform   mat4 view;\nvarying   vec2 vcoord;\n\nvoid main () {\n  gl_Position = view * vec4(position, 1.0);\n  vcoord = coord.xy;\n}\n\n"
+            }
+        }
+    ]
+}
