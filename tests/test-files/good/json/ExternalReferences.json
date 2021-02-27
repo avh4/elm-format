@@ -320,43 +320,27 @@
                                 "tag": "FunctionApplication"
                             },
                             {
-                                "first": {
-                                    "identifier": "text",
-                                    "module": "Html",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 20,
-                                            "line": 31
-                                        },
-                                        "start": {
-                                            "col": 11,
-                                            "line": 31
-                                        }
-                                    },
-                                    "tag": "ExternalReference"
-                                },
-                                "operations": [
+                                "arguments": [
                                     {
-                                        "operator": {
-                                            "name": "<|",
-                                            "tag": "VariableReference"
+                                        "identifier": "text",
+                                        "module": "Html",
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 20,
+                                                "line": 31
+                                            },
+                                            "start": {
+                                                "col": 11,
+                                                "line": 31
+                                            }
                                         },
-                                        "term": {
-                                            "arguments": [
-                                                {
-                                                    "operator": "-",
-                                                    "sourceLocation": {
-                                                        "end": {
-                                                            "col": 36,
-                                                            "line": 31
-                                                        },
-                                                        "start": {
-                                                            "col": 33,
-                                                            "line": 31
-                                                        }
-                                                    },
-                                                    "tag": "UnaryOperator",
-                                                    "term": {
+                                        "tag": "ExternalReference"
+                                    },
+                                    {
+                                        "arguments": [
+                                            {
+                                                "arguments": [
+                                                    {
                                                         "name": "pi",
                                                         "sourceLocation": {
                                                             "end": {
@@ -370,25 +354,29 @@
                                                         },
                                                         "tag": "VariableReference"
                                                     }
-                                                }
-                                            ],
-                                            "function": {
-                                                "name": "toString",
+                                                ],
+                                                "function": {
+                                                    "operator": "-",
+                                                    "tag": "UnaryOperator"
+                                                },
                                                 "sourceLocation": {
                                                     "end": {
-                                                        "col": 32,
+                                                        "col": 36,
                                                         "line": 31
                                                     },
                                                     "start": {
-                                                        "col": 24,
+                                                        "col": 33,
                                                         "line": 31
                                                     }
                                                 },
-                                                "tag": "VariableReference"
-                                            },
+                                                "tag": "FunctionApplication"
+                                            }
+                                        ],
+                                        "function": {
+                                            "name": "toString",
                                             "sourceLocation": {
                                                 "end": {
-                                                    "col": 36,
+                                                    "col": 32,
                                                     "line": 31
                                                 },
                                                 "start": {
@@ -396,10 +384,28 @@
                                                     "line": 31
                                                 }
                                             },
-                                            "tag": "FunctionApplication"
-                                        }
+                                            "tag": "VariableReference"
+                                        },
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 36,
+                                                "line": 31
+                                            },
+                                            "start": {
+                                                "col": 24,
+                                                "line": 31
+                                            }
+                                        },
+                                        "tag": "FunctionApplication"
                                     }
                                 ],
+                                "display": {
+                                    "showAsInfix": true
+                                },
+                                "function": {
+                                    "name": "<|",
+                                    "tag": "VariableReference"
+                                },
                                 "sourceLocation": {
                                     "end": {
                                         "col": 36,
@@ -410,7 +416,7 @@
                                         "line": 31
                                     }
                                 },
-                                "tag": "BinaryOperatorList"
+                                "tag": "FunctionApplication"
                             }
                         ]
                     }

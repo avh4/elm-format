@@ -2,6 +2,7 @@
     "body": [
         {
             "name": "Unit",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 6,
@@ -70,6 +71,7 @@
         },
         {
             "name": "Function",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 6,
@@ -423,6 +425,9 @@
         },
         {
             "name": "Variable",
+            "parameters": [
+                "a"
+            ],
             "sourceLocation": {
                 "end": {
                     "col": 6,
@@ -451,6 +456,7 @@
         },
         {
             "name": "Constructor",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 6,
@@ -741,6 +747,7 @@
         },
         {
             "name": "Parens",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 6,
@@ -802,6 +809,7 @@
         },
         {
             "name": "Tuple",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 6,
@@ -1003,6 +1011,7 @@
         },
         {
             "name": "TupleWithCommentedOutTerms",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 6,
@@ -1064,6 +1073,7 @@
         },
         {
             "name": "TupleMultilineWithSingleLineChildren",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 6,
@@ -1293,6 +1303,7 @@
         },
         {
             "name": "Record",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 6,
@@ -1422,6 +1433,7 @@
         },
         {
             "name": "RecordWithCommentedOutTerms",
+            "parameters": [],
             "sourceLocation": {
                 "end": {
                     "col": 6,
@@ -1600,6 +1612,9 @@
         },
         {
             "name": "RecordExtensionWithCommentedOutTerms",
+            "parameters": [
+                "z"
+            ],
             "sourceLocation": {
                 "end": {
                     "col": 6,

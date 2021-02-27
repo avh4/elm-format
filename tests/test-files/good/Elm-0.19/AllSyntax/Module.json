@@ -146,10 +146,7 @@
             "as": "Maybe",
             "exposing": {
                 "types": {
-                    "Maybe": {
-                        "Just": true,
-                        "Nothing": true
-                    }
+                    "Maybe": "AllTags"
                 },
                 "values": {
                     "map": true

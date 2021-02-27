@@ -1,0 +1,95 @@
+module AllSyntax.Patterns exposing (Foo(..), asAlias, complexCons, consList, data, emptyList, emptyRecord, equivalentCons, list, literal, parens, patternWithQualifiedConstructorAsCosntructorArgument, patternWithUnqualifiedConstructorAsCosntructorArgument, record, tuple, unit, variable, wildcard)
+
+
+type Foo
+    = Foo () ()
+
+
+wildcard _ =
+    ()
+
+
+literal 1 2.0 "string" 'c' =
+    ()
+
+
+variable v =
+    ()
+
+
+data (Foo x y) =
+    ()
+
+
+unit () =
+    ()
+
+
+parens v =
+    ()
+
+
+tuple ( a, b ) =
+    ()
+
+
+emptyList [] =
+    ()
+
+
+list [ a, b ] =
+    ()
+
+
+consList ( a :: b :: c, a :: b :: c, d :: e :: f, d :: e :: f, d :: e :: f ) =
+    ()
+
+
+equivalentCons ( [ y, x ], [ y, x ], [ y, x ] ) =
+    ()
+
+
+complexCons (a :: [ x ] :: ((b :: _) as blah)) =
+    ()
+
+
+record { a, b } =
+    ()
+
+
+emptyRecord {} {} {} =
+    ()
+
+
+asAlias (() as x) =
+    ()
+
+
+patternWithQualifiedConstructorAsCosntructorArgument m =
+    case m of
+        Maybe.Just Maybe.Nothing ->
+            ()
+
+        Maybe.Just _ ->
+            ()
+
+        Maybe.Nothing ->
+            ()
+
+
+patternWithUnqualifiedConstructorAsCosntructorArgument m =
+    case m of
+        Maybe.Just Maybe.Nothing ->
+            ()
+
+        (Maybe.Just _) as x ->
+            ()
+
+        Maybe.Nothing as x ->
+            ()
+
+        (Maybe.Nothing as y) as x ->
+            ()
+
+        _ ->
+            ()

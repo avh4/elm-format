@@ -386,21 +386,21 @@
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": " Union type with params"
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
@@ -638,27 +638,31 @@
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": " Type alias"
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
         },
         {
             "name": "TypeAlias1",
+            "parameters": [
+                "a",
+                "b"
+            ],
             "sourceLocation": {
                 "end": {
                     "col": 39,
@@ -770,6 +774,10 @@
         },
         {
             "name": "TypeAliasMultiline",
+            "parameters": [
+                "a",
+                "b"
+            ],
             "sourceLocation": {
                 "end": {
                     "col": 7,
@@ -797,6 +805,10 @@
         },
         {
             "name": "TypeAlias2",
+            "parameters": [
+                "a",
+                "b"
+            ],
             "sourceLocation": {
                 "end": {
                     "col": 39,
@@ -908,6 +920,10 @@
         },
         {
             "name": "TypeAlias3",
+            "parameters": [
+                "a",
+                "b"
+            ],
             "sourceLocation": {
                 "end": {
                     "col": 39,
@@ -1019,21 +1035,21 @@
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": " Expressions"
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
@@ -1688,21 +1704,21 @@
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": " Declarations in let expressions"
         },
         {
             "display": {
-                "commentType": "BlockComment"
+                "commentType": "LineComment"
             },
             "tag": "Comment",
             "text": ""
@@ -1980,7 +1996,7 @@
                 "declarations": [
                     {
                         "display": {
-                            "commentType": "BlockComment"
+                            "commentType": "LineComment"
                         },
                         "sourceLocation": {
                             "end": {
@@ -2026,7 +2042,7 @@
                     },
                     {
                         "display": {
-                            "commentType": "BlockComment"
+                            "commentType": "LineComment"
                         },
                         "sourceLocation": {
                             "end": {
@@ -2072,7 +2088,7 @@
                     },
                     {
                         "display": {
-                            "commentType": "BlockComment"
+                            "commentType": "LineComment"
                         },
                         "sourceLocation": {
                             "end": {

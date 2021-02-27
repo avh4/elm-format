@@ -7,8 +7,8 @@ import Parse.TestHelpers
 
 
 
-tests :: TestTree
-tests =
+test_tests :: TestTree
+test_tests =
     testGroup "TestHelpers"
     [ testGroup "generateReplacements"
         [ testCase "empty" $

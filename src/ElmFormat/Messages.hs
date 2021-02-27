@@ -14,13 +14,15 @@ import ElmVersion
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
 import Reporting.Region (Region(..), Position(..))
-import qualified Text.JSON as Json
+import qualified Data.Aeson as Aeson
+import Data.Aeson ((.=))
 
 
 data InfoMessage
   = ProcessingFile FilePath
-  | FileWouldChange FilePath
+  | FileWouldChange ElmVersion FilePath
   | ParseError FilePath [A.Located Syntax.Error]
+  | JsonParseError FilePath Text
 
 
 data PromptMessage
@@ -58,7 +60,7 @@ instance ToConsole InfoMessage where
         ProcessingFile file ->
             "Processing file " <> Text.pack file
 
-        FileWouldChange file ->
+        FileWouldChange _ file ->
             "File would be changed " <> Text.pack file
 
         ParseError inputFile errs ->
@@ -71,24 +73,29 @@ instance ToConsole InfoMessage where
             in
             "Unable to parse file " <> location <> " To see a detailed explanation, run elm make on the file."
 
+        JsonParseError inputFile err ->
+            "Unable to parse JSON file " <> Text.pack inputFile <> "\n\n" <> err
+
 
 instance Loggable InfoMessage where
-    jsonInfoMessage elmVersion =
+    jsonInfoMessage =
         let
             fileMessage filename message =
-                Json.makeObj
-                    [ ( "path", Json.JSString $ Json.toJSString filename )
-                    , ( "message", Json.JSString $ Json.toJSString message )
+                Aeson.pairs $ mconcat
+                    [ "path" .= (filename :: FilePath)
+                    , "message" .= (message :: String)
                     ]
         in
         \case
         ProcessingFile _ -> Nothing
-        FileWouldChange file ->
+        FileWouldChange elmVersion file ->
             Just $ fileMessage file $
                 "File is not formatted with elm-format-" <> ElmFormat.Version.asString
                 <> " --elm-version=" <> show elmVersion
         ParseError inputFile _ ->
             Just $ fileMessage inputFile "Error parsing the file"
+        JsonParseError inputFile _ ->
+            Just $ fileMessage inputFile "Error parsing the JSON file"
 
 
 instance ToConsole ErrorMessage where

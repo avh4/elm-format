@@ -296,7 +296,7 @@ letExpr elmVersion =
       let commentsAfterLet = fmap (I.Fix . A.A cal . LetComment) commentsAfterLet'
       defs <-
         block $
-          do  def <- fmap I.Fix $ addLocation (typeAnnotation elmVersion LetAnnotation <|> definition elmVersion LetDefinition)
+          do  def <- fmap I.Fix $ addLocation $ fmap (LetCommonDeclaration . I.Fix) $ addLocation (typeAnnotation elmVersion TypeAnnotation <|> definition elmVersion Definition)
               A.A cad commentsAfterDef' <- addLocation whitespace
               let commentsAfterDef = fmap (I.Fix . A.A cad . LetComment) commentsAfterDef'
               return (def : commentsAfterDef)

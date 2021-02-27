@@ -246,71 +246,72 @@
         },
         {
             "expression": {
-                "first": {
-                    "name": "x",
-                    "sourceLocation": {
-                        "end": {
-                            "col": 6,
-                            "line": 31
-                        },
-                        "start": {
-                            "col": 5,
-                            "line": 31
-                        }
-                    },
-                    "tag": "VariableReference"
-                },
-                "operations": [
+                "arguments": [
                     {
-                        "operator": {
-                            "name": "<|",
-                            "tag": "VariableReference"
-                        },
-                        "term": {
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 10,
-                                    "line": 34
-                                },
-                                "start": {
-                                    "col": 9,
-                                    "line": 32
-                                }
+                        "name": "x",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 6,
+                                "line": 31
                             },
-                            "tag": "ListLiteral",
-                            "terms": [
-                                {
-                                    "name": "y",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 12,
-                                            "line": 32
-                                        },
-                                        "start": {
-                                            "col": 11,
-                                            "line": 32
-                                        }
+                            "start": {
+                                "col": 5,
+                                "line": 31
+                            }
+                        },
+                        "tag": "VariableReference"
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 34
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 32
+                            }
+                        },
+                        "tag": "ListLiteral",
+                        "terms": [
+                            {
+                                "name": "y",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 32
                                     },
-                                    "tag": "VariableReference"
+                                    "start": {
+                                        "col": 11,
+                                        "line": 32
+                                    }
                                 },
-                                {
-                                    "name": "z",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 12,
-                                            "line": 33
-                                        },
-                                        "start": {
-                                            "col": 11,
-                                            "line": 33
-                                        }
+                                "tag": "VariableReference"
+                            },
+                            {
+                                "name": "z",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 33
                                     },
-                                    "tag": "VariableReference"
-                                }
-                            ]
-                        }
+                                    "start": {
+                                        "col": 11,
+                                        "line": 33
+                                    }
+                                },
+                                "tag": "VariableReference"
+                            }
+                        ]
                     }
                 ],
+                "display": {
+                    "showAsInfix": true
+                },
+                "function": {
+                    "name": "<|",
+                    "tag": "VariableReference"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 10,
@@ -321,7 +322,7 @@
                         "line": 31
                     }
                 },
-                "tag": "BinaryOperatorList"
+                "tag": "FunctionApplication"
             },
             "name": "infixPipeLeft",
             "parameters": [
@@ -392,86 +393,87 @@
         },
         {
             "expression": {
-                "first": {
-                    "sourceLocation": {
-                        "end": {
-                            "col": 6,
-                            "line": 39
-                        },
-                        "start": {
-                            "col": 5,
-                            "line": 38
-                        }
-                    },
-                    "tag": "ListLiteral",
-                    "terms": [
-                        {
-                            "name": "x",
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 8,
-                                    "line": 38
-                                },
-                                "start": {
-                                    "col": 7,
-                                    "line": 38
-                                }
-                            },
-                            "tag": "VariableReference"
-                        }
-                    ]
-                },
-                "operations": [
+                "arguments": [
                     {
-                        "operator": {
-                            "name": "<|",
-                            "tag": "VariableReference"
-                        },
-                        "term": {
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 10,
-                                    "line": 43
-                                },
-                                "start": {
-                                    "col": 9,
-                                    "line": 41
-                                }
+                        "sourceLocation": {
+                            "end": {
+                                "col": 6,
+                                "line": 39
                             },
-                            "tag": "ListLiteral",
-                            "terms": [
-                                {
-                                    "name": "y",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 12,
-                                            "line": 41
-                                        },
-                                        "start": {
-                                            "col": 11,
-                                            "line": 41
-                                        }
+                            "start": {
+                                "col": 5,
+                                "line": 38
+                            }
+                        },
+                        "tag": "ListLiteral",
+                        "terms": [
+                            {
+                                "name": "x",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 8,
+                                        "line": 38
                                     },
-                                    "tag": "VariableReference"
+                                    "start": {
+                                        "col": 7,
+                                        "line": 38
+                                    }
                                 },
-                                {
-                                    "name": "z",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 12,
-                                            "line": 42
-                                        },
-                                        "start": {
-                                            "col": 11,
-                                            "line": 42
-                                        }
+                                "tag": "VariableReference"
+                            }
+                        ]
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 43
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 41
+                            }
+                        },
+                        "tag": "ListLiteral",
+                        "terms": [
+                            {
+                                "name": "y",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 41
                                     },
-                                    "tag": "VariableReference"
-                                }
-                            ]
-                        }
+                                    "start": {
+                                        "col": 11,
+                                        "line": 41
+                                    }
+                                },
+                                "tag": "VariableReference"
+                            },
+                            {
+                                "name": "z",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 42
+                                    },
+                                    "start": {
+                                        "col": 11,
+                                        "line": 42
+                                    }
+                                },
+                                "tag": "VariableReference"
+                            }
+                        ]
                     }
                 ],
+                "display": {
+                    "showAsInfix": true
+                },
+                "function": {
+                    "name": "<|",
+                    "tag": "VariableReference"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 10,
@@ -482,7 +484,7 @@
                         "line": 38
                     }
                 },
-                "tag": "BinaryOperatorList"
+                "tag": "FunctionApplication"
             },
             "name": "infixPipeLeft2",
             "parameters": [
@@ -790,7 +792,26 @@
         },
         {
             "expression": {
-                "operator": "-",
+                "arguments": [
+                    {
+                        "name": "x",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 7,
+                                "line": 62
+                            },
+                            "start": {
+                                "col": 6,
+                                "line": 62
+                            }
+                        },
+                        "tag": "VariableReference"
+                    }
+                ],
+                "function": {
+                    "operator": "-",
+                    "tag": "UnaryOperator"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 7,
@@ -801,21 +822,7 @@
                         "line": 62
                     }
                 },
-                "tag": "UnaryOperator",
-                "term": {
-                    "name": "x",
-                    "sourceLocation": {
-                        "end": {
-                            "col": 7,
-                            "line": 62
-                        },
-                        "start": {
-                            "col": 6,
-                            "line": 62
-                        }
-                    },
-                    "tag": "VariableReference"
-                }
+                "tag": "FunctionApplication"
             },
             "name": "unary",
             "parameters": [
@@ -852,71 +859,78 @@
         },
         {
             "expression": {
-                "first": {
-                    "display": {
-                        "representation": "DecimalInt"
-                    },
-                    "sourceLocation": {
-                        "end": {
-                            "col": 6,
-                            "line": 66
-                        },
-                        "start": {
-                            "col": 5,
-                            "line": 66
-                        }
-                    },
-                    "tag": "IntLiteral",
-                    "value": 1
-                },
-                "operations": [
+                "arguments": [
                     {
-                        "operator": {
+                        "arguments": [
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 6,
+                                        "line": 66
+                                    },
+                                    "start": {
+                                        "col": 5,
+                                        "line": 66
+                                    }
+                                },
+                                "tag": "IntLiteral",
+                                "value": 1
+                            },
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 66
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 66
+                                    }
+                                },
+                                "tag": "IntLiteral",
+                                "value": 2
+                            }
+                        ],
+                        "display": {
+                            "showAsInfix": true
+                        },
+                        "function": {
                             "name": "+",
                             "tag": "VariableReference"
                         },
-                        "term": {
-                            "display": {
-                                "representation": "DecimalInt"
-                            },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 10,
-                                    "line": 66
-                                },
-                                "start": {
-                                    "col": 9,
-                                    "line": 66
-                                }
-                            },
-                            "tag": "IntLiteral",
-                            "value": 2
-                        }
+                        "tag": "FunctionApplication"
                     },
                     {
-                        "operator": {
-                            "name": "+",
-                            "tag": "VariableReference"
+                        "display": {
+                            "representation": "DecimalInt"
                         },
-                        "term": {
-                            "display": {
-                                "representation": "DecimalInt"
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 66
                             },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 14,
-                                    "line": 66
-                                },
-                                "start": {
-                                    "col": 13,
-                                    "line": 66
-                                }
-                            },
-                            "tag": "IntLiteral",
-                            "value": 3
-                        }
+                            "start": {
+                                "col": 13,
+                                "line": 66
+                            }
+                        },
+                        "tag": "IntLiteral",
+                        "value": 3
                     }
                 ],
+                "display": {
+                    "showAsInfix": true
+                },
+                "function": {
+                    "name": "+",
+                    "tag": "VariableReference"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 14,
@@ -927,7 +941,7 @@
                         "line": 66
                     }
                 },
-                "tag": "BinaryOperatorList"
+                "tag": "FunctionApplication"
             },
             "name": "binary",
             "parameters": [],
@@ -3580,45 +3594,46 @@
         {
             "expression": {
                 "body": {
-                    "first": {
-                        "name": "x",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 12,
-                                "line": 261
-                            },
-                            "start": {
-                                "col": 11,
-                                "line": 261
-                            }
-                        },
-                        "tag": "VariableReference"
-                    },
-                    "operations": [
+                    "arguments": [
                         {
-                            "operator": {
-                                "name": "+",
-                                "tag": "VariableReference"
+                            "name": "x",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 12,
+                                    "line": 261
+                                },
+                                "start": {
+                                    "col": 11,
+                                    "line": 261
+                                }
                             },
-                            "term": {
-                                "display": {
-                                    "representation": "DecimalInt"
+                            "tag": "VariableReference"
+                        },
+                        {
+                            "display": {
+                                "representation": "DecimalInt"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 16,
+                                    "line": 261
                                 },
-                                "sourceLocation": {
-                                    "end": {
-                                        "col": 16,
-                                        "line": 261
-                                    },
-                                    "start": {
-                                        "col": 15,
-                                        "line": 261
-                                    }
-                                },
-                                "tag": "IntLiteral",
-                                "value": 1
-                            }
+                                "start": {
+                                    "col": 15,
+                                    "line": 261
+                                }
+                            },
+                            "tag": "IntLiteral",
+                            "value": 1
                         }
                     ],
+                    "display": {
+                        "showAsInfix": true
+                    },
+                    "function": {
+                        "name": "+",
+                        "tag": "VariableReference"
+                    },
                     "sourceLocation": {
                         "end": {
                             "col": 16,
@@ -3629,7 +3644,7 @@
                             "line": 261
                         }
                     },
-                    "tag": "BinaryOperatorList"
+                    "tag": "FunctionApplication"
                 },
                 "parameters": [
                     {
@@ -3763,59 +3778,140 @@
                 "declarations": [
                     {
                         "expression": {
-                            "else": {
-                                "else": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 18,
-                                            "line": 283
+                            "branches": [
+                                {
+                                    "body": {
+                                        "display": {
+                                            "representation": "DecimalInt"
                                         },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 283
-                                        }
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 18,
+                                                "line": 277
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 277
+                                            }
+                                        },
+                                        "tag": "IntLiteral",
+                                        "value": 1
                                     },
-                                    "tag": "IntLiteral",
-                                    "value": 3
+                                    "pattern": {
+                                        "arguments": [],
+                                        "constructor": {
+                                            "identifier": "True",
+                                            "module": "Basics",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "DataPattern"
+                                    }
                                 },
-                                "if": {
-                                    "identifier": "False",
-                                    "module": "Basics",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 26,
-                                            "line": 279
+                                {
+                                    "body": {
+                                        "branches": [
+                                            {
+                                                "body": {
+                                                    "display": {
+                                                        "representation": "DecimalInt"
+                                                    },
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 18,
+                                                            "line": 280
+                                                        },
+                                                        "start": {
+                                                            "col": 17,
+                                                            "line": 280
+                                                        }
+                                                    },
+                                                    "tag": "IntLiteral",
+                                                    "value": 2
+                                                },
+                                                "pattern": {
+                                                    "arguments": [],
+                                                    "constructor": {
+                                                        "identifier": "True",
+                                                        "module": "Basics",
+                                                        "tag": "ExternalReference"
+                                                    },
+                                                    "tag": "DataPattern"
+                                                }
+                                            },
+                                            {
+                                                "body": {
+                                                    "display": {
+                                                        "representation": "DecimalInt"
+                                                    },
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 18,
+                                                            "line": 283
+                                                        },
+                                                        "start": {
+                                                            "col": 17,
+                                                            "line": 283
+                                                        }
+                                                    },
+                                                    "tag": "IntLiteral",
+                                                    "value": 3
+                                                },
+                                                "pattern": {
+                                                    "arguments": [],
+                                                    "constructor": {
+                                                        "identifier": "False",
+                                                        "module": "Basics",
+                                                        "tag": "ExternalReference"
+                                                    },
+                                                    "tag": "DataPattern"
+                                                }
+                                            }
+                                        ],
+                                        "display": {
+                                            "showAsIf": true
                                         },
-                                        "start": {
-                                            "col": 21,
-                                            "line": 279
-                                        }
+                                        "subject": {
+                                            "identifier": "False",
+                                            "module": "Basics",
+                                            "sourceLocation": {
+                                                "end": {
+                                                    "col": 26,
+                                                    "line": 279
+                                                },
+                                                "start": {
+                                                    "col": 21,
+                                                    "line": 279
+                                                }
+                                            },
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "CaseExpression"
                                     },
-                                    "tag": "ExternalReference"
+                                    "pattern": {
+                                        "arguments": [],
+                                        "constructor": {
+                                            "identifier": "False",
+                                            "module": "Basics",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "DataPattern"
+                                    }
+                                }
+                            ],
+                            "display": {
+                                "showAsIf": true
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 18,
+                                    "line": 283
                                 },
-                                "tag": "IfExpression",
-                                "then": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 18,
-                                            "line": 280
-                                        },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 280
-                                        }
-                                    },
-                                    "tag": "IntLiteral",
-                                    "value": 2
+                                "start": {
+                                    "col": 13,
+                                    "line": 276
                                 }
                             },
-                            "if": {
+                            "subject": {
                                 "identifier": "True",
                                 "module": "Basics",
                                 "sourceLocation": {
@@ -3830,34 +3926,7 @@
                                 },
                                 "tag": "ExternalReference"
                             },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 18,
-                                    "line": 283
-                                },
-                                "start": {
-                                    "col": 13,
-                                    "line": 276
-                                }
-                            },
-                            "tag": "IfExpression",
-                            "then": {
-                                "display": {
-                                    "representation": "DecimalInt"
-                                },
-                                "sourceLocation": {
-                                    "end": {
-                                        "col": 18,
-                                        "line": 277
-                                    },
-                                    "start": {
-                                        "col": 17,
-                                        "line": 277
-                                    }
-                                },
-                                "tag": "IntLiteral",
-                                "value": 1
-                            }
+                            "tag": "CaseExpression"
                         },
                         "name": "a",
                         "parameters": [],
@@ -3876,59 +3945,140 @@
                     },
                     {
                         "expression": {
-                            "else": {
-                                "else": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 18,
-                                            "line": 298
+                            "branches": [
+                                {
+                                    "body": {
+                                        "display": {
+                                            "representation": "DecimalInt"
                                         },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 298
-                                        }
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 18,
+                                                "line": 288
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 288
+                                            }
+                                        },
+                                        "tag": "IntLiteral",
+                                        "value": 1
                                     },
-                                    "tag": "IntLiteral",
-                                    "value": 3
+                                    "pattern": {
+                                        "arguments": [],
+                                        "constructor": {
+                                            "identifier": "True",
+                                            "module": "Basics",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "DataPattern"
+                                    }
                                 },
-                                "if": {
-                                    "identifier": "False",
-                                    "module": "Basics",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 42,
-                                            "line": 291
+                                {
+                                    "body": {
+                                        "branches": [
+                                            {
+                                                "body": {
+                                                    "display": {
+                                                        "representation": "DecimalInt"
+                                                    },
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 18,
+                                                            "line": 293
+                                                        },
+                                                        "start": {
+                                                            "col": 17,
+                                                            "line": 293
+                                                        }
+                                                    },
+                                                    "tag": "IntLiteral",
+                                                    "value": 2
+                                                },
+                                                "pattern": {
+                                                    "arguments": [],
+                                                    "constructor": {
+                                                        "identifier": "True",
+                                                        "module": "Basics",
+                                                        "tag": "ExternalReference"
+                                                    },
+                                                    "tag": "DataPattern"
+                                                }
+                                            },
+                                            {
+                                                "body": {
+                                                    "display": {
+                                                        "representation": "DecimalInt"
+                                                    },
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 18,
+                                                            "line": 298
+                                                        },
+                                                        "start": {
+                                                            "col": 17,
+                                                            "line": 298
+                                                        }
+                                                    },
+                                                    "tag": "IntLiteral",
+                                                    "value": 3
+                                                },
+                                                "pattern": {
+                                                    "arguments": [],
+                                                    "constructor": {
+                                                        "identifier": "False",
+                                                        "module": "Basics",
+                                                        "tag": "ExternalReference"
+                                                    },
+                                                    "tag": "DataPattern"
+                                                }
+                                            }
+                                        ],
+                                        "display": {
+                                            "showAsIf": true
                                         },
-                                        "start": {
-                                            "col": 37,
-                                            "line": 291
-                                        }
+                                        "subject": {
+                                            "identifier": "False",
+                                            "module": "Basics",
+                                            "sourceLocation": {
+                                                "end": {
+                                                    "col": 42,
+                                                    "line": 291
+                                                },
+                                                "start": {
+                                                    "col": 37,
+                                                    "line": 291
+                                                }
+                                            },
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "CaseExpression"
                                     },
-                                    "tag": "ExternalReference"
+                                    "pattern": {
+                                        "arguments": [],
+                                        "constructor": {
+                                            "identifier": "False",
+                                            "module": "Basics",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "DataPattern"
+                                    }
+                                }
+                            ],
+                            "display": {
+                                "showAsIf": true
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 18,
+                                    "line": 298
                                 },
-                                "tag": "IfExpression",
-                                "then": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 18,
-                                            "line": 293
-                                        },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 293
-                                        }
-                                    },
-                                    "tag": "IntLiteral",
-                                    "value": 2
+                                "start": {
+                                    "col": 13,
+                                    "line": 286
                                 }
                             },
-                            "if": {
+                            "subject": {
                                 "identifier": "True",
                                 "module": "Basics",
                                 "sourceLocation": {
@@ -3943,34 +4093,7 @@
                                 },
                                 "tag": "ExternalReference"
                             },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 18,
-                                    "line": 298
-                                },
-                                "start": {
-                                    "col": 13,
-                                    "line": 286
-                                }
-                            },
-                            "tag": "IfExpression",
-                            "then": {
-                                "display": {
-                                    "representation": "DecimalInt"
-                                },
-                                "sourceLocation": {
-                                    "end": {
-                                        "col": 18,
-                                        "line": 288
-                                    },
-                                    "start": {
-                                        "col": 17,
-                                        "line": 288
-                                    }
-                                },
-                                "tag": "IntLiteral",
-                                "value": 1
-                            }
+                            "tag": "CaseExpression"
                         },
                         "name": "b",
                         "parameters": [],
@@ -3989,59 +4112,140 @@
                     },
                     {
                         "expression": {
-                            "else": {
-                                "else": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 18,
-                                            "line": 323
+                            "branches": [
+                                {
+                                    "body": {
+                                        "display": {
+                                            "representation": "DecimalInt"
                                         },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 323
-                                        }
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 18,
+                                                "line": 307
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 307
+                                            }
+                                        },
+                                        "tag": "IntLiteral",
+                                        "value": 1
                                     },
-                                    "tag": "IntLiteral",
-                                    "value": 3
+                                    "pattern": {
+                                        "arguments": [],
+                                        "constructor": {
+                                            "identifier": "True",
+                                            "module": "Basics",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "DataPattern"
+                                    }
                                 },
-                                "if": {
-                                    "identifier": "False",
-                                    "module": "Basics",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 22,
-                                            "line": 314
+                                {
+                                    "body": {
+                                        "branches": [
+                                            {
+                                                "body": {
+                                                    "display": {
+                                                        "representation": "DecimalInt"
+                                                    },
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 18,
+                                                            "line": 318
+                                                        },
+                                                        "start": {
+                                                            "col": 17,
+                                                            "line": 318
+                                                        }
+                                                    },
+                                                    "tag": "IntLiteral",
+                                                    "value": 2
+                                                },
+                                                "pattern": {
+                                                    "arguments": [],
+                                                    "constructor": {
+                                                        "identifier": "True",
+                                                        "module": "Basics",
+                                                        "tag": "ExternalReference"
+                                                    },
+                                                    "tag": "DataPattern"
+                                                }
+                                            },
+                                            {
+                                                "body": {
+                                                    "display": {
+                                                        "representation": "DecimalInt"
+                                                    },
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 18,
+                                                            "line": 323
+                                                        },
+                                                        "start": {
+                                                            "col": 17,
+                                                            "line": 323
+                                                        }
+                                                    },
+                                                    "tag": "IntLiteral",
+                                                    "value": 3
+                                                },
+                                                "pattern": {
+                                                    "arguments": [],
+                                                    "constructor": {
+                                                        "identifier": "False",
+                                                        "module": "Basics",
+                                                        "tag": "ExternalReference"
+                                                    },
+                                                    "tag": "DataPattern"
+                                                }
+                                            }
+                                        ],
+                                        "display": {
+                                            "showAsIf": true
                                         },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 314
-                                        }
+                                        "subject": {
+                                            "identifier": "False",
+                                            "module": "Basics",
+                                            "sourceLocation": {
+                                                "end": {
+                                                    "col": 22,
+                                                    "line": 314
+                                                },
+                                                "start": {
+                                                    "col": 17,
+                                                    "line": 314
+                                                }
+                                            },
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "CaseExpression"
                                     },
-                                    "tag": "ExternalReference"
+                                    "pattern": {
+                                        "arguments": [],
+                                        "constructor": {
+                                            "identifier": "False",
+                                            "module": "Basics",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "DataPattern"
+                                    }
+                                }
+                            ],
+                            "display": {
+                                "showAsIf": true
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 18,
+                                    "line": 323
                                 },
-                                "tag": "IfExpression",
-                                "then": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 18,
-                                            "line": 318
-                                        },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 318
-                                        }
-                                    },
-                                    "tag": "IntLiteral",
-                                    "value": 2
+                                "start": {
+                                    "col": 13,
+                                    "line": 301
                                 }
                             },
-                            "if": {
+                            "subject": {
                                 "identifier": "True",
                                 "module": "Basics",
                                 "sourceLocation": {
@@ -4056,34 +4260,7 @@
                                 },
                                 "tag": "ExternalReference"
                             },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 18,
-                                    "line": 323
-                                },
-                                "start": {
-                                    "col": 13,
-                                    "line": 301
-                                }
-                            },
-                            "tag": "IfExpression",
-                            "then": {
-                                "display": {
-                                    "representation": "DecimalInt"
-                                },
-                                "sourceLocation": {
-                                    "end": {
-                                        "col": 18,
-                                        "line": 307
-                                    },
-                                    "start": {
-                                        "col": 17,
-                                        "line": 307
-                                    }
-                                },
-                                "tag": "IntLiteral",
-                                "value": 1
-                            }
+                            "tag": "CaseExpression"
                         },
                         "name": "c",
                         "parameters": [],

@@ -70,6 +70,7 @@ foldReferences ftype fctor fvar =
             -- Declarations
             Definition name args _ e -> Const (getConst name <> foldMap (getConst . extract) args <> getConst e)
             TypeAnnotation _ t -> Const (getConst $ extract t)
+            CommonDeclaration d -> Const $ getConst d
             Datatype _ ctors -> Const (foldMap (getConst . fold) ctors)
             TypeAlias _ _ t -> Const (getConst $ extract t)
             PortAnnotation _ _ t -> Const (getConst t)
@@ -95,8 +96,7 @@ foldReferences ftype fctor fvar =
             Lambda args _ e _ -> Const (foldMap (getConst . extract) args <> getConst e)
             If cond elsifs els -> Const (foldIfClause cond <> foldMap (foldIfClause . extract) elsifs <> getConst (extract els))
             Let defs _ e -> Const (foldMap getConst defs <> getConst e)
-            LetDefinition name args _ body -> Const (getConst name <> foldMap (getConst . extract) args <> getConst body)
-            LetAnnotation _ typ -> Const (getConst $ extract typ)
+            LetCommonDeclaration d -> Const $ getConst d
             LetComment _ -> mempty
             Case (cond, _) branches -> Const (getConst (extract cond) <> foldMap getConst branches)
             CaseBranch _ _ _ p e -> Const (getConst p <> getConst e)

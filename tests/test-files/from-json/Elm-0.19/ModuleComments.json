@@ -1,0 +1,24 @@
+{
+    "moduleName": "ModuleComments",
+    "body": [
+        {
+            "tag": "Comment",
+            "text": " Default comment"
+        },
+        {
+            "tag": "Comment",
+            "text": "Block comment",
+            "display": {
+                "commentType": "BlockComment"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "f",
+            "parameters": [],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        }
+    ]
+}

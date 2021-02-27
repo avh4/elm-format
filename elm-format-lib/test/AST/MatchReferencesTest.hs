@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module AST.MatchReferencesTest (tests) where
+module AST.MatchReferencesTest (test_tests) where
 
 import Elm.Utils ((|>))
 
@@ -23,8 +23,8 @@ import Test.Tasty.HUnit
 import qualified Data.Map as Dict
 import Data.List.Split (splitOn)
 
-tests :: TestTree
-tests =
+test_tests :: TestTree
+test_tests =
     testGroup "AST.MatchReferences"
     [ testGroup "matchReferences" $
         let
@@ -200,8 +200,8 @@ makeImportInfo knownContentsRaw imports =
 
 makeKnownContent :: (String, List String) -> (List UppercaseIdentifier, List LocalName)
 makeKnownContent (moduleName, known) =
-    ( fmap UppercaseIdentifier $ splitOn "." moduleName
-    , fmap (VarName . LowercaseIdentifier) known
+    ( UppercaseIdentifier <$> splitOn "." moduleName
+    , VarName . LowercaseIdentifier <$> known
     )
 
 
@@ -216,7 +216,7 @@ makeImportMethod importString =
 makeLetDeclaration :: String -> ASTNS Identity ns 'LetDeclarationNK
 makeLetDeclaration name =
     I.Fix $ Identity $
-    LetDefinition
+    LetCommonDeclaration $ I.Fix $ Identity $ Definition
         (I.Fix $ Identity $ VarPattern $ LowercaseIdentifier name)
         [] []
         (I.Fix $ Identity $ Unit [])

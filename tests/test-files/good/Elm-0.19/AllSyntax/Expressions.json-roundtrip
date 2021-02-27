@@ -1,0 +1,317 @@
+module AllSyntax.Expressions exposing (binary, caseStatement, emptyList, emptyRecord, functionApplication, functionApplicationMultiline, functionApplicationMultilineWithFirstArg, ifStatement, infixPipeLeft, infixPipeLeft2, lambda, lambdaWithMultilinePattern, letStatement, list, listWithCommentedOutItems, literal, operator, parens, record, recordAccess, recordAccessFunction, recordUpdate, recordUpdateWithCommentedOutFields, recordWithCommentedOutFields, tuple, tupleFunction, tupleWithCommentedOutItems, unary, unit, var)
+
+import Foo
+
+
+unit =
+    [ ()
+    , ()
+    , ()
+    ]
+
+
+literal =
+    ( 1
+    , 2.0
+    , "string"
+    , 'c'
+    )
+
+
+var x =
+    x
+
+
+operator =
+    (+)
+
+
+infixPipeLeft x y z =
+    (<|) x
+        [ y
+        , z
+        ]
+
+
+infixPipeLeft2 x y z =
+    (<|)
+        [ x
+        ]
+        [ y
+        , z
+        ]
+
+
+functionApplication =
+    max 1 2
+
+
+functionApplicationMultilineWithFirstArg =
+    max 1 2
+
+
+functionApplicationMultiline =
+    max 1 2
+
+
+unary x =
+    -x
+
+
+binary =
+    (+) ((+) 1 2) 3
+
+
+parens f x a =
+    f (x a)
+
+
+emptyList =
+    [ []
+    , []
+    , []
+    ]
+
+
+list =
+    [ [ ()
+      , ()
+      ]
+    , [ ()
+      , ()
+      ]
+    , [ ()
+      , ()
+      ]
+    , [ ()
+      , ()
+      ]
+    ]
+
+
+listWithCommentedOutItems =
+    [ 1
+    , 4
+    , 6
+    ]
+
+
+tuple =
+    [ ( 1
+      , 2
+      )
+    , ( 1
+      , 2
+      )
+    , ( 1
+      , 2
+      )
+    , ( 1
+      , 2
+      )
+    ]
+
+
+tupleWithCommentedOutItems =
+    ( 1
+    , 4
+    , 6
+    )
+
+
+tupleFunction =
+    (,,) 1 2 3
+
+
+emptyRecord =
+    [ {}
+    , {}
+    , {}
+    ]
+
+
+record =
+    ( { x = 1
+      }
+    , { x = 1
+      , y = 2
+      }
+    , { x = 1
+      , y = 2
+      , z = 3
+      }
+    , { x = 1
+      }
+    , { x = 1
+      , y = 2
+      }
+    , { x = 1
+      , y = 2
+      , z = 3
+      }
+    , { x = 1
+      , y = 2
+      , z = 3
+      }
+    , { x = 1
+      , y = 2
+      , z = 3
+      }
+    , { x = 1
+      , y = 2
+      , z = 3
+      }
+    )
+
+
+recordWithCommentedOutFields =
+    { a = 4
+    , x = 1
+    }
+
+
+recordUpdate a =
+    ( { a
+        | x = 1
+      }
+    , { a
+        | x = 1
+        , y = 2
+      }
+    , { a
+        | x = 1
+      }
+    , { a
+        | x = 1
+        , y = 2
+      }
+    )
+
+
+recordUpdateWithCommentedOutFields a =
+    { a
+        | a = 4
+        , x = 1
+    }
+
+
+recordAccess f a b r =
+    ( .x ()
+    , .x a
+    , .x (f a)
+    , .x
+        ( 1
+        , 2
+        )
+    , .x (,,)
+    , .x {}
+    , .x
+        { x = 1
+        }
+    , .x
+        { r
+            | x = 1
+        }
+    , .y (.x a)
+    , .x Foo.record
+    )
+
+
+recordAccessFunction =
+    .x
+        { x = 1
+        }
+
+
+lambda =
+    \x -> (+) x 1
+
+
+lambdaWithMultilinePattern =
+    \{ x, y } -> ()
+
+
+ifStatement =
+    let
+        a =
+            case Basics.True of
+                Basics.True ->
+                    1
+
+                Basics.False ->
+                    case Basics.False of
+                        Basics.True ->
+                            2
+
+                        Basics.False ->
+                            3
+
+        b =
+            case Basics.True of
+                Basics.True ->
+                    1
+
+                Basics.False ->
+                    case Basics.False of
+                        Basics.True ->
+                            2
+
+                        Basics.False ->
+                            3
+
+        c =
+            case Basics.True of
+                Basics.True ->
+                    1
+
+                Basics.False ->
+                    case Basics.False of
+                        Basics.True ->
+                            2
+
+                        Basics.False ->
+                            3
+    in
+    {}
+
+
+letStatement =
+    let
+        x =
+            1
+
+        y =
+            2
+    in
+    ( x
+    , y
+    )
+
+
+caseStatement =
+    let
+        a =
+            case Maybe.Just 1 of
+                Maybe.Just x ->
+                    x
+
+                _ ->
+                    2
+
+        b =
+            case Maybe.Just 1 of
+                Maybe.Just x ->
+                    x
+
+                _ ->
+                    2
+
+        c =
+            case Maybe.Just 1 of
+                Maybe.Just x ->
+                    x
+
+                _ ->
+                    2
+    in
+    {}

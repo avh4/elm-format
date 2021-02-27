@@ -1,0 +1,195 @@
+module AllSyntax.Declarations exposing (DataType1(..), DataType2(..), DataType3(..), DataTypeWithCommentedOutConstructors(..), DataTypeWithEolComments1(..), DataTypeWithEolComments2(..), DataTypeWithParams1(..), DataTypeWithParams2(..), DataTypeWithParams3(..), TypeAlias1, TypeAlias2, TypeAlias3, TypeAliasMultiline, expressionDefinition, expressionDefinitionNoPatterns, expressionDefinitionsInLet, expressionDefinitionsInLet2, expressionDefinitionsInLet3, expressionTypeAnnotation1, expressionTypeAnnotation2, expressionTypeAnnotation3, expressionTypeAnnotation4, expressionTypeAnnotationForcedMultiline, parametersWithTypes, parametersWithTypesCurried, typeAnnotationInLet)
+
+
+type DataType1
+    = Ctor1
+    | Ctor2 ()
+    | Ctor3 (List ()) ()
+
+
+type DataType2
+    = Ctor1
+    | Ctor2 ()
+    | Ctor3 (List ()) ()
+
+
+type DataType3
+    = Ctor1
+    | Ctor2 ()
+    | Ctor3 (List ()) ()
+
+
+type DataTypeWithEolComments1
+    = Ctor1
+
+
+type DataTypeWithEolComments2
+    = Ctor1
+    | Ctor2 a
+    | Ctor3 b c
+
+
+type DataTypeWithCommentedOutConstructors
+    = A
+    | D
+    | E
+
+
+
+--
+-- Union type with params
+--
+
+
+type DataTypeWithParams1 a b c
+    = Ctor1_
+    | Ctor2_ a
+    | Ctor3_ b c
+
+
+type DataTypeWithParams2 a b c
+    = Ctor1_
+    | Ctor2_ a
+    | Ctor3_ b c
+
+
+type DataTypeWithParams3 a b c
+    = Ctor1_
+    | Ctor2_ a
+    | Ctor3_ b c
+
+
+
+--
+-- Type alias
+--
+
+
+type alias TypeAlias1 a b =
+    { x : Int
+    , y : Int
+    , z : ( a, b )
+    }
+
+
+type alias TypeAliasMultiline a b =
+    ()
+
+
+type alias TypeAlias2 a b =
+    { x : Int
+    , y : Int
+    , z : ( a, b )
+    }
+
+
+type alias TypeAlias3 a b =
+    { x : Int
+    , y : Int
+    , z : ( a, b )
+    }
+
+
+
+--
+-- Expressions
+--
+
+
+expressionDefinition _ _ =
+    ()
+
+
+expressionDefinitionNoPatterns =
+    ()
+
+
+expressionTypeAnnotation1 : ()
+expressionTypeAnnotation1 =
+    ()
+
+
+expressionTypeAnnotation2 : ()
+expressionTypeAnnotation2 =
+    ()
+
+
+expressionTypeAnnotation3 : ()
+expressionTypeAnnotation3 =
+    ()
+
+
+expressionTypeAnnotation4 : ()
+expressionTypeAnnotation4 =
+    ()
+
+
+expressionTypeAnnotationForcedMultiline : Int -> Result String Bool -> List (Maybe.Maybe ())
+expressionTypeAnnotationForcedMultiline _ _ =
+    []
+
+
+parametersWithTypes : Int -> String -> Bool
+parametersWithTypes anInt aString =
+    Basics.False
+
+
+parametersWithTypesCurried : Int -> (String -> Bool)
+parametersWithTypesCurried anInt =
+    Debug.todo
+
+
+
+--
+-- Declarations in let expressions
+--
+
+
+expressionDefinitionsInLet =
+    let
+        def1 =
+            ()
+
+        def2 =
+            ()
+    in
+    ()
+
+
+expressionDefinitionsInLet2 =
+    let
+        {- X -}
+        def1 =
+            ()
+
+        {- AA -}
+        def2 =
+            ()
+
+        {- AD -}
+    in
+    ()
+
+
+expressionDefinitionsInLet3 =
+    let
+        --X
+        def1 =
+            ()
+
+        --Z
+        def2 =
+            ()
+
+        --AB
+    in
+    ()
+
+
+typeAnnotationInLet =
+    let
+        def1 : String -> (Int -> Bool)
+        def1 aString =
+            Basics.False
+    in
+    ()

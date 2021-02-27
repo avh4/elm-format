@@ -23,13 +23,16 @@ import qualified ElmFormat.Parse as Parse
 import qualified ElmFormat.Render.Text as Render
 import qualified ElmFormat.Version
 import qualified Reporting.Result as Result
-import qualified Text.JSON
 import qualified ElmFormat.AST.PublicAST as PublicAST
+import qualified Data.Aeson as Aeson
+import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.Lazy.Char8 as LB
 
 
 data WhatToDo
     = Format TransformMode
     | ConvertToJson TransformMode
+    | ConvertFromJson TransformMode
     | Validate ValidateMode
 
 
@@ -45,7 +48,7 @@ data Destination
 
 data Mode
     = FormatMode
-    | JsonMode
+    | JsonMode Flags.JsonMode
     | ValidateMode
 
 
@@ -66,12 +69,12 @@ determineDestination output =
         Just path -> Right $ ToFile path
 
 
-determineMode :: Bool -> Bool -> Either ErrorMessage Mode
+determineMode :: Bool -> Maybe Flags.JsonMode -> Either ErrorMessage Mode
 determineMode doValidate json =
     case ( doValidate, json ) of
-        ( False, False ) -> Right FormatMode
-        ( True, False ) -> Right ValidateMode
-        ( False, True ) -> Right JsonMode
+        ( False, Nothing ) -> Right FormatMode
+        ( True, Nothing ) -> Right ValidateMode
+        ( False, Just jsonMode ) -> Right (JsonMode jsonMode)
         _ -> Left OutputAndValidate
 
 
@@ -85,10 +88,14 @@ determineWhatToDo source destination mode =
         ( FormatMode, Stdin, ToFile output ) -> Right $ Format (StdinToFile output)
         ( FormatMode, FromFiles first [], ToFile output ) -> Right $ Format (FileToFile first output)
         ( FormatMode, FromFiles first rest, InPlace ) -> Right $ Format (FilesInPlace first rest)
-        ( JsonMode, Stdin, InPlace ) -> Right $ ConvertToJson StdinToStdout
-        ( JsonMode, Stdin, ToFile output ) -> Right $ ConvertToJson (StdinToFile output)
-        ( JsonMode, FromFiles first [], InPlace ) -> Right $ ConvertToJson (FileToStdout first)
-        ( JsonMode, FromFiles _ (_:_), _ ) -> error "TODO: --json with multiple files is not supported"
+        ( JsonMode Flags.ElmToJson, Stdin, InPlace ) -> Right $ ConvertToJson StdinToStdout
+        ( JsonMode Flags.ElmToJson, Stdin, ToFile output ) -> Right $ ConvertToJson (StdinToFile output)
+        ( JsonMode Flags.ElmToJson, FromFiles first [], InPlace ) -> Right $ ConvertToJson (FileToStdout first)
+        ( JsonMode Flags.ElmToJson, FromFiles _ (_:_), _ ) -> error "TODO: --json with multiple files is not supported"
+        ( JsonMode Flags.JsonToElm, Stdin, InPlace ) -> Right $ ConvertFromJson StdinToStdout
+        ( JsonMode Flags.JsonToElm, Stdin, ToFile output ) -> Right $ ConvertFromJson (StdinToFile output)
+        ( JsonMode Flags.JsonToElm, FromFiles first [], InPlace ) -> Right $ ConvertFromJson (FileToStdout first)
+        ( JsonMode Flags.JsonToElm, FromFiles _ (_:_), _ ) -> error "TODO: --from-json with multiple files is not supported"
         ( _, FromFiles _ _, ToFile _ ) -> Left SingleOutputWithMultipleInputs
 
 
@@ -151,7 +158,7 @@ validate elmVersion input@(inputFile, inputText) =
     case parseModule elmVersion input of
         Right modu ->
             if inputText /= Render.render elmVersion modu then
-                Left $ FileWouldChange inputFile
+                Left $ FileWouldChange elmVersion inputFile
             else
                 Right ()
 
@@ -172,6 +179,16 @@ parseModule elmVersion (inputFile, inputText) =
             Left $ ParseError inputFile errs
 
 
+parseJson :: (FilePath, Text.Text)
+    -> Either InfoMessage (Module [UppercaseIdentifier] (ASTNS Identity [UppercaseIdentifier] 'TopLevelNK))
+parseJson (inputFile, inputText) =
+    case Aeson.eitherDecode (LB.fromChunks . return . encodeUtf8 $ inputText) of
+        Right modu -> Right $ PublicAST.toModule modu
+
+        Left message ->
+            Left $ JsonParseError inputFile (Text.pack message)
+
+
 format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
 format elmVersion input =
     Render.render elmVersion <$> parseModule elmVersion input
@@ -185,8 +202,13 @@ toJson elmVersion (inputFile, inputText) =
                 { PublicAST.showSourceLocation = True
                 }
     in
-    toText . Text.JSON.encode . PublicAST.showJSON config . PublicAST.fromModule
+    decodeUtf8 . B.concat . LB.toChunks . Aeson.encode . PublicAST.fromModule config
     <$> parseModule elmVersion (inputFile, inputText)
+
+
+fromJson :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
+fromJson elmVersion input =
+    Render.render elmVersion <$> parseJson input
 
 
 doIt :: World m => ElmVersion -> Bool -> WhatToDo -> m Bool
@@ -194,7 +216,7 @@ doIt elmVersion autoYes whatToDo =
     case whatToDo of
         Validate validateMode ->
             TransformFiles.validateNoChanges
-                elmVersion ProcessingFile
+                ProcessingFile
                 (validate elmVersion)
                 validateMode
 
@@ -208,4 +230,10 @@ doIt elmVersion autoYes whatToDo =
             TransformFiles.applyTransformation
                 ProcessingFile autoYes FilesWillBeOverwritten
                 (toJson elmVersion)
+                transformMode
+
+        ConvertFromJson transformMode ->
+            TransformFiles.applyTransformation
+                ProcessingFile autoYes FilesWillBeOverwritten
+                (fromJson elmVersion)
                 transformMode
