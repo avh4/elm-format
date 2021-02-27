@@ -350,7 +350,7 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) wh
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     Binops ::
         getType 'ExpressionNK
-        -> [BinopsClause varRef (getType 'ExpressionNK)]
+        -> List (BinopsClause varRef (getType 'ExpressionNK)) -- Non-empty
         -> Bool
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     Parens ::

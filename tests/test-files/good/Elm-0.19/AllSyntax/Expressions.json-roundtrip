@@ -27,11 +27,19 @@ operator =
 
 
 infixPipeLeft x y z =
-    "TODO: Object (fromList [(\"tag\",String \"BinaryOperatorList\"),(\"first\",Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"x\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 31.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 31.0),(\"col\",Number 6.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 31.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 34.0),(\"col\",Number 10.0)]))])),(\"operations\",Array [Object (fromList [(\"operator\",Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"<|\")])),(\"term\",Object (fromList [(\"tag\",String \"ListLiteral\"),(\"terms\",Array [Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"y\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 32.0),(\"col\",Number 11.0)])),(\"end\",Object (fromList [(\"line\",Number 32.0),(\"col\",Number 12.0)]))]))]),Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"z\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 33.0),(\"col\",Number 11.0)])),(\"end\",Object (fromList [(\"line\",Number 33.0),(\"col\",Number 12.0)]))]))])]),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 32.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 34.0),(\"col\",Number 10.0)]))]))]))])])])"
+    (<|) x
+        [ y
+        , z
+        ]
 
 
 infixPipeLeft2 x y z =
-    "TODO: Object (fromList [(\"tag\",String \"BinaryOperatorList\"),(\"first\",Object (fromList [(\"tag\",String \"ListLiteral\"),(\"terms\",Array [Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"x\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 38.0),(\"col\",Number 7.0)])),(\"end\",Object (fromList [(\"line\",Number 38.0),(\"col\",Number 8.0)]))]))])]),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 38.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 39.0),(\"col\",Number 6.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 38.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 43.0),(\"col\",Number 10.0)]))])),(\"operations\",Array [Object (fromList [(\"operator\",Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"<|\")])),(\"term\",Object (fromList [(\"tag\",String \"ListLiteral\"),(\"terms\",Array [Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"y\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 41.0),(\"col\",Number 11.0)])),(\"end\",Object (fromList [(\"line\",Number 41.0),(\"col\",Number 12.0)]))]))]),Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"z\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 42.0),(\"col\",Number 11.0)])),(\"end\",Object (fromList [(\"line\",Number 42.0),(\"col\",Number 12.0)]))]))])]),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 41.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 43.0),(\"col\",Number 10.0)]))]))]))])])])"
+    (<|)
+        [ x
+        ]
+        [ y
+        , z
+        ]
 
 
 functionApplication =
@@ -51,7 +59,7 @@ unary x =
 
 
 binary =
-    "TODO: Object (fromList [(\"tag\",String \"BinaryOperatorList\"),(\"first\",Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 1.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 66.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 66.0),(\"col\",Number 6.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 66.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 66.0),(\"col\",Number 14.0)]))])),(\"operations\",Array [Object (fromList [(\"operator\",Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"+\")])),(\"term\",Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 2.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 66.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 66.0),(\"col\",Number 10.0)]))]))]))]),Object (fromList [(\"operator\",Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"+\")])),(\"term\",Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 3.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 66.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 66.0),(\"col\",Number 14.0)]))]))]))])])])"
+    (+) ((+) 1 2) 3
 
 
 parens f x a =
@@ -216,7 +224,7 @@ recordAccessFunction =
 
 
 lambda =
-    \x -> "TODO: Object (fromList [(\"tag\",String \"BinaryOperatorList\"),(\"first\",Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"x\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 261.0),(\"col\",Number 11.0)])),(\"end\",Object (fromList [(\"line\",Number 261.0),(\"col\",Number 12.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 261.0),(\"col\",Number 11.0)])),(\"end\",Object (fromList [(\"line\",Number 261.0),(\"col\",Number 16.0)]))])),(\"operations\",Array [Object (fromList [(\"operator\",Object (fromList [(\"tag\",String \"VariableReference\"),(\"name\",String \"+\")])),(\"term\",Object (fromList [(\"display\",Object (fromList [(\"representation\",String \"DecimalInt\")])),(\"tag\",String \"IntLiteral\"),(\"value\",Number 1.0),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 261.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 261.0),(\"col\",Number 16.0)]))]))]))])])])"
+    \x -> (+) x 1
 
 
 lambdaWithMultilinePattern =
