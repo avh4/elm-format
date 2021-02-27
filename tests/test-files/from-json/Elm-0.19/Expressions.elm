@@ -1,4 +1,4 @@
-module Expressions exposing (caseExpression, charLiteral, emptyList, externalReference, floatLiteral, functionApplication, intLiteral, lambda, letExpression, list, operator, parensAreAddedWhereNeeded, record, recordAccessFunction, recordUpdate, stringLiteral, tag, tuple, unary, unit, var)
+module Expressions exposing (caseExpression, charLiteral, emptyList, externalReference, floatLiteral, functionApplication, glShader, intLiteral, lambda, letExpression, list, operator, parensAreAddedWhereNeeded, record, recordAccessFunction, recordUpdate, stringLiteral, tag, tuple, unary, unit, var)
 
 
 unit =
@@ -101,3 +101,19 @@ letExpression =
             ()
     in
     ()
+
+
+glShader =
+    [glsl|
+
+attribute vec3 position;
+attribute vec3 coord;
+uniform   mat4 view;
+varying   vec2 vcoord;
+
+void main () {
+  gl_Position = view * vec4(position, 1.0);
+  vcoord = coord.xy;
+}
+
+|]
