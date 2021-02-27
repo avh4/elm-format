@@ -12,8 +12,6 @@ import qualified Data.Bimap as Bimap
 import Data.Coapplicative
 import Data.Functor.Identity
 import qualified Data.Indexed as I
-import qualified Data.Map.Strict as Map
-import qualified Data.Set as Set
 import qualified Data.Text as Text
 import Text.Parsec.Char (string)
 import ElmFormat.ImportInfo (ImportInfo(..))
@@ -21,6 +19,7 @@ import ElmFormat.Render.Box (formatExpression, ExpressionContext(..))
 import ElmVersion
 import Parse.TestHelpers
 import Reporting.Annotation (Located)
+import GHC.Int (Int64)
 
 
 pending :: ASTNS Located [UppercaseIdentifier] 'ExpressionNK
@@ -44,28 +43,34 @@ example' name input expected =
         assertParse (fmap (Text.unpack . Box.render . formatExpression Elm_0_19 importInfo SyntaxSeparated . I.convert (Identity . extract)) (expr Elm_0_19)) input expected
 
 
+commentedIntExpr :: (Int, Int, Int, Int) -> String -> String -> Int64 -> Commented ([Comment], [Comment]) (ASTNS Located ns 'ExpressionNK)
 commentedIntExpr (a,b,c,d) preComment postComment i =
     C ([BlockComment [preComment]], [BlockComment [postComment]]) (at a b c d  $ Literal $ IntNum i DecimalInt)
 
+commentedIntExpr' :: (Int, Int, Int, Int) -> String -> Int64 -> Commented ([Comment], [a]) (ASTNS Located ns 'ExpressionNK)
 commentedIntExpr' (a,b,c,d) preComment i =
     C ([BlockComment [preComment]], []) (at a b c d  $ Literal $ IntNum i DecimalInt)
 
 
+commentedIntExpr'' :: (Int, Int, Int, Int) -> String -> Int64 -> Commented [Comment] (ASTNS Located ns 'ExpressionNK)
 commentedIntExpr'' (a,b,c,d) preComment i =
     C [BlockComment [preComment]] $ at a b c d  $ Literal $ IntNum i DecimalInt
 
 
+intExpr :: (Int, Int, Int, Int) -> Int64 -> ASTNS Located ns 'ExpressionNK
 intExpr (a,b,c,d) i = at a b c d $ Literal $ IntNum i DecimalInt
 
+intExpr' :: (Int, Int, Int, Int) -> Int64 -> Commented ([a1], [a2]) (ASTNS Located ns 'ExpressionNK)
 intExpr' (a,b,c,d) i =
     C ([], []) (at a b c d  $ Literal $ IntNum i DecimalInt)
 
+intExpr'' :: (Int, Int, Int, Int) -> Int64 -> Commented [a] (ASTNS Located ns 'ExpressionNK)
 intExpr'' (a,b,c,d) i =
     C [] $ at a b c d  $ Literal $ IntNum i DecimalInt
 
 
-tests :: TestTree
-tests =
+test_tests :: TestTree
+test_tests =
     testGroup "Parse.Expression"
     [ testGroup "Unit"
         [ example "" "()" $ at 1 1 1 3 $ Unit []
@@ -271,12 +276,12 @@ tests =
         ]
 
     , testGroup "let statement"
-        [ example "" "let a=b in z" $ at 1 1 1 13 (Let [at 1 5 1 8 $ LetDefinition (at 1 5 1 6 (VarPattern (LowercaseIdentifier "a"))) [] [] (at 1 7 1 8 (VarExpr (VarRef [] $ LowercaseIdentifier "b")))] [] (at 1 12 1 13 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
-        , example "multiple declarations" "let a=b\n    c=d\nin z" $ at 1 1 3 5 (Let [at 1 5 1 8 $ LetDefinition (at 1 5 1 6 (VarPattern (LowercaseIdentifier "a"))) [] [] (at 1 7 1 8 (VarExpr (VarRef [] $ LowercaseIdentifier "b"))),at 2 5 2 8 $ LetDefinition (at 2 5 2 6 (VarPattern (LowercaseIdentifier "c"))) [] [] (at 2 7 2 8 (VarExpr (VarRef [] $ LowercaseIdentifier "d")))] [] (at 3 4 3 5 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
-        , example "multiple declarations" "let\n a=b\n c=d\nin z" $ at 1 1 4 5 (Let [at 2 2 2 5 $ LetDefinition (at 2 2 2 3 (VarPattern (LowercaseIdentifier "a"))) [] [] (at 2 4 2 5 (VarExpr (VarRef [] $ LowercaseIdentifier "b"))),at 3 2 3 5 $ LetDefinition (at 3 2 3 3 (VarPattern (LowercaseIdentifier "c"))) [] [] (at 3 4 3 5 (VarExpr (VarRef [] $ LowercaseIdentifier "d")))] [] (at 4 4 4 5 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
-        , example "whitespace" "let a = b in z" $ at 1 1 1 15 (Let [at 1 5 1 10 $ LetDefinition (at 1 5 1 6 (VarPattern (LowercaseIdentifier "a"))) [] [] (at 1 9 1 10 (VarExpr (VarRef [] $ LowercaseIdentifier "b")))] [] (at 1 14 1 15 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
-        , example "comments" "let{-A-}a{-B-}={-C-}b{-D-}in{-E-}z" $ at 1 1 1 35 (Let [at 1 4 1 9 $ LetComment (BlockComment ["A"]),at 1 9 1 22 $ LetDefinition (at 1 9 1 10 (VarPattern (LowercaseIdentifier "a"))) [] [BlockComment ["B"],BlockComment ["C"]] (at 1 21 1 22 (VarExpr (VarRef [] $ LowercaseIdentifier "b"))),at 1 22 1 27 $ LetComment (BlockComment ["D"])] [BlockComment ["E"]] (at 1 34 1 35 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
-        , example "newlines" "let\n a\n =\n b\nin\n z" $ at 1 1 6 3 (Let [at 2 2 4 3 $ LetDefinition (at 2 2 2 3 (VarPattern (LowercaseIdentifier "a"))) [] [] (at 4 2 4 3 (VarExpr (VarRef [] $ LowercaseIdentifier "b")))] [] (at 6 2 6 3 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        [ example "" "let a=b in z" $ at 1 1 1 13 (Let [at 1 5 1 8 $ LetCommonDeclaration $ at 1 5 1 8 $ Definition (at 1 5 1 6 (VarPattern (LowercaseIdentifier "a"))) [] [] (at 1 7 1 8 (VarExpr (VarRef [] $ LowercaseIdentifier "b")))] [] (at 1 12 1 13 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "multiple declarations" "let a=b\n    c=d\nin z" $ at 1 1 3 5 (Let [at 1 5 1 8 $ LetCommonDeclaration $ at 1 5 1 8 $ Definition (at 1 5 1 6 (VarPattern (LowercaseIdentifier "a"))) [] [] (at 1 7 1 8 (VarExpr (VarRef [] $ LowercaseIdentifier "b"))),at 2 5 2 8 $ LetCommonDeclaration $ at 2 5 2 8 $ Definition (at 2 5 2 6 (VarPattern (LowercaseIdentifier "c"))) [] [] (at 2 7 2 8 (VarExpr (VarRef [] $ LowercaseIdentifier "d")))] [] (at 3 4 3 5 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "multiple declarations" "let\n a=b\n c=d\nin z" $ at 1 1 4 5 (Let [at 2 2 2 5 $ LetCommonDeclaration $ at 2 2 2 5 $ Definition (at 2 2 2 3 (VarPattern (LowercaseIdentifier "a"))) [] [] (at 2 4 2 5 (VarExpr (VarRef [] $ LowercaseIdentifier "b"))),at 3 2 3 5 $ LetCommonDeclaration $ at 3 2 3 5 $ Definition (at 3 2 3 3 (VarPattern (LowercaseIdentifier "c"))) [] [] (at 3 4 3 5 (VarExpr (VarRef [] $ LowercaseIdentifier "d")))] [] (at 4 4 4 5 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "whitespace" "let a = b in z" $ at 1 1 1 15 (Let [at 1 5 1 10 $ LetCommonDeclaration $ at 1 5 1 10 $ Definition (at 1 5 1 6 (VarPattern (LowercaseIdentifier "a"))) [] [] (at 1 9 1 10 (VarExpr (VarRef [] $ LowercaseIdentifier "b")))] [] (at 1 14 1 15 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "comments" "let{-A-}a{-B-}={-C-}b{-D-}in{-E-}z" $ at 1 1 1 35 (Let [at 1 4 1 9 $ LetComment (BlockComment ["A"]),at 1 9 1 22 $ LetCommonDeclaration $ at 1 9 1 22 $ Definition (at 1 9 1 10 (VarPattern (LowercaseIdentifier "a"))) [] [BlockComment ["B"],BlockComment ["C"]] (at 1 21 1 22 (VarExpr (VarRef [] $ LowercaseIdentifier "b"))),at 1 22 1 27 $ LetComment (BlockComment ["D"])] [BlockComment ["E"]] (at 1 34 1 35 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
+        , example "newlines" "let\n a\n =\n b\nin\n z" $ at 1 1 6 3 (Let [at 2 2 4 3 $ LetCommonDeclaration $ at 2 2 4 3 $ Definition (at 2 2 2 3 (VarPattern (LowercaseIdentifier "a"))) [] [] (at 4 2 4 3 (VarExpr (VarRef [] $ LowercaseIdentifier "b")))] [] (at 6 2 6 3 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
         , testCase "must have at least one definition" $
             assertParseFailure (expr Elm_0_19) "let in z"
         , testGroup "declarations must start at the same column" $

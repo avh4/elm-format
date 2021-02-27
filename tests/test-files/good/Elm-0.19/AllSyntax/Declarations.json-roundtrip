@@ -146,16 +146,50 @@ parametersWithTypesCurried anInt =
 
 
 expressionDefinitionsInLet =
-    "TODO: Object (fromList [(\"tag\",String \"LetExpression\"),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 202.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 202.0),(\"col\",Number 7.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 195.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 202.0),(\"col\",Number 7.0)]))])),(\"declarations\",Array [Object (fromList [(\"tag\",String \"Definition\"),(\"name\",String \"def1\"),(\"expression\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 197.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 197.0),(\"col\",Number 15.0)]))]))])),(\"parameters\",Array []),(\"returnType\",Null),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 196.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 197.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"tag\",String \"Definition\"),(\"name\",String \"def2\"),(\"expression\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 200.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 200.0),(\"col\",Number 15.0)]))]))])),(\"parameters\",Array []),(\"returnType\",Null),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 199.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 200.0),(\"col\",Number 15.0)]))]))])])])"
+    let
+        def1 =
+            ()
+
+        def2 =
+            ()
+    in
+    ()
 
 
 expressionDefinitionsInLet2 =
-    "TODO: Object (fromList [(\"tag\",String \"LetExpression\"),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 220.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 220.0),(\"col\",Number 7.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 206.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 220.0),(\"col\",Number 7.0)]))])),(\"declarations\",Array [Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"X\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 206.0),(\"col\",Number 8.0)])),(\"end\",Object (fromList [(\"line\",Number 208.0),(\"col\",Number 9.0)]))]))]),Object (fromList [(\"tag\",String \"Definition\"),(\"name\",String \"def1\"),(\"expression\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 210.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 210.0),(\"col\",Number 15.0)]))]))])),(\"parameters\",Array []),(\"returnType\",Null),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 208.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 210.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"AA\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 210.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 213.0),(\"col\",Number 9.0)]))]))]),Object (fromList [(\"tag\",String \"Definition\"),(\"name\",String \"def2\"),(\"expression\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 215.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 215.0),(\"col\",Number 15.0)]))]))])),(\"parameters\",Array []),(\"returnType\",Null),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 213.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 215.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"BlockComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"AD\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 215.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 218.0),(\"col\",Number 5.0)]))]))])])])"
+    let
+        {- X -}
+        def1 =
+            ()
+
+        {- AA -}
+        def2 =
+            ()
+
+        {- AD -}
+    in
+    ()
 
 
 expressionDefinitionsInLet3 =
-    "TODO: Object (fromList [(\"tag\",String \"LetExpression\"),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 238.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 238.0),(\"col\",Number 7.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 224.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 238.0),(\"col\",Number 7.0)]))])),(\"declarations\",Array [Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"LineComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"X\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 224.0),(\"col\",Number 8.0)])),(\"end\",Object (fromList [(\"line\",Number 226.0),(\"col\",Number 9.0)]))]))]),Object (fromList [(\"tag\",String \"Definition\"),(\"name\",String \"def1\"),(\"expression\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 228.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 228.0),(\"col\",Number 15.0)]))]))])),(\"parameters\",Array []),(\"returnType\",Null),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 226.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 228.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"LineComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"Z\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 228.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 231.0),(\"col\",Number 9.0)]))]))]),Object (fromList [(\"tag\",String \"Definition\"),(\"name\",String \"def2\"),(\"expression\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 233.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 233.0),(\"col\",Number 15.0)]))]))])),(\"parameters\",Array []),(\"returnType\",Null),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 231.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 233.0),(\"col\",Number 15.0)]))]))]),Object (fromList [(\"display\",Object (fromList [(\"commentType\",String \"LineComment\")])),(\"tag\",String \"Comment\"),(\"text\",String \"AB\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 233.0),(\"col\",Number 15.0)])),(\"end\",Object (fromList [(\"line\",Number 236.0),(\"col\",Number 5.0)]))]))])])])"
+    let
+        --X
+        def1 =
+            ()
+
+        --Z
+        def2 =
+            ()
+
+        --AB
+    in
+    ()
 
 
 typeAnnotationInLet =
-    "TODO: Object (fromList [(\"tag\",String \"LetExpression\"),(\"body\",Object (fromList [(\"tag\",String \"UnitLiteral\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 247.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 247.0),(\"col\",Number 7.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 242.0),(\"col\",Number 5.0)])),(\"end\",Object (fromList [(\"line\",Number 247.0),(\"col\",Number 7.0)]))])),(\"declarations\",Array [Object (fromList [(\"tag\",String \"Definition\"),(\"name\",String \"def1\"),(\"expression\",Object (fromList [(\"tag\",String \"ExternalReference\"),(\"identifier\",String \"False\"),(\"module\",String \"Basics\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 245.0),(\"col\",Number 13.0)])),(\"end\",Object (fromList [(\"line\",Number 245.0),(\"col\",Number 18.0)]))]))])),(\"parameters\",Array [Object (fromList [(\"pattern\",Object (fromList [(\"tag\",String \"VariableDefinition\"),(\"name\",String \"aString\"),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 244.0),(\"col\",Number 14.0)])),(\"end\",Object (fromList [(\"line\",Number 244.0),(\"col\",Number 21.0)]))]))])),(\"type\",Object (fromList [(\"tag\",String \"TypeReference\"),(\"arguments\",Array []),(\"name\",String \"String\"),(\"module\",Null),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 243.0),(\"col\",Number 16.0)])),(\"end\",Object (fromList [(\"line\",Number 243.0),(\"col\",Number 22.0)]))]))]))])]),(\"returnType\",Object (fromList [(\"tag\",String \"FunctionType\"),(\"returnType\",Object (fromList [(\"tag\",String \"TypeReference\"),(\"arguments\",Array []),(\"name\",String \"Bool\"),(\"module\",Null),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 243.0),(\"col\",Number 33.0)])),(\"end\",Object (fromList [(\"line\",Number 243.0),(\"col\",Number 37.0)]))]))])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 243.0),(\"col\",Number 16.0)])),(\"end\",Object (fromList [(\"line\",Number 243.0),(\"col\",Number 37.0)]))])),(\"argumentTypes\",Array [Object (fromList [(\"tag\",String \"TypeReference\"),(\"arguments\",Array []),(\"name\",String \"Int\"),(\"module\",Null),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 243.0),(\"col\",Number 26.0)])),(\"end\",Object (fromList [(\"line\",Number 243.0),(\"col\",Number 29.0)]))]))])])])),(\"sourceLocation\",Object (fromList [(\"start\",Object (fromList [(\"line\",Number 244.0),(\"col\",Number 9.0)])),(\"end\",Object (fromList [(\"line\",Number 245.0),(\"col\",Number 18.0)]))]))])])])"
+    let
+        def1 : String -> (Int -> Bool)
+        def1 aString =
+            Basics.False
+    in
+    ()

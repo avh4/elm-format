@@ -202,6 +202,23 @@
                     "tag": "UnitLiteral"
                 }
             }
+        },
+        {
+            "tag": "Definition",
+            "name": "letExpression",
+            "expression": {
+                "tag": "LetExpression",
+                "declarations": [
+                    {
+                        "tag": "Definition",
+                        "name": "x",
+                        "expression": { "tag": "UnitLiteral" }
+                    }
+                ],
+                "body": {
+                    "tag": "UnitLiteral"
+                }
+            }
         }
     ]
 }
