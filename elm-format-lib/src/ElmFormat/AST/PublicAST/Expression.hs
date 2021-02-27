@@ -369,6 +369,9 @@ instance FromPublicAST 'ExpressionNK where
                 []
                 (toRawAST body)
 
+        GLShader shaderSource ->
+            AST.GLShader shaderSource
+
 
 instance ToJSON Expression where
     toJSON = undefined
@@ -535,6 +538,10 @@ instance FromJSON Expression where
                 LetExpression
                     <$> obj .: "declarations"
                     <*> obj .: "body"
+
+            "GLShader" ->
+                GLShader
+                    <$> obj .: "shaderSource"
 
             _ ->
                 return $ LiteralExpression $ Str ("TODO: " <> show (Object obj)) SingleQuotedString
