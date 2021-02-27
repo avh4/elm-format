@@ -106,6 +106,13 @@ instance ToPublicAST 'CaseBranchNK where
                 (fromRawAST config pat)
                 (JustF $ fromRawAST config body)
 
+instance FromPublicAST 'CaseBranchNK where
+    toRawAST' = \case
+        CaseBranch pattern body ->
+            AST.CaseBranch [] [] []
+                (toRawAST pattern)
+                (maybeF (I.Fix . Identity . toRawAST') toRawAST body)
+
 instance ToPairs CaseBranch where
     toPairs = \case
         CaseBranch pattern body ->
@@ -117,6 +124,12 @@ instance ToPairs CaseBranch where
 instance ToJSON CaseBranch where
     toJSON = undefined
     toEncoding = pairs . toPairs
+
+instance FromJSON CaseBranch where
+    parseJSON = withObject "CaseBranch" $ \obj -> do
+        CaseBranch
+            <$> obj .: "pattern"
+            <*> obj .: "body"
 
 
 data Expression
@@ -262,7 +275,7 @@ instance ToPublicAST 'ExpressionNK where
         AST.Case (C comments subject, multiline) branches ->
             CaseExpression
                 (fromRawAST config subject)
-                (fmap (fromRawAST config) branches)
+                (fromRawAST config <$> branches)
                 (CaseDisplay False)
 
         AST.Range _ _ _ ->
@@ -331,6 +344,11 @@ instance FromPublicAST 'ExpressionNK where
                 []
                 (toRawAST body)
                 False
+
+        CaseExpression subject branches display ->
+            AST.Case
+                (C ([], []) $ toRawAST subject, False)
+                (toRawAST <$> branches)
 
         LetExpression declarations body ->
             AST.Let
@@ -500,6 +518,12 @@ instance FromJSON Expression where
                 AnonymousFunction
                     <$> obj .: "parameters"
                     <*> obj .: "body"
+
+            "CaseExpression" ->
+                CaseExpression
+                    <$> obj .: "subject"
+                    <*> obj .: "branches"
+                    <*> return (CaseDisplay False)
 
             "LetExpression" ->
                 LetExpression
