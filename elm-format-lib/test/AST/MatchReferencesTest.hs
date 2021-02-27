@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module AST.MatchReferencesTest (tests) where
+module AST.MatchReferencesTest (test_tests) where
 
 import Elm.Utils ((|>))
 
@@ -23,8 +23,8 @@ import Test.Tasty.HUnit
 import qualified Data.Map as Dict
 import Data.List.Split (splitOn)
 
-tests :: TestTree
-tests =
+test_tests :: TestTree
+test_tests =
     testGroup "AST.MatchReferences"
     [ testGroup "matchReferences" $
         let

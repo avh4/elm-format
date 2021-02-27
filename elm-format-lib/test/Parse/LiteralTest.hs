@@ -18,8 +18,8 @@ example name input expected =
         assertParse (fmap (unpack . render . formatLiteral ElmVersion.Elm_0_18) literal) input expected
 
 
-tests :: TestTree
-tests =
+test_tests :: TestTree
+test_tests =
     testGroup "Parse.Literal"
     [ testGroup "Int"
         [ example "" "99" "99\n"

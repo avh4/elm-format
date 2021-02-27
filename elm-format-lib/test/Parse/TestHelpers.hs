@@ -46,6 +46,7 @@ assertParseFailure parser input =
                 assertEqual (show result) True False
 
 
+nowhere :: Region
 nowhere = Region (Position 0 0) (Position 0 0)
 
 at ::
@@ -60,6 +61,7 @@ at a b c d = I.Fix . A (Region (Position a b) (Position c d))
 For each "\n " in the input string, a test case will be generated checking that
 the given parser will fail if that "\n " is replaced by "\n".
 -}
+mustBeIndented :: Show a => IParser a -> [Char] -> TestTree
 mustBeIndented parser input =
     input
         |> generateReplacements "\n " "\n"

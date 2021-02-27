@@ -17,7 +17,8 @@ import Parse.IParser
 import Reporting.Annotation (Located)
 
 
-pending = at 0 0 0 0 $ TupleType [] (ForceMultiline False) 
+pending :: ASTNS Located ns 'TypeNK
+pending = at 0 0 0 0 $ TupleType [] (ForceMultiline False)
 
 expr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
 expr = Parse.Type.expr
@@ -29,8 +30,8 @@ example name input expected =
         assertParse (fmap (Text.unpack . Box.render . formatType Elm_0_19) (expr Elm_0_19)) input expected
 
 
-tests :: TestTree
-tests =
+test_tests :: TestTree
+test_tests =
     testGroup "Parse.Type"
     [ testGroup "tuple type"
         [ example "" "(a,b)" "( a, b )\n"

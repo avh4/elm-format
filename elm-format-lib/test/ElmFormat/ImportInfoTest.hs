@@ -13,8 +13,8 @@ import qualified Data.Set as Set
 import qualified ElmFormat.ImportInfo as ImportInfo
 import qualified ElmFormat.KnownContents as KnownContents
 
-tests :: TestTree
-tests =
+test_tests :: TestTree
+test_tests =
     testGroup "ElmFormat.ImportInfo" $
     let
         makeEntry (a, b, c) =

@@ -48,8 +48,8 @@ block text =
         w = identifier text
 
 
-tests :: TestTree
-tests =
+test_tests :: TestTree
+test_tests =
     testGroup "ElmFormat.Render.ElmStructure"
     [ testCase "application (single line)" $
         assertOutput "a b c\n" $
