@@ -74,7 +74,7 @@ instance ToPairs LetDeclaration where
 data CaseBranch
     = CaseBranch
         { pattern :: LocatedIfRequested Pattern
-        , body :: LocatedIfRequested Expression
+        , body :: MaybeF LocatedIfRequested Expression
         }
 
 instance ToPublicAST 'CaseBranchNK where
@@ -84,7 +84,7 @@ instance ToPublicAST 'CaseBranchNK where
         AST.CaseBranch c1 c2 c3 pat body ->
             CaseBranch
                 (fromRawAST config pat)
-                (fromRawAST config body)
+                (JustF $ fromRawAST config body)
 
 instance ToPairs CaseBranch where
     toPairs = \case
@@ -133,11 +133,6 @@ data Expression
         { parameters :: List (LocatedIfRequested Pattern) -- Non-empty
         , body :: LocatedIfRequested Expression
         }
-    | IfExpression
-        { if_ :: LocatedIfRequested Expression
-        , then_ :: LocatedIfRequested Expression
-        , else_ :: MaybeF LocatedIfRequested Expression
-        }
     | LetExpression
         { declarations :: List (MaybeF LocatedIfRequested LetDeclaration)
         , body :: LocatedIfRequested Expression
@@ -145,6 +140,7 @@ data Expression
     | CaseExpression
         { subject :: LocatedIfRequested Expression
         , branches :: List (LocatedIfRequested CaseBranch)
+        , display :: CaseDisplay
         }
     | GLShader
         { shaderSource :: String
@@ -224,13 +220,19 @@ instance ToPublicAST 'ExpressionNK where
             ifThenElse cond' thenBody' rest'
             where
                 ifThenElse (C c1 cond) (C c2 thenBody) rest =
-                    IfExpression
+                    CaseExpression
                         (fromRawAST config cond)
-                        (fromRawAST config thenBody)
-                        $ case rest of
-                            [] -> JustF $ fromRawAST config elseBody
-                            C c4 (AST.IfClause nextCond nextBody) : nextRest ->
-                                NothingF $ ifThenElse nextCond nextBody nextRest
+                        [ LocatedIfRequested $ NothingF $ CaseBranch
+                            (LocatedIfRequested $ NothingF $ DataPattern (ExternalReference (ModuleName [UppercaseIdentifier "Basics"]) (TagRef () $ UppercaseIdentifier "True")) []) $
+                            JustF $ fromRawAST config thenBody
+                        , LocatedIfRequested $ NothingF $ CaseBranch
+                            (LocatedIfRequested $ NothingF $ DataPattern (ExternalReference (ModuleName [UppercaseIdentifier "Basics"]) (TagRef () $ UppercaseIdentifier "False")) []) $
+                            case rest of
+                                [] -> JustF $ fromRawAST config elseBody
+                                C c4 (AST.IfClause nextCond nextBody) : nextRest ->
+                                    NothingF $ ifThenElse nextCond nextBody nextRest
+                        ]
+                        (CaseDisplay True)
 
         AST.Let decls comments body ->
             LetExpression
@@ -241,6 +243,7 @@ instance ToPublicAST 'ExpressionNK where
             CaseExpression
                 (fromRawAST config subject)
                 (fmap (fromRawAST config) branches)
+                (CaseDisplay False)
 
         AST.Range _ _ _ ->
             error "Range syntax is not supported in Elm 0.19"
@@ -388,14 +391,6 @@ instance ToPairs Expression where
                 , "body" .= body
                 ]
 
-        IfExpression if_ then_ else_ ->
-            mconcat
-                [ type_ "IfExpression"
-                , "if" .= if_
-                , "then" .= then_
-                , "else" .= else_
-                ]
-
         LetExpression declarations body ->
             mconcat
                 [ type_ "LetExpression"
@@ -403,11 +398,12 @@ instance ToPairs Expression where
                 , "body" .= body
                 ]
 
-        CaseExpression subject branches ->
-            mconcat
-                [ type_ "CaseExpression"
-                , "subject" .= subject
-                , "branches" .= branches
+        CaseExpression subject branches display ->
+            mconcat $ Maybe.catMaybes
+                [ Just $ type_ "CaseExpression"
+                , Just $ "subject" .= subject
+                , Just $ "branches" .= branches
+                , pair "display" <$> toMaybeEncoding display
                 ]
 
         GLShader shaderSource ->
@@ -501,6 +497,25 @@ instance ToMaybeJSON FunctionApplicationDisplay where
                 [] -> Nothing
                 some -> Just $ pairs $ mconcat some
 
+
+newtype CaseDisplay
+    = CaseDisplay
+        { showAsIf :: Bool
+        }
+    deriving (Generic)
+
+instance ToMaybeJSON CaseDisplay where
+    toMaybeEncoding = \case
+        CaseDisplay showAsIf ->
+            case
+                Maybe.catMaybes
+                    [ if showAsIf
+                        then Just ("showAsIf" .= True)
+                        else Nothing
+                    ]
+            of
+                [] -> Nothing
+                some -> Just $ pairs $ mconcat some
 
 
 --

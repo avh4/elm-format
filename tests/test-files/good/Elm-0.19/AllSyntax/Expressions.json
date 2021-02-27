@@ -3768,59 +3768,140 @@
                 "declarations": [
                     {
                         "expression": {
-                            "else": {
-                                "else": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 18,
-                                            "line": 283
+                            "branches": [
+                                {
+                                    "body": {
+                                        "display": {
+                                            "representation": "DecimalInt"
                                         },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 283
-                                        }
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 18,
+                                                "line": 277
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 277
+                                            }
+                                        },
+                                        "tag": "IntLiteral",
+                                        "value": 1
                                     },
-                                    "tag": "IntLiteral",
-                                    "value": 3
+                                    "pattern": {
+                                        "arguments": [],
+                                        "constructor": {
+                                            "identifier": "True",
+                                            "module": "Basics",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "DataPattern"
+                                    }
                                 },
-                                "if": {
-                                    "identifier": "False",
-                                    "module": "Basics",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 26,
-                                            "line": 279
+                                {
+                                    "body": {
+                                        "branches": [
+                                            {
+                                                "body": {
+                                                    "display": {
+                                                        "representation": "DecimalInt"
+                                                    },
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 18,
+                                                            "line": 280
+                                                        },
+                                                        "start": {
+                                                            "col": 17,
+                                                            "line": 280
+                                                        }
+                                                    },
+                                                    "tag": "IntLiteral",
+                                                    "value": 2
+                                                },
+                                                "pattern": {
+                                                    "arguments": [],
+                                                    "constructor": {
+                                                        "identifier": "True",
+                                                        "module": "Basics",
+                                                        "tag": "ExternalReference"
+                                                    },
+                                                    "tag": "DataPattern"
+                                                }
+                                            },
+                                            {
+                                                "body": {
+                                                    "display": {
+                                                        "representation": "DecimalInt"
+                                                    },
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 18,
+                                                            "line": 283
+                                                        },
+                                                        "start": {
+                                                            "col": 17,
+                                                            "line": 283
+                                                        }
+                                                    },
+                                                    "tag": "IntLiteral",
+                                                    "value": 3
+                                                },
+                                                "pattern": {
+                                                    "arguments": [],
+                                                    "constructor": {
+                                                        "identifier": "False",
+                                                        "module": "Basics",
+                                                        "tag": "ExternalReference"
+                                                    },
+                                                    "tag": "DataPattern"
+                                                }
+                                            }
+                                        ],
+                                        "display": {
+                                            "showAsIf": true
                                         },
-                                        "start": {
-                                            "col": 21,
-                                            "line": 279
-                                        }
+                                        "subject": {
+                                            "identifier": "False",
+                                            "module": "Basics",
+                                            "sourceLocation": {
+                                                "end": {
+                                                    "col": 26,
+                                                    "line": 279
+                                                },
+                                                "start": {
+                                                    "col": 21,
+                                                    "line": 279
+                                                }
+                                            },
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "CaseExpression"
                                     },
-                                    "tag": "ExternalReference"
+                                    "pattern": {
+                                        "arguments": [],
+                                        "constructor": {
+                                            "identifier": "False",
+                                            "module": "Basics",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "DataPattern"
+                                    }
+                                }
+                            ],
+                            "display": {
+                                "showAsIf": true
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 18,
+                                    "line": 283
                                 },
-                                "tag": "IfExpression",
-                                "then": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 18,
-                                            "line": 280
-                                        },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 280
-                                        }
-                                    },
-                                    "tag": "IntLiteral",
-                                    "value": 2
+                                "start": {
+                                    "col": 13,
+                                    "line": 276
                                 }
                             },
-                            "if": {
+                            "subject": {
                                 "identifier": "True",
                                 "module": "Basics",
                                 "sourceLocation": {
@@ -3835,34 +3916,7 @@
                                 },
                                 "tag": "ExternalReference"
                             },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 18,
-                                    "line": 283
-                                },
-                                "start": {
-                                    "col": 13,
-                                    "line": 276
-                                }
-                            },
-                            "tag": "IfExpression",
-                            "then": {
-                                "display": {
-                                    "representation": "DecimalInt"
-                                },
-                                "sourceLocation": {
-                                    "end": {
-                                        "col": 18,
-                                        "line": 277
-                                    },
-                                    "start": {
-                                        "col": 17,
-                                        "line": 277
-                                    }
-                                },
-                                "tag": "IntLiteral",
-                                "value": 1
-                            }
+                            "tag": "CaseExpression"
                         },
                         "name": "a",
                         "parameters": [],
@@ -3881,59 +3935,140 @@
                     },
                     {
                         "expression": {
-                            "else": {
-                                "else": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 18,
-                                            "line": 298
+                            "branches": [
+                                {
+                                    "body": {
+                                        "display": {
+                                            "representation": "DecimalInt"
                                         },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 298
-                                        }
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 18,
+                                                "line": 288
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 288
+                                            }
+                                        },
+                                        "tag": "IntLiteral",
+                                        "value": 1
                                     },
-                                    "tag": "IntLiteral",
-                                    "value": 3
+                                    "pattern": {
+                                        "arguments": [],
+                                        "constructor": {
+                                            "identifier": "True",
+                                            "module": "Basics",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "DataPattern"
+                                    }
                                 },
-                                "if": {
-                                    "identifier": "False",
-                                    "module": "Basics",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 42,
-                                            "line": 291
+                                {
+                                    "body": {
+                                        "branches": [
+                                            {
+                                                "body": {
+                                                    "display": {
+                                                        "representation": "DecimalInt"
+                                                    },
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 18,
+                                                            "line": 293
+                                                        },
+                                                        "start": {
+                                                            "col": 17,
+                                                            "line": 293
+                                                        }
+                                                    },
+                                                    "tag": "IntLiteral",
+                                                    "value": 2
+                                                },
+                                                "pattern": {
+                                                    "arguments": [],
+                                                    "constructor": {
+                                                        "identifier": "True",
+                                                        "module": "Basics",
+                                                        "tag": "ExternalReference"
+                                                    },
+                                                    "tag": "DataPattern"
+                                                }
+                                            },
+                                            {
+                                                "body": {
+                                                    "display": {
+                                                        "representation": "DecimalInt"
+                                                    },
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 18,
+                                                            "line": 298
+                                                        },
+                                                        "start": {
+                                                            "col": 17,
+                                                            "line": 298
+                                                        }
+                                                    },
+                                                    "tag": "IntLiteral",
+                                                    "value": 3
+                                                },
+                                                "pattern": {
+                                                    "arguments": [],
+                                                    "constructor": {
+                                                        "identifier": "False",
+                                                        "module": "Basics",
+                                                        "tag": "ExternalReference"
+                                                    },
+                                                    "tag": "DataPattern"
+                                                }
+                                            }
+                                        ],
+                                        "display": {
+                                            "showAsIf": true
                                         },
-                                        "start": {
-                                            "col": 37,
-                                            "line": 291
-                                        }
+                                        "subject": {
+                                            "identifier": "False",
+                                            "module": "Basics",
+                                            "sourceLocation": {
+                                                "end": {
+                                                    "col": 42,
+                                                    "line": 291
+                                                },
+                                                "start": {
+                                                    "col": 37,
+                                                    "line": 291
+                                                }
+                                            },
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "CaseExpression"
                                     },
-                                    "tag": "ExternalReference"
+                                    "pattern": {
+                                        "arguments": [],
+                                        "constructor": {
+                                            "identifier": "False",
+                                            "module": "Basics",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "DataPattern"
+                                    }
+                                }
+                            ],
+                            "display": {
+                                "showAsIf": true
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 18,
+                                    "line": 298
                                 },
-                                "tag": "IfExpression",
-                                "then": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 18,
-                                            "line": 293
-                                        },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 293
-                                        }
-                                    },
-                                    "tag": "IntLiteral",
-                                    "value": 2
+                                "start": {
+                                    "col": 13,
+                                    "line": 286
                                 }
                             },
-                            "if": {
+                            "subject": {
                                 "identifier": "True",
                                 "module": "Basics",
                                 "sourceLocation": {
@@ -3948,34 +4083,7 @@
                                 },
                                 "tag": "ExternalReference"
                             },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 18,
-                                    "line": 298
-                                },
-                                "start": {
-                                    "col": 13,
-                                    "line": 286
-                                }
-                            },
-                            "tag": "IfExpression",
-                            "then": {
-                                "display": {
-                                    "representation": "DecimalInt"
-                                },
-                                "sourceLocation": {
-                                    "end": {
-                                        "col": 18,
-                                        "line": 288
-                                    },
-                                    "start": {
-                                        "col": 17,
-                                        "line": 288
-                                    }
-                                },
-                                "tag": "IntLiteral",
-                                "value": 1
-                            }
+                            "tag": "CaseExpression"
                         },
                         "name": "b",
                         "parameters": [],
@@ -3994,59 +4102,140 @@
                     },
                     {
                         "expression": {
-                            "else": {
-                                "else": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 18,
-                                            "line": 323
+                            "branches": [
+                                {
+                                    "body": {
+                                        "display": {
+                                            "representation": "DecimalInt"
                                         },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 323
-                                        }
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 18,
+                                                "line": 307
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 307
+                                            }
+                                        },
+                                        "tag": "IntLiteral",
+                                        "value": 1
                                     },
-                                    "tag": "IntLiteral",
-                                    "value": 3
+                                    "pattern": {
+                                        "arguments": [],
+                                        "constructor": {
+                                            "identifier": "True",
+                                            "module": "Basics",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "DataPattern"
+                                    }
                                 },
-                                "if": {
-                                    "identifier": "False",
-                                    "module": "Basics",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 22,
-                                            "line": 314
+                                {
+                                    "body": {
+                                        "branches": [
+                                            {
+                                                "body": {
+                                                    "display": {
+                                                        "representation": "DecimalInt"
+                                                    },
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 18,
+                                                            "line": 318
+                                                        },
+                                                        "start": {
+                                                            "col": 17,
+                                                            "line": 318
+                                                        }
+                                                    },
+                                                    "tag": "IntLiteral",
+                                                    "value": 2
+                                                },
+                                                "pattern": {
+                                                    "arguments": [],
+                                                    "constructor": {
+                                                        "identifier": "True",
+                                                        "module": "Basics",
+                                                        "tag": "ExternalReference"
+                                                    },
+                                                    "tag": "DataPattern"
+                                                }
+                                            },
+                                            {
+                                                "body": {
+                                                    "display": {
+                                                        "representation": "DecimalInt"
+                                                    },
+                                                    "sourceLocation": {
+                                                        "end": {
+                                                            "col": 18,
+                                                            "line": 323
+                                                        },
+                                                        "start": {
+                                                            "col": 17,
+                                                            "line": 323
+                                                        }
+                                                    },
+                                                    "tag": "IntLiteral",
+                                                    "value": 3
+                                                },
+                                                "pattern": {
+                                                    "arguments": [],
+                                                    "constructor": {
+                                                        "identifier": "False",
+                                                        "module": "Basics",
+                                                        "tag": "ExternalReference"
+                                                    },
+                                                    "tag": "DataPattern"
+                                                }
+                                            }
+                                        ],
+                                        "display": {
+                                            "showAsIf": true
                                         },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 314
-                                        }
+                                        "subject": {
+                                            "identifier": "False",
+                                            "module": "Basics",
+                                            "sourceLocation": {
+                                                "end": {
+                                                    "col": 22,
+                                                    "line": 314
+                                                },
+                                                "start": {
+                                                    "col": 17,
+                                                    "line": 314
+                                                }
+                                            },
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "CaseExpression"
                                     },
-                                    "tag": "ExternalReference"
+                                    "pattern": {
+                                        "arguments": [],
+                                        "constructor": {
+                                            "identifier": "False",
+                                            "module": "Basics",
+                                            "tag": "ExternalReference"
+                                        },
+                                        "tag": "DataPattern"
+                                    }
+                                }
+                            ],
+                            "display": {
+                                "showAsIf": true
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 18,
+                                    "line": 323
                                 },
-                                "tag": "IfExpression",
-                                "then": {
-                                    "display": {
-                                        "representation": "DecimalInt"
-                                    },
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 18,
-                                            "line": 318
-                                        },
-                                        "start": {
-                                            "col": 17,
-                                            "line": 318
-                                        }
-                                    },
-                                    "tag": "IntLiteral",
-                                    "value": 2
+                                "start": {
+                                    "col": 13,
+                                    "line": 301
                                 }
                             },
-                            "if": {
+                            "subject": {
                                 "identifier": "True",
                                 "module": "Basics",
                                 "sourceLocation": {
@@ -4061,34 +4250,7 @@
                                 },
                                 "tag": "ExternalReference"
                             },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 18,
-                                    "line": 323
-                                },
-                                "start": {
-                                    "col": 13,
-                                    "line": 301
-                                }
-                            },
-                            "tag": "IfExpression",
-                            "then": {
-                                "display": {
-                                    "representation": "DecimalInt"
-                                },
-                                "sourceLocation": {
-                                    "end": {
-                                        "col": 18,
-                                        "line": 307
-                                    },
-                                    "start": {
-                                        "col": 17,
-                                        "line": 307
-                                    }
-                                },
-                                "tag": "IntLiteral",
-                                "value": 1
-                            }
+                            "tag": "CaseExpression"
                         },
                         "name": "c",
                         "parameters": [],
