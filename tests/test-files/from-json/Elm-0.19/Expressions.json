@@ -205,6 +205,24 @@
         },
         {
             "tag": "Definition",
+            "name": "caseExpression",
+            "expression": {
+                "tag": "CaseExpression",
+                "subject": { "tag": "VariableReference", "name": "x" },
+                "branches": [
+                    {
+                        "pattern": { "tag": "UnitPattern" },
+                        "body": { "tag": "UnitLiteral" }
+                    },
+                    {
+                        "pattern": { "tag": "AnythingPattern" },
+                        "body": { "tag": "UnitLiteral" }
+                    }
+                ]
+            }
+        },
+        {
+            "tag": "Definition",
             "name": "letExpression",
             "expression": {
                 "tag": "LetExpression",
