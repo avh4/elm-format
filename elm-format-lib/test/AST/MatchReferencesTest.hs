@@ -216,7 +216,7 @@ makeImportMethod importString =
 makeLetDeclaration :: String -> ASTNS Identity ns 'LetDeclarationNK
 makeLetDeclaration name =
     I.Fix $ Identity $
-    LetDefinition
+    LetCommonDeclaration $ I.Fix $ Identity $ Definition
         (I.Fix $ Identity $ VarPattern $ LowercaseIdentifier name)
         [] []
         (I.Fix $ Identity $ Unit [])

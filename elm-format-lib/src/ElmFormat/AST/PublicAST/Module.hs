@@ -143,70 +143,41 @@ fromTopLevelStructures :: Config -> ASTNS Located [UppercaseIdentifier] 'TopLeve
 fromTopLevelStructures config (I.Fix (A _ (AST.TopLevel decls))) =
     let
         toDefBuilder :: AST.TopLevelStructure
-                     (ASTNS Located [UppercaseIdentifier] 'DeclarationNK) -> MaybeF LocatedIfRequested (DefinitionBuilder TopLevelStructure)
+                     (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK) -> MaybeF LocatedIfRequested (DefinitionBuilder TopLevelStructure)
         toDefBuilder decl =
             case fmap I.unFix decl of
                 AST.Entry (A region entry) ->
                     JustF $ fromLocated config $ A region $
                     case entry of
-                        AST.Definition (I.Fix (A _ pat)) args preEquals expr ->
-                            DefDef pat args expr
-
-                        AST.TypeAnnotation name typ ->
-                            DefAnnotation name typ
+                        AST.CommonDeclaration (I.Fix (A _ def)) ->
+                            Right def
 
                         AST.TypeAlias c1 (C (c2, c3) (AST.NameWithArgs name args)) (C c4 t) ->
 
-                            DefOpaque $ TypeAlias name (fmap (\(C c a) -> a) args) (fromRawAST config t)
+                            Left $ TypeAlias name (fmap (\(C c a) -> a) args) (fromRawAST config t)
 
                         AST.Datatype (C (c1, c2) (AST.NameWithArgs name args)) variants ->
-                            DefOpaque $ CustomType
+                            Left $ CustomType
                                 name
                                 ((\(C c a) -> a) <$> args)
                                 ((\(C c a) -> mkCustomTypeVariant config a) <$> AST.toCommentedList variants)
 
                         other ->
-                            DefOpaque $ TODO_TopLevelStructure ("TODO: " ++ show other)
+                            Left $ TODO_TopLevelStructure ("TODO: " ++ show other)
 
                 AST.BodyComment comment ->
-                    NothingF $ DefOpaque $ Comment_tls (mkComment comment)
+                    NothingF $ Left $ Comment_tls (mkComment comment)
 
                 _ ->
-                    NothingF $ DefOpaque $
+                    NothingF $ Left $
                         TODO_TopLevelStructure ("TODO: " ++ show decl)
     in
     mkDefinitions config DefinitionStructure $ fmap toDefBuilder decls
 
-toTopLevelStructures :: TopLevelStructure -> List (AST.TopLevelStructure (ASTNS Identity [UppercaseIdentifier] 'DeclarationNK))
+toTopLevelStructures :: TopLevelStructure -> List (AST.TopLevelStructure (ASTNS Identity [UppercaseIdentifier] 'TopLevelDeclarationNK))
 toTopLevelStructures = \case
-    DefinitionStructure (Definition name parameters Nothing expression) ->
-        pure $ AST.Entry $ I.Fix $ Identity $ AST.Definition
-            (I.Fix $ Identity $ AST.VarPattern name)
-            (C [] . toRawAST . pattern <$> parameters)
-            []
-            (toRawAST expression)
-
-    DefinitionStructure (Definition name [] (Just typ) expression) ->
-        [ AST.Entry $ I.Fix $ Identity $ AST.TypeAnnotation
-            (C [] $ VarRef () name)
-            (C [] $ toRawAST typ)
-        , AST.Entry $ I.Fix $ Identity $ AST.Definition
-            (I.Fix $ Identity $ AST.VarPattern name)
-            []
-            []
-            (toRawAST expression)
-        ]
-
-    DefinitionStructure (Definition name parameters (Just typ) expression) ->
-        [ AST.Entry $ I.Fix $ Identity $ AST.TypeAnnotation
-            (C [] $ VarRef () name)
-            (C [] $ toRawAST $ LocatedIfRequested $ NothingF $ FunctionType typ (fromMaybe (LocatedIfRequested $ NothingF UnitType) . type_tp <$> parameters))
-        , AST.Entry $ I.Fix $ Identity $ AST.Definition
-            (I.Fix $ Identity $ AST.VarPattern name)
-            (C [] . toRawAST . pattern <$> parameters)
-            []
-            (toRawAST expression)
-        ]
+    DefinitionStructure def ->
+        AST.Entry . I.Fix . Identity . AST.CommonDeclaration <$> fromDefinition def
 
     TypeAlias name parameters typ ->
         pure $ AST.Entry $ I.Fix $ Identity $ AST.TypeAlias

@@ -25,7 +25,7 @@ parseModule elmVersion src =
     parse src (Parse.Module.elmModule elmVersion)
 
 
-parseDeclarations :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure (ASTNS Located [UppercaseIdentifier] 'DeclarationNK)]
+parseDeclarations :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)]
 parseDeclarations elmVersion src =
     parse src (Parse.Module.topLevel (Parse.Declaration.declaration elmVersion) <* eof)
 

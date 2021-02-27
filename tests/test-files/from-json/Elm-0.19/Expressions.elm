@@ -1,4 +1,4 @@
-module Expressions exposing (charLiteral, emptyList, externalReference, floatLiteral, functionApplication, intLiteral, lambda, list, operator, parensAreAddedWhereNeeded, record, recordAccessFunction, recordUpdate, stringLiteral, tag, tuple, unary, unit, var)
+module Expressions exposing (charLiteral, emptyList, externalReference, floatLiteral, functionApplication, intLiteral, lambda, letExpression, list, operator, parensAreAddedWhereNeeded, record, recordAccessFunction, recordUpdate, stringLiteral, tag, tuple, unary, unit, var)
 
 
 unit =
@@ -84,3 +84,11 @@ recordAccessFunction =
 
 lambda =
     \a b -> ()
+
+
+letExpression =
+    let
+        x =
+            ()
+    in
+    ()

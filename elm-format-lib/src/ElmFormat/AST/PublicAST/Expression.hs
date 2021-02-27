@@ -4,7 +4,7 @@
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
-module ElmFormat.AST.PublicAST.Expression (Expression(..), Definition(..), DefinitionBuilder(..), TypedParameter(..), mkDefinitions) where
+module ElmFormat.AST.PublicAST.Expression (Expression(..), Definition(..), DefinitionBuilder, TypedParameter(..), mkDefinitions, fromDefinition) where
 
 import ElmFormat.AST.PublicAST.Core
 import ElmFormat.AST.PublicAST.Reference
@@ -17,9 +17,10 @@ import qualified Data.Maybe as Maybe
 import ElmFormat.AST.PublicAST.Pattern
 import ElmFormat.AST.PublicAST.Type
 import ElmFormat.AST.PublicAST.Comment
-import Data.Maybe (mapMaybe)
+import Data.Maybe (mapMaybe, fromMaybe)
 import Data.Text (Text)
 import qualified Data.Either as Either
+import qualified Data.Text as Text
 
 
 data BinaryOperation
@@ -47,16 +48,22 @@ mkLetDeclarations config decls =
     let
         toDefBuilder :: ASTNS1 Located [UppercaseIdentifier] 'LetDeclarationNK -> DefinitionBuilder LetDeclaration
         toDefBuilder = \case
-            AST.LetDefinition (I.Fix (A _ pat)) args preEquals expr ->
-                DefDef pat args expr
-
-            AST.LetAnnotation name typ ->
-                DefAnnotation name typ
+            AST.LetCommonDeclaration (I.Fix (A _ def)) ->
+                Right def
 
             AST.LetComment comment ->
-                DefOpaque $ Comment_ld (mkComment comment)
+                Left $ Comment_ld (mkComment comment)
     in
     mkDefinitions config LetDefinition $ fmap (JustF . fmap toDefBuilder . fromLocated config . I.unFix) decls
+
+fromLetDeclaration :: LetDeclaration -> List (ASTNS Identity [UppercaseIdentifier] 'LetDeclarationNK)
+fromLetDeclaration = \case
+    LetDefinition def ->
+        I.Fix . Identity . AST.LetCommonDeclaration <$> fromDefinition def
+
+    Comment_ld comment ->
+        pure $ I.Fix $ Identity $ AST.LetComment (fromComment comment)
+
 
 instance ToJSON LetDeclaration where
     toJSON = undefined
@@ -70,10 +77,23 @@ instance ToPairs LetDeclaration where
         Comment_ld comment ->
             toPairs comment
 
+instance FromJSON LetDeclaration where
+    parseJSON = withObject "LetDeclaration" $ \obj -> do
+        tag :: Text <- obj .: "tag"
+        case tag of
+            "Definition" ->
+                LetDefinition <$> parseJSON (Object obj)
+
+            "Comment" ->
+                Comment_ld <$> parseJSON (Object obj)
+
+            _ ->
+                fail ("unexpected LetDeclaration tag: " <> Text.unpack tag)
+
 
 data CaseBranch
     = CaseBranch
-        { pattern :: LocatedIfRequested Pattern
+        { pattern_cb :: LocatedIfRequested Pattern
         , body :: MaybeF LocatedIfRequested Expression
         }
 
@@ -312,6 +332,12 @@ instance FromPublicAST 'ExpressionNK where
                 (toRawAST body)
                 False
 
+        LetExpression declarations body ->
+            AST.Let
+                (mconcat $ fmap (fromLetDeclaration . extract) declarations)
+                []
+                (toRawAST body)
+
 
 instance ToJSON Expression where
     toJSON = undefined
@@ -475,6 +501,11 @@ instance FromJSON Expression where
                     <$> obj .: "parameters"
                     <*> obj .: "body"
 
+            "LetExpression" ->
+                LetExpression
+                    <$> obj .: "declarations"
+                    <*> obj .: "body"
+
             _ ->
                 return $ LiteralExpression $ Str ("TODO: " <> show (Object obj)) SingleQuotedString
 
@@ -525,7 +556,7 @@ instance ToMaybeJSON CaseDisplay where
 
 data TypedParameter
     = TypedParameter
-        { pattern :: LocatedIfRequested Pattern
+        { pattern_tp :: LocatedIfRequested Pattern
         , type_tp :: Maybe (LocatedIfRequested Type_)
         }
 
@@ -585,15 +616,39 @@ mkDefinition config pat args annotation expr =
                 , show expr
                 ]
 
-data DefinitionBuilder a
-    = DefDef
-        (ASTNS1 Located [UppercaseIdentifier] 'PatternNK)
-        (List (AST.C1 'AST.BeforeTerm (ASTNS Located [UppercaseIdentifier] 'PatternNK)))
-        (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
-    | DefAnnotation
-        (AST.C1 'AST.AfterTerm (AST.Ref ()))
-        (AST.C1 'AST.BeforeTerm (ASTNS Located [UppercaseIdentifier] 'TypeNK))
-    | DefOpaque a
+fromDefinition :: Definition -> List (ASTNS Identity [UppercaseIdentifier] 'CommonDeclarationNK)
+fromDefinition = \case
+    Definition name parameters Nothing expression ->
+        pure $ I.Fix $ Identity $ AST.Definition
+            (I.Fix $ Identity $ AST.VarPattern name)
+            (C [] . toRawAST . pattern_tp <$> parameters)
+            []
+            (toRawAST expression)
+
+    Definition name [] (Just typ) expression ->
+        [ I.Fix $ Identity $ AST.TypeAnnotation
+            (C [] $ VarRef () name)
+            (C [] $ toRawAST typ)
+        , I.Fix $ Identity $ AST.Definition
+            (I.Fix $ Identity $ AST.VarPattern name)
+            []
+            []
+            (toRawAST expression)
+        ]
+
+    Definition name parameters (Just typ) expression ->
+        [ I.Fix $ Identity $ AST.TypeAnnotation
+            (C [] $ VarRef () name)
+            (C [] $ toRawAST $ LocatedIfRequested $ NothingF $ FunctionType typ (fromMaybe (LocatedIfRequested $ NothingF UnitType) . type_tp <$> parameters))
+        , I.Fix $ Identity $ AST.Definition
+            (I.Fix $ Identity $ AST.VarPattern name)
+            (C [] . toRawAST . pattern_tp <$> parameters)
+            []
+            (toRawAST expression)
+        ]
+
+type DefinitionBuilder a
+    = Either a (ASTNS1 Located [UppercaseIdentifier] 'CommonDeclarationNK)
 
 mkDefinitions ::
     forall a.
@@ -606,7 +661,7 @@ mkDefinitions config fromDef items =
         collectAnnotation :: DefinitionBuilder a -> Maybe (LowercaseIdentifier, AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (ASTNS Located [UppercaseIdentifier] 'TypeNK))
         collectAnnotation decl =
             case decl of
-                DefAnnotation (C preColon (VarRef () name)) (C postColon typ) ->
+                Right (AST.TypeAnnotation (C preColon (VarRef () name)) (C postColon typ)) ->
                     Just (name, C (preColon, postColon) typ)
                 _ -> Nothing
 
@@ -617,7 +672,7 @@ mkDefinitions config fromDef items =
         merge :: DefinitionBuilder a -> Maybe a
         merge decl =
             case decl of
-                DefDef pat args expr ->
+                Right (AST.Definition (I.Fix (A _ pat)) args comments expr) ->
                     let
                         annotation =
                             case pat of
@@ -627,11 +682,11 @@ mkDefinitions config fromDef items =
                     in
                     Just $ fromDef $ mkDefinition config pat args annotation expr
 
-                DefAnnotation _ _ ->
+                Right (AST.TypeAnnotation _ _) ->
                     -- TODO: retain annotations that don't have a matching definition
                     Nothing
 
-                DefOpaque a ->
+                Left a ->
                     Just a
     in
     mapMaybe (traverse merge) items
