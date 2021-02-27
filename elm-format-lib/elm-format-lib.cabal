@@ -36,6 +36,7 @@ common common-options
     other-modules:
         AST.Helpers
         Box
+        ElmFormat.AST.BinaryOperatorPrecedence
         ElmFormat.AST.PatternMatching
         ElmFormat.AST.PublicAST.Comment
         ElmFormat.AST.PublicAST.Config
@@ -145,6 +146,7 @@ test-suite efl-tests
     other-modules:
         AST.MatchReferencesTest
         BoxTest
+        ElmFormat.AST.BinaryOperatorPrecedenceTest
         ElmFormat.ImportInfoTest
         ElmFormat.Render.ElmStructureTest
         Parse.ExpressionTest

@@ -21,6 +21,7 @@ import Data.Maybe (mapMaybe, fromMaybe)
 import Data.Text (Text)
 import qualified Data.Either as Either
 import qualified Data.Text as Text
+import qualified ElmFormat.AST.BinaryOperatorPrecedence as BinaryOperatorPrecedence
 
 
 data BinaryOperation
@@ -138,12 +139,8 @@ data Expression
     | VariableReferenceExpression Reference
     | FunctionApplication
         { function :: MaybeF LocatedIfRequested Expression
-        , arguments :: List (LocatedIfRequested Expression)
+        , arguments :: List (MaybeF LocatedIfRequested Expression)
         , display_fa :: FunctionApplicationDisplay
-        }
-    | BinaryOperatorList
-        { first :: LocatedIfRequested Expression
-        , operations :: List BinaryOperation
         }
     | UnaryOperator
         { operator :: AST.UnaryOperator
@@ -196,19 +193,35 @@ instance ToPublicAST 'ExpressionNK where
         AST.App expr args multiline ->
             FunctionApplication
                 (JustF $ fromRawAST config expr)
-                (fmap (\(C comments a) -> fromRawAST config a) args)
-                (FunctionApplicationDisplay False)
+                (fmap (\(C comments a) -> JustF $ fromRawAST config a) args)
+                (FunctionApplicationDisplay ShowAsFunctionApplication)
 
         AST.Binops first rest multiline ->
-            BinaryOperatorList
-                (fromRawAST config first)
-                (fmap (\(AST.BinopsClause c1 op c2 expr) -> BinaryOperation (mkReference op) (fromRawAST config expr)) rest)
+            case
+                BinaryOperatorPrecedence.parseElm0_19
+                    first
+                    ((\(AST.BinopsClause c1 op c2 expr) -> (op, expr)) <$> rest)
+            of
+                Right tree ->
+                    extract $ buildTree tree
+
+                Left message ->
+                    error ("invalid binary operator expression: " <> Text.unpack message)
+            where
+                buildTree :: BinaryOperatorPrecedence.Tree (Ref [UppercaseIdentifier ]) (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) -> MaybeF LocatedIfRequested Expression
+                buildTree (BinaryOperatorPrecedence.Leaf e) =
+                    JustF $ fromRawAST config e
+                buildTree (BinaryOperatorPrecedence.Branch op e1 e2) =
+                    NothingF $ FunctionApplication
+                        (NothingF $ VariableReferenceExpression $ mkReference op)
+                        (buildTree <$> [ e1, e2 ])
+                        (FunctionApplicationDisplay ShowAsInfix)
 
         AST.Unary op expr ->
             FunctionApplication
                 (NothingF $ UnaryOperator op)
-                [ fromRawAST config expr ]
-                (FunctionApplicationDisplay False)
+                [ JustF $ fromRawAST config expr ]
+                (FunctionApplicationDisplay ShowAsFunctionApplication)
 
         AST.Parens (C comments expr) ->
             fromRawAST' config $ extract $ I.unFix expr
@@ -238,8 +251,8 @@ instance ToPublicAST 'ExpressionNK where
         AST.Access base field ->
             FunctionApplication
                 (NothingF $ RecordAccessFunction field)
-                [ fromRawAST config base ]
-                (FunctionApplicationDisplay True)
+                [ JustF $ fromRawAST config base ]
+                (FunctionApplicationDisplay ShowAsRecordAccess)
 
         AST.AccessFunction field ->
             RecordAccessFunction field
@@ -300,7 +313,7 @@ instance FromPublicAST 'ExpressionNK where
                 (UnaryOperator operator, [ single ]) ->
                     AST.Unary
                         operator
-                        (toRawAST single)
+                        (maybeF (I.Fix . Identity . toRawAST') toRawAST single)
 
                 (UnaryOperator _, []) ->
                     undefined
@@ -311,7 +324,7 @@ instance FromPublicAST 'ExpressionNK where
                 _ ->
                     AST.App
                         (maybeF (I.Fix . Identity . toRawAST') toRawAST function)
-                        (C [] . toRawAST <$> args)
+                        (C [] . maybeF (I.Fix . Identity . toRawAST') toRawAST <$> args)
                         (AST.FAJoinFirst AST.JoinAll)
 
         UnaryOperator _ ->
@@ -380,13 +393,6 @@ instance ToPairs Expression where
                 , Just $ "function" .= function
                 , Just $ "arguments" .= arguments
                 , pair "display" <$> toMaybeEncoding display
-                ]
-
-        BinaryOperatorList first operations ->
-            mconcat
-                [ type_ "BinaryOperatorList"
-                , "first" .= first
-                , "operations" .= operations
                 ]
 
         UnaryOperator operator ->
@@ -485,7 +491,7 @@ instance FromJSON Expression where
                 FunctionApplication
                     <$> obj .: "function"
                     <*> obj .: "arguments"
-                    <*> return (FunctionApplicationDisplay False)
+                    <*> return (FunctionApplicationDisplay ShowAsFunctionApplication)
 
             "UnaryOperator" ->
                 UnaryOperator
@@ -536,21 +542,28 @@ instance FromJSON Expression where
 
 newtype FunctionApplicationDisplay
     = FunctionApplicationDisplay
-        { showAsRecordAccess :: Bool
+        { showAs :: FunctionApplicationShowAs
         }
 
 instance ToMaybeJSON FunctionApplicationDisplay where
     toMaybeEncoding = \case
-        FunctionApplicationDisplay showAsRecordAccess ->
+        FunctionApplicationDisplay showAs ->
             case
                 Maybe.catMaybes
-                    [ if showAsRecordAccess
-                        then Just ("showAsRecordAccess" .= True)
-                        else Nothing
+                    [ case showAs of
+                        ShowAsRecordAccess -> Just ("showAsRecordAccess" .= True)
+                        ShowAsInfix -> Just ("showAsInfix" .= True)
+                        ShowAsFunctionApplication -> Nothing
                     ]
             of
                 [] -> Nothing
                 some -> Just $ pairs $ mconcat some
+
+
+data FunctionApplicationShowAs
+    = ShowAsRecordAccess
+    | ShowAsInfix
+    | ShowAsFunctionApplication
 
 
 newtype CaseDisplay

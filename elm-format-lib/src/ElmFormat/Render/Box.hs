@@ -273,7 +273,7 @@ formatModuleHeader elmVersion addDefaultHeader modu =
               |> (extract . I.unFix)
               |> (\(TopLevel decls) -> decls)
               |> concatMap extractVarName
-              |> fmap (\x -> C ([], []) x)
+              |> fmap (C ([], []))
               |> Set.fromList
 
       exportsList =

@@ -246,71 +246,72 @@
         },
         {
             "expression": {
-                "first": {
-                    "name": "x",
-                    "sourceLocation": {
-                        "end": {
-                            "col": 6,
-                            "line": 31
-                        },
-                        "start": {
-                            "col": 5,
-                            "line": 31
-                        }
-                    },
-                    "tag": "VariableReference"
-                },
-                "operations": [
+                "arguments": [
                     {
-                        "operator": {
-                            "name": "<|",
-                            "tag": "VariableReference"
-                        },
-                        "term": {
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 10,
-                                    "line": 34
-                                },
-                                "start": {
-                                    "col": 9,
-                                    "line": 32
-                                }
+                        "name": "x",
+                        "sourceLocation": {
+                            "end": {
+                                "col": 6,
+                                "line": 31
                             },
-                            "tag": "ListLiteral",
-                            "terms": [
-                                {
-                                    "name": "y",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 12,
-                                            "line": 32
-                                        },
-                                        "start": {
-                                            "col": 11,
-                                            "line": 32
-                                        }
+                            "start": {
+                                "col": 5,
+                                "line": 31
+                            }
+                        },
+                        "tag": "VariableReference"
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 34
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 32
+                            }
+                        },
+                        "tag": "ListLiteral",
+                        "terms": [
+                            {
+                                "name": "y",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 32
                                     },
-                                    "tag": "VariableReference"
+                                    "start": {
+                                        "col": 11,
+                                        "line": 32
+                                    }
                                 },
-                                {
-                                    "name": "z",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 12,
-                                            "line": 33
-                                        },
-                                        "start": {
-                                            "col": 11,
-                                            "line": 33
-                                        }
+                                "tag": "VariableReference"
+                            },
+                            {
+                                "name": "z",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 33
                                     },
-                                    "tag": "VariableReference"
-                                }
-                            ]
-                        }
+                                    "start": {
+                                        "col": 11,
+                                        "line": 33
+                                    }
+                                },
+                                "tag": "VariableReference"
+                            }
+                        ]
                     }
                 ],
+                "display": {
+                    "showAsInfix": true
+                },
+                "function": {
+                    "name": "<|",
+                    "tag": "VariableReference"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 10,
@@ -321,7 +322,7 @@
                         "line": 31
                     }
                 },
-                "tag": "BinaryOperatorList"
+                "tag": "FunctionApplication"
             },
             "name": "infixPipeLeft",
             "parameters": [
@@ -392,86 +393,87 @@
         },
         {
             "expression": {
-                "first": {
-                    "sourceLocation": {
-                        "end": {
-                            "col": 6,
-                            "line": 39
-                        },
-                        "start": {
-                            "col": 5,
-                            "line": 38
-                        }
-                    },
-                    "tag": "ListLiteral",
-                    "terms": [
-                        {
-                            "name": "x",
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 8,
-                                    "line": 38
-                                },
-                                "start": {
-                                    "col": 7,
-                                    "line": 38
-                                }
-                            },
-                            "tag": "VariableReference"
-                        }
-                    ]
-                },
-                "operations": [
+                "arguments": [
                     {
-                        "operator": {
-                            "name": "<|",
-                            "tag": "VariableReference"
-                        },
-                        "term": {
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 10,
-                                    "line": 43
-                                },
-                                "start": {
-                                    "col": 9,
-                                    "line": 41
-                                }
+                        "sourceLocation": {
+                            "end": {
+                                "col": 6,
+                                "line": 39
                             },
-                            "tag": "ListLiteral",
-                            "terms": [
-                                {
-                                    "name": "y",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 12,
-                                            "line": 41
-                                        },
-                                        "start": {
-                                            "col": 11,
-                                            "line": 41
-                                        }
+                            "start": {
+                                "col": 5,
+                                "line": 38
+                            }
+                        },
+                        "tag": "ListLiteral",
+                        "terms": [
+                            {
+                                "name": "x",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 8,
+                                        "line": 38
                                     },
-                                    "tag": "VariableReference"
+                                    "start": {
+                                        "col": 7,
+                                        "line": 38
+                                    }
                                 },
-                                {
-                                    "name": "z",
-                                    "sourceLocation": {
-                                        "end": {
-                                            "col": 12,
-                                            "line": 42
-                                        },
-                                        "start": {
-                                            "col": 11,
-                                            "line": 42
-                                        }
+                                "tag": "VariableReference"
+                            }
+                        ]
+                    },
+                    {
+                        "sourceLocation": {
+                            "end": {
+                                "col": 10,
+                                "line": 43
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 41
+                            }
+                        },
+                        "tag": "ListLiteral",
+                        "terms": [
+                            {
+                                "name": "y",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 41
                                     },
-                                    "tag": "VariableReference"
-                                }
-                            ]
-                        }
+                                    "start": {
+                                        "col": 11,
+                                        "line": 41
+                                    }
+                                },
+                                "tag": "VariableReference"
+                            },
+                            {
+                                "name": "z",
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 12,
+                                        "line": 42
+                                    },
+                                    "start": {
+                                        "col": 11,
+                                        "line": 42
+                                    }
+                                },
+                                "tag": "VariableReference"
+                            }
+                        ]
                     }
                 ],
+                "display": {
+                    "showAsInfix": true
+                },
+                "function": {
+                    "name": "<|",
+                    "tag": "VariableReference"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 10,
@@ -482,7 +484,7 @@
                         "line": 38
                     }
                 },
-                "tag": "BinaryOperatorList"
+                "tag": "FunctionApplication"
             },
             "name": "infixPipeLeft2",
             "parameters": [
@@ -857,71 +859,78 @@
         },
         {
             "expression": {
-                "first": {
-                    "display": {
-                        "representation": "DecimalInt"
-                    },
-                    "sourceLocation": {
-                        "end": {
-                            "col": 6,
-                            "line": 66
-                        },
-                        "start": {
-                            "col": 5,
-                            "line": 66
-                        }
-                    },
-                    "tag": "IntLiteral",
-                    "value": 1
-                },
-                "operations": [
+                "arguments": [
                     {
-                        "operator": {
+                        "arguments": [
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 6,
+                                        "line": 66
+                                    },
+                                    "start": {
+                                        "col": 5,
+                                        "line": 66
+                                    }
+                                },
+                                "tag": "IntLiteral",
+                                "value": 1
+                            },
+                            {
+                                "display": {
+                                    "representation": "DecimalInt"
+                                },
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 10,
+                                        "line": 66
+                                    },
+                                    "start": {
+                                        "col": 9,
+                                        "line": 66
+                                    }
+                                },
+                                "tag": "IntLiteral",
+                                "value": 2
+                            }
+                        ],
+                        "display": {
+                            "showAsInfix": true
+                        },
+                        "function": {
                             "name": "+",
                             "tag": "VariableReference"
                         },
-                        "term": {
-                            "display": {
-                                "representation": "DecimalInt"
-                            },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 10,
-                                    "line": 66
-                                },
-                                "start": {
-                                    "col": 9,
-                                    "line": 66
-                                }
-                            },
-                            "tag": "IntLiteral",
-                            "value": 2
-                        }
+                        "tag": "FunctionApplication"
                     },
                     {
-                        "operator": {
-                            "name": "+",
-                            "tag": "VariableReference"
+                        "display": {
+                            "representation": "DecimalInt"
                         },
-                        "term": {
-                            "display": {
-                                "representation": "DecimalInt"
+                        "sourceLocation": {
+                            "end": {
+                                "col": 14,
+                                "line": 66
                             },
-                            "sourceLocation": {
-                                "end": {
-                                    "col": 14,
-                                    "line": 66
-                                },
-                                "start": {
-                                    "col": 13,
-                                    "line": 66
-                                }
-                            },
-                            "tag": "IntLiteral",
-                            "value": 3
-                        }
+                            "start": {
+                                "col": 13,
+                                "line": 66
+                            }
+                        },
+                        "tag": "IntLiteral",
+                        "value": 3
                     }
                 ],
+                "display": {
+                    "showAsInfix": true
+                },
+                "function": {
+                    "name": "+",
+                    "tag": "VariableReference"
+                },
                 "sourceLocation": {
                     "end": {
                         "col": 14,
@@ -932,7 +941,7 @@
                         "line": 66
                     }
                 },
-                "tag": "BinaryOperatorList"
+                "tag": "FunctionApplication"
             },
             "name": "binary",
             "parameters": [],
@@ -3585,45 +3594,46 @@
         {
             "expression": {
                 "body": {
-                    "first": {
-                        "name": "x",
-                        "sourceLocation": {
-                            "end": {
-                                "col": 12,
-                                "line": 261
-                            },
-                            "start": {
-                                "col": 11,
-                                "line": 261
-                            }
-                        },
-                        "tag": "VariableReference"
-                    },
-                    "operations": [
+                    "arguments": [
                         {
-                            "operator": {
-                                "name": "+",
-                                "tag": "VariableReference"
+                            "name": "x",
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 12,
+                                    "line": 261
+                                },
+                                "start": {
+                                    "col": 11,
+                                    "line": 261
+                                }
                             },
-                            "term": {
-                                "display": {
-                                    "representation": "DecimalInt"
+                            "tag": "VariableReference"
+                        },
+                        {
+                            "display": {
+                                "representation": "DecimalInt"
+                            },
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 16,
+                                    "line": 261
                                 },
-                                "sourceLocation": {
-                                    "end": {
-                                        "col": 16,
-                                        "line": 261
-                                    },
-                                    "start": {
-                                        "col": 15,
-                                        "line": 261
-                                    }
-                                },
-                                "tag": "IntLiteral",
-                                "value": 1
-                            }
+                                "start": {
+                                    "col": 15,
+                                    "line": 261
+                                }
+                            },
+                            "tag": "IntLiteral",
+                            "value": 1
                         }
                     ],
+                    "display": {
+                        "showAsInfix": true
+                    },
+                    "function": {
+                        "name": "+",
+                        "tag": "VariableReference"
+                    },
                     "sourceLocation": {
                         "end": {
                             "col": 16,
@@ -3634,7 +3644,7 @@
                             "line": 261
                         }
                     },
-                    "tag": "BinaryOperatorList"
+                    "tag": "FunctionApplication"
                 },
                 "parameters": [
                     {
