@@ -46,8 +46,8 @@ block text =
         w = identifier text
 
 
-tests :: TestTree
-tests =
+test_tests :: TestTree
+test_tests =
     testGroup "ElmFormat.Render.BoxTest"
     [ testCase "keyword" $
         assertLineOutput "module" $ keyword "module"

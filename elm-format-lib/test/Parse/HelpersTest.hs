@@ -11,6 +11,7 @@ import Text.ParserCombinators.Parsec.Char (lower)
 import Parse.TestHelpers
 
 
+example :: (Show a, Eq a) => IParser a -> TestName -> String -> a -> TestTree
 example parser name input expected =
     testCase name $
         assertParse parser input expected
@@ -20,8 +21,8 @@ x :: IParser String
 x = (\x -> [x]) <$> lower
 
 
-tests :: TestTree
-tests =
+test_tests :: TestTree
+test_tests =
     testGroup "Parse.Helpers"
     [ testGroup "parens''"
         [ example (parens'' x) "single term" "(x)" $ Right [C ([], []) "x"]

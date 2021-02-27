@@ -23,8 +23,8 @@ example name input expected =
         assertParse (expr Elm_0_19) input expected
 
 
-tests :: TestTree
-tests =
+test_tests :: TestTree
+test_tests =
     testGroup "Parse.Pattern"
     [ example "wildcard" "_" $ at 1 1 1 2 Anything
 
