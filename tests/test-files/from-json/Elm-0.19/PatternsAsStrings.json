@@ -1,0 +1,153 @@
+{
+    "moduleName": "Patterns",
+    "body": [
+        {
+            "tag": "Definition",
+            "name": "wildcard",
+            "parameters": [
+                {
+                    "pattern": "_"
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "literals",
+            "parameters": [
+                { "pattern": "1" },
+                { "pattern": "2.0" },
+                { "pattern": "\"string\"" },
+                { "pattern": "'c'" }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "variables",
+            "parameters": [
+                {
+                    "pattern": "x"
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "data",
+            "parameters": [
+                {
+                    "pattern": "Foo _ _"
+                },
+                {
+                    "pattern": "Just _ _"
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "unit",
+            "parameters": [
+                {
+                    "pattern": "()"
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "tuple",
+            "parameters": [
+                {
+                    "pattern": "(_, _)"
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "emptyList",
+            "parameters": [
+                {
+                    "pattern": "[]"
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "closedList",
+            "parameters": [
+                {
+                    "pattern": "[ _, _ ]"
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "openList",
+            "parameters": [
+                {
+                    "pattern": "_ :: _ :: _"
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "emptyRecord",
+            "parameters": [
+                {
+                    "pattern": "{}"
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "record",
+            "parameters": [
+                {
+                    "pattern": "{ x, y }"
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        },
+        {
+            "tag": "Definition",
+            "name": "alias",
+            "parameters": [
+                {
+                    "pattern": "_ as x"
+                }
+            ],
+            "expression": {
+                "tag": "UnitLiteral"
+            }
+        }
+    ]
+}

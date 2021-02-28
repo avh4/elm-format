@@ -8,6 +8,8 @@ import ElmFormat.AST.PublicAST.Reference
 import qualified AST.V0_16 as AST
 import qualified Data.Either as Either
 import qualified ElmFormat.AST.PublicAST.Core as Core
+import qualified ElmVersion
+import qualified Parse.Pattern
 
 
 data Pattern
@@ -218,7 +220,7 @@ instance ToPairs Pattern where
                 ]
 
 instance FromJSON Pattern where
-    parseJSON = withObject "Pattern" $ \obj -> do
+    parseJSON = withObjectOrParseString "Pattern" (Parse.Pattern.expr ElmVersion.Elm_0_19) fromRawAST $ \obj -> do
         tag <- obj .: "tag"
         case tag of
             "AnythingPattern" ->
