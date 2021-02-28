@@ -26,7 +26,7 @@ module ElmFormat.AST.PublicAST.Core
     , ToPublicAST(..)
     , VariableDefinition(..)
     , RecordDisplay(..)
-    ,fromLocated,fromRawAST,toRawAST, noRegion) where
+    ,fromLocated,fromRawAST,toRawAST, noRegion, withObjectOrParseString) where
 
 import Data.Functor.Identity
 import Data.Aeson
@@ -55,6 +55,11 @@ import qualified ElmFormat.AST.PublicAST.Config as Config
 import ElmFormat.AST.PublicAST.MaybeF
 import qualified Data.Aeson as Aeson
 import Data.Int (Int64)
+import Parse.IParser (IParser)
+import qualified Reporting.Result as Result
+import qualified Parse.Parse as Parse
+import qualified Data.Aeson.Types as Aeson
+import ElmFormat.AST.PublicAST.Config (Config(Config))
 
 
 class ToPairs a where
@@ -85,6 +90,20 @@ class ToPublicAST nk => FromPublicAST (nk :: NodeKind) where
 toRawAST :: FromPublicAST nk => LocatedIfRequested (PublicAST nk) -> ASTNS Identity [UppercaseIdentifier] nk
 toRawAST =
     I.Fix . Identity . toRawAST' . extract
+
+
+withObjectOrParseString :: String -> IParser raw -> (Config -> raw -> LocatedIfRequested a) -> (Object -> Aeson.Parser a) -> Value -> Aeson.Parser a
+withObjectOrParseString objectName parseString fromRaw parseObj = \case
+    Aeson.String text ->
+        case Parse.parse (Text.unpack text) parseString of
+            Result.Result _ (Result.Ok raw) ->
+                return $ extract $ fromRaw (Config False) raw
+
+            Result.Result _ (Result.Err err) ->
+                fail ("string was not a valid Elm " <> objectName <> ": " <> show err)
+
+    json ->
+        withObject objectName parseObj json
 
 
 --

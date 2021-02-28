@@ -22,6 +22,8 @@ import Data.Text (Text)
 import qualified Data.Either as Either
 import qualified Data.Text as Text
 import qualified ElmFormat.AST.BinaryOperatorPrecedence as BinaryOperatorPrecedence
+import qualified ElmVersion
+import qualified Parse.Expression
 
 
 data BinaryOperation
@@ -466,7 +468,7 @@ instance ToPairs Expression where
                 ]
 
 instance FromJSON Expression where
-    parseJSON = withObject "Expression" $ \obj -> do
+    parseJSON = withObjectOrParseString "Expression" (Parse.Expression.expr ElmVersion.Elm_0_19) fromRawAST $ \obj -> do
         tag :: Text <- obj .: "tag"
         case tag of
             "UnitLiteral" ->

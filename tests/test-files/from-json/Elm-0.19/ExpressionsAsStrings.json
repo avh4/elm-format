@@ -1,0 +1,115 @@
+{
+    "moduleName": "Expressions",
+    "body": [
+        {
+            "tag": "Definition",
+            "name": "unit",
+            "expression": "()"
+        },
+        {
+            "tag": "Definition",
+            "name": "intLiteral",
+            "expression": "1"
+        },
+        {
+            "tag": "Definition",
+            "name": "floatLiteral",
+            "expression": "2.0"
+        },
+        {
+            "tag": "Definition",
+            "name": "stringLiteral",
+            "expression": "\"string\""
+        },
+        {
+            "tag": "Definition",
+            "name": "charLiteral",
+            "expression": "'c'"
+        },
+        {
+            "tag": "Definition",
+            "name": "var",
+            "expression": "x"
+        },
+        {
+            "tag": "Definition",
+            "name": "operator",
+            "expression": "(+)"
+        },
+        {
+            "tag": "Definition",
+            "name": "tag",
+            "expression": "MyTag"
+        },
+        {
+            "tag": "Definition",
+            "name": "externalReference",
+            "expression": "List.map"
+        },
+        {
+            "tag": "Definition",
+            "name": "functionApplication",
+            "expression": "f (g ())"
+        },
+        {
+            "tag": "Definition",
+            "name": "parensAreAddedWhereNeeded",
+            "expression": "f () ()"
+        },
+        {
+            "tag": "Definition",
+            "name": "unary",
+            "expression": "-x"
+        },
+        {
+            "tag": "Definition",
+            "name": "emptyList",
+            "expression": "[]"
+        },
+        {
+            "tag": "Definition",
+            "name": "list",
+            "expression": "[(), ()]"
+        },
+        {
+            "tag": "Definition",
+            "name": "tuple",
+            "expression": "((), ())"
+        },
+        {
+            "tag": "Definition",
+            "name": "record",
+            "expression": "{ x = (), y = () }"
+        },
+        {
+            "tag": "Definition",
+            "name": "recordUpdate",
+            "expression":  "{ r | x = (), y = () }"
+        },
+        {
+            "tag": "Definition",
+            "name": "recordAccessFunction",
+            "expression": ".x"
+        },
+        {
+            "tag": "Definition",
+            "name": "lambda",
+            "expression": "\\a b -> ()"
+        },
+        {
+            "tag": "Definition",
+            "name": "caseExpression",
+            "expression": "case x of\n() -> ()\n_ -> ()"
+        },
+        {
+            "tag": "Definition",
+            "name": "letExpression",
+            "expression": "let x = ()\nin ()"
+        },
+        {
+            "tag": "Definition",
+            "name": "glShader",
+            "expression": "[glsl|\n\nattribute vec3 position;\nattribute vec3 coord;\nuniform   mat4 view;\nvarying   vec2 vcoord;\n\nvoid main () {\n  gl_Position = view * vec4(position, 1.0);\n  vcoord = coord.xy;\n}\n\n|]"
+        }
+    ]
+}
