@@ -17,7 +17,7 @@ import Parse.Common
 
 tvar :: ElmVersion -> IParser (FixAST Located typeRef ctorRef varRef 'TypeNK)
 tvar elmVersion =
-  fmap I.Fix $ addLocation
+  I.Fix <$> addLocation
     (TypeVariable <$> lowVar elmVersion <?> "a type variable")
 
 

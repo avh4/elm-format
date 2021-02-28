@@ -13,6 +13,8 @@ import qualified Data.ReversedList as ReversedList
 import Data.ReversedList (Reversed)
 import qualified Data.Either as Either
 import Data.Maybe (fromMaybe)
+import qualified ElmVersion
+import qualified Parse.Type
 
 
 data Type_
@@ -181,7 +183,7 @@ instance ToPairs Type_ where
                 ]
 
 instance FromJSON Type_ where
-    parseJSON = withObject "Type" $ \obj -> do
+    parseJSON = withObjectOrParseString "Type" (Parse.Type.expr ElmVersion.Elm_0_19) fromRawAST $ \obj -> do
         tag <- obj .: "tag"
         case tag of
             "UnitType" ->

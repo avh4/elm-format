@@ -1,0 +1,53 @@
+{
+    "moduleName": "Declarations",
+    "body": [
+        {
+            "tag": "TypeAlias",
+            "name": "MyUnit",
+            "parameters": [],
+            "type": "()"
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyTypeReference",
+            "parameters": [],
+            "type": "String"
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyTypeReferenceWithArguments",
+            "parameters": [],
+            "type": "Result () ()"
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyTypeVariable",
+            "parameters": [ "a" ],
+            "type": "a"
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyTupleType",
+            "parameters": [],
+            "type": "((), ())"
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyRecordType",
+            "parameters": [],
+            "type": "{ x : (), y : () }"
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyRecordTypeExtension",
+            "parameters": [ "r" ],
+            "type": "{ r | x : (), y : () }"
+        },
+        {
+            "tag": "TypeAlias",
+            "name": "MyFunctionType",
+            "parameters": [],
+            "type": "() -> () -> ()"
+        }
+    ]
+}
