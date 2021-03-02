@@ -1435,6 +1435,9 @@ formatExpression elmVersion importInfo context aexpr =
                         ]
                     |> expressionParens AmbiguousEnd context
 
+        Let [] [] expr ->
+            formatExpression elmVersion importInfo context expr
+
         Let defs bodyComments expr ->
             let
                 spacer :: AST typeRef ctorRef varRef (I.Fix Identity (AST typeRef ctorRef varRef)) 'LetDeclarationNK -> AST typeRef ctorRef varRef getType 'LetDeclarationNK -> [Box]
