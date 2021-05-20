@@ -60,6 +60,7 @@ common common-options
         Parse.Module
         Parse.Parse
         Parse.Pattern
+        Parse.Primitives
         Parse.State
         Parse.Type
         Parse.Whitespace
