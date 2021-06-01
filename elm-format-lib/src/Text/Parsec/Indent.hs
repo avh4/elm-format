@@ -10,23 +10,23 @@ module Text.Parsec.Indent
   ) where
 
 import Text.Parsec.Pos (SourcePos, SourceName)
-import Text.Parsec.Prim (ParsecT, Stream)
+import Text.Parsec.Prim (Parser)
 
 import Control.Monad.State (State)
 
-type IndentParser s u a = ParsecT s u (State SourcePos) a
+type IndentParser a = Parser a
 
 runIndent :: SourceName -> State SourcePos a -> a
 runIndent = undefined
 
-block :: Stream s (State SourcePos) z => IndentParser s u a -> IndentParser s u [a]
+block :: IndentParser a -> IndentParser [a]
 block = undefined
 
-indented :: Stream s (State SourcePos) z => IndentParser s u ()
+indented :: IndentParser ()
 indented = undefined
 
-checkIndent :: Stream s (State SourcePos) z => IndentParser s u ()
+checkIndent :: IndentParser ()
 checkIndent = undefined
 
-withPos :: Stream s (State SourcePos) z => IndentParser s u a -> IndentParser s u a
+withPos :: IndentParser a -> IndentParser a
 withPos = undefined

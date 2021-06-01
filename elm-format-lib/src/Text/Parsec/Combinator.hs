@@ -11,34 +11,34 @@ module Text.Parsec.Combinator
   , eof
   ) where
 
-import Text.Parsec.Prim (ParsecT, Stream)
+import Text.Parsec.Prim (Parser)
 
-choice :: Stream s m t => [ParsecT s u m a] -> ParsecT s u m a
+choice :: [Parser a] -> Parser a
 choice = undefined
 
-many1 :: Stream s m t => ParsecT s u m a -> ParsecT s u m [a]
+many1 :: Parser a -> Parser [a]
 many1 = undefined
 
-manyTill :: Stream s m t => ParsecT s u m a -> ParsecT s u m end -> ParsecT s u m [a]
+manyTill :: Parser a -> Parser end -> Parser [a]
 manyTill = undefined
 
-skipMany1 :: Stream s m t => ParsecT s u m a -> ParsecT s u m ()
+skipMany1 :: Parser a -> Parser ()
 skipMany1 = undefined
 
-option :: Stream s m t => a -> ParsecT s u m a -> ParsecT s u m a
+option :: a -> Parser a -> Parser a
 option = undefined
 
-optionMaybe :: Stream s m t => ParsecT s u m a -> ParsecT s u m (Maybe a)
+optionMaybe :: Parser a -> Parser (Maybe a)
 optionMaybe = undefined
 
-anyToken :: (Stream s m t, Show t) => ParsecT s u m t
+anyToken :: Parser Char
 anyToken = undefined
 
-notFollowedBy :: (Stream s m t, Show a) => ParsecT s u m a -> ParsecT s u m ()
+notFollowedBy :: Show a => Parser a -> Parser ()
 notFollowedBy = undefined
 
-between :: Stream s m t => ParsecT s u m open -> ParsecT s u m close -> ParsecT s u m a -> ParsecT s u m a
+between :: Parser open -> Parser close -> Parser a -> Parser a
 between = undefined
 
-eof :: (Stream s m t, Show t) => ParsecT s u m ()
+eof :: Parser ()
 eof = undefined
