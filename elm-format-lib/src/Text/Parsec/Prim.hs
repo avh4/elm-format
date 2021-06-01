@@ -52,16 +52,6 @@ instance Monad Parser where
 instance Fail.MonadFail (Parser) where
     fail = undefined
 
-instance Semigroup.Semigroup a => Semigroup.Semigroup (Parser a) where
-    (<>)     = undefined
-
-instance ( Monoid.Monoid a
-         , Semigroup.Semigroup (Parser a)
-         ) => Monoid.Monoid (Parser a) where
-    mempty = undefined
-    mappend = undefined
-    mconcat = undefined
-
 infixr 1 <|>
 infix  0 <?>
 
@@ -91,9 +81,6 @@ getPosition = undefined
 
 getInput :: Parser s
 getInput = undefined
-
-setPosition :: SourcePos -> Parser ()
-setPosition = undefined
 
 setInput :: s -> Parser ()
 setInput = undefined
