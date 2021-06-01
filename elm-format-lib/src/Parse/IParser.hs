@@ -1,9 +1,6 @@
 module Parse.IParser where
 
-import Control.Monad.State (State)
-import qualified Parse.State as State
-import Text.Parsec hiding (newline, spaces, State)
+import Text.Parsec.Prim (Parser)
 
 
-type SourceM = State SourcePos
-type IParser a = ParsecT String State.State SourceM a
+type IParser = Parser

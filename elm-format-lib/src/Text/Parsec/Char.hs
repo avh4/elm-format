@@ -16,43 +16,43 @@ module Text.Parsec.Char
   , string
   ) where
 
-import Text.Parsec.Prim (ParsecT, Stream)
+import Text.Parsec.Prim (Parser)
 
-oneOf :: (Stream s m Char) => [Char] -> ParsecT s u m Char
+oneOf :: [Char] -> Parser Char
 oneOf = undefined
 
-space :: (Stream s m Char) => ParsecT s u m Char
+space :: Parser Char
 space = undefined
 
-upper :: (Stream s m Char) => ParsecT s u m Char
+upper :: Parser Char
 upper = undefined
 
-lower :: (Stream s m Char) => ParsecT s u m Char
+lower :: Parser Char
 lower = undefined
 
-alphaNum :: (Stream s m Char => ParsecT s u m Char)
+alphaNum :: Parser Char
 alphaNum = undefined
 
-letter :: Stream s m Char => ParsecT s u m Char
+letter :: Parser Char
 letter = undefined
 
-digit :: (Stream s m Char) => ParsecT s u m Char
+digit :: Parser Char
 digit = undefined
 
-hexDigit :: (Stream s m Char) => ParsecT s u m Char
+hexDigit :: Parser Char
 hexDigit = undefined
 
-octDigit :: (Stream s m Char) => ParsecT s u m Char
+octDigit :: Parser Char
 octDigit = undefined
 
-char :: (Stream s m Char) => Char -> ParsecT s u m Char
+char :: Char -> Parser Char
 char = undefined
 
-anyChar :: (Stream s m Char) => ParsecT s u m Char
+anyChar :: Parser Char
 anyChar             = satisfy (const True)
 
-satisfy :: (Stream s m Char) => (Char -> Bool) -> ParsecT s u m Char
+satisfy :: (Char -> Bool) -> Parser Char
 satisfy = undefined
 
-string :: (Stream s m Char) => String -> ParsecT s u m String
+string :: String -> Parser String
 string = undefined
