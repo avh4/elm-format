@@ -5,18 +5,20 @@ module Text.Parsec.Pos
   , sourceColumn
   ) where
 
+import Parse.Primitives as EP
+
+
 type SourceName = String
 
-type Line = Int
 
-type Column = Int
+data SourcePos = SourcePos SourceName !EP.Row !EP.Col
 
-data SourcePos = SourcePos SourceName !Line !Column
 
-sourceLine :: SourcePos -> Line
+sourceLine :: SourcePos -> Int
 sourceLine = undefined
 
-sourceColumn :: SourcePos -> Column
+
+sourceColumn :: SourcePos -> Int
 sourceColumn = undefined
 
 
