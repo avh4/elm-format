@@ -15,11 +15,13 @@ data SourcePos = SourcePos SourceName !EP.Row !EP.Col
 
 
 sourceLine :: SourcePos -> Int
-sourceLine = undefined
+sourceLine (SourcePos _ row _) =
+  fromIntegral row
 
 
 sourceColumn :: SourcePos -> Int
-sourceColumn = undefined
+sourceColumn (SourcePos _ _ col) =
+  fromIntegral col
 
 
 instance Show SourcePos where
