@@ -18,3 +18,13 @@ sourceLine = undefined
 
 sourceColumn :: SourcePos -> Column
 sourceColumn = undefined
+
+
+instance Show SourcePos where
+  show (SourcePos name line column)
+    | null name = showLineColumn
+    | otherwise = "\"" ++ name ++ "\" " ++ showLineColumn
+    where
+      showLineColumn    = "(line " ++ show line ++
+                          ", column " ++ show column ++
+                          ")"
