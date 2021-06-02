@@ -20,8 +20,6 @@ module Text.Parsec.Prim
   ) where
 
 import qualified Control.Applicative as Applicative ( Applicative(..), Alternative(..) )
-import qualified Data.Semigroup as Semigroup ( Semigroup(..) )
-import qualified Data.Monoid as Monoid ( Monoid(..) )
 import qualified Control.Monad.Fail as Fail
 
 import Text.Parsec.Pos (SourceName, SourcePos)
