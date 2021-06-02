@@ -20,50 +20,91 @@ module Text.Parsec.Prim
   ) where
 
 import qualified Control.Applicative as Applicative ( Applicative(..), Alternative(..) )
+import Control.Monad (MonadPlus(..))
 import qualified Control.Monad.Fail as Fail
 
-import Text.Parsec.Pos (SourceName, SourcePos)
+import Text.Parsec.Pos (SourceName, SourcePos, newPos)
 import Text.Parsec.Error (ParseError)
 
+import qualified Parse.Primitives as EP
 import Parse.State (State)
 
+import qualified Text.Parsec.Error as Error
+
+
+unknownError :: EP.Row -> EP.Col -> ParseError
+unknownError row col =
+  Error.newErrorUnknown $ newPos "" row col
+
+
 data Parser a
-  = Parser
+  = Parser (EP.Parser ParseError a)
+
 
 instance Functor Parser where
-    fmap f p = undefined
+    fmap f (Parser p) = Parser (fmap f p)
+
 
 instance Applicative.Applicative Parser where
-    pure = undefined
-    (<*>) = undefined
-
+    pure = return
+    (Parser f) <*> (Parser a) = Parser (f <*> a)
 
 instance Applicative.Alternative Parser where
-    empty = undefined
-    (<|>) = undefined
+    empty = mzero
+    (<|>) = mplus
+
 
 instance Monad Parser where
-    return = undefined
-    p >>= f = undefined
-    (>>) = undefined
+    return = Parser . return
+    (Parser p) >>= f = Parser $ p >>= unwrap . f
 
-instance Fail.MonadFail (Parser) where
+unwrap :: Parser a -> EP.Parser ParseError a
+unwrap (Parser p) = p
+
+
+instance Fail.MonadFail Parser where
     fail = undefined
+
+
+instance MonadPlus Parser where
+  mzero = parserZero
+  mplus = parserPlus
+
+
+parserZero :: Parser a
+parserZero =
+  Parser $ EP.Parser $ \state _ _ _ eerr ->
+    let
+      (EP.State _ _ _ _ row col) = state
+    in
+    eerr row col unknownError
+
+
+parserPlus :: Parser a -> Parser a -> Parser a
+parserPlus (Parser p) (Parser q) =
+  Parser $ EP.oneOf (\row col -> undefined) [p, q]
+
 
 infixr 1 <|>
 infix  0 <?>
 
+
 (<|>) :: Parser a -> Parser a -> Parser a
-(<|>) = undefined
+(<|>) = mplus
+
 
 (<?>) :: Parser a -> String -> Parser a
 (<?>) = undefined
 
+
 lookAhead :: Parser a -> Parser a
 lookAhead = undefined
 
+
 try :: Parser a -> Parser a
-try = undefined
+try (Parser (EP.Parser parser)) =
+  Parser $ EP.Parser $ \s cok eok _ err ->
+    parser s cok eok err err
 
 many :: Parser a -> Parser [a]
 many = undefined

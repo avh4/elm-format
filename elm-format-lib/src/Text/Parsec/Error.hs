@@ -1,6 +1,7 @@
 module Text.Parsec.Error
   ( Message
   , ParseError
+  , newErrorUnknown
   , errorPos
   , errorMessages
   ) where
@@ -43,6 +44,11 @@ messageString (Message     s) = s
 
 
 data ParseError = ParseError !SourcePos [Message]
+
+
+newErrorUnknown :: SourcePos -> ParseError
+newErrorUnknown pos
+    = ParseError pos []
 
 
 errorPos :: ParseError -> SourcePos
