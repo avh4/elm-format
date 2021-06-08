@@ -1,32 +1,31 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 module Text.Parsec.Indent
-  ( IndentParser
-  , runIndent
+  ( runIndent
   , block
   , indented
   , checkIndent
   , withPos
   ) where
 
-import Text.Parsec.Pos (SourcePos, SourceName)
 import Text.Parsec.Prim (Parser)
 
-import Control.Monad.State (State)
 
-type IndentParser a = Parser a
+runIndent :: s -> a -> a
+runIndent _ = id
 
-runIndent :: SourceName -> State SourcePos a -> a
-runIndent = undefined
 
-block :: IndentParser a -> IndentParser [a]
+block :: Parser a -> Parser [a]
 block = undefined
 
-indented :: IndentParser ()
+
+indented :: Parser ()
 indented = undefined
 
-checkIndent :: IndentParser ()
+
+checkIndent :: Parser ()
 checkIndent = undefined
 
-withPos :: IndentParser a -> IndentParser a
+
+withPos :: Parser a -> Parser a
 withPos = undefined

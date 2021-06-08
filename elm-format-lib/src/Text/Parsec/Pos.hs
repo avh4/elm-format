@@ -15,7 +15,7 @@ type SourceName = String
 data SourcePos = SourcePos SourceName !EP.Row !EP.Col
 
 
-newPos :: String -> EP.Row -> EP.Col -> SourcePos
+newPos :: SourceName -> EP.Row -> EP.Col -> SourcePos
 newPos =
   SourcePos
 
