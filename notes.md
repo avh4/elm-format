@@ -3,11 +3,29 @@
 ## Notes on implemented functions
 
 * `Text.Parsec.Prim`
+    * `Functor`, `Applicative` and `Monad` instances for `Parser`. Uses the underlying elm parser.
+
+        The implementations simply unwrap to the underlying `elm/compiler` parser, applies the relevant function and re-wraps. So for this to work `parsec` and `elm/compiler` need to have the same idea of how these instances should behave, which they seem to do from looking at the code.
+
+    * instance `Applicative.Alternative` for `Parser`. Implemented exactly as it was by parsec.
+
+    * instance `MonadPlus` for `Parser`. Risks of bugs being introduced. Implemented with dummy error handling
+
+        Is implemented using `Parse.Primitives.oneOf`. Pretty confident that it works as expected, except for the error handling which is undefined. Will have to look into if parsec merges errors, and if so, how.
+
+    * `<|>`. Implemented exactly as it was by parsec.
+
     * `<?>`. Dummy implementation.
+
+    * `try`. Implemented exactly as it was by parsec.
 
     * `many`. Risk of bugs being introduced.
 
-        The implementation of `many` is more complex than the usual functions in parsec, and recursion is being used. Furthermore this implementation does not closely follow the original implementation.
+        The implementation of `many` is one of the more complex functions in parsec, and recursion is being used. Furthermore this implementation does not closely follow the original implementation.
+
+    * `runParserT`. Closely follows the implementation of `Parse.Primitives.fromByteString`
+
+        Difference being that `runParserT` converts the `String` to a `ByteString` first. Care has been taken that unicode points arent truncated when converting to `[Word8]` as an intermediate conversion step.
 
 * `Text.Parsec.Combinator`
     * `option`. Implemented exactly as it was by parsec.
@@ -16,7 +34,7 @@
 
     * `eof`. Dummy implementation.
 
-        The elm parser fails if all input isn't consumed, which makes sense in the context of compiling Elm. `parsec` however defaults to succeeding even if everyting isn't consumed, and that behaviour is changed by `eof`. So as of right now, `eof` becommes a NoOp, maybe `Parse.Primitives` will have to be changed to not fail on unconsumed input (for elm-format it can still make sense to not parse all input) at some point, but not right not.
+        The elm parser fails if all input isn't consumed, which makes sense in the context of compiling Elm. parsec however defaults to succeeding even if everyting isn't consumed, and that behaviour is changed by `eof`. So as of right now, `eof` becommes a NoOp, maybe `Parse.Primitives` will have to be changed to not fail on unconsumed input (for elm-format it can still make sense to not parse all input) at some point, but not right not.
 
 ## Mapping between the parsec and Elm parser
 
