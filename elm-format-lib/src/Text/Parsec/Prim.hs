@@ -119,7 +119,30 @@ try (Parser (EP.Parser parser)) =
 
 
 many :: Parser a -> Parser [a]
-many = undefined
+many (Parser (EP.Parser p)) =
+  Parser $ EP.Parser $ \s cok eok cerr eerr ->
+    let
+      many_ p' acc x s' =
+        p
+          s'
+          (many_ p' (x:acc))
+          parserDoesNotConsumeErr
+          cerr
+          (\_ _ _ -> cok (reverse (x:acc)) s')
+    in
+    p
+      s
+      (many_ (EP.Parser p) [])
+      parserDoesNotConsumeErr
+      cerr
+      (\_ _ _ -> eok [] s)
+
+
+{-
+ - Whenever `many` is used with a parser that succeeds without consuming any input, this error is given. But since we expect elm-format to use `many` correctly this error can be left undefined.
+ -}
+parserDoesNotConsumeErr = undefined
+
 
 skipMany ::Parser a -> Parser ()
 skipMany = undefined

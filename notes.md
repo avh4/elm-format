@@ -5,6 +5,10 @@
 * `Text.Parsec.Prim`
     * `<?>`. Dummy implementation.
 
+    * `many`. Risk of bugs being introduced.
+
+        The implementation of `many` is more complex than the usual functions in parsec, and recursion is being used. Furthermore this implementation does not closely follow the original implementation.
+
 * `Text.Parsec.Combinator`
     * `option`. Implemented exactly as it was by parsec.
 
