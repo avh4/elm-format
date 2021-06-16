@@ -42,4 +42,4 @@ between :: Parser open -> Parser close -> Parser a -> Parser a
 between = undefined
 
 eof :: Parser ()
-eof = undefined
+eof = return ()
