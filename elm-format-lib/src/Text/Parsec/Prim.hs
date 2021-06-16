@@ -105,7 +105,7 @@ infix  0 <?>
 
 
 (<?>) :: Parser a -> String -> Parser a
-(<?>) = undefined
+(<?>) p _ = p
 
 
 lookAhead :: Parser a -> Parser a
