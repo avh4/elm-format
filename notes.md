@@ -1,5 +1,11 @@
 # GSOC Notes
 
+## Notes on functions
+
+    * Text.Parsec.Combinator.option
+
+        Implemented exatly as it was by parsec
+
 ## Mapping between the parsec and Elm parser
 
 `parsec` and `elm/compiler`'s parser very much operate on the same principles; continuation-passing style with four continuations in a parser: _empty ok_, _consumed ok_, _empty error_ and consumed error. `elm/compiler`'s parser if however less generic, it only parses bytestrings and has no concept of an "user" state. But `elm/compiler`s parser is general over the error type though, whereas `parsec` limits the user to string error messages

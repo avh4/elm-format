@@ -11,7 +11,8 @@ module Text.Parsec.Combinator
   , eof
   ) where
 
-import Text.Parsec.Prim (Parser)
+import Text.Parsec.Prim (Parser, (<|>))
+
 
 choice :: [Parser a] -> Parser a
 choice = undefined
@@ -26,7 +27,7 @@ skipMany1 :: Parser a -> Parser ()
 skipMany1 = undefined
 
 option :: a -> Parser a -> Parser a
-option = undefined
+option x p = p <|> return x
 
 optionMaybe :: Parser a -> Parser (Maybe a)
 optionMaybe = undefined
