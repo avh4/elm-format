@@ -11,14 +11,17 @@ module Text.Parsec.Combinator
   , eof
   ) where
 
-import Text.Parsec.Prim (Parser, (<|>))
+import Text.Parsec.Prim (Parser, (<|>), many)
 
 
 choice :: [Parser a] -> Parser a
 choice = undefined
 
 many1 :: Parser a -> Parser [a]
-many1 = undefined
+many1 p =
+  do  x <- p
+      xs <- many p
+      return (x:xs)
 
 manyTill :: Parser a -> Parser end -> Parser [a]
 manyTill = undefined

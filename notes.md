@@ -12,6 +12,8 @@
 * `Text.Parsec.Combinator`
     * `option`. Implemented exactly as it was by parsec.
 
+    * `many1`. Implemented exactly as it was by parsec.
+
     * `eof`. Dummy implementation.
 
         The elm parser fails if all input isn't consumed, which makes sense in the context of compiling Elm. `parsec` however defaults to succeeding even if everyting isn't consumed, and that behaviour is changed by `eof`. So as of right now, `eof` becommes a NoOp, maybe `Parse.Primitives` will have to be changed to not fail on unconsumed input (for elm-format it can still make sense to not parse all input) at some point, but not right not.
