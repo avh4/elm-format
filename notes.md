@@ -1,10 +1,12 @@
 # GSOC Notes
 
-## Notes on functions
+## Notes on implemented functions
 
-    * Text.Parsec.Combinator.option
+* `Text.Parsec.Prim`
+    * `<?>`. Not correctly implemented - is a NoOp
 
-        Implemented exatly as it was by parsec
+* `Text.Parsec.Combinator`
+    * `option`. Implemented exatly as it was by parsec
 
 ## Mapping between the parsec and Elm parser
 
