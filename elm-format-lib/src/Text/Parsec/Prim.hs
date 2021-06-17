@@ -5,7 +5,8 @@
 {-# LANGUAGE BangPatterns #-}
 
 module Text.Parsec.Prim
-  ( Parser(..)
+  ( unexpected
+  , Parser(..)
   , (<?>)
   , (<|>)
   , lookAhead
@@ -45,7 +46,14 @@ import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
 
 unknownError :: EP.Row -> EP.Col -> ParseError
 unknownError row col =
-  Error.newErrorUnknown $ newPos "" row col
+  Error.newErrorUnknown "" row col
+
+
+unexpected :: String -> Parser a
+unexpected msg
+    = Parser $ EP.Parser $ \(EP.State _ _ _ _ row col) _ _ _ eerr ->
+      eerr row col (Error.newErrorMessage (Error.UnExpect msg) "TODO")
+
 
 
 data Parser a

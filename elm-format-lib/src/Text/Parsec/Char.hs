@@ -73,13 +73,11 @@ word8s [] = return []
 word8s (w:ws) =
   Parser $ EP.Parser $ \s@(EP.State _ pos end _ row col) cok _ cerr eerr ->
     let
-      sourcePos = newPos "TODO - SourceName" row col
-
       errEof _ _ = setErrorMessage (Expect (show (w:ws)))
-                    (newErrorMessage (SysUnExpect "") sourcePos)
+                    (newErrorMessage (SysUnExpect "") "TODO" row col)
 
       errExpect x _ _ = setErrorMessage (Expect (show (w:ws)))
-                          (newErrorMessage (SysUnExpect (show x)) sourcePos)
+                          (newErrorMessage (SysUnExpect (show x)) "TODO" row col)
 
       walk [] s' = cok (w:ws) s'
       walk (w':ws') s'@(EP.State _ pos' _ _ row' col') =
