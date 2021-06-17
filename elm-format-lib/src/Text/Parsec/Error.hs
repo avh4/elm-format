@@ -1,9 +1,11 @@
 module Text.Parsec.Error
-  ( Message
+  ( Message(..)
   , ParseError
   , newErrorUnknown
   , errorPos
   , errorMessages
+  , newErrorMessage
+  , setErrorMessage
   ) where
 
 import Data.List (nub, sort)
@@ -56,6 +58,20 @@ errorPos = undefined
 
 errorMessages :: ParseError -> [Message]
 errorMessages = undefined
+
+
+
+-- Create parse errors
+
+
+newErrorMessage :: Message -> SourcePos -> ParseError
+newErrorMessage msg pos
+    = ParseError pos [msg]
+
+
+setErrorMessage :: Message -> ParseError -> ParseError
+setErrorMessage msg (ParseError pos msgs)
+    = ParseError pos (msg : filter (msg /=) msgs)
 
 
 instance Show ParseError where
