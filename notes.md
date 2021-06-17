@@ -36,6 +36,11 @@
 
         The elm parser fails if all input isn't consumed, which makes sense in the context of compiling Elm. parsec however defaults to succeeding even if everyting isn't consumed, and that behaviour is changed by `eof`. So as of right now, `eof` becommes a NoOp, maybe `Parse.Primitives` will have to be changed to not fail on unconsumed input (for elm-format it can still make sense to not parse all input) at some point, but not right not.
 
+* `Text.Parsec.Char`
+    * `string`. Risk of bugs, some undefined behavior.
+
+        `string` is one of the more complex functions with recursion. Handling of carrige return and tabs is undefined (see comments in `Text.Parsec.Char.updatePos` for more info). This might have to be implemented at one point, or it might not be needed, so let's wait and see.
+
 ## Mapping between the parsec and Elm parser
 
 `parsec` and `elm/compiler`'s parser very much operate on the same principles; continuation-passing style with four continuations in a parser: _empty ok_, _consumed ok_, _empty error_ and consumed error. `elm/compiler`'s parser if however less generic, it only parses bytestrings and has no concept of an "user" state. But `elm/compiler`s parser is general over the error type though, whereas `parsec` limits the user to string error messages

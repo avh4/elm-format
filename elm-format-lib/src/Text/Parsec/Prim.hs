@@ -5,7 +5,7 @@
 {-# LANGUAGE BangPatterns #-}
 
 module Text.Parsec.Prim
-  ( Parser
+  ( Parser(..)
   , (<?>)
   , (<|>)
   , lookAhead
