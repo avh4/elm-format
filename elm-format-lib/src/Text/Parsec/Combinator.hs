@@ -11,7 +11,9 @@ module Text.Parsec.Combinator
   , eof
   ) where
 
-import Text.Parsec.Prim (Parser, (<|>), many)
+import qualified Parse.Primitives as EP
+import Text.Parsec.Prim (unexpected, Parser(..), (<|>), try, many)
+import Text.Parsec.Error (Message(UnExpect), newErrorMessage)
 
 
 choice :: [Parser a] -> Parser a
@@ -38,8 +40,11 @@ optionMaybe = undefined
 anyToken :: Parser Char
 anyToken = undefined
 
+
 notFollowedBy :: Show a => Parser a -> Parser ()
-notFollowedBy = undefined
+notFollowedBy p =
+  try $ do{ c <- try p; unexpected (show c) } <|> return ()
+
 
 between :: Parser open -> Parser close -> Parser a -> Parser a
 between = undefined

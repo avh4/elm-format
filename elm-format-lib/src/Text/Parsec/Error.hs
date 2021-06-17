@@ -1,16 +1,17 @@
 module Text.Parsec.Error
   ( Message(..)
   , ParseError
+  , newErrorMessage
   , newErrorUnknown
   , errorPos
   , errorMessages
-  , newErrorMessage
   , setErrorMessage
   ) where
 
 import Data.List (nub, sort)
 import Data.Typeable (Typeable)
 
+import Parse.Primitives (Row, Col)
 import Text.Parsec.Pos (SourcePos)
 
 
@@ -45,12 +46,7 @@ messageString (Expect      s) = s
 messageString (Message     s) = s
 
 
-data ParseError = ParseError !SourcePos [Message]
-
-
-newErrorUnknown :: SourcePos -> ParseError
-newErrorUnknown pos
-    = ParseError pos []
+data ParseError = ParseError String Row Col [Message]
 
 
 errorPos :: ParseError -> SourcePos
@@ -64,14 +60,19 @@ errorMessages = undefined
 -- Create parse errors
 
 
-newErrorMessage :: Message -> SourcePos -> ParseError
-newErrorMessage msg pos
-    = ParseError pos [msg]
+newErrorMessage :: Message -> String -> Row -> Col -> ParseError
+newErrorMessage msg sourceName row col
+    = ParseError sourceName row col [msg]
+
+
+newErrorUnknown :: String -> Row -> Col -> ParseError
+newErrorUnknown sourceName row col
+    = ParseError sourceName row col []
 
 
 setErrorMessage :: Message -> ParseError -> ParseError
-setErrorMessage msg (ParseError pos msgs)
-    = ParseError pos (msg : filter (msg /=) msgs)
+setErrorMessage msg (ParseError sourceName row col msgs)
+    = ParseError sourceName row col (msg : filter (msg /=) msgs)
 
 
 instance Show ParseError where
