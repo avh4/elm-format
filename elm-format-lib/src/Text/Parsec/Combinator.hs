@@ -15,9 +15,12 @@ import qualified Parse.Primitives as EP
 import Text.Parsec.Prim (unexpected, Parser(..), (<|>), try, many)
 import Text.Parsec.Error (Message(UnExpect), newErrorMessage)
 
+import Control.Monad (mzero)
+
 
 choice :: [Parser a] -> Parser a
-choice = undefined
+choice ps = foldr (<|>) mzero ps
+
 
 many1 :: Parser a -> Parser [a]
 many1 p =

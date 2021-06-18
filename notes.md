@@ -28,6 +28,8 @@
         Difference being that `runParserT` converts the `String` to a `ByteString` first. Care has been taken that unicode points arent truncated when converting to `[Word8]` as an intermediate conversion step.
 
 * `Text.Parsec.Combinator`
+    * `choice`. Implemented exactly as it was by parsec.
+
     * `many1`. Implemented exactly as it was by parsec.
 
     * `option`. Implemented exactly as it was by parsec.
