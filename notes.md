@@ -1,5 +1,13 @@
 # GSOC Notes
 
+## Notes on timeline
+
+As the timeline stands now, most of the time will be spent implementing the wrapper functions. After some more work, I don't think that this is how it will play out, I think we can be more ambitious.
+
+Turns out there isn't as much to implement for the adapter layer as it might seem. `Text.Parsec.Char` only really consists of two major functions to implement, `string` and `satisfy`, all the other functions are implemented in terms of `satisfy`. Functions in `Text.Parsec.Combinator` are all implemented in terms of `Text.Parsec.Prim` functions. `Text.Parsec.Pos` and `Text.Parsec.Error` will essentially be copies of their respective parsec modules with minor changes. `Text.Parsec.Indent` probably won't do much either. So that leaves us with `Text.Parsec.Prim` containing the functions that need genuine implementations, apart from the _get*_, _set*_ and _update*_ style functions. This all leaves is with very few time consuming functions to implement. The one thing that has the potential of consuming a lot of time is if these foundational functions turns out to be very tricky to get right, with failing integration tests that could be to broad to help us pinpoint the bugs. Getting the first integration test to pass feels like to most difficult thing to do right now.
+
+All this said, I think we can start to think about what we want to do with our time after the adapter layer has been implemented.
+
 ## Notes on implemented functions
 
 * `Text.Parsec.Prim`
@@ -44,6 +52,8 @@
     * `string`. Risk of bugs, some undefined behavior.
 
         `string` is one of the more complex functions with recursion. Handling of carrige return and tabs is undefined (see comments in `Text.Parsec.Char.updatePos` for more info). This might have to be implemented at one point, or it might not be needed, so let's wait and see.
+
+        __EDIT:__ After doing some work on implementing `Text.Parsec.Char.satisfy` I've reallised that implementing `string` and `satisfy` might have some tricky behaviour relating unicode characters. Parsec operates on the character level whereas the new parser operates on a `Word8` level. With the naive behaviour that is implemented right now: if `string` encounters a `0x0a` which represents a newline in ASCII the parsers row is incremented, as it should when moving to the next line. But is it possible that there exists a unicode character that contains a `0x0a` byte as well? In that case that character will trigger the newline behaviour which would be a really subtle and devestating bug. Also, the column in parsec therefore represents unicode characters whereas the new parsers column represents bytes. Will the adapter layer have to convert that? It could be quite tricky in that case.
 
 ## Mapping between the parsec and Elm parser
 
