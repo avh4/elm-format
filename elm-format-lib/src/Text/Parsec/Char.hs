@@ -17,7 +17,7 @@ module Text.Parsec.Char
   ) where
 
 import qualified Parse.Primitives as EP
-import Text.Parsec.Prim (Parser(..))
+import Text.Parsec.Prim (Parser(..), (<?>))
 import Text.Parsec.Pos (newPos)
 import Text.Parsec.Error (Message(SysUnExpect, Expect), newErrorMessage, setErrorMessage)
 
@@ -25,43 +25,69 @@ import Foreign.Ptr (plusPtr)
 import Data.Bits ((.|.), (.&.), shiftL, shiftR)
 import Data.Word (Word8)
 import Data.Char (chr, ord)
+import qualified Data.Char as C
 
 
 oneOf :: [Char] -> Parser Char
-oneOf = undefined
+oneOf cs = satisfy (\c -> elem c cs)
+
 
 space :: Parser Char
-space = undefined
+space = satisfy C.isSpace <?> "space"
+
 
 upper :: Parser Char
-upper = undefined
+upper = satisfy C.isUpper <?> "uppercase letter"
+
 
 lower :: Parser Char
-lower = undefined
+lower = satisfy C.isUpper <?> "lowercase letter"
+
 
 alphaNum :: Parser Char
-alphaNum = undefined
+alphaNum = satisfy C.isAlphaNum <?> "letter or digit"
+
 
 letter :: Parser Char
-letter = undefined
+letter = satisfy C.isAlpha <?> "letter"
+
 
 digit :: Parser Char
-digit = undefined
+digit = satisfy C.isDigit <?> "digit"
+
 
 hexDigit :: Parser Char
-hexDigit = undefined
+hexDigit = satisfy C.isHexDigit <?> "hexadecimal digit"
+
 
 octDigit :: Parser Char
-octDigit = undefined
+octDigit = satisfy C.isOctDigit <?> "octal digit"
+
 
 char :: Char -> Parser Char
-char = undefined
+char c = satisfy (==c) <?> show [c]
+
 
 anyChar :: Parser Char
-anyChar             = satisfy (const True)
+anyChar = satisfy (const True)
+
 
 satisfy :: (Char -> Bool) -> Parser Char
-satisfy = undefined
+satisfy f =
+  Parser $ EP.Parser $ \s@(EP.State _ pos end _ row col) cok _ _ eerr ->
+    let
+      w = EP.unsafeIndex pos
+
+      errEof = newErrorMessage (SysUnExpect "") "TODO"
+
+      errExpect = newErrorMessage (SysUnExpect $ show w) "TODO"
+    in
+    if pos == end then
+      eerr row col errEof
+    else if f w then
+      cok w (updatePos w s)
+    else
+      eerr row col errExpect
 
 
 string :: String -> Parser String
