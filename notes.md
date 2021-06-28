@@ -35,6 +35,8 @@ All this said, I think we can start to think about what we want to do with our t
 
         Difference being that `runParserT` converts the `String` to a `ByteString` first. Care has been taken that unicode points arent truncated when converting to `[Word8]` as an intermediate conversion step.
 
+    * `getPosition`, `getState`, `updateState`. Trivial implementations.
+
 * `Text.Parsec.Combinator`
     * `choice`. Implemented exactly as it was by parsec.
 

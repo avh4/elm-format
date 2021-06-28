@@ -188,7 +188,9 @@ encodeChar = map fromIntegral . go . ord
 
 
 getPosition :: Parser SourcePos
-getPosition = undefined
+getPosition =
+  do  (EP.State _ _ _ _ row col sourceName _) <- getParserState
+      return $ newPos sourceName row col
 
 
 getInput :: Parser String
@@ -197,8 +199,29 @@ getInput = undefined
 setInput :: String -> Parser ()
 setInput = undefined
 
+
 getState :: Parser State
-getState = undefined
+getState =
+  do  (EP.State _ _ _ _ _ _ _ newline) <- getParserState
+      return (State newline)
+
 
 updateState :: (State -> State) -> Parser ()
-updateState = undefined
+updateState f =
+  do  updateParserState
+        (\(EP.State src pos end indent row col sourceName newline) ->
+          let
+            (State newline') = f (State newline)
+          in
+          EP.State src pos end indent row col sourceName newline'
+        )
+      return ()
+
+
+getParserState :: Parser EP.State
+getParserState = updateParserState id
+
+
+updateParserState :: (EP.State -> EP.State) -> Parser EP.State
+updateParserState f =
+  EP.Parser $ \s _ eok _ _ -> eok (f s) (f s)
