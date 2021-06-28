@@ -101,8 +101,12 @@ infix  0 <?>
 
 
 lookAhead :: Parser a -> Parser a
-lookAhead = undefined
-
+lookAhead (EP.Parser p) =
+    EP.Parser $ \s _ eok cerr eerr ->
+      let
+        eok' a _ = eok a s
+      in
+      p s eok' eok' cerr eerr
 
 try :: Parser a -> Parser a
 try (EP.Parser parser) =
