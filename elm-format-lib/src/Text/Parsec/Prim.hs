@@ -20,6 +20,7 @@ module Text.Parsec.Prim
   , setInput
   , getState
   , updateState
+  , updateParserState
   ) where
 
 import qualified Control.Applicative as Applicative ( Applicative(..), Alternative(..) )

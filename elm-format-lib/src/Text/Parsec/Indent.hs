@@ -8,7 +8,8 @@ module Text.Parsec.Indent
   , withPos
   ) where
 
-import Text.Parsec.Prim (Parser)
+import Text.Parsec.Prim (Parser, updateParserState)
+import qualified Parse.Primitives as EP
 
 
 runIndent :: s -> a -> a
@@ -28,4 +29,6 @@ checkIndent = undefined
 
 
 withPos :: Parser a -> Parser a
-withPos = undefined
+withPos p =
+  do  updateParserState (\(EP.State s p e _ r c sn nl) -> EP.State s p e c r c sn nl)
+      p
