@@ -3,6 +3,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Text.Parsec.Prim
   ( unexpected
@@ -30,7 +31,7 @@ import Text.Parsec.Error (ParseError)
 import qualified Text.Parsec.Error as Error
 
 import qualified Parse.Primitives as EP
-import Parse.State (State)
+import Parse.State (State(..))
 
 import Data.Bits (shiftR, (.&.))
 import Data.Word (Word8)
@@ -50,58 +51,40 @@ unknownError row col =
 
 
 unexpected :: String -> Parser a
-unexpected msg
-    = Parser $ EP.Parser $ \(EP.State _ _ _ _ row col) _ _ _ eerr ->
+unexpected msg =
+  EP.Parser $ \(EP.State _ _ _ _ row col _ _) _ _ _ eerr ->
       eerr row col (Error.newErrorMessage (Error.UnExpect msg) "TODO")
 
 
-
-data Parser a
-  = Parser (EP.Parser ParseError a)
+type Parser a = EP.Parser ParseError a
 
 
-instance Functor Parser where
-    fmap f (Parser p) = Parser (fmap f p)
-
-
-instance Applicative.Applicative Parser where
-    pure = return
-    (Parser f) <*> (Parser a) = Parser (f <*> a)
-
-instance Applicative.Alternative Parser where
+instance Applicative.Alternative (EP.Parser ParseError) where
     empty = mzero
     (<|>) = mplus
 
 
-instance Monad Parser where
-    return = Parser . return
-    (Parser p) >>= f = Parser $ p >>= unwrap . f
-
-unwrap :: Parser a -> EP.Parser ParseError a
-unwrap (Parser p) = p
-
-
-instance Fail.MonadFail Parser where
+instance Fail.MonadFail (EP.Parser ParseError) where
     fail = undefined
 
 
-instance MonadPlus Parser where
+instance MonadPlus (EP.Parser ParseError) where
   mzero = parserZero
   mplus = parserPlus
 
 
 parserZero :: Parser a
 parserZero =
-  Parser $ EP.Parser $ \state _ _ _ eerr ->
+  EP.Parser $ \state _ _ _ eerr ->
     let
-      (EP.State _ _ _ _ row col) = state
+      (EP.State _ _ _ _ row col _ _) = state
     in
     eerr row col unknownError
 
 
 parserPlus :: Parser a -> Parser a -> Parser a
-parserPlus (Parser p) (Parser q) =
-  Parser $ EP.oneOf (\row col -> undefined) [p, q]
+parserPlus p q =
+  EP.oneOf (\row col -> undefined) [p, q]
 
 
 infixr 1 <|>
@@ -121,14 +104,14 @@ lookAhead = undefined
 
 
 try :: Parser a -> Parser a
-try (Parser (EP.Parser parser)) =
-  Parser $ EP.Parser $ \s cok eok _ err ->
+try (EP.Parser parser) =
+  EP.Parser $ \s cok eok _ err ->
     parser s cok eok err err
 
 
 many :: Parser a -> Parser [a]
-many (Parser (EP.Parser p)) =
-  Parser $ EP.Parser $ \s cok eok cerr eerr ->
+many (EP.Parser p) =
+  EP.Parser $ \s cok eok cerr eerr ->
     let
       many_ p' acc x s' =
         p
@@ -155,13 +138,13 @@ skipMany ::Parser a -> Parser ()
 skipMany = undefined
 
 runParserT :: Parser a -> State -> SourceName -> String -> Either ParseError a
-runParserT (Parser (EP.Parser p)) _ name source =
+runParserT (EP.Parser p) (State newline) name source =
   B.accursedUnutterablePerformIO $
     let
       (B.PS fptr offset length) = stringToByteString source
       !pos = plusPtr (unsafeForeignPtrToPtr fptr) offset
       !end = plusPtr pos length
-      !result = p (EP.State fptr pos end 0 1 1) toOk toOk toErr toErr
+      !result = p (EP.State fptr pos end 0 1 1 name newline) toOk toOk toErr toErr
     in
     do  touchForeignPtr fptr
         return result
@@ -179,6 +162,7 @@ toErr row col toError =
 
 stringToByteString :: String -> B.ByteString
 stringToByteString = B.pack . concatMap encodeChar
+
 
 -- https://hackage.haskell.org/package/utf8-string-1.0.2/docs/src/Codec.Binary.UTF8.String.html#encodeChar
 encodeChar :: Char -> [Word8]
@@ -202,8 +186,10 @@ encodeChar = map fromIntegral . go . ord
                         , 0x80 + oc .&. 0x3f
                         ]
 
+
 getPosition :: Parser SourcePos
 getPosition = undefined
+
 
 getInput :: Parser String
 getInput = undefined

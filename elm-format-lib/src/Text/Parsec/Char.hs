@@ -18,7 +18,7 @@ module Text.Parsec.Char
 
 import Parse.Primitives (Row, Col, State)
 import qualified Parse.Primitives as EP
-import Text.Parsec.Prim (Parser(..), (<?>))
+import Text.Parsec.Prim (Parser, (<?>))
 import Text.Parsec.Error (ParseError, Message(SysUnExpect, Expect), newErrorMessage, setErrorMessage)
 
 import Foreign.Ptr (plusPtr)
@@ -73,7 +73,7 @@ anyChar = satisfy (const True)
 
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy f =
-  Parser $ EP.Parser $ \s@(EP.State _ pos end _ row col) cok _ _ eerr ->
+  EP.Parser $ \s@(EP.State _ pos end _ row col _ _) cok _ _ eerr ->
     let
       w = EP.unsafeIndex pos
 
@@ -94,7 +94,7 @@ satisfy f =
 string :: String -> Parser String
 string "" = return ""
 string match@(_:cs) =
-  Parser $ EP.Parser $ \s cok _ cerr eerr ->
+  EP.Parser $ \s cok _ cerr eerr ->
     stringHelp
       match
       s
@@ -115,7 +115,7 @@ stringHelp :: forall b.
   -> (Row -> Col -> (Row -> Col -> ParseError) -> b)
   -> b
 stringHelp "" s toOk _ = toOk s
-stringHelp (c:cs) s@(EP.State _ pos end _ row col) toOk toError =
+stringHelp (c:cs) s@(EP.State _ pos end _ row col _ _) toOk toError =
   let
     errEof _ _ = setErrorMessage (Expect (show (c:cs)))
                   (newErrorMessage (SysUnExpect "") "TODO" row col)
@@ -140,7 +140,7 @@ stringHelp (c:cs) s@(EP.State _ pos end _ row col) toOk toError =
 
 
 updatePos :: Word8 -> EP.State -> EP.State
-updatePos w (EP.State src pos end indent row col) =
+updatePos w (EP.State src pos end indent row col sourceName newline) =
   let
     (row', col') =
       case w of
@@ -163,5 +163,5 @@ updatePos w (EP.State src pos end indent row col) =
 
         _ -> (row, col + 1)
   in
-  EP.State src (plusPtr pos 1) end indent row' col'
+  EP.State src (plusPtr pos 1) end indent row' col' sourceName newline
 
