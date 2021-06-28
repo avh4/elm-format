@@ -55,6 +55,11 @@ All this said, I think we can start to think about what we want to do with our t
 
     Difficulties arrise by the fact that the new parser deals with input in terms of `Word8`'s, and one unicode `Char` can be represented by multiple `Word8`'s, so decoding and encoding might have to take pace. Currently, the implementation does not handle this, and runtime errors are thrown if unicode is encountered. Let's wait and see how elm-format uses `string` and `satisfy` first, for example if `string` is only used to match keywords, then we wont have to handle unicode in a nice way.
 
+* `Text.Parsec.Indent`
+    * `withPos`. Simple function, but I might have done in wrong..
+
+        Also, what exactly does the `_indent` field represent? Does it represent indentation in terms of coulmns, or some multiple thereof? Should be easy enough to pinpont if there is an issure here anyhow.
+
 ## Mapping between the parsec and Elm parser
 
 `parsec` and `elm/compiler`'s parser very much operate on the same principles; continuation-passing style with four continuations in a parser: _empty ok_, _consumed ok_, _empty error_ and consumed error. `elm/compiler`'s parser if however less generic, it only parses bytestrings and has no concept of an "user" state. But `elm/compiler`s parser is general over the error type though, whereas `parsec` limits the user to string error messages
