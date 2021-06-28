@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, FlexibleContexts #-}
+{-# LANGUAGE CPP, FlexibleContexts, Rank2Types #-}
 
 module Text.Parsec.Char
   ( oneOf
@@ -16,13 +16,12 @@ module Text.Parsec.Char
   , string
   ) where
 
+import Parse.Primitives (Row, Col, State)
 import qualified Parse.Primitives as EP
 import Text.Parsec.Prim (Parser(..), (<?>))
-import Text.Parsec.Pos (newPos)
-import Text.Parsec.Error (Message(SysUnExpect, Expect), newErrorMessage, setErrorMessage)
+import Text.Parsec.Error (ParseError, Message(SysUnExpect, Expect), newErrorMessage, setErrorMessage)
 
 import Foreign.Ptr (plusPtr)
-import Data.Bits ((.|.), (.&.), shiftL, shiftR)
 import Data.Word (Word8)
 import Data.Char (chr, ord)
 import qualified Data.Char as C
@@ -84,42 +83,60 @@ satisfy f =
     in
     if pos == end then
       eerr row col errEof
-    else if f w then
-      cok w (updatePos w s)
+    else if w > 127 then
+      error "can't handle unicode"
+    else if f (chr $ fromEnum w) then
+      cok (chr $ fromEnum w) (updatePos w s)
     else
       eerr row col errExpect
 
 
 string :: String -> Parser String
-string = fmap decode . word8s . concatMap encodeChar
+string "" = return ""
+string match@(_:cs) =
+  Parser $ EP.Parser $ \s cok _ cerr eerr ->
+    stringHelp
+      match
+      s
+      (\s' ->
+        stringHelp
+          cs
+          s'
+          (cok match)
+          cerr
+      )
+      eerr
 
 
-word8s :: [Word8] -> Parser [Word8]
-word8s [] = return []
-word8s (w:ws) =
-  Parser $ EP.Parser $ \s@(EP.State _ pos end _ row col) cok _ cerr eerr ->
-    let
-      errEof _ _ = setErrorMessage (Expect (show (w:ws)))
-                    (newErrorMessage (SysUnExpect "") "TODO" row col)
+stringHelp :: forall b.
+  String
+  -> EP.State
+  -> (State -> b)
+  -> (Row -> Col -> (Row -> Col -> ParseError) -> b)
+  -> b
+stringHelp "" s toOk _ = toOk s
+stringHelp (c:cs) s@(EP.State _ pos end _ row col) toOk toError =
+  let
+    errEof _ _ = setErrorMessage (Expect (show (c:cs)))
+                  (newErrorMessage (SysUnExpect "") "TODO" row col)
 
-      errExpect x _ _ = setErrorMessage (Expect (show (w:ws)))
-                          (newErrorMessage (SysUnExpect (show x)) "TODO" row col)
+    errExpect x _ _ = setErrorMessage (Expect (show (c:cs)))
+                        (newErrorMessage (SysUnExpect (show x)) "TODO" row col)
 
-      walk [] s' = cok (w:ws) s'
-      walk (w':ws') s'@(EP.State _ pos' _ _ row' col') =
-        if pos' == end then
-          cerr row col errEof
-        else if EP.unsafeIndex pos' == w' then
-          walk ws' (updatePos w' s')
-        else
-          cerr row col (errExpect w')
-    in
-    if pos == end then
-      eerr row col errEof
-    else if EP.unsafeIndex pos == w then
-        walk ws (updatePos w s)
-    else
-      eerr row col (errExpect w)
+    w = EP.unsafeIndex pos
+  in
+  if pos == end then
+    toError row col errEof
+  else if ord c < 32 && ord c /= 10 && ord c /= 13 then
+    error $ "character no. " ++ show (ord c) ++  "can't handle cotrol characters except for line feed (LF) and carrige return (CR)"
+  else if ord c == 127 then
+    error "can't handle DEL character"
+  else if ord c > 127 then
+    error "can't handle unicode"
+  else if fromIntegral w == ord c then
+    stringHelp cs (updatePos w s) toOk toError
+  else
+    toError row col (errExpect c)
 
 
 updatePos :: Word8 -> EP.State -> EP.State
@@ -148,59 +165,3 @@ updatePos w (EP.State src pos end indent row col) =
   in
   EP.State src (plusPtr pos 1) end indent row' col'
 
-
--- https://hackage.haskell.org/package/utf8-string-1.0.2/docs/src/Codec.Binary.UTF8.String.html#encodeChar
-encodeChar :: Char -> [Word8]
-encodeChar = map fromIntegral . go . ord
- where
-  go oc
-   | oc <= 0x7f       = [oc]
-
-   | oc <= 0x7ff      = [ 0xc0 + (oc `shiftR` 6)
-                        , 0x80 + oc .&. 0x3f
-                        ]
-
-   | oc <= 0xffff     = [ 0xe0 + (oc `shiftR` 12)
-                        , 0x80 + ((oc `shiftR` 6) .&. 0x3f)
-                        , 0x80 + oc .&. 0x3f
-                        ]
-
-
--- https://hackage.haskell.org/package/utf8-string-1.0.2/docs/src/Codec.Binary.UTF8.String.html#decode
-decode :: [Word8] -> String
-decode [    ] = ""
-decode (c:cs)
-  | c < 0x80  = chr (fromEnum c) : decode cs
-  | c < 0xc0  = replacement_character : decode cs
-  | c < 0xe0  = multi1
-  | c < 0xf0  = multi_byte 2 0xf  0x800
-  | c < 0xf8  = multi_byte 3 0x7  0x10000
-  | c < 0xfc  = multi_byte 4 0x3  0x200000
-  | c < 0xfe  = multi_byte 5 0x1  0x4000000
-  | otherwise = replacement_character : decode cs
-  where
-    multi1 = case cs of
-      c1 : ds | c1 .&. 0xc0 == 0x80 ->
-        let d = ((fromEnum c .&. 0x1f) `shiftL` 6) .|.  fromEnum (c1 .&. 0x3f)
-        in if d >= 0x000080 then toEnum d : decode ds
-                            else replacement_character : decode ds
-      _ -> replacement_character : decode cs
-
-    multi_byte :: Int -> Word8 -> Int -> [Char]
-    multi_byte i mask overlong = aux i cs (fromEnum (c .&. mask))
-      where
-        aux 0 rs acc
-          | overlong <= acc && acc <= 0x10ffff &&
-            (acc < 0xd800 || 0xdfff < acc)     &&
-            (acc < 0xfffe || 0xffff < acc)      = chr acc : decode rs
-          | otherwise = replacement_character : decode rs
-
-        aux n (r:rs) acc
-          | r .&. 0xc0 == 0x80 = aux (n-1) rs
-                               $ shiftL acc 6 .|. fromEnum (r .&. 0x3f)
-
-        aux _ rs     _ = replacement_character : decode rs
-
-
-replacement_character :: Char
-replacement_character = '\xfffd'
