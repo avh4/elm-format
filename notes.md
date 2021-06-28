@@ -49,11 +49,9 @@ All this said, I think we can start to think about what we want to do with our t
         The elm parser fails if all input isn't consumed, which makes sense in the context of compiling Elm. parsec however defaults to succeeding even if everyting isn't consumed, and that behaviour is changed by `eof`. So as of right now, `eof` becommes a NoOp, maybe `Parse.Primitives` will have to be changed to not fail on unconsumed input (for elm-format it can still make sense to not parse all input) at some point, but not right not.
 
 * `Text.Parsec.Char`
-    * `string`. Risk of bugs, some undefined behavior.
+    The functions in this module all deal with `Char` (AKA unicode). There's really only two important functions here: `satisfy` wich consumes chars as long as a predicate holds, and `string` which succeed if a given string exatcly matches what is being consumed, and fails otherwise.
 
-        `string` is one of the more complex functions with recursion. Handling of carrige return and tabs is undefined (see comments in `Text.Parsec.Char.updatePos` for more info). This might have to be implemented at one point, or it might not be needed, so let's wait and see.
-
-        __EDIT:__ After doing some work on implementing `Text.Parsec.Char.satisfy` I've reallised that implementing `string` and `satisfy` might have some tricky behaviour relating unicode characters. Parsec operates on the character level whereas the new parser operates on a `Word8` level. With the naive behaviour that is implemented right now: if `string` encounters a `0x0a` which represents a newline in ASCII the parsers row is incremented, as it should when moving to the next line. But is it possible that there exists a unicode character that contains a `0x0a` byte as well? In that case that character will trigger the newline behaviour which would be a really subtle and devestating bug. Also, the column in parsec therefore represents unicode characters whereas the new parsers column represents bytes. Will the adapter layer have to convert that? It could be quite tricky in that case.
+    Difficulties arrise by the fact that the new parser deals with input in terms of `Word8`'s, and one unicode `Char` can be represented by multiple `Word8`'s, so decoding and encoding might have to take pace. Currently, the implementation does not handle this, and runtime errors are thrown if unicode is encountered. Let's wait and see how elm-format uses `string` and `satisfy` first, for example if `string` is only used to match keywords, then we wont have to handle unicode in a nice way.
 
 ## Mapping between the parsec and Elm parser
 
