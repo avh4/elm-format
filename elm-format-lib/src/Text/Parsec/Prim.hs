@@ -146,10 +146,9 @@ many (Parser (EP.Parser p)) =
       (\_ _ _ -> eok [] s)
 
 
-{-
- - Whenever `many` is used with a parser that succeeds without consuming any input, this error is given. But since we expect elm-format to use `many` correctly this error can be left undefined.
- -}
-parserDoesNotConsumeErr = undefined
+-- Note that causing a runtime crash when using `many` with a parser that does
+-- not consume is the same behaviour as it was with parsec
+parserDoesNotConsumeErr = error "Text.Parsec.Prim.many: combinator 'many' is applied to a parser that accepts an empty string."
 
 
 skipMany ::Parser a -> Parser ()
