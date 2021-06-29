@@ -12,7 +12,7 @@ module Text.Parsec.Combinator
   ) where
 
 import qualified Parse.Primitives as EP
-import Text.Parsec.Prim (unexpected, Parser(..), (<|>), try, many)
+import Text.Parsec.Prim (unexpected, Parser(..), (<|>), try, many, skipMany)
 import Text.Parsec.Error (Message(UnExpect), newErrorMessage)
 
 import Control.Monad (mzero, liftM)
@@ -39,7 +39,9 @@ manyTill p end =
       do{ x <- p; xs <- scan; return (x:xs) }
 
 skipMany1 :: Parser a -> Parser ()
-skipMany1 = undefined
+skipMany1 p =
+  do  _ <- p
+      skipMany p
 
 option :: a -> Parser a -> Parser a
 option x p = p <|> return x
