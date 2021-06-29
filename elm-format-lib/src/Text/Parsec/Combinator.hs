@@ -57,7 +57,8 @@ notFollowedBy p =
 
 
 between :: Parser open -> Parser close -> Parser a -> Parser a
-between = undefined
+between open close p =
+  do{ _ <- open; x <- p; _ <- close; return x }
 
 eof :: Parser ()
 eof = return ()
