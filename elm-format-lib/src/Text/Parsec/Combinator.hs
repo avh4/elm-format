@@ -15,7 +15,7 @@ import qualified Parse.Primitives as EP
 import Text.Parsec.Prim (unexpected, Parser(..), (<|>), try, many)
 import Text.Parsec.Error (Message(UnExpect), newErrorMessage)
 
-import Control.Monad (mzero)
+import Control.Monad (mzero, liftM)
 
 
 choice :: [Parser a] -> Parser a
@@ -38,7 +38,7 @@ option :: a -> Parser a -> Parser a
 option x p = p <|> return x
 
 optionMaybe :: Parser a -> Parser (Maybe a)
-optionMaybe = undefined
+optionMaybe p = option Nothing (liftM Just p)
 
 anyToken :: Parser Char
 anyToken = undefined
