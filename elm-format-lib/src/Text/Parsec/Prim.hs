@@ -138,17 +138,17 @@ many :: Parser a -> Parser [a]
 many (EP.Parser p) =
   EP.Parser $ \s cok eok cerr eerr ->
     let
-      many_ p' acc x s' =
+      many_ acc x s' =
         p
           s'
-          (many_ p' (x:acc))
+          (many_ (x:acc))
           parserDoesNotConsumeErr
           cerr
           (\_ _ _ -> cok (reverse (x:acc)) s')
     in
     p
       s
-      (many_ (EP.Parser p) [])
+      (many_ [])
       parserDoesNotConsumeErr
       cerr
       (\_ _ _ -> eok [] s)
