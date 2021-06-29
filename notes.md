@@ -53,7 +53,7 @@ All this said, I think we can start to think about what we want to do with our t
 * `Text.Parsec.Char`
     The functions in this module all deal with `Char` (AKA unicode). There's really only two important functions here: `satisfy` wich consumes chars as long as a predicate holds, and `string` which succeed if a given string exatcly matches what is being consumed, and fails otherwise.
 
-    Difficulties arrise by the fact that the new parser deals with input in terms of `Word8`'s, and one unicode `Char` can be represented by multiple `Word8`'s, so decoding and encoding might have to take pace. Currently, the implementation does not handle this, and runtime errors are thrown if unicode is encountered. Let's wait and see how elm-format uses `string` and `satisfy` first, for example if `string` is only used to match keywords, then we wont have to handle unicode in a nice way.
+    Some care has to be taken here because parsec deals with `Char`'s whereas the new parser deals with `Word8`'s. The current implementation handles valid utf-8, but not invalid utf-8.
 
 * `Text.Parsec.Indent`
     * `indented`. Simple function.
