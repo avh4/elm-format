@@ -28,8 +28,15 @@ many1 p =
       xs <- many p
       return (x:xs)
 
+
 manyTill :: Parser a -> Parser end -> Parser [a]
-manyTill = undefined
+manyTill p end =
+  scan
+  where
+    scan =
+      do{ _ <- end; return [] }
+      <|>
+      do{ x <- p; xs <- scan; return (x:xs) }
 
 skipMany1 :: Parser a -> Parser ()
 skipMany1 = undefined
