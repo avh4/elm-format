@@ -26,8 +26,6 @@ import Data.Word (Word8)
 import Data.Char (chr, ord)
 import qualified Data.Char as C
 
-import Debug.Trace (trace)
-
 
 oneOf :: [Char] -> Parser Char
 oneOf cs = satisfy (\c -> elem c cs)
@@ -42,7 +40,7 @@ upper = satisfy C.isUpper <?> "uppercase letter"
 
 
 lower :: Parser Char
-lower = satisfy C.isUpper <?> "lowercase letter"
+lower = satisfy C.isLower <?> "lowercase letter"
 
 
 alphaNum :: Parser Char
@@ -75,13 +73,13 @@ anyChar = satisfy (const True)
 
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy f =
-  EP.Parser $ \s@(EP.State _ pos end _ row col _ _) cok _ _ eerr ->
+  EP.Parser $ \s@(EP.State _ pos end _ row col sourceName _) cok _ _ eerr ->
     let
       w = EP.unsafeIndex pos
 
-      errEof = newErrorMessage (SysUnExpect "") "TODO"
+      errEof = newErrorMessage (SysUnExpect "") sourceName
 
-      errExpect = newErrorMessage (SysUnExpect $ show w) "TODO"
+      errExpect = newErrorMessage (SysUnExpect $ show w) sourceName
     in
     if pos == end then
       eerr row col errEof
@@ -117,13 +115,13 @@ stringHelp :: forall b.
   -> (Row -> Col -> (Row -> Col -> ParseError) -> b)
   -> b
 stringHelp "" s toOk _ = toOk s
-stringHelp (c:cs) s@(EP.State _ pos end _ row col _ _) toOk toError =
+stringHelp (c:cs) s@(EP.State _ pos end _ row col sourceName _) toOk toError =
   let
     errEof _ _ = setErrorMessage (Expect (show (c:cs)))
-                  (newErrorMessage (SysUnExpect "") "TODO" row col)
+                  (newErrorMessage (SysUnExpect "") sourceName row col)
 
     errExpect x _ _ = setErrorMessage (Expect (show (c:cs)))
-                        (newErrorMessage (SysUnExpect (show x)) "TODO" row col)
+                        (newErrorMessage (SysUnExpect (show x)) sourceName row col)
 
     w = EP.unsafeIndex pos
   in
