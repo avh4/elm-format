@@ -26,6 +26,8 @@ import Data.Word (Word8)
 import Data.Char (chr, ord)
 import qualified Data.Char as C
 
+import Debug.Trace (trace)
+
 
 oneOf :: [Char] -> Parser Char
 oneOf cs = satisfy (\c -> elem c cs)
@@ -93,10 +95,10 @@ satisfy f =
 
 string :: String -> Parser String
 string "" = return ""
-string match@(_:cs) =
+string match@(c:cs) =
   EP.Parser $ \s cok _ cerr eerr ->
     stringHelp
-      match
+      [c]
       s
       (\s' ->
         stringHelp
