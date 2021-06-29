@@ -46,6 +46,8 @@ All this said, I think we can start to think about what we want to do with our t
 
     * `option`. Implemented exactly as it was by parsec.
 
+    * `optionMaybe`. Implemented exactly as it was by parsec.
+
     * `notFollowedBy`. Implemented exactly as it was by parsec.
 
     * `eof`. Dummy implementation.
