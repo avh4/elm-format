@@ -1,3 +1,5 @@
+-- Large parts of this module are copied from https://hackage.haskell.org/package/parsec-3.1.14.0/docs/src/Text.Parsec.Error.html#messageString
+
 module Text.Parsec.Error
   ( Message(..)
   , ParseError
@@ -12,7 +14,7 @@ import Data.List (nub, sort)
 import Data.Typeable (Typeable)
 
 import Parse.Primitives (Row, Col)
-import Text.Parsec.Pos (SourcePos)
+import Text.Parsec.Pos (SourcePos, newPos)
 
 
 data Message
@@ -50,10 +52,11 @@ data ParseError = ParseError String Row Col [Message]
 
 
 errorPos :: ParseError -> SourcePos
-errorPos = undefined
+errorPos (ParseError sourceName row col _) = newPos sourceName row col
+
 
 errorMessages :: ParseError -> [Message]
-errorMessages = undefined
+errorMessages (ParseError _ _ _ messages) = messages
 
 
 
