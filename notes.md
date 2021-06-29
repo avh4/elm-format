@@ -42,15 +42,7 @@ All this said, I think we can start to think about what we want to do with our t
     * `getPosition`, `getState`, `updateState`. Trivial implementations.
 
 * `Text.Parsec.Combinator`
-    * `choice`. Implemented exactly as it was by parsec.
-
-    * `many1`. Implemented exactly as it was by parsec.
-
-    * `option`. Implemented exactly as it was by parsec.
-
-    * `optionMaybe`. Implemented exactly as it was by parsec.
-
-    * `notFollowedBy`. Implemented exactly as it was by parsec.
+    Almost all of the functions in this module are implemented in terms of functions found in `Text.Parsec.Prim`, and as such most of the functions are implemented exactly as they where by parserc (except for formatting changes). Only functions that somehow differ from the implementetion in parsec are listed.
 
     * `eof`. Dummy implementation.
 
