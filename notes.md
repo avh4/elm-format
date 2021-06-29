@@ -62,6 +62,10 @@ All this said, I think we can start to think about what we want to do with our t
     Difficulties arrise by the fact that the new parser deals with input in terms of `Word8`'s, and one unicode `Char` can be represented by multiple `Word8`'s, so decoding and encoding might have to take pace. Currently, the implementation does not handle this, and runtime errors are thrown if unicode is encountered. Let's wait and see how elm-format uses `string` and `satisfy` first, for example if `string` is only used to match keywords, then we wont have to handle unicode in a nice way.
 
 * `Text.Parsec.Indent`
+    * `indented`. Simple function.
+
+        In indents `indented` function there is a `put $ setSourceLine s (sourceLine pos)` line which I don't really get. All of the functions from indents used by elm-format only care about the column of the reference, and not the row, so don't think this will be a problem.
+
     * `withPos`. Simple function, but I might have done in wrong..
 
         Also, what exactly does the `_indent` field represent? Does it represent indentation in terms of coulmns, or some multiple thereof? Should be easy enough to pinpont if there is an issure here anyhow.

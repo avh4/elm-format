@@ -20,6 +20,7 @@ module Text.Parsec.Prim
   , setInput
   , getState
   , updateState
+  , getParserState
   , updateParserState
   ) where
 
