@@ -27,7 +27,7 @@ import qualified Control.Applicative as Applicative ( Applicative(..), Alternati
 import Control.Monad (MonadPlus(..))
 import qualified Control.Monad.Fail as Fail
 
-import Text.Parsec.Pos (SourceName, SourcePos, newPos)
+import Text.Parsec.Pos (SourceName, SourcePos, newPos, sourceLine, sourceColumn)
 import Text.Parsec.Error (ParseError)
 import qualified Text.Parsec.Error as Error
 
@@ -84,8 +84,21 @@ parserZero =
 
 
 parserPlus :: Parser a -> Parser a -> Parser a
-parserPlus p q =
-  EP.oneOf (\row col -> undefined) [p, q]
+parserPlus (EP.Parser p) (EP.Parser q) =
+  EP.Parser $ \s cok eok cerr eerr ->
+    let
+      meerr r1 c1 toErr1 =
+        let
+          neerr r2 c2 toErr2 =
+            let
+              err = Error.mergeError (toErr1 r1 c1) (toErr2 r2 c2)
+              row = fromIntegral $ sourceLine $ Error.errorPos err
+              col = fromIntegral $ sourceColumn $ Error.errorPos err
+            in
+            eerr row col (\_ _ -> err)
+        in q s cok eok cerr neerr
+    in
+    p s cok eok cerr meerr
 
 
 infixr 1 <|>

@@ -17,9 +17,9 @@ All this said, I think we can start to think about what we want to do with our t
 
     * instance `Applicative.Alternative` for `Parser`. Implemented exactly as it was by parsec.
 
-    * instance `MonadPlus` for `Parser`. Risks of bugs being introduced. Implemented with dummy error handling
+    * instance `MonadPlus` for `Parser`. Risks of bugs being introduced.
 
-        Is implemented using `Parse.Primitives.oneOf`. Pretty confident that it works as expected, except for the error handling which is undefined. Will have to look into if parsec merges errors, and if so, how.
+        The implementation of `mplus` is straightforward except for the error merging behaviour in parsec, where if the tow parsers fails the errors are merged somehow. Not confident that I've got this right..
 
     * `<|>`. Implemented exactly as it was by parsec.
 

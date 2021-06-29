@@ -8,6 +8,7 @@ module Text.Parsec.Error
   , errorPos
   , errorMessages
   , setErrorMessage
+  , mergeError
   ) where
 
 import Data.List (nub, sort)
@@ -76,6 +77,19 @@ newErrorUnknown sourceName row col
 setErrorMessage :: Message -> ParseError -> ParseError
 setErrorMessage msg (ParseError sourceName row col msgs)
     = ParseError sourceName row col (msg : filter (msg /=) msgs)
+
+
+mergeError :: ParseError -> ParseError -> ParseError
+mergeError e1@(ParseError sn1 r1 c1 msgs1) e2@(ParseError sn2 r2 c2 msgs2)
+    -- prefer meaningful errors
+    | null msgs2 && not (null msgs1) = e1
+    | null msgs1 && not (null msgs2) = e2
+    | otherwise
+    = case (r1, c1) `compare` (r2, c2) of
+        -- select the longest match
+        EQ -> ParseError sn1 r1 c1 (msgs1 ++ msgs2)
+        GT -> e1
+        LT -> e2
 
 
 instance Show ParseError where
