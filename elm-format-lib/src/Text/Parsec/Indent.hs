@@ -8,7 +8,7 @@ module Text.Parsec.Indent
   , withPos
   ) where
 
-import Text.Parsec.Prim (Parser, updateParserState)
+import Text.Parsec.Prim (Parser, getParserState, updateParserState)
 import qualified Parse.Primitives as EP
 
 
@@ -21,7 +21,9 @@ block = undefined
 
 
 indented :: Parser ()
-indented = undefined
+indented =
+  do  (EP.State _ _ _ indent _ col _ _) <- getParserState
+      if col <= indent then fail "not indented" else do return ()
 
 
 checkIndent :: Parser ()
