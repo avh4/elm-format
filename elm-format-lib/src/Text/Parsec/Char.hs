@@ -22,6 +22,7 @@ import Text.Parsec.Prim (Parser, (<?>))
 import Text.Parsec.Error (ParseError, Message(SysUnExpect, Expect), newErrorMessage, setErrorMessage)
 
 import Foreign.Ptr (plusPtr)
+import Data.Bits (shiftL, (.&.), (.|.))
 import Data.Word (Word8)
 import Data.Char (chr, ord)
 import qualified Data.Char as C
@@ -75,18 +76,16 @@ satisfy :: (Char -> Bool) -> Parser Char
 satisfy f =
   EP.Parser $ \s@(EP.State _ pos end _ row col sourceName _) cok _ _ eerr ->
     let
-      w = EP.unsafeIndex pos
+      (char, width) = extractChar s
 
       errEof = newErrorMessage (SysUnExpect "") sourceName
 
-      errExpect = newErrorMessage (SysUnExpect $ show w) sourceName
+      errExpect = newErrorMessage (SysUnExpect $ [char]) sourceName
     in
     if pos == end then
       eerr row col errEof
-    else if w > 127 then
-      error "can't handle unicode"
-    else if f (chr $ fromEnum w) then
-      cok (chr $ fromEnum w) (updatePos w s)
+    else if f char then
+      cok char (updatePos width char s)
     else
       eerr row col errExpect
 
@@ -123,28 +122,22 @@ stringHelp (c:cs) s@(EP.State _ pos end _ row col sourceName _) toOk toError =
     errExpect x _ _ = setErrorMessage (Expect (show (c:cs)))
                         (newErrorMessage (SysUnExpect (show x)) sourceName row col)
 
-    w = EP.unsafeIndex pos
+    (char, width) = extractChar s
   in
   if pos == end then
     toError row col errEof
-  else if ord c < 32 && ord c /= 10 && ord c /= 13 then
-    error $ "character no. " ++ show (ord c) ++  "can't handle cotrol characters except for line feed (LF) and carrige return (CR)"
-  else if ord c == 127 then
-    error "can't handle DEL character"
-  else if ord c > 127 then
-    error "can't handle unicode"
-  else if fromIntegral w == ord c then
-    stringHelp cs (updatePos w s) toOk toError
+  else if char == c then
+    stringHelp cs (updatePos width char s) toOk toError
   else
     toError row col (errExpect c)
 
 
-updatePos :: Word8 -> EP.State -> EP.State
-updatePos w (EP.State src pos end indent row col sourceName newline) =
+updatePos :: Int -> Char -> EP.State -> EP.State
+updatePos width c (EP.State src pos end indent row col sourceName newline) =
   let
     (row', col') =
-      case w of
-        0x0a {- "\n" -} -> (row + 1, 1)
+      case c of
+        '\n' -> (row + 1, 1)
 
         -- The doccumentation for `Text.Parsec.Char.updatePosChar` claims that
         -- carrige return ("\r") increments row by 1, just like newline ("\n").
@@ -153,15 +146,58 @@ updatePos w (EP.State src pos end indent row col sourceName newline) =
         --
         -- Let's not devle into this unless it turns out that elm-format
         -- needs it.
-        0x0d {- "\r" -} -> error "Can't handle carrige return"
+        '\r' -> error "Can't handle carrige return"
 
         -- The parsec behaviour for tabs is to increment to the nearest
         -- 8'th collumn. Shoud we do this as well?
         -- Let's not implement this unless it turns out that elm-format
         -- needs it.
-        0x09 {- "\t" -} -> error "Can't handle tabs"
+        '\t' -> error "Can't handle tabs"
 
         _ -> (row, col + 1)
   in
-  EP.State src (plusPtr pos 1) end indent row' col' sourceName newline
+  EP.State src (plusPtr pos width) end indent row' col' sourceName newline
 
+
+-- Inspired by https://hackage.haskell.org/package/utf8-string-1.0.2/docs/src/Codec.Binary.UTF8.String.html#decode
+extractChar :: EP.State -> (Char, Int)
+extractChar (EP.State _ pos _ _ _ _ _ _) =
+  if w0 < 0xc0 then
+    (chr (fromEnum w0), 1)
+  else if w0 < 0xe0 then
+    (multi1, 2)
+  else if w0 < 0xf0 then
+    (multi_byte [w1, w2] 0xf 0x800, 3)
+  else if w0 < 0xf8 then
+    (multi_byte [w1, w2, w3] 0x7 0x10000, 4)
+  else
+    error "invalid utf-8"
+  where
+    w0 = EP.unsafeIndex pos
+    w1 = EP.unsafeIndex (plusPtr pos 1)
+    w2 = EP.unsafeIndex (plusPtr pos 2)
+    w3 = EP.unsafeIndex (plusPtr pos 3)
+
+    multi1 =
+      if w1 .&. 0xc0 == 0x80 then
+        let d = (fromEnum w0 .&. 0x1f) `shiftL` 6 .|. fromEnum (w1 .&. 0x3f)
+        in
+        if d >= 0x000080 then
+          toEnum d
+        else
+          error "invalid utf-8"
+      else
+        error "invalid utf-8"
+
+    multi_byte words mask overlong = aux words (fromEnum (w0 .&. mask))
+      where
+        aux [] acc
+          | overlong <= acc && acc <= 0x10ffff &&
+            (acc < 0xd800 || 0xdfff < acc)     &&
+            (acc < 0xfffe || 0xffff < acc)      = chr acc
+          | otherwise = error "invalid utf-8"
+
+        aux (w:ws) acc
+          | w .&. 0xc0 == 0x80 = aux ws
+                               $ shiftL acc 6 .|. fromEnum (w .&. 0x3f)
+          | otherwise = error "invalid utf-8"
