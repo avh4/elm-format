@@ -1,3 +1,5 @@
 module Text.ParserCombinators.Parsec.Char (lower) where
 
-lower = undefined
+import qualified Text.Parsec.Char
+
+lower = Text.Parsec.Char.lower
