@@ -31,6 +31,8 @@ All this said, I think we can start to think about what we want to do with our t
 
     * `many`. Risk of bugs being introduced.
 
+    * `skipMany`. Not to complicated.
+
     * `lookAhead`. Trivial implementation.
 
         The implementation of `many` is one of the more complex functions in parsec, and recursion is being used. Furthermore this implementation does not closely follow the original implementation.

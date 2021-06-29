@@ -154,13 +154,24 @@ many (EP.Parser p) =
       (\_ _ _ -> eok [] s)
 
 
--- Note that causing a runtime crash when using `many` with a parser that does
--- not consume is the same behaviour as it was with parsec
-parserDoesNotConsumeErr = error "Text.Parsec.Prim.many: combinator 'many' is applied to a parser that accepts an empty string."
-
-
 skipMany ::Parser a -> Parser ()
-skipMany = undefined
+skipMany (EP.Parser p) =
+  EP.Parser $ \s cok eok cerr eerr ->
+    let
+      skipMany_ s' =
+        p
+          s'
+          (\_ -> skipMany_)
+          parserDoesNotConsumeErr
+          cerr
+          (\_ _ _ -> cok () s')
+    in
+    skipMany_ s
+
+
+-- Note that causing a runtime crash when using `many` or `skipMany` with a
+-- parser that does not consume is the same behaviour as it was with parsec
+parserDoesNotConsumeErr = error "Text.Parsec.Prim.many: combinator 'many' is applied to a parser that accepts an empty string."
 
 runParserT :: Parser a -> State -> SourceName -> String -> Either ParseError a
 runParserT (EP.Parser p) (State newline) name source =
