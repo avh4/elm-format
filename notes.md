@@ -19,6 +19,8 @@ All this said, I think we can start to think about what we want to do with our t
 
     * instance `MonadPlus` for `Parser`. Risks of bugs being introduced.
 
+    * instance `Fail.MonadFail` for `Parser`. Implementation closely matches that of parsec.
+
         The implementation of `mplus` is straightforward except for the error merging behaviour in parsec, where if the tow parsers fails the errors are merged somehow. Not confident that I've got this right..
 
     * `<|>`. Implemented exactly as it was by parsec.
