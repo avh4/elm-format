@@ -66,7 +66,13 @@ instance Applicative.Alternative (EP.Parser ParseError) where
 
 
 instance Fail.MonadFail (EP.Parser ParseError) where
-    fail = undefined
+    fail = parserFail
+
+
+parserFail :: String -> Parser a
+parserFail msg =
+  EP.Parser $ \(EP.State _ _ _ _ row col sourceName _) _ _ _ eerr ->
+    eerr row col $ Error.newErrorMessage (Error.Message msg) sourceName
 
 
 instance MonadPlus (EP.Parser ParseError) where
