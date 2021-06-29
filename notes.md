@@ -1,5 +1,11 @@
 # GSOC Notes
 
+## Missing test coverage
+
+* elm-format tests unicode in string literals, but unicode can appear in variable names and possibly other places. We need to figure exactly where and how unicode can appear and add test coverage for that.
+
+* Should elm-format gracefully handle invalid utf-8? If so we might want test coverage for that.
+
 ## Notes on timeline
 
 As the timeline stands now, most of the time will be spent implementing the wrapper functions. After some more work, I don't think that this is how it will play out, I think we can be more ambitious.
