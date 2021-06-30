@@ -66,6 +66,8 @@ All this said, I think we can start to think about what we want to do with our t
 
         In indents `indented` function there is a `put $ setSourceLine s (sourceLine pos)` line which I don't really get. All of the functions from indents used by elm-format only care about the column of the reference, and not the row, so don't think this will be a problem.
 
+    * `checkIndent`. Simple function.
+
     * `withPos`. Simple function, but I might have done in wrong..
 
         Also, what exactly does the `_indent` field represent? Does it represent indentation in terms of coulmns, or some multiple thereof? Should be easy enough to pinpont if there is an issure here anyhow.
