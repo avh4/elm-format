@@ -57,9 +57,7 @@ All this said, I think we can start to think about what we want to do with our t
         The elm parser fails if all input isn't consumed, which makes sense in the context of compiling Elm. parsec however defaults to succeeding even if everyting isn't consumed, and that behaviour is changed by `eof`. So as of right now, `eof` becommes a NoOp, maybe `Parse.Primitives` will have to be changed to not fail on unconsumed input (for elm-format it can still make sense to not parse all input) at some point, but not right not.
 
 * `Text.Parsec.Char`
-    The functions in this module all deal with `Char` (AKA unicode). There's really only two important functions here: `satisfy` wich consumes chars as long as a predicate holds, and `string` which succeed if a given string exatcly matches what is being consumed, and fails otherwise.
-
-    Some care has to be taken here because parsec deals with `Char`'s whereas the new parser deals with `Word8`'s. The current implementation handles valid utf-8, but not invalid utf-8.
+    The functions in this module all deal with `Char` (AKA unicode). There's really only two important functions here: `satisfy` wich consumes chars as long as a predicate holds, and `string` which succeed if a given string exatcly matches what is being consumed, and fails otherwise.  Some care has to be taken here because parsec deals with `Char`'s whereas the new parser deals with `Word8`'s. The current implementation handles valid utf-8, but not invalid utf-8.
 
 * `Text.Parsec.Indent`
     * `indented`. Simple function.

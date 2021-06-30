@@ -9,6 +9,7 @@ module Text.Parsec.Indent
   ) where
 
 import Text.Parsec.Prim (Parser, getParserState, updateParserState)
+import Text.Parsec.Combinator (many1)
 import qualified Parse.Primitives as EP
 
 
@@ -17,7 +18,9 @@ runIndent _ = id
 
 
 block :: Parser a -> Parser [a]
-block = undefined
+block p = withPos $ do
+    r <- many1 (checkIndent >> p)
+    return r
 
 
 indented :: Parser ()
