@@ -27,7 +27,9 @@ indented =
 
 
 checkIndent :: Parser ()
-checkIndent = undefined
+checkIndent =
+  do  (EP.State _ _ _ indent _ col _ _) <- getParserState
+      if indent == col then return () else fail "indentation doesn't match"
 
 
 withPos :: Parser a -> Parser a
