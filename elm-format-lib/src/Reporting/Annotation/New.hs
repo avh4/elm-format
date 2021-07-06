@@ -1,3 +1,6 @@
+-- This module is copied from the Elm compiler with small changes
+-- https://github.com/elm/compiler/blob/94715a520f499591ac6901c8c822bc87cd1af24f/compiler/src/Reporting/Annotation.hs
+
 {-# OPTIONS_GHC -Wall #-}
 module Reporting.Annotation.New
   ( Located(..)

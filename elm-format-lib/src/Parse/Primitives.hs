@@ -1,3 +1,6 @@
+-- This module is copied from the Elm compiler with small changes
+-- https://github.com/elm/compiler/blob/94715a520f499591ac6901c8c822bc87cd1af24f/compiler/src/Parse/Primitives.hs
+
 {-# OPTIONS_GHC -Wall -fno-warn-unused-do-bind -fno-warn-name-shadowing #-}
 {-# LANGUAGE BangPatterns, Rank2Types, UnboxedTuples #-}
 module Parse.Primitives
