@@ -139,14 +139,13 @@ updatePos width c (EP.State src pos end indent row col sourceName newline) =
       case c of
         '\n' -> (row + 1, 1)
 
-        -- The doccumentation for `Text.Parsec.Char.updatePosChar` claims that
-        -- carrige return ("\r") increments row by 1, just like newline ("\n").
-        -- This doesn't appear to be the case from looking at the code:
-        -- https://hackage.haskell.org/package/parsec-3.1.14.0/docs/src/Text.Parsec.Pos.html#updatePosChar
+        -- The parsec docs states that CR increments line just like an LF does,
+        -- this is not what happens in the code though,
+        -- see: https://github.com/haskell/parsec/issues/129 for details.
         --
-        -- Let's not devle into this unless it turns out that elm-format
-        -- needs it.
-        '\r' -> error "Can't handle carrige return"
+        -- Here we've opted for following the behaviour of parsec, and not the
+        -- doccumentation even though this behaviour might be considered a bug.
+        '\r' -> (row, col + 1)
 
         -- The parsec behaviour for tabs is to increment to the nearest
         -- 8'th collumn. Shoud we do this as well?
