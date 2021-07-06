@@ -1,10 +1,16 @@
 # GSOC Notes
 
+## About this document
+
+Here are various notes I (`@emmabastas`) have made during the effort to integrate the parser from the Elm compiler into elm-format as part of a [GSOC project](https://github.com/elm-tooling/gsoc-projects/issues/13). Eventually, all of these notes will live elsewhere, like source code comments of github issues, but for now they are centralized in this document.
+
 ## Missing test coverage
 
 * elm-format tests unicode in string literals, but unicode can appear in variable names and possibly other places. We need to figure exactly where and how unicode can appear and add test coverage for that.
 
 * Should elm-format gracefully handle invalid utf-8? If so we might want test coverage for that.
+
+    **UPDATE:** It's really uncomon for people to have invalid utf-8, and if so, they proably have bigger probles than elm-format crashing. For now, just crashig with a descriptive error message is enoug.
 
 ## Notes on timeline
 
