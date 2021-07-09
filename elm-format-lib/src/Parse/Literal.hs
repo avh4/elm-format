@@ -2,8 +2,7 @@ module Parse.Literal (literal) where
 
 import Prelude hiding (exponent)
 import Data.Char (digitToInt, isSpace)
-import Text.Parsec ((<|>), (<?>), digit, hexDigit, lookAhead, many1, option, string, try, char, notFollowedBy, choice, anyChar, satisfy, manyTill, many, between, skipMany, skipMany1)
-import Text.Parsec.Char (octDigit, space, upper)
+import Parse.ParsecAdapter
 import Parse.Helpers (processAs, escaped, expecting, sandwich, betwixt)
 import Parse.IParser
 

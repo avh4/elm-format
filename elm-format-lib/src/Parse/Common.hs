@@ -5,7 +5,7 @@ module Parse.Common
     ) where
 
 import AST.V0_16
-import Text.Parsec
+import Parse.ParsecAdapter
 import Parse.Helpers
 import Parse.Whitespace
 import Parse.IParser

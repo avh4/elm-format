@@ -8,11 +8,11 @@ import Test.Tasty.HUnit
 import AST.V0_16
 import AST.Structure
 import Data.Indexed as I
+import Parse.ParsecAdapter (eof)
 import Parse.Helpers (iParse)
 import Parse.IParser
 import Reporting.Annotation hiding (at)
 import Reporting.Region
-import Text.ParserCombinators.Parsec.Combinator (eof)
 import qualified Data.List as List
 import qualified Data.List.Split as List
 

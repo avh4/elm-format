@@ -4,7 +4,7 @@ module Parse.Module (moduleDecl, elmModule, topLevel, import') where
 import qualified Control.Applicative
 import Data.Map.Strict ( Map, empty, insert, insertWith )
 import Elm.Utils ((|>))
-import Text.Parsec ( char, letter, string, choice, eof, option, optionMaybe, (<?>), (<|>), many, try )
+import Parse.ParsecAdapter ( char, letter, string, choice, eof, option, optionMaybe, (<?>), (<|>), many, try )
 import Parse.Helpers
 import qualified Parse.Declaration as Decl
 import AST.Listing (Listing(..), mergeCommentedMap, mergeListing)
