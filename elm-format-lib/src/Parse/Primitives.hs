@@ -57,7 +57,10 @@ data State = -- PERF try taking some out to avoid allocation
     , _indent :: !Word16
     , _row :: !Row
     , _col :: !Col
+    -- _sourceName is needed by the parsec errors. At some point we should
+    -- migrate to our own error type an refactor this field out of the parser state.
     , _sourceName :: String
+    -- _newline is needed by elm-format to track some formatting information.
     , _newline :: [Bool]
     }
 
