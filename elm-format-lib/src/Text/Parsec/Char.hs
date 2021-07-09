@@ -149,9 +149,8 @@ updatePos width c (EP.State src pos end indent row col sourceName newline) =
 
         -- The parsec behaviour for tabs is to increment to the nearest
         -- 8'th collumn. Shoud we do this as well?
-        -- Let's not implement this unless it turns out that elm-format
-        -- needs it.
-        '\t' -> error "Can't handle tabs"
+        -- Let's follow the parsec behaviour
+        '\t' -> (row, (col + 8 - ((col-1) `mod` 8)))
 
         _ -> (row, col + 1)
   in
