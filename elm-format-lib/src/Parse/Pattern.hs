@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module Parse.Pattern (term, expr) where
 
-import Text.Parsec ((<|>), (<?>), char, choice, optionMaybe, try)
+import Parse.ParsecAdapter ((<|>), (<?>), char, choice, optionMaybe, try)
 
 import AST.V0_16
 import AST.Structure

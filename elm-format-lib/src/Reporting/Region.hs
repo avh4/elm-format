@@ -6,7 +6,7 @@ import Relude
 import Text.Show (showParen, showString, showsPrec)
 
 import qualified Data.String as String
-import qualified Text.Parsec.Pos as Parsec
+import qualified Parse.ParsecAdapter as Parsec
 
 
 data Region = Region
