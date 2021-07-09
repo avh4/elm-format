@@ -111,8 +111,8 @@ unknownError row col =
 
 unexpected :: String -> Parser a
 unexpected msg =
-  EP.Parser $ \(EP.State _ _ _ _ row col _ _) _ _ _ eerr ->
-      eerr row col (newErrorMessage (UnExpect msg) "TODO")
+  EP.Parser $ \(EP.State _ _ _ _ row col sourceName _) _ _ _ eerr ->
+      eerr row col (newErrorMessage (UnExpect msg) sourceName)
 
 
 type Parser a = EP.Parser ParseError a
