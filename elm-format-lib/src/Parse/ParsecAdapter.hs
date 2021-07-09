@@ -80,7 +80,7 @@ import Parse.Primitives (Row, Col)
 import qualified Parse.Primitives as EP
 import Parse.State (State(..))
 
-import qualified Control.Applicative as Applicative ( Applicative(..), Alternative(..) )
+import qualified Control.Applicative as Applicative
 import Control.Monad (MonadPlus(..), mzero, liftM)
 import qualified Control.Monad.Fail as Fail
 
@@ -93,9 +93,8 @@ import qualified Data.Char as C
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Internal as B
 
-import Foreign.Ptr (Ptr, plusPtr)
-import Foreign.Storable (peek)
-import Foreign.ForeignPtr (ForeignPtr, touchForeignPtr)
+import Foreign.Ptr (plusPtr)
+import Foreign.ForeignPtr (touchForeignPtr)
 import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
 
 
@@ -216,7 +215,7 @@ try (EP.Parser parser) =
 -- with a single `many_` call?
 many :: Parser a -> Parser [a]
 many (EP.Parser p) =
-  EP.Parser $ \s cok eok cerr eerr ->
+  EP.Parser $ \s cok eok cerr _ ->
     let
       many_ acc x s' =
         p
@@ -236,7 +235,7 @@ many (EP.Parser p) =
 
 skipMany ::Parser a -> Parser ()
 skipMany (EP.Parser p) =
-  EP.Parser $ \s cok eok cerr eerr ->
+  EP.Parser $ \s cok _ cerr _ ->
     let
       skipMany_ s' =
         p
@@ -251,6 +250,7 @@ skipMany (EP.Parser p) =
 
 -- Note that causing a runtime crash when using `many` or `skipMany` with a
 -- parser that does not consume is the same behaviour as it was with parsec.
+parserDoesNotConsumeErr :: a
 parserDoesNotConsumeErr = error "Text.Parsec.Prim.many: combinator 'many' is applied to a parser that accepts an empty string."
 
 
@@ -336,7 +336,7 @@ getState =
 
 updateState :: (State -> State) -> Parser ()
 updateState f =
-  do  updateParserState
+  do  _ <- updateParserState
         (\(EP.State src pos end indent row col sourceName newline) ->
           let
             (State newline') = f (State newline)
@@ -453,7 +453,7 @@ setErrorMessage msg (ParseError sourceName row col msgs)
 
 
 mergeError :: ParseError -> ParseError -> ParseError
-mergeError e1@(ParseError sn1 r1 c1 msgs1) e2@(ParseError sn2 r2 c2 msgs2)
+mergeError e1@(ParseError sn1 r1 c1 msgs1) e2@(ParseError _ r2 c2 msgs2)
     -- prefer meaningful errors
     | null msgs2 && not (null msgs1) = e1
     | null msgs1 && not (null msgs2) = e2
@@ -577,7 +577,6 @@ between open close p =
  --- but we'll see
 eof :: Parser ()
 eof = notFollowedBy anyToken <?> "end of input"
-
 
 
 -- Text.Parsec.Char
