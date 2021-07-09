@@ -38,16 +38,20 @@ manyTill p end =
       <|>
       do{ x <- p; xs <- scan; return (x:xs) }
 
+
 skipMany1 :: Parser a -> Parser ()
 skipMany1 p =
   do  _ <- p
       skipMany p
 
+
 option :: a -> Parser a -> Parser a
 option x p = p <|> return x
 
+
 optionMaybe :: Parser a -> Parser (Maybe a)
 optionMaybe p = option Nothing (liftM Just p)
+
 
 anyToken :: Parser Char
 anyToken = undefined
@@ -62,5 +66,21 @@ between :: Parser open -> Parser close -> Parser a -> Parser a
 between open close p =
   do{ _ <- open; x <- p; _ <- close; return x }
 
+
+-- `eof` makes the parser fail if the entire inpute hasn't been consumed.
+-- This function sits in an odd possition right now because the new parser
+-- (`Parse.Primiteves.fromByteString` and `Parse.Primitives.fromSnippet`)
+-- automatically does this whereas the adapter (`Text.Parsec.Prim.runParserT`)
+-- does not.
+--
+-- I think the solution is to remove the eof behaviour from the new parser,
+-- but we'll see
 eof :: Parser ()
-eof = return ()
+eof =
+  EP.Parser $ \s@(EP.State _ pos end _ row col sourceName _) cok eok cerr eerr ->
+    if pos == end then
+      eok () s
+    else
+      -- In the parsec implementation the error message is the character that was found.
+      -- This behaviour would require some extra logic, so here the we just give "token" as the message instead.
+      eerr row col $ newErrorMessage (UnExpect "token") sourceName
