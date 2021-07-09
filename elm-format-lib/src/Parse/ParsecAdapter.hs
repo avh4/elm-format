@@ -154,6 +154,9 @@ parserPlus (EP.Parser p) (EP.Parser q) =
       meerr r1 c1 toErr1 =
         let
           neerr r2 c2 toErr2 =
+            -- This error merging behavior from parsec is really tricky for
+            -- me to understand, especially the error positions.
+            -- I doubt that I got this 100% correct.
             let
               err = mergeError (toErr1 r1 c1) (toErr2 r2 c2)
               row = fromIntegral $ sourceLine $ errorPos err
@@ -173,6 +176,13 @@ infix  0 <?>
 (<|>) = mplus
 
 
+-- TODO: Can the implementation be improved?
+--
+-- It's probable that this behaviour doesn't 100% match the original parsec
+-- behaviour. In particular, parsec stores error information in the _ok_
+-- continuations as well, why is that? And is it possible to get the same
+-- behaviour with the new parser which only stores errors in the _err_
+-- continuations.
 (<?>) :: Parser a -> String -> Parser a
 (<?>) (EP.Parser p) msg =
   EP.Parser $ \s@(EP.State _ _ _ _ _ _ sn _) cok eok cerr eerr ->
@@ -198,6 +208,12 @@ try (EP.Parser parser) =
     parser s cok eok err err
 
 
+-- TODO: See if this can be implemented more eloquently
+--
+-- The many_ helper and the code after the `in` are very similar and it's not
+-- obvious how they differ from looking at the code. Is there a way to make this
+-- implementation more obvious? Maybe the code in the `in` could be replaced
+-- with a single `many_` call?
 many :: Parser a -> Parser [a]
 many (EP.Parser p) =
   EP.Parser $ \s cok eok cerr eerr ->
@@ -234,10 +250,11 @@ skipMany (EP.Parser p) =
 
 
 -- Note that causing a runtime crash when using `many` or `skipMany` with a
--- parser that does not consume is the same behaviour as it was with parsec
+-- parser that does not consume is the same behaviour as it was with parsec.
 parserDoesNotConsumeErr = error "Text.Parsec.Prim.many: combinator 'many' is applied to a parser that accepts an empty string."
 
 
+-- This function is very similar to `Parse.Primitives.fromByteString`.
 runParserT :: Parser a -> State -> SourceName -> String -> Either ParseError a
 runParserT (EP.Parser p) (State newline) name source =
   B.accursedUnutterablePerformIO $
@@ -294,10 +311,19 @@ getPosition =
       return $ newPos sourceName row col
 
 
+-- TODO: Figure out why this function is never reached by the test suite.
+--
+-- This function is needed for elm-format to compile, but leaving it undefined
+-- doesn't cause any of the tests to fail.
+-- Is there missing coverage in the test suite? Or is this function required by
+-- dead code?
+--
+-- `setInput` is in the same situation.
 getInput :: Parser String
 getInput = undefined
 
 
+-- TODO: See `getInput`
 setInput :: String -> Parser ()
 setInput = undefined
 
@@ -541,6 +567,14 @@ between open close p =
   do{ _ <- open; x <- p; _ <- close; return x }
 
 
+ --- `eof` makes the parser fail if the entire input hasn't been consumed.
+ --- This function sits in an odd position right now because the new parser
+ --- (`Parse.Primiteves.fromByteString` and `Parse.Primitives.fromSnippet`)
+ --- automatically does this whereas the adapter (`Parse.ParsecAdapter.runParsercT`)
+ --- does not.
+ ---
+ --- I think the solution is to remove the eof behaviour from the new parser,
+ --- but we'll see
 eof :: Parser ()
 eof = notFollowedBy anyToken <?> "end of input"
 
@@ -680,14 +714,30 @@ updatePos width c (EP.State src pos end indent row col sourceName newline) =
 
 
 -- Inspired by https://hackage.haskell.org/package/utf8-string-1.0.2/docs/src/Codec.Binary.UTF8.String.html#decode
+--
+-- TODO: "Gracefully" crash on incomplete multibyte codepoint
+--
+-- If there's an incomplete multibyte codepoint at the end of the file this
+-- function will attempt to index ´Word8´'s outside the buffer, resulting in
+-- some nasty things. While 100% proper handling for utf-8 is not super important
+-- (or even desirable) for elm-format, crashing with a descriptive error message
+-- instead of indexing outside the buffer might be worth implementing.
+--
+--  w0, 4 byte char    w1        w2         w3, outside buffer
+--          v           v         v          v
+-- | ...,  11110xxx,  10xxxxxx,  10xxxxxx | ...
 extractChar :: EP.State -> (Char, Int)
 extractChar (EP.State _ pos _ _ _ _ _ _) =
+  -- 1 byte codepoint
   if w0 < 0xc0 then
     (chr (fromEnum w0), 1)
+  -- 2 byte codepoint
   else if w0 < 0xe0 then
     (multi1, 2)
+  -- 3 byte codepoint
   else if w0 < 0xf0 then
     (multi_byte [w1, w2] 0xf 0x800, 3)
+  -- 4 byte codepoint
   else if w0 < 0xf8 then
     (multi_byte [w1, w2, w3] 0x7 0x10000, 4)
   else
@@ -698,6 +748,9 @@ extractChar (EP.State _ pos _ _ _ _ _ _) =
     w2 = EP.unsafeIndex (plusPtr pos 2)
     w3 = EP.unsafeIndex (plusPtr pos 3)
 
+    -- `Codec.Binary.UTF8.String.decode` has this special case function for
+    -- a 2 byte codepoint, why is that? Will it behave the same way if we use
+    -- the general `multi_byte` instead?
     multi1 =
       if w1 .&. 0xc0 == 0x80 then
         let d = (fromEnum w0 .&. 0x1f) `shiftL` 6 .|. fromEnum (w1 .&. 0x3f)
@@ -727,6 +780,9 @@ extractChar (EP.State _ pos _ _ _ _ _ _) =
 -- Text.Parsec.Indents
 
 
+-- indents adds additional data onto parsecs `ParsecT` in order to track
+-- indentation information. The new parser tracks this information by itself
+-- now, which is why this function becomes a no-op.
 runIndent :: s -> a -> a
 runIndent _ = id
 
