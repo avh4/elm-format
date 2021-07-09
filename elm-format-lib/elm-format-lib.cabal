@@ -59,20 +59,12 @@ common common-options
         Parse.Literal
         Parse.Module
         Parse.Parse
+        Parse.ParsecAdapter
         Parse.Pattern
         Parse.Primitives
         Parse.State
         Parse.Type
         Parse.Whitespace
-        Text.Parsec
-        Text.Parsec.Char
-        Text.Parsec.Combinator
-        Text.Parsec.Error
-        Text.Parsec.Indent
-        Text.Parsec.Pos
-        Text.Parsec.Prim
-        Text.ParserCombinators.Parsec.Char
-        Text.ParserCombinators.Parsec.Combinator
 
     build-depends:
         aeson >= 1.5.5.1 && < 1.6,
