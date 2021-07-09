@@ -58,7 +58,7 @@ All this said, I think we can start to think about what we want to do with our t
 * `Text.Parsec.Combinator`
     Almost all of the functions in this module are implemented in terms of functions found in `Text.Parsec.Prim`, and as such most of the functions are implemented exactly as they where by parserc (except for formatting changes). Only functions that somehow differ from the implementetion in parsec are listed.
 
-    * `eof`. Dummy implementation.
+    * `eof`. Not implemented the way parser does it. Implemented in a way that's more straightforward with the new parser. The error message is less descriptive.
 
         The elm parser fails if all input isn't consumed, which makes sense in the context of compiling Elm. parsec however defaults to succeeding even if everyting isn't consumed, and that behaviour is changed by `eof`. So as of right now, `eof` becommes a NoOp, maybe `Parse.Primitives` will have to be changed to not fail on unconsumed input (for elm-format it can still make sense to not parse all input) at some point, but not right not.
 
