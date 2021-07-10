@@ -33,11 +33,11 @@ All this said, I think we can start to think about what we want to do with our t
 
     * instance `Fail.MonadFail` for `Parser`. Implementation closely matches that of parsec.
 
-        The implementation of `mplus` is straightforward except for the error merging behaviour in parsec, where if the tow parsers fails the errors are merged somehow. Not confident that I've got this right..
+        The implementation of `mplus` is straightforward except for the error merging behaviour in parsec, where if the two parsers fails the errors are merged somehow. Not confident that I've got this right..
 
     * `<|>`. Implemented exactly as it was by parsec.
 
-    * `<?>`. Dummy implementation.
+    * `<?>`. Possibly incomplete implementation. Parsec does error handling differently to the new parser, so how it's a bit unclear to me how to properly implement this, but I think this implementation should be acceptable.
 
     * `try`. Implemented exactly as it was by parsec.
 
@@ -58,7 +58,10 @@ All this said, I think we can start to think about what we want to do with our t
 * `Text.Parsec.Combinator`
     Almost all of the functions in this module are implemented in terms of functions found in `Text.Parsec.Prim`, and as such most of the functions are implemented exactly as they where by parserc (except for formatting changes). Only functions that somehow differ from the implementetion in parsec are listed.
 
-    * `eof`. Not implemented the way parser does it. Implemented in a way that's more straightforward with the new parser. The error message is less descriptive.
+    * `anyToken`. Same as `Text.Parsec.Char.anyChar`
+        Due to the adapter not being generic over the input type these two functions behave the same.
+
+    * `eof`. Implemented exactly as it was by parsec
 
         The elm parser fails if all input isn't consumed, which makes sense in the context of compiling Elm. parsec however defaults to succeeding even if everyting isn't consumed, and that behaviour is changed by `eof`. So as of right now, `eof` becommes a NoOp, maybe `Parse.Primitives` will have to be changed to not fail on unconsumed input (for elm-format it can still make sense to not parse all input) at some point, but not right not.
 
@@ -73,8 +76,6 @@ All this said, I think we can start to think about what we want to do with our t
     * `checkIndent`. Simple function.
 
     * `withPos`. Simple function, but I might have done in wrong..
-
-        Also, what exactly does the `_indent` field represent? Does it represent indentation in terms of coulmns, or some multiple thereof? Should be easy enough to pinpont if there is an issure here anyhow.
 
 ## Mapping between the parsec and Elm parser
 
