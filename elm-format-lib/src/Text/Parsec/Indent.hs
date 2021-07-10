@@ -12,6 +12,8 @@ import Text.Parsec.Prim (Parser, getParserState, updateParserState)
 import Text.Parsec.Combinator (many1)
 import qualified Parse.Primitives as EP
 
+import Data.Word (Word16)
+
 
 runIndent :: s -> a -> a
 runIndent _ = id
@@ -36,6 +38,15 @@ checkIndent =
 
 
 withPos :: Parser a -> Parser a
-withPos p =
-  do  updateParserState (\(EP.State s p e _ r c sn nl) -> EP.State s p e c r c sn nl)
-      p
+withPos (EP.Parser p) =
+  EP.Parser $ \s@(EP.State _ _ _ indent _ col _ _) cok eok cerr eerr ->
+    let
+      cok' x s' = cok x (setIndent indent s')
+      eok' x s' = eok x (setIndent indent s')
+    in
+    p (setIndent col s) cok' eok' cerr eerr
+
+
+setIndent :: Word16 -> EP.State -> EP.State
+setIndent indent (EP.State s p e _ r c nl sn) =
+  EP.State s p e indent r c nl sn
