@@ -186,7 +186,7 @@ runParserT (EP.Parser p) (State newline) name source =
       (B.PS fptr offset length) = stringToByteString source
       !pos = plusPtr (unsafeForeignPtrToPtr fptr) offset
       !end = plusPtr pos length
-      !result = p (EP.State fptr pos end 0 1 1 name newline) toOk toOk toErr toErr
+      !result = p (EP.State fptr pos end 1 1 1 name newline) toOk toOk toErr toErr
     in
     do  touchForeignPtr fptr
         return result
