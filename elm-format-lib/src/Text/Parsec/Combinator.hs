@@ -14,6 +14,7 @@ module Text.Parsec.Combinator
 import qualified Parse.Primitives as EP
 import Text.Parsec.Prim (unexpected, Parser(..), (<|>), try, many, skipMany)
 import Text.Parsec.Error (Message(UnExpect), newErrorMessage)
+import Text.Parsec.Char (anyChar)
 
 import Control.Monad (mzero, liftM)
 
@@ -54,7 +55,7 @@ optionMaybe p = option Nothing (liftM Just p)
 
 
 anyToken :: Parser Char
-anyToken = undefined
+anyToken = anyChar
 
 
 notFollowedBy :: Show a => Parser a -> Parser ()
