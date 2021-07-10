@@ -117,7 +117,13 @@ infix  0 <?>
 
 
 (<?>) :: Parser a -> String -> Parser a
-(<?>) p _ = p
+(<?>) (EP.Parser p) msg =
+  EP.Parser $ \s@(EP.State _ _ _ _ _ _ sn _) cok eok cerr eerr ->
+    let
+      eerr' row col _ =
+        eerr row col (Error.newErrorMessage (Error.Expect msg) sn)
+    in
+    p s cok eok cerr eerr'
 
 
 lookAhead :: Parser a -> Parser a
