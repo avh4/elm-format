@@ -1,14 +1,21 @@
+-- Large parts of this module are copied from https://hackage.haskell.org/package/parsec-3.1.14.0/docs/src/Text.Parsec.Error.html#messageString
+
 module Text.Parsec.Error
-  ( Message
+  ( Message(..)
   , ParseError
+  , newErrorMessage
+  , newErrorUnknown
   , errorPos
   , errorMessages
+  , setErrorMessage
+  , mergeError
   ) where
 
 import Data.List (nub, sort)
 import Data.Typeable (Typeable)
 
-import Text.Parsec.Pos (SourcePos)
+import Parse.Primitives (Row, Col)
+import Text.Parsec.Pos (SourcePos, newPos)
 
 
 data Message
@@ -42,14 +49,47 @@ messageString (Expect      s) = s
 messageString (Message     s) = s
 
 
-data ParseError = ParseError !SourcePos [Message]
+data ParseError = ParseError String Row Col [Message]
 
 
 errorPos :: ParseError -> SourcePos
-errorPos = undefined
+errorPos (ParseError sourceName row col _) = newPos sourceName row col
+
 
 errorMessages :: ParseError -> [Message]
-errorMessages = undefined
+errorMessages (ParseError _ _ _ messages) = messages
+
+
+
+-- Create parse errors
+
+
+newErrorMessage :: Message -> String -> Row -> Col -> ParseError
+newErrorMessage msg sourceName row col
+    = ParseError sourceName row col [msg]
+
+
+newErrorUnknown :: String -> Row -> Col -> ParseError
+newErrorUnknown sourceName row col
+    = ParseError sourceName row col []
+
+
+setErrorMessage :: Message -> ParseError -> ParseError
+setErrorMessage msg (ParseError sourceName row col msgs)
+    = ParseError sourceName row col (msg : filter (msg /=) msgs)
+
+
+mergeError :: ParseError -> ParseError -> ParseError
+mergeError e1@(ParseError sn1 r1 c1 msgs1) e2@(ParseError sn2 r2 c2 msgs2)
+    -- prefer meaningful errors
+    | null msgs2 && not (null msgs1) = e1
+    | null msgs1 && not (null msgs2) = e2
+    | otherwise
+    = case (r1, c1) `compare` (r2, c2) of
+        -- select the longest match
+        EQ -> ParseError sn1 r1 c1 (msgs1 ++ msgs2)
+        GT -> e1
+        LT -> e2
 
 
 instance Show ParseError where

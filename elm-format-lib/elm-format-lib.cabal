@@ -118,6 +118,7 @@ library
         ElmVersion
         Parse.Markdown
         Reporting.Annotation
+        Reporting.Annotation.New
         Reporting.Error.Syntax
         Reporting.Region
         Reporting.Result
@@ -147,6 +148,7 @@ test-suite efl-tests
         ElmVersion
         Parse.Markdown
         Reporting.Annotation
+        Reporting.Annotation.New
         Reporting.Error.Syntax
         Reporting.Region
         Reporting.Result

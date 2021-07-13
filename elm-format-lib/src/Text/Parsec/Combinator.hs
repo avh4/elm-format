@@ -11,34 +11,76 @@ module Text.Parsec.Combinator
   , eof
   ) where
 
-import Text.Parsec.Prim (Parser)
+import qualified Parse.Primitives as EP
+import Text.Parsec.Prim (unexpected, Parser(..), (<|>), try, many, skipMany)
+import Text.Parsec.Error (Message(UnExpect), newErrorMessage)
+
+import Control.Monad (mzero, liftM)
+
 
 choice :: [Parser a] -> Parser a
-choice = undefined
+choice ps = foldr (<|>) mzero ps
+
 
 many1 :: Parser a -> Parser [a]
-many1 = undefined
+many1 p =
+  do  x <- p
+      xs <- many p
+      return (x:xs)
+
 
 manyTill :: Parser a -> Parser end -> Parser [a]
-manyTill = undefined
+manyTill p end =
+  scan
+  where
+    scan =
+      do{ _ <- end; return [] }
+      <|>
+      do{ x <- p; xs <- scan; return (x:xs) }
+
 
 skipMany1 :: Parser a -> Parser ()
-skipMany1 = undefined
+skipMany1 p =
+  do  _ <- p
+      skipMany p
+
 
 option :: a -> Parser a -> Parser a
-option = undefined
+option x p = p <|> return x
+
 
 optionMaybe :: Parser a -> Parser (Maybe a)
-optionMaybe = undefined
+optionMaybe p = option Nothing (liftM Just p)
+
 
 anyToken :: Parser Char
 anyToken = undefined
 
+
 notFollowedBy :: Show a => Parser a -> Parser ()
-notFollowedBy = undefined
+notFollowedBy p =
+  try $ do{ c <- try p; unexpected (show c) } <|> return ()
+
 
 between :: Parser open -> Parser close -> Parser a -> Parser a
-between = undefined
+between open close p =
+  do{ _ <- open; x <- p; _ <- close; return x }
 
+
+-- `eof` makes the parser fail if the entire inpute hasn't been consumed.
+-- This function sits in an odd possition right now because the new parser
+-- (`Parse.Primiteves.fromByteString` and `Parse.Primitives.fromSnippet`)
+-- automatically does this whereas the adapter (`Text.Parsec.Prim.runParserT`)
+-- does not.
+--
+-- I think the solution is to remove the eof behaviour from the new parser,
+-- but we'll see
 eof :: Parser ()
-eof = undefined
+eof =
+  EP.Parser $ \s@(EP.State _ pos end _ row col sourceName _) cok eok cerr eerr ->
+    if pos == end then
+      eok () s
+    else
+      -- In the parsec implementation the error message is the character that was found.
+      -- This behaviour would require some extra logic, so here the we just give "token" as the message instead.
+      eerr row col $ newErrorMessage (UnExpect "token") sourceName
