@@ -2,7 +2,7 @@
 module Reporting.Error.Syntax where
 
 import AST.V0_16
-import qualified Text.Parsec.Error as Parsec
+import qualified Parse.ParsecAdapter as Parsec
 
 
 data Error

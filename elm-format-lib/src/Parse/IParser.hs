@@ -1,6 +1,7 @@
 module Parse.IParser where
 
-import Text.Parsec.Prim (Parser)
+import Parse.Primitives (Parser)
+import Parse.ParsecAdapter (ParseError)
 
 
-type IParser a = Parser a
+type IParser a = Parser ParseError a

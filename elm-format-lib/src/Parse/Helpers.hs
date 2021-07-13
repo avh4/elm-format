@@ -6,8 +6,7 @@ import Prelude hiding (until)
 import Control.Monad (guard)
 import qualified Data.Indexed as I
 import Data.Map.Strict hiding (foldl)
-import Text.Parsec hiding (newline, spaces, State)
-import Text.Parsec.Indent (indented, runIndent)
+import Parse.ParsecAdapter hiding (newline, spaces, State)
 
 import AST.V0_16
 import qualified AST.Helpers as Help

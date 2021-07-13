@@ -13,7 +13,7 @@ import Data.Coapplicative
 import Data.Functor.Identity
 import qualified Data.Indexed as I
 import qualified Data.Text as Text
-import Text.Parsec.Char (string)
+import Parse.ParsecAdapter (string)
 import ElmFormat.ImportInfo (ImportInfo(..))
 import ElmFormat.Render.Box (formatExpression, ExpressionContext(..))
 import ElmVersion
