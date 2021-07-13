@@ -1,3 +1,5 @@
 module Text.ParserCombinators.Parsec.Combinator (eof) where
 
-eof = undefined
+import qualified Text.Parsec.Combinator
+
+eof = Text.Parsec.Combinator.eof
