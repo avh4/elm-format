@@ -12,8 +12,9 @@ module Text.Parsec.Combinator
   ) where
 
 import qualified Parse.Primitives as EP
-import Text.Parsec.Prim (unexpected, Parser(..), (<|>), try, many, skipMany)
+import Text.Parsec.Prim (unexpected, Parser(..), (<|>), (<?>), try, many, skipMany)
 import Text.Parsec.Error (Message(UnExpect), newErrorMessage)
+import Text.Parsec.Char (anyChar)
 
 import Control.Monad (mzero, liftM)
 
@@ -54,7 +55,7 @@ optionMaybe p = option Nothing (liftM Just p)
 
 
 anyToken :: Parser Char
-anyToken = undefined
+anyToken = anyChar
 
 
 notFollowedBy :: Show a => Parser a -> Parser ()
@@ -76,11 +77,4 @@ between open close p =
 -- I think the solution is to remove the eof behaviour from the new parser,
 -- but we'll see
 eof :: Parser ()
-eof =
-  EP.Parser $ \s@(EP.State _ pos end _ row col sourceName _) cok eok cerr eerr ->
-    if pos == end then
-      eok () s
-    else
-      -- In the parsec implementation the error message is the character that was found.
-      -- This behaviour would require some extra logic, so here the we just give "token" as the message instead.
-      eerr row col $ newErrorMessage (UnExpect "token") sourceName
+eof = notFollowedBy anyToken <?> "end of input"
