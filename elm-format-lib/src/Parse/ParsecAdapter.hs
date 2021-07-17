@@ -28,8 +28,6 @@ module Parse.ParsecAdapter
   , skipMany
   , runParserT
   , getPosition
-  , getInput
-  , setInput
   , getState
   , updateState
   -- Text.Parsec.Pos
@@ -309,23 +307,6 @@ getPosition :: Parser SourcePos
 getPosition =
   do  (EP.State _ _ _ _ row col sourceName _) <- getParserState
       return $ newPos sourceName row col
-
-
--- TODO: Figure out why this function is never reached by the test suite.
---
--- This function is needed for elm-format to compile, but leaving it undefined
--- doesn't cause any of the tests to fail.
--- Is there missing coverage in the test suite? Or is this function required by
--- dead code?
---
--- `setInput` is in the same situation.
-getInput :: Parser String
-getInput = undefined
-
-
--- TODO: See `getInput`
-setInput :: String -> Parser ()
-setInput = undefined
 
 
 getState :: Parser State
