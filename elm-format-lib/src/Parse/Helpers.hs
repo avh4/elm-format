@@ -16,6 +16,7 @@ import qualified Parse.State as State
 import Parse.Comments
 import Parse.IParser
 import Parse.Whitespace
+import qualified Parse.Primitives as EP
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Region as R
@@ -511,12 +512,18 @@ commentedKeyword elmVersion word parser =
 
 -- ODD COMBINATORS
 
+-- Behaves the same as `Parse.ParsecAdapter.fail` except that the consumed
+-- continuation is called instead of the empty continuation.
 failure :: String -> IParser String
-failure msg = do
-  inp <- getInput
-  setInput ('x':inp)
-  _ <- anyToken
-  fail msg
+failure msg =
+  EP.Parser $ \s _ _ cerr _ ->
+    let
+      (EP.Parser p) = fail msg
+    in
+    -- This looks really unsound, but `p` which was created with `fail` will
+    -- only ever call the empty error continuation (which in this case
+    -- re-routes to the consumed error continuation)
+    p s undefined undefined undefined cerr
 
 
 until :: IParser a -> IParser b -> IParser b
