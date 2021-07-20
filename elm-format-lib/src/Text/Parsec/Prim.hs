@@ -117,7 +117,13 @@ infix  0 <?>
 
 
 (<?>) :: Parser a -> String -> Parser a
-(<?>) p _ = p
+(<?>) (EP.Parser p) msg =
+  EP.Parser $ \s@(EP.State _ _ _ _ _ _ sn _) cok eok cerr eerr ->
+    let
+      eerr' row col _ =
+        eerr row col (Error.newErrorMessage (Error.Expect msg) sn)
+    in
+    p s cok eok cerr eerr'
 
 
 lookAhead :: Parser a -> Parser a
@@ -180,7 +186,7 @@ runParserT (EP.Parser p) (State newline) name source =
       (B.PS fptr offset length) = stringToByteString source
       !pos = plusPtr (unsafeForeignPtrToPtr fptr) offset
       !end = plusPtr pos length
-      !result = p (EP.State fptr pos end 0 1 1 name newline) toOk toOk toErr toErr
+      !result = p (EP.State fptr pos end 1 1 1 name newline) toOk toOk toErr toErr
     in
     do  touchForeignPtr fptr
         return result
