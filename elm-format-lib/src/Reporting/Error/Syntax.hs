@@ -470,6 +470,7 @@ data Char
   = CharEndless
   | CharEscape Escape
   | CharNotString Word16
+  deriving Show
 
 
 data String
@@ -483,6 +484,7 @@ data Escape
   | BadUnicodeFormat Word16
   | BadUnicodeCode Word16
   | BadUnicodeLength Word16 Int Int
+  deriving Show
 
 
 --data Number
