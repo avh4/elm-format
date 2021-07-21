@@ -37,6 +37,7 @@ module Parse.ParsecAdapter
   , sourceColumn
   -- Text.Parsec.Error
   , ParseError
+  , newErrorUnknown
   , Message
   , errorPos
   , errorMessages
