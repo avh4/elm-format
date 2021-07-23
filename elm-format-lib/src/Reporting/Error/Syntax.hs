@@ -63,7 +63,7 @@ import Data.Word (Word16)
 
 --import qualified Elm.ModuleName as ModuleName
 --import Parse.Primitives (Row, Col)
-import qualified Parse.ParsecAdapter as ParsecAdapter
+import qualified Parse.ParsecAdapter.Message
 --import Parse.Symbol (BadOperator(..))
 --import qualified Reporting.Annotation as A
 --import qualified Reporting.Doc as D
@@ -76,7 +76,7 @@ import qualified Parse.ParsecAdapter as ParsecAdapter
 
 
 data Error
-    = Parse [ParsecAdapter.Message]
+    = Parse [Parse.ParsecAdapter.Message.Message]
 --  = ModuleNameUnspecified ModuleName.Raw
 --  | ModuleNameMismatch ModuleName.Raw (A.Located ModuleName.Raw)
 --  | UnexpectedPort A.Region
@@ -88,7 +88,7 @@ data Error
     deriving (Eq, Show)
 
 
-instance Show ParsecAdapter.Message where
+instance Show Parse.ParsecAdapter.Message.Message where
    show _ = "<Text.Parsec.Error.Message>"
 
 
