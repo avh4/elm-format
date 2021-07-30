@@ -182,7 +182,9 @@ singleString pos end row col initialPos revChunks =
           finalize initialPos pos revChunks
 
       else if word == 0x0A {- \n -} then
-        Err row col E.StringEndless_Single
+        let !newPos = plusPtr pos 1 in
+        singleString newPos end (row + 1) 1 newPos $
+          addChunk newline initialPos pos revChunks
 
       else if word == 0x27 {- ' -} then
         let !newPos = plusPtr pos 1 in
