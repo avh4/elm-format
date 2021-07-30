@@ -276,8 +276,24 @@ eatEscape pos end row col =
       0x22 {- " -} -> EscapeOk 2 $ ES.AsciiChar 0x22 {- " -}
       0x27 {- ' -} -> EscapeOk 2 $ ES.AsciiChar 0x27 {- ' -}
       0x5C {- \ -} -> EscapeOk 2 $ ES.AsciiChar 0x5C {- \ -}
+      0x78 {- x -} -> eatPre019Unicode (plusPtr pos 1) end row col
       0x75 {- u -} -> eatUnicode (plusPtr pos 1) end row col
       _            -> EscapeProblem row col E.EscapeUnknown
+
+
+eatPre019Unicode :: Ptr Word8 -> Ptr Word8 -> Row -> Col -> EscapeResult
+eatPre019Unicode pos end row col =
+  if pos >= end then
+    EscapeProblem row col (E.BadUnicodeFormat 2)
+  else
+    let
+      (# newPos, code #) = Number.chompHex pos end
+      !numDigits = minusPtr newPos pos
+    in
+    if newPos >= end then
+      EscapeProblem row col $ E.BadUnicodeFormat (2 + fromIntegral numDigits)
+    else
+      EscapeOk (2 + numDigits) $ ES.UnicodeChar code
 
 
 eatUnicode :: Ptr Word8 -> Ptr Word8 -> Row -> Col -> EscapeResult
