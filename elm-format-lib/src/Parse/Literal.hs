@@ -126,7 +126,8 @@ chr =
     toError e = newErrorUnknown ("Error parsing char: " ++ show e)
   in
   do  s <- character toExpecation toError
-      processAs charLiteral $ sandwich '\'' (ES.toChars s)
+      case ES.toChars s of
+        [ c ] -> return c
 
 
 --
