@@ -39,6 +39,7 @@ module Parse.ParsecAdapter
   , ParseError
   , newErrorUnknown
   , module Parse.ParsecAdapter.Message
+  , newErrorUnknown
   , errorPos
   , errorMessages
   -- Text.Parsec.Combinator

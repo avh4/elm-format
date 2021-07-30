@@ -7,7 +7,7 @@ import qualified Parse.Primitives as P
 import Parse.ParsecAdapter
 import Parse.Helpers (processAs, escaped, expecting, sandwich, betwixt)
 import Parse.IParser
-import Parse.String (character)
+import qualified Parse.String
 
 import AST.V0_16
 
@@ -80,41 +80,13 @@ exponent =
 
 str :: IParser (String, StringRepresentation)
 str =
-  expecting "a string" $
-  do  (s, representation) <- choice [ multiStr, singleStr ]
-      result <- processAs stringLiteral . sandwich '\"' $ concat s
-      return (result, representation)
-  where
-    rawString quote insides =
-        quote >> manyTill insides quote
+  let
+    toExpectation = newErrorUnknown "Expected a `\"`"
 
-    multiStr  =
-        do  result <- rawString (try (string "\"\"\"")) multilineStringChar
-            return (result, TripleQuotedString)
-    singleStr =
-        do  result <- rawString (char '"') stringChar
-            return (result, SingleQuotedString)
-
-    stringChar :: IParser String
-    stringChar = choice [ newlineChar, escaped '\"', (:[]) <$> satisfy (/= '\"') ]
-
-    multilineStringChar :: IParser String
-    multilineStringChar =
-        do noEnd
-           choice [ newlineChar, escaped '\"', expandQuote <$> anyChar ]
-        where
-          noEnd = notFollowedBy (string "\"\"\"")
-          expandQuote c = if c == '\"' then "\\\"" else [c]
-
-    newlineChar :: IParser String
-    newlineChar =
-        choice
-            [ char '\n' >> return "\\n"
-            , char '\r' >> choice
-                [ char '\n' >> return "\\n"
-                , return "\\r"
-                ]
-            ]
+    toError e = newErrorUnknown ("Error parsing string: " ++ show e)
+  in
+  do  (s, representation) <- Parse.String.string toExpectation toError
+      return (ES.toChars s, representation)
 
 
 -- TODO: Error handling.
@@ -125,7 +97,7 @@ chr =
 
     toError e = newErrorUnknown ("Error parsing char: " ++ show e)
   in
-  do  s <- character toExpecation toError
+  do  s <- Parse.String.character newErrorUnknown newErrorUnknown
       case ES.toChars s of
         [ c ] -> return c
 

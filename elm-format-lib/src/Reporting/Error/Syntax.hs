@@ -477,6 +477,7 @@ data String
   = StringEndless_Single
   | StringEndless_Multi
   | StringEscape Escape
+  deriving Show
 
 
 data Escape
