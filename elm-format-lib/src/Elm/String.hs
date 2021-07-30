@@ -57,8 +57,8 @@ toBuilder =
 
 data Chunk
   = Slice (Ptr Word8) Int
-  | Escape Word8
-  | CodePoint Int
+  | AsciiChar Word8
+  | UnicodeChar Int
 
 
 fromChunks :: [Chunk] -> String
@@ -74,9 +74,18 @@ fromChunks chunks =
 chunkToWidth :: Chunk -> Int
 chunkToWidth chunk =
   case chunk of
-    Slice _ len -> len
-    Escape _    -> 2
-    CodePoint c -> if c < 0xFFFF then 6 else 12
+    Slice _ len   -> len
+    AsciiChar _   -> 1
+    UnicodeChar c -> unicodeCharToWidth c
+
+
+-- Inspired by https://hackage.haskell.org/package/utf8-string-1.0.2/docs/src/Codec.Binary.UTF8.String.html#encodeChar
+unicodeCharToWidth :: Int -> Int
+unicodeCharToWidth c
+  | c <= 0x7f   = 1
+  | c <= 0x7ff  = 2
+  | c <= 0xffff = 3
+  | otherwise   = 4
 
 
 writeChunks :: MBA RealWorld -> Int -> [Chunk] -> ST RealWorld ()
@@ -92,39 +101,37 @@ writeChunks mba offset chunks =
               let !newOffset = offset + len
               writeChunks mba newOffset chunks
 
-        Escape word ->
-          do  writeWord8 mba offset 0x5C {- \ -}
-              writeWord8 mba (offset + 1) word
-              let !newOffset = offset + 2
+        AsciiChar word ->
+          do  writeWord8 mba offset word
+              let !newOffset = offset + 1
               writeChunks mba newOffset chunks
 
-        CodePoint code ->
-          if code < 0xFFFF then
-            do  writeCode mba offset code
-                let !newOffset = offset + 6
-                writeChunks mba newOffset chunks
-          else
-            do  let (hi,lo) = divMod (code - 0x10000) 0x400
-                writeCode mba (offset    ) (hi + 0xD800)
-                writeCode mba (offset + 6) (lo + 0xDC00)
-                let !newOffset = offset + 12
-                writeChunks mba newOffset chunks
+        UnicodeChar code ->
+          do  delta <- writeUnicodeChar mba offset code
+              let !newOffset = offset + delta
+              writeChunks mba newOffset chunks
 
 
-writeCode :: MBA RealWorld -> Int -> Int -> ST RealWorld ()
-writeCode mba offset code =
-  do  writeWord8 mba offset 0x5C {- \ -}
-      writeWord8 mba (offset + 1) 0x75 {- u -}
-      writeHex mba (offset + 2) (shiftR code 12)
-      writeHex mba (offset + 3) (shiftR code 8)
-      writeHex mba (offset + 4) (shiftR code 4)
-      writeHex mba (offset + 5) code
+-- Inspired by https://hackage.haskell.org/package/utf8-string-1.0.2/docs/src/Codec.Binary.UTF8.String.html#encodeChar
+writeUnicodeChar :: MBA RealWorld -> Int -> Int -> ST RealWorld Int
+writeUnicodeChar mba offset c
+  | c <= 0x7f     = do  writeWord8 mba offset (fromIntegral c)
+                        return 1
 
+  | c <= 0x7ff    = do  writeWord8 mba (offset + 0) (fromIntegral $ 0xc0 + (c `shiftR` 6))
+                        writeWord8 mba (offset + 1) (fromIntegral $ 0x80 + c .&. 0x3f)
+                        return 2
 
-writeHex :: MBA RealWorld -> Int -> Int -> ST RealWorld ()
-writeHex mba !offset !bits =
-  do  let !n = fromIntegral bits .&. 0x0F
-      writeWord8 mba offset (if n < 10 then 0x30 + n else 0x37 + n)
+  | c <= 0xffff   = do  writeWord8 mba (offset + 0) (fromIntegral $ 0xe0 + (c `shiftR` 12))
+                        writeWord8 mba (offset + 1) (fromIntegral $ 0x80 + ((c `shiftR` 6) .&. 0x3f))
+                        writeWord8 mba (offset + 2) (fromIntegral $ 0x80 + c .&. 0x3f)
+                        return 3
+
+  | otherwise     = do  writeWord8 mba (offset + 0) (fromIntegral $ 0xf0 + (c `shiftR` 18))
+                        writeWord8 mba (offset + 1) (fromIntegral $ 0x80 + ((c `shiftR` 12) .&. 0x3f))
+                        writeWord8 mba (offset + 2) (fromIntegral $ 0x80 + ((c `shiftR` 6) .&. 0x3f))
+                        writeWord8 mba (offset + 3) (fromIntegral $ 0x80 + c .&. 0x3f)
+                        return 4
 
 
 
