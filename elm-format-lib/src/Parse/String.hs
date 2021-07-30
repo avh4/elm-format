@@ -20,6 +20,8 @@ import qualified Parse.Number as Number
 import qualified Parse.Primitives as P
 import qualified Reporting.Error.Syntax as E
 
+import AST.V0_16 ( StringRepresentation(SingleQuotedString, TripleQuotedString) )
+
 
 
 -- CHARACTER
@@ -98,7 +100,7 @@ chompChar pos end row col numChars mostRecent =
 -- STRINGS
 
 
-string :: (Row -> Col -> x) -> (E.String -> Row -> Col -> x) -> Parser x ES.String
+string :: (Row -> Col -> x) -> (E.String -> Row -> Col -> x) -> Parser x (ES.String, StringRepresentation)
 string toExpectation toError =
   P.Parser $ \(P.State src pos end indent row col nl sn) cok _ cerr eerr ->
     if isDoubleQuote pos end then
@@ -114,20 +116,20 @@ string toExpectation toError =
               !pos3 = plusPtr pos 3
               !col3 = col + 3
             in
-            multiString pos3 end row col3 pos3 row col mempty
+            (multiString pos3 end row col3 pos3 row col mempty, TripleQuotedString)
           else
-            Ok pos2 row (col + 2) Utf8.empty
+            (Ok pos2 row (col + 2) Utf8.empty, SingleQuotedString)
         else
-          singleString pos1 end row (col + 1) pos1 mempty
+          (singleString pos1 end row (col + 1) pos1 mempty, SingleQuotedString)
       of
-        Ok newPos newRow newCol utf8 ->
+        (Ok newPos newRow newCol utf8, representation) ->
           let
             !newState =
               P.State src newPos end indent newRow newCol nl sn
           in
-          cok utf8 newState
+          cok (utf8, representation) newState
 
-        Err r c x ->
+        (Err r c x, _) ->
           cerr r c (toError x)
 
     else
