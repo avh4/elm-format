@@ -1944,15 +1944,29 @@ formatString elmVersion style s =
     stringBox quotes escaper =
       line $ row
           [ punc quotes
-          , literal $ escaper $ concatMap fix s
+          , literal $ escaper $ comonadic_ish_map fix s
           , punc quotes
           ]
 
-    fix c =
+    comonadic_ish_map :: (Char -> Char -> String) -> String -> String
+    comonadic_ish_map f s =
+      case s of
+        c1 :  c2 : cs ->
+          f c1 c2 ++ comonadic_ish_map f (c2:cs)
+
+        [c] ->
+          f c (Char.chr 0x0)
+
+        [] ->
+          []
+
+    fix c cNext =
         if (style == SString TripleQuotedString) && c == '\n' then
             [c]
         else if c == '\n' then
             "\\n"
+        else if c == '\r' && cNext == '\n' then
+            ""
         else if c == '\t' then
             "\\t"
         else if c == '\\' then
