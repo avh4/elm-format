@@ -97,7 +97,7 @@ chr =
 
     toError e = newErrorUnknown ("Error parsing char: " ++ show e)
   in
-  do  s <- Parse.String.character newErrorUnknown newErrorUnknown
+  do  s <- Parse.String.character toExpecation toError
       case ES.toChars s of
         [ c ] -> return c
 
