@@ -142,6 +142,12 @@ isDoubleQuote pos end =
   pos < end && P.unsafeIndex pos == 0x22 {- " -}
 
 
+{-# INLINE isNewline #-}
+isNewline :: Ptr Word8 -> Ptr Word8 -> Bool
+isNewline pos end =
+  pos < end && P.unsafeIndex pos == 0x0A {- \n -}
+
+
 data StringResult
   = Ok (Ptr Word8) Row Col !ES.String
   | Err Row Col E.String
@@ -183,6 +189,11 @@ singleString pos end row col initialPos revChunks =
 
       else if word == 0x0A {- \n -} then
         let !newPos = plusPtr pos 1 in
+        singleString newPos end (row + 1) 1 newPos $
+          addChunk newline initialPos pos revChunks
+
+      else if word == 0x0D {- \r -} && isNewline (plusPtr pos 1) end then
+        let !newPos = plusPtr pos 2 in
         singleString newPos end (row + 1) 1 newPos $
           addChunk newline initialPos pos revChunks
 
@@ -231,6 +242,11 @@ multiString pos end row col initialPos sr sc revChunks =
 
     else if word == 0x0A {- \n -} then
       let !pos1 = plusPtr pos 1 in
+      multiString pos1 end (row + 1) 1 pos1 sr sc $
+        addChunk newline initialPos pos revChunks
+
+    else if word == 0x0D {- \r -} && isNewline (plusPtr pos 1) end then
+      let !pos1 = plusPtr pos 2 in
       multiString pos1 end (row + 1) 1 pos1 sr sc $
         addChunk newline initialPos pos revChunks
 
