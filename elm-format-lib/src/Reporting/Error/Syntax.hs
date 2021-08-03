@@ -40,8 +40,8 @@ module Reporting.Error.Syntax
   , Char(..)
   , String(..)
   , Escape(..)
---  , Number(..)
---  --
+  , Number(..)
+  --
 --  , Space(..)
 --  , toSpaceReport
   --
@@ -488,11 +488,11 @@ data Escape
   deriving Show
 
 
---data Number
---  = NumberEnd
---  | NumberDot Int
---  | NumberHexDigit
---  | NumberNoLeadingZero
+data Number
+  = NumberEnd
+  | NumberDot Int
+  | NumberHexDigit
+  | NumberNoLeadingZero
 
 
 
