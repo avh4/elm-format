@@ -24,6 +24,7 @@ import qualified Parse.Variable as Var
 import qualified Parse.Primitives as P
 import qualified Reporting.Error.Syntax as E
 
+import AST.V0_16
 
 
 -- HELPERS
@@ -45,7 +46,7 @@ isDecimalDigit word =
 
 
 data Number
-  = Int Int
+  = Int Int IntRepresentation
   | Float EF.Float
 
 
@@ -75,10 +76,10 @@ number toExpectation toError =
               in
               cerr row newCol (toError problem)
 
-            OkInt newPos n ->
+            OkInt newPos n representation ->
               let
                 !newCol = col + fromIntegral (minusPtr newPos pos)
-                !integer = Int n
+                !integer = Int n representation
                 !newState = P.State src newPos end indent row newCol sn nl
               in
               cok integer newState
@@ -101,7 +102,7 @@ number toExpectation toError =
 --
 data Outcome
   = Err (Ptr Word8) E.Number
-  | OkInt (Ptr Word8) Int
+  | OkInt (Ptr Word8) Int IntRepresentation
   | OkFloat (Ptr Word8)
 
 
@@ -113,7 +114,7 @@ chompInt :: Ptr Word8 -> Ptr Word8 -> Int -> Outcome
 chompInt !pos end !n =
   if pos >= end then
 
-    OkInt pos n
+    OkInt pos n DecimalInt
 
   else
 
@@ -133,7 +134,7 @@ chompInt !pos end !n =
         Err pos E.NumberEnd
 
       else
-        OkInt pos n
+        OkInt pos n DecimalInt
 
 
 
@@ -220,7 +221,7 @@ chompExponentHelp pos end =
 chompZero :: Ptr Word8 -> Ptr Word8 -> Outcome
 chompZero pos end =
   if pos >= end then
-    OkInt pos 0
+    OkInt pos 0 DecimalInt
 
   else
     let !word = P.unsafeIndex pos in
@@ -237,7 +238,7 @@ chompZero pos end =
       Err pos E.NumberEnd
 
     else
-      OkInt pos 0
+      OkInt pos 0 DecimalInt
 
 
 chompHexInt :: Ptr Word8 -> Ptr Word8 -> Outcome
@@ -246,7 +247,7 @@ chompHexInt pos end =
   if answer < 0 then
     Err newPos E.NumberHexDigit
   else
-    OkInt newPos answer
+    OkInt newPos answer HexadecimalInt
 
 
 
