@@ -89,7 +89,6 @@ str =
       return (ES.toChars s, representation)
 
 
--- TODO: Error handling.
 chr :: IParser Char
 chr =
   let
@@ -100,6 +99,10 @@ chr =
   do  s <- Parse.String.character toExpecation toError
       case ES.toChars s of
         [ c ] -> return c
+
+        s ->
+          error $ "A Char literal was parsed as containing " ++ show (length s) ++ " characters.  Please report this issue at https://github.com/avh4/elm-format/issues"
+
 
 
 --
