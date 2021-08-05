@@ -73,9 +73,6 @@ chompChar pos end row col numChars mostRecent =
       else if word == 0x0A {- \n -} then
         CharEndless col
 
-      else if word == 0x22 {- " -} then
-        chompChar (plusPtr pos 1) end row (col + 1) (numChars + 1) doubleQuote
-
       else if word == 0x5C {- \ -} then
         case eatEscape (plusPtr pos 1) end row col of
           EscapeOk delta chunk ->
@@ -197,11 +194,6 @@ singleString pos end row col initialPos revChunks =
         singleString newPos end (row + 1) 1 newPos $
           addChunk newline initialPos pos revChunks
 
-      else if word == 0x27 {- ' -} then
-        let !newPos = plusPtr pos 1 in
-        singleString newPos end row (col + 1) newPos $
-          addChunk singleQuote initialPos pos revChunks
-
       else if word == 0x5C {- \ -} then
         case eatEscape (plusPtr pos 1) end row col of
           EscapeOk delta chunk ->
@@ -235,11 +227,6 @@ multiString pos end row col initialPos sr sc revChunks =
       Ok (plusPtr pos 3) row (col + 3) $
         finalize initialPos pos revChunks
 
-    else if word == 0x27 {- ' -} then
-      let !pos1 = plusPtr pos 1 in
-      multiString pos1 end row (col + 1) pos1 sr sc $
-        addChunk singleQuote initialPos pos revChunks
-
     else if word == 0x0A {- \n -} then
       let !pos1 = plusPtr pos 1 in
       multiString pos1 end (row + 1) 1 pos1 sr sc $
@@ -249,11 +236,6 @@ multiString pos end row col initialPos sr sc revChunks =
       let !pos1 = plusPtr pos 2 in
       multiString pos1 end (row + 1) 1 pos1 sr sc $
         addChunk newline initialPos pos revChunks
-
-    else if word == 0x0D {- \r -} then
-      let !pos1 = plusPtr pos 1 in
-      multiString pos1 end row col pos1 sr sc $
-        addChunk carriageReturn initialPos pos revChunks
 
     else if word == 0x5C {- \ -} then
       case eatEscape (plusPtr pos 1) end row col of
@@ -343,28 +325,10 @@ eatUnicode pos end row col =
       EscapeOk (numDigits + 4) $ ES.UnicodeChar code
 
 
-{-# NOINLINE singleQuote #-}
-singleQuote :: ES.Chunk
-singleQuote =
-  ES.AsciiChar 0x27 {- ' -}
-
-
-{-# NOINLINE doubleQuote #-}
-doubleQuote :: ES.Chunk
-doubleQuote =
-  ES.AsciiChar 0x22 {- " -}
-
-
 {-# NOINLINE newline #-}
 newline :: ES.Chunk
 newline =
   ES.AsciiChar 0x0A {- \n -}
-
-
-{-# NOINLINE carriageReturn #-}
-carriageReturn :: ES.Chunk
-carriageReturn =
-  ES.AsciiChar 0x0D {- \r -}
 
 
 {-# NOINLINE placeholder #-}
