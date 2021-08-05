@@ -75,9 +75,11 @@ chompChar pos end row col numChars mostRecent =
 
       else if word == 0x5C {- \ -} then
         case eatEscape (plusPtr pos 1) end row col of
-          EscapeOk delta chunk ->
-            let !newPos = plusPtr pos delta in
-            chompChar newPos end row (col + fromIntegral delta) (numChars + 1) chunk
+          EscapeNormal code ->
+            chompChar (plusPtr pos 2) end row (col + 2) (numChars + 1) (ES.AsciiChar code)
+
+          EscapeUnicode delta code ->
+            chompChar (plusPtr pos delta) end row (col + fromIntegral delta) (numChars + 1) (ES.CodePoint code)
 
           EscapeProblem r c badEscape ->
             CharEscape r c badEscape
@@ -196,10 +198,15 @@ singleString pos end row col initialPos revChunks =
 
       else if word == 0x5C {- \ -} then
         case eatEscape (plusPtr pos 1) end row col of
-          EscapeOk delta chunk ->
+          EscapeNormal code ->
+            let !newPos = plusPtr pos 2 in
+            singleString newPos end row (col + 2) newPos $
+              addChunk (ES.AsciiChar code) initialPos pos revChunks
+
+          EscapeUnicode delta code ->
             let !newPos = plusPtr pos delta in
             singleString newPos end row (col + fromIntegral delta) newPos $
-              addChunk chunk initialPos pos revChunks
+              addChunk (ES.CodePoint code) initialPos pos revChunks
 
           EscapeProblem r c x ->
             Err r c (E.StringEscape x)
@@ -239,10 +246,15 @@ multiString pos end row col initialPos sr sc revChunks =
 
     else if word == 0x5C {- \ -} then
       case eatEscape (plusPtr pos 1) end row col of
-        EscapeOk delta chunk ->
+        EscapeNormal code ->
+          let !newPos = plusPtr pos 2 in
+          multiString newPos end row (col + 2) newPos sr sc $
+            addChunk (ES.AsciiChar code) initialPos pos revChunks
+
+        EscapeUnicode delta code ->
           let !newPos = plusPtr pos delta in
           multiString newPos end row (col + fromIntegral delta) newPos sr sc $
-            addChunk chunk initialPos pos revChunks
+            addChunk (ES.CodePoint code) initialPos pos revChunks
 
         EscapeProblem r c x ->
           Err r c (E.StringEscape x)
@@ -259,31 +271,32 @@ multiString pos end row col initialPos sr sc revChunks =
 -- ESCAPE CHARACTERS
 
 
-data EscapeResult
-  = EscapeOk !Int ES.Chunk
+data Escape
+  = EscapeNormal Word8
+  | EscapeUnicode !Int !Int
   | EscapeEndOfFile
   | EscapeProblem Row Col E.Escape
 
 
-eatEscape :: Ptr Word8 -> Ptr Word8 -> Row -> Col -> EscapeResult
+eatEscape :: Ptr Word8 -> Ptr Word8 -> Row -> Col -> Escape
 eatEscape pos end row col =
   if pos >= end then
     EscapeEndOfFile
 
   else
     case P.unsafeIndex pos of
-      0x6E {- n -} -> EscapeOk 2 $ ES.AsciiChar 0x0A {- \n -}
-      0x72 {- r -} -> EscapeOk 2 $ ES.AsciiChar 0x0D {- \r -}
-      0x74 {- t -} -> EscapeOk 2 $ ES.AsciiChar 0x09 {- \t -}
-      0x22 {- " -} -> EscapeOk 2 $ ES.AsciiChar 0x22 {- " -}
-      0x27 {- ' -} -> EscapeOk 2 $ ES.AsciiChar 0x27 {- ' -}
-      0x5C {- \ -} -> EscapeOk 2 $ ES.AsciiChar 0x5C {- \ -}
+      0x6E {- n -} -> EscapeNormal 0x0A {- \n -}
+      0x72 {- r -} -> EscapeNormal 0x0D {- \r -}
+      0x74 {- t -} -> EscapeNormal 0x09 {- \t -}
+      0x22 {- " -} -> EscapeNormal 0x22 {- " -}
+      0x27 {- ' -} -> EscapeNormal 0x27 {- ' -}
+      0x5C {- \ -} -> EscapeNormal 0x5C {- \ -}
       0x78 {- x -} -> eatPre019Unicode (plusPtr pos 1) end row col
       0x75 {- u -} -> eatUnicode (plusPtr pos 1) end row col
       _            -> EscapeProblem row col E.EscapeUnknown
 
 
-eatPre019Unicode :: Ptr Word8 -> Ptr Word8 -> Row -> Col -> EscapeResult
+eatPre019Unicode :: Ptr Word8 -> Ptr Word8 -> Row -> Col -> Escape
 eatPre019Unicode pos end row col =
   if pos >= end then
     EscapeProblem row col (E.BadUnicodeFormat 2)
@@ -295,10 +308,10 @@ eatPre019Unicode pos end row col =
     if newPos >= end then
       EscapeProblem row col $ E.BadUnicodeFormat (2 + fromIntegral numDigits)
     else
-      EscapeOk (2 + numDigits) $ ES.UnicodeChar code
+      EscapeUnicode (2 + numDigits) code
 
 
-eatUnicode :: Ptr Word8 -> Ptr Word8 -> Row -> Col -> EscapeResult
+eatUnicode :: Ptr Word8 -> Ptr Word8 -> Row -> Col -> Escape
 eatUnicode pos end row col =
   if pos >= end || P.unsafeIndex pos /= 0x7B {- { -} then
     EscapeProblem row col (E.BadUnicodeFormat 2)
@@ -322,7 +335,7 @@ eatUnicode pos end row col =
           code
 
     else
-      EscapeOk (numDigits + 4) $ ES.UnicodeChar code
+      EscapeUnicode (numDigits + 4) code
 
 
 {-# NOINLINE newline #-}
@@ -334,4 +347,4 @@ newline =
 {-# NOINLINE placeholder #-}
 placeholder :: ES.Chunk
 placeholder =
-  ES.UnicodeChar 0xFFFD {-replacement character-}
+  ES.CodePoint 0xFFFD {-replacement character-}
