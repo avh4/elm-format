@@ -58,7 +58,7 @@ toBuilder =
 data Chunk
   = Slice (Ptr Word8) Int
   | AsciiChar Word8
-  | UnicodeChar Int
+  | CodePoint Int
 
 
 fromChunks :: [Chunk] -> String
@@ -76,7 +76,7 @@ chunkToWidth chunk =
   case chunk of
     Slice _ len   -> len
     AsciiChar _   -> 1
-    UnicodeChar c -> unicodeCharToWidth c
+    CodePoint c -> unicodeCharToWidth c
 
 
 -- Inspired by https://hackage.haskell.org/package/utf8-string-1.0.2/docs/src/Codec.Binary.UTF8.String.html#encodeChar
@@ -106,15 +106,15 @@ writeChunks mba offset chunks =
               let !newOffset = offset + 1
               writeChunks mba newOffset chunks
 
-        UnicodeChar code ->
-          do  delta <- writeUnicodeChar mba offset code
+        CodePoint code ->
+          do  delta <- writeCode mba offset code
               let !newOffset = offset + delta
               writeChunks mba newOffset chunks
 
 
 -- Inspired by https://hackage.haskell.org/package/utf8-string-1.0.2/docs/src/Codec.Binary.UTF8.String.html#encodeChar
-writeUnicodeChar :: MBA RealWorld -> Int -> Int -> ST RealWorld Int
-writeUnicodeChar mba offset c
+writeCode :: MBA RealWorld -> Int -> Int -> ST RealWorld Int
+writeCode mba offset c
   | c <= 0x7f     = do  writeWord8 mba offset (fromIntegral c)
                         return 1
 
