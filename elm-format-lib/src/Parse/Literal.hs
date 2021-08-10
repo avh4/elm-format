@@ -5,6 +5,7 @@ import qualified Elm.String as ES
 import Parse.ParsecAdapter
 import Parse.IParser
 import qualified Parse.String
+import qualified Parse.Number
 
 import AST.V0_16
 
@@ -16,39 +17,21 @@ literal =
 
 num :: IParser LiteralValue
 num =
-  toLiteral <$> (rawNumber <?> "a number")
+  let
+    toExpectation = newErrorUnknown "Expected a digit"
 
+    toError e = newErrorUnknown ("Error parsing number: " ++ show e)
+  in
+  do  negate <- option False (return True <$> minus)
+      n <- Parse.Number.number toExpectation toError
+      case n of
+        Parse.Number.Int int representation ->
+          let num = if negate then -int else int in
+          return $ IntNum num representation
 
-toLiteral :: String -> LiteralValue
-toLiteral n
-  | 'x' `elem` n         = IntNum (read n) HexadecimalInt
-  | any (`elem` ("eE" :: String)) n = FloatNum (read n) ExponentFloat
-  | any (`elem` ("." :: String)) n = FloatNum (read n) DecimalFloat
-  | otherwise            = IntNum (read n) DecimalInt
-
-
-rawNumber :: IParser String
-rawNumber =
-  concat <$> sequence
-    [ option "" minus
-    , base16 <|> base10
-    ]
-
-
-base16 :: IParser String
-base16 =
-  do  _ <- try (string "0x")
-      digits <- many1 hexDigit
-      return ("0x" ++ digits)
-
-
-base10 :: IParser String
-base10 =
-  concat <$> sequence
-    [ many1 digit
-    , option "" decimals
-    , option "" exponent
-    ]
+        Parse.Number.Float float representation ->
+          let num = if negate then -float else float in
+          return $ FloatNum num representation
 
 
 minus :: IParser String
@@ -57,22 +40,6 @@ minus =
     _ <- string "-"
     _ <- lookAhead digit
     return "-"
-
-
-decimals :: IParser String
-decimals =
-  do  _ <- try $ lookAhead (string "." >> digit)
-      _ <- string "."
-      n <- many1 digit
-      return ('.' : n)
-
-
-exponent :: IParser String
-exponent =
-  do  _ <- string "e" <|> string "E"
-      op <- option "" (string "+" <|> string "-")
-      n <- many1 digit
-      return ('e' : op ++ n)
 
 
 str :: IParser (String, StringRepresentation)
