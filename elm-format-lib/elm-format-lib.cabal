@@ -37,7 +37,6 @@ common common-options
         AST.Helpers
         Box
         Data.Utf8
-        Elm.Float
         Elm.String
         ElmFormat.AST.BinaryOperatorPrecedence
         ElmFormat.AST.PatternMatching
