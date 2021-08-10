@@ -59,6 +59,7 @@ import qualified Prelude as Prelude
 --import qualified Data.Char as Char
 --import qualified Data.Name as Name
 import Data.Word (Word16)
+import Data.Int (Int64)
 --import Numeric (showHex)
 
 --import qualified Elm.ModuleName as ModuleName
@@ -490,9 +491,10 @@ data Escape
 
 data Number
   = NumberEnd
-  | NumberDot Int
+  | NumberDot Int64
   | NumberHexDigit
   | NumberNoLeadingZero
+  deriving Show
 
 
 

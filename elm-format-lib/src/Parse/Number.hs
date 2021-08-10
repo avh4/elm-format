@@ -25,6 +25,7 @@ import qualified Parse.Primitives as P
 import qualified Reporting.Error.Syntax as E
 
 import AST.V0_16
+import Data.Int (Int64)
 
 
 -- HELPERS
@@ -46,7 +47,7 @@ isDecimalDigit word =
 
 
 data Number
-  = Int Int IntRepresentation
+  = Int Int64 IntRepresentation
   | Float Double FloatRepresentation
 
 
@@ -106,7 +107,7 @@ parseFloat pos end =
 --
 data Outcome
   = Err (Ptr Word8) E.Number
-  | OkInt (Ptr Word8) Int IntRepresentation
+  | OkInt (Ptr Word8) Int64 IntRepresentation
   | OkFloat (Ptr Word8) FloatRepresentation
 
 
@@ -114,7 +115,7 @@ data Outcome
 -- CHOMP INT
 
 
-chompInt :: Ptr Word8 -> Ptr Word8 -> Int -> Outcome
+chompInt :: Ptr Word8 -> Ptr Word8 -> Int64 -> Outcome
 chompInt !pos end !n =
   if pos >= end then
 
@@ -145,7 +146,7 @@ chompInt !pos end !n =
 -- CHOMP FRACTION
 
 
-chompFraction :: Ptr Word8 -> Ptr Word8 -> Int -> Outcome
+chompFraction :: Ptr Word8 -> Ptr Word8 -> Int64 -> Outcome
 chompFraction pos end n =
   let
     !pos1 = plusPtr pos 1
@@ -262,12 +263,12 @@ chompHexInt pos end =
 -- Return -2 if it has BAD digits
 
 {-# INLINE chompHex #-}
-chompHex :: Ptr Word8 -> Ptr Word8 -> (# Ptr Word8, Int #)
+chompHex :: (Integral i) => Ptr Word8 -> Ptr Word8 -> (# Ptr Word8, i #)
 chompHex pos end =
   chompHexHelp pos end (-1) 0
 
 
-chompHexHelp :: Ptr Word8 -> Ptr Word8 -> Int -> Int -> (# Ptr Word8, Int #)
+chompHexHelp :: (Integral i) => Ptr Word8 -> Ptr Word8 -> i -> i -> (# Ptr Word8, i #)
 chompHexHelp pos end answer accumulator =
   if pos >= end then
     (# pos, answer #)
@@ -283,7 +284,7 @@ chompHexHelp pos end answer accumulator =
 
 
 {-# INLINE stepHex #-}
-stepHex :: Ptr Word8 -> Ptr Word8 -> Word8 -> Int -> Int
+stepHex :: (Integral i) => Ptr Word8 -> Ptr Word8 -> Word8 -> i -> i
 stepHex pos end word acc
   | 0x30 {-0-} <= word && word <= 0x39 {-9-} = 16 * acc + fromIntegral (word - 0x30 {-0-})
   | 0x61 {-a-} <= word && word <= 0x66 {-f-} = 16 * acc + 10 + fromIntegral (word - 0x61 {-a-})
