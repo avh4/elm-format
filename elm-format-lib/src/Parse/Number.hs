@@ -16,9 +16,9 @@ module Parse.Number
 
 import Data.Word (Word8)
 import Foreign.Ptr (Ptr, plusPtr, minusPtr)
+import qualified Data.Utf8 as Utf8
 
 --import qualified AST.Utils.Binop as Binop
-import qualified Elm.Float as EF
 import Parse.Primitives (Parser, Row, Col)
 import qualified Parse.Variable as Var
 import qualified Parse.Primitives as P
@@ -47,7 +47,7 @@ isDecimalDigit word =
 
 data Number
   = Int Int IntRepresentation
-  | Float EF.Float
+  | Float Double
 
 
 number :: (Row -> Col -> x) -> (E.Number -> Row -> Col -> x) -> Parser x Number
@@ -87,11 +87,15 @@ number toExpectation toError =
             OkFloat newPos ->
               let
                 !newCol = col + fromIntegral (minusPtr newPos pos)
-                !copy = EF.fromPtr pos newPos
-                !float = Float copy
+                !float = Float $ parseFloat pos newPos
                 !newState = P.State src newPos end indent row newCol sn nl
               in
               cok float newState
+
+
+parseFloat :: Ptr Word8 -> Ptr Word8 -> Double
+parseFloat pos end =
+  read $ Utf8.toChars $ Utf8.fromPtr pos end
 
 
 
