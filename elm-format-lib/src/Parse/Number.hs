@@ -129,7 +129,7 @@ chompInt !pos end !n =
       if isDecimalDigit word then
         chompInt (plusPtr pos 1) end (10 * n + fromIntegral (word - 0x30 {-0-}))
 
-      else if word == 0x2E {-.-} then
+      else if word == 0x2E {-.-} && not (isDot (plusPtr pos 1) end) then
         chompFraction pos end n
 
       else if word == 0x65 {-e-} || word == 0x45 {-E-} then
@@ -140,6 +140,12 @@ chompInt !pos end !n =
 
       else
         OkInt pos n DecimalInt
+
+
+{-# INLINE isDot #-}
+isDot :: Ptr Word8 -> Ptr Word8 -> Bool
+isDot pos end =
+  pos < end && P.unsafeIndex pos == 0x2E {-.-}
 
 
 
