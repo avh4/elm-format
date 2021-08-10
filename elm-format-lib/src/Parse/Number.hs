@@ -47,7 +47,7 @@ isDecimalDigit word =
 
 data Number
   = Int Int IntRepresentation
-  | Float Double
+  | Float Double FloatRepresentation
 
 
 number :: (Row -> Col -> x) -> (E.Number -> Row -> Col -> x) -> Parser x Number
@@ -84,10 +84,10 @@ number toExpectation toError =
               in
               cok integer newState
 
-            OkFloat newPos ->
+            OkFloat newPos representation ->
               let
                 !newCol = col + fromIntegral (minusPtr newPos pos)
-                !float = Float $ parseFloat pos newPos
+                !float = Float (parseFloat pos newPos) representation
                 !newState = P.State src newPos end indent row newCol sn nl
               in
               cok float newState
@@ -107,7 +107,7 @@ parseFloat pos end =
 data Outcome
   = Err (Ptr Word8) E.Number
   | OkInt (Ptr Word8) Int IntRepresentation
-  | OkFloat (Ptr Word8)
+  | OkFloat (Ptr Word8) FloatRepresentation
 
 
 
@@ -163,7 +163,7 @@ chompFraction pos end n =
 chompFractionHelp :: Ptr Word8 -> Ptr Word8 -> Outcome
 chompFractionHelp pos end =
   if pos >= end then
-    OkFloat pos
+    OkFloat pos DecimalFloat
 
   else
     let !word = P.unsafeIndex pos in
@@ -177,7 +177,7 @@ chompFractionHelp pos end =
       Err pos E.NumberEnd
 
     else
-      OkFloat pos
+      OkFloat pos DecimalFloat
 
 
 
@@ -209,13 +209,13 @@ chompExponent pos end =
 chompExponentHelp :: Ptr Word8 -> Ptr Word8 -> Outcome
 chompExponentHelp pos end =
   if pos >= end then
-    OkFloat pos
+    OkFloat pos ExponentFloat
 
   else if isDecimalDigit (P.unsafeIndex pos) then
     chompExponentHelp (plusPtr pos 1) end
 
   else
-    OkFloat pos
+    OkFloat pos ExponentFloat
 
 
 
