@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module Parse.Type where
 
-import Text.Parsec ((<|>), (<?>), char, many1, string, try, optionMaybe)
+import Parse.ParsecAdapter ((<|>), (<?>), char, many1, string, try, optionMaybe)
 
 import Parse.Helpers
 import Reporting.Annotation (Located)
