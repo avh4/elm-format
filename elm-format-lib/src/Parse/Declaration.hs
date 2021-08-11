@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module Parse.Declaration where
 
-import Text.Parsec ( (<|>), (<?>), choice, digit, optionMaybe, string, try )
+import Parse.ParsecAdapter ( (<|>), (<?>), choice, digit, optionMaybe, string, try )
 
 import AST.Structure
 import qualified Data.Indexed as I

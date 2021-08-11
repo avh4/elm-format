@@ -6,9 +6,8 @@ module Parse.Expression (term, typeAnnotation, definition, expr) where
 import Data.Coapplicative
 import qualified Data.Indexed as I
 import Data.Maybe (fromMaybe)
-import Text.Parsec hiding (newline, spaces)
-import Text.Parsec.Indent (block, withPos, checkIndent)
 
+import Parse.ParsecAdapter hiding (newline, spaces)
 import qualified Parse.Binop as Binop
 import Parse.Helpers
 import Parse.Common
