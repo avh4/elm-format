@@ -111,8 +111,8 @@ unknownError row col =
 
 unexpected :: String -> Parser a
 unexpected msg =
-  P.Parser $ \(P.State _ _ _ _ row col sourceName _) _ _ _ eerr ->
-      eerr row col (newErrorMessage (UnExpect msg) sourceName)
+  P.Parser $ \(P.State _ _ _ _ row col _) _ _ _ eerr ->
+      eerr row col (newErrorMessage (UnExpect msg))
 
 
 type Parser a = P.Parser ParseError a
@@ -129,8 +129,8 @@ instance Fail.MonadFail (P.Parser ParseError) where
 
 parserFail :: String -> Parser a
 parserFail msg =
-  P.Parser $ \(P.State _ _ _ _ row col sourceName _) _ _ _ eerr ->
-    eerr row col $ newErrorMessage (Message msg) sourceName
+  P.Parser $ \(P.State _ _ _ _ row col _) _ _ _ eerr ->
+    eerr row col $ newErrorMessage (Message msg)
 
 
 instance MonadPlus (P.Parser ParseError) where
@@ -142,7 +142,7 @@ parserZero :: Parser a
 parserZero =
   P.Parser $ \state _ _ _ eerr ->
     let
-      (P.State _ _ _ _ row col _ _) = state
+      (P.State _ _ _ _ row col _) = state
     in
     eerr row col unknownError
 
@@ -185,10 +185,10 @@ infix  0 <?>
 -- continuations.
 (<?>) :: Parser a -> String -> Parser a
 (<?>) (P.Parser p) msg =
-  P.Parser $ \s@(P.State _ _ _ _ _ _ sn _) cok eok cerr eerr ->
+  P.Parser $ \s cok eok cerr eerr ->
     let
       eerr' row col _ =
-        eerr row col (newErrorMessage (Expect msg) sn)
+        eerr row col (newErrorMessage (Expect msg))
     in
     p s cok eok cerr eerr'
 
@@ -256,14 +256,14 @@ parserDoesNotConsumeErr = error "Text.Parsec.Prim.many: combinator 'many' is app
 
 
 -- This function is very similar to `Parse.Primitives.fromByteString`.
-runParserT :: Parser a -> State -> SourceName -> String -> Either ParseError a
-runParserT (P.Parser p) (State newline) name source =
+runParserT :: Parser a -> State -> String -> Either ParseError a
+runParserT (P.Parser p) (State newline) source =
   B.accursedUnutterablePerformIO $
     let
       (B.PS fptr offset length) = stringToByteString source
       !pos = plusPtr (unsafeForeignPtrToPtr fptr) offset
       !end = plusPtr pos length
-      !result = p (P.State fptr pos end 1 1 1 name newline) toOk toOk toErr toErr
+      !result = p (P.State fptr pos end 1 1 1 newline) toOk toOk toErr toErr
     in
     do  touchForeignPtr fptr
         return result
@@ -308,24 +308,24 @@ encodeChar = map fromIntegral . go . ord
 
 getPosition :: Parser SourcePos
 getPosition =
-  do  (P.State _ _ _ _ row col sourceName _) <- getParserState
-      return $ newPos sourceName row col
+  do  (P.State _ _ _ _ row col _) <- getParserState
+      return $ newPos row col
 
 
 getState :: Parser State
 getState =
-  do  (P.State _ _ _ _ _ _ _ newline) <- getParserState
+  do  (P.State _ _ _ _ _ _ newline) <- getParserState
       return (State newline)
 
 
 updateState :: (State -> State) -> Parser ()
 updateState f =
   do  _ <- updateParserState
-        (\(P.State src pos end indent row col sourceName newline) ->
+        (\(P.State src pos end indent row col newline) ->
           let
             (State newline') = f (State newline)
           in
-          P.State src pos end indent row col sourceName newline'
+          P.State src pos end indent row col newline'
         )
       return ()
 
@@ -346,21 +346,21 @@ updateParserState f =
 type SourceName = String
 
 
-data SourcePos = SourcePos SourceName !P.Row !P.Col
+data SourcePos = SourcePos !P.Row !P.Col
 
 
-newPos :: SourceName -> P.Row -> P.Col -> SourcePos
+newPos :: P.Row -> P.Col -> SourcePos
 newPos =
   SourcePos
 
 
 sourceLine :: SourcePos -> Int
-sourceLine (SourcePos _ row _) =
+sourceLine (SourcePos row _) =
   fromIntegral row
 
 
 sourceColumn :: SourcePos -> Int
-sourceColumn (SourcePos _ _ col) =
+sourceColumn (SourcePos _ col) =
   fromIntegral col
 
 
@@ -368,46 +368,46 @@ sourceColumn (SourcePos _ _ col) =
 -- Text.Parsec.Error
 
 
-data ParseError = ParseError String Row Col [Message]
+data ParseError = ParseError Row Col [Message]
   deriving Show
 
 
 errorPos :: ParseError -> SourcePos
-errorPos (ParseError sourceName row col _) = newPos sourceName row col
+errorPos (ParseError row col _) = newPos row col
 
 
 errorMessages :: ParseError -> [Message]
-errorMessages (ParseError _ _ _ messages) = messages
+errorMessages (ParseError _ _ messages) = messages
 
 
 
 -- Create parse errors
 
 
-newErrorMessage :: Message -> String -> Row -> Col -> ParseError
-newErrorMessage msg sourceName row col
-    = ParseError sourceName row col [msg]
+newErrorMessage :: Message -> Row -> Col -> ParseError
+newErrorMessage msg row col
+    = ParseError row col [msg]
 
 
 newErrorUnknown :: String -> Row -> Col -> ParseError
-newErrorUnknown sourceName row col
-    = ParseError sourceName row col []
+newErrorUnknown msg row col
+    = ParseError row col [Message msg]
 
 
 setErrorMessage :: Message -> ParseError -> ParseError
-setErrorMessage msg (ParseError sourceName row col msgs)
-    = ParseError sourceName row col (msg : filter (msg /=) msgs)
+setErrorMessage msg (ParseError row col msgs)
+    = ParseError row col (msg : filter (msg /=) msgs)
 
 
 mergeError :: ParseError -> ParseError -> ParseError
-mergeError e1@(ParseError sn1 r1 c1 msgs1) e2@(ParseError _ r2 c2 msgs2)
+mergeError e1@(ParseError r1 c1 msgs1) e2@(ParseError r2 c2 msgs2)
     -- prefer meaningful errors
     | null msgs2 && not (null msgs1) = e1
     | null msgs1 && not (null msgs2) = e2
     | otherwise
     = case (r1, c1) `compare` (r2, c2) of
         -- select the longest match
-        EQ -> ParseError sn1 r1 c1 (msgs1 ++ msgs2)
+        EQ -> ParseError r1 c1 (msgs1 ++ msgs2)
         GT -> e1
         LT -> e2
 
@@ -526,13 +526,13 @@ anyChar = satisfy (const True)
 
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy f =
-  P.Parser $ \s@(P.State _ pos end _ row col sourceName _) cok _ _ eerr ->
+  P.Parser $ \s@(P.State _ pos end _ row col _) cok _ _ eerr ->
     let
       (char, width) = extractChar s
 
-      errEof = newErrorMessage (SysUnExpect "") sourceName
+      errEof = newErrorMessage (SysUnExpect "")
 
-      errExpect = newErrorMessage (SysUnExpect $ [char]) sourceName
+      errExpect = newErrorMessage (SysUnExpect $ [char])
     in
     if pos == end then
       eerr row col errEof
@@ -551,7 +551,7 @@ string (c:cs) =
 
 
 updatePos :: Int -> Char -> P.State -> P.State
-updatePos width c (P.State src pos end indent row col sourceName newline) =
+updatePos width c (P.State src pos end indent row col newline) =
   let
     (row', col') =
       case c of
@@ -573,7 +573,7 @@ updatePos width c (P.State src pos end indent row col sourceName newline) =
 
         _ -> (row, col + 1)
   in
-  P.State src (plusPtr pos width) end indent row' col' sourceName newline
+  P.State src (plusPtr pos width) end indent row' col' newline
 
 
 -- Inspired by https://hackage.haskell.org/package/utf8-string-1.0.2/docs/src/Codec.Binary.UTF8.String.html#decode
@@ -590,7 +590,7 @@ updatePos width c (P.State src pos end indent row col sourceName newline) =
 --          v           v         v          v
 -- | ...,  11110xxx,  10xxxxxx,  10xxxxxx | ...
 extractChar :: P.State -> (Char, Int)
-extractChar (P.State _ pos _ _ _ _ _ _) =
+extractChar (P.State _ pos _ _ _ _ _) =
   -- 1 byte codepoint
   if w0 < 0xc0 then
     (chr (fromEnum w0), 1)
@@ -646,8 +646,8 @@ extractChar (P.State _ pos _ _ _ _ _ _) =
 -- indents adds additional data onto parsecs `ParsecT` in order to track
 -- indentation information. The new parser tracks this information by itself
 -- now, which is why this function becomes a no-op.
-runIndent :: s -> a -> a
-runIndent _ = id
+runIndent :: a -> a
+runIndent = id
 
 
 block :: Parser a -> Parser [a]
@@ -658,19 +658,19 @@ block p = withPos $ do
 
 indented :: Parser ()
 indented =
-  do  (P.State _ _ _ indent _ col _ _) <- getParserState
+  do  (P.State _ _ _ indent _ col _) <- getParserState
       if col <= indent then fail "not indented" else do return ()
 
 
 checkIndent :: Parser ()
 checkIndent =
-  do  (P.State _ _ _ indent _ col _ _) <- getParserState
+  do  (P.State _ _ _ indent _ col _) <- getParserState
       if indent == col then return () else fail "indentation doesn't match"
 
 
 withPos :: Parser a -> Parser a
 withPos (P.Parser p) =
-  P.Parser $ \s@(P.State _ _ _ indent _ col _ _) cok eok cerr eerr ->
+  P.Parser $ \s@(P.State _ _ _ indent _ col _) cok eok cerr eerr ->
     let
       cok' x s' = cok x (setIndent indent s')
       eok' x s' = eok x (setIndent indent s')
@@ -679,5 +679,5 @@ withPos (P.Parser p) =
 
 
 setIndent :: Word16 -> P.State -> P.State
-setIndent indent (P.State s p e _ r c nl sn) =
-  P.State s p e indent r c nl sn
+setIndent indent (P.State s p e _ r c nl) =
+  P.State s p e indent r c nl
