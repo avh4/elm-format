@@ -29,7 +29,7 @@ import AST.V0_16 ( StringRepresentation(SingleQuotedString, TripleQuotedString) 
 
 character :: (Row -> Col -> x) -> (E.Char -> Row -> Col -> x) -> Parser x ES.String
 character toExpectation toError =
-  P.Parser $ \(P.State src pos end indent row col nl sn) cok _ cerr eerr ->
+  P.Parser $ \(P.State src pos end indent row col nl) cok _ cerr eerr ->
     if pos >= end || P.unsafeIndex pos /= 0x27 {- ' -} then
       eerr row col toExpectation
 
@@ -40,7 +40,7 @@ character toExpectation toError =
             cerr row col (toError (E.CharNotString (fromIntegral (newCol - col))))
           else
             let
-              !newState = P.State src newPos end indent row newCol nl sn
+              !newState = P.State src newPos end indent row newCol nl
               !char = ES.fromChunks [mostRecent]
             in
             cok char newState
@@ -101,7 +101,7 @@ chompChar pos end row col numChars mostRecent =
 
 string :: (Row -> Col -> x) -> (E.String -> Row -> Col -> x) -> Parser x (ES.String, StringRepresentation)
 string toExpectation toError =
-  P.Parser $ \(P.State src pos end indent row col nl sn) cok _ cerr eerr ->
+  P.Parser $ \(P.State src pos end indent row col nl) cok _ cerr eerr ->
     if isDoubleQuote pos end then
 
       let
@@ -124,7 +124,7 @@ string toExpectation toError =
         (Ok newPos newRow newCol utf8, representation) ->
           let
             !newState =
-              P.State src newPos end indent newRow newCol nl sn
+              P.State src newPos end indent newRow newCol nl
           in
           cok (utf8, representation) newState
 

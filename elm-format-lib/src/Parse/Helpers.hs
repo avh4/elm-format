@@ -44,12 +44,12 @@ expecting = flip (<?>)
 
 iParse :: IParser a -> String -> Either ParseError a
 iParse =
-    iParseWithState "" State.init
+    iParseWithState State.init
 
 
-iParseWithState :: SourceName -> State.State -> IParser a -> String -> Either ParseError a
-iParseWithState sourceName state aParser input =
-  runIndent sourceName $ runParserT aParser state sourceName input
+iParseWithState :: State.State -> IParser a -> String -> Either ParseError a
+iParseWithState state aParser input =
+  runIndent $ runParserT aParser state input
 
 
 -- VARIABLES
