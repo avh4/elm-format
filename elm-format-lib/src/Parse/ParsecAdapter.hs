@@ -606,44 +606,10 @@ satisfy f =
 
 string :: String -> Parser String
 string "" = return ""
-string match@(c:cs) =
-  EP.Parser $ \s cok _ cerr eerr ->
-    stringHelp
-      [c]
-      s
-      (\s' ->
-        stringHelp
-          cs
-          s'
-          (cok match)
-          cerr
-      )
-      eerr
-
-
-stringHelp :: forall b.
-  String
-  -> EP.State
-  -> (EP.State -> b)
-  -> (Row -> Col -> (Row -> Col -> ParseError) -> b)
-  -> b
-stringHelp "" s toOk _ = toOk s
-stringHelp (c:cs) s@(EP.State _ pos end _ row col sourceName _) toOk toError =
-  let
-    errEof _ _ = setErrorMessage (Expect (show (c:cs)))
-                  (newErrorMessage (SysUnExpect "") sourceName row col)
-
-    errExpect x _ _ = setErrorMessage (Expect (show (c:cs)))
-                        (newErrorMessage (SysUnExpect (show x)) sourceName row col)
-
-    (char, width) = extractChar s
-  in
-  if pos == end then
-    toError row col errEof
-  else if char == c then
-    stringHelp cs (updatePos width char s) toOk toError
-  else
-    toError row col (errExpect c)
+string (c:cs) =
+  do  _ <- satisfy ((==) c)
+      _ <- string cs
+      return (c:cs)
 
 
 updatePos :: Int -> Char -> EP.State -> EP.State
