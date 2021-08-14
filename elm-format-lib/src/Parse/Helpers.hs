@@ -16,7 +16,7 @@ import qualified Parse.State as State
 import Parse.Comments
 import Parse.IParser
 import Parse.Whitespace
-import qualified Parse.Primitives as EP
+import qualified Parse.Primitives as P
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
 import qualified Reporting.Region as R
@@ -516,9 +516,9 @@ commentedKeyword elmVersion word parser =
 -- continuation is called instead of the empty continuation.
 failure :: String -> IParser String
 failure msg =
-  EP.Parser $ \s _ _ cerr _ ->
+  P.Parser $ \s _ _ cerr _ ->
     let
-      (EP.Parser p) = fail msg
+      (P.Parser p) = fail msg
     in
     -- This looks really unsound, but `p` which was created with `fail` will
     -- only ever call the empty error continuation (which in this case

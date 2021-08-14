@@ -78,7 +78,7 @@ module Parse.ParsecAdapter
 
 import Parse.ParsecAdapter.Message (Message(..))
 import Parse.Primitives (Row, Col)
-import qualified Parse.Primitives as EP
+import qualified Parse.Primitives as P
 import Parse.State (State(..))
 
 import qualified Control.Applicative as Applicative
@@ -104,52 +104,52 @@ import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
 -- Text.Parsec.Prim
 
 
-unknownError :: EP.Row -> EP.Col -> ParseError
+unknownError :: P.Row -> P.Col -> ParseError
 unknownError row col =
   newErrorUnknown "" row col
 
 
 unexpected :: String -> Parser a
 unexpected msg =
-  EP.Parser $ \(EP.State _ _ _ _ row col sourceName _) _ _ _ eerr ->
+  P.Parser $ \(P.State _ _ _ _ row col sourceName _) _ _ _ eerr ->
       eerr row col (newErrorMessage (UnExpect msg) sourceName)
 
 
-type Parser a = EP.Parser ParseError a
+type Parser a = P.Parser ParseError a
 
 
-instance Applicative.Alternative (EP.Parser ParseError) where
+instance Applicative.Alternative (P.Parser ParseError) where
     empty = mzero
     (<|>) = mplus
 
 
-instance Fail.MonadFail (EP.Parser ParseError) where
+instance Fail.MonadFail (P.Parser ParseError) where
     fail = parserFail
 
 
 parserFail :: String -> Parser a
 parserFail msg =
-  EP.Parser $ \(EP.State _ _ _ _ row col sourceName _) _ _ _ eerr ->
+  P.Parser $ \(P.State _ _ _ _ row col sourceName _) _ _ _ eerr ->
     eerr row col $ newErrorMessage (Message msg) sourceName
 
 
-instance MonadPlus (EP.Parser ParseError) where
+instance MonadPlus (P.Parser ParseError) where
   mzero = parserZero
   mplus = parserPlus
 
 
 parserZero :: Parser a
 parserZero =
-  EP.Parser $ \state _ _ _ eerr ->
+  P.Parser $ \state _ _ _ eerr ->
     let
-      (EP.State _ _ _ _ row col _ _) = state
+      (P.State _ _ _ _ row col _ _) = state
     in
     eerr row col unknownError
 
 
 parserPlus :: Parser a -> Parser a -> Parser a
-parserPlus (EP.Parser p) (EP.Parser q) =
-  EP.Parser $ \s cok eok cerr eerr ->
+parserPlus (P.Parser p) (P.Parser q) =
+  P.Parser $ \s cok eok cerr eerr ->
     let
       meerr r1 c1 toErr1 =
         let
@@ -184,8 +184,8 @@ infix  0 <?>
 -- behaviour with the new parser which only stores errors in the _err_
 -- continuations.
 (<?>) :: Parser a -> String -> Parser a
-(<?>) (EP.Parser p) msg =
-  EP.Parser $ \s@(EP.State _ _ _ _ _ _ sn _) cok eok cerr eerr ->
+(<?>) (P.Parser p) msg =
+  P.Parser $ \s@(P.State _ _ _ _ _ _ sn _) cok eok cerr eerr ->
     let
       eerr' row col _ =
         eerr row col (newErrorMessage (Expect msg) sn)
@@ -194,8 +194,8 @@ infix  0 <?>
 
 
 lookAhead :: Parser a -> Parser a
-lookAhead (EP.Parser p) =
-    EP.Parser $ \s _ eok cerr eerr ->
+lookAhead (P.Parser p) =
+    P.Parser $ \s _ eok cerr eerr ->
       let
         eok' a _ = eok a s
       in
@@ -203,8 +203,8 @@ lookAhead (EP.Parser p) =
 
 
 try :: Parser a -> Parser a
-try (EP.Parser parser) =
-  EP.Parser $ \s cok eok _ err ->
+try (P.Parser parser) =
+  P.Parser $ \s cok eok _ err ->
     parser s cok eok err err
 
 
@@ -215,8 +215,8 @@ try (EP.Parser parser) =
 -- implementation more obvious? Maybe the code in the `in` could be replaced
 -- with a single `many_` call?
 many :: Parser a -> Parser [a]
-many (EP.Parser p) =
-  EP.Parser $ \s cok eok cerr _ ->
+many (P.Parser p) =
+  P.Parser $ \s cok eok cerr _ ->
     let
       many_ acc x s' =
         p
@@ -235,8 +235,8 @@ many (EP.Parser p) =
 
 
 skipMany ::Parser a -> Parser ()
-skipMany (EP.Parser p) =
-  EP.Parser $ \s cok _ cerr _ ->
+skipMany (P.Parser p) =
+  P.Parser $ \s cok _ cerr _ ->
     let
       skipMany_ s' =
         p
@@ -257,24 +257,24 @@ parserDoesNotConsumeErr = error "Text.Parsec.Prim.many: combinator 'many' is app
 
 -- This function is very similar to `Parse.Primitives.fromByteString`.
 runParserT :: Parser a -> State -> SourceName -> String -> Either ParseError a
-runParserT (EP.Parser p) (State newline) name source =
+runParserT (P.Parser p) (State newline) name source =
   B.accursedUnutterablePerformIO $
     let
       (B.PS fptr offset length) = stringToByteString source
       !pos = plusPtr (unsafeForeignPtrToPtr fptr) offset
       !end = plusPtr pos length
-      !result = p (EP.State fptr pos end 1 1 1 name newline) toOk toOk toErr toErr
+      !result = p (P.State fptr pos end 1 1 1 name newline) toOk toOk toErr toErr
     in
     do  touchForeignPtr fptr
         return result
 
 
-toOk :: a -> EP.State -> Either x a
+toOk :: a -> P.State -> Either x a
 toOk !a _ =
   Right a
 
 
-toErr :: EP.Row -> EP.Col -> (EP.Row -> EP.Col -> x) -> Either x a
+toErr :: P.Row -> P.Col -> (P.Row -> P.Col -> x) -> Either x a
 toErr row col toError =
   Left (toError row col)
 
@@ -308,35 +308,35 @@ encodeChar = map fromIntegral . go . ord
 
 getPosition :: Parser SourcePos
 getPosition =
-  do  (EP.State _ _ _ _ row col sourceName _) <- getParserState
+  do  (P.State _ _ _ _ row col sourceName _) <- getParserState
       return $ newPos sourceName row col
 
 
 getState :: Parser State
 getState =
-  do  (EP.State _ _ _ _ _ _ _ newline) <- getParserState
+  do  (P.State _ _ _ _ _ _ _ newline) <- getParserState
       return (State newline)
 
 
 updateState :: (State -> State) -> Parser ()
 updateState f =
   do  _ <- updateParserState
-        (\(EP.State src pos end indent row col sourceName newline) ->
+        (\(P.State src pos end indent row col sourceName newline) ->
           let
             (State newline') = f (State newline)
           in
-          EP.State src pos end indent row col sourceName newline'
+          P.State src pos end indent row col sourceName newline'
         )
       return ()
 
 
-getParserState :: Parser EP.State
+getParserState :: Parser P.State
 getParserState = updateParserState id
 
 
-updateParserState :: (EP.State -> EP.State) -> Parser EP.State
+updateParserState :: (P.State -> P.State) -> Parser P.State
 updateParserState f =
-  EP.Parser $ \s _ eok _ _ -> eok (f s) (f s)
+  P.Parser $ \s _ eok _ _ -> eok (f s) (f s)
 
 
 
@@ -346,10 +346,10 @@ updateParserState f =
 type SourceName = String
 
 
-data SourcePos = SourcePos SourceName !EP.Row !EP.Col
+data SourcePos = SourcePos SourceName !P.Row !P.Col
 
 
-newPos :: SourceName -> EP.Row -> EP.Col -> SourcePos
+newPos :: SourceName -> P.Row -> P.Col -> SourcePos
 newPos =
   SourcePos
 
@@ -588,7 +588,7 @@ anyChar = satisfy (const True)
 
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy f =
-  EP.Parser $ \s@(EP.State _ pos end _ row col sourceName _) cok _ _ eerr ->
+  P.Parser $ \s@(P.State _ pos end _ row col sourceName _) cok _ _ eerr ->
     let
       (char, width) = extractChar s
 
@@ -612,8 +612,8 @@ string (c:cs) =
       return (c:cs)
 
 
-updatePos :: Int -> Char -> EP.State -> EP.State
-updatePos width c (EP.State src pos end indent row col sourceName newline) =
+updatePos :: Int -> Char -> P.State -> P.State
+updatePos width c (P.State src pos end indent row col sourceName newline) =
   let
     (row', col') =
       case c of
@@ -635,7 +635,7 @@ updatePos width c (EP.State src pos end indent row col sourceName newline) =
 
         _ -> (row, col + 1)
   in
-  EP.State src (plusPtr pos width) end indent row' col' sourceName newline
+  P.State src (plusPtr pos width) end indent row' col' sourceName newline
 
 
 -- Inspired by https://hackage.haskell.org/package/utf8-string-1.0.2/docs/src/Codec.Binary.UTF8.String.html#decode
@@ -651,8 +651,8 @@ updatePos width c (EP.State src pos end indent row col sourceName newline) =
 --  w0, 4 byte char    w1        w2         w3, outside buffer
 --          v           v         v          v
 -- | ...,  11110xxx,  10xxxxxx,  10xxxxxx | ...
-extractChar :: EP.State -> (Char, Int)
-extractChar (EP.State _ pos _ _ _ _ _ _) =
+extractChar :: P.State -> (Char, Int)
+extractChar (P.State _ pos _ _ _ _ _ _) =
   -- 1 byte codepoint
   if w0 < 0xc0 then
     (chr (fromEnum w0), 1)
@@ -668,10 +668,10 @@ extractChar (EP.State _ pos _ _ _ _ _ _) =
   else
     error "invalid utf-8"
   where
-    w0 = EP.unsafeIndex pos
-    w1 = EP.unsafeIndex (plusPtr pos 1)
-    w2 = EP.unsafeIndex (plusPtr pos 2)
-    w3 = EP.unsafeIndex (plusPtr pos 3)
+    w0 = P.unsafeIndex pos
+    w1 = P.unsafeIndex (plusPtr pos 1)
+    w2 = P.unsafeIndex (plusPtr pos 2)
+    w3 = P.unsafeIndex (plusPtr pos 3)
 
     -- `Codec.Binary.UTF8.String.decode` has this special case function for
     -- a 2 byte codepoint, why is that? Will it behave the same way if we use
@@ -720,19 +720,19 @@ block p = withPos $ do
 
 indented :: Parser ()
 indented =
-  do  (EP.State _ _ _ indent _ col _ _) <- getParserState
+  do  (P.State _ _ _ indent _ col _ _) <- getParserState
       if col <= indent then fail "not indented" else do return ()
 
 
 checkIndent :: Parser ()
 checkIndent =
-  do  (EP.State _ _ _ indent _ col _ _) <- getParserState
+  do  (P.State _ _ _ indent _ col _ _) <- getParserState
       if indent == col then return () else fail "indentation doesn't match"
 
 
 withPos :: Parser a -> Parser a
-withPos (EP.Parser p) =
-  EP.Parser $ \s@(EP.State _ _ _ indent _ col _ _) cok eok cerr eerr ->
+withPos (P.Parser p) =
+  P.Parser $ \s@(P.State _ _ _ indent _ col _ _) cok eok cerr eerr ->
     let
       cok' x s' = cok x (setIndent indent s')
       eok' x s' = eok x (setIndent indent s')
@@ -740,6 +740,6 @@ withPos (EP.Parser p) =
     p (setIndent col s) cok' eok' cerr eerr
 
 
-setIndent :: Word16 -> EP.State -> EP.State
-setIndent indent (EP.State s p e _ r c nl sn) =
-  EP.State s p e indent r c nl sn
+setIndent :: Word16 -> P.State -> P.State
+setIndent indent (P.State s p e _ r c nl sn) =
+  P.State s p e indent r c nl sn
