@@ -83,7 +83,6 @@ import Parse.State (State(..))
 import Reporting.Error.Syntax (ParsecError(..), Message(..))
 
 import qualified Control.Applicative as Applicative
-import Control.Monad (MonadPlus(..), mzero, liftM)
 
 import Data.Bits (shiftL, shiftR, (.&.), (.|.))
 import Data.Word (Word8, Word16)
@@ -112,23 +111,14 @@ type Parser a = P.Parser ParsecError a
 
 
 instance Applicative.Alternative (P.Parser ParsecError) where
-    empty = mzero
-    (<|>) = mplus
+    empty = parserFail $ parseError (Message "Parse.ParsecAdapter.empty")
+    (<|>) = parserPlus
 
 
 parserFail :: (Row -> Col -> x) -> P.Parser x a
 parserFail toErr =
   P.Parser $ \(P.State _ _ _ _ row col _) _ _ _ eerr ->
     eerr row col toErr
-
-
-instance MonadPlus (P.Parser ParsecError) where
-  mzero = parserZero
-  mplus = parserPlus
-
-
-parserZero :: Parser a
-parserZero = parserFail $ parseError (Message "Parse.ParsecAdapter.parserZero")
 
 
 parserPlus :: Parser a -> Parser a -> Parser a
@@ -154,7 +144,7 @@ infix  0 <?>
 
 
 (<|>) :: Parser a -> Parser a -> Parser a
-(<|>) = mplus
+(<|>) = parserPlus
 
 
 (<?>) :: Parser a -> String -> Parser a
@@ -387,7 +377,11 @@ errorMessages err =
 
 
 choice :: [Parser a] -> Parser a
-choice ps = foldr (<|>) mzero ps
+choice ps =
+  let
+    err = parseError (Message "Parse.ParsecAdapter.choice")
+  in
+  foldr (<|>) (parserFail err) ps
 
 
 many1 :: Parser a -> Parser [a]
@@ -418,7 +412,7 @@ option x p = p <|> return x
 
 
 optionMaybe :: Parser a -> Parser (Maybe a)
-optionMaybe p = option Nothing (liftM Just p)
+optionMaybe p = option Nothing (fmap Just p)
 
 
 anyToken :: Parser Char
