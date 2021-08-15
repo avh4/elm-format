@@ -31,10 +31,6 @@ module Parse.ParsecAdapter
   , getPosition
   , getState
   , updateState
-  -- Text.Parsec.Pos
-  , SourcePos
-  , sourceLine
-  , sourceColumn
   -- Text.Parsec.Error
   , Reporting.Error.Syntax.ParsecError(..)
   , Reporting.Error.Syntax.Message(..)
@@ -79,6 +75,7 @@ import Parse.Primitives (Row, Col)
 import qualified Parse.Primitives as P
 import Parse.State (State(..))
 
+import qualified Reporting.Annotation as A
 import Reporting.Error.Syntax (ParsecError(..), Message(..))
 
 import qualified Control.Applicative as Applicative
@@ -127,8 +124,7 @@ infix  0 <?>
           neerr r2 c2 toErr2 =
             let
               err = mergeError (toErr1 r1 c1) (toErr2 r2 c2)
-              row = fromIntegral $ sourceLine $ errorPos err
-              col = fromIntegral $ sourceColumn $ errorPos err
+              (A.Position row col) = errorPos err
             in
             eerr row col (\_ _ -> err)
         in q s cok eok cerr neerr
@@ -259,10 +255,10 @@ encodeChar = map fromIntegral . go . ord
                         ]
 
 
-getPosition :: Parser SourcePos
+getPosition :: Parser A.Position
 getPosition =
   do  (P.State _ _ _ _ row col _) <- getParserState
-      return $ newPos row col
+      return $ A.Position row col
 
 
 getState :: Parser State
@@ -293,28 +289,6 @@ updateParserState f =
 
 
 
--- Text.Parsec.Pos
-
-
-data SourcePos = SourcePos !P.Row !P.Col
-
-
-newPos :: P.Row -> P.Col -> SourcePos
-newPos =
-  SourcePos
-
-
-sourceLine :: SourcePos -> Int
-sourceLine (SourcePos row _) =
-  fromIntegral row
-
-
-sourceColumn :: SourcePos -> Int
-sourceColumn (SourcePos _ col) =
-  fromIntegral col
-
-
-
 -- Text.Parsec.Error
 
 
@@ -332,14 +306,14 @@ mergeError :: ParsecError -> ParsecError -> ParsecError
 mergeError = OneOf
 
 
-errorPos :: ParsecError -> SourcePos
+errorPos :: ParsecError -> A.Position
 errorPos err =
   case err of
     Nil ->
       error "An unexpeced error occured, this is likely a bug. Please report this issue at https://github.com/avh4/elm-format/issues"
 
     Cons _ row col _ ->
-      newPos row col
+      A.Position row col
 
     OneOf _ e2 ->
       errorPos e2
