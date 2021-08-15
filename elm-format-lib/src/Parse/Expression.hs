@@ -291,13 +291,13 @@ letExpr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'Expressio
 letExpr elmVersion =
   fmap I.Fix $ addLocation $
   do  try (reserved elmVersion "let")
-      A.A cal commentsAfterLet' <- addLocation whitespace
-      let commentsAfterLet = fmap (I.Fix . A.A cal . LetComment) commentsAfterLet'
+      A.At cal commentsAfterLet' <- addLocation whitespace
+      let commentsAfterLet = fmap (I.Fix . A.At cal . LetComment) commentsAfterLet'
       defs <-
         block $
           do  def <- fmap I.Fix $ addLocation $ fmap (LetCommonDeclaration . I.Fix) $ addLocation (typeAnnotation elmVersion TypeAnnotation <|> definition elmVersion Definition)
-              A.A cad commentsAfterDef' <- addLocation whitespace
-              let commentsAfterDef = fmap (I.Fix . A.A cad . LetComment) commentsAfterDef'
+              A.At cad commentsAfterDef' <- addLocation whitespace
+              let commentsAfterDef = fmap (I.Fix . A.At cad . LetComment) commentsAfterDef'
               return (def : commentsAfterDef)
       _ <- reserved elmVersion "in"
       bodyComments <- whitespace

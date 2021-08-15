@@ -97,7 +97,7 @@ expr elmVersion =
         Left t ->
           t
         Right (region, first', rest', multiline) ->
-          I.Fix $ A.A region $ FunctionType first' rest' (ForceMultiline multiline)
+          I.Fix $ A.At region $ FunctionType first' rest' (ForceMultiline multiline)
 
 
 -- TODO: can this be removed?  (tag is the new name?)

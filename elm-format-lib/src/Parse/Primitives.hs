@@ -30,7 +30,7 @@ import Foreign.Storable (peek)
 import Foreign.ForeignPtr (ForeignPtr, touchForeignPtr)
 import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
 
-import qualified Reporting.Annotation.New as A
+import qualified Reporting.Annotation as A
 
 
 
