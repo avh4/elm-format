@@ -37,9 +37,8 @@ module Parse.ParsecAdapter
   , sourceColumn
   -- Text.Parsec.Error
   , ParseError
-  , newErrorUnknown
   , module Parse.ParsecAdapter.Message
-  , newErrorUnknown
+  , parseError
   , errorPos
   , errorMessages
   -- Text.Parsec.Combinator
@@ -85,8 +84,6 @@ import qualified Control.Applicative as Applicative
 import Control.Monad (MonadPlus(..), mzero, liftM)
 import qualified Control.Monad.Fail as Fail
 
-import Data.List (nub)
-import Data.Typeable (Typeable)
 import Data.Bits (shiftL, shiftR, (.&.), (.|.))
 import Data.Word (Word8, Word16)
 import Data.Char (chr, ord)
@@ -104,15 +101,10 @@ import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
 -- Text.Parsec.Prim
 
 
-unknownError :: P.Row -> P.Col -> ParseError
-unknownError row col =
-  newErrorUnknown "" row col
-
-
 unexpected :: String -> Parser a
 unexpected msg =
   P.Parser $ \(P.State _ _ _ _ row col _) _ _ _ eerr ->
-      eerr row col (newErrorMessage (UnExpect msg))
+      eerr row col $ parseError (UnExpect msg)
 
 
 type Parser a = P.Parser ParseError a
@@ -130,7 +122,7 @@ instance Fail.MonadFail (P.Parser ParseError) where
 parserFail :: String -> Parser a
 parserFail msg =
   P.Parser $ \(P.State _ _ _ _ row col _) _ _ _ eerr ->
-    eerr row col $ newErrorMessage (Message msg)
+    eerr row col $ parseError (Message msg)
 
 
 instance MonadPlus (P.Parser ParseError) where
@@ -139,12 +131,7 @@ instance MonadPlus (P.Parser ParseError) where
 
 
 parserZero :: Parser a
-parserZero =
-  P.Parser $ \state _ _ _ eerr ->
-    let
-      (P.State _ _ _ _ row col _) = state
-    in
-    eerr row col unknownError
+parserZero = parserFail "Parse.ParsecAdapter.parserZero"
 
 
 parserPlus :: Parser a -> Parser a -> Parser a
@@ -154,9 +141,6 @@ parserPlus (P.Parser p) (P.Parser q) =
       meerr r1 c1 toErr1 =
         let
           neerr r2 c2 toErr2 =
-            -- This error merging behavior from parsec is really tricky for
-            -- me to understand, especially the error positions.
-            -- I doubt that I got this 100% correct.
             let
               err = mergeError (toErr1 r1 c1) (toErr2 r2 c2)
               row = fromIntegral $ sourceLine $ errorPos err
@@ -176,19 +160,12 @@ infix  0 <?>
 (<|>) = mplus
 
 
--- TODO: Can the implementation be improved?
---
--- It's probable that this behaviour doesn't 100% match the original parsec
--- behaviour. In particular, parsec stores error information in the _ok_
--- continuations as well, why is that? And is it possible to get the same
--- behaviour with the new parser which only stores errors in the _err_
--- continuations.
 (<?>) :: Parser a -> String -> Parser a
 (<?>) (P.Parser p) msg =
   P.Parser $ \s cok eok cerr eerr ->
     let
-      eerr' row col _ =
-        eerr row col (newErrorMessage (Expect msg))
+      eerr' row col err =
+        eerr row col $ addMessage (Expect msg) err
     in
     p s cok eok cerr eerr'
 
@@ -368,48 +345,51 @@ sourceColumn (SourcePos _ col) =
 -- Text.Parsec.Error
 
 
-data ParseError = ParseError Row Col [Message]
+data ParseError
+  = Nil
+  | Cons Message Row Col ParseError
+  | OneOf ParseError ParseError
   deriving Show
 
 
-errorPos :: ParseError -> SourcePos
-errorPos (ParseError row col _) = newPos row col
+parseError :: Message -> Row -> Col -> ParseError
+parseError message row col =
+  Cons message row col Nil
 
 
-errorMessages :: ParseError -> [Message]
-errorMessages (ParseError _ _ messages) = messages
-
-
-
--- Create parse errors
-
-
-newErrorMessage :: Message -> Row -> Col -> ParseError
-newErrorMessage msg row col
-    = ParseError row col [msg]
-
-
-newErrorUnknown :: String -> Row -> Col -> ParseError
-newErrorUnknown msg row col
-    = ParseError row col [Message msg]
-
-
-setErrorMessage :: Message -> ParseError -> ParseError
-setErrorMessage msg (ParseError row col msgs)
-    = ParseError row col (msg : filter (msg /=) msgs)
+addMessage :: Message -> (Row -> Col -> ParseError) -> Row -> Col -> ParseError
+addMessage message toErr row col =
+  Cons message row col (toErr row col)
 
 
 mergeError :: ParseError -> ParseError -> ParseError
-mergeError e1@(ParseError r1 c1 msgs1) e2@(ParseError r2 c2 msgs2)
-    -- prefer meaningful errors
-    | null msgs2 && not (null msgs1) = e1
-    | null msgs1 && not (null msgs2) = e2
-    | otherwise
-    = case (r1, c1) `compare` (r2, c2) of
-        -- select the longest match
-        EQ -> ParseError r1 c1 (msgs1 ++ msgs2)
-        GT -> e1
-        LT -> e2
+mergeError = OneOf
+
+
+errorPos :: ParseError -> SourcePos
+errorPos err =
+  case err of
+    Nil ->
+      error "An unexpeced error occured, this is likely a bug. Please report this issue at https://github.com/avh4/elm-format/issues"
+
+    Cons _ row col _ ->
+      newPos row col
+
+    OneOf _ e2 ->
+      errorPos e2
+
+
+errorMessages :: ParseError -> [Message]
+errorMessages err =
+  case err of
+    Nil ->
+      []
+
+    Cons message _ _ subErrs ->
+      message : errorMessages subErrs
+
+    OneOf _ e2 ->
+      errorMessages e2
 
 
 
@@ -530,9 +510,9 @@ satisfy f =
     let
       (char, width) = extractChar s
 
-      errEof = newErrorMessage (SysUnExpect "")
+      errEof = parseError (UnExpect "end of file")
 
-      errExpect = newErrorMessage (SysUnExpect $ [char])
+      errExpect = parseError (UnExpect [char])
     in
     if pos == end then
       eerr row col errEof
