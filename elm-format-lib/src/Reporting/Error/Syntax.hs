@@ -89,10 +89,6 @@ data Error
     deriving (Eq, Show)
 
 
-instance Show Parse.ParsecAdapter.Message.Message where
-   show _ = "<Text.Parsec.Error.Message>"
-
-
 
 -- MODULE
 
