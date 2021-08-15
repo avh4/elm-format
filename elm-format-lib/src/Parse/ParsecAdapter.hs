@@ -33,7 +33,6 @@ module Parse.ParsecAdapter
   , updateState
   -- Text.Parsec.Pos
   , SourcePos
-  , SourceName
   , sourceLine
   , sourceColumn
   -- Text.Parsec.Error
@@ -101,18 +100,12 @@ import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
 -- Text.Parsec.Prim
 
 
-unexpected :: String -> Parser a
-unexpected msg =
-  P.Parser $ \(P.State _ _ _ _ row col _) _ _ _ eerr ->
-      eerr row col $ parseError (UnExpect msg)
-
-
 type Parser a = P.Parser ParsecError a
 
 
 instance Applicative.Alternative (P.Parser ParsecError) where
     empty = parserFail $ parseError (Message "Parse.ParsecAdapter.empty")
-    (<|>) = parserPlus
+    (<|>) = (<|>)
 
 
 parserFail :: (Row -> Col -> x) -> P.Parser x a
@@ -121,8 +114,12 @@ parserFail toErr =
     eerr row col toErr
 
 
-parserPlus :: Parser a -> Parser a -> Parser a
-parserPlus (P.Parser p) (P.Parser q) =
+infixr 1 <|>
+infix  0 <?>
+
+
+(<|>) :: Parser a -> Parser a -> Parser a
+(<|>) (P.Parser p) (P.Parser q) =
   P.Parser $ \s cok eok cerr eerr ->
     let
       meerr r1 c1 toErr1 =
@@ -137,14 +134,6 @@ parserPlus (P.Parser p) (P.Parser q) =
         in q s cok eok cerr neerr
     in
     p s cok eok cerr meerr
-
-
-infixr 1 <|>
-infix  0 <?>
-
-
-(<|>) :: Parser a -> Parser a -> Parser a
-(<|>) = parserPlus
 
 
 (<?>) :: Parser a -> String -> Parser a
@@ -307,9 +296,6 @@ updateParserState f =
 -- Text.Parsec.Pos
 
 
-type SourceName = String
-
-
 data SourcePos = SourcePos !P.Row !P.Col
 
 
@@ -421,7 +407,11 @@ anyToken = anyChar
 
 notFollowedBy :: Show a => Parser a -> Parser ()
 notFollowedBy p =
-  try $ do{ c <- try p; unexpected (show c) } <|> return ()
+  try $
+    do{ c <- try p;
+        parserFail $ parseError (UnExpect (show c))
+      }
+    <|> return ()
 
 
 between :: Parser open -> Parser close -> Parser a -> Parser a
