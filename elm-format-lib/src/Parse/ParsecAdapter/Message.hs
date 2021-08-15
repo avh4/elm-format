@@ -9,7 +9,7 @@ data Message
   | UnExpect    !String -- @ unexpected something
   | Expect      !String -- @ expecting something
   | Message     !String -- @ raw message
-  deriving ( Typeable )
+  deriving ( Show, Typeable )
 
 
 instance Enum Message where

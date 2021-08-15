@@ -364,25 +364,12 @@ sourceColumn (SourcePos _ _ col) =
   fromIntegral col
 
 
-instance Show SourcePos where
-  show (SourcePos name line column)
-    | null name = showLineColumn
-    | otherwise = "\"" ++ name ++ "\" " ++ showLineColumn
-    where
-      showLineColumn    = "(line " ++ show line ++
-                          ", column " ++ show column ++
-                          ")"
+
 -- Text.Parsec.Error
 
 
-messageString :: Message -> String
-messageString (SysUnExpect s) = s
-messageString (UnExpect    s) = s
-messageString (Expect      s) = s
-messageString (Message     s) = s
-
-
 data ParseError = ParseError String Row Col [Message]
+  deriving Show
 
 
 errorPos :: ParseError -> SourcePos
@@ -423,55 +410,6 @@ mergeError e1@(ParseError sn1 r1 c1 msgs1) e2@(ParseError _ r2 c2 msgs2)
         EQ -> ParseError sn1 r1 c1 (msgs1 ++ msgs2)
         GT -> e1
         LT -> e2
-
-
-instance Show ParseError where
-    show err
-        = show (errorPos err) ++ ":" ++
-          showErrorMessages "or" "unknown parse error"
-                            "expecting" "unexpected" "end of input"
-                           (errorMessages err)
-
-
-showErrorMessages ::
-    String -> String -> String -> String -> String -> [Message] -> String
-showErrorMessages msgOr msgUnknown msgExpecting msgUnExpected msgEndOfInput msgs
-    | null msgs = msgUnknown
-    | otherwise = concat $ map ("\n"++) $ clean $
-                 [showSysUnExpect,showUnExpect,showExpect,showMessages]
-    where
-      (sysUnExpect,msgs1) = span ((SysUnExpect "") ==) msgs
-      (unExpect,msgs2)    = span ((UnExpect    "") ==) msgs1
-      (expect,messages)   = span ((Expect      "") ==) msgs2
-
-      showExpect      = showMany msgExpecting expect
-      showUnExpect    = showMany msgUnExpected unExpect
-      showSysUnExpect | not (null unExpect) ||
-                        null sysUnExpect = ""
-                      | null firstMsg    = msgUnExpected ++ " " ++ msgEndOfInput
-                      | otherwise        = msgUnExpected ++ " " ++ firstMsg
-          where
-              firstMsg  = messageString (head sysUnExpect)
-
-      showMessages      = showMany "" messages
-
-      -- helpers
-      showMany pre msgs3 = case clean (map messageString msgs3) of
-                            [] -> ""
-                            ms | null pre  -> commasOr ms
-                               | otherwise -> pre ++ " " ++ commasOr ms
-
-      commasOr []       = ""
-      commasOr [m]      = m
-      commasOr ms       = commaSep (init ms) ++ " " ++ msgOr ++ " " ++ last ms
-
-      commaSep          = separate ", " . clean
-
-      separate   _ []     = ""
-      separate   _ [m]    = m
-      separate sep (m:ms) = m ++ sep ++ separate sep ms
-
-      clean             = nub . filter (not . null)
 
 
 
