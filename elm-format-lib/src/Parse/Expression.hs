@@ -7,7 +7,7 @@ import Data.Coapplicative
 import qualified Data.Indexed as I
 import Data.Maybe (fromMaybe)
 
-import Parse.ParsecAdapter hiding (newline, spaces)
+import Parse.ParsecAdapter
 import qualified Parse.Binop as Binop
 import Parse.Helpers
 import Parse.Common
@@ -157,10 +157,10 @@ head' (a:_) = Just a
 appExpr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
 appExpr elmVersion =
   expecting "an expression" $
-  do  start <- getMyPosition
+  do  start <- getPosition
       (t, initialTermMultiline) <- trackNewline (term elmVersion)
       ts <- constrainedSpacePrefix (term elmVersion)
-      end <- getMyPosition
+      end <- getPosition
       return $
           case ts of
             [] ->

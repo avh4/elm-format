@@ -294,7 +294,7 @@ separated :: IParser sep -> IParser e -> IParser (Either e (A.Region, C0Eol e, S
 separated sep expr' =
   let
     subparser =
-      do  start <- getMyPosition
+      do  start <- Parsec.getPosition
           t1 <- expr'
           arrow <- optionMaybe $ try ((,) <$> restOfLine <*> whitespace <* sep)
           case arrow of
@@ -303,7 +303,7 @@ separated sep expr' =
             Just (eolT1, preArrow) ->
                 do  postArrow <- whitespace
                     t2 <- separated sep expr'
-                    end <- getMyPosition
+                    end <- Parsec.getPosition
                     case t2 of
                         Right (_, C eolT2 t2', Sequence ts, _) ->
                           return $ \multiline -> Right
@@ -459,17 +459,6 @@ surround'' leftDelim rightDelim inner =
 
 -- HELPERS FOR EXPRESSIONS
 
-getMyPosition :: IParser A.Position
-getMyPosition =
-  fromSourcePos <$> getPosition
-
-
-fromSourcePos :: Parsec.SourcePos -> A.Position
-fromSourcePos pos =
-  A.Position
-    (fromIntegral $ Parsec.sourceLine pos)
-    (fromIntegral $ Parsec.sourceColumn pos)
-
 addLocation :: IParser a -> IParser (A.Located a)
 addLocation expr =
   do  (start, e, end) <- located expr
@@ -478,15 +467,15 @@ addLocation expr =
 
 located :: IParser a -> IParser (A.Position, a, A.Position)
 located parser =
-  do  start <- getMyPosition
+  do  start <- Parsec.getPosition
       value <- parser
-      end <- getMyPosition
+      end <- Parsec.getPosition
       return (start, value, end)
 
 
 accessible :: ElmVersion -> IParser (FixAST A.Located typeRef ctorRef varRef 'ExpressionNK) -> IParser (FixAST A.Located typeRef ctorRef varRef 'ExpressionNK)
 accessible elmVersion exprParser =
-  do  start <- getMyPosition
+  do  start <- Parsec.getPosition
       rootExpr <- exprParser
       access <- optionMaybe (try dot <?> "a field access like .name")
 
@@ -497,7 +486,7 @@ accessible elmVersion exprParser =
         Just _ ->
           accessible elmVersion $
             do  v <- lowVar elmVersion
-                end <- getMyPosition
+                end <- Parsec.getPosition
                 return $ I.Fix $ A.at start end $ Access rootExpr v
 
 
