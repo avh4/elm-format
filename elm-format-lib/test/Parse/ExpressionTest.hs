@@ -19,6 +19,7 @@ import ElmFormat.Render.Box (formatExpression, ExpressionContext(..))
 import ElmVersion
 import Parse.TestHelpers
 import Reporting.Annotation (Located)
+import Data.Word (Word16)
 import GHC.Int (Int64)
 
 
@@ -43,28 +44,28 @@ example' name input expected =
         assertParse (fmap (Text.unpack . Box.render . formatExpression Elm_0_19 importInfo SyntaxSeparated . I.convert (Identity . extract)) (expr Elm_0_19)) input expected
 
 
-commentedIntExpr :: (Int, Int, Int, Int) -> String -> String -> Int64 -> Commented ([Comment], [Comment]) (ASTNS Located ns 'ExpressionNK)
+commentedIntExpr :: (Word16, Word16, Word16, Word16) -> String -> String -> Int64 -> Commented ([Comment], [Comment]) (ASTNS Located ns 'ExpressionNK)
 commentedIntExpr (a,b,c,d) preComment postComment i =
     C ([BlockComment [preComment]], [BlockComment [postComment]]) (at a b c d  $ Literal $ IntNum i DecimalInt)
 
-commentedIntExpr' :: (Int, Int, Int, Int) -> String -> Int64 -> Commented ([Comment], [a]) (ASTNS Located ns 'ExpressionNK)
+commentedIntExpr' :: (Word16, Word16, Word16, Word16) -> String -> Int64 -> Commented ([Comment], [a]) (ASTNS Located ns 'ExpressionNK)
 commentedIntExpr' (a,b,c,d) preComment i =
     C ([BlockComment [preComment]], []) (at a b c d  $ Literal $ IntNum i DecimalInt)
 
 
-commentedIntExpr'' :: (Int, Int, Int, Int) -> String -> Int64 -> Commented [Comment] (ASTNS Located ns 'ExpressionNK)
+commentedIntExpr'' :: (Word16, Word16, Word16, Word16) -> String -> Int64 -> Commented [Comment] (ASTNS Located ns 'ExpressionNK)
 commentedIntExpr'' (a,b,c,d) preComment i =
     C [BlockComment [preComment]] $ at a b c d  $ Literal $ IntNum i DecimalInt
 
 
-intExpr :: (Int, Int, Int, Int) -> Int64 -> ASTNS Located ns 'ExpressionNK
+intExpr :: (Word16, Word16, Word16, Word16) -> Int64 -> ASTNS Located ns 'ExpressionNK
 intExpr (a,b,c,d) i = at a b c d $ Literal $ IntNum i DecimalInt
 
-intExpr' :: (Int, Int, Int, Int) -> Int64 -> Commented ([a1], [a2]) (ASTNS Located ns 'ExpressionNK)
+intExpr' :: (Word16, Word16, Word16, Word16) -> Int64 -> Commented ([a1], [a2]) (ASTNS Located ns 'ExpressionNK)
 intExpr' (a,b,c,d) i =
     C ([], []) (at a b c d  $ Literal $ IntNum i DecimalInt)
 
-intExpr'' :: (Int, Int, Int, Int) -> Int64 -> Commented [a] (ASTNS Located ns 'ExpressionNK)
+intExpr'' :: (Word16, Word16, Word16, Word16) -> Int64 -> Commented [a] (ASTNS Located ns 'ExpressionNK)
 intExpr'' (a,b,c,d) i =
     C [] $ at a b c d  $ Literal $ IntNum i DecimalInt
 

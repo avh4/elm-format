@@ -11,10 +11,11 @@ import Data.Indexed as I
 import Parse.ParsecAdapter (eof)
 import Parse.Helpers (iParse)
 import Parse.IParser
-import Reporting.Annotation hiding (at)
-import Reporting.Region
+import Reporting.Annotation (Located, Region)
+import qualified Reporting.Annotation as A
 import qualified Data.List as List
 import qualified Data.List.Split as List
+import Data.Word (Word16)
 
 
 parseFullInput :: IParser a -> IParser a
@@ -47,13 +48,13 @@ assertParseFailure parser input =
 
 
 nowhere :: Region
-nowhere = Region (Position 0 0) (Position 0 0)
+nowhere = A.Region (A.Position 0 0) (A.Position 0 0)
 
 at ::
-    Int -> Int -> Int -> Int
+    Word16 -> Word16 -> Word16 -> Word16
    -> AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns) (ASTNS Located ns) kind
    -> ASTNS Located ns kind
-at a b c d = I.Fix . A (Region (Position a b) (Position c d))
+at a b c d = I.Fix . A.At (A.Region (A.Position a b) (A.Position c d))
 
 
 {-| Checks that removing indentation causes parsing to fail.

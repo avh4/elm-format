@@ -14,7 +14,7 @@ import qualified Parse.Expression
 import Parse.Helpers
 import qualified Parse.Module
 import Reporting.Annotation (Located)
-import qualified Reporting.Region as R
+import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Error
 import qualified Reporting.Result as Result
 import Parse.IParser
@@ -44,6 +44,6 @@ parse source parser =
         return result
 
     Left err ->
-        let pos = R.fromSourcePos (Parsec.errorPos err)
+        let pos = fromSourcePos (Parsec.errorPos err)
         in
-            Result.throw (R.Region pos pos) (Error.Parse err)
+            Result.throw (A.Region pos pos) (Error.Parse err)

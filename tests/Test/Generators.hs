@@ -15,7 +15,6 @@ import qualified AST.Listing
 import Data.Functor.Identity
 import qualified Data.Indexed as I
 import qualified Reporting.Annotation
-import qualified Reporting.Region
 
 
 capitalLetter :: Gen Char
@@ -86,6 +85,6 @@ instance Arbitrary (Module [UppercaseIdentifier] (ASTNS Identity [UppercaseIdent
                   Nothing
                   (Just $ C ([], []) listing)
                 )
-                (Reporting.Annotation.at (Reporting.Region.Position 0 0) (Reporting.Region.Position 0 0) Nothing)
+                (Reporting.Annotation.at (Reporting.Annotation.Position 0 0) (Reporting.Annotation.Position 0 0) Nothing)
                 (C [] empty)
                 (I.Fix $ pure $ TopLevel [ Entry $ I.Fix $ pure $ CommonDeclaration $ I.Fix $ pure $ Definition (I.Fix $ pure $ Anything) [] [] (I.Fix $ pure $ TupleFunction 2)])

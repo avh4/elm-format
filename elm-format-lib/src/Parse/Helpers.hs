@@ -17,9 +17,9 @@ import Parse.Comments
 import Parse.IParser
 import Parse.Whitespace
 import qualified Parse.Primitives as P
+import qualified Parse.ParsecAdapter as Parsec
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
-import qualified Reporting.Region as R
 
 
 reserveds :: [String]
@@ -290,7 +290,7 @@ keyValue parseSep parseKey parseVal =
       )
 
 
-separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, C0Eol e, Sequence e, Bool))
+separated :: IParser sep -> IParser e -> IParser (Either e (A.Region, C0Eol e, Sequence e, Bool))
 separated sep expr' =
   let
     subparser =
@@ -307,7 +307,7 @@ separated sep expr' =
                     case t2 of
                         Right (_, C eolT2 t2', Sequence ts, _) ->
                           return $ \multiline -> Right
-                            ( R.Region start end
+                            ( A.Region start end
                             , C eolT1 t1
                             , Sequence (C (preArrow, postArrow, eolT2) t2' : ts)
                             , multiline
@@ -316,7 +316,7 @@ separated sep expr' =
                           do
                             eol <- restOfLine
                             return $ \multiline -> Right
-                              ( R.Region start end
+                              ( A.Region start end
                               , C eolT1 t1
                               , Sequence [ C (preArrow, postArrow, eol) t2' ]
                               , multiline)
@@ -459,10 +459,16 @@ surround'' leftDelim rightDelim inner =
 
 -- HELPERS FOR EXPRESSIONS
 
-getMyPosition :: IParser R.Position
+getMyPosition :: IParser A.Position
 getMyPosition =
-  R.fromSourcePos <$> getPosition
+  fromSourcePos <$> getPosition
 
+
+fromSourcePos :: Parsec.SourcePos -> A.Position
+fromSourcePos pos =
+  A.Position
+    (fromIntegral $ Parsec.sourceLine pos)
+    (fromIntegral $ Parsec.sourceColumn pos)
 
 addLocation :: IParser a -> IParser (A.Located a)
 addLocation expr =
@@ -470,7 +476,7 @@ addLocation expr =
       return (A.at start end e)
 
 
-located :: IParser a -> IParser (R.Position, a, R.Position)
+located :: IParser a -> IParser (A.Position, a, A.Position)
 located parser =
   do  start <- getMyPosition
       value <- parser

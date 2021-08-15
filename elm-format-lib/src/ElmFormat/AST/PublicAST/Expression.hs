@@ -17,6 +17,7 @@ import qualified Data.Maybe as Maybe
 import ElmFormat.AST.PublicAST.Pattern
 import ElmFormat.AST.PublicAST.Type
 import ElmFormat.AST.PublicAST.Comment
+import Reporting.Annotation (Located(At))
 import Data.Maybe (mapMaybe, fromMaybe)
 import Data.Text (Text)
 import qualified Data.Either as Either
@@ -49,7 +50,7 @@ mkLetDeclarations config decls =
     let
         toDefBuilder :: ASTNS1 Located [UppercaseIdentifier] 'LetDeclarationNK -> DefinitionBuilder LetDeclaration
         toDefBuilder = \case
-            AST.LetCommonDeclaration (I.Fix (A _ def)) ->
+            AST.LetCommonDeclaration (I.Fix (At _ def)) ->
                 Right def
 
             AST.LetComment comment ->
@@ -716,7 +717,7 @@ mkDefinitions config fromDef items =
         merge :: DefinitionBuilder a -> Maybe a
         merge decl =
             case decl of
-                Right (AST.Definition (I.Fix (A _ pat)) args comments expr) ->
+                Right (AST.Definition (I.Fix (At _ pat)) args comments expr) ->
                     let
                         annotation =
                             case pat of
