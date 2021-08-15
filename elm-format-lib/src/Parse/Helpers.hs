@@ -98,7 +98,7 @@ makeVar :: ElmVersion -> IParser Char -> IParser String
 makeVar elmVersion firstChar =
   do  variable <- (:) <$> firstChar <*> many (innerVarChar elmVersion)
       if variable `elem` reserveds
-        then fail (Syntax.keyword variable)
+        then parserFail $ parseError (Message (Syntax.keyword variable))
         else return variable
 
 
@@ -524,7 +524,7 @@ failure :: String -> IParser String
 failure msg =
   P.Parser $ \s _ _ cerr _ ->
     let
-      (P.Parser p) = fail msg
+      (P.Parser p) = parserFail $ parseError (Message msg)
     in
     -- This looks really unsound, but `p` which was created with `fail` will
     -- only ever call the empty error continuation (which in this case
@@ -576,4 +576,4 @@ processAs processor s =
   where
     calloutParser :: String -> IParser a -> IParser a
     calloutParser inp p =
-      either (fail . show) return (iParse p inp)
+      either (parserFail . const . const) return (iParse p inp)

@@ -22,6 +22,7 @@ module Parse.ParsecAdapter
   -- Text.Parsec.Prim
   ( (<|>)
   , (<?>)
+  , parserFail
   , lookAhead
   , try
   , many
@@ -83,7 +84,6 @@ import Reporting.Error.Syntax (ParsecError(..), Message(..))
 
 import qualified Control.Applicative as Applicative
 import Control.Monad (MonadPlus(..), mzero, liftM)
-import qualified Control.Monad.Fail as Fail
 
 import Data.Bits (shiftL, shiftR, (.&.), (.|.))
 import Data.Word (Word8, Word16)
@@ -116,14 +116,10 @@ instance Applicative.Alternative (P.Parser ParsecError) where
     (<|>) = mplus
 
 
-instance Fail.MonadFail (P.Parser ParsecError) where
-    fail = parserFail
-
-
-parserFail :: String -> Parser a
-parserFail msg =
+parserFail :: (Row -> Col -> x) -> P.Parser x a
+parserFail toErr =
   P.Parser $ \(P.State _ _ _ _ row col _) _ _ _ eerr ->
-    eerr row col $ parseError (Message msg)
+    eerr row col toErr
 
 
 instance MonadPlus (P.Parser ParsecError) where
@@ -132,7 +128,7 @@ instance MonadPlus (P.Parser ParsecError) where
 
 
 parserZero :: Parser a
-parserZero = parserFail "Parse.ParsecAdapter.parserZero"
+parserZero = parserFail $ parseError (Message "Parse.ParsecAdapter.parserZero")
 
 
 parserPlus :: Parser a -> Parser a -> Parser a
@@ -633,13 +629,19 @@ block p = withPos $ do
 indented :: Parser ()
 indented =
   do  (P.State _ _ _ indent _ col _) <- getParserState
-      if col <= indent then fail "not indented" else do return ()
+      if col <= indent then
+        parserFail $ parseError (Message "not indented")
+      else do
+        return ()
 
 
 checkIndent :: Parser ()
 checkIndent =
   do  (P.State _ _ _ indent _ col _) <- getParserState
-      if indent == col then return () else fail "indentation doesn't match"
+      if indent == col then
+        return ()
+      else
+        parserFail $ parseError (Message "indentation doesn't match")
 
 
 withPos :: Parser a -> Parser a
