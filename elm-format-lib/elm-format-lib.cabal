@@ -63,7 +63,6 @@ common common-options
         Parse.Number
         Parse.Parse
         Parse.ParsecAdapter
-        Parse.ParsecAdapter.Message
         Parse.Pattern
         Parse.Primitives
         Parse.State
