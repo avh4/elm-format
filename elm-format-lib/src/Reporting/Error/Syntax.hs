@@ -106,6 +106,9 @@ data Message
   = Message     !Prelude.String -- raw message
   | Expect      !Prelude.String -- expecting something
   | UnExpect    !Prelude.String -- unexpected something
+  | CharError     Char
+  | StringError   String
+  | NumberError   Number
   deriving (Eq, Show)
 
 
@@ -487,14 +490,14 @@ data Char
   = CharEndless
   | CharEscape Escape
   | CharNotString Word16
-  deriving Show
+  deriving (Eq, Show)
 
 
 data String
   = StringEndless_Single
   | StringEndless_Multi
   | StringEscape Escape
-  deriving Show
+  deriving (Eq, Show)
 
 
 data Escape
@@ -502,7 +505,7 @@ data Escape
   | BadUnicodeFormat Word16
   | BadUnicodeCode Word16
   | BadUnicodeLength Word16 Int Int
-  deriving Show
+  deriving (Eq, Show)
 
 
 data Number
@@ -510,7 +513,7 @@ data Number
   | NumberDot Int64
   | NumberHexDigit
   | NumberNoLeadingZero
-  deriving Show
+  deriving (Eq, Show)
 
 
 
