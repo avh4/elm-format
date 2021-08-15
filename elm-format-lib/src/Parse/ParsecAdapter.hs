@@ -36,8 +36,8 @@ module Parse.ParsecAdapter
   , sourceLine
   , sourceColumn
   -- Text.Parsec.Error
-  , ParseError
-  , module Parse.ParsecAdapter.Message
+  , Reporting.Error.Syntax.ParsecError(..)
+  , Reporting.Error.Syntax.Message(..)
   , parseError
   , errorPos
   , errorMessages
@@ -75,10 +75,11 @@ module Parse.ParsecAdapter
   )
   where
 
-import Parse.ParsecAdapter.Message (Message(..))
 import Parse.Primitives (Row, Col)
 import qualified Parse.Primitives as P
 import Parse.State (State(..))
+
+import Reporting.Error.Syntax (ParsecError(..), Message(..))
 
 import qualified Control.Applicative as Applicative
 import Control.Monad (MonadPlus(..), mzero, liftM)
@@ -107,15 +108,15 @@ unexpected msg =
       eerr row col $ parseError (UnExpect msg)
 
 
-type Parser a = P.Parser ParseError a
+type Parser a = P.Parser ParsecError a
 
 
-instance Applicative.Alternative (P.Parser ParseError) where
+instance Applicative.Alternative (P.Parser ParsecError) where
     empty = mzero
     (<|>) = mplus
 
 
-instance Fail.MonadFail (P.Parser ParseError) where
+instance Fail.MonadFail (P.Parser ParsecError) where
     fail = parserFail
 
 
@@ -125,7 +126,7 @@ parserFail msg =
     eerr row col $ parseError (Message msg)
 
 
-instance MonadPlus (P.Parser ParseError) where
+instance MonadPlus (P.Parser ParsecError) where
   mzero = parserZero
   mplus = parserPlus
 
@@ -233,7 +234,7 @@ parserDoesNotConsumeErr = error "Text.Parsec.Prim.many: combinator 'many' is app
 
 
 -- This function is very similar to `Parse.Primitives.fromByteString`.
-runParserT :: Parser a -> State -> String -> Either ParseError a
+runParserT :: Parser a -> State -> String -> Either ParsecError a
 runParserT (P.Parser p) (State newline) source =
   B.accursedUnutterablePerformIO $
     let
@@ -345,28 +346,21 @@ sourceColumn (SourcePos _ col) =
 -- Text.Parsec.Error
 
 
-data ParseError
-  = Nil
-  | Cons Message Row Col ParseError
-  | OneOf ParseError ParseError
-  deriving Show
-
-
-parseError :: Message -> Row -> Col -> ParseError
+parseError :: Message -> Row -> Col -> ParsecError
 parseError message row col =
   Cons message row col Nil
 
 
-addMessage :: Message -> (Row -> Col -> ParseError) -> Row -> Col -> ParseError
+addMessage :: Message -> (Row -> Col -> ParsecError) -> Row -> Col -> ParsecError
 addMessage message toErr row col =
   Cons message row col (toErr row col)
 
 
-mergeError :: ParseError -> ParseError -> ParseError
+mergeError :: ParsecError -> ParsecError -> ParsecError
 mergeError = OneOf
 
 
-errorPos :: ParseError -> SourcePos
+errorPos :: ParsecError -> SourcePos
 errorPos err =
   case err of
     Nil ->
@@ -379,7 +373,7 @@ errorPos err =
       errorPos e2
 
 
-errorMessages :: ParseError -> [Message]
+errorMessages :: ParsecError -> [Message]
 errorMessages err =
   case err of
     Nil ->

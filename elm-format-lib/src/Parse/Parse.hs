@@ -45,6 +45,5 @@ parse source parser =
 
     Left err ->
         let pos = R.fromSourcePos (Parsec.errorPos err)
-            msgs = Parsec.errorMessages err
         in
-            Result.throw (R.Region pos pos) (Error.Parse msgs)
+            Result.throw (R.Region pos pos) (Error.Parse err)
