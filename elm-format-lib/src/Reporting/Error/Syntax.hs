@@ -40,8 +40,8 @@ module Reporting.Error.Syntax
   , Char(..)
   , String(..)
   , Escape(..)
---  , Number(..)
---  --
+  , Number(..)
+  --
 --  , Space(..)
 --  , toSpaceReport
   --
@@ -59,6 +59,7 @@ import qualified Prelude as Prelude
 --import qualified Data.Char as Char
 --import qualified Data.Name as Name
 import Data.Word (Word16)
+import Data.Int (Int64)
 --import Numeric (showHex)
 
 --import qualified Elm.ModuleName as ModuleName
@@ -488,11 +489,12 @@ data Escape
   deriving Show
 
 
---data Number
---  = NumberEnd
---  | NumberDot Int
---  | NumberHexDigit
---  | NumberNoLeadingZero
+data Number
+  = NumberEnd
+  | NumberDot Int64
+  | NumberHexDigit
+  | NumberNoLeadingZero
+  deriving Show
 
 
 
