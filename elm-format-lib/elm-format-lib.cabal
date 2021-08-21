@@ -63,7 +63,6 @@ common common-options
         Parse.Number
         Parse.Parse
         Parse.ParsecAdapter
-        Parse.ParsecAdapter.Message
         Parse.Pattern
         Parse.Primitives
         Parse.State
@@ -117,9 +116,7 @@ library
         ElmVersion
         Parse.Markdown
         Reporting.Annotation
-        Reporting.Annotation.New
         Reporting.Error.Syntax
-        Reporting.Region
         Reporting.Result
 
 
@@ -147,9 +144,7 @@ test-suite efl-tests
         ElmVersion
         Parse.Markdown
         Reporting.Annotation
-        Reporting.Annotation.New
         Reporting.Error.Syntax
-        Reporting.Region
         Reporting.Result
 
     other-modules:

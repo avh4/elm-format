@@ -13,6 +13,7 @@ import Reporting.Annotation (Located)
 import qualified Reporting.Annotation as A
 import Parse.IParser
 import Parse.Whitespace
+import qualified Parse.ParsecAdapter as Parsec
 
 
 basic :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
@@ -47,7 +48,7 @@ asPattern elmVersion patternParser =
 
       case maybeAlias of
         Just (postPattern, alias) ->
-            do  end <- getMyPosition
+            do  end <- Parsec.getPosition
                 return $ I.Fix $ A.at start end $ Alias (C postPattern pattern) alias
 
         Nothing ->
@@ -137,4 +138,4 @@ expr elmVersion =
             Left pattern ->
               pattern
             Right (region, first, rest, _) ->
-              I.Fix $ A.A region $ ConsPattern first rest
+              I.Fix $ A.At region $ ConsPattern first rest

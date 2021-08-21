@@ -6,7 +6,10 @@
 module Reporting.Error.Syntax
   ( Error(..)
 --  , toReport
---  --
+  --
+  , ParsecError(..)
+  , Message(..)
+  --
 --  , Module(..)
 --  , Exposing(..)
 --  --
@@ -63,8 +66,7 @@ import Data.Int (Int64)
 --import Numeric (showHex)
 
 --import qualified Elm.ModuleName as ModuleName
---import Parse.Primitives (Row, Col)
-import qualified Parse.ParsecAdapter.Message
+import Parse.Primitives (Row, Col)
 --import Parse.Symbol (BadOperator(..))
 --import qualified Reporting.Annotation as A
 --import qualified Reporting.Doc as D
@@ -77,7 +79,7 @@ import qualified Parse.ParsecAdapter.Message
 
 
 data Error
-    = Parse [Parse.ParsecAdapter.Message.Message]
+    = Parse ParsecError
 --  = ModuleNameUnspecified ModuleName.Raw
 --  | ModuleNameMismatch ModuleName.Raw (A.Located ModuleName.Raw)
 --  | UnexpectedPort A.Region
@@ -89,8 +91,25 @@ data Error
     deriving (Eq, Show)
 
 
-instance Show Parse.ParsecAdapter.Message.Message where
-   show _ = "<Text.Parsec.Error.Message>"
+
+-- PARSEC ADAPTER
+
+
+data ParsecError
+  = Nil
+  | Cons Message Row Col ParsecError
+  | OneOf ParsecError ParsecError
+  deriving (Eq, Show)
+
+
+data Message
+  = Message     !Prelude.String -- raw message
+  | Expect      !Prelude.String -- expecting something
+  | UnExpect    !Prelude.String -- unexpected something
+  | CharError     Char
+  | StringError   String
+  | NumberError   Number
+  deriving (Eq, Show)
 
 
 
@@ -471,14 +490,14 @@ data Char
   = CharEndless
   | CharEscape Escape
   | CharNotString Word16
-  deriving Show
+  deriving (Eq, Show)
 
 
 data String
   = StringEndless_Single
   | StringEndless_Multi
   | StringEscape Escape
-  deriving Show
+  deriving (Eq, Show)
 
 
 data Escape
@@ -486,7 +505,7 @@ data Escape
   | BadUnicodeFormat Word16
   | BadUnicodeCode Word16
   | BadUnicodeLength Word16 Int Int
-  deriving Show
+  deriving (Eq, Show)
 
 
 data Number
@@ -494,7 +513,7 @@ data Number
   | NumberDot Int64
   | NumberHexDigit
   | NumberNoLeadingZero
-  deriving Show
+  deriving (Eq, Show)
 
 
 

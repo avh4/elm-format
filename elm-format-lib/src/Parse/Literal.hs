@@ -2,6 +2,8 @@ module Parse.Literal (literal) where
 
 import Prelude hiding (exponent)
 import qualified Elm.String as ES
+
+import qualified Parse.Primitives as P
 import Parse.ParsecAdapter
 import Parse.IParser
 import qualified Parse.String
@@ -12,15 +14,20 @@ import AST.V0_16
 
 literal :: IParser LiteralValue
 literal =
-  num <|> (uncurry Str <$> str) <|> (Chr <$> chr)
+  P.oneOf
+    (parseError (Expect "a literal value"))
+    [ num
+    , uncurry Str <$> str
+    , Chr <$> chr
+    ]
 
 
 num :: IParser LiteralValue
 num =
   let
-    toExpectation = newErrorUnknown "Expected a digit"
+    toExpectation = parseError (Expect  "a digit")
 
-    toError e = newErrorUnknown ("Error parsing number: " ++ show e)
+    toError e = parseError (NumberError e)
   in
   do  negate <- option False (return True <$> minus)
       n <- Parse.Number.number toExpectation toError
@@ -45,9 +52,9 @@ minus =
 str :: IParser (String, StringRepresentation)
 str =
   let
-    toExpectation = newErrorUnknown "Expected a `\"`"
+    toExpectation = parseError (Expect "\"`")
 
-    toError e = newErrorUnknown ("Error parsing string: " ++ show e)
+    toError e = parseError (StringError e)
   in
   do  (s, representation) <- Parse.String.string toExpectation toError
       return (ES.toChars s, representation)
@@ -56,9 +63,9 @@ str =
 chr :: IParser Char
 chr =
   let
-    toExpecation = newErrorUnknown "Expected `'`"
+    toExpecation = parseError (Expect "'")
 
-    toError e = newErrorUnknown ("Error parsing char: " ++ show e)
+    toError e = parseError (CharError e)
   in
   do  s <- Parse.String.character toExpecation toError
       case ES.toChars s of
