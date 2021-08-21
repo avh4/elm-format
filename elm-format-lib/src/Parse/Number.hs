@@ -53,7 +53,7 @@ data Number
 
 number :: (Row -> Col -> x) -> (E.Number -> Row -> Col -> x) -> Parser x Number
 number toExpectation toError =
-  P.Parser $ \(P.State src pos end indent row col sn nl) cok _ cerr eerr ->
+  P.Parser $ \(P.State src pos end indent row col nl) cok _ cerr eerr ->
     if pos >= end then
       eerr row col toExpectation
 
@@ -81,7 +81,7 @@ number toExpectation toError =
               let
                 !newCol = col + fromIntegral (minusPtr newPos pos)
                 !integer = Int n representation
-                !newState = P.State src newPos end indent row newCol sn nl
+                !newState = P.State src newPos end indent row newCol nl
               in
               cok integer newState
 
@@ -89,7 +89,7 @@ number toExpectation toError =
               let
                 !newCol = col + fromIntegral (minusPtr newPos pos)
                 !float = Float (parseFloat pos newPos) representation
-                !newState = P.State src newPos end indent row newCol sn nl
+                !newState = P.State src newPos end indent row newCol nl
               in
               cok float newState
 

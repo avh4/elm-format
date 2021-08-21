@@ -7,7 +7,7 @@ import Data.Coapplicative
 import qualified Data.Indexed as I
 import Data.Maybe (fromMaybe)
 
-import Parse.ParsecAdapter hiding (newline, spaces)
+import Parse.ParsecAdapter
 import qualified Parse.Binop as Binop
 import Parse.Helpers
 import Parse.Common
@@ -157,10 +157,10 @@ head' (a:_) = Just a
 appExpr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
 appExpr elmVersion =
   expecting "an expression" $
-  do  start <- getMyPosition
+  do  start <- getPosition
       (t, initialTermMultiline) <- trackNewline (term elmVersion)
       ts <- constrainedSpacePrefix (term elmVersion)
-      end <- getMyPosition
+      end <- getPosition
       return $
           case ts of
             [] ->
@@ -291,13 +291,13 @@ letExpr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'Expressio
 letExpr elmVersion =
   fmap I.Fix $ addLocation $
   do  try (reserved elmVersion "let")
-      A.A cal commentsAfterLet' <- addLocation whitespace
-      let commentsAfterLet = fmap (I.Fix . A.A cal . LetComment) commentsAfterLet'
+      A.At cal commentsAfterLet' <- addLocation whitespace
+      let commentsAfterLet = fmap (I.Fix . A.At cal . LetComment) commentsAfterLet'
       defs <-
         block $
           do  def <- fmap I.Fix $ addLocation $ fmap (LetCommonDeclaration . I.Fix) $ addLocation (typeAnnotation elmVersion TypeAnnotation <|> definition elmVersion Definition)
-              A.A cad commentsAfterDef' <- addLocation whitespace
-              let commentsAfterDef = fmap (I.Fix . A.A cad . LetComment) commentsAfterDef'
+              A.At cad commentsAfterDef' <- addLocation whitespace
+              let commentsAfterDef = fmap (I.Fix . A.At cad . LetComment) commentsAfterDef'
               return (def : commentsAfterDef)
       _ <- reserved elmVersion "in"
       bodyComments <- whitespace

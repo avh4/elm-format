@@ -13,7 +13,6 @@ module ElmFormat.AST.PublicAST.Core
     , module AST.V0_16
     , module AST.Structure
     , module Reporting.Annotation
-    , module Reporting.Region
     , module Data.Coapplicative
     , module ElmFormat.AST.PublicAST.MaybeF
     , module ElmFormat.AST.PublicAST.Config
@@ -39,10 +38,8 @@ import qualified AST.V0_16 as AST
 import qualified AST.Module as AST
 import qualified AST.Listing as AST
 import Data.Indexed as I
-import Reporting.Annotation (Located(A))
-import qualified Reporting.Annotation
-import Reporting.Region (Region)
-import qualified Reporting.Region as Region
+import Reporting.Annotation (Located, Region, Position)
+import qualified Reporting.Annotation as A
 import Data.Coapplicative
 import qualified Data.List as List
 import qualified Data.Text as Text
@@ -189,25 +186,25 @@ instance (FromJSON a) => FromJSON (LocatedIfRequested a) where
 
 instance ToPairs a => ToJSON (Located a) where
     toJSON = undefined
-    toEncoding (A region a) =
+    toEncoding (A.At region a) =
         pairs (toPairs a <> "sourceLocation" .= region)
 
 
 instance ToJSON Region where
     toJSON = undefined
-    toEncoding region =
+    toEncoding (A.Region start end) =
         pairs $ mconcat
-            [ "start" .= Region.start region
-            , "end" .= Region.end region
+            [ "start" .= start
+            , "end" .= end
             ]
 
 
-instance ToJSON Region.Position where
+instance ToJSON A.Position where
     toJSON = undefined
-    toEncoding pos =
+    toEncoding (A.Position row col) =
         pairs $ mconcat
-            [ "line" .= Region.line pos
-            , "col" .= Region.column pos
+            [ "line" .= row
+            , "col" .= col
             ]
 
 
@@ -482,11 +479,11 @@ instance (FromJSON (f a)) => FromJSON (MaybeF f a) where
 --
 
 
-nowhere :: Region.Position
+nowhere :: A.Position
 nowhere =
-    Region.Position 0 0
+    A.Position 0 0
 
 
-noRegion :: a -> Reporting.Annotation.Located a
+noRegion :: a -> Located a
 noRegion =
-    Reporting.Annotation.at nowhere nowhere
+    A.at nowhere nowhere

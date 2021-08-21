@@ -8,6 +8,7 @@ import ElmFormat.AST.PublicAST.Core
 import ElmFormat.AST.PublicAST.Comment
 import ElmFormat.AST.PublicAST.Expression
 import ElmFormat.AST.PublicAST.Type
+import Reporting.Annotation (Located(At))
 import qualified AST.V0_16 as AST
 import qualified AST.Module as AST
 import qualified AST.Listing as AST
@@ -140,16 +141,16 @@ data TopLevelStructure
     | TODO_TopLevelStructure String
 
 fromTopLevelStructures :: Config -> ASTNS Located [UppercaseIdentifier] 'TopLevelNK -> List (MaybeF LocatedIfRequested TopLevelStructure)
-fromTopLevelStructures config (I.Fix (A _ (AST.TopLevel decls))) =
+fromTopLevelStructures config (I.Fix (At _ (AST.TopLevel decls))) =
     let
         toDefBuilder :: AST.TopLevelStructure
                      (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK) -> MaybeF LocatedIfRequested (DefinitionBuilder TopLevelStructure)
         toDefBuilder decl =
             case fmap I.unFix decl of
-                AST.Entry (A region entry) ->
-                    JustF $ fromLocated config $ A region $
+                AST.Entry (At region entry) ->
+                    JustF $ fromLocated config $ At region $
                     case entry of
-                        AST.CommonDeclaration (I.Fix (A _ def)) ->
+                        AST.CommonDeclaration (I.Fix (At _ def)) ->
                             Right def
 
                         AST.TypeAlias c1 (C (c2, c3) (AST.NameWithArgs name args)) (C c4 t) ->

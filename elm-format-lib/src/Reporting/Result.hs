@@ -4,7 +4,6 @@ import qualified Control.Monad as M
 import Control.Monad.Except (Except, runExcept)
 import Data.Coapplicative
 import qualified Reporting.Annotation as A
-import qualified Reporting.Region as R
 
 
 -- TASK
@@ -29,9 +28,9 @@ ok value =
   Result [] (Ok value)
 
 
-throw :: R.Region -> e -> Result w e a
+throw :: A.Region -> e -> Result w e a
 throw region err =
-  Result [] (Err [A.A region err])
+  Result [] (Err [A.At region err])
 
 
 throwMany :: [A.Located e] -> Result w e a
@@ -60,9 +59,9 @@ mapError f (Result warnings rawResult) =
           Err (map (fmap f) msgs)
 
 
-warn :: R.Region -> w -> Result w e ()
+warn :: A.Region -> w -> Result w e ()
 warn region warning =
-  Result [A.A region warning] (Ok ())
+  Result [A.At region warning] (Ok ())
 
 
 addWarnings :: [A.Located w] -> Result w e a -> Result w e a

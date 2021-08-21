@@ -22,6 +22,7 @@ module Parse.ParsecAdapter
   -- Text.Parsec.Prim
   ( (<|>)
   , (<?>)
+  , parserFail
   , lookAhead
   , try
   , many
@@ -30,16 +31,10 @@ module Parse.ParsecAdapter
   , getPosition
   , getState
   , updateState
-  -- Text.Parsec.Pos
-  , SourcePos
-  , SourceName
-  , sourceLine
-  , sourceColumn
   -- Text.Parsec.Error
-  , ParseError
-  , newErrorUnknown
-  , module Parse.ParsecAdapter.Message
-  , newErrorUnknown
+  , Reporting.Error.Syntax.ParsecError(..)
+  , Reporting.Error.Syntax.Message(..)
+  , parseError
   , errorPos
   , errorMessages
   -- Text.Parsec.Combinator
@@ -76,17 +71,15 @@ module Parse.ParsecAdapter
   )
   where
 
-import Parse.ParsecAdapter.Message (Message(..))
 import Parse.Primitives (Row, Col)
-import qualified Parse.Primitives as EP
+import qualified Parse.Primitives as P
 import Parse.State (State(..))
 
-import qualified Control.Applicative as Applicative
-import Control.Monad (MonadPlus(..), mzero, liftM)
-import qualified Control.Monad.Fail as Fail
+import qualified Reporting.Annotation as A
+import Reporting.Error.Syntax (ParsecError(..), Message(..))
 
-import Data.List (nub)
-import Data.Typeable (Typeable)
+import qualified Control.Applicative as Applicative
+
 import Data.Bits (shiftL, shiftR, (.&.), (.|.))
 import Data.Word (Word8, Word16)
 import Data.Char (chr, ord)
@@ -104,68 +97,18 @@ import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
 -- Text.Parsec.Prim
 
 
-unknownError :: EP.Row -> EP.Col -> ParseError
-unknownError row col =
-  newErrorUnknown "" row col
+type Parser a = P.Parser ParsecError a
 
 
-unexpected :: String -> Parser a
-unexpected msg =
-  EP.Parser $ \(EP.State _ _ _ _ row col sourceName _) _ _ _ eerr ->
-      eerr row col (newErrorMessage (UnExpect msg) sourceName)
+instance Applicative.Alternative (P.Parser ParsecError) where
+    empty = parserFail $ parseError (Message "Parse.ParsecAdapter.empty")
+    (<|>) = (<|>)
 
 
-type Parser a = EP.Parser ParseError a
-
-
-instance Applicative.Alternative (EP.Parser ParseError) where
-    empty = mzero
-    (<|>) = mplus
-
-
-instance Fail.MonadFail (EP.Parser ParseError) where
-    fail = parserFail
-
-
-parserFail :: String -> Parser a
-parserFail msg =
-  EP.Parser $ \(EP.State _ _ _ _ row col sourceName _) _ _ _ eerr ->
-    eerr row col $ newErrorMessage (Message msg) sourceName
-
-
-instance MonadPlus (EP.Parser ParseError) where
-  mzero = parserZero
-  mplus = parserPlus
-
-
-parserZero :: Parser a
-parserZero =
-  EP.Parser $ \state _ _ _ eerr ->
-    let
-      (EP.State _ _ _ _ row col _ _) = state
-    in
-    eerr row col unknownError
-
-
-parserPlus :: Parser a -> Parser a -> Parser a
-parserPlus (EP.Parser p) (EP.Parser q) =
-  EP.Parser $ \s cok eok cerr eerr ->
-    let
-      meerr r1 c1 toErr1 =
-        let
-          neerr r2 c2 toErr2 =
-            -- This error merging behavior from parsec is really tricky for
-            -- me to understand, especially the error positions.
-            -- I doubt that I got this 100% correct.
-            let
-              err = mergeError (toErr1 r1 c1) (toErr2 r2 c2)
-              row = fromIntegral $ sourceLine $ errorPos err
-              col = fromIntegral $ sourceColumn $ errorPos err
-            in
-            eerr row col (\_ _ -> err)
-        in q s cok eok cerr neerr
-    in
-    p s cok eok cerr meerr
+parserFail :: (Row -> Col -> x) -> P.Parser x a
+parserFail toErr =
+  P.Parser $ \(P.State _ _ _ _ row col _) _ _ _ eerr ->
+    eerr row col toErr
 
 
 infixr 1 <|>
@@ -173,29 +116,35 @@ infix  0 <?>
 
 
 (<|>) :: Parser a -> Parser a -> Parser a
-(<|>) = mplus
-
-
--- TODO: Can the implementation be improved?
---
--- It's probable that this behaviour doesn't 100% match the original parsec
--- behaviour. In particular, parsec stores error information in the _ok_
--- continuations as well, why is that? And is it possible to get the same
--- behaviour with the new parser which only stores errors in the _err_
--- continuations.
-(<?>) :: Parser a -> String -> Parser a
-(<?>) (EP.Parser p) msg =
-  EP.Parser $ \s@(EP.State _ _ _ _ _ _ sn _) cok eok cerr eerr ->
+(<|>) (P.Parser p) (P.Parser q) =
+  P.Parser $ \s cok eok cerr eerr ->
     let
-      eerr' row col _ =
-        eerr row col (newErrorMessage (Expect msg) sn)
+      meerr r1 c1 toErr1 =
+        let
+          neerr r2 c2 toErr2 =
+            let
+              err = mergeError (toErr1 r1 c1) (toErr2 r2 c2)
+              (A.Position row col) = errorPos err
+            in
+            eerr row col (\_ _ -> err)
+        in q s cok eok cerr neerr
+    in
+    p s cok eok cerr meerr
+
+
+(<?>) :: Parser a -> String -> Parser a
+(<?>) (P.Parser p) msg =
+  P.Parser $ \s cok eok cerr eerr ->
+    let
+      eerr' row col err =
+        eerr row col $ addMessage (Expect msg) err
     in
     p s cok eok cerr eerr'
 
 
 lookAhead :: Parser a -> Parser a
-lookAhead (EP.Parser p) =
-    EP.Parser $ \s _ eok cerr eerr ->
+lookAhead (P.Parser p) =
+    P.Parser $ \s _ eok cerr eerr ->
       let
         eok' a _ = eok a s
       in
@@ -203,8 +152,8 @@ lookAhead (EP.Parser p) =
 
 
 try :: Parser a -> Parser a
-try (EP.Parser parser) =
-  EP.Parser $ \s cok eok _ err ->
+try (P.Parser parser) =
+  P.Parser $ \s cok eok _ err ->
     parser s cok eok err err
 
 
@@ -215,8 +164,8 @@ try (EP.Parser parser) =
 -- implementation more obvious? Maybe the code in the `in` could be replaced
 -- with a single `many_` call?
 many :: Parser a -> Parser [a]
-many (EP.Parser p) =
-  EP.Parser $ \s cok eok cerr _ ->
+many (P.Parser p) =
+  P.Parser $ \s cok eok cerr _ ->
     let
       many_ acc x s' =
         p
@@ -235,8 +184,8 @@ many (EP.Parser p) =
 
 
 skipMany ::Parser a -> Parser ()
-skipMany (EP.Parser p) =
-  EP.Parser $ \s cok _ cerr _ ->
+skipMany (P.Parser p) =
+  P.Parser $ \s cok _ cerr _ ->
     let
       skipMany_ s' =
         p
@@ -256,25 +205,25 @@ parserDoesNotConsumeErr = error "Text.Parsec.Prim.many: combinator 'many' is app
 
 
 -- This function is very similar to `Parse.Primitives.fromByteString`.
-runParserT :: Parser a -> State -> SourceName -> String -> Either ParseError a
-runParserT (EP.Parser p) (State newline) name source =
+runParserT :: Parser a -> State -> String -> Either ParsecError a
+runParserT (P.Parser p) (State newline) source =
   B.accursedUnutterablePerformIO $
     let
       (B.PS fptr offset length) = stringToByteString source
       !pos = plusPtr (unsafeForeignPtrToPtr fptr) offset
       !end = plusPtr pos length
-      !result = p (EP.State fptr pos end 1 1 1 name newline) toOk toOk toErr toErr
+      !result = p (P.State fptr pos end 1 1 1 newline) toOk toOk toErr toErr
     in
     do  touchForeignPtr fptr
         return result
 
 
-toOk :: a -> EP.State -> Either x a
+toOk :: a -> P.State -> Either x a
 toOk !a _ =
   Right a
 
 
-toErr :: EP.Row -> EP.Col -> (EP.Row -> EP.Col -> x) -> Either x a
+toErr :: P.Row -> P.Col -> (P.Row -> P.Col -> x) -> Either x a
 toErr row col toError =
   Left (toError row col)
 
@@ -306,172 +255,81 @@ encodeChar = map fromIntegral . go . ord
                         ]
 
 
-getPosition :: Parser SourcePos
+getPosition :: Parser A.Position
 getPosition =
-  do  (EP.State _ _ _ _ row col sourceName _) <- getParserState
-      return $ newPos sourceName row col
+  do  (P.State _ _ _ _ row col _) <- getParserState
+      return $ A.Position row col
 
 
 getState :: Parser State
 getState =
-  do  (EP.State _ _ _ _ _ _ _ newline) <- getParserState
+  do  (P.State _ _ _ _ _ _ newline) <- getParserState
       return (State newline)
 
 
 updateState :: (State -> State) -> Parser ()
 updateState f =
   do  _ <- updateParserState
-        (\(EP.State src pos end indent row col sourceName newline) ->
+        (\(P.State src pos end indent row col newline) ->
           let
             (State newline') = f (State newline)
           in
-          EP.State src pos end indent row col sourceName newline'
+          P.State src pos end indent row col newline'
         )
       return ()
 
 
-getParserState :: Parser EP.State
+getParserState :: Parser P.State
 getParserState = updateParserState id
 
 
-updateParserState :: (EP.State -> EP.State) -> Parser EP.State
+updateParserState :: (P.State -> P.State) -> Parser P.State
 updateParserState f =
-  EP.Parser $ \s _ eok _ _ -> eok (f s) (f s)
+  P.Parser $ \s _ eok _ _ -> eok (f s) (f s)
 
 
 
--- Text.Parsec.Pos
-
-
-type SourceName = String
-
-
-data SourcePos = SourcePos SourceName !EP.Row !EP.Col
-
-
-newPos :: SourceName -> EP.Row -> EP.Col -> SourcePos
-newPos =
-  SourcePos
-
-
-sourceLine :: SourcePos -> Int
-sourceLine (SourcePos _ row _) =
-  fromIntegral row
-
-
-sourceColumn :: SourcePos -> Int
-sourceColumn (SourcePos _ _ col) =
-  fromIntegral col
-
-
-instance Show SourcePos where
-  show (SourcePos name line column)
-    | null name = showLineColumn
-    | otherwise = "\"" ++ name ++ "\" " ++ showLineColumn
-    where
-      showLineColumn    = "(line " ++ show line ++
-                          ", column " ++ show column ++
-                          ")"
 -- Text.Parsec.Error
 
 
-messageString :: Message -> String
-messageString (SysUnExpect s) = s
-messageString (UnExpect    s) = s
-messageString (Expect      s) = s
-messageString (Message     s) = s
+parseError :: Message -> Row -> Col -> ParsecError
+parseError message row col =
+  Cons message row col Nil
 
 
-data ParseError = ParseError String Row Col [Message]
+addMessage :: Message -> (Row -> Col -> ParsecError) -> Row -> Col -> ParsecError
+addMessage message toErr row col =
+  Cons message row col (toErr row col)
 
 
-errorPos :: ParseError -> SourcePos
-errorPos (ParseError sourceName row col _) = newPos sourceName row col
+mergeError :: ParsecError -> ParsecError -> ParsecError
+mergeError = OneOf
 
 
-errorMessages :: ParseError -> [Message]
-errorMessages (ParseError _ _ _ messages) = messages
+errorPos :: ParsecError -> A.Position
+errorPos err =
+  case err of
+    Nil ->
+      error "An unexpeced error occured, this is likely a bug. Please report this issue at https://github.com/avh4/elm-format/issues"
+
+    Cons _ row col _ ->
+      A.Position row col
+
+    OneOf _ e2 ->
+      errorPos e2
 
 
+errorMessages :: ParsecError -> [Message]
+errorMessages err =
+  case err of
+    Nil ->
+      []
 
--- Create parse errors
+    Cons message _ _ subErrs ->
+      message : errorMessages subErrs
 
-
-newErrorMessage :: Message -> String -> Row -> Col -> ParseError
-newErrorMessage msg sourceName row col
-    = ParseError sourceName row col [msg]
-
-
-newErrorUnknown :: String -> Row -> Col -> ParseError
-newErrorUnknown sourceName row col
-    = ParseError sourceName row col []
-
-
-setErrorMessage :: Message -> ParseError -> ParseError
-setErrorMessage msg (ParseError sourceName row col msgs)
-    = ParseError sourceName row col (msg : filter (msg /=) msgs)
-
-
-mergeError :: ParseError -> ParseError -> ParseError
-mergeError e1@(ParseError sn1 r1 c1 msgs1) e2@(ParseError _ r2 c2 msgs2)
-    -- prefer meaningful errors
-    | null msgs2 && not (null msgs1) = e1
-    | null msgs1 && not (null msgs2) = e2
-    | otherwise
-    = case (r1, c1) `compare` (r2, c2) of
-        -- select the longest match
-        EQ -> ParseError sn1 r1 c1 (msgs1 ++ msgs2)
-        GT -> e1
-        LT -> e2
-
-
-instance Show ParseError where
-    show err
-        = show (errorPos err) ++ ":" ++
-          showErrorMessages "or" "unknown parse error"
-                            "expecting" "unexpected" "end of input"
-                           (errorMessages err)
-
-
-showErrorMessages ::
-    String -> String -> String -> String -> String -> [Message] -> String
-showErrorMessages msgOr msgUnknown msgExpecting msgUnExpected msgEndOfInput msgs
-    | null msgs = msgUnknown
-    | otherwise = concat $ map ("\n"++) $ clean $
-                 [showSysUnExpect,showUnExpect,showExpect,showMessages]
-    where
-      (sysUnExpect,msgs1) = span ((SysUnExpect "") ==) msgs
-      (unExpect,msgs2)    = span ((UnExpect    "") ==) msgs1
-      (expect,messages)   = span ((Expect      "") ==) msgs2
-
-      showExpect      = showMany msgExpecting expect
-      showUnExpect    = showMany msgUnExpected unExpect
-      showSysUnExpect | not (null unExpect) ||
-                        null sysUnExpect = ""
-                      | null firstMsg    = msgUnExpected ++ " " ++ msgEndOfInput
-                      | otherwise        = msgUnExpected ++ " " ++ firstMsg
-          where
-              firstMsg  = messageString (head sysUnExpect)
-
-      showMessages      = showMany "" messages
-
-      -- helpers
-      showMany pre msgs3 = case clean (map messageString msgs3) of
-                            [] -> ""
-                            ms | null pre  -> commasOr ms
-                               | otherwise -> pre ++ " " ++ commasOr ms
-
-      commasOr []       = ""
-      commasOr [m]      = m
-      commasOr ms       = commaSep (init ms) ++ " " ++ msgOr ++ " " ++ last ms
-
-      commaSep          = separate ", " . clean
-
-      separate   _ []     = ""
-      separate   _ [m]    = m
-      separate sep (m:ms) = m ++ sep ++ separate sep ms
-
-      clean             = nub . filter (not . null)
+    OneOf _ e2 ->
+      errorMessages e2
 
 
 
@@ -479,7 +337,11 @@ showErrorMessages msgOr msgUnknown msgExpecting msgUnExpected msgEndOfInput msgs
 
 
 choice :: [Parser a] -> Parser a
-choice ps = foldr (<|>) mzero ps
+choice ps =
+  let
+    err = parseError (Message "Parse.ParsecAdapter.choice")
+  in
+  foldr (<|>) (parserFail err) ps
 
 
 many1 :: Parser a -> Parser [a]
@@ -510,7 +372,7 @@ option x p = p <|> return x
 
 
 optionMaybe :: Parser a -> Parser (Maybe a)
-optionMaybe p = option Nothing (liftM Just p)
+optionMaybe p = option Nothing (fmap Just p)
 
 
 anyToken :: Parser Char
@@ -519,7 +381,11 @@ anyToken = anyChar
 
 notFollowedBy :: Show a => Parser a -> Parser ()
 notFollowedBy p =
-  try $ do{ c <- try p; unexpected (show c) } <|> return ()
+  try $
+    do{ c <- try p;
+        parserFail $ parseError (UnExpect (show c))
+      }
+    <|> return ()
 
 
 between :: Parser open -> Parser close -> Parser a -> Parser a
@@ -588,13 +454,13 @@ anyChar = satisfy (const True)
 
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy f =
-  EP.Parser $ \s@(EP.State _ pos end _ row col sourceName _) cok _ _ eerr ->
+  P.Parser $ \s@(P.State _ pos end _ row col _) cok _ _ eerr ->
     let
       (char, width) = extractChar s
 
-      errEof = newErrorMessage (SysUnExpect "") sourceName
+      errEof = parseError (UnExpect "end of file")
 
-      errExpect = newErrorMessage (SysUnExpect $ [char]) sourceName
+      errExpect = parseError (UnExpect [char])
     in
     if pos == end then
       eerr row col errEof
@@ -606,48 +472,14 @@ satisfy f =
 
 string :: String -> Parser String
 string "" = return ""
-string match@(c:cs) =
-  EP.Parser $ \s cok _ cerr eerr ->
-    stringHelp
-      [c]
-      s
-      (\s' ->
-        stringHelp
-          cs
-          s'
-          (cok match)
-          cerr
-      )
-      eerr
+string (c:cs) =
+  do  _ <- satisfy ((==) c)
+      _ <- string cs
+      return (c:cs)
 
 
-stringHelp :: forall b.
-  String
-  -> EP.State
-  -> (EP.State -> b)
-  -> (Row -> Col -> (Row -> Col -> ParseError) -> b)
-  -> b
-stringHelp "" s toOk _ = toOk s
-stringHelp (c:cs) s@(EP.State _ pos end _ row col sourceName _) toOk toError =
-  let
-    errEof _ _ = setErrorMessage (Expect (show (c:cs)))
-                  (newErrorMessage (SysUnExpect "") sourceName row col)
-
-    errExpect x _ _ = setErrorMessage (Expect (show (c:cs)))
-                        (newErrorMessage (SysUnExpect (show x)) sourceName row col)
-
-    (char, width) = extractChar s
-  in
-  if pos == end then
-    toError row col errEof
-  else if char == c then
-    stringHelp cs (updatePos width char s) toOk toError
-  else
-    toError row col (errExpect c)
-
-
-updatePos :: Int -> Char -> EP.State -> EP.State
-updatePos width c (EP.State src pos end indent row col sourceName newline) =
+updatePos :: Int -> Char -> P.State -> P.State
+updatePos width c (P.State src pos end indent row col newline) =
   let
     (row', col') =
       case c of
@@ -669,7 +501,7 @@ updatePos width c (EP.State src pos end indent row col sourceName newline) =
 
         _ -> (row, col + 1)
   in
-  EP.State src (plusPtr pos width) end indent row' col' sourceName newline
+  P.State src (plusPtr pos width) end indent row' col' newline
 
 
 -- Inspired by https://hackage.haskell.org/package/utf8-string-1.0.2/docs/src/Codec.Binary.UTF8.String.html#decode
@@ -685,8 +517,8 @@ updatePos width c (EP.State src pos end indent row col sourceName newline) =
 --  w0, 4 byte char    w1        w2         w3, outside buffer
 --          v           v         v          v
 -- | ...,  11110xxx,  10xxxxxx,  10xxxxxx | ...
-extractChar :: EP.State -> (Char, Int)
-extractChar (EP.State _ pos _ _ _ _ _ _) =
+extractChar :: P.State -> (Char, Int)
+extractChar (P.State _ pos _ _ _ _ _) =
   -- 1 byte codepoint
   if w0 < 0xc0 then
     (chr (fromEnum w0), 1)
@@ -702,10 +534,10 @@ extractChar (EP.State _ pos _ _ _ _ _ _) =
   else
     error "invalid utf-8"
   where
-    w0 = EP.unsafeIndex pos
-    w1 = EP.unsafeIndex (plusPtr pos 1)
-    w2 = EP.unsafeIndex (plusPtr pos 2)
-    w3 = EP.unsafeIndex (plusPtr pos 3)
+    w0 = P.unsafeIndex pos
+    w1 = P.unsafeIndex (plusPtr pos 1)
+    w2 = P.unsafeIndex (plusPtr pos 2)
+    w3 = P.unsafeIndex (plusPtr pos 3)
 
     -- `Codec.Binary.UTF8.String.decode` has this special case function for
     -- a 2 byte codepoint, why is that? Will it behave the same way if we use
@@ -742,8 +574,8 @@ extractChar (EP.State _ pos _ _ _ _ _ _) =
 -- indents adds additional data onto parsecs `ParsecT` in order to track
 -- indentation information. The new parser tracks this information by itself
 -- now, which is why this function becomes a no-op.
-runIndent :: s -> a -> a
-runIndent _ = id
+runIndent :: a -> a
+runIndent = id
 
 
 block :: Parser a -> Parser [a]
@@ -754,19 +586,25 @@ block p = withPos $ do
 
 indented :: Parser ()
 indented =
-  do  (EP.State _ _ _ indent _ col _ _) <- getParserState
-      if col <= indent then fail "not indented" else do return ()
+  do  (P.State _ _ _ indent _ col _) <- getParserState
+      if col <= indent then
+        parserFail $ parseError (Message "not indented")
+      else do
+        return ()
 
 
 checkIndent :: Parser ()
 checkIndent =
-  do  (EP.State _ _ _ indent _ col _ _) <- getParserState
-      if indent == col then return () else fail "indentation doesn't match"
+  do  (P.State _ _ _ indent _ col _) <- getParserState
+      if indent == col then
+        return ()
+      else
+        parserFail $ parseError (Message "indentation doesn't match")
 
 
 withPos :: Parser a -> Parser a
-withPos (EP.Parser p) =
-  EP.Parser $ \s@(EP.State _ _ _ indent _ col _ _) cok eok cerr eerr ->
+withPos (P.Parser p) =
+  P.Parser $ \s@(P.State _ _ _ indent _ col _) cok eok cerr eerr ->
     let
       cok' x s' = cok x (setIndent indent s')
       eok' x s' = eok x (setIndent indent s')
@@ -774,6 +612,6 @@ withPos (EP.Parser p) =
     p (setIndent col s) cok' eok' cerr eerr
 
 
-setIndent :: Word16 -> EP.State -> EP.State
-setIndent indent (EP.State s p e _ r c nl sn) =
-  EP.State s p e indent r c nl sn
+setIndent :: Word16 -> P.State -> P.State
+setIndent indent (P.State s p e _ r c nl) =
+  P.State s p e indent r c nl
