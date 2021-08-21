@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'json'
+      - 'new-parser-2021'
 
 defaults:
   run:
