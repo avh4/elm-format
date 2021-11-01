@@ -33,7 +33,7 @@ common common-options
         src
 
     build-depends:
-        ansi-terminal >= 0.10.3 && < 0.11,
+        ansi-terminal >= 0.11 && < 0.12,
         ansi-wl-pprint >= 0.6.8.2 && < 0.7,
         array >= 0.5.4.0 && < 0.6,
         base >= 4.12.0.0 && < 5,
