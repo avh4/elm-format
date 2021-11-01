@@ -39,12 +39,12 @@ jobs:
       name: Setup Haskell
       id: setup-haskell
       with:
-        ghc-version: 8.10.7
+        ghc-version: 9.0.1
     - name: Verify Haskell version
       run: |
         cabal --version
         ghc --version
-        [[ $(ghc --numeric-version) == 8.10.7 ]]
+        [[ $(ghc --numeric-version) == 9.0.1 ]]
     - uses: actions/cache@v2
       name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:
