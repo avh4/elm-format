@@ -81,7 +81,7 @@ common common-options
         optparse-applicative >= 0.15.1.0 && < 0.16,
         parsec >= 3.1.13.0 && < 4,
         process >= 1.6.5.0 && < 2,
-        relude >= 0.7 && < 0.8,
+        relude >= 1.0.0.1 && < 1.1,
         text >= 1.2.3.1 && < 2,
         avh4-lib,
         elm-format-markdown
