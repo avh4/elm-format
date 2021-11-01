@@ -158,7 +158,7 @@ test-suite efl-tests
         Parse.TypeTest
 
     build-depends:
-        split >= 0.2.3.3 && < 0.3,
+        split >= 0.2.3.4 && < 0.3,
         tasty >= 1.2 && < 2,
         tasty-hspec >= 1.1.5.1 && < 1.2,
         tasty-hunit >= 0.10.0.1 && < 0.11,

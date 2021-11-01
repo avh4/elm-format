@@ -40,7 +40,7 @@ common common-options
         hspec-core >= 2.7.4 && < 3,
         hspec-golden >= 0.1.0.3 && < 0.2,
         mtl >= 2.2.2 && < 3,
-        split >= 0.2.3.3 && < 0.3,
+        split >= 0.2.3.4 && < 0.3,
         tasty >= 1.2 && < 2,
         tasty-hspec >= 1.1.5.1 && < 1.2,
         tasty-hunit >= 0.10.0.1 && < 0.11,
