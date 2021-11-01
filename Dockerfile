@@ -1,6 +1,6 @@
 FROM alpine:latest as build
 
-ENV GHC_VERSION 8.10.4
+ENV GHC_VERSION 8.10.7
 
 ENV LANG C.UTF-8
 
