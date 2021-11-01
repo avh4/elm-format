@@ -74,7 +74,7 @@ common common-options
         binary >= 0.8.9.0 && < 0.9,
         bytestring >= 0.11.1.0 && < 0.12,
         containers >= 0.6.5.1 && < 0.7,
-        directory >= 1.3.3.0 && < 2,
+        directory >= 1.3.7.0 && < 2,
         filepath >= 1.4.2.1 && < 2,
         indents >= 0.3.3 && < 0.4,
         mtl >= 2.2.2 && < 3,
