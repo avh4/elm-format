@@ -36,7 +36,7 @@ common common-options
         base >= 4.12.0.0 && < 5,
         containers >= 0.6.5.1 && < 0.7,
         mtl >= 2.2.2 && < 3,
-        text >= 1.2.3.1 && < 2
+        text >= 1.2.5.0 && < 2
 
 library
     import: common-options
