@@ -88,8 +88,7 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Internal as B
 
 import Foreign.Ptr (plusPtr)
-import Foreign.ForeignPtr (touchForeignPtr)
-import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
+import Foreign.ForeignPtr (withForeignPtr)
 
 import System.IO.Unsafe (unsafePerformIO)
 
@@ -212,12 +211,16 @@ runParserT (P.Parser p) (State newline) source =
   unsafePerformIO $
     let
       (B.PS fptr offset length) = stringToByteString source
-      !pos = plusPtr (unsafeForeignPtrToPtr fptr) offset
-      !end = plusPtr pos length
-      !result = p (P.State fptr pos end 1 1 1 newline) toOk toOk toErr toErr
-    in
-    do  touchForeignPtr fptr
+
+      run' ptr =
+        let
+          !pos = plusPtr ptr offset
+          !end = plusPtr pos length
+          !result = p (P.State fptr pos end 1 1 1 newline) toOk toOk toErr toErr
+        in
         return result
+    in
+    withForeignPtr fptr run'
 
 
 toOk :: a -> P.State -> Either x a
