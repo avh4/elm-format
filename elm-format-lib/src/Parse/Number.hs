@@ -88,7 +88,8 @@ number toExpectation toError =
             OkFloat newPos representation ->
               let
                 !newCol = col + fromIntegral (minusPtr newPos pos)
-                !float = Float (parseFloat pos newPos) representation
+                !value = parseFloat pos newPos
+                !float = Float value representation
                 !newState = P.State src newPos end indent row newCol nl
               in
               cok float newState
