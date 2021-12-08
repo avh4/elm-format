@@ -91,6 +91,8 @@ import Foreign.Ptr (plusPtr)
 import Foreign.ForeignPtr (touchForeignPtr)
 import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
 
+import System.IO.Unsafe (unsafePerformIO)
+
 
 
 
@@ -207,7 +209,7 @@ parserDoesNotConsumeErr = error "Text.Parsec.Prim.many: combinator 'many' is app
 -- This function is very similar to `Parse.Primitives.fromByteString`.
 runParserT :: Parser a -> State -> String -> Either ParsecError a
 runParserT (P.Parser p) (State newline) source =
-  B.accursedUnutterablePerformIO $
+  unsafePerformIO $
     let
       (B.PS fptr offset length) = stringToByteString source
       !pos = plusPtr (unsafeForeignPtrToPtr fptr) offset
