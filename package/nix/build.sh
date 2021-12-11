@@ -8,7 +8,7 @@ ELM_FORMAT_VERSION="$(git describe --abbrev=8)"
 BRANCH="elm-format-$ELM_FORMAT_VERSION"
 
 if [ ! -d nixpkgs ]; then
-  git clone https://github.com/NixOS/nixpkgs.git nixpkgs
+  git clone --depth 10 --branch master https://github.com/NixOS/nixpkgs.git nixpkgs
 fi
 
 pushd nixpkgs
@@ -23,8 +23,6 @@ else
 fi
 popd
 
-cabal2nix --no-check cabal://indents-0.3.3 > nixpkgs/pkgs/development/compilers/elm/packages/indents.nix
-cabal2nix cabal://bimap-0.3.3 > nixpkgs/pkgs/development/compilers/elm/packages/bimap.nix
 cabal2nix --no-haddock https://github.com/avh4/elm-format --revision "$REV" --subpath avh4-lib > nixpkgs/pkgs/development/compilers/elm/packages/avh4-lib.nix
 cabal2nix --no-haddock https://github.com/avh4/elm-format --revision "$REV" --subpath elm-format-lib > nixpkgs/pkgs/development/compilers/elm/packages/elm-format-lib.nix
 cabal2nix --no-haddock https://github.com/avh4/elm-format --revision "$REV" --subpath elm-format-test-lib > nixpkgs/pkgs/development/compilers/elm/packages/elm-format-test-lib.nix
