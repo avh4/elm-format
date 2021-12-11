@@ -13,7 +13,6 @@ import qualified ElmFormat.Version
 import ElmVersion
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
-import Reporting.Region (Region(..), Position(..))
 import qualified Data.Aeson as Aeson
 import Data.Aeson ((.=))
 
@@ -69,7 +68,7 @@ instance ToConsole InfoMessage where
                     Text.pack $
                     case errs of
                         [] -> inputFile
-                        (A.A (Region (Position line col) _) _) : _ -> inputFile ++ ":" ++ show line ++ ":" ++ show col
+                        (A.At (A.Region (A.Position line col) _) _) : _ -> inputFile ++ ":" ++ show line ++ ":" ++ show col
             in
             "Unable to parse file " <> location <> " To see a detailed explanation, run elm make on the file."
 

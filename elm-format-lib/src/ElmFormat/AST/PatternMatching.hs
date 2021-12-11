@@ -5,7 +5,7 @@ module ElmFormat.AST.PatternMatching where
 import ElmFormat.AST.Shared
 import AST.V0_16
 import AST.Structure
-import Reporting.Annotation (Located(A))
+import Reporting.Annotation (Located(At))
 import Data.Indexed as I
 
 
@@ -23,12 +23,12 @@ matchType ::
        , ASTNS Located ns 'TypeNK
        )
 matchType [] typ = ( [], typ )
-matchType (pat : restPat) (I.Fix (A region (FunctionType (C eol typ) restTyp multiline))) =
+matchType (pat : restPat) (I.Fix (At region (FunctionType (C eol typ) restTyp multiline))) =
     let
         nextTyp =
             case toCommentedList restTyp of
                 [ (C _ single) ] -> single
-                ( (C (_, _, eol2) first) : rest ) -> I.Fix $ A region $ FunctionType (C eol2 first) (Sequence rest) multiline
+                ( (C (_, _, eol2) first) : rest ) -> I.Fix $ At region $ FunctionType (C eol2 first) (Sequence rest) multiline
 
         ( pats, retType ) =
             matchType restPat nextTyp

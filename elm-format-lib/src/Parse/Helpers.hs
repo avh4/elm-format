@@ -6,8 +6,7 @@ import Prelude hiding (until)
 import Control.Monad (guard)
 import qualified Data.Indexed as I
 import Data.Map.Strict hiding (foldl)
-import Text.Parsec hiding (newline, spaces, State)
-import Text.Parsec.Indent (indented, runIndent)
+import Parse.ParsecAdapter hiding (newline, spaces, State)
 
 import AST.V0_16
 import qualified AST.Helpers as Help
@@ -17,9 +16,10 @@ import qualified Parse.State as State
 import Parse.Comments
 import Parse.IParser
 import Parse.Whitespace
+import qualified Parse.Primitives as P
+import qualified Parse.ParsecAdapter as Parsec
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
-import qualified Reporting.Region as R
 
 
 reserveds :: [String]
@@ -42,14 +42,14 @@ expecting = flip (<?>)
 
 -- SETUP
 
-iParse :: IParser a -> String -> Either ParseError a
+iParse :: IParser a -> String -> Either ParsecError a
 iParse =
-    iParseWithState "" State.init
+    iParseWithState State.init
 
 
-iParseWithState :: SourceName -> State.State -> IParser a -> String -> Either ParseError a
-iParseWithState sourceName state aParser input =
-  runIndent sourceName $ runParserT aParser state sourceName input
+iParseWithState :: State.State -> IParser a -> String -> Either ParsecError a
+iParseWithState state aParser input =
+  runIndent $ runParserT aParser state input
 
 
 -- VARIABLES
@@ -98,7 +98,7 @@ makeVar :: ElmVersion -> IParser Char -> IParser String
 makeVar elmVersion firstChar =
   do  variable <- (:) <$> firstChar <*> many (innerVarChar elmVersion)
       if variable `elem` reserveds
-        then fail (Syntax.keyword variable)
+        then parserFail $ parseError (Message (Syntax.keyword variable))
         else return variable
 
 
@@ -290,11 +290,11 @@ keyValue parseSep parseKey parseVal =
       )
 
 
-separated :: IParser sep -> IParser e -> IParser (Either e (R.Region, C0Eol e, Sequence e, Bool))
+separated :: IParser sep -> IParser e -> IParser (Either e (A.Region, C0Eol e, Sequence e, Bool))
 separated sep expr' =
   let
     subparser =
-      do  start <- getMyPosition
+      do  start <- Parsec.getPosition
           t1 <- expr'
           arrow <- optionMaybe $ try ((,) <$> restOfLine <*> whitespace <* sep)
           case arrow of
@@ -303,11 +303,11 @@ separated sep expr' =
             Just (eolT1, preArrow) ->
                 do  postArrow <- whitespace
                     t2 <- separated sep expr'
-                    end <- getMyPosition
+                    end <- Parsec.getPosition
                     case t2 of
                         Right (_, C eolT2 t2', Sequence ts, _) ->
                           return $ \multiline -> Right
-                            ( R.Region start end
+                            ( A.Region start end
                             , C eolT1 t1
                             , Sequence (C (preArrow, postArrow, eolT2) t2' : ts)
                             , multiline
@@ -316,7 +316,7 @@ separated sep expr' =
                           do
                             eol <- restOfLine
                             return $ \multiline -> Right
-                              ( R.Region start end
+                              ( A.Region start end
                               , C eolT1 t1
                               , Sequence [ C (preArrow, postArrow, eol) t2' ]
                               , multiline)
@@ -459,28 +459,23 @@ surround'' leftDelim rightDelim inner =
 
 -- HELPERS FOR EXPRESSIONS
 
-getMyPosition :: IParser R.Position
-getMyPosition =
-  R.fromSourcePos <$> getPosition
-
-
 addLocation :: IParser a -> IParser (A.Located a)
 addLocation expr =
   do  (start, e, end) <- located expr
       return (A.at start end e)
 
 
-located :: IParser a -> IParser (R.Position, a, R.Position)
+located :: IParser a -> IParser (A.Position, a, A.Position)
 located parser =
-  do  start <- getMyPosition
+  do  start <- Parsec.getPosition
       value <- parser
-      end <- getMyPosition
+      end <- Parsec.getPosition
       return (start, value, end)
 
 
 accessible :: ElmVersion -> IParser (FixAST A.Located typeRef ctorRef varRef 'ExpressionNK) -> IParser (FixAST A.Located typeRef ctorRef varRef 'ExpressionNK)
 accessible elmVersion exprParser =
-  do  start <- getMyPosition
+  do  start <- Parsec.getPosition
       rootExpr <- exprParser
       access <- optionMaybe (try dot <?> "a field access like .name")
 
@@ -491,7 +486,7 @@ accessible elmVersion exprParser =
         Just _ ->
           accessible elmVersion $
             do  v <- lowVar elmVersion
-                end <- getMyPosition
+                end <- Parsec.getPosition
                 return $ I.Fix $ A.at start end $ Access rootExpr v
 
 
@@ -512,12 +507,18 @@ commentedKeyword elmVersion word parser =
 
 -- ODD COMBINATORS
 
+-- Behaves the same as `Parse.ParsecAdapter.fail` except that the consumed
+-- continuation is called instead of the empty continuation.
 failure :: String -> IParser String
-failure msg = do
-  inp <- getInput
-  setInput ('x':inp)
-  _ <- anyToken
-  fail msg
+failure msg =
+  P.Parser $ \s _ _ cerr _ ->
+    let
+      (P.Parser p) = parserFail $ parseError (Message msg)
+    in
+    -- This looks really unsound, but `p` which was created with `fail` will
+    -- only ever call the empty error continuation (which in this case
+    -- re-routes to the consumed error continuation)
+    p s undefined undefined undefined cerr
 
 
 until :: IParser a -> IParser b -> IParser b
@@ -564,4 +565,4 @@ processAs processor s =
   where
     calloutParser :: String -> IParser a -> IParser a
     calloutParser inp p =
-      either (fail . show) return (iParse p inp)
+      either (parserFail . const . const) return (iParse p inp)

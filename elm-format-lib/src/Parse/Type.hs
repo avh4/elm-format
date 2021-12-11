@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module Parse.Type where
 
-import Text.Parsec ((<|>), (<?>), char, many1, string, try, optionMaybe)
+import Parse.ParsecAdapter ((<|>), (<?>), char, many1, string, try, optionMaybe)
 
 import Parse.Helpers
 import Reporting.Annotation (Located)
@@ -97,7 +97,7 @@ expr elmVersion =
         Left t ->
           t
         Right (region, first', rest', multiline) ->
-          I.Fix $ A.A region $ FunctionType first' rest' (ForceMultiline multiline)
+          I.Fix $ A.At region $ FunctionType first' rest' (ForceMultiline multiline)
 
 
 -- TODO: can this be removed?  (tag is the new name?)
