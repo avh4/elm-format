@@ -1,0 +1,19 @@
+
+tasks:
+  - before: |
+      export GHCUP_INSTALL_BASE_PREFIX=/workspace/.ghcup
+      export CABAL_DIR=/workspace/.cabal
+      source "$GHCUP_INSTALL_BASE_PREFIX/.ghcup/env" || true
+    init: |
+      curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 BOOTSTRAP_HASKELL_MINIMAL=1 sh
+      source "$GHCUP_INSTALL_BASE_PREFIX/.ghcup/env"
+      ghcup install ghc 8.10.4
+      ghcup set ghc 8.10.4
+      ghcup install cabal
+      cabal update
+      ./build.sh
+    command: ./_build/elm-format
+
+vscode:
+  extensions:
+    - haskell.haskell
