@@ -42,7 +42,6 @@ import qualified Reporting.Annotation as A
 import qualified Reporting.Result as Result
 import Text.Printf (printf)
 
-
 pleaseReport'' :: String -> String -> String
 pleaseReport'' what details =
     -- TODO: include version in the message
@@ -464,8 +463,21 @@ formatModuleLine elmVersion (varsToExpose, extraComments) srcTag name moduleSett
                       |> ElmStructure.group' False "(" "," (maybeToList (formatComments extraComments)) ")" False
               _ ->
                   varsToExpose
-                      |> fmap (ElmStructure.group False "" "," "" False . fmap (formatCommented $ formatVarValue elmVersion))
+                      |> fmap (formatCommented id . mapCommented (ElmStructure.group False "" "," "" False . fmap (formatVarValue elmVersion)) . mergeCommented)
                       |> ElmStructure.group' False "(" "," (maybeToList (formatComments extraComments)) ")" True
+
+    mergeCommented :: [AST.Commented a] -> AST.Commented [a]
+    mergeCommented commenteds =
+        foldr
+            (\(AST.Commented pre inner post) (AST.Commented accPre accInner accPost) ->
+                AST.Commented (pre ++ accPre) (inner : accInner) (post ++ accPost)
+            )
+            (AST.Commented [] [] [])
+            commenteds
+
+    mapCommented :: (a -> b) -> AST.Commented a -> AST.Commented b
+    mapCommented f (AST.Commented pre inner post) =
+        AST.Commented pre (f inner) post
 
     formatSetting (k, v) =
       formatRecordPair elmVersion "=" (line . formatUppercaseIdentifier elmVersion) (k, v, False)
