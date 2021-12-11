@@ -1,7 +1,8 @@
 {-# LANGUAGE DataKinds #-}
 module Parse.Parse (parse, parseModule, parseDeclarations, parseExpressions) where
 
-import qualified Text.Parsec.Error as Parsec
+import Parse.ParsecAdapter (eof)
+import qualified Parse.ParsecAdapter as Parsec
 
 import AST.V0_16
 import AST.Module (Module)
@@ -13,11 +14,10 @@ import qualified Parse.Expression
 import Parse.Helpers
 import qualified Parse.Module
 import Reporting.Annotation (Located)
-import qualified Reporting.Region as R
+import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Error
 import qualified Reporting.Result as Result
 import Parse.IParser
-import Text.Parsec (eof)
 
 
 parseModule :: ElmVersion -> String -> Result.Result () Error.Error (Module [UppercaseIdentifier] (ASTNS Located [UppercaseIdentifier] 'TopLevelNK))
@@ -44,7 +44,7 @@ parse source parser =
         return result
 
     Left err ->
-        let pos = R.fromSourcePos (Parsec.errorPos err)
-            msgs = Parsec.errorMessages err
+        let
+          pos = (Parsec.errorPos err)
         in
-            Result.throw (R.Region pos pos) (Error.Parse msgs)
+        Result.throw (A.Region pos pos) (Error.Parse err)

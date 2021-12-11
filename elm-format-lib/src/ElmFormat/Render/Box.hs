@@ -38,8 +38,7 @@ import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified ElmFormat.Render.Markdown
 import qualified ElmVersion
 import qualified Parse.Parse as Parse
-import qualified Reporting.Annotation as RA
-import qualified Reporting.Region as Region
+import qualified Reporting.Annotation as A
 import qualified Reporting.Result as Result
 import Text.Printf (printf)
 
@@ -1715,14 +1714,14 @@ formatRange_0_17 elmVersion importInfo left right multiline =
                 , line $ punc "]"
                 ]
 
-nowhere :: Region.Position
+nowhere :: A.Position
 nowhere =
-    Region.Position 0 0
+    A.Position 0 0
 
 
-noRegion :: a -> RA.Located a
+noRegion :: a -> A.Located a
 noRegion =
-    RA.at nowhere nowhere
+    A.at nowhere nowhere
 
 formatRange_0_18 ::
     Coapplicative annf =>

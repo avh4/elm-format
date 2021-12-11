@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module Parse.Binop (binops) where
 
-import Text.Parsec ((<|>), choice, try)
+import Parse.ParsecAdapter ((<|>), choice, try)
 
 import AST.V0_16
 import AST.Structure (FixAST)
