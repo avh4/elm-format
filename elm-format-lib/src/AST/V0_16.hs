@@ -15,6 +15,7 @@ import Data.Foldable
 import Data.Functor.Const
 import Data.Functor.Compose
 import qualified Data.Indexed as I
+import Data.Kind
 import qualified Cheapskate.Types as Markdown
 import ElmFormat.AST.Shared
 import qualified Data.Maybe as Maybe
@@ -60,7 +61,7 @@ type C1Eol (l1 :: CommentType) = Commented (Comments, Maybe String)
 type C2Eol (l1 :: CommentType) (l2 :: CommentType) = Commented (Comments, Comments, Maybe String)
 
 class AsCommentedList f where
-    type CommentsFor f :: * -> *
+    type CommentsFor f :: Type -> Type
     toCommentedList :: f a -> List (CommentsFor f a)
     fromCommentedList :: List (CommentsFor f a) -> Either Text (f a)
 
@@ -268,7 +269,7 @@ data NodeKind
     | TypeNK
 
 
-data AST typeRef ctorRef varRef (getType :: NodeKind -> *) (kind :: NodeKind) where
+data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind) where
 
     TopLevel ::
         [TopLevelStructure (getType 'TopLevelDeclarationNK)]

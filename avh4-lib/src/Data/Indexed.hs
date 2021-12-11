@@ -6,20 +6,22 @@
 
 module Data.Indexed where
 
+import Data.Kind
+
 
 -- Common typeclasses
 
-class IFunctor (f :: (k -> *) -> k -> *) where
+class IFunctor (f :: (k -> Type) -> k -> Type) where
    imap :: (forall i. a i -> b i) -> (forall i. f a i -> f b i)
 
 
-class Foldable (t :: (k -> *) -> k -> *) where
+class Foldable (t :: (k -> Type) -> k -> Type) where
     foldMap :: Monoid m => (forall i. f i -> m) -> t f a -> m
 
 
 -- Recursion schemes
 
-newtype Fix (ann :: * -> *) (f :: (k -> *) -> k -> *) (i :: k)
+newtype Fix (ann :: Type -> Type) (f :: (k -> Type) -> k -> Type) (i :: k)
     = Fix { unFix :: ann (f (Fix ann f) i) }
 
 deriving instance Show (ann (f (Fix ann f) i)) => Show (Fix ann f i)
