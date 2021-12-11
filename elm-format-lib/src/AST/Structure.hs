@@ -22,16 +22,16 @@ import AST.V0_16
 import qualified Data.Indexed as I
 
 
--- FixAST :: (* -> *) -> * -> * -> * -> NodeKind -> *
+-- FixAST :: (Type -> Type) -> Type -> Type -> Type -> NodeKind -> Type
 type FixAST annf typeRef ctorRef varRef =
     I.Fix annf (AST typeRef ctorRef varRef)
 
--- ASTNS :: (* -> *) -> * -> NodeKind -> *
+-- ASTNS :: (Type -> Type) -> Type -> NodeKind -> Type
 type ASTNS annf ns =
     FixAST annf (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)
 
 -- This is the same as ASTNS, but with the first level unFix'ed
--- ASTNS1 :: (* -> *) -> * -> NodeKind -> *
+-- ASTNS1 :: (Type -> Type) -> Type -> NodeKind -> Type
 type ASTNS1 annf ns =
     AST
         (ns, UppercaseIdentifier)
