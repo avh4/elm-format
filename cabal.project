@@ -8,4 +8,6 @@ with-compiler: ghc-9.0.1
 
 constraints:
   -- ansi-terminal-0.11.1 has issues with Win32-2.10.* (which is packaged with ghc-9.0)
-  ansi-terminal == 0.11
+  ansi-terminal == 0.11,
+  -- bytestring-0.11.2.0 makes aeson-2.0.2.0 fail to compile
+  bytestring == 0.11.1.0
