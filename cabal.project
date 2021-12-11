@@ -7,7 +7,8 @@ packages:
 with-compiler: ghc-9.0.1
 
 constraints:
+  -- required to work with ansi-terminal-0.11.1
   Win32 >= 2.13.2.0 && < 2.14
 
 allow-newer:
-  process:Win32
+  Win32
