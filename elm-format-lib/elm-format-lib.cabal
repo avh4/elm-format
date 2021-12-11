@@ -36,6 +36,8 @@ common common-options
     other-modules:
         AST.Helpers
         Box
+        Data.Utf8
+        Elm.String
         ElmFormat.AST.BinaryOperatorPrecedence
         ElmFormat.AST.PatternMatching
         ElmFormat.AST.PublicAST.Comment
@@ -58,10 +60,15 @@ common common-options
         Parse.IParser
         Parse.Literal
         Parse.Module
+        Parse.Number
         Parse.Parse
+        Parse.ParsecAdapter
         Parse.Pattern
+        Parse.Primitives
         Parse.State
+        Parse.String
         Parse.Type
+        Parse.Variable
         Parse.Whitespace
 
     build-depends:
@@ -76,10 +83,9 @@ common common-options
         containers >= 0.6.0.1 && < 0.7,
         directory >= 1.3.3.0 && < 2,
         filepath >= 1.4.2.1 && < 2,
-        indents >= 0.3.3 && < 0.4,
+        ghc-prim >= 0.5.2,
         mtl >= 2.2.2 && < 3,
         optparse-applicative >= 0.15.1.0 && < 0.16,
-        parsec >= 3.1.13.0 && < 4,
         process >= 1.6.5.0 && < 2,
         relude >= 0.7 && < 0.8,
         text >= 1.2.3.1 && < 2,
@@ -111,7 +117,6 @@ library
         Parse.Markdown
         Reporting.Annotation
         Reporting.Error.Syntax
-        Reporting.Region
         Reporting.Result
 
 
@@ -140,7 +145,6 @@ test-suite efl-tests
         Parse.Markdown
         Reporting.Annotation
         Reporting.Error.Syntax
-        Reporting.Region
         Reporting.Result
 
     other-modules:
