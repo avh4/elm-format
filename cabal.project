@@ -5,3 +5,6 @@ packages:
     ./elm-format-test-lib,
     ./
 with-compiler: ghc-9.0.1
+
+constraints:
+  Win32 >= 2.13.2.0
