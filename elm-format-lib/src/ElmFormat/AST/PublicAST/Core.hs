@@ -44,6 +44,7 @@ import Data.Coapplicative
 import qualified Data.List as List
 import qualified Data.Text as Text
 import qualified Data.Aeson.Encoding.Internal as AesonInternal
+import qualified Data.Aeson.Key as AesonKey
 import qualified Data.Char as Char
 import Data.Text (Text)
 import qualified Data.Map.Strict as Map
@@ -104,7 +105,7 @@ instance ToJSON ModuleName where
 instance ToJSONKey ModuleName where
     toJSONKey =
         ToJSONKeyText
-            (Text.pack . show)
+            (AesonKey.fromString . show)
             (AesonInternal.string . show)
 
 instance FromJSON ModuleName where
@@ -230,7 +231,7 @@ instance ToJSON LowercaseIdentifier where
 instance ToJSONKey LowercaseIdentifier where
     toJSONKey =
         ToJSONKeyText
-            (\(LowercaseIdentifier name) -> Text.pack name)
+            (\(LowercaseIdentifier name) -> AesonKey.fromString name)
             (\(LowercaseIdentifier name) -> AesonInternal.string name)
 
 instance FromJSON LowercaseIdentifier where
