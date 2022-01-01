@@ -61,17 +61,16 @@ pleaseReport what details =
 surround :: Char -> Char -> Box -> Box
 surround left right b =
   let
-    left' = punc (left : [])
-    right' = punc (right : [])
+    left' = punc [left]
+    right' = punc [right]
   in
     case b of
       SingleLine b' ->
           line $ row [ left', b', right' ]
       _ ->
           stack1
-              [ b
-                  |> prefix left'
-              , line $ right'
+              [ prefix left' b
+              , line right'
               ]
 
 
@@ -182,7 +181,7 @@ sortVars forceMultiline fromExposing fromDocs =
             fromDocs
                 |> fmap (Maybe.mapMaybe (\v -> Map.lookup v allowedInDocs))
                 |> filter (not . List.null)
-                |> fmap (fmap (\v -> C ([], []) v))
+                |> fmap (fmap (C ([], [])))
                 |> removeDuplicates
 
         listedInExposing =
@@ -261,8 +260,8 @@ formatModuleHeader elmVersion addDefaultHeader modu =
           case Text.unpack text of
               s@(c:_) | Char.isUpper c -> TagRef [] (UppercaseIdentifier s)
               s@(c:_) | Char.isLower c -> VarRef [] (LowercaseIdentifier s)
-              '(':a:')':[] -> OpRef (SymbolIdentifier $ a:[])
-              '(':a:b:')':[] -> OpRef (SymbolIdentifier $ a:b:[])
+              ['(', a, ')'] -> OpRef (SymbolIdentifier [a])
+              ['(', a, b, ')'] -> OpRef (SymbolIdentifier [a, b])
               s -> VarRef [] (LowercaseIdentifier s)
 
       definedVars :: Set (C2 before after AST.Listing.Value)
@@ -298,7 +297,7 @@ formatModuleHeader elmVersion addDefaultHeader modu =
       varsToExpose =
           case AST.Module.exports =<< maybeHeader of
               Nothing ->
-                  if null $ concat documentedVars
+                  if all null documentedVars
                       then definedVars
                       else definedVars |> Set.filter (\v -> Set.member (varName v) documentedVarsSet)
               Just (C _ e) -> detailedListingToSet e
@@ -372,7 +371,7 @@ formatImports elmVersion modu =
         |> maybeToList
     , imports
         |> Map.assocs
-        |> fmap (\(name, (C pre method)) -> formatImport elmVersion (C pre name, method))
+        |> fmap (\(name, C pre method) -> formatImport elmVersion (C pre name, method))
     ]
         |> List.filter (not . List.null)
         |> List.intersperse [blankLine]
@@ -422,9 +421,9 @@ formatModuleLine_0_16 header =
       (name', exports', _) ->
         stack1
           [ line $ keyword "module"
-          , indent $ name'
-          , indent $ exports'
-          , indent $ whereClause
+          , indent name'
+          , indent exports'
+          , indent whereClause
           ]
 
 
@@ -495,7 +494,7 @@ formatModuleLine elmVersion (varsToExpose, extraComments) srcTag name moduleSett
         (tag', name') ->
           stack1
             [ tag'
-            , indent $ name'
+            , indent name'
             ]
   in
   ElmStructure.spaceSepOrIndented
@@ -714,13 +713,13 @@ formatDocCommentString docs =
     case lines docs of
         [] ->
             line $ row [ punc "{-|", space, punc "-}" ]
-        (first:[]) ->
+        [first] ->
             stack1
                 [ line $ row [ punc "{-|", space, literal first ]
                 , line $ punc "-}"
                 ]
         (first:rest) ->
-            (line $ row [ punc "{-|", space, literal first ])
+            line (row [ punc "{-|", space, literal first ])
                 |> andThen (map (line . literal) rest)
                 |> andThen [ line $ punc "-}" ]
 
@@ -1041,7 +1040,7 @@ formatDeclaration elmVersion importInfo decl =
                         nameWithArgs' ->
                             stack1
                             [ line $ keyword "type"
-                            , indent $ nameWithArgs'
+                            , indent nameWithArgs'
                             , first
                                 |> prefix (row [punc "=", space])
                                 |> andThen (map (prefix (row [punc "|", space])) rest)
@@ -1066,7 +1065,7 @@ formatDeclaration elmVersion importInfo decl =
             ElmStructure.definition "=" True
             (line $ keyword "port")
             [formatCommented (line . formatLowercaseIdentifier elmVersion []) name]
-            (formatCommented' bodyComments (formatExpression elmVersion importInfo SyntaxSeparated) $ expr)
+            (formatCommented' bodyComments (formatExpression elmVersion importInfo SyntaxSeparated) expr)
 
         Fixity_until_0_18 assoc precedenceComments precedence nameComments name ->
             case
@@ -1110,7 +1109,7 @@ formatNameWithArgs :: ElmVersion -> NameWithArgs UppercaseIdentifier LowercaseId
 formatNameWithArgs elmVersion (NameWithArgs name args) =
   case allSingles $ map (formatHeadCommented (line . formatLowercaseIdentifier elmVersion [])) args of
     Right args' ->
-      line $ row $ List.intersperse space $ ((formatUppercaseIdentifier elmVersion name):args')
+      line $ row $ List.intersperse space ((formatUppercaseIdentifier elmVersion name):args')
     Left args' ->
       stack1 $
         [ line $ formatUppercaseIdentifier elmVersion name ]
@@ -1182,7 +1181,7 @@ formatPattern elmVersion parensRequired apattern =
             in
                 formatBinary False
                     (formatEolCommented (formatPattern elmVersion True) first)
-                    (fmap formatRight $ toCommentedList rest)
+                    (formatRight <$> toCommentedList rest)
                 |> if parensRequired then parens else id
 
         DataPattern (ns, tag) [] ->
@@ -1338,7 +1337,7 @@ formatExpression elmVersion importInfo context aexpr =
                 (False, Right patterns', True, SingleLine expr') ->
                     line $ row
                         [ punc "\\"
-                        , row $ List.intersperse space $ patterns'
+                        , row $ List.intersperse space patterns'
                         , space
                         , punc "->"
                         , space
@@ -1495,7 +1494,7 @@ formatExpression elmVersion importInfo context aexpr =
                 clause (CaseBranch prePat postPat preExpr pat expr) =
                     case
                       ( postPat
-                      , (formatPattern elmVersion False pat)
+                      , formatPattern elmVersion False pat
                           |> negativeCasePatternWorkaround pat
                       , formatCommentedStack (formatPattern elmVersion False) (C (prePat, postPat) pat)
                           |> negativeCasePatternWorkaround pat
@@ -1566,7 +1565,7 @@ formatExpression elmVersion importInfo context aexpr =
         GLShader src ->
           line $ row
             [ punc "[glsl|"
-            , literal $ src
+            , literal src
             , punc "|]"
             ]
 
@@ -1648,7 +1647,7 @@ formatSequence left _ Nothing _ _ trailing (Sequence []) =
 
 mapIsLast :: (Bool -> a -> b) -> [a] -> [b]
 mapIsLast _ [] = []
-mapIsLast f (last_:[]) = f True last_ : []
+mapIsLast f [last_] = [f True last_]
 mapIsLast f (next:rest) = f False next : mapIsLast f rest
 
 
@@ -1755,7 +1754,7 @@ formatUnit :: Char -> Char -> Comments -> Box
 formatUnit left right comments =
   case (left, comments) of
     (_, []) ->
-      line $ punc (left : right : [])
+      line $ punc [left, right]
 
     ('{', (LineComment _):_) ->
       surround left right $ prefix space $ stack1 $ map formatComment comments
@@ -1796,7 +1795,7 @@ formatCommented =
 
 
 -- TODO: rename to formatPreCommented
-formatHeadCommented :: (a -> Box) -> (C1 before a) -> Box
+formatHeadCommented :: (a -> Box) -> C1 before a -> Box
 formatHeadCommented format (C pre inner) =
     formatCommented' pre format inner
 
@@ -1829,12 +1828,12 @@ formatEolCommented format (C post inner) =
 formatCommentedStack :: (a -> Box) -> C2 before after a -> Box
 formatCommentedStack format (C (pre, post) inner) =
   stack1 $
-    (map formatComment pre)
+    map formatComment pre
       ++ [ format inner ]
-      ++ (map formatComment post)
+      ++ map formatComment post
 
 
-formatHeadCommentedStack :: (a -> Box) -> (C1 before a) -> Box
+formatHeadCommentedStack :: (a -> Box) -> C1 before a -> Box
 formatHeadCommentedStack format (C pre inner) =
   formatCommentedStack format (C (pre, []) inner)
 
@@ -1848,8 +1847,8 @@ formatKeywordCommented word format (C (pre, post) value) =
 
 formatOpenCommentedList :: (a -> Box) -> OpenCommentedList a -> [Box]
 formatOpenCommentedList format (OpenCommentedList rest (C (preLst, eol) lst)) =
-    (fmap (formatC2Eol . fmap format) rest)
-        ++ [formatC2Eol $ fmap format $ C (preLst, [], eol) lst]
+    fmap (formatC2Eol . fmap format) rest
+        ++ [formatC2Eol $ format <$> C (preLst, [], eol) lst]
 
 
 formatComment :: Comment -> Box
@@ -1988,7 +1987,7 @@ formatString elmVersion style s =
             step okay quotes remaining =
                 case remaining of
                     [] ->
-                        reverse $ (concat $ replicate quotes "\"\\") ++ okay
+                        reverse $ concat (replicate quotes "\"\\") ++ okay
 
                     next : rest ->
                         if next == '"' then
@@ -2033,7 +2032,7 @@ formatTypeConstructor elmVersion ctor =
             line $ formatQualifiedUppercaseIdentifier elmVersion (namespace ++ [name])
 
         TupleConstructor n ->
-            line $ keyword $ "(" ++ (List.replicate (n-1) ',') ++ ")"
+            line $ keyword $ "(" ++ List.replicate (n-1) ',' ++ ")"
 
 
 formatType' ::
@@ -2063,7 +2062,7 @@ formatType' elmVersion requireParens atype =
                 ElmStructure.forceableSpaceSepOrStack
                     forceMultiline
                     (formatEolCommented (formatType' elmVersion ForLambda) first)
-                    (fmap formatRight $ toCommentedList rest)
+                    (formatRight <$> toCommentedList rest)
                 |> if requireParens /= NotRequired then parens else id
 
         TypeVariable var ->
