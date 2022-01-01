@@ -1,5 +1,4 @@
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE StandaloneDeriving #-}
@@ -618,7 +617,7 @@ mapAll ftyp fctor fvar fast = \case
 
 instance I.IFunctor (AST typeRef ctorRef varRef) where
     -- TODO: it's probably worth making an optimized version of this
-    imap fast = mapAll id id id fast
+    imap = mapAll id id id
 
 
 
@@ -637,7 +636,7 @@ topDownReferencesWithContext ::
     (LocalName -> context -> context) -- TODO: since the caller typically passes a function that builds a Map or Set, this could be optimized by taking `List (LocalName)` instead of one at a time
     -> (context -> (ns, UppercaseIdentifier) -> typeRef2)
     -> (context -> (ns, UppercaseIdentifier) -> ctorRef2)
-    -> (context -> (Ref ns) -> varRef2)
+    -> (context -> Ref ns -> varRef2)
     -> context
     -> I.Fix ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)) kind
     -> I.Fix ann (AST typeRef2 ctorRef2 varRef2) kind
