@@ -1011,7 +1011,7 @@ formatDeclaration elmVersion importInfo decl =
         Datatype nameWithArgs tags ->
             let
                 ctor (NameWithArgs tag args') =
-                    case allSingles $ map (formatPreCommented .fmap (formatType' elmVersion ForCtor)) args' of
+                    case allSingles $ map (formatPreCommented .fmap (typeParens ForCtor . formatType elmVersion)) args' of
                         Right args'' ->
                             line $ row $ List.intersperse space $ (formatUppercaseIdentifier elmVersion tag):args''
                         Left [] ->
@@ -1057,13 +1057,13 @@ formatDeclaration elmVersion importInfo decl =
             [ formatPreCommented (C preAlias $ line $ keyword "alias")
             , formatCommented $ fmap (formatNameWithArgs elmVersion) nameWithArgs
             ]
-            (formatPreCommentedStack $ fmap (formatType elmVersion) typ)
+            (formatPreCommentedStack $ fmap (typeParens NotRequired . formatType elmVersion) typ)
 
         PortAnnotation name typeComments typ ->
             ElmStructure.definition ":" False
             (line $ keyword "port")
             [ formatCommented $ fmap (line . formatLowercaseIdentifier elmVersion []) name ]
-            (formatCommented' typeComments $ formatType elmVersion typ)
+            (formatCommented' typeComments $ typeParens NotRequired $ formatType elmVersion typ)
 
         PortDefinition_until_0_16 name bodyComments expr ->
             ElmStructure.definition "=" True
@@ -1149,7 +1149,7 @@ formatTypeAnnotation elmVersion name typ =
   ElmStructure.definition ":" False
     (formatTailCommented $ fmap (line . formatVar elmVersion . fmap (\() -> [])) name)
     []
-    (formatPreCommented $ fmap (formatType elmVersion) typ)
+    (formatPreCommented $ fmap (typeParens NotRequired . formatType elmVersion) typ)
 
 
 formatAstNode :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> AST typeRef ([UppercaseIdentifier], UppercaseIdentifier ) varRef (Const (SyntaxContext, Box)) nk -> Const (SyntaxContext, Box) nk
@@ -1370,7 +1370,7 @@ formatExpression elmVersion importInfo aexpr =
                             , punc "->"
                             ]
                         , indent $ stack1 $
-                            (fmap formatComment bodyComments)
+                            fmap formatComment bodyComments
                             ++ [ expr' ]
                         ]
                 (_, Left [], _, _) ->
@@ -1380,7 +1380,7 @@ formatExpression elmVersion importInfo aexpr =
                         [ prefix (punc "\\") $ stack1 patterns'
                         , line $ punc "->"
                         , indent $ stack1 $
-                            (fmap formatComment bodyComments)
+                            fmap formatComment bodyComments
                             ++ [ expr' ]
                         ]
 
@@ -1419,7 +1419,7 @@ formatExpression elmVersion importInfo aexpr =
 
                 formatIf (IfClause cond body) =
                     stack1
-                        [ opening (line $ keyword "if") $ formatCommentedExpression elmVersion importInfo SyntaxSeparated cond
+                        [ opening (line $ keyword "if") $ formatCommentedExpression elmVersion importInfo cond
                         , indent $ formatCommented_ True $ fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) body
                         ]
 
@@ -1437,7 +1437,7 @@ formatExpression elmVersion importInfo aexpr =
                   in
                     stack1
                       [ blankLine
-                      , opening key $ formatCommentedExpression elmVersion importInfo SyntaxSeparated cond
+                      , opening key $ formatCommentedExpression elmVersion importInfo cond
                       , indent $ formatCommented_ True $ fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) body
                       ]
             in
@@ -1482,7 +1482,7 @@ formatExpression elmVersion importInfo aexpr =
                     |> andThen
                         [ line $ keyword "in"
                         , stack1 $
-                            (fmap formatComment bodyComments)
+                            fmap formatComment bodyComments
                             ++ [syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr]
                         ]
 
@@ -1491,7 +1491,7 @@ formatExpression elmVersion importInfo aexpr =
                 opening =
                   case
                     ( multiline
-                    , formatCommentedExpression elmVersion importInfo SyntaxSeparated subject
+                    , formatCommentedExpression elmVersion importInfo subject
                     )
                   of
                       (False, SingleLine subject') ->
@@ -1527,7 +1527,7 @@ formatExpression elmVersion importInfo aexpr =
                                 ]
                         ([], SingleLine pat', _, body') ->
                             stack1 $
-                                (map formatComment prePat)
+                                fmap formatComment prePat
                                 ++ [ line $ row [ pat', space, keyword "->"]
                                    , indent body'
                                    ]
@@ -1549,7 +1549,7 @@ formatExpression elmVersion importInfo aexpr =
 
         Tuple exprs multiline ->
             (,) SyntaxSeparated $
-            ElmStructure.group True "(" "," ")" multiline $ map (formatCommentedExpression elmVersion importInfo SyntaxSeparated) exprs
+            ElmStructure.group True "(" "," ")" multiline $ map (formatCommentedExpression elmVersion importInfo) exprs
 
         TupleFunction n ->
             (,) SyntaxSeparated $
@@ -1579,7 +1579,7 @@ formatExpression elmVersion importInfo aexpr =
 
                 _ ->
                     (,) SyntaxSeparated $
-                    formatCommentedExpression elmVersion importInfo SyntaxSeparated expr
+                    formatCommentedExpression elmVersion importInfo expr
                         |> parens
 
 
@@ -1597,10 +1597,10 @@ formatExpression elmVersion importInfo aexpr =
 
 
 formatCommentedExpression ::
-    ElmVersion -> ImportInfo [UppercaseIdentifier] -> SyntaxContext
+    ElmVersion -> ImportInfo [UppercaseIdentifier]
     -> C2 before after (ASTNS Identity [UppercaseIdentifier] 'ExpressionNK)
     -> Box
-formatCommentedExpression elmVersion importInfo context (C (pre, post) e) =
+formatCommentedExpression elmVersion importInfo (C (pre, post) e) =
     let
         commented' =
             case extract $ I.unFix e of
@@ -1608,7 +1608,7 @@ formatCommentedExpression elmVersion importInfo context (C (pre, post) e) =
                     C (pre ++ pre'', post'' ++ post) e''
                 _ -> C (pre, post) e
     in
-    formatCommented $ fmap (syntaxParens context . formatExpression elmVersion importInfo) commented'
+    formatCommented $ fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) commented'
 
 
 formatPreCommentedExpression ::
@@ -1661,7 +1661,7 @@ formatSequence left delim right (ForceMultiline multiline) trailing (Sequence (f
                 (formatItem left first)
                 (map (formatItem delim) rest)
             )
-            (maybe [] (flip (:) [] . stack' blankLine) (formatComments trailing) ++ (Maybe.maybeToList $ fmap (line . punc . flip (:) []) right))
+            (maybe [] (flip (:) [] . stack' blankLine) (formatComments trailing) ++ Maybe.maybeToList (fmap (line . punc . flip (:) []) right))
 formatSequence left _ (Just right) _ trailing (Sequence []) =
     formatUnit left right trailing
 formatSequence left _ Nothing _ trailing (Sequence []) =
@@ -1714,8 +1714,8 @@ formatRange_0_17 ::
 formatRange_0_17 elmVersion importInfo left right multiline =
     case
         ( multiline
-        , formatCommentedExpression elmVersion importInfo SyntaxSeparated left
-        , formatCommentedExpression elmVersion importInfo SyntaxSeparated right
+        , formatCommentedExpression elmVersion importInfo left
+        , formatCommentedExpression elmVersion importInfo right
         )
     of
         (False, SingleLine left', SingleLine right') ->
@@ -2026,17 +2026,28 @@ formatString elmVersion style s =
 
 
 data TypeParensRequired
-    = ForLambda
-    | ForCtor
-    | NotRequired
-    deriving (Eq)
+    = {- 0 -} NotRequired
+    | {- 1 -} ForLambda
+    | {- 2 -} ForCtor
+    deriving (Eq, Ord)
 
 
-formatType ::
-    Coapplicative annf =>
-    ElmVersion -> ASTNS annf [UppercaseIdentifier] 'TypeNK -> Box
-formatType elmVersion =
-    formatType' elmVersion NotRequired
+data TypeParensInner
+    = NotNeeded
+    | ForFunctionType
+    | ForTypeConstruction
+
+
+typeParens :: TypeParensRequired -> (TypeParensInner, Box) -> Box
+typeParens outer (inner, box) =
+    if typeParensNeeded outer inner then parens box else box
+
+
+typeParensNeeded :: TypeParensRequired -> TypeParensInner -> Bool
+typeParensNeeded outer = \case
+    NotNeeded -> False
+    ForTypeConstruction -> outer >= ForCtor
+    ForFunctionType -> outer >= ForLambda
 
 
 commaSpace :: Line
@@ -2057,12 +2068,13 @@ formatTypeConstructor elmVersion ctor =
             line $ keyword $ "(" ++ List.replicate (n-1) ',' ++ ")"
 
 
-formatType' ::
+formatType ::
     Coapplicative annf =>
-    ElmVersion -> TypeParensRequired -> ASTNS annf [UppercaseIdentifier] 'TypeNK -> Box
-formatType' elmVersion requireParens atype =
+    ElmVersion -> ASTNS annf [UppercaseIdentifier] 'TypeNK -> (TypeParensInner, Box)
+formatType elmVersion atype =
     case extract $ I.unFix atype of
         UnitType comments ->
+          (,) NotNeeded $
           formatUnit '(' ')' comments
 
         FunctionType first rest (ForceMultiline forceMultiline) ->
@@ -2075,19 +2087,20 @@ formatType' elmVersion requireParens atype =
                             , [ ElmStructure.prefixOrIndented
                                   (line $ punc "->")
                                   (formatC2Eol $
-                                      (fmap $ formatType' elmVersion ForLambda)
+                                      (fmap $ typeParens ForLambda . formatType elmVersion)
                                       (C (postOp, [], eol) term)
                                   )
                               ]
                             ]
             in
+                (,) ForFunctionType $
                 ElmStructure.forceableSpaceSepOrStack
                     forceMultiline
-                    (formatEolCommented (formatType' elmVersion ForLambda <$> first))
+                    (formatEolCommented (typeParens ForLambda . formatType elmVersion <$> first))
                     (formatRight <$> toCommentedList rest)
-                |> if requireParens /= NotRequired then parens else id
 
         TypeVariable var ->
+            (,) NotNeeded $
             line $ identifier $ formatVarName elmVersion var
 
         TypeConstruction ctor args forceMultiline ->
@@ -2097,22 +2110,25 @@ formatType' elmVersion requireParens atype =
                         ForceMultiline True -> FASplitFirst
                         ForceMultiline False -> FAJoinFirst JoinAll
             in
+            (,) (if null args then NotNeeded else ForTypeConstruction) $
             ElmStructure.application
                 join
                 (formatTypeConstructor elmVersion ctor)
-                (fmap (formatPreCommented . fmap (formatType' elmVersion ForCtor)) args)
-                |> (if not (null args) && requireParens == ForCtor then parens else id)
+                (fmap (formatPreCommented . fmap (typeParens ForCtor . formatType elmVersion)) args)
 
         TypeParens type' ->
-          parens $ formatCommented $ fmap (formatType elmVersion) type'
+          (,) NotNeeded $
+          parens $ formatCommented $ fmap (typeParens NotRequired . formatType elmVersion) type'
 
         TupleType types (ForceMultiline forceMultiline) ->
-            ElmStructure.group True "(" "," ")" forceMultiline (fmap (formatC2Eol . fmap (formatType elmVersion)) types)
+            (,) NotNeeded $
+            ElmStructure.group True "(" "," ")" forceMultiline (fmap (formatC2Eol . fmap (typeParens NotRequired . formatType elmVersion)) types)
 
         RecordType base fields trailing multiline ->
+            (,) NotNeeded $
             formatRecordLike
                 (fmap (line . formatLowercaseIdentifier elmVersion []) <$> base)
-                (fmap (formatPair ":" . mapPair (formatLowercaseIdentifier elmVersion []) (formatType elmVersion)) fields)
+                (fmap (formatPair ":" . mapPair (formatLowercaseIdentifier elmVersion []) (typeParens NotRequired . formatType elmVersion)) fields)
                 trailing multiline
 
 
