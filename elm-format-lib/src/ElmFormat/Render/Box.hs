@@ -41,6 +41,7 @@ import qualified Parse.Parse as Parse
 import qualified Reporting.Annotation as A
 import qualified Reporting.Result as Result
 import Text.Printf (printf)
+import Data.Functor.Const (Const (getConst, Const))
 
 pleaseReport'' :: String -> String -> String
 pleaseReport'' what details =
@@ -982,6 +983,11 @@ formatTopLevelStructure elmVersion importInfo topLevelStructure =
             entry
 
 
+formatAst :: Coapplicative annf => ElmVersion -> ImportInfo [UppercaseIdentifier] -> ASTNS annf [UppercaseIdentifier ] nk -> (SyntaxContext, Box) 
+formatAst elmVersion importInfo =
+    getConst . I.cata (formatAstNode elmVersion importInfo . extract)
+
+
 formatCommonDeclaration ::
     Coapplicative annf =>
     ElmVersion -> ImportInfo [UppercaseIdentifier] -> ASTNS annf [UppercaseIdentifier] 'CommonDeclarationNK -> Box
@@ -1131,8 +1137,8 @@ formatDefinition elmVersion importInfo name args comments expr =
         ]
   in
     ElmStructure.definition "=" True
-      (syntaxParens SpaceSeparated $ formatPattern elmVersion name)
-      (map (\(C x y) -> formatCommented' x $ syntaxParens SpaceSeparated $ formatPattern elmVersion y) args)
+      (syntaxParens SpaceSeparated $ formatAst elmVersion importInfo name)
+      (map (\(C x y) -> formatCommented' x $ syntaxParens SpaceSeparated $ formatAst elmVersion importInfo y) args)
       body
 
 
@@ -1146,11 +1152,10 @@ formatTypeAnnotation elmVersion name typ =
     (formatPreCommented $ fmap (formatType elmVersion) typ)
 
 
-formatPattern ::
-    Coapplicative annf =>
-    ElmVersion -> ASTNS annf [UppercaseIdentifier] 'PatternNK -> (SyntaxContext, Box)
-formatPattern elmVersion apattern =
-    case extract $ I.unFix apattern of
+formatAstNode :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> AST typeRef ([UppercaseIdentifier], UppercaseIdentifier ) varRef (Const (SyntaxContext, Box)) nk -> Const (SyntaxContext, Box) nk
+formatAstNode elmVersion importInfo =
+    Const .
+    \case
         Anything ->
             (,) SyntaxSeparated $ line $ keyword "_"
 
@@ -1173,14 +1178,14 @@ formatPattern elmVersion apattern =
                     , preOp
                     , line $ punc "::"
                     , formatC2Eol $
-                        (fmap $ syntaxParens SpaceSeparated . formatPattern elmVersion)
+                        (fmap $ syntaxParens SpaceSeparated)
                         (C (postOp, [], eol) term)
                     )
             in
                 (,) SpaceSeparated $
                 formatBinary False
-                    (formatEolCommented $ fmap (syntaxParens SpaceSeparated . formatPattern elmVersion) first)
-                    (formatRight <$> toCommentedList rest)
+                    (formatEolCommented $ fmap (syntaxParens SpaceSeparated . getConst) first)
+                    (formatRight . fmap getConst <$> toCommentedList rest)
 
         DataPattern (ns, tag) [] ->
             let
@@ -1204,16 +1209,16 @@ formatPattern elmVersion apattern =
             ElmStructure.application
                 (FAJoinFirst JoinAll)
                 (line $ formatQualifiedUppercaseIdentifier elmVersion ctor)
-                (fmap (formatPreCommented . fmap (syntaxParens SpaceSeparated . formatPattern elmVersion)) patterns)
+                (fmap (formatPreCommented . fmap (syntaxParens SpaceSeparated . getConst)) patterns)
 
         PatternParens pattern ->
-            formatCommented (fmap (syntaxParens SyntaxSeparated . formatPattern elmVersion) pattern)
+            formatCommented (fmap (syntaxParens SyntaxSeparated . getConst) pattern)
               |> parens
               |> (,) SyntaxSeparated
 
         TuplePattern patterns ->
             (,) SyntaxSeparated $
-            ElmStructure.group True "(" "," ")" False $ fmap (formatCommented . fmap (syntaxParens SyntaxSeparated . formatPattern elmVersion)) patterns
+            ElmStructure.group True "(" "," ")" False $ fmap (formatCommented . fmap (syntaxParens SyntaxSeparated . getConst)) patterns
 
         EmptyListPattern comments ->
             (,) SyntaxSeparated $
@@ -1221,7 +1226,7 @@ formatPattern elmVersion apattern =
 
         ListPattern patterns ->
             (,) SyntaxSeparated $
-            ElmStructure.group True "[" "," "]" False $ fmap (formatCommented . fmap (syntaxParens SyntaxSeparated . formatPattern elmVersion)) patterns
+            ElmStructure.group True "[" "," "]" False $ fmap (formatCommented . fmap (syntaxParens SyntaxSeparated . getConst)) patterns
 
         EmptyRecordPattern comments ->
             (,) SyntaxSeparated $
@@ -1234,7 +1239,7 @@ formatPattern elmVersion apattern =
         Alias pattern name ->
           (,) SpaceSeparated $
           case
-            ( formatTailCommented $ fmap (syntaxParens SpaceSeparated . formatPattern elmVersion) pattern
+            ( formatTailCommented $ fmap (syntaxParens SpaceSeparated . getConst) pattern
             , formatPreCommented $ fmap (line . formatLowercaseIdentifier elmVersion []) name
             )
           of
@@ -1342,7 +1347,7 @@ formatExpression elmVersion importInfo aexpr =
             (,) AmbiguousEnd $ 
             case
                 ( multiline
-                , allSingles $ fmap (formatPreCommented . fmap (syntaxParens SpaceSeparated . formatPattern elmVersion)) patterns
+                , allSingles $ fmap (formatPreCommented . fmap (syntaxParens SpaceSeparated . formatAst elmVersion importInfo)) patterns
                 , bodyComments == []
                 , syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr
                 )
@@ -1507,10 +1512,10 @@ formatExpression elmVersion importInfo aexpr =
                 clause (CaseBranch prePat postPat preExpr pat expr) =
                     case
                       ( postPat
-                      , formatPattern elmVersion pat
+                      , formatAst elmVersion importInfo pat
                           |> syntaxParens SyntaxSeparated
                           |> negativeCasePatternWorkaround pat
-                      , formatCommentedStack (fmap (syntaxParens SyntaxSeparated . formatPattern elmVersion) (C (prePat, postPat) pat))
+                      , formatCommentedStack (fmap (syntaxParens SyntaxSeparated . formatAst elmVersion importInfo) (C (prePat, postPat) pat))
                           |> negativeCasePatternWorkaround pat
                       , formatPreCommentedStack $ fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) (C preExpr expr)
                       )
