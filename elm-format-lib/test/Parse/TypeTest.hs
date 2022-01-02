@@ -10,7 +10,7 @@ import AST.Structure
 
 import Parse.TestHelpers
 import ElmVersion
-import ElmFormat.Render.Box (formatType)
+import ElmFormat.Render.Box (formatType, TypeParensRequired (NotRequired), typeParens)
 import qualified Box
 import qualified Data.Text as Text
 import Parse.IParser
@@ -27,7 +27,7 @@ expr = Parse.Type.expr
 example :: String -> String -> String -> TestTree
 example name input expected =
     testCase name $
-        assertParse (fmap (Text.unpack . Box.render . formatType Elm_0_19) (expr Elm_0_19)) input expected
+        assertParse (fmap (Text.unpack . Box.render . typeParens NotRequired . formatType Elm_0_19) (expr Elm_0_19)) input expected
 
 
 test_tests :: TestTree
