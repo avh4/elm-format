@@ -1365,7 +1365,7 @@ formatExpression elmVersion importInfo aexpr =
                             , punc "->"
                             ]
                         , indent $ stack1 $
-                            (fmap formatComment bodyComments)
+                            fmap formatComment bodyComments
                             ++ [ expr' ]
                         ]
                 (_, Left [], _, _) ->
@@ -1375,7 +1375,7 @@ formatExpression elmVersion importInfo aexpr =
                         [ prefix (punc "\\") $ stack1 patterns'
                         , line $ punc "->"
                         , indent $ stack1 $
-                            (fmap formatComment bodyComments)
+                            fmap formatComment bodyComments
                             ++ [ expr' ]
                         ]
 
@@ -1414,7 +1414,7 @@ formatExpression elmVersion importInfo aexpr =
 
                 formatIf (IfClause cond body) =
                     stack1
-                        [ opening (line $ keyword "if") $ formatCommentedExpression elmVersion importInfo SyntaxSeparated cond
+                        [ opening (line $ keyword "if") $ formatCommentedExpression elmVersion importInfo cond
                         , indent $ formatCommented_ True $ fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) body
                         ]
 
@@ -1432,7 +1432,7 @@ formatExpression elmVersion importInfo aexpr =
                   in
                     stack1
                       [ blankLine
-                      , opening key $ formatCommentedExpression elmVersion importInfo SyntaxSeparated cond
+                      , opening key $ formatCommentedExpression elmVersion importInfo cond
                       , indent $ formatCommented_ True $ fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) body
                       ]
             in
@@ -1486,7 +1486,7 @@ formatExpression elmVersion importInfo aexpr =
                 opening =
                   case
                     ( multiline
-                    , formatCommentedExpression elmVersion importInfo SyntaxSeparated subject
+                    , formatCommentedExpression elmVersion importInfo subject
                     )
                   of
                       (False, SingleLine subject') ->
@@ -1544,7 +1544,7 @@ formatExpression elmVersion importInfo aexpr =
 
         Tuple exprs multiline ->
             (,) SyntaxSeparated $
-            ElmStructure.group True "(" "," ")" multiline $ map (formatCommentedExpression elmVersion importInfo SyntaxSeparated) exprs
+            ElmStructure.group True "(" "," ")" multiline $ map (formatCommentedExpression elmVersion importInfo) exprs
 
         TupleFunction n ->
             (,) SyntaxSeparated $
@@ -1574,7 +1574,7 @@ formatExpression elmVersion importInfo aexpr =
 
                 _ ->
                     (,) SyntaxSeparated $
-                    formatCommentedExpression elmVersion importInfo SyntaxSeparated expr
+                    formatCommentedExpression elmVersion importInfo expr
                         |> parens
 
 
@@ -1592,10 +1592,10 @@ formatExpression elmVersion importInfo aexpr =
 
 
 formatCommentedExpression ::
-    ElmVersion -> ImportInfo [UppercaseIdentifier] -> SyntaxContext
+    ElmVersion -> ImportInfo [UppercaseIdentifier]
     -> C2 before after (ASTNS Identity [UppercaseIdentifier] 'ExpressionNK)
     -> Box
-formatCommentedExpression elmVersion importInfo context (C (pre, post) e) =
+formatCommentedExpression elmVersion importInfo (C (pre, post) e) =
     let
         commented' =
             case extract $ I.unFix e of
@@ -1603,7 +1603,7 @@ formatCommentedExpression elmVersion importInfo context (C (pre, post) e) =
                     C (pre ++ pre'', post'' ++ post) e''
                 _ -> C (pre, post) e
     in
-    formatCommented $ fmap (syntaxParens context . formatExpression elmVersion importInfo) commented'
+    formatCommented $ fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) commented'
 
 
 formatPreCommentedExpression ::
@@ -1709,8 +1709,8 @@ formatRange_0_17 ::
 formatRange_0_17 elmVersion importInfo left right multiline =
     case
         ( multiline
-        , formatCommentedExpression elmVersion importInfo SyntaxSeparated left
-        , formatCommentedExpression elmVersion importInfo SyntaxSeparated right
+        , formatCommentedExpression elmVersion importInfo left
+        , formatCommentedExpression elmVersion importInfo right
         )
     of
         (False, SingleLine left', SingleLine right') ->
