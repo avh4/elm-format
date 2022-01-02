@@ -1332,10 +1332,9 @@ formatExpression elmVersion importInfo aexpr =
         ExplicitList exprs trailing multiline ->
             (,) SyntaxSeparated $ 
             formatSequence '[' ',' (Just ']')
-                (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo)
                 multiline
                 trailing
-                exprs
+                (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo <$> exprs)
 
         Binops left ops multiline ->
             (,) InfixSeparated $ 
@@ -1566,11 +1565,9 @@ formatExpression elmVersion importInfo aexpr =
         Record base fields trailing multiline ->
             (,) SyntaxSeparated $
             formatRecordLike
-                (line . formatLowercaseIdentifier elmVersion [])
-                (formatLowercaseIdentifier elmVersion [])
-                "="
-                (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo)
-                base fields trailing multiline
+                (fmap (line . formatLowercaseIdentifier elmVersion []) <$> base)
+                (fmap (formatPair "=" . mapPair (formatLowercaseIdentifier elmVersion []) (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo)) fields)
+                trailing multiline
 
         Parens expr ->
             case expr of
@@ -1628,36 +1625,33 @@ formatPreCommentedExpression elmVersion importInfo context (C pre e) =
 
 
 formatRecordLike ::
-    (base -> Box) -> (key -> Line) -> String -> (value -> Box)
-    -> Maybe (C2 before after base) -> Sequence (Pair key value)-> Comments -> ForceMultiline
+    Maybe (C2 before after Box) -> Sequence Box -> Comments -> ForceMultiline
     -> Box
-formatRecordLike formatBase formatKey fieldSep formatValue base' fields trailing multiline =
+formatRecordLike base' fields trailing multiline =
     case (base', fields) of
       ( Just base, pairs' ) ->
           ElmStructure.extensionGroup'
               ((\(ForceMultiline b) -> b) multiline)
-              (formatCommented $ fmap formatBase base)
+              (formatCommented base)
               (formatSequence '|' ',' Nothing
-                  (formatPair fieldSep . mapPair formatKey formatValue)
                   multiline
                   trailing
                   pairs')
 
       ( Nothing, pairs' ) ->
           formatSequence '{' ',' (Just '}')
-              (formatPair fieldSep . mapPair formatKey formatValue)
               multiline
               trailing
               pairs'
 
 
-formatSequence :: Char -> Char -> Maybe Char -> (a -> Box) -> ForceMultiline -> Comments -> Sequence a -> Box
-formatSequence left delim right formatA (ForceMultiline multiline) trailing (Sequence (first:rest)) =
+formatSequence :: Char -> Char -> Maybe Char -> ForceMultiline -> Comments -> Sequence Box -> Box
+formatSequence left delim right (ForceMultiline multiline) trailing (Sequence (first:rest)) =
     let
         formatItem delim_ (C (pre, post, eol) item) =
             maybe id (stack' . stack' blankLine) (formatComments pre) $
             prefix (row [ punc [delim_], space ]) $
-            formatC2Eol $ C (post, [], eol) $ formatA item
+            formatC2Eol $ C (post, [], eol) item
     in
         ElmStructure.forceableSpaceSepOrStack multiline
             (ElmStructure.forceableRowOrStack multiline
@@ -1665,9 +1659,9 @@ formatSequence left delim right formatA (ForceMultiline multiline) trailing (Seq
                 (map (formatItem delim) rest)
             )
             (maybe [] (flip (:) [] . stack' blankLine) (formatComments trailing) ++ (Maybe.maybeToList $ fmap (line . punc . flip (:) []) right))
-formatSequence left _ (Just right) _ _ trailing (Sequence []) =
+formatSequence left _ (Just right) _ trailing (Sequence []) =
     formatUnit left right trailing
-formatSequence left _ Nothing _ _ trailing (Sequence []) =
+formatSequence left _ Nothing _ trailing (Sequence []) =
     formatUnit left ' ' trailing
 
 
@@ -2114,11 +2108,9 @@ formatType' elmVersion requireParens atype =
 
         RecordType base fields trailing multiline ->
             formatRecordLike
-                (line . formatLowercaseIdentifier elmVersion [])
-                (formatLowercaseIdentifier elmVersion [])
-                ":"
-                (formatType elmVersion)
-                base fields trailing multiline
+                (fmap (line . formatLowercaseIdentifier elmVersion []) <$> base)
+                (fmap (formatPair ":" . mapPair (formatLowercaseIdentifier elmVersion []) (formatType elmVersion)) fields)
+                trailing multiline
 
 
 formatVar :: ElmVersion -> Ref [UppercaseIdentifier] -> Line
