@@ -182,6 +182,10 @@ data Pair key value =
         }
     deriving (Show, Eq, Functor)
 
+mapPair :: (a1 -> a2) -> (b1 -> b2) -> Pair a1 b1 -> Pair a2 b2
+mapPair fa fb (Pair k v fm) =
+    Pair (fa <$> k) (fb <$> v) fm
+
 
 data Multiline
     = JoinAll
