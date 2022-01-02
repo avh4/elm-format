@@ -130,11 +130,11 @@ data DeclarationType
   deriving (Show)
 
 
-declarationType :: (a -> BodyEntryType) -> TopLevelStructure a -> DeclarationType
-declarationType entryType decl =
+declarationType :: TopLevelStructure BodyEntryType -> DeclarationType
+declarationType decl =
   case decl of
     Entry entry ->
-        case entryType entry of
+        case entry of
             BodyNamed name -> DDefinition (Just name)
             BodyUnnamed -> DDefinition Nothing
             BodyFixity -> DFixity
@@ -575,7 +575,8 @@ formatModuleBody linesBetween elmVersion importInfo body =
                 Fixity _ _ _ _ ->
                     BodyFixity
     in
-    formatTopLevelBody linesBetween elmVersion importInfo entryType (formatDeclaration elmVersion importInfo) body
+    formatTopLevelBody linesBetween elmVersion importInfo $
+        fmap (fmap $ \b -> (entryType b, formatDeclaration elmVersion importInfo b)) body
 
 
 data BodyEntryType
@@ -588,17 +589,15 @@ formatTopLevelBody ::
     Int
     -> ElmVersion
     -> ImportInfo [UppercaseIdentifier]
-    -> (a -> BodyEntryType)
-    -> (a -> Box)
-    -> [TopLevelStructure a]
+    -> [TopLevelStructure (BodyEntryType, Box)]
     -> Maybe Box
-formatTopLevelBody linesBetween elmVersion importInfo entryType formatEntry body =
+formatTopLevelBody linesBetween elmVersion importInfo body =
     let
         extraLines n =
             List.replicate n blankLine
 
-        spacer first second =
-            case (declarationType entryType first, declarationType entryType second) of
+        spacer a b =
+            case (declarationType (fmap fst a), declarationType (fmap fst b)) of
                 (DStarter, _) -> 0
                 (_, DCloser) -> 0
                 (DComment, DComment) -> 0
@@ -622,7 +621,7 @@ formatTopLevelBody linesBetween elmVersion importInfo entryType formatEntry body
 
         boxes =
             intersperseMap (\a b -> extraLines $ spacer a b)
-                (formatTopLevelStructure elmVersion importInfo formatEntry)
+                (formatTopLevelStructure elmVersion importInfo . fmap snd)
                 body
     in
         case boxes of
@@ -681,12 +680,11 @@ formatDocComment elmVersion importInfo blocks =
                         |> fromMaybe ""
 
                 ExpressionsCode expressions ->
-                    let
-                        entryType _ = BodyUnnamed
-                    in
                     expressions
                         |> fmap (fmap $ fmap $ I.convert (Identity . extract))
-                        |> formatTopLevelBody 1 elmVersion importInfo entryType (formatEolCommented . fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo))
+                        |> fmap (fmap $ formatEolCommented . fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo))
+                        |> fmap (fmap $ (,) BodyUnnamed)
+                        |> formatTopLevelBody 1 elmVersion importInfo
                         |> fmap (Text.unpack . Box.render)
                         |> fromMaybe ""
 
@@ -971,8 +969,8 @@ formatVarValue elmVersion aval =
                     name'
 
 
-formatTopLevelStructure :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> (a -> Box) -> TopLevelStructure a -> Box
-formatTopLevelStructure elmVersion importInfo formatEntry topLevelStructure =
+formatTopLevelStructure :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> TopLevelStructure Box -> Box
+formatTopLevelStructure elmVersion importInfo topLevelStructure =
     case topLevelStructure of
         DocComment docs ->
             formatDocComment elmVersion importInfo docs
@@ -981,7 +979,7 @@ formatTopLevelStructure elmVersion importInfo formatEntry topLevelStructure =
             formatComment c
 
         Entry entry ->
-            formatEntry entry
+            entry
 
 
 formatCommonDeclaration ::
