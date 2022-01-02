@@ -2021,10 +2021,10 @@ formatString elmVersion style s =
 
 
 data TypeParensRequired
-    = ForLambda
-    | ForCtor
-    | NotRequired
-    deriving (Eq)
+    = {- 0 -} NotRequired
+    | {- 1 -} ForLambda
+    | {- 2 -} ForCtor
+    deriving (Eq, Ord)
 
 
 data TypeParensInner
@@ -2039,15 +2039,10 @@ typeParens outer (inner, box) =
 
 
 typeParensNeeded :: TypeParensRequired -> TypeParensInner -> Bool
-typeParensNeeded outer inner =
-    case (inner, outer) of
-        (NotNeeded, _) -> False
-        (ForTypeConstruction, ForCtor) -> True
-        (ForTypeConstruction, ForLambda) -> False
-        (ForTypeConstruction, NotRequired) -> False
-        (ForFunctionType, ForCtor) -> True
-        (ForFunctionType, ForLambda) -> True
-        (ForFunctionType, NotRequired) -> False
+typeParensNeeded outer = \case
+    NotNeeded -> False
+    ForTypeConstruction -> outer >= ForCtor
+    ForFunctionType -> outer >= ForLambda
 
 
 commaSpace :: Line
