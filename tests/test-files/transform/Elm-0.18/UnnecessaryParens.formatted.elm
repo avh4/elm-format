@@ -31,6 +31,14 @@ unnecessaryParens =
     )
 
 
+nestedParensMergeComments =
+    ({- A -} {- B -} 0 {- C -} {- D -})
+
+
+nestedParensMergeComments2 f =
+    f {- A -} {- B -} 0
+
+
 allowedParens =
     ( (x + 1) + (y - 1)
     , ()
