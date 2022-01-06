@@ -3,6 +3,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GADTs #-}
 
 module ElmFormat.Render.Box where
 
@@ -983,9 +984,14 @@ formatTopLevelStructure elmVersion importInfo topLevelStructure =
             entry
 
 
-formatAst :: Coapplicative annf => ElmVersion -> ImportInfo [UppercaseIdentifier] -> ASTNS annf [UppercaseIdentifier ] nk -> (SyntaxContext, Box) 
+data FormatResult (nk :: NodeKind) where
+    FormattedExpression :: SyntaxContext -> Box -> FormatResult 'ExpressionNK 
+    FormattedPattern :: SyntaxContext -> Box -> FormatResult 'PatternNK 
+
+
+formatAst :: Coapplicative annf => ElmVersion -> ImportInfo [UppercaseIdentifier] -> ASTNS annf [UppercaseIdentifier ] nk -> FormatResult nk
 formatAst elmVersion importInfo =
-    getConst . I.cata (formatAstNode elmVersion importInfo . extract)
+    I.cata (formatAstNode elmVersion importInfo . extract)
 
 
 formatCommonDeclaration ::
@@ -1152,24 +1158,23 @@ formatTypeAnnotation elmVersion name typ =
     (formatPreCommented $ fmap (typeParens NotRequired . formatType elmVersion) typ)
 
 
-formatAstNode :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> AST typeRef ([UppercaseIdentifier], UppercaseIdentifier ) varRef (Const (SyntaxContext, Box)) nk -> Const (SyntaxContext, Box) nk
+formatAstNode :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> AST typeRef ([UppercaseIdentifier], UppercaseIdentifier ) varRef FormatResult nk -> FormatResult nk
 formatAstNode elmVersion importInfo =
-    Const .
     \case
         Anything ->
-            (,) SyntaxSeparated $ line $ keyword "_"
+            FormattedPattern SyntaxSeparated $ line $ keyword "_"
 
         UnitPattern comments ->
-            (,) SyntaxSeparated $ formatUnit '(' ')' comments
+            FormattedPattern SyntaxSeparated $ formatUnit '(' ')' comments
 
         LiteralPattern lit ->
-            (,) SyntaxSeparated $ formatLiteral elmVersion lit
+            FormattedPattern SyntaxSeparated $ formatLiteral elmVersion lit
 
         VarPattern var ->
-            (,) SyntaxSeparated $ line $ formatLowercaseIdentifier elmVersion [] var
+            FormattedPattern SyntaxSeparated $ line $ formatLowercaseIdentifier elmVersion [] var
 
         OpPattern (SymbolIdentifier name) ->
-            (,) SyntaxSeparated $ line $ identifier $ "(" ++ name ++ ")"
+            FormattedPattern SyntaxSeparated $ line $ identifier $ "(" ++ name ++ ")"
 
         ConsPattern first rest ->
             let
@@ -1182,10 +1187,10 @@ formatAstNode elmVersion importInfo =
                         (C (postOp, [], eol) term)
                     )
             in
-                (,) SpaceSeparated $
+                FormattedPattern SpaceSeparated $
                 formatBinary False
-                    (formatEolCommented $ fmap (syntaxParens SpaceSeparated . getConst) first)
-                    (formatRight . fmap getConst <$> toCommentedList rest)
+                    (formatEolCommented $ fmap (syntaxParens SpaceSeparated) first)
+                    (formatRight <$> toCommentedList rest)
 
         DataPattern (ns, tag) [] ->
             let
@@ -1195,51 +1200,51 @@ formatAstNode elmVersion importInfo =
                 |>
                     case (elmVersion, ctor) of
                         (Elm_0_16, [_]) ->
-                            (,) SyntaxSeparated
+                            FormattedPattern SyntaxSeparated
                         (Elm_0_16, _) ->
-                            (,) SpaceSeparated
+                            FormattedPattern SpaceSeparated
                         _ ->
-                            (,) SyntaxSeparated
+                            FormattedPattern SyntaxSeparated
 
         DataPattern (ns, tag) patterns ->
             let
                 ctor = ns ++ [tag]
             in
-            (,) SpaceSeparated $
+            FormattedPattern SpaceSeparated $
             ElmStructure.application
                 (FAJoinFirst JoinAll)
                 (line $ formatQualifiedUppercaseIdentifier elmVersion ctor)
-                (fmap (formatPreCommented . fmap (syntaxParens SpaceSeparated . getConst)) patterns)
+                (fmap (formatPreCommented . fmap (syntaxParens SpaceSeparated)) patterns)
 
         PatternParens pattern ->
-            formatCommented (fmap (syntaxParens SyntaxSeparated . getConst) pattern)
+            formatCommented (fmap (syntaxParens SyntaxSeparated) pattern)
               |> parens
-              |> (,) SyntaxSeparated
+              |> FormattedPattern SyntaxSeparated
 
         TuplePattern patterns ->
-            (,) SyntaxSeparated $
-            ElmStructure.group True "(" "," ")" False $ fmap (formatCommented . fmap (syntaxParens SyntaxSeparated . getConst)) patterns
+            FormattedPattern SyntaxSeparated $
+            ElmStructure.group True "(" "," ")" False $ fmap (formatCommented . fmap (syntaxParens SyntaxSeparated)) patterns
 
         EmptyListPattern comments ->
-            (,) SyntaxSeparated $
+            FormattedPattern SyntaxSeparated $
             formatUnit '[' ']' comments
 
         ListPattern patterns ->
-            (,) SyntaxSeparated $
-            ElmStructure.group True "[" "," "]" False $ fmap (formatCommented . fmap (syntaxParens SyntaxSeparated . getConst)) patterns
+            FormattedPattern SyntaxSeparated $
+            ElmStructure.group True "[" "," "]" False $ fmap (formatCommented . fmap (syntaxParens SyntaxSeparated)) patterns
 
         EmptyRecordPattern comments ->
-            (,) SyntaxSeparated $
+            FormattedPattern SyntaxSeparated $
             formatUnit '{' '}' comments
 
         RecordPattern fields ->
-            (,) SyntaxSeparated $
+            FormattedPattern SyntaxSeparated $
             ElmStructure.group True "{" "," "}" False $ map (formatCommented . fmap (line . formatLowercaseIdentifier elmVersion [])) fields
 
         Alias pattern name ->
-          (,) SpaceSeparated $
+          FormattedPattern SpaceSeparated $
           case
-            ( formatTailCommented $ fmap (syntaxParens SpaceSeparated . getConst) pattern
+            ( formatTailCommented $ fmap (syntaxParens SpaceSeparated) pattern
             , formatPreCommented $ fmap (line . formatLowercaseIdentifier elmVersion []) name
             )
           of
@@ -1293,9 +1298,24 @@ data SyntaxContext
     | AmbiguousEnd
 
 
-syntaxParens :: SyntaxContext -> (SyntaxContext, Box) -> Box
-syntaxParens outer (inner, box) =
-    parensIf (needsParensInContext inner outer) box
+class UsesSyntaxParens a where
+    type Context a
+    parensNeeded :: Context a -> a -> Bool
+    getBox :: a -> Box
+
+instance UsesSyntaxParens (FormatResult 'ExpressionNK) where
+    type Context (FormatResult 'ExpressionNK) = SyntaxContext
+    parensNeeded outer (FormattedExpression inner _) = needsParensInContext inner outer
+    getBox (FormattedExpression _ box) = box
+
+instance UsesSyntaxParens (FormatResult 'PatternNK) where
+    type Context (FormatResult 'PatternNK) = SyntaxContext
+    parensNeeded outer (FormattedPattern inner _) = needsParensInContext inner outer
+    getBox (FormattedPattern _ box) = box
+
+syntaxParens :: UsesSyntaxParens a => Context a -> a -> Box
+syntaxParens outer a =
+    parensIf (parensNeeded outer a) (getBox a)
     where
         parensIf True = parens
         parensIf False = id
@@ -1316,35 +1336,35 @@ needsParensInContext inner outer =
 formatExpression ::
     ElmVersion -> ImportInfo [UppercaseIdentifier]
     -> ASTNS Identity [UppercaseIdentifier] 'ExpressionNK
-    -> (SyntaxContext, Box)
+    -> FormatResult 'ExpressionNK
 formatExpression elmVersion importInfo aexpr =
     case extract $ I.unFix aexpr of
         Literal lit ->
-            (,) SyntaxSeparated $ formatLiteral elmVersion lit
+            FormattedExpression SyntaxSeparated $ formatLiteral elmVersion lit
 
         VarExpr v ->
-            (,) SyntaxSeparated $ line $ formatVar elmVersion v
+            FormattedExpression SyntaxSeparated $ line $ formatVar elmVersion v
 
         Range left right multiline ->
             case elmVersion of
-                Elm_0_16 -> (,) SyntaxSeparated $ formatRange_0_17 elmVersion importInfo left right multiline
-                Elm_0_17 -> (,) SyntaxSeparated $ formatRange_0_17 elmVersion importInfo left right multiline
+                Elm_0_16 -> FormattedExpression SyntaxSeparated $ formatRange_0_17 elmVersion importInfo left right multiline
+                Elm_0_17 -> FormattedExpression SyntaxSeparated $ formatRange_0_17 elmVersion importInfo left right multiline
                 Elm_0_18 -> formatRange_0_18 elmVersion importInfo left right
                 Elm_0_19 -> formatRange_0_18 elmVersion importInfo left right
 
         ExplicitList exprs trailing multiline ->
-            (,) SyntaxSeparated $ 
+            FormattedExpression SyntaxSeparated $ 
             formatSequence '[' ',' (Just ']')
                 multiline
                 trailing
                 (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo <$> exprs)
 
         Binops left ops multiline ->
-            (,) InfixSeparated $ 
+            FormattedExpression InfixSeparated $ 
             formatBinops elmVersion importInfo left ops multiline
 
         Lambda patterns bodyComments expr multiline ->
-            (,) AmbiguousEnd $ 
+            FormattedExpression AmbiguousEnd $ 
             case
                 ( multiline
                 , allSingles $ fmap (formatPreCommented . fmap (syntaxParens SpaceSeparated . formatAst elmVersion importInfo)) patterns
@@ -1385,14 +1405,14 @@ formatExpression elmVersion importInfo aexpr =
                         ]
 
         Unary Negative e ->
-            (,) SyntaxSeparated $
+            FormattedExpression SyntaxSeparated $
             prefix (punc "-") $ syntaxParens SpaceSeparated $ formatExpression elmVersion importInfo e -- TODO: This might need something stronger than SpaceSeparated?
 
         App left [] _ ->
             formatExpression elmVersion importInfo left
 
         App left args multiline ->
-            (,) SpaceSeparated $
+            FormattedExpression SpaceSeparated $
             ElmStructure.application
                 multiline
                 (syntaxParens InfixSeparated $ formatExpression elmVersion importInfo left)
@@ -1441,7 +1461,7 @@ formatExpression elmVersion importInfo aexpr =
                       , indent $ formatCommented_ True $ fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) body
                       ]
             in
-                (,) AmbiguousEnd $
+                FormattedExpression AmbiguousEnd $
                 formatIf if'
                     |> andThen (fmap formatElseIf elseifs)
                     |> andThen
@@ -1471,7 +1491,7 @@ formatExpression elmVersion importInfo aexpr =
                     LetComment comment ->
                         formatComment comment
             in
-                (,) AmbiguousEnd $ -- TODO: not tested
+                FormattedExpression AmbiguousEnd $ -- TODO: not tested
                 line (keyword "let")
                     |> andThen
                         (defs
@@ -1538,7 +1558,7 @@ formatExpression elmVersion importInfo aexpr =
                               , indent body'
                               ]
             in
-                (,) AmbiguousEnd $ -- TODO: not tested
+                FormattedExpression AmbiguousEnd $ -- TODO: not tested
                 opening
                     |> andThen
                         (clauses
@@ -1548,25 +1568,25 @@ formatExpression elmVersion importInfo aexpr =
                         )
 
         Tuple exprs multiline ->
-            (,) SyntaxSeparated $
+            FormattedExpression SyntaxSeparated $
             ElmStructure.group True "(" "," ")" multiline $ map (formatCommentedExpression elmVersion importInfo) exprs
 
         TupleFunction n ->
-            (,) SyntaxSeparated $
+            FormattedExpression SyntaxSeparated $
             line $ keyword $ "(" ++ List.replicate (n-1) ',' ++ ")"
 
         Access expr field ->
-            (,) SyntaxSeparated $
+            FormattedExpression SyntaxSeparated $
             formatExpression elmVersion importInfo expr
                 |> syntaxParens SpaceSeparated -- TODO: does this need a different context than SpaceSeparated?
                 |> addSuffix (row $ [punc ".", formatLowercaseIdentifier elmVersion [] field])
 
         AccessFunction (LowercaseIdentifier field) ->
-            (,) SyntaxSeparated $
+            FormattedExpression SyntaxSeparated $
             line $ identifier $ "." ++ formatVarName' elmVersion field
 
         Record base fields trailing multiline ->
-            (,) SyntaxSeparated $
+            FormattedExpression SyntaxSeparated $
             formatRecordLike
                 (fmap (line . formatLowercaseIdentifier elmVersion []) <$> base)
                 (fmap (formatPair "=" . mapPair (formatLowercaseIdentifier elmVersion []) (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo)) fields)
@@ -1578,17 +1598,17 @@ formatExpression elmVersion importInfo aexpr =
                     formatExpression elmVersion importInfo expr'
 
                 _ ->
-                    (,) SyntaxSeparated $
+                    FormattedExpression SyntaxSeparated $
                     formatCommentedExpression elmVersion importInfo expr
                         |> parens
 
 
         Unit comments ->
-            (,) SyntaxSeparated $
+            FormattedExpression SyntaxSeparated $
             formatUnit '(' ')' comments
 
         GLShader src ->
-          (,) SyntaxSeparated $
+          FormattedExpression SyntaxSeparated $
           line $ row
             [ punc "[glsl|"
             , literal src
@@ -1749,7 +1769,7 @@ formatRange_0_18 ::
     ElmVersion -> ImportInfo [UppercaseIdentifier]
     -> C2 before after (ASTNS annf [UppercaseIdentifier] 'ExpressionNK)
     -> C2 before after (ASTNS annf [UppercaseIdentifier] 'ExpressionNK)
-    -> (SyntaxContext, Box)
+    -> FormatResult 'ExpressionNK
 formatRange_0_18 elmVersion importInfo left right =
     case (left, right) of
         (C (preLeft, []) left', C (preRight, []) right') ->
