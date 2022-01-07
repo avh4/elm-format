@@ -7,7 +7,8 @@ module Box
   , render
   ) where
 
-import Elm.Utils ((|>))
+import Data.Fix
+import Elm.Utils ((|>), List)
 
 import qualified Data.Text as T
 
@@ -20,42 +21,44 @@ Space is self-explanatory,
   Text brings any string into the data structure,
   Row joins more of these elements onto one line.
 -}
-data Line
+data LineF a
     = Text T.Text
-    | Row [Line]
+    | Row (List a)
     | Space
     | Tab
+
+type Line = Fix LineF
 
 
 identifier :: String -> Line
 identifier =
-    Text . T.pack
+    Fix . Text . T.pack
 
 
 keyword :: String -> Line
 keyword =
-    Text . T.pack
+    Fix . Text . T.pack
 
 
 punc :: String -> Line
 punc =
-    Text . T.pack
+    Fix . Text . T.pack
 
 
 literal :: String -> Line
 literal =
-    Text . T.pack
+    Fix . Text . T.pack
 
 
 -- join more Line elements into one
-row :: [Line] -> Line
+row :: List Line -> Line
 row =
-    Row
+    Fix . Row
 
 
 space :: Line
 space =
-    Space
+    Fix Space
 
 
 {-
@@ -140,7 +143,7 @@ mapFirstLine firstFn restFn b =
 
 indent :: Box -> Box
 indent =
-    mapLines (\l -> row [Tab, l])
+    mapLines (\l -> row [Fix Tab, l])
 
 
 isLine :: Box -> Either Box Line
@@ -207,7 +210,7 @@ addSuffix suffix b =
 
 renderLine :: Int -> Line -> T.Text
 renderLine startColumn line' =
-    case line' of
+    case unFix line' of
         Text text ->
             text
         Space ->
@@ -232,7 +235,7 @@ render box' =
 lineLength :: Int -> Line -> Int
 lineLength startColumn line' =
    startColumn +
-      case line' of
+      case unFix line' of
          Text string -> T.length string
          Space -> 1
          Tab -> tabLength startColumn

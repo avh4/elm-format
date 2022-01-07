@@ -2,6 +2,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 module Elm.Utils
     ( (|>), (<|), (>>)
+    , List
     , run, unwrappedRun
     , CommandError(..)
     ) where
@@ -10,6 +11,9 @@ import Prelude hiding ((>>))
 import Control.Monad.Except (MonadError, MonadIO, liftIO, throwError)
 import System.Exit (ExitCode(ExitSuccess, ExitFailure))
 import System.Process (readProcessWithExitCode)
+
+
+type List = []
 
 
 {-| Forward function application `x |> f == f x`. This function is useful

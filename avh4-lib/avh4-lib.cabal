@@ -58,6 +58,7 @@ library
         CommandLine.World.IO
         Data.Coapplicative
         Data.Either.Extra
+        Data.Fix
         Data.Indexed
         Data.List.Extra
         Data.ReversedList
@@ -79,6 +80,7 @@ test-suite al-tests
         CommandLine.World.IO
         Data.Coapplicative
         Data.Either.Extra
+        Data.Fix
         Data.Indexed
         Data.List.Extra
         Data.ReversedList
