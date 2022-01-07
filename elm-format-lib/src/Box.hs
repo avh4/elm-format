@@ -88,13 +88,13 @@ blankLine =
 
 
 line :: Line -> Box
-line l =
-    SingleLine l
+line =
+    SingleLine
 
 
 mustBreak :: Line -> Box
-mustBreak l =
-    MustBreak l
+mustBreak =
+    MustBreak
 
 
 stack' :: Box -> Box -> Box
@@ -168,7 +168,7 @@ destructure b =
 
 allSingles :: [Box] -> Either [Box] [Line]
 allSingles boxes =
-    case sequence $ map isLine boxes of
+    case mapM isLine boxes of
         Right lines' ->
             Right lines'
         _ ->
@@ -258,7 +258,7 @@ spacesToNextTab startColumn =
 
 tabLength :: Int -> Int
 tabLength startColumn =
-  spacesInTab - (spacesToNextTab startColumn)
+  spacesInTab - spacesToNextTab startColumn
 
 {-
 What happens here is we take a row and start building its contents
