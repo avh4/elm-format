@@ -11,6 +11,7 @@ data ElmVersion
   | Elm_0_17 -- TODO: remove 0_17
   | Elm_0_18
   | Elm_0_19
+  deriving (Eq, Ord)
 
 
 instance Show ElmVersion where

@@ -71,11 +71,10 @@ listTerm elmVersion =
           lo <- expr elmVersion
           (C (loPost, hiPre) _) <- padded (string "..")
           hi <- expr elmVersion
-          return $ \loPre hiPost multiline ->
+          return $ \loPre hiPost _ ->
               Range
                   (C (loPre, loPost) lo)
                   (C (hiPre, hiPost) hi)
-                  multiline
 
     shader' =
       do  rawSrc <- Help.shader

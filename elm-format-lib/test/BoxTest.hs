@@ -8,6 +8,8 @@ import qualified Data.Text.Lazy as LazyText
 import qualified Data.Text as Text
 
 import Box
+import Data.Text (Text)
+import Test.Tasty.Hspec
 
 
 trim :: String -> String
@@ -28,19 +30,19 @@ assertLineOutput expected actual =
 assertOutput :: String -> Box -> Assertion
 assertOutput expected actual =
     assertEqual expected expected $
-        trim $ Text.unpack $ render $ actual
+        trim $ Text.unpack $ render actual
 
 
-word :: String -> Box
+word :: Text -> Box
 word =
     line . identifier
 
 
-block :: String -> Box
+block :: Text -> Box
 block text =
     stack1
-        [ line $ row [ w, w ]
-        , line $ row [ w, w ]
+        [ line $ w <> w
+        , line $ w <> w
         ]
     where
         w = identifier text
@@ -48,7 +50,7 @@ block text =
 
 test_tests :: TestTree
 test_tests =
-    testGroup "ElmFormat.Render.BoxTest"
+    testGroup "BoxTest"
     [ testCase "keyword" $
         assertLineOutput "module" $ keyword "module"
     , testCase "identifier" $
@@ -56,9 +58,9 @@ test_tests =
     , testCase "punctuation" $
         assertLineOutput "::" $ punc "::"
     , testCase "row" $
-        assertLineOutput "ab" $ row [ identifier "a", identifier "b" ]
+        assertLineOutput "ab" $ identifier "a" <> identifier "b"
     , testCase "space" $
-        assertLineOutput "a b" $ row [ identifier "a", space, identifier "b" ]
+        assertLineOutput "a b" $ identifier "a" <> space <> identifier "b"
 
     , testCase "stack1" $
         assertOutput "foo\nbar\n" $
@@ -72,7 +74,36 @@ test_tests =
                 [ word "a"
                 , word "b"
                 ]
-    , testCase "indent (with leading spaces)" $
-        assertOutput "    a\n" $
-            prefix space $ indent $ line $ identifier "a"
     ]
+
+
+spec_spec :: Spec
+spec_spec =
+    describe "Box" $ do
+
+        describe "prefix in front of block with indented lines" $ do
+            it "when prefix is smaller than a TAB" $ do
+                prefix (keyword ">>") $ stack1
+                    [ word "a"
+                    , indent $ word "b"
+                    ]
+                `shouldOutput`
+                [ ">>a"
+                , "    b"
+                ]
+
+            it "when prefix is longer than a TAB" $ do
+                prefix (keyword ">>>>>") $ stack1
+                    [ word "a"
+                    , indent $ word "b"
+                    ]
+                `shouldOutput`
+                [ ">>>>>a"
+                , "        b"
+                ]
+
+
+shouldOutput :: Box -> [Text] -> Expectation
+shouldOutput box expected =
+    Box.render box
+    `shouldBe` Text.unlines expected

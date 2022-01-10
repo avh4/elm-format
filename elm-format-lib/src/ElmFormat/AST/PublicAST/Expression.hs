@@ -292,7 +292,7 @@ instance ToPublicAST 'ExpressionNK where
                 (fromRawAST config <$> branches)
                 (CaseDisplay False)
 
-        AST.Range _ _ _ ->
+        AST.Range _ _ ->
             error "Range syntax is not supported in Elm 0.19"
 
         AST.GLShader shader ->

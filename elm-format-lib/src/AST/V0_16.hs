@@ -19,6 +19,7 @@ import qualified Cheapskate.Types as Markdown
 import ElmFormat.AST.Shared
 import qualified Data.Maybe as Maybe
 import Data.Text (Text)
+import Data.List.NonEmpty (NonEmpty)
 
 
 newtype ForceMultiline =
@@ -370,7 +371,6 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind)
     Range ::
         C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)
         -> C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)
-        -> Bool
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
 
     Tuple ::
@@ -507,7 +507,7 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind)
         C2 'BeforeTerm 'AfterTerm (getType 'TypeNK)
         -> AST typeRef ctorRef varRef getType 'TypeNK
     TupleType ::
-        [C2Eol 'BeforeTerm 'AfterTerm (getType 'TypeNK)]
+        NonEmpty (C2Eol 'BeforeTerm 'AfterTerm (getType 'TypeNK))
         -> ForceMultiline
         -> AST typeRef ctorRef varRef getType 'TypeNK
     RecordType ::
@@ -578,7 +578,7 @@ mapAll ftyp fctor fvar fast = \case
     Binops first ops ml -> Binops (fast first) (fmap (bimap fvar fast) ops) ml
     Parens e -> Parens (fmap fast e)
     ExplicitList terms c ml -> ExplicitList (fmap fast terms) c ml
-    Range left right ml -> Range (fmap fast left) (fmap fast right) ml
+    Range left right -> Range (fmap fast left) (fmap fast right)
     Tuple terms ml -> Tuple (fmap (fmap fast) terms) ml
     TupleFunction n -> TupleFunction n
     Record base fields c ml -> Record base (fmap (fmap fast) fields) c ml

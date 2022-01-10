@@ -18,7 +18,12 @@ build-type: Simple
 
 common common-options
     ghc-options:
-        -O2 -Wall -Wno-name-shadowing
+        -O2
+        -Wall
+        -Wno-name-shadowing
+        -Werror=overlapping-patterns
+        -Werror=inaccessible-code
+        -Werror=overflowed-literals
 
     default-language: Haskell2010
 
@@ -89,6 +94,7 @@ test-suite al-tests
         Regex
 
     other-modules:
+        Data.Either.ExtraTest
         Data.List.ExtraTest
         Data.Text.ExtraTest
 

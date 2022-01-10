@@ -13,6 +13,7 @@ import qualified Data.Indexed as I
 import ElmVersion
 import Parse.IParser
 import Parse.Common
+import Data.List.NonEmpty (NonEmpty(..))
 
 
 tvar :: ElmVersion -> IParser (FixAST Located typeRef ctorRef varRef 'TypeNK)
@@ -35,8 +36,8 @@ tuple elmVersion =
                   \_ -> extract $ I.unFix t
               Right [C (pre, post) (C eol t)] ->
                   \_ -> TypeParens $ C (pre, eolToComment eol ++ post) t
-              Right types' ->
-                  TupleType $ fmap (\(C (pre, post) (C eol t)) -> C (pre, post, eol) t) types'
+              Right (typ0:typ1:typs) ->
+                  TupleType $ (\(C (pre, post) (C eol t)) -> C (pre, post, eol) t) <$> typ0:|typ1:typs
 
 
 record :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)

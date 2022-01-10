@@ -21,6 +21,8 @@ import Parse.TestHelpers
 import Reporting.Annotation (Located)
 import Data.Word (Word16)
 import GHC.Int (Int64)
+import qualified ElmFormat.Render.ElmStructure as ElmStructure
+import qualified Data.Fix as Fix
 
 
 pending :: ASTNS Located [UppercaseIdentifier] 'ExpressionNK
@@ -41,7 +43,7 @@ importInfo =
 example' :: String -> String -> String -> TestTree
 example' name input expected =
     testCase name $
-        assertParse (fmap (Text.unpack . Box.render . syntaxParens SyntaxSeparated . formatExpression Elm_0_19 importInfo . I.convert (Identity . extract)) (expr Elm_0_19)) input expected
+        assertParse (fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render . syntaxParens SyntaxSeparated . formatExpression Elm_0_19 importInfo . I.convert (Identity . extract)) (expr Elm_0_19)) input expected
 
 
 commentedIntExpr :: (Word16, Word16, Word16, Word16) -> String -> String -> Int64 -> Commented ([Comment], [Comment]) (ASTNS Located ns 'ExpressionNK)
@@ -95,7 +97,7 @@ test_tests =
         , example "qualified" "Bar.Baz.foo" $ at 1 1 1 12 $ VarExpr $ VarRef [UppercaseIdentifier "Bar", UppercaseIdentifier "Baz"] $ LowercaseIdentifier "foo"
 
         , testGroup "symbolic operator"
-            [ example "" "(+)" $ at 1 1 1 4 $ VarExpr $ (OpRef $ SymbolIdentifier "+")
+            [ example "" "(+)" $ at 1 1 1 4 $ VarExpr $ OpRef (SymbolIdentifier "+")
             , testCase "does not allow whitespace" $
                 assertParseFailure (expr Elm_0_19) "( + )"
             , testCase "doew not allow comments" $
@@ -165,16 +167,24 @@ test_tests =
             \\n\
             \{- F -}\n\
             \]\n"
+        , example' "sections with multiple items"
+            "[{-A-}1{-B-},{-C-}2,{-D-}3]"
+            "[ {- A -} 1\n\
+            \\n\
+            \{- B -}\n\
+            \, {- C -} 2\n\
+            \, {- D -} 3\n\
+            \]\n"
         , example' "newlines"
             "[\n 1\n ,\n 2\n ,\n 3\n ]"
             "[ 1\n, 2\n, 3\n]\n"
         ]
 
     , testGroup "Range"
-        [ example "" "[7..9]" $ at 1 1 1 7 $ Range (intExpr' (1,2,1,3) 7) (intExpr' (1,5,1,6) 9) False
-        , example "whitespace" "[ 7 .. 9 ]" $ at 1 1 1 11 $ Range (intExpr' (1,3,1,4) 7) (intExpr' (1,8,1,9) 9) False
-        , example "comments" "[{-A-}7{-B-}..{-C-}9{-D-}]" $ at 1 1 1 27 $ Range (commentedIntExpr (1,7,1,8) "A" "B" 7) (commentedIntExpr (1,20,1,21) "C" "D" 9) False
-        , example "newlines" "[\n 7\n ..\n 9\n ]" $ at 1 1 5 3 $ Range (intExpr' (2,2,2,3) 7) (intExpr' (4,2,4,3) 9) True
+        [ example "" "[7..9]" $ at 1 1 1 7 $ Range (intExpr' (1,2,1,3) 7) (intExpr' (1,5,1,6) 9)
+        , example "whitespace" "[ 7 .. 9 ]" $ at 1 1 1 11 $ Range (intExpr' (1,3,1,4) 7) (intExpr' (1,8,1,9) 9)
+        , example "comments" "[{-A-}7{-B-}..{-C-}9{-D-}]" $ at 1 1 1 27 $ Range (commentedIntExpr (1,7,1,8) "A" "B" 7) (commentedIntExpr (1,20,1,21) "C" "D" 9)
+        , example "newlines" "[\n 7\n ..\n 9\n ]" $ at 1 1 5 3 $ Range (intExpr' (2,2,2,3) 7) (intExpr' (4,2,4,3) 9)
         ]
 
     , testGroup "Tuple"
@@ -234,6 +244,9 @@ test_tests =
         , example' "comments"
             "{{-A-}a{-B-}|{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}"
             "{ {- A -} a {- B -}\n    | {- C -} x {- D -} = {- E -} 7\n\n    {- F -}\n    , {- G -} y {- H -} = {- I -} 8\n\n    {- J -}\n}\n"
+        , example' "comments + multiline"
+            "{{-A-}a{-B-}|\n{-C-}x{-D-}={-E-}7{-F-},{-G-}y{-H-}={-I-}8{-J-}}"
+            "{ {- A -} a {- B -}\n    | {- C -} x {- D -} = {- E -} 7\n\n    {- F -}\n    , {- G -} y {- H -} = {- I -} 8\n\n    {- J -}\n}\n"
         , example' "newlines"
             "{\n a\n |\n x\n =\n 7\n ,\n y\n =\n 8\n }"
             "{ a\n    | x =\n        7\n    , y =\n        8\n}\n"
@@ -243,7 +256,7 @@ test_tests =
             assertParseFailure (expr Elm_0_19) "{{}|x=7}"
         , example' "no fields (elm-compiler does not allow this)"
             "{a|}"
-            "{ a |  }\n"
+            "{ a | }\n"
         ]
 
     , testGroup "record access"

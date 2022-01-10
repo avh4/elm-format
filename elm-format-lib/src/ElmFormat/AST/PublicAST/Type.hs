@@ -13,6 +13,7 @@ import qualified Data.ReversedList as ReversedList
 import Data.ReversedList (Reversed)
 import qualified Data.Either as Either
 import Data.Maybe (fromMaybe)
+import Data.List.NonEmpty (NonEmpty)
 
 
 data Type_
@@ -26,7 +27,7 @@ data Type_
         { name_tv :: LowercaseIdentifier
         }
     | TupleType
-        { terms :: List (LocatedIfRequested Type_) -- At least two items
+        { terms :: NonEmpty (LocatedIfRequested Type_) -- At least two items
         }
     | RecordType
         { base :: Maybe LowercaseIdentifier

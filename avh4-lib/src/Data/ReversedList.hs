@@ -8,10 +8,18 @@ list that needs to be reversed in the termination case).
 
 newtype Reversed a = Reversed [a]
 
+instance Show a => Show (Reversed a) where
+    show = show . toList
+
 
 empty :: Reversed a
 empty =
     Reversed []
+
+
+singleton :: a -> Reversed a
+singleton a =
+    Reversed [a]
 
 
 push :: a -> Reversed a -> Reversed a

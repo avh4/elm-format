@@ -40,7 +40,8 @@ main = do
     phony "build" $ need [ "elm-format" ]
     phony "elm-format" $ need [ elmFormat ]
     phony "unit-tests" $ need
-        [ "_build/cabal/elm-format-lib/test.ok"
+        [ "_build/cabal/avh4-lib/test.ok"
+        , "_build/cabal/elm-format-lib/test.ok"
         , "_build/cabal/elm-format-test-lib/test.ok"
         , "_build/cabal/elm-format/test.ok"
         ]

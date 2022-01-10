@@ -87,7 +87,7 @@ foldReferences ftype fctor fvar =
             Binops first ops _ -> Const (getConst first <> foldMap foldBinopsClause ops)
             Parens e -> extract e
             ExplicitList terms _ _ -> fold terms
-            Range left right _ -> extract left <> extract right
+            Range left right -> extract left <> extract right
             Tuple terms _ -> mconcat $ fmap extract terms
             TupleFunction _ -> mempty
             Record _ fields _ _ -> foldMap (extract . _value) fields

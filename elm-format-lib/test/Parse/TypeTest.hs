@@ -15,10 +15,9 @@ import qualified Box
 import qualified Data.Text as Text
 import Parse.IParser
 import Reporting.Annotation (Located)
+import qualified Data.Fix as Fix
+import qualified ElmFormat.Render.ElmStructure as ElmStructure
 
-
-pending :: ASTNS Located ns 'TypeNK
-pending = at 0 0 0 0 $ TupleType [] (ForceMultiline False)
 
 expr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
 expr = Parse.Type.expr
@@ -27,7 +26,7 @@ expr = Parse.Type.expr
 example :: String -> String -> String -> TestTree
 example name input expected =
     testCase name $
-        assertParse (fmap (Text.unpack . Box.render . typeParens NotRequired . formatType Elm_0_19) (expr Elm_0_19)) input expected
+        assertParse (fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render . typeParens NotRequired . formatType Elm_0_19) (expr Elm_0_19)) input expected
 
 
 test_tests :: TestTree
@@ -113,6 +112,6 @@ test_tests =
             assertParseFailure (expr Elm_0_19) "{{}|x:m}"
         , example "no fields (elm-compiler does not allow this)"
             "{a|}"
-            "{ a |  }\n"
+            "{ a | }\n"
         ]
     ]

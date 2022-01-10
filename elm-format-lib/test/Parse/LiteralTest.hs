@@ -3,19 +3,21 @@ module Parse.LiteralTest where
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import Box (render)
-import Data.Text (unpack)
 import ElmFormat.Render.Box (formatLiteral)
 import Parse.Literal (literal)
 import Parse.TestHelpers (assertParse, assertParseFailure)
 
 import qualified ElmVersion
+import qualified Data.Text as Text
+import qualified Box
+import qualified Data.Fix as Fix
+import qualified ElmFormat.Render.ElmStructure as ElmStructure
 
 
 example :: String -> String -> String -> TestTree
 example name input expected =
     testCase name $
-        assertParse (fmap (unpack . render . formatLiteral ElmVersion.Elm_0_18) literal) input expected
+        assertParse (fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render . formatLiteral ElmVersion.Elm_0_18) literal) input expected
 
 
 test_tests :: TestTree
