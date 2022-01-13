@@ -10,7 +10,7 @@ data Listing a
     = ExplicitListing a Bool
     | OpenListing (C2 'BeforeTerm 'AfterTerm ())
     | ClosedListing
-    deriving (Eq, Ord, Show) -- TODO: is Ord needed?
+    deriving (Eq, Ord, Show, Functor) -- TODO: is Ord needed?
 
 mergeListing :: (a -> a -> a) -> Listing a -> Listing a -> Listing a
 mergeListing merge left right =
