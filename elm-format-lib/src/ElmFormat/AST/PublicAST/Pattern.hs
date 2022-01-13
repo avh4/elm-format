@@ -9,6 +9,7 @@ import qualified AST.V0_16 as AST
 import qualified Data.Either as Either
 import qualified ElmFormat.AST.PublicAST.Core as Core
 import qualified Data.Indexed as I
+import Reporting.Annotation (Located(At))
 
 
 data Pattern
@@ -63,7 +64,7 @@ instance ToPublicAST 'PatternNK where
         AST.OpPattern _ ->
             error "PublicAST: OpPattern is not supported in Elm 0.19"
 
-        AST.DataPattern (namespace, tag) args ->
+        AST.DataPattern (I.Fix2 (At _ (AST.CtorRef_ (namespace, tag)))) args ->
             DataPattern
                 (mkReference $ TagRef namespace tag)
                 (fromRawAST config . (\(C comments a) -> a) <$> args)
@@ -122,7 +123,7 @@ instance FromPublicAST 'PatternNK where
             case toRef constructor of
                 TagRef ns tag ->
                     AST.DataPattern
-                        (ns, tag)
+                        (I.Fix $ AST.CtorRef_ (ns, tag))
                         (C [] . toRawAST <$> arguments)
 
                 ref ->

@@ -55,6 +55,9 @@ foldReferences ftype fctor fvar =
         foldNode :: forall kind'. AST p (Const a) kind' -> Const a kind'
         foldNode = \case
             TopLevel tls -> Const $ foldMap (foldMap getConst) tls
+            TypeRef_ r -> Const $ ftype r
+            CtorRef_ r -> Const $ fctor r
+            VarRef_ r -> Const $ fvar r
 
             -- Declarations
             Definition name args _ e -> Const (getConst name <> foldMap (getConst . extract) args <> getConst e)
@@ -64,13 +67,13 @@ foldReferences ftype fctor fvar =
             TypeAlias _ _ t -> Const (getConst $ extract t)
             PortAnnotation _ _ t -> Const (getConst t)
             PortDefinition_until_0_16 _ _ e -> Const (getConst e)
-            Fixity_until_0_18 _ _ _ _ name -> Const (fvar name)
+            Fixity_until_0_18 _ _ _ _ name -> Const $ getConst name
             Fixity _ _ _ _ -> mempty
 
             -- Expressions
             Unit _ -> mempty
             Literal _ -> mempty
-            VarExpr var -> Const $ fvar var
+            VarExpr var -> Const $ getConst var
             App first rest _ -> first <> mconcat (fmap extract rest)
             Unary _ e -> e
             Binops first ops _ -> Const (getConst first <> foldMap foldBinopsClause ops)
@@ -97,7 +100,7 @@ foldReferences ftype fctor fvar =
             LiteralPattern _ -> mempty
             VarPattern _ -> mempty
             OpPattern _ -> mempty
-            DataPattern ctor args -> Const (fctor ctor <> foldMap (getConst . extract) args)
+            DataPattern ctor args -> Const (getConst ctor <> foldMap (getConst . extract) args)
             PatternParens p -> extract p
             TuplePattern terms -> foldMap extract terms
             EmptyListPattern _ -> mempty
@@ -116,14 +119,14 @@ foldReferences ftype fctor fvar =
             RecordType _ fields _ _ -> foldMap (extract . _value) fields
             FunctionType first rest _ -> extract first <> fold rest
 
-        foldTypeConstructor :: TypeConstructor (TypeRef p) -> a
+        foldTypeConstructor :: TypeConstructor (Const a 'TypeRefNK) -> a
         foldTypeConstructor = \case
-            NamedConstructor name -> ftype name
+            NamedConstructor name -> getConst name
             TupleConstructor _ -> mempty
 
-        foldBinopsClause :: BinopsClause (VarRef p) (Const a 'ExpressionNK) -> a
+        foldBinopsClause :: BinopsClause (Const a 'VarRefNK) (Const a 'ExpressionNK) -> a
         foldBinopsClause = \case
-            BinopsClause _ op _ e -> fvar op <> getConst e
+            BinopsClause _ op _ e -> getConst op <> getConst e
 
         foldIfClause :: IfClause (Const a 'ExpressionNK) -> a
         foldIfClause = \case

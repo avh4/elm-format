@@ -266,6 +266,9 @@ data LocalName
 
 data NodeKind
     = TopLevelNK
+    | TypeRefNK
+    | CtorRefNK
+    | VarRefNK
     | CommonDeclarationNK
     | TopLevelDeclarationNK
     | ExpressionNK
@@ -289,9 +292,17 @@ instance ASTParameters (VariableNamespace ns) where
 
 data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
 
+    --
+    -- Singletons
+    --
+
     TopLevel ::
         [TopLevelStructure (getType 'TopLevelDeclarationNK)]
         -> AST p getType 'TopLevelNK
+
+    TypeRef_ :: TypeRef p -> AST p getType 'TypeRefNK
+    CtorRef_ :: CtorRef p -> AST p getType 'CtorRefNK
+    VarRef_ :: VarRef p -> AST p getType 'VarRefNK
 
     --
     -- Declarations
@@ -335,7 +346,7 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
         -> Comments
         -> Int
         -> Comments
-        -> (VarRef p)
+        -> getType 'VarRefNK
         -> AST p getType 'TopLevelDeclarationNK
     Fixity ::
         C1 'BeforeTerm Assoc
@@ -348,15 +359,9 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
     -- Expressions
     --
 
-    Unit ::
-        Comments
-        -> AST p getType 'ExpressionNK
-    Literal ::
-        LiteralValue
-        -> AST p getType 'ExpressionNK
-    VarExpr ::
-        VarRef p
-        -> AST p getType 'ExpressionNK
+    Unit :: Comments -> AST p getType 'ExpressionNK
+    Literal :: LiteralValue -> AST p getType 'ExpressionNK
+    VarExpr :: getType 'VarRefNK -> AST p getType 'ExpressionNK
 
     App ::
         getType 'ExpressionNK
@@ -369,7 +374,7 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
         -> AST p getType 'ExpressionNK
     Binops ::
         getType 'ExpressionNK
-        -> List (BinopsClause (VarRef p) (getType 'ExpressionNK)) -- Non-empty
+        -> List (BinopsClause (getType 'VarRefNK) (getType 'ExpressionNK)) -- Non-empty
         -> Bool
         -> AST p getType 'ExpressionNK
     Parens ::
@@ -470,7 +475,7 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
         SymbolIdentifier
         -> AST p getType 'PatternNK
     DataPattern ::
-        CtorRef p
+        getType 'CtorRefNK
         -> [C1 'BeforeTerm (getType 'PatternNK)]
         -> AST p getType 'PatternNK
     PatternParens ::
@@ -513,7 +518,7 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
         LowercaseIdentifier
         -> AST p getType 'TypeNK
     TypeConstruction ::
-        TypeConstructor (TypeRef p)
+        TypeConstructor (getType 'TypeRefNK)
         -> [C1 'BeforeTerm (getType 'TypeNK)]
         -> ForceMultiline
         -> AST p getType 'TypeNK
@@ -539,8 +544,11 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
         -> AST p getType 'TypeNK
 
 deriving instance
-    (Eq (getType 'CommonDeclarationNK)
+    ( Eq (getType 'CommonDeclarationNK)
     , Eq (getType 'TopLevelDeclarationNK)
+    , Eq (getType 'TypeRefNK)
+    , Eq (getType 'CtorRefNK)
+    , Eq (getType 'VarRefNK)
     , Eq (getType 'ExpressionNK)
     , Eq (getType 'LetDeclarationNK)
     , Eq (getType 'CaseBranchNK)
@@ -554,6 +562,9 @@ deriving instance
 deriving instance
     ( Show (getType 'CommonDeclarationNK)
     , Show (getType 'TopLevelDeclarationNK)
+    , Show (getType 'TypeRefNK)
+    , Show (getType 'CtorRefNK)
+    , Show (getType 'VarRefNK)
     , Show (getType 'ExpressionNK)
     , Show (getType 'LetDeclarationNK)
     , Show (getType 'CaseBranchNK)
@@ -575,6 +586,9 @@ mapAll ::
         )
 mapAll ftyp fctor fvar fast = \case
     TopLevel tls -> TopLevel (fmap (fmap fast) tls)
+    TypeRef_ r -> TypeRef_ (ftyp r)
+    CtorRef_ r -> CtorRef_ (fctor r)
+    VarRef_ r -> VarRef_ (fvar r)
 
     -- Declaration
     Definition name args c e -> Definition (fast name) (fmap (fmap fast) args) c (fast e)
@@ -584,16 +598,16 @@ mapAll ftyp fctor fvar fast = \case
     TypeAlias c nameWithArgs t -> TypeAlias c nameWithArgs (fmap fast t)
     PortAnnotation name c t -> PortAnnotation name c (fast t)
     PortDefinition_until_0_16 name c e -> PortDefinition_until_0_16 name c (fast e)
-    Fixity_until_0_18 a c n c' name -> Fixity_until_0_18 a c n c' (fvar name)
+    Fixity_until_0_18 a c n c' name -> Fixity_until_0_18 a c n c' (fast name)
     Fixity a n op name -> Fixity a n op name
 
     -- Expressions
     Unit c -> Unit c
     Literal l -> Literal l
-    VarExpr var -> VarExpr (fvar var)
+    VarExpr var -> VarExpr (fast var)
     App first rest ml -> App (fast first) (fmap (fmap fast) rest) ml
     Unary op e -> Unary op (fast e)
-    Binops first ops ml -> Binops (fast first) (fmap (bimap fvar fast) ops) ml
+    Binops first ops ml -> Binops (fast first) (fmap (bimap fast fast) ops) ml
     Parens e -> Parens (fmap fast e)
     ExplicitList terms c ml -> ExplicitList (fmap fast terms) c ml
     Range left right -> Range (fmap fast left) (fmap fast right)
@@ -617,7 +631,7 @@ mapAll ftyp fctor fvar fast = \case
     LiteralPattern l -> LiteralPattern l
     VarPattern l -> VarPattern l
     OpPattern s -> OpPattern s
-    DataPattern ctor pats -> DataPattern (fctor ctor) (fmap (fmap fast) pats)
+    DataPattern ctor pats -> DataPattern (fast ctor) (fmap (fmap fast) pats)
     PatternParens pat -> PatternParens (fmap fast pat)
     TuplePattern pats -> TuplePattern (fmap (fmap fast) pats)
     EmptyListPattern c -> EmptyListPattern c
@@ -630,7 +644,7 @@ mapAll ftyp fctor fvar fast = \case
     -- Types
     UnitType c -> UnitType c
     TypeVariable name -> TypeVariable name
-    TypeConstruction name args forceMultiline -> TypeConstruction (fmap ftyp name) (fmap (fmap fast) args) forceMultiline
+    TypeConstruction name args forceMultiline -> TypeConstruction (fmap fast name) (fmap (fmap fast) args) forceMultiline
     TypeParens typ -> TypeParens (fmap fast typ)
     TupleType typs forceMultiline -> TupleType (fmap (fmap fast) typs) forceMultiline
     RecordType base fields c ml -> RecordType base (fmap (fmap fast) fields) c ml

@@ -188,7 +188,7 @@ instance ToPublicAST 'ExpressionNK where
         AST.Literal lit ->
             LiteralExpression lit
 
-        AST.VarExpr var ->
+        AST.VarExpr (I.Fix2 (At _ (AST.VarRef_ var))) ->
             VariableReferenceExpression $ mkReference var
 
         AST.App expr args multiline ->
@@ -201,7 +201,7 @@ instance ToPublicAST 'ExpressionNK where
             case
                 BinaryOperatorPrecedence.parseElm0_19
                     first
-                    ((\(AST.BinopsClause c1 op c2 expr) -> (op, expr)) <$> rest)
+                    ((\(AST.BinopsClause c1 (I.Fix2 (At _ (AST.VarRef_ op))) c2 expr) -> (op, expr)) <$> rest)
             of
                 Right tree ->
                     extract $ buildTree tree
@@ -307,7 +307,7 @@ instance FromPublicAST 'ExpressionNK where
             AST.Literal lit
 
         VariableReferenceExpression var ->
-            AST.VarExpr $ toRef var
+            AST.VarExpr $ I.Fix $ AST.VarRef_ $ toRef var
 
         FunctionApplication function args display ->
             case (extract function, args) of

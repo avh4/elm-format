@@ -44,14 +44,14 @@ test_tests =
                         case locals of
                             [] ->
                                 -- no locals to define, so just make a var expression
-                                I.Fix2 $ Identity $ VarExpr r
+                                I.Fix2 $ Identity $ VarExpr $ I.Fix2 $ Identity $ VarRef_ r
                             _ ->
                                 -- define the provided locals in a let block
                                 I.Fix2 $ Identity $
                                 Let
                                     (fmap makeLetDeclaration locals)
                                     []
-                                    (I.Fix2 $ Identity $ VarExpr r)
+                                    (I.Fix2 $ Identity $ VarExpr $ I.Fix2 $ Identity $ VarRef_ r)
                 in
                 testCase name $
                     matchReferences (makeImportInfo knownContents imports) (wrapExpr sourceAst)
@@ -107,14 +107,14 @@ test_tests =
                         case locals of
                             [] ->
                                 -- no locals to define, so just make a var expression
-                                I.Fix2 $ Identity $ VarExpr r
+                                I.Fix2 $ Identity $ VarExpr $ I.Fix2 $ Identity $ VarRef_ r
                             _ ->
                                 -- define the provided locals in a let block
                                 I.Fix2 $ Identity $
                                 Let
                                     (fmap makeLetDeclaration locals)
                                     []
-                                    (I.Fix2 $ Identity $ VarExpr r)
+                                    (I.Fix2 $ Identity $ VarExpr $ I.Fix2 $ Identity $ VarRef_ r)
                 in
                 testCase name $
                     applyReferences (makeImportInfo knownContents imports) (wrapExpr sourceAst)

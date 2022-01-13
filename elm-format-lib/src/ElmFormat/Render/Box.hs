@@ -742,6 +742,7 @@ formatTopLevelStructure elmVersion importInfo topLevelStructure =
 
 
 data FormatResult (nk :: NodeKind) where
+    FormattedCtorRef :: SyntaxContext -> Elm -> FormatResult 'CtorRefNK
     FormattedExpression :: SyntaxContext -> Elm -> FormatResult 'ExpressionNK
     FormattedPattern :: SyntaxContext -> Elm -> FormatResult 'PatternNK
 
@@ -811,7 +812,7 @@ formatDeclaration elmVersion importInfo decl =
             [formatCommented $ formatLowercaseIdentifier [] <$> name]
             (formatCommented' bodyComments $ syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr)
 
-        Fixity_until_0_18 assoc precedenceComments precedence nameComments name ->
+        Fixity_until_0_18 assoc precedenceComments precedence nameComments (I.Fix (VarRef_ name)) ->
             ElmStructure.spaceSepOrIndented
                 (formatInfixAssociativity_0_18 assoc)
                 [ formatCommented' precedenceComments $ formatInfixPrecedence precedence
@@ -895,6 +896,17 @@ formatAstNode ::
     ElmVersion -> ImportInfo [UppercaseIdentifier] -> AST p FormatResult nk -> FormatResult nk
 formatAstNode elmVersion importInfo =
     \case
+        CtorRef_ (ns, tag) ->
+            formatUppercaseIdentifier ns tag
+                |>
+                    case (elmVersion, ns) of
+                        (Elm_0_16, []) ->
+                            FormattedCtorRef SyntaxSeparated
+                        (Elm_0_16, _:_) ->
+                            FormattedCtorRef SpaceSeparated
+                        _ ->
+                            FormattedCtorRef SyntaxSeparated
+
         Anything ->
             FormattedPattern SyntaxSeparated $ keyword "_"
 
@@ -925,22 +937,14 @@ formatAstNode elmVersion importInfo =
                     (formatEolCommented $ syntaxParens SpaceSeparated <$> first)
                     (formatRight <$> toCommentedList rest)
 
-        DataPattern (ns, tag) [] ->
-            formatUppercaseIdentifier ns tag
-                |>
-                    case (elmVersion, ns) of
-                        (Elm_0_16, []) ->
-                            FormattedPattern SyntaxSeparated
-                        (Elm_0_16, _:_) ->
-                            FormattedPattern SpaceSeparated
-                        _ ->
-                            FormattedPattern SyntaxSeparated
+        DataPattern (FormattedCtorRef context tag) [] ->
+            FormattedPattern context tag
 
-        DataPattern (ns, tag) (pat0:pats) ->
+        DataPattern (FormattedCtorRef context tag) (pat0:pats) ->
             FormattedPattern SpaceSeparated $
             ElmStructure.application
                 (FAJoinFirst JoinAll)
-                (formatUppercaseIdentifier ns tag)
+                tag
                 (formatPreCommented . fmap (syntaxParens SpaceSeparated) <$> pat0:|pats)
 
         PatternParens pattern ->
@@ -1052,7 +1056,7 @@ formatExpression elmVersion importInfo aexpr =
         Literal lit ->
             FormattedExpression SyntaxSeparated $ formatLiteral elmVersion lit
 
-        VarExpr v ->
+        VarExpr (I.Fix (VarRef_ v)) ->
             FormattedExpression SyntaxSeparated $ formatVar v
 
         Range left right ->
@@ -1343,15 +1347,16 @@ mapIsLast f (next:rest) = f False next : mapIsLast f rest
 
 
 formatBinops ::
+    p ~ VariableNamespace [UppercaseIdentifier] =>
     ElmVersion
     -> ImportInfo [UppercaseIdentifier]
-    -> I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK
-    -> [BinopsClause (Ref [UppercaseIdentifier]) (I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK)]
+    -> I.Fix (AST p) 'ExpressionNK
+    -> [BinopsClause (I.Fix (AST p) 'VarRefNK) (I.Fix (AST p) 'ExpressionNK)]
     -> Bool
     -> Elm
 formatBinops elmVersion importInfo left ops multiline =
     let
-        formatPair_ isLast (BinopsClause po o pe e) =
+        formatPair_ isLast (BinopsClause po (I.Fix (VarRef_ o)) pe e) =
             let
                 isLeftPipe =
                     o == OpRef (SymbolIdentifier "<|")
@@ -1393,7 +1398,7 @@ formatRange_0_18 elmVersion importInfo left right =
     case (left, right) of
         (C (preLeft, []) left', C (preRight, []) right') ->
             App
-                (I.Fix $ VarExpr $ VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
+                (I.Fix $ VarExpr $ I.Fix $ VarRef_ $ VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
                 [ C preLeft left'
                 , C preRight right'
                 ]
@@ -1403,7 +1408,7 @@ formatRange_0_18 elmVersion importInfo left right =
 
         _ ->
             App
-                (I.Fix $ VarExpr $ VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
+                (I.Fix $ VarExpr $ I.Fix $ VarRef_ $ VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
                 [ C [] $ I.Fix $ Parens left
                 , C [] $ I.Fix $ Parens right
                 ]
@@ -1669,10 +1674,10 @@ commaSpace =
     punc "," <> space
 
 
-formatTypeConstructor :: TypeConstructor ([UppercaseIdentifier], UppercaseIdentifier) -> Elm
+formatTypeConstructor :: TypeConstructor (I.Fix (ASTNS [UppercaseIdentifier]) 'TypeRefNK) -> Elm
 formatTypeConstructor ctor =
     case ctor of
-        NamedConstructor (namespace, name) ->
+        NamedConstructor (I.Fix (TypeRef_ (namespace, name))) ->
             formatUppercaseIdentifier namespace name
 
         TupleConstructor n ->

@@ -14,6 +14,7 @@ import Data.ReversedList (Reversed)
 import qualified Data.Either as Either
 import Data.Maybe (fromMaybe)
 import Data.List.NonEmpty (NonEmpty)
+import Reporting.Annotation (Located(At))
 
 
 data Type_
@@ -46,7 +47,7 @@ instance ToPublicAST 'TypeNK where
         AST.UnitType comments ->
             UnitType
 
-        AST.TypeConstruction (AST.NamedConstructor ( namespace, name )) args forceMultine ->
+        AST.TypeConstruction (AST.NamedConstructor (I.Fix2 (At _ (AST.TypeRef_ ( namespace, name ))))) args forceMultine ->
             TypeReference
                 name
                 (ModuleName namespace)
@@ -98,7 +99,7 @@ instance FromPublicAST 'TypeNK where
 
         TypeReference name (ModuleName namespace) args ->
             AST.TypeConstruction
-                (AST.NamedConstructor ( namespace, name ))
+                (AST.NamedConstructor $ I.Fix $ AST.TypeRef_ ( namespace, name ))
                 (C [] . toRawAST <$> args)
                 (AST.ForceMultiline False)
 

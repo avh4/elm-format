@@ -54,13 +54,13 @@ capTypeVar elmVersion =
     dotSep1 (capVar elmVersion)
 
 
-constructor0 :: ElmVersion -> IParser (TypeConstructor ([UppercaseIdentifier], UppercaseIdentifier))
+constructor0 :: ElmVersion -> IParser (TypeConstructor (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TypeRefNK))
 constructor0 elmVersion =
-  do  name <- capTypeVar elmVersion
-      case reverse name of
-        [] -> error "Impossible empty TypeConstructor name"
-        last':rest' ->
-            return (NamedConstructor (reverse rest', last'))
+  do  name <- addLocation (capTypeVar elmVersion)
+      case reverse <$> name of
+        A.At _ [] -> error "Impossible empty TypeConstructor name"
+        A.At at (last':rest') ->
+            return (NamedConstructor $ I.Fix2 $ A.At at $ TypeRef_ (reverse rest', last'))
 
 
 constructor0' :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TypeNK)

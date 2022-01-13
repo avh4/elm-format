@@ -31,13 +31,13 @@ varTerm :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) '
 varTerm elmVersion =
     fmap I.Fix2 $ addLocation $
     let
-        resolve v =
+        resolve (A.At at v) =
             case v of
                 TagRef [] (UppercaseIdentifier "True") -> Literal $ Boolean True
                 TagRef [] (UppercaseIdentifier "False") -> Literal $ Boolean False
-                _ -> VarExpr v
+                _ -> VarExpr $ I.Fix2 $ A.At at $ VarRef_ v
     in
-        resolve <$> var elmVersion
+    resolve <$> addLocation (var elmVersion)
 
 
 accessor :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
@@ -99,7 +99,7 @@ parensTerm elmVersion =
     ]
   where
     opFn =
-      VarExpr <$> anyOp elmVersion
+      VarExpr . I.Fix2 <$> addLocation (VarRef_ <$> anyOp elmVersion)
 
     tupleFn =
       do  commas <- many1 comma

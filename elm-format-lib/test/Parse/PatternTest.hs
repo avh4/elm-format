@@ -34,10 +34,10 @@ test_tests =
     , example "variable" "a" $ at 1 1 1 2 (VarPattern (LowercaseIdentifier "a"))
 
     , testGroup "data"
-        [ example "" "Just x y" $ at 1 1 1 9 $ DataPattern ([], UppercaseIdentifier "Just") [C [] $ at 1 6 1 7 $ VarPattern (LowercaseIdentifier "x"),C [] (at 1 8 1 9 (VarPattern (LowercaseIdentifier "y")))]
-        , example "single parameter" "Just x" $ at 1 1 1 7 $ DataPattern ([], UppercaseIdentifier "Just") [C [] (at 1 6 1 7 (VarPattern (LowercaseIdentifier "x")))]
-        , example "comments" "Just{-A-}x{-B-}y" $ at 1 1 1 17 $ DataPattern ([], UppercaseIdentifier "Just") [C [BlockComment ["A"]] (at 1 10 1 11 (VarPattern (LowercaseIdentifier "x"))),C [BlockComment ["B"]] (at 1 16 1 17 (VarPattern (LowercaseIdentifier "y")))]
-        , example "newlines" "Just\n x\n y" $ at 1 1 3 3 $ DataPattern ([], UppercaseIdentifier "Just") [C [] (at 2 2 2 3 (VarPattern (LowercaseIdentifier "x"))),C [] (at 3 2 3 3 (VarPattern (LowercaseIdentifier "y")))]
+        [ example "" "Just x y" $ at 1 1 1 9 $ DataPattern (at 1 1 1 5 $ CtorRef_ ([], UppercaseIdentifier "Just")) [C [] $ at 1 6 1 7 $ VarPattern (LowercaseIdentifier "x"),C [] (at 1 8 1 9 (VarPattern (LowercaseIdentifier "y")))]
+        , example "single parameter" "Just x" $ at 1 1 1 7 $ DataPattern (at 1 1 1 5 $ CtorRef_ ([], UppercaseIdentifier "Just")) [C [] (at 1 6 1 7 (VarPattern (LowercaseIdentifier "x")))]
+        , example "comments" "Just{-A-}x{-B-}y" $ at 1 1 1 17 $ DataPattern (at 1 1 1 5 $ CtorRef_ ([], UppercaseIdentifier "Just")) [C [BlockComment ["A"]] (at 1 10 1 11 (VarPattern (LowercaseIdentifier "x"))),C [BlockComment ["B"]] (at 1 16 1 17 (VarPattern (LowercaseIdentifier "y")))]
+        , example "newlines" "Just\n x\n y" $ at 1 1 3 3 $ DataPattern (at 1 1 1 5 $ CtorRef_ ([], UppercaseIdentifier "Just")) [C [] (at 2 2 2 3 (VarPattern (LowercaseIdentifier "x"))),C [] (at 3 2 3 3 (VarPattern (LowercaseIdentifier "y")))]
         ]
 
     , testGroup "unit"
@@ -87,8 +87,8 @@ test_tests =
 
     , testGroup "alias"
         [ example "" "_ as x" $ at 1 1 1 7 (Alias (C [] (at 1 1 1 2 Anything)) (C [] (LowercaseIdentifier "x")))
-        , example "left side has whitespace" "A b as x" $ at 1 1 1 9 $ Alias (C [] (at 1 1 1 4 $ DataPattern ([], UppercaseIdentifier "A") [C [] ( at 1 3 1 4 (VarPattern (LowercaseIdentifier "b")))])) (C [] (LowercaseIdentifier "x"))
-        , example "left side ctor without whitespace" "A as x" $ at 1 1 1 7 $ Alias (C [] (at 1 1 1 2 $ DataPattern ([], UppercaseIdentifier "A") [])) (C [] (LowercaseIdentifier "x"))
+        , example "left side has whitespace" "A b as x" $ at 1 1 1 9 $ Alias (C [] (at 1 1 1 4 $ DataPattern (at 1 1 1 2 $ CtorRef_ ([], UppercaseIdentifier "A")) [C [] ( at 1 3 1 4 (VarPattern (LowercaseIdentifier "b")))])) (C [] (LowercaseIdentifier "x"))
+        , example "left side ctor without whitespace" "A as x" $ at 1 1 1 7 $ Alias (C [] (at 1 1 1 2 $ DataPattern (at 1 1 1 2 $ CtorRef_ ([], UppercaseIdentifier "A")) [])) (C [] (LowercaseIdentifier "x"))
         , example "comments" "_{-A-}as{-B-}x" $ at 1 1 1 15 (Alias (C [BlockComment ["A"]] (at 1 1 1 2 Anything)) (C [BlockComment ["B"]] (LowercaseIdentifier "x")))
         , example "newlines" "_\n as\n x" $ at 1 1 3 3 (Alias (C [] (at 1 1 1 2 Anything)) (C [] (LowercaseIdentifier "x")))
         , example "nested" "(_ as x)as y" $ at 1 1 1 13 (Alias (C [] (at 1 2 1 8 (Alias (C [] (at 1 2 1 3 Anything)) (C [] (LowercaseIdentifier "x"))))) (C [] (LowercaseIdentifier "y")))

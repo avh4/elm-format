@@ -23,22 +23,22 @@ basic elmVersion =
     choice
       [ char '_' >> return Anything
       , VarPattern <$> lowVar elmVersion
-      , chunksToPattern <$> dotSep1 (capVar elmVersion)
+      , chunksToPattern <$> addLocation (dotSep1 (capVar elmVersion))
       , LiteralPattern <$> Literal.literal
       ]
   where
     chunksToPattern chunks =
-        case reverse chunks of
-          [UppercaseIdentifier "True"] ->
+        case reverse <$> chunks of
+          A.At _ [UppercaseIdentifier "True"] ->
               LiteralPattern (Boolean True)
 
-          [UppercaseIdentifier "False"] ->
+          A.At _ [UppercaseIdentifier "False"] ->
               LiteralPattern (Boolean False)
 
-          (last:rest) ->
-              DataPattern (reverse rest, last) []
+          A.At at (last:rest) ->
+              DataPattern (I.Fix2 $ A.At at $ CtorRef_ (reverse rest, last)) []
 
-          [] -> error "dotSep1 returned empty list"
+          A.At _ [] -> error "dotSep1 returned empty list"
 
 
 asPattern ::
@@ -122,12 +122,12 @@ term elmVersion =
 patternConstructor :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 patternConstructor elmVersion =
   fmap I.Fix2 $ addLocation $
-    do  v <- dotSep1 (capVar elmVersion)
-        case reverse v of
-          [UppercaseIdentifier "True"]  -> return $ LiteralPattern (Boolean True)
-          [UppercaseIdentifier "False"] -> return $ LiteralPattern (Boolean False)
-          (last:rest) -> DataPattern (reverse rest, last) <$> spacePrefix (term elmVersion)
-          [] -> error "dotSep1 returned empty list"
+    do  v <- addLocation $ dotSep1 (capVar elmVersion)
+        case reverse <$> v of
+          A.At _ [UppercaseIdentifier "True"]  -> return $ LiteralPattern (Boolean True)
+          A.At _ [UppercaseIdentifier "False"] -> return $ LiteralPattern (Boolean False)
+          A.At at (last:rest) -> DataPattern (I.Fix2 $ A.At at $ CtorRef_ (reverse rest, last)) <$> spacePrefix (term elmVersion)
+          A.At _ [] -> error "dotSep1 returned empty list"
 
 
 expr :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)

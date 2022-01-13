@@ -101,8 +101,8 @@ infixDecl_0_19 elmVersion =
     in
     Fixity
         <$> (try (reserved elmVersion "infix") *> preCommented assoc)
-        <*> (preCommented $ (\n -> read [n]) <$> digit)
-        <*> (commented symOpInParens)
+        <*> preCommented ((\n -> read [n]) <$> digit)
+        <*> commented symOpInParens
         <*> (equals *> preCommented (lowVar elmVersion))
 
 
@@ -118,7 +118,7 @@ infixDecl_0_16 elmVersion =
       digitComments <- forcedWS
       n <- digit
       opComments <- forcedWS
-      Fixity_until_0_18 assoc digitComments (read [n]) opComments <$> anyOp elmVersion
+      Fixity_until_0_18 assoc digitComments (read [n]) opComments . I.Fix2 <$> addLocation (VarRef_ <$> anyOp elmVersion)
 
 
 -- PORT

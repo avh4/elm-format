@@ -31,7 +31,7 @@ binops term last anyOp =
       choice
         [ commitIf (whitespace >> anyOp) $
             do  preOpComments <- whitespace
-                op <- anyOp
+                op <- I.Fix2 <$> addLocation (VarRef_ <$> anyOp)
                 preExpressionComments <- whitespace
                 expr <- Left <$> try term <|> Right <$> last
                 case expr of
