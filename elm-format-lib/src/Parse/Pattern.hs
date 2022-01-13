@@ -40,7 +40,10 @@ basic elmVersion =
           [] -> error "dotSep1 returned empty list"
 
 
-asPattern :: ElmVersion -> IParser (Fix2AST Located typeRef ctorRef varRef 'PatternNK) -> IParser (Fix2AST Located typeRef ctorRef varRef 'PatternNK)
+asPattern ::
+  ElmVersion
+  -> IParser (I.Fix2 Located (AST typeRef ctorRef varRef) 'PatternNK)
+  -> IParser (I.Fix2 Located (AST typeRef ctorRef varRef) 'PatternNK)
 asPattern elmVersion patternParser =
   do  (start, pattern, _) <- located patternParser
 
@@ -61,7 +64,7 @@ asPattern elmVersion patternParser =
           return (preAs, C postAs var)
 
 
-record :: ElmVersion -> IParser (Fix2AST Located typeRef ctorRef varRef 'PatternNK)
+record :: ElmVersion -> IParser (I.Fix2 Located (AST typeRef ctorRef varRef) 'PatternNK)
 record elmVersion =
   fmap I.Fix2 $ addLocation $
   do

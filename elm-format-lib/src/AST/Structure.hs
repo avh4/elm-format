@@ -6,7 +6,7 @@
 {-# LANGUAGE PolyKinds #-}
 
 module AST.Structure
-    ( Fix2AST, ASTNS2, ASTNS1
+    ( ASTNS, ASTNS2, ASTNS1
     , foldReferences
     , bottomUpReferences
     , mapNs
@@ -20,22 +20,22 @@ import AST.V0_16
 import qualified Data.Indexed as I
 
 
--- Fix2AST :: (Type -> Type) -> Type -> Type -> Type -> NodeKind -> Type
-type Fix2AST annf typeRef ctorRef varRef =
-    I.Fix2 annf (AST typeRef ctorRef varRef)
-
--- ASTNS2 :: (Type -> Type) -> Type -> NodeKind -> Type
-type ASTNS2 annf ns =
-    Fix2AST annf (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)
-
--- This is the same as ASTNS2, but with the first level unFix'ed
--- ASTNS1 :: (Type -> Type) -> Type -> NodeKind -> Type
-type ASTNS1 annf ns =
+type ASTNS ns =
     AST
         (ns, UppercaseIdentifier)
         (ns, UppercaseIdentifier)
         (Ref ns)
-        (ASTNS2 annf ns)
+
+
+-- ASTNS2 :: (Type -> Type) -> Type -> NodeKind -> Type
+type ASTNS2 annf ns =
+    I.Fix2 annf (ASTNS ns)
+
+
+-- This is the same as ASTNS2, but with the first level unFix'ed
+-- ASTNS1 :: (Type -> Type) -> Type -> NodeKind -> Type
+type ASTNS1 annf ns =
+    ASTNS ns (ASTNS2 annf ns)
 
 
 bottomUpReferences ::
@@ -44,8 +44,8 @@ bottomUpReferences ::
     -> (ctorRef1 -> ctorRef2)
     -> (varRef1 -> varRef2)
     -> (forall kind.
-        Fix2AST annf typeRef1 ctorRef1 varRef1 kind
-        -> Fix2AST annf typeRef2 ctorRef2 varRef2 kind
+        I.Fix2 annf (AST typeRef1 ctorRef1 varRef1) kind
+        -> I.Fix2 annf (AST typeRef2 ctorRef2 varRef2) kind
        )
 bottomUpReferences ftr fcr fvr =
     I.fold2 (I.Fix2 . fmap (mapAll ftr fcr fvr id))
@@ -55,7 +55,7 @@ foldReferences ::
     forall a annf typeRef ctorRef varRef kind.
     (Monoid a, Coapplicative annf) =>
     (typeRef -> a) -> (ctorRef -> a) -> (varRef -> a)
-    -> Fix2AST annf typeRef ctorRef varRef kind -> a
+    -> I.Fix2 annf (AST typeRef ctorRef varRef) kind -> a
 foldReferences ftype fctor fvar =
     getConst . I.fold2 (foldNode  . extract)
     where

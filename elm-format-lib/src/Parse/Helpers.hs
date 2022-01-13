@@ -6,11 +6,10 @@ import Prelude hiding (until)
 import Control.Monad (guard)
 import qualified Data.Indexed as I
 import Data.Map.Strict hiding (foldl)
-import Parse.ParsecAdapter hiding (newline, spaces, State)
+import Parse.ParsecAdapter
 
 import AST.V0_16
 import qualified AST.Helpers as Help
-import AST.Structure (Fix2AST)
 import ElmVersion
 import qualified Parse.State as State
 import Parse.Comments
@@ -473,7 +472,10 @@ located parser =
       return (start, value, end)
 
 
-accessible :: ElmVersion -> IParser (Fix2AST A.Located typeRef ctorRef varRef 'ExpressionNK) -> IParser (Fix2AST A.Located typeRef ctorRef varRef 'ExpressionNK)
+accessible ::
+    ElmVersion
+    -> IParser (I.Fix2 A.Located (AST typeRef ctorRef varRef) 'ExpressionNK)
+    -> IParser (I.Fix2 A.Located (AST typeRef ctorRef varRef) 'ExpressionNK)
 accessible elmVersion exprParser =
   do  start <- Parsec.getPosition
       rootExpr <- exprParser
