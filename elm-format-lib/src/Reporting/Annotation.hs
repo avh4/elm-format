@@ -21,7 +21,6 @@ import Control.Monad (liftM2)
 import Data.Coapplicative
 import Data.Binary (Binary, get, put)
 import Data.Word (Word16)
-import Data.String (unwords)
 
 
 
@@ -136,4 +135,3 @@ instance Binary Region where
 instance Binary Position where
   put (Position a b) = put a >> put b
   get = liftM2 Position get get
-

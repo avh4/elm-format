@@ -18,6 +18,7 @@ import Reporting.Annotation (Located)
 import qualified Data.Fix as Fix
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified Data.Indexed as I
+import Data.Coapplicative (extract)
 
 
 expr :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TypeNK)
@@ -27,7 +28,7 @@ expr = Parse.Type.expr
 example :: String -> String -> String -> TestTree
 example name input expected =
     testCase name $
-        assertParse (fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render . typeParens NotRequired . formatType Elm_0_19) (expr Elm_0_19)) input expected
+        assertParse (fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render . typeParens NotRequired . formatType Elm_0_19 . I.fold2 (I.Fix . extract)) (expr Elm_0_19)) input expected
 
 
 test_tests :: TestTree

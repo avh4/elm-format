@@ -8,6 +8,7 @@ import ElmFormat.AST.PublicAST.Reference
 import qualified AST.V0_16 as AST
 import qualified Data.Either as Either
 import qualified ElmFormat.AST.PublicAST.Core as Core
+import qualified Data.Indexed as I
 
 
 data Pattern
@@ -104,7 +105,7 @@ instance ToPublicAST 'PatternNK where
                 (fromRawAST config pat)
 
 instance FromPublicAST 'PatternNK where
-    toRawAST' = \case
+    toRawAST' = I.Fix . \case
         AnythingPattern ->
             AST.Anything
 

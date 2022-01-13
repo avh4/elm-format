@@ -92,7 +92,7 @@ instance ToPublicAST 'TypeNK where
                         (ReversedList.toList acc, last)
 
 instance FromPublicAST 'TypeNK where
-    toRawAST' = \case
+    toRawAST' = I.Fix . \case
         UnitType ->
             AST.UnitType []
 
@@ -235,7 +235,7 @@ mkCustomTypeVariant config (AST.NameWithArgs name args) =
         name
         ((\(C c a) -> fromRawAST config a) <$> args)
 
-fromCustomTypeVariant :: CustomTypeVariant -> AST.NameWithArgs UppercaseIdentifier (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'TypeNK)
+fromCustomTypeVariant :: CustomTypeVariant -> AST.NameWithArgs UppercaseIdentifier (I.Fix (ASTNS [UppercaseIdentifier]) 'TypeNK)
 fromCustomTypeVariant = \case
     CustomTypeVariant name parameterTypes ->
         AST.NameWithArgs

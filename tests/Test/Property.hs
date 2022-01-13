@@ -21,6 +21,7 @@ import qualified ElmVersion
 import qualified Test.Generators ()
 import qualified Test.ElmSourceGenerators
 import qualified Data.Indexed as I
+import Data.Coapplicative (extract)
 
 
 assertStringToString :: String -> Assertion
@@ -31,6 +32,7 @@ assertStringToString source =
         result =
             Parse.parse ElmVersion.Elm_0_19 source'
                 |> Parse.toEither
+                |> fmap (fmap $ I.fold2 $ I.Fix . extract)
                 |> fmap (Render.render ElmVersion.Elm_0_19)
     in
         assertEqual "" (Right source') result
@@ -41,6 +43,7 @@ astToAst ast =
     let
         result =
             ast
+                |> fmap (I.fold2 $ I.Fix . extract)
                 |> Render.render ElmVersion.Elm_0_19
                 |> Parse.parse ElmVersion.Elm_0_19
                 |> Parse.toEither
@@ -48,11 +51,13 @@ astToAst ast =
         assertEqual "" (Right ast) result
 
 
+simpleAst :: Module [UppercaseIdentifier] (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelNK)
 simpleAst =
     case Parse.toEither $ Parse.parse ElmVersion.Elm_0_19 $ Text.pack "module Main exposing (foo)\n\n\nfoo =\n  8\n" of
         Right ast -> ast
 
 
+reportFailedAst :: Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> [Char]
 reportFailedAst ast =
     let
         rendering = Render.render ElmVersion.Elm_0_19 ast |> Text.unpack
@@ -70,8 +75,9 @@ reportFailedAst ast =
             , "=== END OF failed AST rendering\n"
             ]
 
-withCounterexample fn prop =
-  (\s -> counterexample (fn s) $ prop s)
+withCounterexample :: Testable prop => (t -> String) -> (t -> prop) -> t -> Property
+withCounterexample fn prop s =
+    counterexample (fn s) $ prop s
 
 
 propertyTests :: TestTree

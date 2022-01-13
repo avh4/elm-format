@@ -20,7 +20,6 @@ import qualified Control.Monad as Monad
 import qualified Data.Char as Char
 import Data.Coapplicative
 import qualified Data.Foldable as Foldable
-import Data.Functor.Identity (Identity(..))
 import qualified Data.Indexed as I
 import qualified Data.List as List
 import qualified Data.Map.Strict as Map
@@ -194,7 +193,7 @@ sortVars forceMultiline fromExposing fromDocs =
         else ( listedInDocs ++ [remainingFromExposing | not (List.null remainingFromExposing)], commentsFromReorderedVars )
 
 
-formatModuleHeader :: Coapplicative annf => ElmVersion -> Bool -> AST.Module.Module [UppercaseIdentifier] (I.Fix2 annf (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> (Maybe Elm, Maybe Elm, (Maybe Elm, List Elm))
+formatModuleHeader :: ElmVersion -> Bool -> AST.Module.Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> (Maybe Elm, Maybe Elm, (Maybe Elm, List Elm))
 formatModuleHeader elmVersion addDefaultHeader modu =
     let
       maybeHeader =
@@ -239,7 +238,7 @@ formatModuleHeader elmVersion addDefaultHeader modu =
       definedVars :: Set (C2 before after AST.Listing.Value)
       definedVars =
           AST.Module.body modu
-              |> (extract . I.unFix2)
+              |> I.unFix
               |> (\(TopLevel decls) -> decls)
               |> concatMap extractVarName
               |> fmap (C ([], []))
@@ -280,16 +279,16 @@ formatModuleHeader elmVersion addDefaultHeader modu =
               varsToExpose
               documentedVars
 
-      extractVarName :: Coapplicative annf => TopLevelStructure (I.Fix2 annf (ASTNS ns) 'TopLevelDeclarationNK) -> [AST.Listing.Value]
+      extractVarName :: TopLevelStructure (I.Fix (ASTNS ns) 'TopLevelDeclarationNK) -> [AST.Listing.Value]
       extractVarName decl =
-          case extract . I.unFix2 <$> decl of
+          case I.unFix <$> decl of
               DocComment _ -> []
               BodyComment _ -> []
               Entry (PortAnnotation (C _ (LowercaseIdentifier name)) _ _) -> [ AST.Listing.Value (LowercaseIdentifier name) ]
               Entry (CommonDeclaration def) ->
-                case extract $ I.unFix2 def of
+                case I.unFix def of
                     Definition pat _ _ _ ->
-                        case extract $ I.unFix2 pat of
+                        case I.unFix pat of
                             VarPattern (LowercaseIdentifier name) -> [ AST.Listing.Value (LowercaseIdentifier name) ]
                             RecordPattern fields -> AST.Listing.Value . extract <$> fields
                             _ -> []
@@ -435,17 +434,17 @@ formatModuleLine elmVersion (varsToExpose, extraComments) srcTag name moduleSett
       [ exports ]
 
 
-formatModule :: Coapplicative annf => ElmVersion -> Bool -> Int -> AST.Module.Module [UppercaseIdentifier] (I.Fix2 annf (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> Elm
+formatModule :: ElmVersion -> Bool -> Int -> AST.Module.Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> Elm
 formatModule elmVersion addDefaultHeader spacing modu =
     let
         spaceBeforeBody =
-            case extract $ I.unFix2 $ AST.Module.body modu of
+            case I.unFix $ AST.Module.body modu of
                 TopLevel [] -> 0
                 TopLevel (BodyComment _ : _) -> spacing + 1
                 TopLevel _ -> spacing
 
         decls =
-          case extract $ I.unFix2 $ AST.Module.body modu of
+          case I.unFix $ AST.Module.body modu of
               TopLevel decls -> decls
     in
     ElmStructure.module'
@@ -455,16 +454,16 @@ formatModule elmVersion addDefaultHeader spacing modu =
         (formatModuleBody spacing elmVersion (ImportInfo.fromModule mempty modu) decls)
 
 
-formatModuleBody :: forall annf. Coapplicative annf => Int -> ElmVersion -> ImportInfo [UppercaseIdentifier] -> [TopLevelStructure (I.Fix2 annf (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)] -> Maybe Elm
+formatModuleBody :: Int -> ElmVersion -> ImportInfo [UppercaseIdentifier] -> [TopLevelStructure (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)] -> Maybe Elm
 formatModuleBody linesBetween elmVersion importInfo body =
     let
-        entryType :: I.Fix2 annf (ASTNS ns) 'TopLevelDeclarationNK -> BodyEntryType
+        entryType :: I.Fix (ASTNS ns) 'TopLevelDeclarationNK -> BodyEntryType
         entryType adecl =
-            case extract $ I.unFix2 adecl of
+            case I.unFix adecl of
                 CommonDeclaration def ->
-                    case extract $ I.unFix2 def of
+                    case I.unFix def of
                         Definition pat _ _ _ ->
-                            case extract $ I.unFix2 pat of
+                            case I.unFix pat of
                                 VarPattern name ->
                                     BodyNamed $ VarRef () name
 
@@ -560,16 +559,10 @@ topLevelSpacer linesBetween a b =
         (_, DFixity) -> linesBetween
 
 
-data ElmCodeBlock annf ns
-    = DeclarationsCode [TopLevelStructure (I.Fix2 annf (ASTNS ns) 'TopLevelDeclarationNK)]
-    | ExpressionsCode [TopLevelStructure (C0Eol (I.Fix2 annf (ASTNS ns) 'ExpressionNK))]
-    | ModuleCode (AST.Module.Module ns (I.Fix2 annf (ASTNS ns) 'TopLevelNK))
-
-convertElmCodeBlock :: Functor ann => (forall x. ann x -> ann' x) -> ElmCodeBlock ann ns -> ElmCodeBlock ann' ns
-convertElmCodeBlock f = \case
-    DeclarationsCode decls -> DeclarationsCode (fmap (I.convert f) <$> decls)
-    ExpressionsCode exprs -> ExpressionsCode (fmap (fmap $ I.convert f) <$> exprs)
-    ModuleCode mod -> ModuleCode (I.convert f <$> mod)
+data ElmCodeBlock ns
+    = DeclarationsCode [TopLevelStructure (I.Fix (ASTNS ns) 'TopLevelDeclarationNK)]
+    | ExpressionsCode [TopLevelStructure (C0Eol (I.Fix (ASTNS ns) 'ExpressionNK))]
+    | ModuleCode (AST.Module.Module ns (I.Fix (ASTNS ns) 'TopLevelNK))
 
 
 -- TODO: there must be an existing haskell function that does this, right?
@@ -586,19 +579,20 @@ firstOf options value =
 formatDocComment :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> Markdown.Blocks -> Elm
 formatDocComment elmVersion importInfo blocks =
     let
-        parse :: String -> Maybe (ElmCodeBlock Identity [UppercaseIdentifier])
+        parse :: String -> Maybe (ElmCodeBlock [UppercaseIdentifier])
         parse source =
             source
                 |> firstOf
-                    [ fmap DeclarationsCode . Result.toMaybe . Parse.parseDeclarations elmVersion
-                    , fmap ExpressionsCode . Result.toMaybe . Parse.parseExpressions elmVersion
-                    , fmap ModuleCode . Result.toMaybe . Parse.parseModule elmVersion
+                    [ fmap (DeclarationsCode . fmap (fmap $ I.fold2 $ I.Fix . extract))
+                        . Result.toMaybe . Parse.parseDeclarations elmVersion
+                    , fmap (ExpressionsCode . fmap (fmap $ fmap $ I.fold2 $ I.Fix . extract))
+                        . Result.toMaybe . Parse.parseExpressions elmVersion
+                    , fmap (ModuleCode . fmap (I.fold2 $ I.Fix . extract))
+                        . Result.toMaybe . Parse.parseModule elmVersion
                     ]
-                |> fmap (convertElmCodeBlock (pure . extract))
 
         format ::
-            (Applicative annf, Coapplicative annf) =>
-            ElmCodeBlock annf [UppercaseIdentifier] -> String
+            ElmCodeBlock [UppercaseIdentifier] -> String
         format result =
             case result of
                 ModuleCode modu ->
@@ -612,7 +606,6 @@ formatDocComment elmVersion importInfo blocks =
 
                 ExpressionsCode expressions ->
                     expressions
-                        |> fmap (fmap $ fmap $ I.convert (Identity . extract))
                         |> fmap (fmap $ formatEolCommented . fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo))
                         |> fmap (fmap $ (,) BodyUnnamed)
                         |> formatTopLevelBody 1 elmVersion importInfo
@@ -759,16 +752,15 @@ data FormatResult (nk :: NodeKind) where
     FormattedPattern :: SyntaxContext -> Elm -> FormatResult 'PatternNK
 
 
-formatAst :: Coapplicative annf => ElmVersion -> ImportInfo [UppercaseIdentifier] -> I.Fix2 annf (ASTNS [UppercaseIdentifier]) nk -> FormatResult nk
+formatAst :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> I.Fix (ASTNS [UppercaseIdentifier]) nk -> FormatResult nk
 formatAst elmVersion importInfo =
-    I.fold2 (formatAstNode elmVersion importInfo . extract)
+    I.fold (formatAstNode elmVersion importInfo)
 
 
 formatCommonDeclaration ::
-    Coapplicative annf =>
-    ElmVersion -> ImportInfo [UppercaseIdentifier] -> I.Fix2 annf (ASTNS [UppercaseIdentifier]) 'CommonDeclarationNK -> Elm
+    ElmVersion -> ImportInfo [UppercaseIdentifier] -> I.Fix (ASTNS [UppercaseIdentifier]) 'CommonDeclarationNK -> Elm
 formatCommonDeclaration elmVersion importInfo decl =
-    case extract $ I.unFix2 $ I.convert (Identity . extract) decl of
+    case I.unFix decl of
         Definition name args comments expr ->
             formatDefinition elmVersion importInfo name args comments expr
 
@@ -777,10 +769,9 @@ formatCommonDeclaration elmVersion importInfo decl =
 
 
 formatDeclaration ::
-    Coapplicative annf =>
-    ElmVersion -> ImportInfo [UppercaseIdentifier] -> I.Fix2 annf (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK -> Elm
+    ElmVersion -> ImportInfo [UppercaseIdentifier] -> I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK -> Elm
 formatDeclaration elmVersion importInfo decl =
-    case extract $ I.unFix2 $ I.convert (Identity . extract) decl of
+    case I.unFix decl of
         CommonDeclaration def ->
             formatCommonDeclaration elmVersion importInfo def
 
@@ -877,10 +868,10 @@ formatNameWithArgs elmVersion (NameWithArgs name args) =
 formatDefinition ::
     ElmVersion
     -> ImportInfo [UppercaseIdentifier]
-    -> I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'PatternNK
-    -> [C1 before (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'PatternNK)]
+    -> I.Fix (ASTNS [UppercaseIdentifier]) 'PatternNK
+    -> [C1 before (I.Fix (ASTNS [UppercaseIdentifier]) 'PatternNK)]
     -> Comments
-    -> I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'ExpressionNK
+    -> I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK
     -> Elm
 formatDefinition elmVersion importInfo name args comments expr =
     let
@@ -897,8 +888,7 @@ formatDefinition elmVersion importInfo name args comments expr =
 
 
 formatTypeAnnotation ::
-    Coapplicative annf =>
-    ElmVersion -> C1 after (Ref ()) -> C1 before (I.Fix2 annf (ASTNS [UppercaseIdentifier]) 'TypeNK) -> Elm
+    ElmVersion -> C1 after (Ref ()) -> C1 before (I.Fix (ASTNS [UppercaseIdentifier]) 'TypeNK) -> Elm
 formatTypeAnnotation elmVersion name typ =
   ElmStructure.definition ":" False
     (formatTailCommented $ formatVar elmVersion . fmap (\() -> []) <$> name)
@@ -1009,10 +999,9 @@ formatPair delim (Pair a b (ForceMultiline forceMultiline)) =
 
 
 negativeCasePatternWorkaround ::
-    Coapplicative annf =>
-    I.Fix2 annf (ASTNS [UppercaseIdentifier]) 'PatternNK -> Elm -> Elm
+    I.Fix (ASTNS [UppercaseIdentifier]) 'PatternNK -> Elm -> Elm
 negativeCasePatternWorkaround pattern =
-    case extract $ I.unFix2 pattern of
+    case I.unFix pattern of
         LiteralPattern (IntNum i _) | i < 0 -> parens
         LiteralPattern (FloatNum f _) | f < 0 -> parens
         _ -> id
@@ -1062,10 +1051,10 @@ needsParensInContext inner outer =
 
 formatExpression ::
     ElmVersion -> ImportInfo [UppercaseIdentifier]
-    -> I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'ExpressionNK
+    -> I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK
     -> FormatResult 'ExpressionNK
 formatExpression elmVersion importInfo aexpr =
-    case extract $ I.unFix2 aexpr of
+    case I.unFix aexpr of
         Literal lit ->
             FormattedExpression SyntaxSeparated $ formatLiteral elmVersion lit
 
@@ -1140,18 +1129,18 @@ formatExpression elmVersion importInfo aexpr =
 
         Let (def1:defs) bodyComments expr ->
             let
-                spacer :: AST p (I.Fix2 Identity (AST p)) 'LetDeclarationNK -> letDecl -> Int
+                spacer :: AST p (I.Fix (AST p)) 'LetDeclarationNK -> letDecl -> Int
                 spacer first _ =
                     case first of
-                        LetCommonDeclaration (I.Fix2 (Identity (Definition _ _ _ _))) -> 1
+                        LetCommonDeclaration (I.Fix (Definition _ _ _ _)) -> 1
                         _ -> 0
 
                 formatDefinition' def =
                   case def of
-                    LetCommonDeclaration (I.Fix2 (Identity (Definition name args comments expr'))) ->
+                    LetCommonDeclaration (I.Fix (Definition name args comments expr')) ->
                       formatDefinition elmVersion importInfo name args comments expr'
 
-                    LetCommonDeclaration (I.Fix2 (Identity (TypeAnnotation name typ))) ->
+                    LetCommonDeclaration (I.Fix (TypeAnnotation name typ)) ->
                       formatTypeAnnotation elmVersion name typ
 
                     LetComment comment ->
@@ -1160,8 +1149,8 @@ formatExpression elmVersion importInfo aexpr =
                 FormattedExpression AmbiguousEnd $ -- TODO: not tested
                 ElmStructure.letIn "let" "in"
                     (stackWithSpacing
-                        (\a b -> spacer (extract $ I.unFix2 a) b)
-                        (formatDefinition' . extract . I.unFix2)
+                        (\a b -> spacer (I.unFix a) b)
+                        (formatDefinition' . I.unFix)
                         def1 defs
                     )
                     (ElmStructure.stack1 $
@@ -1173,7 +1162,7 @@ formatExpression elmVersion importInfo aexpr =
             FormattedExpression AmbiguousEnd $ -- TODO: not tested
             ElmStructure.case' "case" "of" multiline
                 (formatCommentedExpression elmVersion importInfo subject)
-                (formatCaseClause elmVersion importInfo . extract . I.unFix2 <$> clauses)
+                (formatCaseClause elmVersion importInfo . I.unFix <$> clauses)
 
         Tuple exprs multiline ->
             FormattedExpression SyntaxSeparated $
@@ -1218,8 +1207,7 @@ formatExpression elmVersion importInfo aexpr =
           FormattedExpression SyntaxSeparated $
           ElmStructure.literal $ "[glsl|" <> Text.pack src <> "|]"
 
-
-formatCaseClause :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> ASTNS1 Identity [UppercaseIdentifier] 'CaseBranchNK -> Elm
+formatCaseClause :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> ASTNS [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier])) 'CaseBranchNK -> Elm
 formatCaseClause elmVersion importInfo (CaseBranch prePat postPat preExpr pat expr) =
     let
         (pat', forceArrowNewline) =
@@ -1254,12 +1242,12 @@ formatCaseClause elmVersion importInfo (CaseBranch prePat postPat preExpr pat ex
 
 formatCommentedExpression ::
     ElmVersion -> ImportInfo [UppercaseIdentifier]
-    -> C2 before after (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
+    -> C2 before after (I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
     -> Elm
 formatCommentedExpression elmVersion importInfo (C (pre, post) e) =
     let
         commented' =
-            case extract $ I.unFix2 e of
+            case I.unFix e of
                 Parens (C (pre'', post'') e'') ->
                     C (pre ++ pre'', post'' ++ post) e''
                 _ -> C (pre, post) e
@@ -1268,19 +1256,18 @@ formatCommentedExpression elmVersion importInfo (C (pre, post) e) =
 
 
 formatPreCommentedExpression ::
-    Coapplicative annf =>
     ElmVersion -> ImportInfo [UppercaseIdentifier] -> SyntaxContext
-    -> C1 before (I.Fix2 annf (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
+    -> C1 before (I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
     -> Elm
 formatPreCommentedExpression elmVersion importInfo context (C pre e) =
     let
         (pre', e') =
-            case extract $ I.unFix2 e of
+            case I.unFix e of
                 Parens (C (pre'', []) e'') ->
                     (pre ++ pre'', e'')
                 _ -> (pre, e)
     in
-    formatCommented' pre' (syntaxParens context $ formatExpression elmVersion importInfo $ I.convert (Identity . extract) e')
+    formatCommented' pre' (syntaxParens context $ formatExpression elmVersion importInfo e')
 
 
 formatRecordLike ::
@@ -1364,8 +1351,8 @@ mapIsLast f (next:rest) = f False next : mapIsLast f rest
 formatBinops ::
     ElmVersion
     -> ImportInfo [UppercaseIdentifier]
-    -> I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'ExpressionNK
-    -> [BinopsClause (Ref [UppercaseIdentifier]) (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'ExpressionNK)]
+    -> I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK
+    -> [BinopsClause (Ref [UppercaseIdentifier]) (I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK)]
     -> Bool
     -> Elm
 formatBinops elmVersion importInfo left ops multiline =
@@ -1394,8 +1381,8 @@ formatBinops elmVersion importInfo left ops multiline =
 
 formatRange_0_17 ::
     ElmVersion -> ImportInfo [UppercaseIdentifier]
-    -> C2 before after (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
-    -> C2 before after (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
+    -> C2 before after (I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
+    -> C2 before after (I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
     -> Elm
 formatRange_0_17 elmVersion importInfo left right =
     ElmStructure.range "[" ".." "]"
@@ -1404,31 +1391,30 @@ formatRange_0_17 elmVersion importInfo left right =
 
 
 formatRange_0_18 ::
-    Coapplicative annf =>
     ElmVersion -> ImportInfo [UppercaseIdentifier]
-    -> C2 before after (I.Fix2 annf (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
-    -> C2 before after (I.Fix2 annf (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
+    -> C2 before after (I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
+    -> C2 before after (I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
     -> FormatResult 'ExpressionNK
 formatRange_0_18 elmVersion importInfo left right =
     case (left, right) of
         (C (preLeft, []) left', C (preRight, []) right') ->
             App
-                (I.Fix2 $ Identity $ VarExpr $ VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
-                [ C preLeft $ I.convert (pure . extract) left'
-                , C preRight $ I.convert (pure . extract) right'
+                (I.Fix $ VarExpr $ VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
+                [ C preLeft left'
+                , C preRight right'
                 ]
                 (FAJoinFirst JoinAll)
-                |> (I.Fix2 . pure)
+                |> I.Fix
                 |> formatExpression elmVersion importInfo
 
         _ ->
             App
-                (I.Fix2 $ Identity $ VarExpr $ VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
-                [ C [] $ I.Fix2 $ pure $ Parens $ I.convert (pure . extract) <$> left
-                , C [] $ I.Fix2 $ pure $ Parens $ I.convert (pure . extract) <$> right
+                (I.Fix $ VarExpr $ VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
+                [ C [] $ I.Fix $ Parens left
+                , C [] $ I.Fix $ Parens right
                 ]
                 (FAJoinFirst JoinAll)
-                |> I.Fix2 . pure
+                |> I.Fix
                 |> formatExpression elmVersion importInfo
 
 
@@ -1700,10 +1686,9 @@ formatTypeConstructor elmVersion ctor =
 
 
 formatType ::
-    Coapplicative annf =>
-    ElmVersion -> I.Fix2 annf (ASTNS [UppercaseIdentifier]) 'TypeNK -> (TypeParensInner, Elm)
+    ElmVersion -> I.Fix (ASTNS [UppercaseIdentifier]) 'TypeNK -> (TypeParensInner, Elm)
 formatType elmVersion atype =
-    case extract $ I.unFix2 atype of
+    case I.unFix atype of
         UnitType comments ->
           (,) NotNeeded $
           formatUnit '(' ')' comments

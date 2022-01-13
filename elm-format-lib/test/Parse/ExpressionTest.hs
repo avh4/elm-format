@@ -10,7 +10,6 @@ import AST.Structure
 import qualified Box
 import qualified Data.Bimap as Bimap
 import Data.Coapplicative
-import Data.Functor.Identity
 import qualified Data.Indexed as I
 import qualified Data.Text as Text
 import Parse.ParsecAdapter (string)
@@ -43,7 +42,7 @@ importInfo =
 example' :: String -> String -> String -> TestTree
 example' name input expected =
     testCase name $
-        assertParse (fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render . syntaxParens SyntaxSeparated . formatExpression Elm_0_19 importInfo . I.convert (Identity . extract)) (expr Elm_0_19)) input expected
+        assertParse (fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render . syntaxParens SyntaxSeparated . formatExpression Elm_0_19 importInfo . I.fold2 (I.Fix . extract)) (expr Elm_0_19)) input expected
 
 
 commentedIntExpr :: (Word16, Word16, Word16, Word16) -> String -> String -> Int64 -> Commented ([Comment], [Comment]) (I.Fix2 Located (ASTNS ns) 'ExpressionNK)

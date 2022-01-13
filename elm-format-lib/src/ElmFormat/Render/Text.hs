@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 module ElmFormat.Render.Text where
 
-import Data.Coapplicative
 import Elm.Utils ((|>))
 import ElmVersion (ElmVersion)
 import AST.Structure
@@ -16,7 +15,7 @@ import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified Data.Indexed as I
 
 
-render :: Coapplicative annf => ElmVersion -> Module [UppercaseIdentifier] (I.Fix2 annf (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> Text.Text
+render :: ElmVersion -> Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> Text.Text
 render elmVersion modu =
     renderBox $ Fix.cata ElmStructure.render $ Render.formatModule elmVersion True 2 modu
 

@@ -1,5 +1,4 @@
 {-# LANGUAGE TupleSections #-}
-{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DeriveGeneric #-}
@@ -78,11 +77,11 @@ fromRawAST config =
 
 
 class ToPublicAST nk => FromPublicAST (nk :: NodeKind) where
-    toRawAST' :: PublicAST nk -> ASTNS1 Identity [UppercaseIdentifier] nk
+    toRawAST' :: PublicAST nk -> I.Fix (ASTNS [UppercaseIdentifier]) nk
 
-toRawAST :: FromPublicAST nk => LocatedIfRequested (PublicAST nk) -> I.Fix2 Identity (ASTNS [UppercaseIdentifier]) nk
+toRawAST :: FromPublicAST nk => LocatedIfRequested (PublicAST nk) -> I.Fix (ASTNS [UppercaseIdentifier]) nk
 toRawAST =
-    I.Fix2 . Identity . toRawAST' . extract
+    toRawAST' . extract
 
 
 --

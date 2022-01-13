@@ -58,13 +58,13 @@ mkLetDeclarations config decls =
     in
     mkDefinitions config LetDefinition $ fmap (JustF . fmap toDefBuilder . fromLocated config . I.unFix2) decls
 
-fromLetDeclaration :: LetDeclaration -> List (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'LetDeclarationNK)
+fromLetDeclaration :: LetDeclaration -> List (I.Fix (ASTNS [UppercaseIdentifier]) 'LetDeclarationNK)
 fromLetDeclaration = \case
     LetDefinition def ->
-        I.Fix2 . Identity . AST.LetCommonDeclaration <$> fromDefinition def
+        I.Fix . AST.LetCommonDeclaration <$> fromDefinition def
 
     Comment_ld comment ->
-        pure $ I.Fix2 $ Identity $ AST.LetComment (fromComment comment)
+        pure $ I.Fix $ AST.LetComment (fromComment comment)
 
 
 instance ToJSON LetDeclaration where
@@ -109,11 +109,11 @@ instance ToPublicAST 'CaseBranchNK where
                 (JustF $ fromRawAST config body)
 
 instance FromPublicAST 'CaseBranchNK where
-    toRawAST' = \case
+    toRawAST' = I.Fix . \case
         CaseBranch pattern body ->
             AST.CaseBranch [] [] []
                 (toRawAST pattern)
-                (maybeF (I.Fix2 . Identity . toRawAST') toRawAST body)
+                (maybeF toRawAST' toRawAST body)
 
 instance ToPairs CaseBranch where
     toPairs = \case
@@ -299,7 +299,7 @@ instance ToPublicAST 'ExpressionNK where
             GLShader shader
 
 instance FromPublicAST 'ExpressionNK where
-    toRawAST' = \case
+    toRawAST' = I.Fix . \case
         UnitLiteral ->
             AST.Unit []
 
@@ -314,7 +314,7 @@ instance FromPublicAST 'ExpressionNK where
                 (UnaryOperator operator, [ single ]) ->
                     AST.Unary
                         operator
-                        (maybeF (I.Fix2 . Identity . toRawAST') toRawAST single)
+                        (maybeF toRawAST' toRawAST single)
 
                 (UnaryOperator _, []) ->
                     undefined
@@ -324,8 +324,8 @@ instance FromPublicAST 'ExpressionNK where
 
                 _ ->
                     AST.App
-                        (maybeF (I.Fix2 . Identity . toRawAST') toRawAST function)
-                        (C [] . maybeF (I.Fix2 . Identity . toRawAST') toRawAST <$> args)
+                        (maybeF toRawAST' toRawAST function)
+                        (C [] . maybeF toRawAST' toRawAST <$> args)
                         (AST.FAJoinFirst AST.JoinAll)
 
         UnaryOperator _ ->
@@ -661,32 +661,32 @@ mkDefinition config pat args annotation expr =
                 , show expr
                 ]
 
-fromDefinition :: Definition -> List (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'CommonDeclarationNK)
+fromDefinition :: Definition -> List (I.Fix (ASTNS [UppercaseIdentifier]) 'CommonDeclarationNK)
 fromDefinition = \case
     Definition name parameters Nothing expression ->
-        pure $ I.Fix2 $ Identity $ AST.Definition
-            (I.Fix2 $ Identity $ AST.VarPattern name)
+        pure $ I.Fix $ AST.Definition
+            (I.Fix $ AST.VarPattern name)
             (C [] . toRawAST . pattern_tp <$> parameters)
             []
             (toRawAST expression)
 
     Definition name [] (Just typ) expression ->
-        [ I.Fix2 $ Identity $ AST.TypeAnnotation
+        [ I.Fix $ AST.TypeAnnotation
             (C [] $ VarRef () name)
             (C [] $ toRawAST typ)
-        , I.Fix2 $ Identity $ AST.Definition
-            (I.Fix2 $ Identity $ AST.VarPattern name)
+        , I.Fix $ AST.Definition
+            (I.Fix $ AST.VarPattern name)
             []
             []
             (toRawAST expression)
         ]
 
     Definition name parameters (Just typ) expression ->
-        [ I.Fix2 $ Identity $ AST.TypeAnnotation
+        [ I.Fix $ AST.TypeAnnotation
             (C [] $ VarRef () name)
             (C [] $ toRawAST $ LocatedIfRequested $ NothingF $ FunctionType typ (fromMaybe (LocatedIfRequested $ NothingF UnitType) . type_tp <$> parameters))
-        , I.Fix2 $ Identity $ AST.Definition
-            (I.Fix2 $ Identity $ AST.VarPattern name)
+        , I.Fix $ AST.Definition
+            (I.Fix $ AST.VarPattern name)
             (C [] . toRawAST . pattern_tp <$> parameters)
             []
             (toRawAST expression)

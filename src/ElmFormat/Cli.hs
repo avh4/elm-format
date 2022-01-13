@@ -28,6 +28,7 @@ import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as LB
 import qualified Data.Indexed as I
+import Data.Coapplicative (extract)
 
 
 data WhatToDo
@@ -158,7 +159,7 @@ validate :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage ()
 validate elmVersion input@(inputFile, inputText) =
     case parseModule elmVersion input of
         Right modu ->
-            if inputText /= Render.render elmVersion modu then
+            if inputText /= Render.render elmVersion (I.fold2 (I.Fix . extract) <$> modu) then
                 Left $ FileWouldChange elmVersion inputFile
             else
                 Right ()
@@ -181,7 +182,7 @@ parseModule elmVersion (inputFile, inputText) =
 
 
 parseJson :: (FilePath, Text.Text)
-    -> Either InfoMessage (Module [UppercaseIdentifier] (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'TopLevelNK))
+    -> Either InfoMessage (Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK))
 parseJson (inputFile, inputText) =
     case Aeson.eitherDecode (LB.fromChunks . return . encodeUtf8 $ inputText) of
         Right modu -> Right $ PublicAST.toModule modu
@@ -192,7 +193,7 @@ parseJson (inputFile, inputText) =
 
 format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
 format elmVersion input =
-    Render.render elmVersion <$> parseModule elmVersion input
+    Render.render elmVersion . fmap (I.fold2 $ I.Fix . extract) <$> parseModule elmVersion input
 
 
 toJson :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text

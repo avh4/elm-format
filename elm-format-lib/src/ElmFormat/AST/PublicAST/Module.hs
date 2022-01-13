@@ -51,7 +51,7 @@ fromModule config = \case
             (Map.mapWithKey (\m (C comments i) -> fromImportMethod m i) $ Map.mapKeys ModuleName imports)
             (fromTopLevelStructures config $ normalize body)
 
-toModule :: Module -> AST.Module [UppercaseIdentifier] (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'TopLevelNK)
+toModule :: Module -> AST.Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK)
 toModule (Module (ModuleName name) imports body) =
     -- TODO: remove this placeholder
     AST.Module
@@ -64,9 +64,7 @@ toModule (Module (ModuleName name) imports body) =
         )
         (noRegion Nothing)
         (C [] $ Map.mapKeys (\(ModuleName ns) -> ns) $ C [] . toImportMethod <$> imports)
-        (f $ AST.TopLevel $ mconcat $ fmap (toTopLevelStructures . extract) body)
-    where
-        f = I.Fix2 . Identity
+        (I.Fix $ AST.TopLevel $ mconcat $ fmap (toTopLevelStructures . extract) body)
 
 instance ToJSON Module where
     toJSON = undefined
@@ -175,19 +173,19 @@ fromTopLevelStructures config (I.Fix2 (At _ (AST.TopLevel decls))) =
     in
     mkDefinitions config DefinitionStructure $ fmap toDefBuilder decls
 
-toTopLevelStructures :: TopLevelStructure -> List (AST.TopLevelStructure (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK))
+toTopLevelStructures :: TopLevelStructure -> List (AST.TopLevelStructure (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK))
 toTopLevelStructures = \case
     DefinitionStructure def ->
-        AST.Entry . I.Fix2 . Identity . AST.CommonDeclaration <$> fromDefinition def
+        AST.Entry . I.Fix . AST.CommonDeclaration <$> fromDefinition def
 
     TypeAlias name parameters typ ->
-        pure $ AST.Entry $ I.Fix2 $ Identity $ AST.TypeAlias
+        pure $ AST.Entry $ I.Fix $ AST.TypeAlias
             []
             (C ([], []) (AST.NameWithArgs name (fmap (C []) parameters)))
             (C [] $ toRawAST typ)
 
     CustomType name parameters variants ->
-        pure $ AST.Entry $ I.Fix2 $ Identity $ AST.Datatype
+        pure $ AST.Entry $ I.Fix $ AST.Datatype
             (C ([], []) (AST.NameWithArgs name (fmap (C []) parameters)))
             (Either.fromRight undefined $ AST.fromCommentedList (C ([], [], Nothing) . fromCustomTypeVariant <$> variants))
 
