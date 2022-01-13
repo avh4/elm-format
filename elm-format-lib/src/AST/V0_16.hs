@@ -221,6 +221,11 @@ assocToString assoc =
 data NameWithArgs name arg =
     NameWithArgs name [C1 'BeforeTerm arg]
     deriving (Eq, Show, Functor)
+
+instance Bifunctor NameWithArgs where
+    bimap fname farg (NameWithArgs name args) =
+        NameWithArgs (fname name) (fmap farg <$> args)
+
 instance Foldable (NameWithArgs name) where
     foldMap f (NameWithArgs _ args) = foldMap (f . extract) args
 
