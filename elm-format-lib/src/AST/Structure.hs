@@ -21,10 +21,7 @@ import qualified Data.Indexed as I
 
 
 type ASTNS ns =
-    AST
-        (ns, UppercaseIdentifier)
-        (ns, UppercaseIdentifier)
-        (Ref ns)
+    AST (VariableNamespace ns)
 
 
 -- ASTNS1 :: (Type -> Type) -> Type -> NodeKind -> Type
@@ -34,28 +31,28 @@ type ASTNS1 annf ns =
 
 bottomUpReferences ::
     (Functor annf) =>
-    (typeRef1 -> typeRef2)
-    -> (ctorRef1 -> ctorRef2)
-    -> (varRef1 -> varRef2)
+    (TypeRef p1 -> TypeRef p2)
+    -> (CtorRef p1 -> CtorRef p2)
+    -> (VarRef p1 -> VarRef p2)
     -> (forall kind.
-        I.Fix2 annf (AST typeRef1 ctorRef1 varRef1) kind
-        -> I.Fix2 annf (AST typeRef2 ctorRef2 varRef2) kind
+        I.Fix2 annf (AST p1) kind
+        -> I.Fix2 annf (AST p2) kind
        )
 bottomUpReferences ftr fcr fvr =
     I.fold2 (I.Fix2 . fmap (mapAll ftr fcr fvr id))
 
 
 foldReferences ::
-    forall a annf typeRef ctorRef varRef kind.
+    forall a annf p kind.
     (Monoid a, Coapplicative annf) =>
-    (typeRef -> a) -> (ctorRef -> a) -> (varRef -> a)
-    -> I.Fix2 annf (AST typeRef ctorRef varRef) kind -> a
+    (TypeRef p -> a) -> (CtorRef p -> a) -> (VarRef p -> a)
+    -> I.Fix2 annf (AST p) kind -> a
 foldReferences ftype fctor fvar =
     getConst . I.fold2 (foldNode  . extract)
     where
         -- This is kinda confusing, but we use the Const type constructor to merge all the different NodeKinds into a single type `a`
         -- See http://www.timphilipwilliams.com/posts/2013-01-16-fixing-gadts.html for relevant details.
-        foldNode :: forall kind'. AST typeRef ctorRef varRef (Const a) kind' -> Const a kind'
+        foldNode :: forall kind'. AST p (Const a) kind' -> Const a kind'
         foldNode = \case
             TopLevel tls -> Const $ foldMap (foldMap getConst) tls
 
@@ -119,12 +116,12 @@ foldReferences ftype fctor fvar =
             RecordType _ fields _ _ -> foldMap (extract . _value) fields
             FunctionType first rest _ -> extract first <> fold rest
 
-        foldTypeConstructor :: TypeConstructor typeRef -> a
+        foldTypeConstructor :: TypeConstructor (TypeRef p) -> a
         foldTypeConstructor = \case
             NamedConstructor name -> ftype name
             TupleConstructor _ -> mempty
 
-        foldBinopsClause :: BinopsClause varRef (Const a 'ExpressionNK) -> a
+        foldBinopsClause :: BinopsClause (VarRef p) (Const a 'ExpressionNK) -> a
         foldBinopsClause = \case
             BinopsClause _ op _ e -> fvar op <> getConst e
 

@@ -474,8 +474,8 @@ located parser =
 
 accessible ::
     ElmVersion
-    -> IParser (I.Fix2 A.Located (AST typeRef ctorRef varRef) 'ExpressionNK)
-    -> IParser (I.Fix2 A.Located (AST typeRef ctorRef varRef) 'ExpressionNK)
+    -> IParser (I.Fix2 A.Located (AST p) 'ExpressionNK)
+    -> IParser (I.Fix2 A.Located (AST p) 'ExpressionNK)
 accessible elmVersion exprParser =
   do  start <- Parsec.getPosition
       rootExpr <- exprParser

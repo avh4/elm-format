@@ -16,7 +16,7 @@ import Parse.Common
 import Data.List.NonEmpty (NonEmpty(..))
 
 
-tvar :: ElmVersion -> IParser (I.Fix2 Located (AST typeRef ctorRef varRef) 'TypeNK)
+tvar :: ElmVersion -> IParser (I.Fix2 Located (AST p) 'TypeNK)
 tvar elmVersion =
   fmap I.Fix2 $ addLocation
     (TypeVariable <$> lowVar elmVersion <?> "a type variable")

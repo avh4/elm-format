@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE TypeFamilies #-}
 module Parse.Pattern (term, expr) where
 
 import Parse.ParsecAdapter ((<|>), (<?>), char, choice, optionMaybe, try)
@@ -42,8 +43,8 @@ basic elmVersion =
 
 asPattern ::
   ElmVersion
-  -> IParser (I.Fix2 Located (AST typeRef ctorRef varRef) 'PatternNK)
-  -> IParser (I.Fix2 Located (AST typeRef ctorRef varRef) 'PatternNK)
+  -> IParser (I.Fix2 Located (AST p) 'PatternNK)
+  -> IParser (I.Fix2 Located (AST p) 'PatternNK)
 asPattern elmVersion patternParser =
   do  (start, pattern, _) <- located patternParser
 
@@ -64,7 +65,7 @@ asPattern elmVersion patternParser =
           return (preAs, C postAs var)
 
 
-record :: ElmVersion -> IParser (I.Fix2 Located (AST typeRef ctorRef varRef) 'PatternNK)
+record :: ElmVersion -> IParser (I.Fix2 Located (AST p) 'PatternNK)
 record elmVersion =
   fmap I.Fix2 $ addLocation $
   do

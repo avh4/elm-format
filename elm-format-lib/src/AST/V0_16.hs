@@ -5,6 +5,8 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module AST.V0_16 (module AST.V0_16, module ElmFormat.AST.Shared) where
 
@@ -273,11 +275,23 @@ data NodeKind
     | TypeNK
 
 
-data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind) where
+class ASTParameters p where
+    type TypeRef p :: Type
+    type CtorRef p :: Type
+    type VarRef p :: Type
+
+data VariableNamespace (ns :: Type)
+instance ASTParameters (VariableNamespace ns) where
+    type TypeRef (VariableNamespace ns) = (ns, UppercaseIdentifier)
+    type CtorRef (VariableNamespace ns) = (ns, UppercaseIdentifier)
+    type VarRef (VariableNamespace ns) = Ref ns
+
+
+data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
 
     TopLevel ::
         [TopLevelStructure (getType 'TopLevelDeclarationNK)]
-        -> AST typeRef ctorRef varRef getType 'TopLevelNK
+        -> AST p getType 'TopLevelNK
 
     --
     -- Declarations
@@ -288,47 +302,47 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind)
         -> [C1 'BeforeTerm (getType 'PatternNK)]
         -> Comments
         -> getType 'ExpressionNK
-        -> AST typeRef ctorRef varRef getType 'CommonDeclarationNK
+        -> AST p getType 'CommonDeclarationNK
     TypeAnnotation ::
         C1 'AfterTerm (Ref ())
         -> C1 'BeforeTerm (getType 'TypeNK)
-        -> AST typeRef ctorRef varRef getType 'CommonDeclarationNK
+        -> AST p getType 'CommonDeclarationNK
     CommonDeclaration ::
         getType 'CommonDeclarationNK
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> AST p getType 'TopLevelDeclarationNK
     Datatype ::
         { nameWithArgs :: C2 'BeforeTerm 'AfterTerm (NameWithArgs UppercaseIdentifier LowercaseIdentifier)
         , tags :: OpenCommentedList (NameWithArgs UppercaseIdentifier (getType 'TypeNK))
         }
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> AST p getType 'TopLevelDeclarationNK
     TypeAlias ::
         Comments
         -> C2 'BeforeTerm 'AfterTerm (NameWithArgs UppercaseIdentifier LowercaseIdentifier)
         -> C1 'BeforeTerm (getType 'TypeNK)
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> AST p getType 'TopLevelDeclarationNK
     PortAnnotation ::
         C2 'BeforeTerm 'AfterTerm LowercaseIdentifier
         -> Comments
         -> getType 'TypeNK
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> AST p getType 'TopLevelDeclarationNK
     PortDefinition_until_0_16 ::
         C2 'BeforeTerm 'AfterTerm LowercaseIdentifier
         -> Comments
         -> getType 'ExpressionNK
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> AST p getType 'TopLevelDeclarationNK
     Fixity_until_0_18 ::
         Assoc
         -> Comments
         -> Int
         -> Comments
-        -> varRef
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> (VarRef p)
+        -> AST p getType 'TopLevelDeclarationNK
     Fixity ::
         C1 'BeforeTerm Assoc
         -> C1 'BeforeTerm Int
         -> C2 'BeforeTerm 'AfterTerm SymbolIdentifier
         -> C1 'BeforeTerm LowercaseIdentifier
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> AST p getType 'TopLevelDeclarationNK
 
     --
     -- Expressions
@@ -336,50 +350,50 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind)
 
     Unit ::
         Comments
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     Literal ::
         LiteralValue
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     VarExpr ::
-        varRef
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        VarRef p
+        -> AST p getType 'ExpressionNK
 
     App ::
         getType 'ExpressionNK
         -> [C1 'BeforeTerm (getType 'ExpressionNK)]
         -> FunctionApplicationMultiline
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     Unary ::
         UnaryOperator
         -> getType 'ExpressionNK
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     Binops ::
         getType 'ExpressionNK
-        -> List (BinopsClause varRef (getType 'ExpressionNK)) -- Non-empty
+        -> List (BinopsClause (VarRef p) (getType 'ExpressionNK)) -- Non-empty
         -> Bool
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     Parens ::
         C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
 
     ExplicitList ::
         { terms :: Sequence (getType 'ExpressionNK)
         , trailingComments_el :: Comments
         , forceMultiline_el :: ForceMultiline
         }
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     Range ::
         C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)
         -> C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
 
     Tuple ::
         [C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)]
         -> Bool
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     TupleFunction ::
         Int -- will be 2 or greater, indicating the number of elements in the tuple
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
 
     Record ::
         { base_r :: Maybe (C2 'BeforeTerm 'AfterTerm LowercaseIdentifier)
@@ -387,41 +401,41 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind)
         , trailingComments_r :: Comments
         , forceMultiline_r :: ForceMultiline
         }
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     Access ::
         getType 'ExpressionNK
         -> LowercaseIdentifier
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     AccessFunction ::
         LowercaseIdentifier
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
 
     Lambda ::
         [C1 'BeforeTerm (getType 'PatternNK)]
         -> Comments
         -> getType 'ExpressionNK
         -> Bool
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     If ::
         IfClause (getType 'ExpressionNK)
         -> [C1 'BeforeTerm (IfClause (getType 'ExpressionNK))]
         -> C1 'BeforeTerm (getType 'ExpressionNK)
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     Let ::
         [getType 'LetDeclarationNK]
         -> Comments
         -> getType 'ExpressionNK
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     LetCommonDeclaration ::
         getType 'CommonDeclarationNK
-        -> AST typeRef ctorRef varRef getType 'LetDeclarationNK
+        -> AST p getType 'LetDeclarationNK
     LetComment ::
         Comment
-        -> AST typeRef ctorRef varRef getType 'LetDeclarationNK
+        -> AST p getType 'LetDeclarationNK
     Case ::
         (C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK), Bool)
         -> [getType 'CaseBranchNK]
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     CaseBranch ::
         { beforePattern :: Comments
         , beforeArrow :: Comments
@@ -429,12 +443,12 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind)
         , pattern :: getType 'PatternNK
         , body :: getType 'ExpressionNK
         }
-        -> AST typeRef ctorRef varRef getType 'CaseBranchNK
+        -> AST p getType 'CaseBranchNK
 
     -- for type checking and code gen only
     GLShader ::
         String
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
 
 
     --
@@ -442,50 +456,50 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind)
     --
 
     Anything ::
-        AST typeRef ctorRef varRef getType 'PatternNK
+        AST p getType 'PatternNK
     UnitPattern ::
         Comments
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     LiteralPattern ::
         LiteralValue
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     VarPattern ::
         LowercaseIdentifier
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     OpPattern ::
         SymbolIdentifier
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     DataPattern ::
-        ctorRef
+        CtorRef p
         -> [C1 'BeforeTerm (getType 'PatternNK)]
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     PatternParens ::
         C2 'BeforeTerm 'AfterTerm (getType 'PatternNK)
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     TuplePattern ::
         [C2 'BeforeTerm 'AfterTerm (getType 'PatternNK)]
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     EmptyListPattern ::
         Comments
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     ListPattern ::
         [C2 'BeforeTerm 'AfterTerm (getType 'PatternNK)]
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     ConsPattern ::
         { first_cp :: C0Eol (getType 'PatternNK)
         , rest_cp :: Sequence (getType 'PatternNK)
         }
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     EmptyRecordPattern ::
         Comments
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     RecordPattern ::
         [C2 'BeforeTerm 'AfterTerm LowercaseIdentifier]
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     Alias ::
         C1 'AfterTerm (getType 'PatternNK)
         -> C1 'BeforeTerm LowercaseIdentifier
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
 
 
     --
@@ -494,66 +508,70 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind)
 
     UnitType ::
         Comments
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
     TypeVariable ::
         LowercaseIdentifier
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
     TypeConstruction ::
-        TypeConstructor typeRef
+        TypeConstructor (TypeRef p)
         -> [C1 'BeforeTerm (getType 'TypeNK)]
         -> ForceMultiline
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
     TypeParens ::
         C2 'BeforeTerm 'AfterTerm (getType 'TypeNK)
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
     TupleType ::
         NonEmpty (C2Eol 'BeforeTerm 'AfterTerm (getType 'TypeNK))
         -> ForceMultiline
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
     RecordType ::
         { base_rt :: Maybe (C2 'BeforeTerm 'AfterTerm LowercaseIdentifier)
         , fields_rt :: Sequence (Pair LowercaseIdentifier (getType 'TypeNK))
         , trailingComments_rt :: Comments
         , forceMultiline_rt :: ForceMultiline
         }
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
     FunctionType ::
         { first_ft :: C0Eol (getType 'TypeNK)
         , rest_ft :: Sequence (getType 'TypeNK)
         , forceMultiline_ft :: ForceMultiline
         }
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
 
 deriving instance
-    ( Eq typeRef, Eq ctorRef, Eq varRef
-    , Eq (getType 'CommonDeclarationNK)
+    (Eq (getType 'CommonDeclarationNK)
     , Eq (getType 'TopLevelDeclarationNK)
     , Eq (getType 'ExpressionNK)
     , Eq (getType 'LetDeclarationNK)
     , Eq (getType 'CaseBranchNK)
     , Eq (getType 'PatternNK)
     , Eq (getType 'TypeNK)
+    , Eq (TypeRef p) -- TODO: is there a way to not need UndecidableInstances for this?
+    , Eq (CtorRef p)
+    , Eq (VarRef p)
     ) =>
-    Eq (AST typeRef ctorRef varRef getType kind)
+    Eq (AST p getType kind)
 deriving instance
-    ( Show typeRef, Show ctorRef, Show varRef
-    , Show (getType 'CommonDeclarationNK)
+    ( Show (getType 'CommonDeclarationNK)
     , Show (getType 'TopLevelDeclarationNK)
     , Show (getType 'ExpressionNK)
     , Show (getType 'LetDeclarationNK)
     , Show (getType 'CaseBranchNK)
     , Show (getType 'PatternNK)
     , Show (getType 'TypeNK)
+    , Show (TypeRef p)
+    , Show (CtorRef p)
+    , Show (VarRef p)
     ) =>
-    Show (AST typeRef ctorRef varRef getType kind)
+    Show (AST p getType kind)
 
 
 mapAll ::
-    (typeRef1 -> typeRef2) -> (ctorRef1 -> ctorRef2) -> (varRef1 -> varRef2)
+    (TypeRef p1 -> TypeRef p2) -> (CtorRef p1 -> CtorRef p2) -> (VarRef p1 -> VarRef p2)
     -> (forall kind. getType1 kind -> getType2 kind)
     -> (forall kind.
-        AST typeRef1 ctorRef1 varRef1 getType1 kind
-        -> AST typeRef2 ctorRef2 varRef2 getType2 kind
+        AST p1 getType1 kind
+        -> AST p2 getType2 kind
         )
 mapAll ftyp fctor fvar fast = \case
     TopLevel tls -> TopLevel (fmap (fmap fast) tls)
@@ -619,7 +637,7 @@ mapAll ftyp fctor fvar fast = \case
     FunctionType first rest ml -> FunctionType (fmap fast first) (fmap fast rest) ml
 
 
-instance I.HFunctor (AST typeRef ctorRef varRef) where
+instance I.HFunctor (AST p) where
     -- TODO: it's probably worth making an optimized version of this
     hmap = mapAll id id id
 
@@ -633,22 +651,23 @@ instance I.HFunctor (AST typeRef ctorRef varRef) where
 topDownReferencesWithContext ::
     forall
         context ns
-        typeRef2 ctorRef2 varRef2
+        p2
         ann kind.
     Functor ann =>
     Coapplicative ann =>
+    ASTParameters p2 =>
     (LocalName -> context -> context) -- TODO: since the caller typically passes a function that builds a Map or Set, this could be optimized by taking `List (LocalName)` instead of one at a time
-    -> (context -> (ns, UppercaseIdentifier) -> typeRef2)
-    -> (context -> (ns, UppercaseIdentifier) -> ctorRef2)
-    -> (context -> Ref ns -> varRef2)
+    -> (context -> (ns, UppercaseIdentifier) -> TypeRef p2)
+    -> (context -> (ns, UppercaseIdentifier) -> CtorRef p2)
+    -> (context -> Ref ns -> VarRef p2)
     -> context
-    -> I.Fix2 ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)) kind
-    -> I.Fix2 ann (AST typeRef2 ctorRef2 varRef2) kind
+    -> I.Fix2 ann (AST (VariableNamespace ns)) kind
+    -> I.Fix2 ann (AST p2) kind
 topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initialAst =
     let
         namesFromPattern' ::
-            forall a b c kind'. -- We actually only care about PatternNK' here
-            AST a b c (Const [LocalName]) kind'
+            forall p kind'. -- We actually only care about PatternNK' here
+            AST p (Const [LocalName]) kind'
             -> Const [LocalName] kind'
         namesFromPattern' = \case
             Anything -> mempty
@@ -668,14 +687,14 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
 
         namesFromPattern ::
             Coapplicative ann' =>
-            I.Fix2 ann' (AST a b c) kind'
+            I.Fix2 ann' (AST p) kind'
             -> [LocalName]
         namesFromPattern =
             getConst . I.fold2 (namesFromPattern' . extract)
 
         namesFrom ::
             Coapplicative ann' =>
-            I.Fix2 ann' (AST a b c) kind'
+            I.Fix2 ann' (AST p) kind'
             -> [LocalName]
         namesFrom decl =
             case extract $ I.unFix2 decl of
@@ -697,8 +716,8 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
 
         newDefinitionsAtNode ::
             forall kind'.
-            AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)
-                (I.Fix2 ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)))
+            AST (VariableNamespace ns)
+                (I.Fix2 ann (AST (VariableNamespace ns)))
                 kind'
             -> [LocalName]
         newDefinitionsAtNode node =
@@ -730,13 +749,13 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
         step ::
             forall kind'.
             context
-            -> AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)
-                (I.Fix2 ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)))
+            -> AST (VariableNamespace ns)
+                (I.Fix2 ann (AST (VariableNamespace ns)))
                 kind'
-            -> AST typeRef2 ctorRef2 varRef2
+            -> AST p2
                 (Compose
                     ((,) context)
-                    (I.Fix2 ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)))
+                    (I.Fix2 ann (AST (VariableNamespace ns)))
                 )
                 kind'
         step context node =

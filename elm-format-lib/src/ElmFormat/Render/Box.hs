@@ -906,7 +906,9 @@ formatTypeAnnotation elmVersion name typ =
     (formatPreCommented $ typeParens NotRequired . formatType elmVersion <$> typ)
 
 
-formatAstNode :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> AST typeRef ([UppercaseIdentifier], UppercaseIdentifier ) varRef FormatResult nk -> FormatResult nk
+formatAstNode ::
+    CtorRef p ~ ([UppercaseIdentifier], UppercaseIdentifier) =>
+    ElmVersion -> ImportInfo [UppercaseIdentifier] -> AST p FormatResult nk -> FormatResult nk
 formatAstNode elmVersion importInfo =
     \case
         Anything ->
@@ -1138,7 +1140,7 @@ formatExpression elmVersion importInfo aexpr =
 
         Let (def1:defs) bodyComments expr ->
             let
-                spacer :: AST typeRef ctorRef varRef (I.Fix2 Identity (AST typeRef ctorRef varRef)) 'LetDeclarationNK -> letDecl -> Int
+                spacer :: AST p (I.Fix2 Identity (AST p)) 'LetDeclarationNK -> letDecl -> Int
                 spacer first _ =
                     case first of
                         LetCommonDeclaration (I.Fix2 (Identity (Definition _ _ _ _))) -> 1

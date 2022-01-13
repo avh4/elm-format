@@ -13,10 +13,10 @@ import Reporting.Annotation (Located)
 
 
 binops
-    :: IParser (I.Fix2 Located (AST typeRef ctorRef varRef) 'ExpressionNK)
-    -> IParser (I.Fix2 Located (AST typeRef ctorRef varRef) 'ExpressionNK)
-    -> IParser varRef
-    -> IParser (I.Fix2 Located (AST typeRef ctorRef varRef) 'ExpressionNK)
+    :: IParser (I.Fix2 Located (AST p) 'ExpressionNK)
+    -> IParser (I.Fix2 Located (AST p) 'ExpressionNK)
+    -> IParser (VarRef p)
+    -> IParser (I.Fix2 Located (AST p) 'ExpressionNK)
 binops term last anyOp =
   fmap I.Fix2 $ addLocation $
   do  ((e, ops), multiline) <- trackNewline ((,) <$> term <*> nextOps)

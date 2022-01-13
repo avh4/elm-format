@@ -52,7 +52,7 @@ nowhere = A.Region (A.Position 0 0) (A.Position 0 0)
 
 at ::
     Word16 -> Word16 -> Word16 -> Word16
-   -> AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns) (I.Fix2 Located (ASTNS ns)) kind
+   -> AST (VariableNamespace  ns) (I.Fix2 Located (ASTNS ns)) kind
    -> I.Fix2 Located (ASTNS ns) kind
 at a b c d = I.Fix2 . A.At (A.Region (A.Position a b) (A.Position c d))
 
