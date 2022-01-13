@@ -54,7 +54,7 @@ at ::
     Word16 -> Word16 -> Word16 -> Word16
    -> AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns) (ASTNS Located ns) kind
    -> ASTNS Located ns kind
-at a b c d = I.Fix . A.At (A.Region (A.Position a b) (A.Position c d))
+at a b c d = I.Fix2 . A.At (A.Region (A.Position a b) (A.Position c d))
 
 
 {-| Checks that removing indentation causes parsing to fail.

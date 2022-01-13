@@ -19,12 +19,12 @@ binops
     -> IParser varRef
     -> IParser (FixAST Located typeRef ctorRef varRef 'ExpressionNK)
 binops term last anyOp =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do  ((e, ops), multiline) <- trackNewline ((,) <$> term <*> nextOps)
       return $
         case ops of
           [] ->
-            extract $ I.unFix e
+            extract $ I.unFix2 e
           _ ->
             Binops e ops $ multilineToBool multiline
   where

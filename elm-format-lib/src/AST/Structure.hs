@@ -24,7 +24,7 @@ import qualified Data.Indexed as I
 
 -- FixAST :: (Type -> Type) -> Type -> Type -> Type -> NodeKind -> Type
 type FixAST annf typeRef ctorRef varRef =
-    I.Fix annf (AST typeRef ctorRef varRef)
+    I.Fix2 annf (AST typeRef ctorRef varRef)
 
 -- ASTNS :: (Type -> Type) -> Type -> NodeKind -> Type
 type ASTNS annf ns =
@@ -50,7 +50,7 @@ bottomUpReferences ::
         -> FixAST annf typeRef2 ctorRef2 varRef2 kind
        )
 bottomUpReferences ftr fcr fvr =
-    I.cata (I.Fix . fmap (mapAll ftr fcr fvr id))
+    I.fold2 (I.Fix2 . fmap (mapAll ftr fcr fvr id))
 
 
 foldReferences ::
@@ -59,7 +59,7 @@ foldReferences ::
     (typeRef -> a) -> (ctorRef -> a) -> (varRef -> a)
     -> FixAST annf typeRef ctorRef varRef kind -> a
 foldReferences ftype fctor fvar =
-    getConst . I.cata (foldNode  . extract)
+    getConst . I.fold2 (foldNode  . extract)
     where
         -- This is kinda confusing, but we use the Const type constructor to merge all the different NodeKinds into a single type `a`
         -- See http://www.timphilipwilliams.com/posts/2013-01-16-fixing-gadts.html for relevant details.

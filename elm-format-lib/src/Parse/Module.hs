@@ -32,7 +32,7 @@ elmModule elmVersion =
           ]
       (preImportComments, imports', postImportComments) <- imports elmVersion
       topLevels <-
-          fmap I.Fix $
+          fmap I.Fix2 $
           addLocation $
           fmap TopLevel $
           do

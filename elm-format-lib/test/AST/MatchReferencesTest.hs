@@ -44,14 +44,14 @@ test_tests =
                         case locals of
                             [] ->
                                 -- no locals to define, so just make a var expression
-                                I.Fix $ Identity $ VarExpr r
+                                I.Fix2 $ Identity $ VarExpr r
                             _ ->
                                 -- define the provided locals in a let block
-                                I.Fix $ Identity $
+                                I.Fix2 $ Identity $
                                 Let
                                     (fmap makeLetDeclaration locals)
                                     []
-                                    (I.Fix $ Identity $ VarExpr r)
+                                    (I.Fix2 $ Identity $ VarExpr r)
                 in
                 testCase name $
                     matchReferences (makeImportInfo knownContents imports) (wrapExpr sourceAst)
@@ -107,14 +107,14 @@ test_tests =
                         case locals of
                             [] ->
                                 -- no locals to define, so just make a var expression
-                                I.Fix $ Identity $ VarExpr r
+                                I.Fix2 $ Identity $ VarExpr r
                             _ ->
                                 -- define the provided locals in a let block
-                                I.Fix $ Identity $
+                                I.Fix2 $ Identity $
                                 Let
                                     (fmap makeLetDeclaration locals)
                                     []
-                                    (I.Fix $ Identity $ VarExpr r)
+                                    (I.Fix2 $ Identity $ VarExpr r)
                 in
                 testCase name $
                     applyReferences (makeImportInfo knownContents imports) (wrapExpr sourceAst)
@@ -215,8 +215,8 @@ makeImportMethod importString =
 
 makeLetDeclaration :: String -> ASTNS Identity ns 'LetDeclarationNK
 makeLetDeclaration name =
-    I.Fix $ Identity $
-    LetCommonDeclaration $ I.Fix $ Identity $ Definition
-        (I.Fix $ Identity $ VarPattern $ LowercaseIdentifier name)
+    I.Fix2 $ Identity $
+    LetCommonDeclaration $ I.Fix2 $ Identity $ Definition
+        (I.Fix2 $ Identity $ VarPattern $ LowercaseIdentifier name)
         [] []
-        (I.Fix $ Identity $ Unit [])
+        (I.Fix2 $ Identity $ Unit [])

@@ -2,6 +2,7 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Data.Indexed where
 
@@ -10,42 +11,46 @@ import Data.Kind
 
 -- Common typeclasses
 
-class IFunctor (f :: (k -> Type) -> k -> Type) where
-   imap :: (forall i. a i -> b i) -> (forall i. f a i -> f b i)
+type (~>) (f :: k -> Type) (g :: k -> Type) =
+    forall (i :: k). f i -> g i
+
+class HFunctor (f :: (k -> Type) -> k -> Type) where
+   hmap :: (a ~> b) -> f a ~> f b
 
 
-class Foldable (t :: (k -> Type) -> k -> Type) where
-    foldMap :: Monoid m => (forall i. f i -> m) -> t f a -> m
+class HFoldable (t :: (k -> Type) -> k -> Type) where
+    hFoldMap :: Monoid m => (forall i. f i -> m) -> t f a -> m
 
 
 -- Recursion schemes
 
-newtype Fix (ann :: Type -> Type) (f :: (k -> Type) -> k -> Type) (i :: k)
-    = Fix { unFix :: ann (f (Fix ann f) i) }
+newtype Fix2 (ann :: Type -> Type) (f :: (k -> Type) -> k -> Type) (i :: k)
+    = Fix2 { unFix2 :: ann (f (Fix2 ann f) i) }
 
-deriving instance Show (ann (f (Fix ann f) i)) => Show (Fix ann f i)
-deriving instance Eq (ann (f (Fix ann f) i)) => Eq (Fix ann f i)
-deriving instance Ord (ann (f (Fix ann f) i)) => Ord (Fix ann f i)
+deriving instance Show (ann (f (Fix2 ann f) i)) => Show (Fix2 ann f i)
+deriving instance Eq (ann (f (Fix2 ann f) i)) => Eq (Fix2 ann f i)
+deriving instance Ord (ann (f (Fix2 ann f) i)) => Ord (Fix2 ann f i)
 
-cata ::
+
+fold2 ::
+    HFunctor f =>
     Functor ann =>
-    IFunctor f =>
     (forall i. ann (f a i) -> a i)
-    -> (forall i. Fix ann f i -> a i)
-cata f = f . fmap (imap $ cata f) . unFix
+    -> (Fix2 ann f ~> a)
+fold2 f = f . fmap (hmap $ fold2 f) . unFix2
 
 
-ana ::
+unfold2 ::
+    HFunctor f =>
     Functor ann =>
-    IFunctor f =>
     (forall i. a i -> ann (f a i))
-    -> (forall i. a i -> Fix ann f i)
-ana f = Fix . fmap (imap $ ana f) . f
+    -> (a ~> Fix2 ann f)
+unfold2 f = Fix2 . fmap (hmap $ unfold2 f) . f
 
 
 convert ::
-  Functor ann1 =>
-  IFunctor f =>
-  (forall x. ann1 x -> ann2 x) ->
-  (forall i. Fix ann1 f i -> Fix ann2 f i)
-convert f = cata (Fix . f)
+    HFunctor f =>
+    Functor ann1 =>
+    (ann1 ~> ann2) ->
+    (Fix2 ann1 f ~> Fix2 ann2 f)
+convert f = fold2 (Fix2 . f)

@@ -74,7 +74,7 @@ class ToPublicAST (nk :: NodeKind) where
 
 fromRawAST :: ToPublicAST nk => Config -> ASTNS Located [UppercaseIdentifier] nk -> LocatedIfRequested (PublicAST nk)
 fromRawAST config =
-    fmap (fromRawAST' config) . fromLocated config . I.unFix
+    fmap (fromRawAST' config) . fromLocated config . I.unFix2
 
 
 class ToPublicAST nk => FromPublicAST (nk :: NodeKind) where
@@ -82,7 +82,7 @@ class ToPublicAST nk => FromPublicAST (nk :: NodeKind) where
 
 toRawAST :: FromPublicAST nk => LocatedIfRequested (PublicAST nk) -> ASTNS Identity [UppercaseIdentifier] nk
 toRawAST =
-    I.Fix . Identity . toRawAST' . extract
+    I.Fix2 . Identity . toRawAST' . extract
 
 
 --

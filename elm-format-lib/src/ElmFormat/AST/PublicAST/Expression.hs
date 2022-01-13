@@ -50,21 +50,21 @@ mkLetDeclarations config decls =
     let
         toDefBuilder :: ASTNS1 Located [UppercaseIdentifier] 'LetDeclarationNK -> DefinitionBuilder LetDeclaration
         toDefBuilder = \case
-            AST.LetCommonDeclaration (I.Fix (At _ def)) ->
+            AST.LetCommonDeclaration (I.Fix2 (At _ def)) ->
                 Right def
 
             AST.LetComment comment ->
                 Left $ Comment_ld (mkComment comment)
     in
-    mkDefinitions config LetDefinition $ fmap (JustF . fmap toDefBuilder . fromLocated config . I.unFix) decls
+    mkDefinitions config LetDefinition $ fmap (JustF . fmap toDefBuilder . fromLocated config . I.unFix2) decls
 
 fromLetDeclaration :: LetDeclaration -> List (ASTNS Identity [UppercaseIdentifier] 'LetDeclarationNK)
 fromLetDeclaration = \case
     LetDefinition def ->
-        I.Fix . Identity . AST.LetCommonDeclaration <$> fromDefinition def
+        I.Fix2 . Identity . AST.LetCommonDeclaration <$> fromDefinition def
 
     Comment_ld comment ->
-        pure $ I.Fix $ Identity $ AST.LetComment (fromComment comment)
+        pure $ I.Fix2 $ Identity $ AST.LetComment (fromComment comment)
 
 
 instance ToJSON LetDeclaration where
@@ -113,7 +113,7 @@ instance FromPublicAST 'CaseBranchNK where
         CaseBranch pattern body ->
             AST.CaseBranch [] [] []
                 (toRawAST pattern)
-                (maybeF (I.Fix . Identity . toRawAST') toRawAST body)
+                (maybeF (I.Fix2 . Identity . toRawAST') toRawAST body)
 
 instance ToPairs CaseBranch where
     toPairs = \case
@@ -225,7 +225,7 @@ instance ToPublicAST 'ExpressionNK where
                 (FunctionApplicationDisplay ShowAsFunctionApplication)
 
         AST.Parens (C comments expr) ->
-            fromRawAST' config $ extract $ I.unFix expr
+            fromRawAST' config $ extract $ I.unFix2 expr
 
         AST.ExplicitList terms comments multiline ->
             ListLiteral
@@ -314,7 +314,7 @@ instance FromPublicAST 'ExpressionNK where
                 (UnaryOperator operator, [ single ]) ->
                     AST.Unary
                         operator
-                        (maybeF (I.Fix . Identity . toRawAST') toRawAST single)
+                        (maybeF (I.Fix2 . Identity . toRawAST') toRawAST single)
 
                 (UnaryOperator _, []) ->
                     undefined
@@ -324,8 +324,8 @@ instance FromPublicAST 'ExpressionNK where
 
                 _ ->
                     AST.App
-                        (maybeF (I.Fix . Identity . toRawAST') toRawAST function)
-                        (C [] . maybeF (I.Fix . Identity . toRawAST') toRawAST <$> args)
+                        (maybeF (I.Fix2 . Identity . toRawAST') toRawAST function)
+                        (C [] . maybeF (I.Fix2 . Identity . toRawAST') toRawAST <$> args)
                         (AST.FAJoinFirst AST.JoinAll)
 
         UnaryOperator _ ->
@@ -664,29 +664,29 @@ mkDefinition config pat args annotation expr =
 fromDefinition :: Definition -> List (ASTNS Identity [UppercaseIdentifier] 'CommonDeclarationNK)
 fromDefinition = \case
     Definition name parameters Nothing expression ->
-        pure $ I.Fix $ Identity $ AST.Definition
-            (I.Fix $ Identity $ AST.VarPattern name)
+        pure $ I.Fix2 $ Identity $ AST.Definition
+            (I.Fix2 $ Identity $ AST.VarPattern name)
             (C [] . toRawAST . pattern_tp <$> parameters)
             []
             (toRawAST expression)
 
     Definition name [] (Just typ) expression ->
-        [ I.Fix $ Identity $ AST.TypeAnnotation
+        [ I.Fix2 $ Identity $ AST.TypeAnnotation
             (C [] $ VarRef () name)
             (C [] $ toRawAST typ)
-        , I.Fix $ Identity $ AST.Definition
-            (I.Fix $ Identity $ AST.VarPattern name)
+        , I.Fix2 $ Identity $ AST.Definition
+            (I.Fix2 $ Identity $ AST.VarPattern name)
             []
             []
             (toRawAST expression)
         ]
 
     Definition name parameters (Just typ) expression ->
-        [ I.Fix $ Identity $ AST.TypeAnnotation
+        [ I.Fix2 $ Identity $ AST.TypeAnnotation
             (C [] $ VarRef () name)
             (C [] $ toRawAST $ LocatedIfRequested $ NothingF $ FunctionType typ (fromMaybe (LocatedIfRequested $ NothingF UnitType) . type_tp <$> parameters))
-        , I.Fix $ Identity $ AST.Definition
-            (I.Fix $ Identity $ AST.VarPattern name)
+        , I.Fix2 $ Identity $ AST.Definition
+            (I.Fix2 $ Identity $ AST.VarPattern name)
             (C [] . toRawAST . pattern_tp <$> parameters)
             []
             (toRawAST expression)
@@ -717,7 +717,7 @@ mkDefinitions config fromDef items =
         merge :: DefinitionBuilder a -> Maybe a
         merge decl =
             case decl of
-                Right (AST.Definition (I.Fix (At _ pat)) args comments expr) ->
+                Right (AST.Definition (I.Fix2 (At _ pat)) args comments expr) ->
                     let
                         annotation =
                             case pat of
@@ -770,4 +770,3 @@ instance FromJSON Definition where
 
             _ ->
                 fail ("unexpected Definition tag: " <> tag)
-

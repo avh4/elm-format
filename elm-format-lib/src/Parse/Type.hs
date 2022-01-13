@@ -18,13 +18,13 @@ import Data.List.NonEmpty (NonEmpty(..))
 
 tvar :: ElmVersion -> IParser (FixAST Located typeRef ctorRef varRef 'TypeNK)
 tvar elmVersion =
-  fmap I.Fix $ addLocation
+  fmap I.Fix2 $ addLocation
     (TypeVariable <$> lowVar elmVersion <?> "a type variable")
 
 
 tuple :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
 tuple elmVersion =
-  fmap I.Fix $ addLocation $ checkMultiline $
+  fmap I.Fix2 $ addLocation $ checkMultiline $
   do  types <- parens'' (withEol $ expr elmVersion)
       return $
           case types of
@@ -33,7 +33,7 @@ tuple elmVersion =
               Right [] ->
                   \_ -> UnitType []
               Right [C ([], []) (C Nothing t)] ->
-                  \_ -> extract $ I.unFix t
+                  \_ -> extract $ I.unFix2 t
               Right [C (pre, post) (C eol t)] ->
                   \_ -> TypeParens $ C (pre, eolToComment eol ++ post) t
               Right (typ0:typ1:typs) ->
@@ -42,7 +42,7 @@ tuple elmVersion =
 
 record :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
 record elmVersion =
-    fmap I.Fix $ addLocation $ brackets' $ checkMultiline $
+    fmap I.Fix2 $ addLocation $ brackets' $ checkMultiline $
         do
             base' <- optionMaybe $ try (commented (lowVar elmVersion) <* string "|")
             (fields', trailing) <- sectionedGroup (pair (lowVar elmVersion) lenientHasType (expr elmVersion))
@@ -65,7 +65,7 @@ constructor0 elmVersion =
 
 constructor0' :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
 constructor0' elmVersion =
-    fmap I.Fix $ addLocation $ checkMultiline $
+    fmap I.Fix2 $ addLocation $ checkMultiline $
     do  ctor <- constructor0 elmVersion
         return (TypeConstruction ctor [])
 
@@ -83,7 +83,7 @@ tupleCtor =
 
 app :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
 app elmVersion =
-  fmap I.Fix $ addLocation $ checkMultiline $
+  fmap I.Fix2 $ addLocation $ checkMultiline $
   do  f <- constructor0 elmVersion <|> try tupleCtor <?> "a type constructor"
       args <- spacePrefix (term elmVersion)
       return $ TypeConstruction f args
@@ -98,7 +98,7 @@ expr elmVersion =
         Left t ->
           t
         Right (region, first', rest', multiline) ->
-          I.Fix $ A.At region $ FunctionType first' rest' (ForceMultiline multiline)
+          I.Fix2 $ A.At region $ FunctionType first' rest' (ForceMultiline multiline)
 
 
 -- TODO: can this be removed?  (tag is the new name?)

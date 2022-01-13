@@ -29,7 +29,7 @@ import qualified Reporting.Annotation as A
 
 varTerm :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
 varTerm elmVersion =
-    fmap I.Fix $ addLocation $
+    fmap I.Fix2 $ addLocation $
     let
         resolve v =
             case v of
@@ -42,14 +42,14 @@ varTerm elmVersion =
 
 accessor :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
 accessor elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do  lbl <- try (string "." >> rLabel elmVersion)
       return $ AccessFunction lbl
 
 
 negative :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
 negative elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do  nTerm <-
           try $
             do  _ <- char '-'
@@ -63,7 +63,7 @@ negative elmVersion =
 
 listTerm :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
 listTerm elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
     shader' <|> try (braces range) <|> commaSeparated
   where
     range =
@@ -89,7 +89,7 @@ listTerm elmVersion =
 
 parensTerm :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
 parensTerm elmVersion =
-  fmap I.Fix $
+  fmap I.Fix2 $
   choice
     [ try (addLocation $ parens' opFn )
     , try (addLocation $ parens' tupleFn)
@@ -121,7 +121,7 @@ parensTerm elmVersion =
 
 recordTerm :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
 recordTerm elmVersion =
-    fmap I.Fix $
+    fmap I.Fix2 $
     addLocation $ brackets' $ checkMultiline $
         do
             base <- optionMaybe $ try (commented (lowVar elmVersion) <* string "|")
@@ -132,7 +132,7 @@ recordTerm elmVersion =
 term :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
 term elmVersion =
   (choice
-      [ fmap I.Fix $ addLocation (Literal <$> Literal.literal)
+      [ fmap I.Fix2 $ addLocation (Literal <$> Literal.literal)
       , listTerm elmVersion
       , accessor elmVersion
       , negative elmVersion
@@ -178,7 +178,7 @@ appExpr elmVersion =
                             (JoinAll, JoinAll, False) -> FAJoinFirst JoinAll
                             (JoinAll, SplitAll, _) -> FASplitFirst
                 in
-                    I.Fix $ A.at start end $ App t (fmap fst ts) multiline
+                    I.Fix2 $ A.at start end $ App t (fmap fst ts) multiline
 
 
 --------  Normal Expressions  --------
@@ -208,7 +208,7 @@ ifExpr elmVersion =
       (reserved elmVersion "else" <?> "an 'else' branch")
         >> whitespace
   in
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
     do
       first <- ifClause elmVersion
       rest <- many (try $ C <$> elseKeyword <*> ifClause elmVersion)
@@ -241,14 +241,14 @@ lambdaExpr elmVersion =
       body <- expr elmVersion
       return (args, preArrowComments, bodyComments, body)
   in
-    fmap I.Fix $ addLocation $
+    fmap I.Fix2 $ addLocation $
         do  ((args, preArrowComments, bodyComments, body), multiline) <- trackNewline subparser
             return $ Lambda args (preArrowComments ++ bodyComments) body $ multilineToBool multiline
 
 
 caseExpr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
 caseExpr elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do  try (reserved elmVersion "case")
       (e, multilineSubject) <- trackNewline $ padded (expr elmVersion)
       reserved elmVersion "of"
@@ -257,7 +257,7 @@ caseExpr elmVersion =
       return $ Case (e, multilineToBool multilineSubject) result
   where
     case_ preComments =
-      fmap I.Fix $ addLocation $
+      fmap I.Fix2 $ addLocation $
       do
           (patternComments, p, C (preArrowComments, bodyComments) _) <-
               try ((,,)
@@ -288,15 +288,15 @@ caseExpr elmVersion =
 
 letExpr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
 letExpr elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do  try (reserved elmVersion "let")
       A.At cal commentsAfterLet' <- addLocation whitespace
-      let commentsAfterLet = fmap (I.Fix . A.At cal . LetComment) commentsAfterLet'
+      let commentsAfterLet = fmap (I.Fix2 . A.At cal . LetComment) commentsAfterLet'
       defs <-
         block $
-          do  def <- fmap I.Fix $ addLocation $ fmap (LetCommonDeclaration . I.Fix) $ addLocation (typeAnnotation elmVersion TypeAnnotation <|> definition elmVersion Definition)
+          do  def <- fmap I.Fix2 $ addLocation $ fmap (LetCommonDeclaration . I.Fix2) $ addLocation (typeAnnotation elmVersion TypeAnnotation <|> definition elmVersion Definition)
               A.At cad commentsAfterDef' <- addLocation whitespace
-              let commentsAfterDef = fmap (I.Fix . A.At cad . LetComment) commentsAfterDef'
+              let commentsAfterDef = fmap (I.Fix2 . A.At cad . LetComment) commentsAfterDef'
               return (def : commentsAfterDef)
       _ <- reserved elmVersion "in"
       bodyComments <- whitespace
@@ -342,13 +342,13 @@ defStart elmVersion =
     choice
       [ do  pattern <- try $ Pattern.term elmVersion
             func $ pattern
-      , do  opPattern <- fmap I.Fix $ addLocation (OpPattern <$> parens' symOp)
+      , do  opPattern <- fmap I.Fix2 $ addLocation (OpPattern <$> parens' symOp)
             func opPattern
       ]
       <?> "the definition of a variable (x = ...)"
   where
     func pattern =
-        case extract $ I.unFix pattern of
+        case extract $ I.unFix2 pattern of
           VarPattern _ ->
               ((,) pattern) <$> spacePrefix (Pattern.term elmVersion)
 

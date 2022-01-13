@@ -59,7 +59,7 @@ instance ToPublicAST 'TypeNK where
             TypeVariable name
 
         AST.TypeParens (C comments t) ->
-            fromRawAST' config (extract $ I.unFix t)
+            fromRawAST' config (extract $ I.unFix2 t)
 
         AST.TupleType terms multiline ->
             TupleType

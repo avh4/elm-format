@@ -487,7 +487,7 @@ accessible elmVersion exprParser =
           accessible elmVersion $
             do  v <- lowVar elmVersion
                 end <- Parsec.getPosition
-                return $ I.Fix $ A.at start end $ Access rootExpr v
+                return $ I.Fix2 $ A.at start end $ Access rootExpr v
 
 
 dot :: IParser ()

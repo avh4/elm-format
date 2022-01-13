@@ -23,12 +23,12 @@ matchType ::
        , ASTNS Located ns 'TypeNK
        )
 matchType [] typ = ( [], typ )
-matchType (pat : restPat) (I.Fix (At region (FunctionType (C eol typ) restTyp multiline))) =
+matchType (pat : restPat) (I.Fix2 (At region (FunctionType (C eol typ) restTyp multiline))) =
     let
         nextTyp =
             case toCommentedList restTyp of
                 [ (C _ single) ] -> single
-                ( (C (_, _, eol2) first) : rest ) -> I.Fix $ At region $ FunctionType (C eol2 first) (Sequence rest) multiline
+                ( (C (_, _, eol2) first) : rest ) -> I.Fix2 $ At region $ FunctionType (C eol2 first) (Sequence rest) multiline
 
         ( pats, retType ) =
             matchType restPat nextTyp

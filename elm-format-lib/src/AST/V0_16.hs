@@ -619,9 +619,9 @@ mapAll ftyp fctor fvar fast = \case
     FunctionType first rest ml -> FunctionType (fmap fast first) (fmap fast rest) ml
 
 
-instance I.IFunctor (AST typeRef ctorRef varRef) where
+instance I.HFunctor (AST typeRef ctorRef varRef) where
     -- TODO: it's probably worth making an optimized version of this
-    imap = mapAll id id id
+    hmap = mapAll id id id
 
 
 
@@ -642,8 +642,8 @@ topDownReferencesWithContext ::
     -> (context -> (ns, UppercaseIdentifier) -> ctorRef2)
     -> (context -> Ref ns -> varRef2)
     -> context
-    -> I.Fix ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)) kind
-    -> I.Fix ann (AST typeRef2 ctorRef2 varRef2) kind
+    -> I.Fix2 ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)) kind
+    -> I.Fix2 ann (AST typeRef2 ctorRef2 varRef2) kind
 topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initialAst =
     let
         namesFromPattern' ::
@@ -668,17 +668,17 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
 
         namesFromPattern ::
             Coapplicative ann' =>
-            I.Fix ann' (AST a b c) kind'
+            I.Fix2 ann' (AST a b c) kind'
             -> [LocalName]
         namesFromPattern =
-            getConst . I.cata (namesFromPattern' . extract)
+            getConst . I.fold2 (namesFromPattern' . extract)
 
         namesFrom ::
             Coapplicative ann' =>
-            I.Fix ann' (AST a b c) kind'
+            I.Fix2 ann' (AST a b c) kind'
             -> [LocalName]
         namesFrom decl =
-            case extract $ I.unFix decl of
+            case extract $ I.unFix2 decl of
                 Definition p _ _ _ -> namesFromPattern p
                 TypeAnnotation _ _ -> mempty
 
@@ -698,7 +698,7 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
         newDefinitionsAtNode ::
             forall kind'.
             AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)
-                (I.Fix ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)))
+                (I.Fix2 ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)))
                 kind'
             -> [LocalName]
         newDefinitionsAtNode node =
@@ -707,7 +707,7 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
                     foldMap (foldMap namesFrom) decls
 
                 CommonDeclaration d ->
-                    newDefinitionsAtNode (extract $ I.unFix d)
+                    newDefinitionsAtNode (extract $ I.unFix2 d)
 
                 Definition first rest _ _ ->
                     foldMap namesFromPattern (first : fmap extract rest)
@@ -719,7 +719,7 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
                     foldMap namesFrom decls
 
                 LetCommonDeclaration d ->
-                    newDefinitionsAtNode (extract $ I.unFix d)
+                    newDefinitionsAtNode (extract $ I.unFix2 d)
 
                 CaseBranch _ _ _ p _ ->
                     namesFromPattern p
@@ -731,12 +731,12 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
             forall kind'.
             context
             -> AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)
-                (I.Fix ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)))
+                (I.Fix2 ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)))
                 kind'
             -> AST typeRef2 ctorRef2 varRef2
                 (Compose
                     ((,) context)
-                    (I.Fix ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)))
+                    (I.Fix2 ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)))
                 )
                 kind'
         step context node =
@@ -744,8 +744,8 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
                 context' = foldl (flip defineLocal) context (newDefinitionsAtNode node)
             in
             mapAll (fType context') (fCtor context') (fVar context') id
-                $ I.imap (Compose . (,) context') node
+                $ I.hmap (Compose . (,) context') node
     in
-    I.ana
-        (\(Compose (context, ast)) -> step context <$> I.unFix ast)
+    I.unfold2
+        (\(Compose (context, ast)) -> step context <$> I.unFix2 ast)
         (Compose (initialContext, initialAst))

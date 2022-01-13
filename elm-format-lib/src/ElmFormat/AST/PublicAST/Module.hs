@@ -66,7 +66,7 @@ toModule (Module (ModuleName name) imports body) =
         (C [] $ Map.mapKeys (\(ModuleName ns) -> ns) $ C [] . toImportMethod <$> imports)
         (f $ AST.TopLevel $ mconcat $ fmap (toTopLevelStructures . extract) body)
     where
-        f = I.Fix . Identity
+        f = I.Fix2 . Identity
 
 instance ToJSON Module where
     toJSON = undefined
@@ -141,16 +141,16 @@ data TopLevelStructure
     | TODO_TopLevelStructure String
 
 fromTopLevelStructures :: Config -> ASTNS Located [UppercaseIdentifier] 'TopLevelNK -> List (MaybeF LocatedIfRequested TopLevelStructure)
-fromTopLevelStructures config (I.Fix (At _ (AST.TopLevel decls))) =
+fromTopLevelStructures config (I.Fix2 (At _ (AST.TopLevel decls))) =
     let
         toDefBuilder :: AST.TopLevelStructure
                      (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK) -> MaybeF LocatedIfRequested (DefinitionBuilder TopLevelStructure)
         toDefBuilder decl =
-            case fmap I.unFix decl of
+            case fmap I.unFix2 decl of
                 AST.Entry (At region entry) ->
                     JustF $ fromLocated config $ At region $
                     case entry of
-                        AST.CommonDeclaration (I.Fix (At _ def)) ->
+                        AST.CommonDeclaration (I.Fix2 (At _ def)) ->
                             Right def
 
                         AST.TypeAlias c1 (C (c2, c3) (AST.NameWithArgs name args)) (C c4 t) ->
@@ -178,16 +178,16 @@ fromTopLevelStructures config (I.Fix (At _ (AST.TopLevel decls))) =
 toTopLevelStructures :: TopLevelStructure -> List (AST.TopLevelStructure (ASTNS Identity [UppercaseIdentifier] 'TopLevelDeclarationNK))
 toTopLevelStructures = \case
     DefinitionStructure def ->
-        AST.Entry . I.Fix . Identity . AST.CommonDeclaration <$> fromDefinition def
+        AST.Entry . I.Fix2 . Identity . AST.CommonDeclaration <$> fromDefinition def
 
     TypeAlias name parameters typ ->
-        pure $ AST.Entry $ I.Fix $ Identity $ AST.TypeAlias
+        pure $ AST.Entry $ I.Fix2 $ Identity $ AST.TypeAlias
             []
             (C ([], []) (AST.NameWithArgs name (fmap (C []) parameters)))
             (C [] $ toRawAST typ)
 
     CustomType name parameters variants ->
-        pure $ AST.Entry $ I.Fix $ Identity $ AST.Datatype
+        pure $ AST.Entry $ I.Fix2 $ Identity $ AST.Datatype
             (C ([], []) (AST.NameWithArgs name (fmap (C []) parameters)))
             (Either.fromRight undefined $ AST.fromCommentedList (C ([], [], Nothing) . fromCustomTypeVariant <$> variants))
 

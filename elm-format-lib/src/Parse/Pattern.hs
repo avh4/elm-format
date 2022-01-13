@@ -18,7 +18,7 @@ import qualified Parse.ParsecAdapter as Parsec
 
 basic :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
 basic elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
     choice
       [ char '_' >> return Anything
       , VarPattern <$> lowVar elmVersion
@@ -49,7 +49,7 @@ asPattern elmVersion patternParser =
       case maybeAlias of
         Just (postPattern, alias) ->
             do  end <- Parsec.getPosition
-                return $ I.Fix $ A.at start end $ Alias (C postPattern pattern) alias
+                return $ I.Fix2 $ A.at start end $ Alias (C postPattern pattern) alias
 
         Nothing ->
             return pattern
@@ -63,7 +63,7 @@ asPattern elmVersion patternParser =
 
 record :: ElmVersion -> IParser (FixAST Located typeRef ctorRef varRef 'PatternNK)
 record elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do
       result <- surround'' '{' '}' (lowVar elmVersion)
       return $
@@ -81,24 +81,24 @@ tuple elmVersion =
       return $
         case patterns of
           Left comments ->
-            I.Fix $ A.at start end $ UnitPattern comments
+            I.Fix2 $ A.at start end $ UnitPattern comments
 
           Right [] ->
-            I.Fix $ A.at start end $ UnitPattern []
+            I.Fix2 $ A.at start end $ UnitPattern []
 
           Right [C ([], []) pattern] ->
             pattern
 
           Right [pattern] ->
-            I.Fix $ A.at start end $ PatternParens pattern
+            I.Fix2 $ A.at start end $ PatternParens pattern
 
           Right patterns ->
-            I.Fix $ A.at start end $ TuplePattern patterns
+            I.Fix2 $ A.at start end $ TuplePattern patterns
 
 
 list :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
 list elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do
     result <- braces'' (expr elmVersion)
     return $
@@ -117,7 +117,7 @@ term elmVersion =
 
 patternConstructor :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
 patternConstructor elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
     do  v <- dotSep1 (capVar elmVersion)
         case reverse v of
           [UppercaseIdentifier "True"]  -> return $ LiteralPattern (Boolean True)
@@ -138,4 +138,4 @@ expr elmVersion =
             Left pattern ->
               pattern
             Right (region, first, rest, _) ->
-              I.Fix $ A.At region $ ConsPattern first rest
+              I.Fix2 $ A.At region $ ConsPattern first rest

@@ -87,4 +87,4 @@ instance Arbitrary (Module [UppercaseIdentifier] (ASTNS Identity [UppercaseIdent
                 )
                 (Reporting.Annotation.at (Reporting.Annotation.Position 0 0) (Reporting.Annotation.Position 0 0) Nothing)
                 (C [] empty)
-                (I.Fix $ pure $ TopLevel [ Entry $ I.Fix $ pure $ CommonDeclaration $ I.Fix $ pure $ Definition (I.Fix $ pure $ Anything) [] [] (I.Fix $ pure $ TupleFunction 2)])
+                (I.Fix2 $ pure $ TopLevel [ Entry $ I.Fix2 $ pure $ CommonDeclaration $ I.Fix2 $ pure $ Definition (I.Fix2 $ pure $ Anything) [] [] (I.Fix2 $ pure $ TupleFunction 2)])

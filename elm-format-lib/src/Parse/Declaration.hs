@@ -34,7 +34,7 @@ topLevelStructure entry =
 
 definition :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
 definition elmVersion =
-    fmap I.Fix $ addLocation $ fmap (CommonDeclaration . I.Fix) $ addLocation
+    fmap I.Fix2 $ addLocation $ fmap (CommonDeclaration . I.Fix2) $ addLocation
     (
         (Expr.typeAnnotation elmVersion TypeAnnotation
             <|> Expr.definition elmVersion Definition
@@ -47,7 +47,7 @@ definition elmVersion =
 
 typeDecl :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
 typeDecl elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do  try (reserved elmVersion "type") <?> "a type declaration"
       postType <- forcedWS
       isAlias <- optionMaybe (string "alias" >> forcedWS)
@@ -90,7 +90,7 @@ infixDecl elmVersion =
 
 infixDecl_0_19 :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
 infixDecl_0_19 elmVersion =
-    fmap I.Fix $ addLocation $
+    fmap I.Fix2 $ addLocation $
     let
         assoc =
             choice
@@ -108,7 +108,7 @@ infixDecl_0_19 elmVersion =
 
 infixDecl_0_16 :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
 infixDecl_0_16 elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do  assoc <-
           choice
             [ try (reserved elmVersion "infixl") >> return L
@@ -126,7 +126,7 @@ infixDecl_0_16 elmVersion =
 port :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
 port elmVersion =
   expecting "a port declaration" $
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do  try (reserved elmVersion "port")
       preNameComments <- whitespace
       name <- lowVar elmVersion
