@@ -305,32 +305,29 @@ formatModuleHeader elmVersion addDefaultHeader modu =
                     Just (C (pre, post) _) -> (pre, post)
         in
         case elmVersion of
-          Elm_0_16 ->
-            formatModuleLine_0_16 header
+            Elm_0_16 ->
+                formatModuleLine_0_16 header
 
-          Elm_0_17 ->
-            formatModuleLine elmVersion sortedExports srcTag name moduleSettings preExposing postExposing
+            Elm_0_17 ->
+                formatModuleLine sortedExports srcTag name moduleSettings preExposing postExposing
 
-          Elm_0_18 ->
-            formatModuleLine elmVersion sortedExports srcTag name moduleSettings preExposing postExposing
+            Elm_0_18 ->
+                formatModuleLine sortedExports srcTag name moduleSettings preExposing postExposing
 
-          Elm_0_19 ->
-              formatModuleLine elmVersion sortedExports srcTag name moduleSettings preExposing postExposing
+            Elm_0_19 ->
+                formatModuleLine sortedExports srcTag name moduleSettings preExposing postExposing
 
       docs =
           fmap (formatDocComment elmVersion (ImportInfo.fromModule mempty modu)) $ extract $ AST.Module.docs modu
-
-      imports =
-          formatImports elmVersion modu
     in
     ( formatModuleLine' <$> maybeHeader
     , docs
-    , imports
+    , formatImports modu
     )
 
 
-formatImports :: ElmVersion -> AST.Module.Module [UppercaseIdentifier] decl -> (Maybe Elm, [Elm])
-formatImports elmVersion modu =
+formatImports :: AST.Module.Module [UppercaseIdentifier] decl -> (Maybe Elm, [Elm])
+formatImports modu =
     let
         (C comments imports) =
             AST.Module.imports modu
@@ -338,22 +335,20 @@ formatImports elmVersion modu =
     ( formatComments comments
     , imports
         |> Map.assocs
-        |> fmap (\(name, C pre method) -> formatImport elmVersion (C pre name, method))
+        |> fmap (\(name, C pre method) -> formatImport (C pre name, method))
     )
 
 
 formatModuleLine_0_16 :: AST.Module.Header -> Elm
 formatModuleLine_0_16 header =
   let
-    elmVersion = Elm_0_16
-
     exports =
         case AST.Module.exports header of
             Just (C _ value) -> value
             Nothing -> AST.Listing.OpenListing (C ([], []) ())
 
     formatExports =
-        case formatListing (formatDetailedListing elmVersion) exports of
+        case formatListing formatDetailedListing exports of
             Just listing ->
                 listing
             _ ->
@@ -369,22 +364,21 @@ formatModuleLine_0_16 header =
   in
     ElmStructure.spaceSepOrIndented
         (keyword "module")
-        [ formatCommented $ formatUppercaseIdentifier' . fmap (fixUppercaseIdentifier elmVersion) <$> AST.Module.name header
+        [ formatCommented $ formatUppercaseIdentifier' <$> AST.Module.name header
         , formatExports
         , whereClause
         ]
 
 
 formatModuleLine ::
-    ElmVersion
-    -> ([[C2 before after AST.Listing.Value]], Comments)
+    ([[C2 before after AST.Listing.Value]], Comments)
     -> AST.Module.SourceTag
     -> C2 before after [UppercaseIdentifier]
     -> Maybe (C2 before after AST.Module.SourceSettings)
     -> Comments
     -> Comments
     -> Elm
-formatModuleLine elmVersion (varsToExpose, extraComments) srcTag name moduleSettings preExposing postExposing =
+formatModuleLine (varsToExpose, extraComments) srcTag name moduleSettings preExposing postExposing =
     let
         tag =
             case srcTag of
@@ -406,13 +400,13 @@ formatModuleLine elmVersion (varsToExpose, extraComments) srcTag name moduleSett
                 [] -> keyword "(..)"
                 [oneGroup] ->
                     ElmStructure.group' False "(" "," (formatComments extraComments) ")" False $
-                    formatCommented . fmap (formatVarValue elmVersion) <$> oneGroup
+                    formatCommented . fmap formatVarValue <$> oneGroup
                 _ ->
                     ElmStructure.group' False "(" "," (formatComments extraComments) ")" True $
-                    formatCommented . fmap (ElmStructure.group False "" "," "" False . fmap (formatVarValue elmVersion)) . sequenceA <$> varsToExpose
+                    formatCommented . fmap (ElmStructure.group False "" "," "" False . fmap formatVarValue) . sequenceA <$> varsToExpose
 
         formatSetting (k, v) =
-            formatRecordPair elmVersion "=" (k, formatUppercaseIdentifier [] . fixUppercaseIdentifier elmVersion <$> v, False)
+            formatRecordPair "=" (k, formatUppercaseIdentifier [] <$> v, False)
 
         formatSettings settings =
             ElmStructure.group True "{" "," "}" False $
@@ -424,7 +418,7 @@ formatModuleLine elmVersion (varsToExpose, extraComments) srcTag name moduleSett
 
         nameClause =
             ElmStructure.spaceSepOrIndented tag
-                [formatCommented $ formatUppercaseIdentifier' . fmap (fixUppercaseIdentifier elmVersion) <$> name]
+                [formatCommented $ formatUppercaseIdentifier' <$> name]
   in
   ElmStructure.spaceSepOrIndented
       (ElmStructure.spaceSepOrIndented
@@ -631,11 +625,11 @@ formatDocComment elmVersion importInfo blocks =
         (Text.lines $ Text.pack content)
 
 
-formatImport :: ElmVersion -> AST.Module.UserImport -> Elm
-formatImport elmVersion (name@(C _ rawName), method) =
+formatImport :: AST.Module.UserImport -> Elm
+formatImport (name@(C _ rawName), method) =
     let
         name' =
-            formatPreCommented $ formatUppercaseIdentifier' . fmap (fixUppercaseIdentifier elmVersion) <$> name
+            formatPreCommented $ formatUppercaseIdentifier' <$> name
 
         requestedAs =
             case AST.Module.alias method of
@@ -644,12 +638,12 @@ formatImport elmVersion (name@(C _ rawName), method) =
 
         as =
             requestedAs
-                |> fmap (formatImportClause "as" . fmap (Just . formatUppercaseIdentifier [] . fixUppercaseIdentifier elmVersion))
+                |> fmap (formatImportClause "as" . fmap (Just . formatUppercaseIdentifier []))
                 |> Monad.join
 
         exposing =
           formatImportClause "exposing"
-            (formatListing (formatDetailedListing elmVersion) <$> AST.Module.exposedVars method)
+            (formatListing formatDetailedListing <$> AST.Module.exposedVars method)
 
         formatImportClause :: Text -> C2 beforeKeyword afterKeyword (Maybe Elm) -> Maybe Elm
         formatImportClause keyw = \case
@@ -682,20 +676,20 @@ formatListing format listing =
                 vars' -> Just $ ElmStructure.group False "(" "," ")" multiline vars'
 
 
-formatDetailedListing :: ElmVersion -> AST.Module.DetailedListing -> [Elm]
-formatDetailedListing elmVersion listing =
+formatDetailedListing :: AST.Module.DetailedListing -> [Elm]
+formatDetailedListing listing =
     concat
         [ formatCommentedMap
             (\name () -> AST.Listing.OpValue name)
-            (formatVarValue elmVersion)
+            formatVarValue
             (AST.Module.operators listing)
         , formatCommentedMap
             (\name (C inner listing_) -> AST.Listing.Union (C inner name) listing_)
-            (formatVarValue elmVersion)
+            formatVarValue
             (AST.Module.types listing)
         , formatCommentedMap
             (\name () -> AST.Listing.Value name)
-            (formatVarValue elmVersion)
+            formatVarValue
             (AST.Module.values listing)
         ]
 
@@ -709,11 +703,11 @@ formatCommentedMap construct format values =
     format' <$> Map.assocs values
 
 
-formatVarValue :: ElmVersion -> AST.Listing.Value -> Elm
-formatVarValue elmVersion aval =
+formatVarValue :: AST.Listing.Value -> Elm
+formatVarValue aval =
     case aval of
         AST.Listing.Value val ->
-            formatLowercaseIdentifier [] $ fixLowercaseIdentifier elmVersion val
+            formatLowercaseIdentifier [] val
 
         AST.Listing.OpValue op ->
             formatSymbolIdentifierInParens op
@@ -724,12 +718,12 @@ formatVarValue elmVersion aval =
                     formatListing
                         (formatCommentedMap
                             (\name_ () -> name_)
-                            (formatUppercaseIdentifier [] . fixUppercaseIdentifier elmVersion)
+                            (formatUppercaseIdentifier [])
                         )
                         listing
             in
             ElmStructure.unionListing
-                (formatTailCommented $ formatUppercaseIdentifier [] . fixUppercaseIdentifier elmVersion <$> name)
+                (formatTailCommented $ formatUppercaseIdentifier [] <$> name)
                 ([] /= (\(C c _) -> c) name)
                 listing'
 
@@ -779,13 +773,13 @@ formatDeclaration elmVersion importInfo decl =
             let
                 ctor (NameWithArgs tag args') =
                     ElmStructure.spaceSepOrIndented
-                        (formatUppercaseIdentifier [] $ fixUppercaseIdentifier elmVersion tag)
+                        (formatUppercaseIdentifier [] tag)
                         (formatPreCommented . fmap (typeParens ForCtor . formatType elmVersion) <$> args')
 
                 leftSide =
                     ElmStructure.spaceSepOrIndented
                         (keyword "type")
-                        [ formatCommented $ formatNameWithArgs elmVersion <$> nameWithArgs
+                        [ formatCommented $ formatNameWithArgs <$> nameWithArgs
                         ]
 
                 variants =
@@ -801,27 +795,27 @@ formatDeclaration elmVersion importInfo decl =
             ElmStructure.definition "=" True
             (keyword "type")
             [ formatPreCommented (C preAlias $ keyword "alias")
-            , formatCommented $ formatNameWithArgs elmVersion <$> nameWithArgs
+            , formatCommented $ formatNameWithArgs <$> nameWithArgs
             ]
             (formatPreCommentedStack $ typeParens NotRequired . formatType elmVersion <$> typ)
 
         PortAnnotation name typeComments typ ->
             ElmStructure.definition ":" False
             (keyword "port")
-            [ formatCommented $ formatLowercaseIdentifier [] . fixLowercaseIdentifier elmVersion <$> name ]
+            [ formatCommented $ formatLowercaseIdentifier [] <$> name ]
             (formatCommented' typeComments $ typeParens NotRequired $ formatType elmVersion typ)
 
         PortDefinition_until_0_16 name bodyComments expr ->
             ElmStructure.definition "=" True
             (keyword "port")
-            [formatCommented $ formatLowercaseIdentifier [] . fixLowercaseIdentifier elmVersion <$> name]
+            [formatCommented $ formatLowercaseIdentifier [] <$> name]
             (formatCommented' bodyComments $ syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr)
 
         Fixity_until_0_18 assoc precedenceComments precedence nameComments name ->
             ElmStructure.spaceSepOrIndented
                 (formatInfixAssociativity_0_18 assoc)
                 [ formatCommented' precedenceComments $ formatInfixPrecedence precedence
-                , formatCommented' nameComments $ formatInfixVar elmVersion name
+                , formatCommented' nameComments $ formatInfixVar name
                 ]
 
         Fixity assoc precedence name value ->
@@ -831,7 +825,7 @@ formatDeclaration elmVersion importInfo decl =
                 , formatPreCommented $ formatInfixPrecedence <$> precedence
                 , formatCommented $ formatSymbolIdentifierInParens <$> name
                 , keyword "="
-                , formatPreCommented $ formatLowercaseIdentifier [] . fixLowercaseIdentifier elmVersion <$> value
+                , formatPreCommented $ formatLowercaseIdentifier [] <$> value
                 ]
 
 
@@ -858,11 +852,11 @@ formatInfixPrecedence =
     ElmStructure.literal . Text.pack . show
 
 
-formatNameWithArgs :: ElmVersion -> NameWithArgs UppercaseIdentifier LowercaseIdentifier -> Elm
-formatNameWithArgs elmVersion (NameWithArgs name args) =
+formatNameWithArgs :: NameWithArgs UppercaseIdentifier LowercaseIdentifier -> Elm
+formatNameWithArgs (NameWithArgs name args) =
     ElmStructure.spaceSepOrIndented
-        (formatUppercaseIdentifier [] $ fixUppercaseIdentifier elmVersion name)
-        (formatPreCommented . fmap (formatLowercaseIdentifier [] . fixLowercaseIdentifier elmVersion) <$> args)
+        (formatUppercaseIdentifier [] name)
+        (formatPreCommented . fmap (formatLowercaseIdentifier []) <$> args)
 
 
 formatDefinition ::
@@ -891,7 +885,7 @@ formatTypeAnnotation ::
     ElmVersion -> C1 after (Ref ()) -> C1 before (I.Fix (ASTNS [UppercaseIdentifier]) 'TypeNK) -> Elm
 formatTypeAnnotation elmVersion name typ =
   ElmStructure.definition ":" False
-    (formatTailCommented $ formatVar elmVersion . fmap (\() -> []) <$> name)
+    (formatTailCommented $ formatVar . fmap (\() -> []) <$> name)
     []
     (formatPreCommented $ typeParens NotRequired . formatType elmVersion <$> typ)
 
@@ -911,7 +905,7 @@ formatAstNode elmVersion importInfo =
             FormattedPattern SyntaxSeparated $ formatLiteral elmVersion lit
 
         VarPattern var ->
-            FormattedPattern SyntaxSeparated $ formatLowercaseIdentifier [] $ fixLowercaseIdentifier elmVersion var
+            FormattedPattern SyntaxSeparated $ formatLowercaseIdentifier [] var
 
         OpPattern op ->
             FormattedPattern SyntaxSeparated $
@@ -932,7 +926,7 @@ formatAstNode elmVersion importInfo =
                     (formatRight <$> toCommentedList rest)
 
         DataPattern (ns, tag) [] ->
-            formatUppercaseIdentifier ns (fixUppercaseIdentifier elmVersion tag)
+            formatUppercaseIdentifier ns tag
                 |>
                     case (elmVersion, ns) of
                         (Elm_0_16, []) ->
@@ -946,7 +940,7 @@ formatAstNode elmVersion importInfo =
             FormattedPattern SpaceSeparated $
             ElmStructure.application
                 (FAJoinFirst JoinAll)
-                (formatUppercaseIdentifier ns $ fixUppercaseIdentifier elmVersion tag)
+                (formatUppercaseIdentifier ns tag)
                 (formatPreCommented . fmap (syntaxParens SpaceSeparated) <$> pat0:|pats)
 
         PatternParens pattern ->
@@ -971,7 +965,7 @@ formatAstNode elmVersion importInfo =
 
         RecordPattern fields ->
             FormattedPattern SyntaxSeparated $
-            ElmStructure.group True "{" "," "}" False $ formatCommented . fmap (formatLowercaseIdentifier [] . fixLowercaseIdentifier elmVersion) <$> fields
+            ElmStructure.group True "{" "," "}" False $ formatCommented . fmap (formatLowercaseIdentifier []) <$> fields
 
         Alias pattern name ->
             FormattedPattern SpaceSeparated $
@@ -979,15 +973,15 @@ formatAstNode elmVersion importInfo =
                 (formatTailCommented $ syntaxParens SpaceSeparated <$> pattern)
                 [ ElmStructure.spaceSepOrIndented
                     (keyword "as")
-                    [ formatPreCommented $ formatLowercaseIdentifier [] . fixLowercaseIdentifier elmVersion <$> name]
+                    [ formatPreCommented $ formatLowercaseIdentifier [] <$> name]
                 ]
 
 
-formatRecordPair :: ElmVersion -> Text -> (C2 before after LowercaseIdentifier, C2 before after Elm, Bool) -> Elm
-formatRecordPair elmVersion delim (C (pre, postK) k, v, forceMultiline) =
+formatRecordPair :: Text -> (C2 before after LowercaseIdentifier, C2 before after Elm, Bool) -> Elm
+formatRecordPair delim (C (pre, postK) k, v, forceMultiline) =
     formatPreCommented $ C pre $
     ElmStructure.equalsPair delim forceMultiline
-        (formatCommented $ formatLowercaseIdentifier [] . fixLowercaseIdentifier elmVersion <$> C ([], postK) k)
+        (formatCommented $ formatLowercaseIdentifier [] <$> C ([], postK) k)
         (formatCommented v)
 
 
@@ -1059,7 +1053,7 @@ formatExpression elmVersion importInfo aexpr =
             FormattedExpression SyntaxSeparated $ formatLiteral elmVersion lit
 
         VarExpr v ->
-            FormattedExpression SyntaxSeparated $ formatVar elmVersion v
+            FormattedExpression SyntaxSeparated $ formatVar v
 
         Range left right ->
             case elmVersion of
@@ -1176,17 +1170,17 @@ formatExpression elmVersion importInfo aexpr =
             FormattedExpression SyntaxSeparated $
             formatExpression elmVersion importInfo expr
                 |> syntaxParens SpaceSeparated -- TODO: does this need a different context than SpaceSeparated?
-                |> ElmStructure.suffix (punc "." <> Box.identifier (Text.pack $ (\(LowercaseIdentifier l) -> l) $ fixLowercaseIdentifier elmVersion field))
+                |> ElmStructure.suffix (punc "." <> Box.identifier (Text.pack $ (\(LowercaseIdentifier l) -> l) field))
 
         AccessFunction (LowercaseIdentifier field) ->
             FormattedExpression SyntaxSeparated $
-            ElmStructure.identifier $ "." <> Text.pack (fixVarName elmVersion field)
+            ElmStructure.identifier $ "." <> Text.pack field
 
         Record base fields trailing multiline ->
             FormattedExpression SyntaxSeparated $
             formatRecordLike
-                (fmap (formatLowercaseIdentifier [] . fixLowercaseIdentifier elmVersion) <$> base)
-                (formatPair "=" . mapPair (formatLowercaseIdentifier [] . fixLowercaseIdentifier elmVersion) (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) <$> fields)
+                (fmap (formatLowercaseIdentifier []) <$> base)
+                (formatPair "=" . mapPair (formatLowercaseIdentifier []) (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) <$> fields)
                 trailing multiline
 
         Parens expr ->
@@ -1369,7 +1363,7 @@ formatBinops elmVersion importInfo left ops multiline =
             in
             ( isLeftPipe
             , po
-            , formatInfixVar elmVersion o
+            , formatInfixVar o
             , formatCommented' pe $ syntaxParens formatContext $ formatExpression elmVersion importInfo e
             )
     in
@@ -1675,11 +1669,11 @@ commaSpace =
     punc "," <> space
 
 
-formatTypeConstructor :: ElmVersion -> TypeConstructor ([UppercaseIdentifier], UppercaseIdentifier) -> Elm
-formatTypeConstructor elmVersion ctor =
+formatTypeConstructor :: TypeConstructor ([UppercaseIdentifier], UppercaseIdentifier) -> Elm
+formatTypeConstructor ctor =
     case ctor of
         NamedConstructor (namespace, name) ->
-            formatUppercaseIdentifier namespace $ fixUppercaseIdentifier elmVersion name
+            formatUppercaseIdentifier namespace name
 
         TupleConstructor n ->
             keyword $ "(" <> Text.replicate (n-1) "," <> ")"
@@ -1717,11 +1711,11 @@ formatType elmVersion atype =
 
         TypeVariable var ->
             (,) NotNeeded $
-            formatLowercaseIdentifier [] $ fixLowercaseIdentifier elmVersion var
+            formatLowercaseIdentifier [] var
 
         TypeConstruction ctor [] _ ->
             (,) NotNeeded $
-            formatTypeConstructor elmVersion ctor
+            formatTypeConstructor ctor
 
         TypeConstruction ctor (arg0:args) forceMultiline ->
             let
@@ -1733,7 +1727,7 @@ formatType elmVersion atype =
             (,) ForTypeConstruction $
             ElmStructure.application
                 join
-                (formatTypeConstructor elmVersion ctor)
+                (formatTypeConstructor ctor)
                 (formatPreCommented . fmap (typeParens ForCtor . formatType elmVersion) <$> arg0:|args)
 
         TypeParens type' ->
@@ -1747,19 +1741,19 @@ formatType elmVersion atype =
         RecordType base fields trailing multiline ->
             (,) NotNeeded $
             formatRecordLike
-                (fmap (formatLowercaseIdentifier [] . fixLowercaseIdentifier elmVersion) <$> base)
-                (formatPair ":" . mapPair (formatLowercaseIdentifier [] . fixLowercaseIdentifier elmVersion) (typeParens NotRequired . formatType elmVersion) <$> fields)
+                (fmap (formatLowercaseIdentifier []) <$> base)
+                (formatPair ":" . mapPair (formatLowercaseIdentifier []) (typeParens NotRequired . formatType elmVersion) <$> fields)
                 trailing multiline
 
 
-formatVar :: ElmVersion -> Ref [UppercaseIdentifier] -> Elm
-formatVar elmVersion var =
+formatVar :: Ref [UppercaseIdentifier] -> Elm
+formatVar var =
     case var of
         VarRef namespace name ->
-            formatLowercaseIdentifier namespace $ fixLowercaseIdentifier elmVersion name
+            formatLowercaseIdentifier namespace name
 
         TagRef namespace name ->
-            formatUppercaseIdentifier namespace $ fixUppercaseIdentifier elmVersion name
+            formatUppercaseIdentifier namespace name
 
         OpRef name ->
             formatSymbolIdentifierInParens name
@@ -1775,16 +1769,16 @@ formatSymbolIdentifierInParens (SymbolIdentifier name) =
     ElmStructure.identifier $ "(" <> Text.pack name <> ")"
 
 
-formatInfixVar :: ElmVersion -> Ref [UppercaseIdentifier] -> Elm
-formatInfixVar elmVersion var =
+formatInfixVar :: Ref [UppercaseIdentifier] -> Elm
+formatInfixVar var =
     case var of
         VarRef namespace name ->
             ElmStructure.groupOfOne "`" "`" $
-            formatLowercaseIdentifier namespace $ fixLowercaseIdentifier elmVersion name
+            formatLowercaseIdentifier namespace name
 
         TagRef namespace name ->
             ElmStructure.groupOfOne "`" "`" $
-            formatUppercaseIdentifier namespace $ fixUppercaseIdentifier elmVersion name
+            formatUppercaseIdentifier namespace name
 
         OpRef op ->
             formatSymbolIdentifierAsInfix op
@@ -1814,22 +1808,3 @@ formatUppercaseIdentifier' [] =
     pleaseReport "UPEXPECTED UPPERCASE IDENTIFIER" "no name"
 formatUppercaseIdentifier' some =
     formatUppercaseIdentifier (List.init some) (List.last some)
-
-
-fixLowercaseIdentifier :: ElmVersion -> LowercaseIdentifier -> LowercaseIdentifier
-fixLowercaseIdentifier elmVersion (LowercaseIdentifier name) =
-    LowercaseIdentifier $ fixVarName elmVersion name
-
-
-fixVarName :: ElmVersion -> String -> String
-fixVarName elmVersion name =
-    -- TODO: Move this to Normalize
-    case elmVersion of
-        Elm_0_16 -> name
-        Elm_0_17 -> name
-        _ -> map (\x -> if x == '\'' then '_' else x) name
-
-
-fixUppercaseIdentifier :: ElmVersion -> UppercaseIdentifier -> UppercaseIdentifier
-fixUppercaseIdentifier elmVersion (UppercaseIdentifier name) =
-    UppercaseIdentifier $ fixVarName elmVersion name
