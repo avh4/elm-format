@@ -15,7 +15,7 @@ import qualified Data.Indexed as I
 import qualified Data.Text as Text
 import Parse.ParsecAdapter (string)
 import ElmFormat.ImportInfo (ImportInfo(..))
-import ElmFormat.Render.Box (formatExpression, ExpressionContext(..))
+import ElmFormat.Render.Box (formatExpression, syntaxParens, SyntaxContext (SyntaxSeparated))
 import ElmVersion
 import Parse.TestHelpers
 import Reporting.Annotation (Located)
@@ -41,7 +41,7 @@ importInfo =
 example' :: String -> String -> String -> TestTree
 example' name input expected =
     testCase name $
-        assertParse (fmap (Text.unpack . Box.render . formatExpression Elm_0_19 importInfo SyntaxSeparated . I.convert (Identity . extract)) (expr Elm_0_19)) input expected
+        assertParse (fmap (Text.unpack . Box.render . syntaxParens SyntaxSeparated . formatExpression Elm_0_19 importInfo . I.convert (Identity . extract)) (expr Elm_0_19)) input expected
 
 
 commentedIntExpr :: (Word16, Word16, Word16, Word16) -> String -> String -> Int64 -> Commented ([Comment], [Comment]) (ASTNS Located ns 'ExpressionNK)
