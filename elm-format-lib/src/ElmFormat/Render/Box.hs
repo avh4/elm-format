@@ -44,6 +44,7 @@ import qualified Data.Fix as Fix
 import Data.List.NonEmpty (NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Either.Extra
+import Data.Bifunctor (bimap)
 
 
 pleaseReport :: String -> String -> a
@@ -1184,7 +1185,7 @@ formatExpression elmVersion importInfo aexpr =
             FormattedExpression SyntaxSeparated $
             formatRecordLike
                 (fmap (formatLowercaseIdentifier []) <$> base)
-                (formatPair "=" . mapPair (formatLowercaseIdentifier []) (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) <$> fields)
+                (formatPair "=" . bimap (formatLowercaseIdentifier []) (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) <$> fields)
                 trailing multiline
 
         Parens expr ->
@@ -1747,7 +1748,7 @@ formatType elmVersion atype =
             (,) NotNeeded $
             formatRecordLike
                 (fmap (formatLowercaseIdentifier []) <$> base)
-                (formatPair ":" . mapPair (formatLowercaseIdentifier []) (typeParens NotRequired . formatType elmVersion) <$> fields)
+                (formatPair ":" . bimap (formatLowercaseIdentifier []) (typeParens NotRequired . formatType elmVersion) <$> fields)
                 trailing multiline
 
 
