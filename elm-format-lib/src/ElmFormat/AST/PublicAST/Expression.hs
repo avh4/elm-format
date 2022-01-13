@@ -45,7 +45,7 @@ data LetDeclaration
     = LetDefinition Definition
     | Comment_ld Comment
 
-mkLetDeclarations :: Config -> List (ASTNS2 Located [UppercaseIdentifier] 'LetDeclarationNK) -> List (MaybeF LocatedIfRequested LetDeclaration)
+mkLetDeclarations :: Config -> List (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'LetDeclarationNK) -> List (MaybeF LocatedIfRequested LetDeclaration)
 mkLetDeclarations config decls =
     let
         toDefBuilder :: ASTNS1 Located [UppercaseIdentifier] 'LetDeclarationNK -> DefinitionBuilder LetDeclaration
@@ -58,7 +58,7 @@ mkLetDeclarations config decls =
     in
     mkDefinitions config LetDefinition $ fmap (JustF . fmap toDefBuilder . fromLocated config . I.unFix2) decls
 
-fromLetDeclaration :: LetDeclaration -> List (ASTNS2 Identity [UppercaseIdentifier] 'LetDeclarationNK)
+fromLetDeclaration :: LetDeclaration -> List (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'LetDeclarationNK)
 fromLetDeclaration = \case
     LetDefinition def ->
         I.Fix2 . Identity . AST.LetCommonDeclaration <$> fromDefinition def
@@ -209,7 +209,7 @@ instance ToPublicAST 'ExpressionNK where
                 Left message ->
                     error ("invalid binary operator expression: " <> Text.unpack message)
             where
-                buildTree :: BinaryOperatorPrecedence.Tree (Ref [UppercaseIdentifier ]) (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK) -> MaybeF LocatedIfRequested Expression
+                buildTree :: BinaryOperatorPrecedence.Tree (Ref [UppercaseIdentifier ]) (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ExpressionNK) -> MaybeF LocatedIfRequested Expression
                 buildTree (BinaryOperatorPrecedence.Leaf e) =
                     JustF $ fromRawAST config e
                 buildTree (BinaryOperatorPrecedence.Branch op e1 e2) =
@@ -633,9 +633,9 @@ data Definition
 mkDefinition ::
     Config
     -> ASTNS1 Located [UppercaseIdentifier] 'PatternNK
-    -> List (AST.C1 'AST.BeforeTerm (ASTNS2 Located [UppercaseIdentifier] 'PatternNK))
-    -> Maybe (AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (ASTNS2 Located [UppercaseIdentifier] 'TypeNK))
-    -> ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK
+    -> List (AST.C1 'AST.BeforeTerm (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK))
+    -> Maybe (AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TypeNK))
+    -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ExpressionNK
     -> Definition
 mkDefinition config pat args annotation expr =
     case pat of
@@ -661,7 +661,7 @@ mkDefinition config pat args annotation expr =
                 , show expr
                 ]
 
-fromDefinition :: Definition -> List (ASTNS2 Identity [UppercaseIdentifier] 'CommonDeclarationNK)
+fromDefinition :: Definition -> List (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'CommonDeclarationNK)
 fromDefinition = \case
     Definition name parameters Nothing expression ->
         pure $ I.Fix2 $ Identity $ AST.Definition
@@ -703,14 +703,14 @@ mkDefinitions ::
     -> List (MaybeF LocatedIfRequested a)
 mkDefinitions config fromDef items =
     let
-        collectAnnotation :: DefinitionBuilder a -> Maybe (LowercaseIdentifier, AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (ASTNS2 Located [UppercaseIdentifier] 'TypeNK))
+        collectAnnotation :: DefinitionBuilder a -> Maybe (LowercaseIdentifier, AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TypeNK))
         collectAnnotation decl =
             case decl of
                 Right (AST.TypeAnnotation (C preColon (VarRef () name)) (C postColon typ)) ->
                     Just (name, C (preColon, postColon) typ)
                 _ -> Nothing
 
-        annotations :: Map LowercaseIdentifier (AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (ASTNS2 Located [UppercaseIdentifier] 'TypeNK))
+        annotations :: Map LowercaseIdentifier (AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TypeNK))
         annotations =
             Map.fromList $ mapMaybe (collectAnnotation . extract) items
 

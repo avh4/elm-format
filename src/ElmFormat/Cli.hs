@@ -27,6 +27,7 @@ import qualified ElmFormat.AST.PublicAST as PublicAST
 import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as LB
+import qualified Data.Indexed as I
 
 
 data WhatToDo
@@ -169,7 +170,7 @@ validate elmVersion input@(inputFile, inputText) =
 parseModule ::
     ElmVersion
     -> (FilePath, Text.Text)
-    -> Either InfoMessage (Module [UppercaseIdentifier] (ASTNS2 Located [UppercaseIdentifier] 'TopLevelNK))
+    -> Either InfoMessage (Module [UppercaseIdentifier] (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelNK))
 parseModule elmVersion (inputFile, inputText) =
     case Parse.parse elmVersion inputText of
         Result.Result _ (Result.Ok modu) ->
@@ -180,7 +181,7 @@ parseModule elmVersion (inputFile, inputText) =
 
 
 parseJson :: (FilePath, Text.Text)
-    -> Either InfoMessage (Module [UppercaseIdentifier] (ASTNS2 Identity [UppercaseIdentifier] 'TopLevelNK))
+    -> Either InfoMessage (Module [UppercaseIdentifier] (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'TopLevelNK))
 parseJson (inputFile, inputText) =
     case Aeson.eitherDecode (LB.fromChunks . return . encodeUtf8 $ inputText) of
         Right modu -> Right $ PublicAST.toModule modu

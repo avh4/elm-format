@@ -17,9 +17,10 @@ import Parse.IParser
 import Reporting.Annotation (Located)
 import qualified Data.Fix as Fix
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
+import qualified Data.Indexed as I
 
 
-expr :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TypeNK)
+expr :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TypeNK)
 expr = Parse.Type.expr
 
 

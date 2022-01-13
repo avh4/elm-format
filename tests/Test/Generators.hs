@@ -71,7 +71,7 @@ listing =
     return $ AST.Listing.OpenListing (C ([], []) ())
 
 
-instance Arbitrary (Module [UppercaseIdentifier] (ASTNS2 Identity [UppercaseIdentifier] 'TopLevelNK)) where
+instance Arbitrary (Module [UppercaseIdentifier] (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'TopLevelNK)) where
     arbitrary =
         do
             name <- listOf1 $ capIdentifier

@@ -17,10 +17,10 @@ TODO: retain all comments in the output
 TODO: make complete function so it doesn't crash on invalid source files
 -}
 matchType ::
-    List (C1 'BeforeTerm (ASTNS2 Located ns 'PatternNK))
-    -> ASTNS2 Located ns 'TypeNK
-    -> ( List (C1 'BeforeTerm (ASTNS2 Located ns 'PatternNK), ASTNS2 Located ns 'TypeNK)
-       , ASTNS2 Located ns 'TypeNK
+    List (C1 'BeforeTerm (I.Fix2 Located (ASTNS ns) 'PatternNK))
+    -> I.Fix2 Located (ASTNS ns) 'TypeNK
+    -> ( List (C1 'BeforeTerm (I.Fix2 Located (ASTNS ns) 'PatternNK), I.Fix2 Located (ASTNS ns) 'TypeNK)
+       , I.Fix2 Located (ASTNS ns) 'TypeNK
        )
 matchType [] typ = ( [], typ )
 matchType (pat : restPat) (I.Fix2 (At region (FunctionType (C eol typ) restTyp multiline))) =

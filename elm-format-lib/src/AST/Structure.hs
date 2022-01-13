@@ -6,7 +6,7 @@
 {-# LANGUAGE PolyKinds #-}
 
 module AST.Structure
-    ( ASTNS, ASTNS2, ASTNS1
+    ( ASTNS, ASTNS1
     , foldReferences
     , bottomUpReferences
     , mapNs
@@ -27,15 +27,9 @@ type ASTNS ns =
         (Ref ns)
 
 
--- ASTNS2 :: (Type -> Type) -> Type -> NodeKind -> Type
-type ASTNS2 annf ns =
-    I.Fix2 annf (ASTNS ns)
-
-
--- This is the same as ASTNS2, but with the first level unFix'ed
 -- ASTNS1 :: (Type -> Type) -> Type -> NodeKind -> Type
 type ASTNS1 annf ns =
-    ASTNS ns (ASTNS2 annf ns)
+    ASTNS ns (I.Fix2 annf (ASTNS ns))
 
 
 bottomUpReferences ::
@@ -143,8 +137,8 @@ mapNs ::
     Functor annf =>
     (ns1 -> ns2)
     -> (forall kind.
-        ASTNS2 annf ns1 kind
-        -> ASTNS2 annf ns2 kind
+        I.Fix2 annf (ASTNS ns1) kind
+        -> I.Fix2 annf (ASTNS ns2) kind
        )
 mapNs f =
     let

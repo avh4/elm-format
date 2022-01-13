@@ -20,6 +20,7 @@ import qualified ElmFormat.Render.Text as Render
 import qualified ElmVersion
 import qualified Test.Generators ()
 import qualified Test.ElmSourceGenerators
+import qualified Data.Indexed as I
 
 
 assertStringToString :: String -> Assertion
@@ -35,7 +36,7 @@ assertStringToString source =
         assertEqual "" (Right source') result
 
 
-astToAst :: Module [UppercaseIdentifier] (ASTNS2 Located [UppercaseIdentifier] 'TopLevelNK) -> Assertion
+astToAst :: Module [UppercaseIdentifier] (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> Assertion
 astToAst ast =
     let
         result =

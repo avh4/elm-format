@@ -16,7 +16,7 @@ import Parse.Whitespace
 import qualified Parse.ParsecAdapter as Parsec
 
 
-basic :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)
+basic :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 basic elmVersion =
   fmap I.Fix2 $ addLocation $
     choice
@@ -77,7 +77,7 @@ record elmVersion =
                   RecordPattern fields
 
 
-tuple :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)
+tuple :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 tuple elmVersion =
   do  (start, patterns, end) <- located $ parens'' (expr elmVersion)
 
@@ -99,7 +99,7 @@ tuple elmVersion =
             I.Fix2 $ A.at start end $ TuplePattern patterns
 
 
-list :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)
+list :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 list elmVersion =
   fmap I.Fix2 $ addLocation $
   do
@@ -112,13 +112,13 @@ list elmVersion =
           ListPattern patterns
 
 
-term :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)
+term :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 term elmVersion =
   choice [ record elmVersion, tuple elmVersion, list elmVersion, basic elmVersion ]
     <?> "a pattern"
 
 
-patternConstructor :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)
+patternConstructor :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 patternConstructor elmVersion =
   fmap I.Fix2 $ addLocation $
     do  v <- dotSep1 (capVar elmVersion)
@@ -129,7 +129,7 @@ patternConstructor elmVersion =
           [] -> error "dotSep1 returned empty list"
 
 
-expr :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)
+expr :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 expr elmVersion =
     asPattern elmVersion subPattern <?> "a pattern"
   where

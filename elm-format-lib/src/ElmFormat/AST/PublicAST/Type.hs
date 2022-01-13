@@ -229,13 +229,13 @@ data CustomTypeVariant
         }
     deriving (Generic)
 
-mkCustomTypeVariant :: Config -> AST.NameWithArgs UppercaseIdentifier (ASTNS2 Located [UppercaseIdentifier] 'TypeNK) -> CustomTypeVariant
+mkCustomTypeVariant :: Config -> AST.NameWithArgs UppercaseIdentifier (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TypeNK) -> CustomTypeVariant
 mkCustomTypeVariant config (AST.NameWithArgs name args) =
     CustomTypeVariant
         name
         ((\(C c a) -> fromRawAST config a) <$> args)
 
-fromCustomTypeVariant :: CustomTypeVariant -> AST.NameWithArgs UppercaseIdentifier (ASTNS2 Identity [UppercaseIdentifier] 'TypeNK)
+fromCustomTypeVariant :: CustomTypeVariant -> AST.NameWithArgs UppercaseIdentifier (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'TypeNK)
 fromCustomTypeVariant = \case
     CustomTypeVariant name parameterTypes ->
         AST.NameWithArgs

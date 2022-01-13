@@ -31,7 +31,7 @@ data Module
         , body :: List (MaybeF LocatedIfRequested TopLevelStructure)
         }
 
-fromModule :: Config -> AST.Module [UppercaseIdentifier] (ASTNS2 Located [UppercaseIdentifier] 'TopLevelNK) -> Module
+fromModule :: Config -> AST.Module [UppercaseIdentifier] (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> Module
 fromModule config = \case
     modu@(AST.Module _ maybeHeader _ (C _ imports) body) ->
         let
@@ -51,7 +51,7 @@ fromModule config = \case
             (Map.mapWithKey (\m (C comments i) -> fromImportMethod m i) $ Map.mapKeys ModuleName imports)
             (fromTopLevelStructures config $ normalize body)
 
-toModule :: Module -> AST.Module [UppercaseIdentifier] (ASTNS2 Identity [UppercaseIdentifier] 'TopLevelNK)
+toModule :: Module -> AST.Module [UppercaseIdentifier] (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'TopLevelNK)
 toModule (Module (ModuleName name) imports body) =
     -- TODO: remove this placeholder
     AST.Module
@@ -140,11 +140,11 @@ data TopLevelStructure
     | Comment_tls Comment
     | TODO_TopLevelStructure String
 
-fromTopLevelStructures :: Config -> ASTNS2 Located [UppercaseIdentifier] 'TopLevelNK -> List (MaybeF LocatedIfRequested TopLevelStructure)
+fromTopLevelStructures :: Config -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelNK -> List (MaybeF LocatedIfRequested TopLevelStructure)
 fromTopLevelStructures config (I.Fix2 (At _ (AST.TopLevel decls))) =
     let
         toDefBuilder :: AST.TopLevelStructure
-                     (ASTNS2 Located [UppercaseIdentifier] 'TopLevelDeclarationNK) -> MaybeF LocatedIfRequested (DefinitionBuilder TopLevelStructure)
+                     (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK) -> MaybeF LocatedIfRequested (DefinitionBuilder TopLevelStructure)
         toDefBuilder decl =
             case fmap I.unFix2 decl of
                 AST.Entry (At region entry) ->
@@ -175,7 +175,7 @@ fromTopLevelStructures config (I.Fix2 (At _ (AST.TopLevel decls))) =
     in
     mkDefinitions config DefinitionStructure $ fmap toDefBuilder decls
 
-toTopLevelStructures :: TopLevelStructure -> List (AST.TopLevelStructure (ASTNS2 Identity [UppercaseIdentifier] 'TopLevelDeclarationNK))
+toTopLevelStructures :: TopLevelStructure -> List (AST.TopLevelStructure (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK))
 toTopLevelStructures = \case
     DefinitionStructure def ->
         AST.Entry . I.Fix2 . Identity . AST.CommonDeclaration <$> fromDefinition def

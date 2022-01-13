@@ -16,7 +16,7 @@ import Parse.Whitespace
 import Reporting.Annotation (Located)
 
 
-declaration :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+declaration :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 declaration elmVersion =
     typeDecl elmVersion <|> infixDecl elmVersion <|> port elmVersion <|> definition elmVersion
 
@@ -32,7 +32,7 @@ topLevelStructure entry =
 
 -- TYPE ANNOTATIONS and DEFINITIONS
 
-definition :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+definition :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 definition elmVersion =
     fmap I.Fix2 $ addLocation $ fmap (CommonDeclaration . I.Fix2) $ addLocation
     (
@@ -45,7 +45,7 @@ definition elmVersion =
 
 -- TYPE ALIAS and UNION TYPES
 
-typeDecl :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+typeDecl :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 typeDecl elmVersion =
   fmap I.Fix2 $ addLocation $
   do  try (reserved elmVersion "type") <?> "a type declaration"
@@ -79,7 +79,7 @@ typeDecl elmVersion =
 -- INFIX
 
 
-infixDecl :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+infixDecl :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 infixDecl elmVersion =
     expecting "an infix declaration" $
     choice
@@ -88,7 +88,7 @@ infixDecl elmVersion =
         ]
 
 
-infixDecl_0_19 :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+infixDecl_0_19 :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 infixDecl_0_19 elmVersion =
     fmap I.Fix2 $ addLocation $
     let
@@ -106,7 +106,7 @@ infixDecl_0_19 elmVersion =
         <*> (equals *> preCommented (lowVar elmVersion))
 
 
-infixDecl_0_16 :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+infixDecl_0_16 :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 infixDecl_0_16 elmVersion =
   fmap I.Fix2 $ addLocation $
   do  assoc <-
@@ -123,7 +123,7 @@ infixDecl_0_16 elmVersion =
 
 -- PORT
 
-port :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+port :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 port elmVersion =
   expecting "a port declaration" $
   fmap I.Fix2 $ addLocation $

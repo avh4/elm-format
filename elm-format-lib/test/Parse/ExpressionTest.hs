@@ -25,11 +25,11 @@ import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified Data.Fix as Fix
 
 
-pending :: ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK
+pending :: I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ExpressionNK
 pending = at 0 0 0 0 $ Unit []
 
 
-example :: String -> String -> ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK -> TestTree
+example :: String -> String -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ExpressionNK -> TestTree
 example name input expected =
     testCase name $
         assertParse (expr Elm_0_19) input expected
@@ -46,28 +46,28 @@ example' name input expected =
         assertParse (fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render . syntaxParens SyntaxSeparated . formatExpression Elm_0_19 importInfo . I.convert (Identity . extract)) (expr Elm_0_19)) input expected
 
 
-commentedIntExpr :: (Word16, Word16, Word16, Word16) -> String -> String -> Int64 -> Commented ([Comment], [Comment]) (ASTNS2 Located ns 'ExpressionNK)
+commentedIntExpr :: (Word16, Word16, Word16, Word16) -> String -> String -> Int64 -> Commented ([Comment], [Comment]) (I.Fix2 Located (ASTNS ns) 'ExpressionNK)
 commentedIntExpr (a,b,c,d) preComment postComment i =
     C ([BlockComment [preComment]], [BlockComment [postComment]]) (at a b c d  $ Literal $ IntNum i DecimalInt)
 
-commentedIntExpr' :: (Word16, Word16, Word16, Word16) -> String -> Int64 -> Commented ([Comment], [a]) (ASTNS2 Located ns 'ExpressionNK)
+commentedIntExpr' :: (Word16, Word16, Word16, Word16) -> String -> Int64 -> Commented ([Comment], [a]) (I.Fix2 Located (ASTNS ns) 'ExpressionNK)
 commentedIntExpr' (a,b,c,d) preComment i =
     C ([BlockComment [preComment]], []) (at a b c d  $ Literal $ IntNum i DecimalInt)
 
 
-commentedIntExpr'' :: (Word16, Word16, Word16, Word16) -> String -> Int64 -> Commented [Comment] (ASTNS2 Located ns 'ExpressionNK)
+commentedIntExpr'' :: (Word16, Word16, Word16, Word16) -> String -> Int64 -> Commented [Comment] (I.Fix2 Located (ASTNS ns) 'ExpressionNK)
 commentedIntExpr'' (a,b,c,d) preComment i =
     C [BlockComment [preComment]] $ at a b c d  $ Literal $ IntNum i DecimalInt
 
 
-intExpr :: (Word16, Word16, Word16, Word16) -> Int64 -> ASTNS2 Located ns 'ExpressionNK
+intExpr :: (Word16, Word16, Word16, Word16) -> Int64 -> I.Fix2 Located (ASTNS ns) 'ExpressionNK
 intExpr (a,b,c,d) i = at a b c d $ Literal $ IntNum i DecimalInt
 
-intExpr' :: (Word16, Word16, Word16, Word16) -> Int64 -> Commented ([a1], [a2]) (ASTNS2 Located ns 'ExpressionNK)
+intExpr' :: (Word16, Word16, Word16, Word16) -> Int64 -> Commented ([a1], [a2]) (I.Fix2 Located (ASTNS ns) 'ExpressionNK)
 intExpr' (a,b,c,d) i =
     C ([], []) (at a b c d  $ Literal $ IntNum i DecimalInt)
 
-intExpr'' :: (Word16, Word16, Word16, Word16) -> Int64 -> Commented [a] (ASTNS2 Located ns 'ExpressionNK)
+intExpr'' :: (Word16, Word16, Word16, Word16) -> Int64 -> Commented [a] (I.Fix2 Located (ASTNS ns) 'ExpressionNK)
 intExpr'' (a,b,c,d) i =
     C [] $ at a b c d  $ Literal $ IntNum i DecimalInt
 
