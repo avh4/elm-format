@@ -27,7 +27,7 @@ import qualified Reporting.Annotation as A
 
 --------  Basic Terms  --------
 
-varTerm :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+varTerm :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 varTerm elmVersion =
     fmap I.Fix2 $ addLocation $
     let
@@ -40,14 +40,14 @@ varTerm elmVersion =
         resolve <$> var elmVersion
 
 
-accessor :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+accessor :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 accessor elmVersion =
   fmap I.Fix2 $ addLocation $
   do  lbl <- try (string "." >> rLabel elmVersion)
       return $ AccessFunction lbl
 
 
-negative :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+negative :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 negative elmVersion =
   fmap I.Fix2 $ addLocation $
   do  nTerm <-
@@ -61,7 +61,7 @@ negative elmVersion =
 
 --------  Complex Terms  --------
 
-listTerm :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+listTerm :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 listTerm elmVersion =
   fmap I.Fix2 $ addLocation $
     shader' <|> try (braces range) <|> commaSeparated
@@ -87,7 +87,7 @@ listTerm elmVersion =
             return $ ExplicitList terms trailing
 
 
-parensTerm :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+parensTerm :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 parensTerm elmVersion =
   fmap I.Fix2 $
   choice
@@ -119,7 +119,7 @@ parensTerm elmVersion =
         return $ \pre post _ -> Unit (pre ++ post)
 
 
-recordTerm :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+recordTerm :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 recordTerm elmVersion =
     fmap I.Fix2 $
     addLocation $ brackets' $ checkMultiline $
@@ -129,7 +129,7 @@ recordTerm elmVersion =
             return $ Record base fields trailing
 
 
-term :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+term :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 term elmVersion =
   (choice
       [ fmap I.Fix2 $ addLocation (Literal <$> Literal.literal)
@@ -153,7 +153,7 @@ head' [] = Nothing
 head' (a:_) = Just a
 
 
-appExpr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+appExpr :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 appExpr elmVersion =
   expecting "an expression" $
   do  start <- getPosition
@@ -183,7 +183,7 @@ appExpr elmVersion =
 
 --------  Normal Expressions  --------
 
-expr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+expr :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 expr elmVersion =
   choice [ letExpr elmVersion, caseExpr elmVersion, ifExpr elmVersion ]
     <|> lambdaExpr elmVersion
@@ -191,7 +191,7 @@ expr elmVersion =
     <?> "an expression"
 
 
-binaryExpr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+binaryExpr :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 binaryExpr elmVersion =
     Binop.binops (appExpr elmVersion) lastExpr (anyOp elmVersion)
   where
@@ -201,7 +201,7 @@ binaryExpr elmVersion =
         <?> "an expression"
 
 
-ifExpr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+ifExpr :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 ifExpr elmVersion =
   let
     elseKeyword =
@@ -217,7 +217,7 @@ ifExpr elmVersion =
       return $ If first rest final
 
 
-ifClause :: ElmVersion -> IParser (IfClause (ASTNS Located [UppercaseIdentifier] 'ExpressionNK))
+ifClause :: ElmVersion -> IParser (IfClause (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK))
 ifClause elmVersion =
   do
     try (reserved elmVersion "if")
@@ -231,7 +231,7 @@ ifClause elmVersion =
       (C (bodyComments, preElse) thenBranch)
 
 
-lambdaExpr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+lambdaExpr :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 lambdaExpr elmVersion =
   let
     subparser = do
@@ -246,7 +246,7 @@ lambdaExpr elmVersion =
             return $ Lambda args (preArrowComments ++ bodyComments) body $ multilineToBool multiline
 
 
-caseExpr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+caseExpr :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 caseExpr elmVersion =
   fmap I.Fix2 $ addLocation $
   do  try (reserved elmVersion "case")
@@ -286,7 +286,7 @@ caseExpr elmVersion =
 -- LET
 
 
-letExpr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+letExpr :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
 letExpr elmVersion =
   fmap I.Fix2 $ addLocation $
   do  try (reserved elmVersion "let")
@@ -306,7 +306,7 @@ letExpr elmVersion =
 
 -- TYPE ANNOTATION
 
-typeAnnotation :: ElmVersion -> (C1 after (Ref ()) -> C1 before (ASTNS Located [UppercaseIdentifier] 'TypeNK) -> a) -> IParser a
+typeAnnotation :: ElmVersion -> (C1 after (Ref ()) -> C1 before (ASTNS2 Located [UppercaseIdentifier] 'TypeNK) -> a) -> IParser a
 typeAnnotation elmVersion fn =
     (\(v, pre, post) e -> fn (C pre v) (C post e)) <$> try start <*> Type.expr elmVersion
   where
@@ -321,10 +321,10 @@ typeAnnotation elmVersion fn =
 definition ::
     ElmVersion
     ->
-        (ASTNS Located [UppercaseIdentifier] 'PatternNK
-          -> [C1 before (ASTNS Located [UppercaseIdentifier] 'PatternNK)]
+        (ASTNS2 Located [UppercaseIdentifier] 'PatternNK
+          -> [C1 before (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)]
           -> Comments
-          -> (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+          -> (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK)
           -> a
         )
     -> IParser a
@@ -337,7 +337,7 @@ definition elmVersion fn =
         return $ fn name args (preEqualsComments ++ postEqualsComments) body
 
 
-defStart :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK, [C1 before (ASTNS Located [UppercaseIdentifier] 'PatternNK)])
+defStart :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK, [C1 before (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)])
 defStart elmVersion =
     choice
       [ do  pattern <- try $ Pattern.term elmVersion

@@ -16,13 +16,13 @@ import Parse.Common
 import Data.List.NonEmpty (NonEmpty(..))
 
 
-tvar :: ElmVersion -> IParser (FixAST Located typeRef ctorRef varRef 'TypeNK)
+tvar :: ElmVersion -> IParser (Fix2AST Located typeRef ctorRef varRef 'TypeNK)
 tvar elmVersion =
   fmap I.Fix2 $ addLocation
     (TypeVariable <$> lowVar elmVersion <?> "a type variable")
 
 
-tuple :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
+tuple :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TypeNK)
 tuple elmVersion =
   fmap I.Fix2 $ addLocation $ checkMultiline $
   do  types <- parens'' (withEol $ expr elmVersion)
@@ -40,7 +40,7 @@ tuple elmVersion =
                   TupleType $ (\(C (pre, post) (C eol t)) -> C (pre, post, eol) t) <$> typ0:|typ1:typs
 
 
-record :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
+record :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TypeNK)
 record elmVersion =
     fmap I.Fix2 $ addLocation $ brackets' $ checkMultiline $
         do
@@ -63,14 +63,14 @@ constructor0 elmVersion =
             return (NamedConstructor (reverse rest', last'))
 
 
-constructor0' :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
+constructor0' :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TypeNK)
 constructor0' elmVersion =
     fmap I.Fix2 $ addLocation $ checkMultiline $
     do  ctor <- constructor0 elmVersion
         return (TypeConstruction ctor [])
 
 
-term :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
+term :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TypeNK)
 term elmVersion =
   tuple elmVersion <|> record elmVersion <|> tvar elmVersion <|> constructor0' elmVersion
 
@@ -81,7 +81,7 @@ tupleCtor =
         return (TupleConstructor (length ctor + 1))
 
 
-app :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
+app :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TypeNK)
 app elmVersion =
   fmap I.Fix2 $ addLocation $ checkMultiline $
   do  f <- constructor0 elmVersion <|> try tupleCtor <?> "a type constructor"
@@ -89,7 +89,7 @@ app elmVersion =
       return $ TypeConstruction f args
 
 
-expr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
+expr :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TypeNK)
 expr elmVersion =
   do
     result <- separated rightArrow (app elmVersion <|> term elmVersion)
@@ -102,13 +102,13 @@ expr elmVersion =
 
 
 -- TODO: can this be removed?  (tag is the new name?)
-constructor :: ElmVersion -> IParser ([UppercaseIdentifier], [C1 before (ASTNS Located [UppercaseIdentifier] 'TypeNK)])
+constructor :: ElmVersion -> IParser ([UppercaseIdentifier], [C1 before (ASTNS2 Located [UppercaseIdentifier] 'TypeNK)])
 constructor elmVersion =
   (,) <$> (capTypeVar elmVersion<?> "another type constructor")
       <*> spacePrefix (term elmVersion)
 
 
-tag :: ElmVersion -> IParser (NameWithArgs UppercaseIdentifier (ASTNS Located [UppercaseIdentifier] 'TypeNK))
+tag :: ElmVersion -> IParser (NameWithArgs UppercaseIdentifier (ASTNS2 Located [UppercaseIdentifier] 'TypeNK))
 tag elmVersion =
   NameWithArgs
       <$> (capVar elmVersion <?> "another type constructor")

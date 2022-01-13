@@ -15,7 +15,7 @@ import qualified Data.Fix as Fix
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 
 
-render :: Coapplicative annf => ElmVersion -> Module [UppercaseIdentifier] (ASTNS annf [UppercaseIdentifier] 'TopLevelNK) -> Text.Text
+render :: Coapplicative annf => ElmVersion -> Module [UppercaseIdentifier] (ASTNS2 annf [UppercaseIdentifier] 'TopLevelNK) -> Text.Text
 render elmVersion modu =
     renderBox $ Fix.cata ElmStructure.render $ Render.formatModule elmVersion True 2 modu
 

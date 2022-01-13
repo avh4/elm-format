@@ -33,7 +33,7 @@ import Data.Aeson.Encoding.Internal (pair)
 import GHC.Generics
 import ElmFormat.AST.Shared
 import AST.V0_16 (NodeKind(..), Pair(..))
-import AST.Structure (ASTNS, ASTNS1, mapNs)
+import AST.Structure (ASTNS2, ASTNS1, mapNs)
 import qualified AST.V0_16 as AST
 import qualified AST.Module as AST
 import qualified AST.Listing as AST
@@ -72,7 +72,7 @@ class ToPublicAST (nk :: NodeKind) where
     type PublicAST nk
     fromRawAST' :: Config -> ASTNS1 Located [UppercaseIdentifier] nk -> PublicAST nk
 
-fromRawAST :: ToPublicAST nk => Config -> ASTNS Located [UppercaseIdentifier] nk -> LocatedIfRequested (PublicAST nk)
+fromRawAST :: ToPublicAST nk => Config -> ASTNS2 Located [UppercaseIdentifier] nk -> LocatedIfRequested (PublicAST nk)
 fromRawAST config =
     fmap (fromRawAST' config) . fromLocated config . I.unFix2
 
@@ -80,7 +80,7 @@ fromRawAST config =
 class ToPublicAST nk => FromPublicAST (nk :: NodeKind) where
     toRawAST' :: PublicAST nk -> ASTNS1 Identity [UppercaseIdentifier] nk
 
-toRawAST :: FromPublicAST nk => LocatedIfRequested (PublicAST nk) -> ASTNS Identity [UppercaseIdentifier] nk
+toRawAST :: FromPublicAST nk => LocatedIfRequested (PublicAST nk) -> ASTNS2 Identity [UppercaseIdentifier] nk
 toRawAST =
     I.Fix2 . Identity . toRawAST' . extract
 

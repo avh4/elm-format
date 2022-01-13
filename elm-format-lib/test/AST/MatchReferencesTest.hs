@@ -213,7 +213,7 @@ makeImportMethod importString =
             (moduleName, importMethod)
 
 
-makeLetDeclaration :: String -> ASTNS Identity ns 'LetDeclarationNK
+makeLetDeclaration :: String -> ASTNS2 Identity ns 'LetDeclarationNK
 makeLetDeclaration name =
     I.Fix2 $ Identity $
     LetCommonDeclaration $ I.Fix2 $ Identity $ Definition

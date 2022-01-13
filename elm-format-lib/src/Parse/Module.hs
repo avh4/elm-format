@@ -20,7 +20,7 @@ import Parse.Whitespace
 import Reporting.Annotation (Located)
 
 
-elmModule :: ElmVersion -> IParser (Module [UppercaseIdentifier] (ASTNS Located [UppercaseIdentifier] 'TopLevelNK))
+elmModule :: ElmVersion -> IParser (Module [UppercaseIdentifier] (ASTNS2 Located [UppercaseIdentifier] 'TopLevelNK))
 elmModule elmVersion =
   do  preModule <- option [] freshLine
       h <- moduleDecl elmVersion

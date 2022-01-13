@@ -169,7 +169,7 @@ validate elmVersion input@(inputFile, inputText) =
 parseModule ::
     ElmVersion
     -> (FilePath, Text.Text)
-    -> Either InfoMessage (Module [UppercaseIdentifier] (ASTNS Located [UppercaseIdentifier] 'TopLevelNK))
+    -> Either InfoMessage (Module [UppercaseIdentifier] (ASTNS2 Located [UppercaseIdentifier] 'TopLevelNK))
 parseModule elmVersion (inputFile, inputText) =
     case Parse.parse elmVersion inputText of
         Result.Result _ (Result.Ok modu) ->
@@ -180,7 +180,7 @@ parseModule elmVersion (inputFile, inputText) =
 
 
 parseJson :: (FilePath, Text.Text)
-    -> Either InfoMessage (Module [UppercaseIdentifier] (ASTNS Identity [UppercaseIdentifier] 'TopLevelNK))
+    -> Either InfoMessage (Module [UppercaseIdentifier] (ASTNS2 Identity [UppercaseIdentifier] 'TopLevelNK))
 parseJson (inputFile, inputText) =
     case Aeson.eitherDecode (LB.fromChunks . return . encodeUtf8 $ inputText) of
         Right modu -> Right $ PublicAST.toModule modu

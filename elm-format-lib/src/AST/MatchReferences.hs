@@ -31,8 +31,8 @@ fromMatched empty (UnmatchedUnqualified _) = empty
 matchReferences ::
     (Coapplicative annf, Ord u) =>
     ImportInfo [u]
-    -> ASTNS annf [u] kind
-    -> ASTNS annf (MatchedNamespace [u]) kind
+    -> ASTNS2 annf [u] kind
+    -> ASTNS2 annf (MatchedNamespace [u]) kind
 matchReferences importInfo =
     let
         aliases = Bimap.toMap $ ImportInfo._aliases importInfo
@@ -86,8 +86,8 @@ matchReferences importInfo =
 applyReferences ::
     (Coapplicative annf, Ord u) =>
     ImportInfo [u]
-    -> ASTNS annf (MatchedNamespace [u]) kind
-    -> ASTNS annf [u] kind
+    -> ASTNS2 annf (MatchedNamespace [u]) kind
+    -> ASTNS2 annf [u] kind
 applyReferences importInfo =
     let
         aliases = Bimap.toMapR $ ImportInfo._aliases importInfo

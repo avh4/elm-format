@@ -20,17 +20,17 @@ import qualified Reporting.Result as Result
 import Parse.IParser
 
 
-parseModule :: ElmVersion -> String -> Result.Result () Error.Error (Module [UppercaseIdentifier] (ASTNS Located [UppercaseIdentifier] 'TopLevelNK))
+parseModule :: ElmVersion -> String -> Result.Result () Error.Error (Module [UppercaseIdentifier] (ASTNS2 Located [UppercaseIdentifier] 'TopLevelNK))
 parseModule elmVersion src =
     parse src (Parse.Module.elmModule elmVersion)
 
 
-parseDeclarations :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)]
+parseDeclarations :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure (ASTNS2 Located [UppercaseIdentifier] 'TopLevelDeclarationNK)]
 parseDeclarations elmVersion src =
     parse src (Parse.Module.topLevel (Parse.Declaration.declaration elmVersion) <* eof)
 
 
-parseExpressions :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure (C0Eol (ASTNS Located [UppercaseIdentifier] 'ExpressionNK))]
+parseExpressions :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure (C0Eol (ASTNS2 Located [UppercaseIdentifier] 'ExpressionNK))]
 parseExpressions elmVersion src =
     parse src (Parse.Module.topLevel (withEol $ Parse.Expression.expr elmVersion) <* eof)
 

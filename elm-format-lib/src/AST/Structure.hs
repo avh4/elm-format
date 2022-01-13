@@ -1,14 +1,12 @@
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
 
 module AST.Structure
-    ( FixAST, ASTNS, ASTNS1
+    ( Fix2AST, ASTNS2, ASTNS1
     , foldReferences
     , bottomUpReferences
     , mapNs
@@ -22,22 +20,22 @@ import AST.V0_16
 import qualified Data.Indexed as I
 
 
--- FixAST :: (Type -> Type) -> Type -> Type -> Type -> NodeKind -> Type
-type FixAST annf typeRef ctorRef varRef =
+-- Fix2AST :: (Type -> Type) -> Type -> Type -> Type -> NodeKind -> Type
+type Fix2AST annf typeRef ctorRef varRef =
     I.Fix2 annf (AST typeRef ctorRef varRef)
 
--- ASTNS :: (Type -> Type) -> Type -> NodeKind -> Type
-type ASTNS annf ns =
-    FixAST annf (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)
+-- ASTNS2 :: (Type -> Type) -> Type -> NodeKind -> Type
+type ASTNS2 annf ns =
+    Fix2AST annf (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)
 
--- This is the same as ASTNS, but with the first level unFix'ed
+-- This is the same as ASTNS2, but with the first level unFix'ed
 -- ASTNS1 :: (Type -> Type) -> Type -> NodeKind -> Type
 type ASTNS1 annf ns =
     AST
         (ns, UppercaseIdentifier)
         (ns, UppercaseIdentifier)
         (Ref ns)
-        (ASTNS annf ns)
+        (ASTNS2 annf ns)
 
 
 bottomUpReferences ::
@@ -46,8 +44,8 @@ bottomUpReferences ::
     -> (ctorRef1 -> ctorRef2)
     -> (varRef1 -> varRef2)
     -> (forall kind.
-        FixAST annf typeRef1 ctorRef1 varRef1 kind
-        -> FixAST annf typeRef2 ctorRef2 varRef2 kind
+        Fix2AST annf typeRef1 ctorRef1 varRef1 kind
+        -> Fix2AST annf typeRef2 ctorRef2 varRef2 kind
        )
 bottomUpReferences ftr fcr fvr =
     I.fold2 (I.Fix2 . fmap (mapAll ftr fcr fvr id))
@@ -57,7 +55,7 @@ foldReferences ::
     forall a annf typeRef ctorRef varRef kind.
     (Monoid a, Coapplicative annf) =>
     (typeRef -> a) -> (ctorRef -> a) -> (varRef -> a)
-    -> FixAST annf typeRef ctorRef varRef kind -> a
+    -> Fix2AST annf typeRef ctorRef varRef kind -> a
 foldReferences ftype fctor fvar =
     getConst . I.fold2 (foldNode  . extract)
     where
@@ -145,8 +143,8 @@ mapNs ::
     Functor annf =>
     (ns1 -> ns2)
     -> (forall kind.
-        ASTNS annf ns1 kind
-        -> ASTNS annf ns2 kind
+        ASTNS2 annf ns1 kind
+        -> ASTNS2 annf ns2 kind
        )
 mapNs f =
     let

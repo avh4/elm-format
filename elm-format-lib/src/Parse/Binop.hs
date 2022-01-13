@@ -4,7 +4,7 @@ module Parse.Binop (binops) where
 import Parse.ParsecAdapter ((<|>), choice, try)
 
 import AST.V0_16
-import AST.Structure (FixAST)
+import AST.Structure (Fix2AST)
 import Data.Coapplicative
 import qualified Data.Indexed as I
 import Parse.Helpers (commitIf, addLocation, multilineToBool)
@@ -14,10 +14,10 @@ import Reporting.Annotation (Located)
 
 
 binops
-    :: IParser (FixAST Located typeRef ctorRef varRef 'ExpressionNK)
-    -> IParser (FixAST Located typeRef ctorRef varRef 'ExpressionNK)
+    :: IParser (Fix2AST Located typeRef ctorRef varRef 'ExpressionNK)
+    -> IParser (Fix2AST Located typeRef ctorRef varRef 'ExpressionNK)
     -> IParser varRef
-    -> IParser (FixAST Located typeRef ctorRef varRef 'ExpressionNK)
+    -> IParser (Fix2AST Located typeRef ctorRef varRef 'ExpressionNK)
 binops term last anyOp =
   fmap I.Fix2 $ addLocation $
   do  ((e, ops), multiline) <- trackNewline ((,) <$> term <*> nextOps)

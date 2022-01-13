@@ -16,7 +16,7 @@ import Parse.Whitespace
 import qualified Parse.ParsecAdapter as Parsec
 
 
-basic :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
+basic :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)
 basic elmVersion =
   fmap I.Fix2 $ addLocation $
     choice
@@ -40,7 +40,7 @@ basic elmVersion =
           [] -> error "dotSep1 returned empty list"
 
 
-asPattern :: ElmVersion -> IParser (FixAST Located typeRef ctorRef varRef 'PatternNK) -> IParser (FixAST Located typeRef ctorRef varRef 'PatternNK)
+asPattern :: ElmVersion -> IParser (Fix2AST Located typeRef ctorRef varRef 'PatternNK) -> IParser (Fix2AST Located typeRef ctorRef varRef 'PatternNK)
 asPattern elmVersion patternParser =
   do  (start, pattern, _) <- located patternParser
 
@@ -61,7 +61,7 @@ asPattern elmVersion patternParser =
           return (preAs, C postAs var)
 
 
-record :: ElmVersion -> IParser (FixAST Located typeRef ctorRef varRef 'PatternNK)
+record :: ElmVersion -> IParser (Fix2AST Located typeRef ctorRef varRef 'PatternNK)
 record elmVersion =
   fmap I.Fix2 $ addLocation $
   do
@@ -74,7 +74,7 @@ record elmVersion =
                   RecordPattern fields
 
 
-tuple :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
+tuple :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)
 tuple elmVersion =
   do  (start, patterns, end) <- located $ parens'' (expr elmVersion)
 
@@ -96,7 +96,7 @@ tuple elmVersion =
             I.Fix2 $ A.at start end $ TuplePattern patterns
 
 
-list :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
+list :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)
 list elmVersion =
   fmap I.Fix2 $ addLocation $
   do
@@ -109,13 +109,13 @@ list elmVersion =
           ListPattern patterns
 
 
-term :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
+term :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)
 term elmVersion =
   choice [ record elmVersion, tuple elmVersion, list elmVersion, basic elmVersion ]
     <?> "a pattern"
 
 
-patternConstructor :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
+patternConstructor :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)
 patternConstructor elmVersion =
   fmap I.Fix2 $ addLocation $
     do  v <- dotSep1 (capVar elmVersion)
@@ -126,7 +126,7 @@ patternConstructor elmVersion =
           [] -> error "dotSep1 returned empty list"
 
 
-expr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
+expr :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)
 expr elmVersion =
     asPattern elmVersion subPattern <?> "a pattern"
   where

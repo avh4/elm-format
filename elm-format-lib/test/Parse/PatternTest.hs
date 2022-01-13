@@ -14,10 +14,10 @@ import Reporting.Annotation (Located)
 import Parse.TestHelpers
 
 
-expr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
+expr :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'PatternNK)
 expr = Parse.Pattern.expr
 
-example :: String -> String -> ASTNS Located [UppercaseIdentifier] 'PatternNK -> TestTree
+example :: String -> String -> ASTNS2 Located [UppercaseIdentifier] 'PatternNK -> TestTree
 example name input expected =
     testCase name $
         assertParse (expr Elm_0_19) input expected

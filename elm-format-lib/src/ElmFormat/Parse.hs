@@ -5,7 +5,7 @@ import Elm.Utils ((|>))
 import AST.V0_16
 
 import AST.Module (Module)
-import AST.Structure ( ASTNS )
+import AST.Structure ( ASTNS2 )
 import Data.Coapplicative
 import qualified Data.Text as Text
 import ElmVersion ( ElmVersion )
@@ -19,7 +19,7 @@ import qualified Parse.Module
 import Data.Text (Text)
 
 
-parse :: ElmVersion -> Text -> Result.Result () Syntax.Error (Module [UppercaseIdentifier] (ASTNS Located [UppercaseIdentifier] 'TopLevelNK))
+parse :: ElmVersion -> Text -> Result.Result () Syntax.Error (Module [UppercaseIdentifier] (ASTNS2 Located [UppercaseIdentifier] 'TopLevelNK))
 parse elmVersion input =
     Text.unpack input
         |> Parse.parseModule elmVersion

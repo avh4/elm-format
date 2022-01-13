@@ -19,7 +19,7 @@ import qualified Data.Fix as Fix
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 
 
-expr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TypeNK)
+expr :: ElmVersion -> IParser (ASTNS2 Located [UppercaseIdentifier] 'TypeNK)
 expr = Parse.Type.expr
 
 
