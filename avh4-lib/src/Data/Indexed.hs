@@ -71,6 +71,9 @@ convert f = fold2 (Fix2 . f)
 {-| Convenience function for applying a function that works with `Fix2` to a `Fix`. -}
 fold2Identity ::
     HFunctor f => HFunctor g =>
-    (forall m i. m (f (Fix2 m g) i) -> Fix2 m g i)
+    (forall i. f (Fix2 Identity g) i -> Identity (g (Fix2 Identity g) i))
     -> (Fix f ~> Fix g)
-fold2Identity f = fold2 (Fix . runIdentity) . fold2 f . fold (Fix2 . Identity)
+fold2Identity f =
+    fold2 (Fix . runIdentity)
+    . fold2 (Fix2 . f . runIdentity)
+    . fold (Fix2 . Identity)

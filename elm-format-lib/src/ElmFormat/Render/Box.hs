@@ -46,7 +46,6 @@ import Data.List.NonEmpty (NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Either.Extra
 import Data.Bifunctor (bimap)
-import Data.Functor.Identity (Identity(..))
 
 
 pleaseReport :: String -> String -> a
@@ -432,8 +431,10 @@ formatModuleLine (varsToExpose, extraComments) srcTag name moduleSettings preExp
 
 
 formatModule :: ElmVersion -> Bool -> Int -> AST.Module.Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> Elm
-formatModule elmVersion addDefaultHeader spacing modu =
+formatModule elmVersion addDefaultHeader spacing modu' =
     let
+        modu = I.fold2Identity Normalize.shallow <$> modu'
+
         spaceBeforeBody =
             case I.unFix $ AST.Module.body modu of
                 TopLevel [] -> 0
@@ -1055,7 +1056,7 @@ formatExpression ::
     -> I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK
     -> FormatResult 'ExpressionNK
 formatExpression elmVersion importInfo aexpr =
-    case I.unFix $ I.fold2 (I.Fix . runIdentity) $ I.Fix2 $ Normalize.shallow $ runIdentity $ I.unFix2 $ I.fold (I.Fix2 . Identity) aexpr of
+    case I.unFix aexpr of
         Literal lit ->
             FormattedExpression SyntaxSeparated $ formatLiteral elmVersion lit
 
