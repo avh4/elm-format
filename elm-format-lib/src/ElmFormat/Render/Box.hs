@@ -433,7 +433,7 @@ formatModuleLine (varsToExpose, extraComments) srcTag name moduleSettings preExp
 formatModule :: ElmVersion -> Bool -> Int -> AST.Module.Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> Elm
 formatModule elmVersion addDefaultHeader spacing modu' =
     let
-        modu = I.fold2Identity Normalize.shallow <$> modu'
+        modu = I.fold2Identity (Normalize.shallow elmVersion) <$> modu'
 
         spaceBeforeBody =
             case I.unFix $ AST.Module.body modu of
@@ -1064,11 +1064,10 @@ formatExpression elmVersion importInfo aexpr =
             FormattedExpression SyntaxSeparated $ formatVar v
 
         Range left right ->
-            case elmVersion of
-                Elm_0_16 -> FormattedExpression SyntaxSeparated $ formatRange_0_17 elmVersion importInfo left right
-                Elm_0_17 -> FormattedExpression SyntaxSeparated $ formatRange_0_17 elmVersion importInfo left right
-                Elm_0_18 -> formatRange_0_18 elmVersion importInfo left right
-                Elm_0_19 -> formatRange_0_18 elmVersion importInfo left right
+            FormattedExpression SyntaxSeparated $
+            ElmStructure.range "[" ".." "]"
+                (formatCommentedExpression elmVersion importInfo left)
+                (formatCommentedExpression elmVersion importInfo right)
 
         ExplicitList exprs trailing multiline ->
             FormattedExpression SyntaxSeparated $
@@ -1365,45 +1364,6 @@ formatBinops elmVersion importInfo left ops multiline =
             multiline
             (syntaxParens InfixSeparated $ formatExpression elmVersion importInfo left)
             (mapIsLast formatPair_ ops)
-
-
-formatRange_0_17 ::
-    ElmVersion -> ImportInfo [UppercaseIdentifier]
-    -> C2 before after (I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
-    -> C2 before after (I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
-    -> Elm
-formatRange_0_17 elmVersion importInfo left right =
-    ElmStructure.range "[" ".." "]"
-        (formatCommentedExpression elmVersion importInfo left)
-        (formatCommentedExpression elmVersion importInfo right)
-
-
-formatRange_0_18 ::
-    ElmVersion -> ImportInfo [UppercaseIdentifier]
-    -> C2 before after (I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
-    -> C2 before after (I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
-    -> FormatResult 'ExpressionNK
-formatRange_0_18 elmVersion importInfo left right =
-    case (left, right) of
-        (C (preLeft, []) left', C (preRight, []) right') ->
-            App
-                (I.Fix $ VarExpr $ I.Fix $ VarRef_ $ VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
-                [ C preLeft left'
-                , C preRight right'
-                ]
-                (FAJoinFirst JoinAll)
-                |> I.Fix
-                |> formatExpression elmVersion importInfo
-
-        _ ->
-            App
-                (I.Fix $ VarExpr $ I.Fix $ VarRef_ $ VarRef [UppercaseIdentifier "List"] $ LowercaseIdentifier "range")
-                [ C [] $ I.Fix $ Parens left
-                , C [] $ I.Fix $ Parens right
-                ]
-                (FAJoinFirst JoinAll)
-                |> I.Fix
-                |> formatExpression elmVersion importInfo
 
 
 formatUnit :: Char -> Char -> Comments -> Elm

@@ -15,18 +15,22 @@ import AST.Structure
 import qualified Data.Indexed as I
 import Control.Monad (join)
 import Control.Applicative (liftA2)
+import ElmVersion (ElmVersion)
+import qualified ElmVersion
 
 
 {-| Simply uses `join` to combine layers -}
-deepMonad :: forall annf ns nk.
+deepMonad :: forall annf nk.
     Traversable annf => Monad annf =>
-    I.Fix2 annf (ASTNS ns) nk -> I.Fix2 annf (ASTNS ns) nk
-deepMonad = I.fold2 go
+    ElmVersion
+    -> I.Fix2 annf (ASTNS [UppercaseIdentifier]) nk
+    -> I.Fix2 annf (ASTNS [UppercaseIdentifier]) nk
+deepMonad elmVersion = I.fold2 go
     where
-        go :: annf (AST (VariableNamespace ns) (I.Fix2 annf (ASTNS ns)) i)
-         -> I.Fix2 annf (ASTNS ns) i
+        go :: annf (AST (VariableNamespace [UppercaseIdentifier]) (I.Fix2 annf (ASTNS [UppercaseIdentifier])) i)
+         -> I.Fix2 annf (ASTNS [UppercaseIdentifier]) i
         go original =
-            I.Fix2 $ join $ fmap shallow original
+            I.Fix2 $ join $ fmap (shallow elmVersion) original
 
 
 -- {-| Will use `normalized <> original` at each layer. -}
@@ -80,15 +84,16 @@ deepMonad = I.fold2 go
 
 
 shallow ::
-    forall annf ns nk.
-    (Applicative annf, Traversable annf
-    , Monad annf) =>
-    ASTNS ns (I.Fix2 annf (ASTNS ns)) nk
-    -> annf (ASTNS ns (I.Fix2 annf (ASTNS ns)) nk)
-shallow = \case
+    forall annf nk.
+    (Traversable annf, Monad annf) =>
+    ElmVersion
+    -> ASTNS [UppercaseIdentifier] (I.Fix2 annf (ASTNS [UppercaseIdentifier])) nk
+    -> annf (ASTNS [UppercaseIdentifier] (I.Fix2 annf (ASTNS [UppercaseIdentifier])) nk)
+shallow elmVersion = \case
     App left [] _ ->
         I.unFix2 left
 
+    -- Remove parens in function arguments when the comments can be merged with the surrounding whitespace
     App left args multiline -> do
         -- TODO: This currently joins `annf` for _all_ the args, but ideally we only want to join for ones that we want to simplify and leave the others untouched.
         newArgs <- gg args
@@ -115,4 +120,33 @@ shallow = \case
                 Parens (C (pre', []) e) -> (,) pre' <$> I.unFix2 e
                 other -> pure ([], other)
 
+    -- Convert literal range syntax if it's not allowed
+    Range left right ->
+        if ElmVersion.syntax_0_18_disallowLiteralRange elmVersion
+        then
+            case (left, right) of
+                -- No comments after terms, so we can skip adding parens
+                (C (preLeft, []) left', C (preRight, []) right') ->
+                    pure $ App
+                        (mkVarRef "List" "range")
+                        [ C preLeft left'
+                        , C preRight right'
+                        ]
+                        (FAJoinFirst JoinAll)
+
+                _ ->
+                    pure $ App
+                        (mkVarRef "List" "range")
+                        [ C [] $ I.Fix2 $ pure $ Parens left
+                        , C [] $ I.Fix2 $ pure $ Parens right
+                        ]
+                        (FAJoinFirst JoinAll)
+        else
+            pure $ Range left right
+
     ast -> pure ast
+
+
+mkVarRef :: Applicative m => String -> String -> I.Fix2 m (ASTNS [UppercaseIdentifier]) 'ExpressionNK
+mkVarRef ns1 name =
+    I.Fix2 $ pure $ VarExpr $ I.Fix2 $ pure $ VarRef_ $ VarRef [UppercaseIdentifier ns1] (LowercaseIdentifier name)

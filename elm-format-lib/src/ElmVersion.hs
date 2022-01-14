@@ -30,28 +30,17 @@ parse versionString =
     _ -> Left ("Invalid Elm version \"" ++ versionString ++ "\".  Supported versions are 0.18, 0.19")
 
 
+syntax_0_18_disallowLiteralRange :: ElmVersion -> Bool
+syntax_0_18_disallowLiteralRange = (>= Elm_0_18)
+
+
 syntax_0_19_disallowApostropheInVars :: ElmVersion -> Bool
-syntax_0_19_disallowApostropheInVars elmVersion =
-    case elmVersion of
-        Elm_0_16 -> False
-        Elm_0_17 -> False
-        Elm_0_18 -> False
-        Elm_0_19 -> True
+syntax_0_19_disallowApostropheInVars = (>= Elm_0_19)
 
 
 style_0_19_stringEscape :: ElmVersion -> Bool
-style_0_19_stringEscape elmVersion =
-    case elmVersion of
-        Elm_0_16 -> False
-        Elm_0_17 -> False
-        Elm_0_18 -> False
-        Elm_0_19 -> True
+style_0_19_stringEscape = (>= Elm_0_19)
 
 
 style_0_19_cannotExposeOpenListing :: ElmVersion -> Bool
-style_0_19_cannotExposeOpenListing elmVersion =
-    case elmVersion of
-        Elm_0_16 -> False
-        Elm_0_17 -> False
-        Elm_0_18 -> False
-        Elm_0_19 -> True
+style_0_19_cannotExposeOpenListing = (>= Elm_0_19)

@@ -10,6 +10,7 @@ import qualified Data.Indexed as I
 import qualified ElmFormat.Normalize as Normalize
 import Test.Tasty.Hspec
 import Control.Monad.Identity (Identity(..))
+import qualified ElmVersion
 
 
 -- type ResultList =
@@ -81,10 +82,10 @@ spec_spec = describe "ElmFormat.Normalize" $ do
 
         it "List" $
             let
-                var n = VarExpr $ I.Fix2 [VarRef_ $ VarRef () $ lc n]
+                var n = VarExpr $ I.Fix2 [VarRef_ $ VarRef [] $ lc n]
                 f = I.Fix2 [var "f"]
             in do
-            Normalize.deepMonad
+            Normalize.deepMonad ElmVersion.Elm_0_19
                 (I.Fix2 [App f
                     [ c ["!"] (I.Fix2 [var "a", Parens $ C ([BlockComment ["$"]], []) (I.Fix2 [var "b", var "c"])])
                     , c ["@"] (I.Fix2 [var "x", var "z"])
@@ -142,10 +143,10 @@ spec_spec = describe "ElmFormat.Normalize" $ do
 
         it "Identity" $
             let
-                var n = I.Fix2 $ Identity $ VarExpr $ I.Fix2 $ Identity $ VarRef_ $ VarRef () $ lc n
+                var n = I.Fix2 $ Identity $ VarExpr $ I.Fix2 $ Identity $ VarRef_ $ VarRef [] $ lc n
                 f = var "f"
             in
-            Normalize.deepMonad
+            Normalize.deepMonad ElmVersion.Elm_0_19
                 (I.Fix2 $ Identity $ App f
                     [ c ["!"] (I.Fix2 $ Identity $ Parens $ C ([BlockComment ["$"]], []) (var "b"))
                     , c ["@"] (var "c")
