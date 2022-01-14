@@ -33,6 +33,7 @@ import Data.Text (Text)
 import qualified Data.Text as Text
 import ElmFormat.ImportInfo (ImportInfo)
 import qualified ElmFormat.ImportInfo as ImportInfo
+import qualified ElmFormat.Normalize as Normalize
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified ElmFormat.Render.Markdown
 import qualified ElmVersion
@@ -45,6 +46,7 @@ import Data.List.NonEmpty (NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Either.Extra
 import Data.Bifunctor (bimap)
+import Data.Functor.Identity (Identity(..))
 
 
 pleaseReport :: String -> String -> a
@@ -1053,7 +1055,7 @@ formatExpression ::
     -> I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK
     -> FormatResult 'ExpressionNK
 formatExpression elmVersion importInfo aexpr =
-    case I.unFix aexpr of
+    case I.unFix $ I.fold2 (I.Fix . runIdentity) $ I.Fix2 $ Normalize.shallow $ runIdentity $ I.unFix2 $ I.fold (I.Fix2 . Identity) aexpr of
         Literal lit ->
             FormattedExpression SyntaxSeparated $ formatLiteral elmVersion lit
 
@@ -1106,7 +1108,7 @@ formatExpression elmVersion importInfo aexpr =
             ElmStructure.application
                 multiline
                 (syntaxParens InfixSeparated $ formatExpression elmVersion importInfo left)
-                (formatPreCommentedExpression elmVersion importInfo SpaceSeparated <$> arg0:|args)
+                (formatPreCommented . fmap (syntaxParens SpaceSeparated . formatExpression elmVersion importInfo) <$> arg0:|args)
 
         If (IfClause cond body) elseifs (C elsComments els) ->
             let
@@ -1252,21 +1254,6 @@ formatCommentedExpression elmVersion importInfo (C (pre, post) e) =
                 _ -> C (pre, post) e
     in
     formatCommented $ syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo <$> commented'
-
-
-formatPreCommentedExpression ::
-    ElmVersion -> ImportInfo [UppercaseIdentifier] -> SyntaxContext
-    -> C1 before (I.Fix (ASTNS [UppercaseIdentifier]) 'ExpressionNK)
-    -> Elm
-formatPreCommentedExpression elmVersion importInfo context (C pre e) =
-    let
-        (pre', e') =
-            case I.unFix e of
-                Parens (C (pre'', []) e'') ->
-                    (pre ++ pre'', e'')
-                _ -> (pre, e)
-    in
-    formatCommented' pre' (syntaxParens context $ formatExpression elmVersion importInfo e')
 
 
 formatRecordLike ::

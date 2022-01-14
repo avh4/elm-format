@@ -7,6 +7,7 @@
 module Data.Indexed where
 
 import Data.Kind
+import Control.Monad.Identity (Identity(..))
 
 
 -- Common typeclasses
@@ -66,3 +67,10 @@ convert ::
     (ann1 ~> ann2) ->
     (Fix2 ann1 f ~> Fix2 ann2 f)
 convert f = fold2 (Fix2 . f)
+
+{-| Convenience function for applying a function that works with `Fix2` to a `Fix`. -}
+fold2Identity ::
+    HFunctor f => HFunctor g =>
+    (forall m i. m (f (Fix2 m g) i) -> Fix2 m g i)
+    -> (Fix f ~> Fix g)
+fold2Identity f = fold2 (Fix . runIdentity) . fold2 f . fold (Fix2 . Identity)

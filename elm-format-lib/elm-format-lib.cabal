@@ -116,6 +116,7 @@ library
         ElmFormat.AST.Shared
         ElmFormat.ImportInfo
         ElmFormat.KnownContents
+        ElmFormat.Normalize
         ElmFormat.Parse
         ElmFormat.Render.Markdown
         ElmFormat.Render.Text
@@ -144,6 +145,7 @@ test-suite efl-tests
         ElmFormat.AST.Shared
         ElmFormat.ImportInfo
         ElmFormat.KnownContents
+        ElmFormat.Normalize
         ElmFormat.Parse
         ElmFormat.Render.Markdown
         ElmFormat.Render.Text
@@ -158,6 +160,7 @@ test-suite efl-tests
         BoxTest
         ElmFormat.AST.BinaryOperatorPrecedenceTest
         ElmFormat.ImportInfoTest
+        ElmFormat.NormalizeTest
         ElmFormat.Render.ElmStructureTest
         IndentTest
         Parse.ExpressionTest

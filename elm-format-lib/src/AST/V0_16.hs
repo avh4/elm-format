@@ -370,7 +370,7 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
 
     App ::
         getType 'ExpressionNK
-        -> [C1 'BeforeTerm (getType 'ExpressionNK)]
+        -> List (C1 'BeforeTerm (getType 'ExpressionNK))
         -> FunctionApplicationMultiline
         -> AST p getType 'ExpressionNK
     Unary ::
