@@ -105,8 +105,7 @@ shallow = \case
                 C1 'BeforeTerm (I.Fix2 annf (ASTNS ns) 'ExpressionNK)
                 -> annf (C1 'BeforeTerm (I.Fix2 annf (ASTNS ns) 'ExpressionNK))
             removeParens (C pre e) =
-                fmap (fmap $ I.Fix2 . pure)
-                $ fmap (\(c, e') -> C (pre ++ c) e')
+                fmap (fmap (I.Fix2 . pure) . (\(c, e') -> C (pre ++ c) e'))
                 ((>>= matchPreCommentedParens) (I.unFix2 e))
 
             matchPreCommentedParens ::

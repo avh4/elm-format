@@ -110,8 +110,7 @@ instance Monad m => World (State.StateT TestWorldState m) where
     putStr = modify . Stdio.putStr
     putStrLn = modify . Stdio.putStrLn
 
-    writeStdout text =
-        putStr text
+    writeStdout = putStr
 
     putStrStderr = modify . Stdio.putStrStderr
     putStrLnStderr = modify . Stdio.putStrLnStderr

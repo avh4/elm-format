@@ -1151,7 +1151,7 @@ formatExpression elmVersion importInfo aexpr =
                 FormattedExpression AmbiguousEnd $ -- TODO: not tested
                 ElmStructure.letIn "let" "in"
                     (stackWithSpacing
-                        (\a b -> spacer (I.unFix a) b)
+                        (spacer . I.unFix)
                         (formatDefinition' . I.unFix)
                         def1 defs
                     )
@@ -1602,7 +1602,7 @@ formatString elmVersion style s =
     hex char =
       case ElmVersion.style_0_19_stringEscape elmVersion of
           True ->
-              "\\u{" ++ (printf "%04X" $ Char.ord char) ++ "}"
+              "\\u{" ++ printf "%04X" (Char.ord char) ++ "}"
           False ->
               "\\x" ++ (printf fmt $ Char.ord char)
       where

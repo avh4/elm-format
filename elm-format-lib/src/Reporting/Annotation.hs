@@ -49,17 +49,13 @@ instance Foldable Located where
 
 
 instance Traversable Located where
-    traverse f (At region a) = fmap (At region) $ f a
+    traverse f (At region a) = At region <$> f a
 
 
 instance Coapplicative Located where
     extract (At _ x) = x
     {-# INLINE extract #-}
 
-
-traverse :: (Functor f) => (a -> f b) -> Located a -> f (Located b)
-traverse func (At region value) =
-  At region <$> func value
 
 
 toValue :: Located a -> a
@@ -68,8 +64,8 @@ toValue (At _ value) =
 
 
 merge :: Located a -> Located b -> value -> Located value
-merge (At r1 _) (At r2 _) value =
-  At (mergeRegions r1 r2) value
+merge (At r1 _) (At r2 _) =
+    At (mergeRegions r1 r2)
 
 
 
@@ -84,8 +80,8 @@ data Position =
 
 
 at :: Position -> Position -> a -> Located a
-at start end a =
-  At (Region start end) a
+at start end =
+    At (Region start end)
 
 
 
