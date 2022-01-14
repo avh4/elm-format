@@ -706,17 +706,12 @@ forceableRowOrStack False a (b:rest) = Fix $ WrapStackNoSpaces a b rest
 
 {-| Same as `forceableSpaceSepOrStack`
 -}
-forceableSpaceSepOrStack1 :: Bool -> [Elm] -> Elm
-forceableSpaceSepOrStack1 forceMultiline boxes =
-    case boxes of
-        (first:rest) ->
-            forceableSpaceSepOrStack forceMultiline first rest
-
-        _ ->
-            error "forceableSpaceSepOrStack1 with empty list"
+forceableSpaceSepOrStack1 :: Bool -> NonEmpty Elm -> Elm
+forceableSpaceSepOrStack1 forceMultiline (first:|rest) =
+    forceableSpaceSepOrStack forceMultiline first rest
 
 
-stack1 :: [Elm] -> Elm
+stack1 :: NonEmpty Elm -> Elm
 stack1 = forceableSpaceSepOrStack1 True
 
 

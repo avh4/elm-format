@@ -15,6 +15,7 @@ import qualified Data.Fix as Fix
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import Test.Tasty.Hspec
 import Data.List.NonEmpty(NonEmpty(..))
+import qualified Data.List.NonEmpty as NonEmpty
 
 
 trim :: String -> String
@@ -44,7 +45,7 @@ a :: Elm ; b :: Elm ; c :: Elm
 
 block :: Text -> Elm
 block text =
-    ElmStructure.stack1
+    ElmStructure.stack1 $ NonEmpty.fromList
         [ word (text<>text)
         , word (text<>text)
         ]

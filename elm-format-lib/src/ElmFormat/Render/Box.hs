@@ -23,7 +23,7 @@ import qualified Data.Foldable as Foldable
 import qualified Data.Indexed as I
 import qualified Data.List as List
 import qualified Data.Map.Strict as Map
-import Data.Maybe (fromMaybe, maybeToList)
+import Data.Maybe (fromMaybe, maybeToList, catMaybes)
 import qualified Data.Maybe as Maybe
 import Data.ReversedList (Reversed)
 import qualified Data.ReversedList as ReversedList
@@ -875,7 +875,7 @@ formatDefinition ::
 formatDefinition elmVersion importInfo name args comments expr =
     let
         body =
-            ElmStructure.stack1 $ mconcat
+            ElmStructure.stack1 $ NonEmpty.fromList $ mconcat
                 [ formatComment <$> comments
                 , [ syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr ]
                 ]
@@ -1087,7 +1087,7 @@ formatExpression elmVersion importInfo aexpr =
             let
                 patterns' =
                     ElmStructure.forceableSpaceSepOrStack1 False
-                    (formatPreCommented . fmap (syntaxParens SpaceSeparated . formatAst elmVersion importInfo) <$> pat1:pats)
+                    (formatPreCommented . fmap (syntaxParens SpaceSeparated . formatAst elmVersion importInfo) <$> pat1:|pats)
             in
             FormattedExpression AmbiguousEnd $
             ElmStructure.lambda "\\" "->" multiline
@@ -1154,7 +1154,7 @@ formatExpression elmVersion importInfo aexpr =
                         (formatDefinition' . I.unFix)
                         def1 defs
                     )
-                    (ElmStructure.stack1 $
+                    (ElmStructure.stack1 $ NonEmpty.fromList $
                         fmap formatComment bodyComments
                             ++ [syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr]
                     )
@@ -1220,9 +1220,9 @@ formatCaseClause elmVersion importInfo (CaseBranch prePat postPat preExpr pat ex
                     , False
                     )
 
-                (prePat', []) ->
-                    ( ElmStructure.stack1
-                        [ ElmStructure.stack1 $ formatComment <$> prePat'
+                ((prePat1:prePats), []) ->
+                    ( ElmStructure.stack1 $ NonEmpty.fromList
+                        [ ElmStructure.stack1 $ formatComment <$> prePat1:|prePats
                         , negativeCasePatternWorkaround pat $
                           syntaxParens SyntaxSeparated $
                           formatAst elmVersion importInfo pat
@@ -1373,8 +1373,8 @@ formatUnit left right comments =
         keyword $ Text.pack [left, right]
 
     ('{', (LineComment _):_) ->
-      ElmStructure.groupOfOne "{ " (Text.singleton right) $
-      ElmStructure.stack1 $ formatComment <$> comments
+        ElmStructure.groupOfOne "{ " (Text.singleton right) $
+        ElmStructure.stack1 $ NonEmpty.fromList $ formatComment <$> comments
 
     (_, first:rest) ->
         ElmStructure.groupOfOne (Text.singleton left) (Text.singleton right) $
@@ -1393,12 +1393,11 @@ formatComments comments =
 
 formatCommented_ :: Bool -> C2 before after Elm -> Elm
 formatCommented_ forceMultiline (C (pre, post) inner) =
-    ElmStructure.forceableSpaceSepOrStack1 forceMultiline $
-        concat
-            [ maybeToList $ formatComments pre
-            , [inner]
-            , maybeToList $ formatComments post
-            ]
+    ElmStructure.forceableSpaceSepOrStack1 forceMultiline $ NonEmpty.fromList $ concat
+        [ maybeToList $ formatComments pre
+        , [inner]
+        , maybeToList $ formatComments post
+        ]
 
 
 formatCommented :: C2 before after Elm -> Elm
@@ -1434,7 +1433,7 @@ formatEolCommented (C (Just eol) inner) =
 
 formatCommentedStack :: C2 before after Elm -> Elm
 formatCommentedStack (C (pre, post) inner) =
-    ElmStructure.stack1 $
+    ElmStructure.stack1 $ NonEmpty.fromList $
         fmap formatComment pre
         ++ [ inner ]
         ++ fmap formatComment post
@@ -1644,17 +1643,15 @@ formatType elmVersion atype =
         FunctionType first rest (ForceMultiline forceMultiline) ->
             let
                 formatRight (C (preOp, postOp, eol) term) =
-                    ElmStructure.forceableSpaceSepOrStack1
-                        False
-                        $ concat
-                            [ maybeToList $ formatComments preOp
-                            , [ ElmStructure.prefixOrIndented
-                                  (keyword "->")
-                                  (formatC2Eol $
-                                      (fmap $ typeParens ForLambda . formatType elmVersion)
-                                      (C (postOp, [], eol) term)
-                                  )
-                              ]
+                    ElmStructure.forceableSpaceSepOrStack1 False
+                        $ NonEmpty.fromList $ catMaybes
+                            [ formatComments preOp
+                            , Just $ ElmStructure.prefixOrIndented
+                                (keyword "->")
+                                (formatC2Eol $
+                                    (fmap $ typeParens ForLambda . formatType elmVersion)
+                                    (C (postOp, [], eol) term)
+                                )
                             ]
             in
                 (,) ForFunctionType $
