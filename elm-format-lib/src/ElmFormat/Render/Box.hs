@@ -1078,7 +1078,7 @@ formatExpression elmVersion importInfo aexpr =
 
         Binops left ops multiline ->
             FormattedExpression InfixSeparated $
-            formatBinops elmVersion importInfo left ops multiline
+            formatBinops (formatExpression elmVersion importInfo left) (fmap (formatExpression elmVersion importInfo) <$> ops) multiline
 
         Lambda [] _ _ _ ->
             pleaseReport "UNEXPECTED LAMBDA" "no patterns"
@@ -1335,15 +1335,13 @@ mapIsLast f (next:rest) = f False next : mapIsLast f rest
 
 
 formatBinops ::
-    p ~ VariableNamespace [UppercaseIdentifier] =>
-    ElmVersion
-    -> ImportInfo [UppercaseIdentifier]
-    -> I.Fix (AST p) 'ExpressionNK
-    -> [BinopsClause (I.Fix (AST p) 'VarRefNK) (I.Fix (AST p) 'ExpressionNK)]
+    FormatResult 'ExpressionNK
+    -> [BinopsClause (I.Fix (AST (VariableNamespace [UppercaseIdentifier])) 'VarRefNK) (FormatResult 'ExpressionNK)]
     -> Bool
     -> Elm
-formatBinops elmVersion importInfo left ops multiline =
+formatBinops left ops multiline =
     let
+        formatPair_ :: Bool -> BinopsClause (I.Fix (AST (VariableNamespace [UppercaseIdentifier])) 'VarRefNK) (FormatResult 'ExpressionNK) -> (Bool, Comments, Elm, Elm)
         formatPair_ isLast (BinopsClause po (I.Fix (VarRef_ o)) pe e) =
             let
                 isLeftPipe =
@@ -1357,12 +1355,12 @@ formatBinops elmVersion importInfo left ops multiline =
             ( isLeftPipe
             , po
             , formatInfixVar o
-            , formatCommented' pe $ syntaxParens formatContext $ formatExpression elmVersion importInfo e
+            , formatCommented' pe $ syntaxParens formatContext e
             )
     in
         formatBinary
             multiline
-            (syntaxParens InfixSeparated $ formatExpression elmVersion importInfo left)
+            (syntaxParens InfixSeparated left)
             (mapIsLast formatPair_ ops)
 
 
