@@ -36,7 +36,6 @@ common common-options
     hs-source-dirs: src
 
     other-modules:
-        TestWorld.Stdio
 
     build-depends:
         base >= 4.15.0.0 && < 5,
@@ -60,6 +59,7 @@ library
         CommandLine.TestWorld
         Data.FileTree
         Expect
+        TestWorld.Stdio
 
 
 test-suite elm-format-test-lib-tests
@@ -73,6 +73,7 @@ test-suite elm-format-test-lib-tests
         Data.FileTree
         Data.FileTreeTest
         Expect
+        TestWorld.Stdio
 
     build-tool-depends:
         tasty-discover:tasty-discover >= 4.2.1 && < 5
