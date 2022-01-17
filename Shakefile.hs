@@ -15,6 +15,10 @@ import Shakefiles.Extra
 
 main :: IO ()
 main = do
+    shakefiles <- getDirectoryFilesIO ""
+        [ "Shakefile.hs"
+        , "Shakefiles//*.hs"
+        ]
     shakefilesHash <- getHashedShakeVersion [ "Shakefile.hs" ]
     shakeArgs shakeOptions{
       shakeChange = ChangeModtimeAndDigest,
