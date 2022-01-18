@@ -44,6 +44,7 @@ common common-options
         hspec >= 2.7.10 && < 3,
         hspec-core >= 2.7.10 && < 3,
         hspec-golden >= 0.1.0.3 && < 0.2,
+        microlens-platform >= 0.4.2.1 && < 0.5,
         mtl >= 2.2.2 && < 3,
         split >= 0.2.3.4 && < 0.3,
         text >= 1.2.5.0 && < 2,

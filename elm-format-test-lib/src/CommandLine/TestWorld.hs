@@ -24,7 +24,7 @@ import Test.Hspec (shouldBe, Expectation)
 data TestWorldState =
     TestWorldState
         { filesystem :: FileTree Text
-        , stdio :: Stdio.State
+        , stdio :: Stdio.Stdio
         , _lastExitCode :: LastExitCode
         }
 
@@ -80,7 +80,7 @@ instance Lens TestWorldState (FileTree Text) where
     get = filesystem
     set x s = s { filesystem = x }
 
-instance Lens TestWorldState Stdio.State where
+instance Lens TestWorldState Stdio.Stdio where
     get = stdio
     set x s = s { stdio = x }
 
@@ -142,7 +142,7 @@ eval = State.evalState
 
 queueStdin :: Text -> TestWorld ()
 queueStdin =
-    modify' (undefined :: Stdio.State) . over . Stdio.queueStdin
+    modify' (undefined :: Stdio.Stdio) . over . Stdio.queueStdin
 
 
 init :: TestWorldState
@@ -161,12 +161,12 @@ downloadFile =
 
 fullStdout :: TestWorld Text
 fullStdout =
-    gets' (undefined :: Stdio.State) $ from Stdio.fullStdout
+    gets' (undefined :: Stdio.Stdio) $ from Stdio.fullStdout
 
 
 fullStderr :: TestWorld Text
 fullStderr =
-    gets' (undefined :: Stdio.State) $ from Stdio.fullStderr
+    gets' (undefined :: Stdio.Stdio) $ from Stdio.fullStderr
 
 
 lastExitCode :: TestWorld (Maybe Int)
