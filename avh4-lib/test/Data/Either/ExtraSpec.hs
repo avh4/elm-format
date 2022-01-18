@@ -1,11 +1,11 @@
-module Data.Either.ExtraTest where
+module Data.Either.ExtraSpec where
 
 import Data.Either.Extra
-import Test.Tasty.Hspec
+import Test.Hspec
 
 
-spec_spec :: Spec
-spec_spec =
+spec :: Spec
+spec =
     describe "Data.Either.Extra" $ do
 
         describe "delimit" $ do

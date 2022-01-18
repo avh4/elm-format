@@ -1,9 +1,9 @@
 {-# OPTIONS_GHC -Wno-type-defaults #-}
 {-# LANGUAGE FlexibleContexts #-}
-module ElmFormat.AST.BinaryOperatorPrecedenceTest where
+module ElmFormat.AST.BinaryOperatorPrecedenceSpec where
 
 import Prelude hiding (or)
-import Test.Tasty.Hspec
+import Test.Hspec
 import qualified ElmFormat.AST.BinaryOperatorPrecedence as BinaryOperatorPrecedence
 import ElmFormat.AST.BinaryOperatorPrecedence (Tree(..), Precedence(..), Associativity(..))
 import ElmFormat.AST.Shared
@@ -12,8 +12,8 @@ import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 
 
-spec_spec :: Spec
-spec_spec =
+spec :: Spec
+spec =
     describe "ElmFormat.AST.BinaryOperatorPrecedence" $ do
         it "trivial case: no operators" $ do
             parse "A" []

@@ -2,13 +2,13 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module ElmFormat.NormalizeTest where
+module ElmFormat.NormalizeSpec where
 
 import AST.V0_16
 
 import qualified Data.Indexed as I
 import qualified ElmFormat.Normalize as Normalize
-import Test.Tasty.Hspec
+import Test.Hspec
 import Control.Monad.Identity (Identity(..))
 import qualified ElmVersion
 
@@ -48,8 +48,8 @@ c comments =
     C (BlockComment . pure <$> comments)
 
 
-spec_spec :: Spec
-spec_spec = describe "ElmFormat.Normalize" $ do
+spec :: Spec
+spec = describe "ElmFormat.Normalize" $ do
     describe "remove parens within comments in function application" $
         let
             ml = FAJoinFirst JoinAll

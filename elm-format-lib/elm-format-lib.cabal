@@ -132,7 +132,7 @@ test-suite efl-tests
     type: exitcode-stdio-1.0
 
     hs-source-dirs: test
-    main-is: Tests.hs
+    main-is: Spec.hs
 
     other-modules:
         AST.Listing
@@ -156,29 +156,26 @@ test-suite efl-tests
         Reporting.Result
 
     other-modules:
-        AST.MatchReferencesTest
-        BoxTest
-        ElmFormat.AST.BinaryOperatorPrecedenceTest
-        ElmFormat.ImportInfoTest
-        ElmFormat.NormalizeTest
-        ElmFormat.Render.ElmStructureTest
-        IndentTest
-        Parse.ExpressionTest
-        Parse.HelpersTest
-        Parse.LiteralTest
-        Parse.PatternTest
+        AST.MatchReferencesSpec
+        BoxSpec
+        ElmFormat.AST.BinaryOperatorPrecedenceSpec
+        ElmFormat.ImportInfoSpec
+        ElmFormat.NormalizeSpec
+        ElmFormat.Render.ElmStructureSpec
+        IndentSpec
+        Parse.ExpressionSpec
+        Parse.HelpersSpec
+        Parse.LiteralSpec
+        Parse.PatternSpec
         Parse.TestHelpers
-        Parse.TestHelpersTest
-        Parse.TypeTest
+        Parse.TestHelpersSpec
+        Parse.TypeSpec
 
     build-depends:
         split >= 0.2.3.4 && < 0.3,
-        tasty >= 1.2 && < 2,
-        tasty-hspec >= 1.1.5.1 && < 1.2,
-        tasty-hunit >= 0.10.0.1 && < 0.11,
-        tasty-quickcheck >= 0.10.1 && < 0.11,
+        hspec >= 2.7.10 && < 3,
         avh4-lib,
         elm-format-test-lib
 
     build-tool-depends:
-        tasty-discover:tasty-discover >= 4.2.1 && < 5
+        hspec-discover:hspec-discover >= 2.7.10 && < 3

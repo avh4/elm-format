@@ -1,14 +1,14 @@
-module Integration.CliTest (spec_spec) where
+module Integration.CliSpec (spec) where
 
 import CommandLine.TestWorld
-import Test.Tasty.Hspec hiding (Success)
+import Test.Hspec
 import qualified ElmFormat.Cli as ElmFormat
 import Data.Text (Text)
 import qualified Data.Text as Text
 
 
-spec_spec :: Spec
-spec_spec =
+spec :: Spec
+spec =
     describe "CLI" $ do
         it "usage" $ do
             ElmFormat.main [ "--help" ]

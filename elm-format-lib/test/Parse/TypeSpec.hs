@@ -1,8 +1,7 @@
 {-# LANGUAGE DataKinds #-}
-module Parse.TypeTest where
+module Parse.TypeSpec where
 
-import Test.Tasty
-import Test.Tasty.HUnit
+import Test.Hspec hiding (example)
 
 import qualified Parse.Type
 import AST.V0_16
@@ -25,38 +24,35 @@ expr :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'Typ
 expr = Parse.Type.expr
 
 
-example :: String -> String -> String -> TestTree
+example :: String -> String -> String -> SpecWith ()
 example name input expected =
-    testCase name $
+    it name $
         assertParse (fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render . typeParens NotRequired . formatType Elm_0_19 . I.fold2 (I.Fix . extract)) (expr Elm_0_19)) input expected
 
 
-test_tests :: TestTree
-test_tests =
-    testGroup "Parse.Type"
-    [ testGroup "tuple type"
-        [ example "" "(a,b)" "( a, b )\n"
-        , example "whitespace" "( a , b )" "( a, b )\n"
-        , example "comments"
+spec :: Spec
+spec = describe "Parse.Type" $ do
+    describe "tuple type" $ do
+        example "" "(a,b)" "( a, b )\n"
+        example "whitespace" "( a , b )" "( a, b )\n"
+        example "comments"
             "({-A-}a{-B-},{-C-}b{-D-})"
             "( {- A -} a {- B -}, {- C -} b {- D -} )\n"
-        , example "newlines" "(\n a\n ,\n b\n )" "( a\n, b\n)\n"
-        ]
+        example "newlines" "(\n a\n ,\n b\n )" "( a\n, b\n)\n"
 
-    , testGroup "record type"
-        [ testGroup "empty"
-            [ example "" "{}" "{}\n"
-            , example "whitespace" "{ }" "{}\n"
-            , example "comments" "{{-A-}}" "{{- A -}}\n"
-            ]
+    describe "record type" $ do
+        describe "empty" $ do
+            example "" "{}" "{}\n"
+            example "whitespace" "{ }" "{}\n"
+            example "comments" "{{-A-}}" "{{- A -}}\n"
 
-        , example ""
+        example ""
             "{x:m,y:n}"
             "{ x : m, y : n }\n"
-        , example "whitespace"
+        example "whitespace"
             "{ x : m , y : n }"
             "{ x : m, y : n }\n"
-        , example "comments"
+        example "comments"
             "{{-A-}x{-B-}:{-C-}m{-D-},{-E-}y{-F-}:{-G-}n{-H-}}"
             "{ {- A -} x {- B -} : {- C -} m\n\
             \\n\
@@ -65,32 +61,31 @@ test_tests =
             \\n\
             \{- H -}\n\
             \}\n"
-        , example "single field with comments"
+        example "single field with comments"
             "{{-A-}x{-B-}:{-C-}m{-D-}}"
             "{ {- A -} x {- B -} : {- C -} m\n\
             \\n\
             \{- D -}\n\
             \}\n"
-        , example "newlines"
+        example "newlines"
             "{\n x\n :\n m\n ,\n y\n :\n n\n }"
             "{ x :\n\
             \    m\n\
             \, y :\n\
             \    n\n\
             \}\n"
-        ]
 
-    , testGroup "record extension type"
-        [ example ""
+    describe "record extension type" $ do
+        example ""
             "{a|x:m,y:n}"
             "{ a | x : m, y : n }\n"
-        , example "single field"
+        example "single field"
             "{a|x:m}"
             "{ a | x : m }\n"
-        , example "whitespace"
+        example "whitespace"
             "{ a | x : m , y : n }"
             "{ a | x : m, y : n }\n"
-        , example "comments"
+        example "comments"
             "{{-A-}a{-B-}|{-C-}x{-D-}:{-E-}m{-F-},{-G-}y{-H-}:{-I-}n{-J-}}"
             "{ {- A -} a {- B -}\n\
             \    | {- C -} x {- D -} : {- E -} m\n\
@@ -100,7 +95,7 @@ test_tests =
             \\n\
             \    {- J -}\n\
             \}\n"
-        , example "newlines"
+        example "newlines"
             "{\n a\n |\n x\n :\n m\n ,\n y\n :\n n\n }"
             "{ a\n\
             \    | x :\n\
@@ -108,12 +103,10 @@ test_tests =
             \    , y :\n\
             \        n\n\
             \}\n"
-        , testCase "only allows simple base" $
+        it "only allows simple base" $
             assertParseFailure (expr Elm_0_19) "{()|x:m}"
-        , testCase "only allows simple base" $
+        it "only allows simple base" $
             assertParseFailure (expr Elm_0_19) "{{}|x:m}"
-        , example "no fields (elm-compiler does not allow this)"
+        example "no fields (elm-compiler does not allow this)"
             "{a|}"
             "{ a | }\n"
-        ]
-    ]

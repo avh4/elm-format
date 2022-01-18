@@ -1,15 +1,13 @@
-module BoxTest where
+module BoxSpec where
 
 import Elm.Utils ((|>))
 
-import Test.Tasty
-import Test.Tasty.HUnit
+import Test.Hspec
 import qualified Data.Text.Lazy as LazyText
 import qualified Data.Text as Text
 
 import Box
 import Data.Text (Text)
-import Test.Tasty.Hspec
 
 
 trim :: String -> String
@@ -22,15 +20,14 @@ trim text =
         |> LazyText.unpack
 
 
-assertLineOutput :: String -> Line -> Assertion
+assertLineOutput :: String -> Line -> Expectation
 assertLineOutput expected actual =
     assertOutput (expected ++ "\n") (line actual)
 
 
-assertOutput :: String -> Box -> Assertion
+assertOutput :: String -> Box -> Expectation
 assertOutput expected actual =
-    assertEqual expected expected $
-        trim $ Text.unpack $ render actual
+    expected `shouldBe` trim (Text.unpack $ render actual)
 
 
 word :: Text -> Box
@@ -48,59 +45,52 @@ block text =
         w = identifier text
 
 
-test_tests :: TestTree
-test_tests =
-    testGroup "BoxTest"
-    [ testCase "keyword" $
+spec :: Spec
+spec = describe "Box" $ do
+    it "keyword" $
         assertLineOutput "module" $ keyword "module"
-    , testCase "identifier" $
+    it "identifier" $
         assertLineOutput "sqrt" $ identifier "sqrt"
-    , testCase "punctuation" $
+    it "punctuation" $
         assertLineOutput "::" $ punc "::"
-    , testCase "row" $
+    it "row" $
         assertLineOutput "ab" $ identifier "a" <> identifier "b"
-    , testCase "space" $
+    it "space" $
         assertLineOutput "a b" $ identifier "a" <> space <> identifier "b"
 
-    , testCase "stack1" $
+    it "stack1" $
         assertOutput "foo\nbar\n" $
             stack1
                 [ word "foo"
                 , word "bar"
                 ]
-    , testCase "indent" $
+    it "indent" $
         assertOutput "    a\n    b\n" $
             indent $ stack1
                 [ word "a"
                 , word "b"
                 ]
-    ]
 
-
-spec_spec :: Spec
-spec_spec =
-    describe "Box" $ do
-
-        describe "prefix in front of block with indented lines" $ do
-            it "when prefix is smaller than a TAB" $ do
-                prefix (keyword ">>") $ stack1
-                    [ word "a"
-                    , indent $ word "b"
-                    ]
-                `shouldOutput`
-                [ ">>a"
-                , "    b"
+    describe "prefix in front of block with indented lines" $ do
+        it "when prefix is smaller than a TAB" $ do
+            prefix (keyword ">>") $ stack1
+                [ word "a"
+                , indent $ word "b"
                 ]
+            `shouldOutput`
+            [ ">>a"
+            , "    b"
+            ]
 
-            it "when prefix is longer than a TAB" $ do
-                prefix (keyword ">>>>>") $ stack1
-                    [ word "a"
-                    , indent $ word "b"
-                    ]
-                `shouldOutput`
-                [ ">>>>>a"
-                , "        b"
+        it "when prefix is longer than a TAB" $ do
+            prefix (keyword ">>>>>") $ stack1
+                [ word "a"
+                , indent $ word "b"
                 ]
+            `shouldOutput`
+            [ ">>>>>a"
+            , "        b"
+            ]
 
 
 shouldOutput :: Box -> [Text] -> Expectation

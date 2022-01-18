@@ -77,7 +77,7 @@ test-suite al-tests
     type: exitcode-stdio-1.0
 
     hs-source-dirs: test
-    main-is: Tests.hs
+    main-is: Spec.hs
 
     other-modules:
         CommandLine.Filesystem
@@ -94,14 +94,12 @@ test-suite al-tests
         Regex
 
     other-modules:
-        Data.Either.ExtraTest
-        Data.List.ExtraTest
-        Data.Text.ExtraTest
+        Data.Either.ExtraSpec
+        Data.List.ExtraSpec
+        Data.Text.ExtraSpec
 
     build-depends:
-        tasty >= 1.2 && < 2,
-        tasty-hspec >= 1.1.5.1 && < 1.2,
-        tasty-hunit >= 0.10.0.1 && < 0.11
+        hspec >= 2.7.10 && < 3
 
     build-tool-depends:
-        tasty-discover:tasty-discover >= 4.2.1 && < 5
+        hspec-discover:hspec-discover >= 2.7.10 && < 3

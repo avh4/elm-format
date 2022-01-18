@@ -41,13 +41,11 @@ common common-options
         base >= 4.15.0.0 && < 5,
         containers >= 0.6.5.1 && < 0.7,
         filepath >= 1.4.2.1 && < 1.5,
-        hspec-core >= 2.7.4 && < 3,
+        hspec >= 2.7.10 && < 3,
+        hspec-core >= 2.7.10 && < 3,
         hspec-golden >= 0.1.0.3 && < 0.2,
         mtl >= 2.2.2 && < 3,
         split >= 0.2.3.4 && < 0.3,
-        tasty >= 1.2 && < 2,
-        tasty-hspec >= 1.1.5.1 && < 1.2,
-        tasty-hunit >= 0.10.0.1 && < 0.11,
         text >= 1.2.5.0 && < 2,
         avh4-lib
 
@@ -58,7 +56,6 @@ library
     exposed-modules:
         CommandLine.TestWorld
         Data.FileTree
-        Expect
         TestWorld.Stdio
 
 
@@ -67,13 +64,12 @@ test-suite elm-format-test-lib-tests
     type: exitcode-stdio-1.0
 
     hs-source-dirs: test
-    main-is: Tests.hs
+    main-is: Spec.hs
 
     other-modules:
         Data.FileTree
-        Data.FileTreeTest
-        Expect
+        Data.FileTreeSpec
         TestWorld.Stdio
 
     build-tool-depends:
-        tasty-discover:tasty-discover >= 4.2.1 && < 5
+        hspec-discover:hspec-discover >= 2.7.10 && < 3

@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module AST.MatchReferencesTest (test_tests) where
+module AST.MatchReferencesSpec (spec) where
 
 import Elm.Utils ((|>))
 
@@ -9,7 +9,6 @@ import AST.Module (ImportMethod(..))
 import AST.Structure
 import Data.Functor.Identity
 import qualified Data.Indexed as I
-import Expect
 import ElmFormat.ImportInfo (ImportInfo)
 import qualified ElmFormat.KnownContents as KnownContents
 import ElmVersion
@@ -17,16 +16,14 @@ import qualified ElmFormat.ImportInfo as ImportInfo
 import qualified Parse.Module
 import qualified Parse.Parse as Parse
 import qualified Reporting.Result as Result
-import Test.Tasty
-import Test.Tasty.HUnit
+import Test.Hspec
 
 import qualified Data.Map as Dict
 import Data.List.Split (splitOn)
 
-test_tests :: TestTree
-test_tests =
-    testGroup "AST.MatchReferences"
-    [ testGroup "matchReferences" $
+spec :: Spec
+spec = describe "AST.MatchReferences" $ do
+    describe "matchReferences" $
         let
             test ::
                 String
@@ -35,7 +32,7 @@ test_tests =
                 -> List String -- locals
                 -> Ref [String]
                 -> Ref (MatchedNamespace [String])
-                -> TestTree
+                -> SpecWith ()
             test name knownContents imports locals sourceAst' matchedAst' =
                 let
                     sourceAst = fmap (fmap UppercaseIdentifier) sourceAst'
@@ -53,43 +50,43 @@ test_tests =
                                     []
                                     (I.Fix2 $ Identity $ VarExpr $ I.Fix2 $ Identity $ VarRef_ r)
                 in
-                testCase name $
+                it name $
                     matchReferences (makeImportInfo knownContents imports) (wrapExpr sourceAst)
-                        |> Expect.equals (wrapExpr matchedAst)
-        in
-        [ test "identifies unknown references"
+                        `shouldBe` wrapExpr matchedAst
+        in do
+        test "identifies unknown references"
             [] [] []
             (VarRef ["A"] (LowercaseIdentifier "a"))
             (VarRef (Unmatched ["A"]) (LowercaseIdentifier "a"))
-        , test "matches references from an import"
+        test "matches references from an import"
             []
             [ "import A" ]
             []
             (VarRef ["A"] (LowercaseIdentifier "a"))
             (VarRef (MatchedImport True ["A"]) (LowercaseIdentifier "a"))
-        , test "matches reference to a known value via exposing(..)"
+        test "matches reference to a known value via exposing(..)"
             [ ("Html", ["div"]) ]
             [ "import Html exposing (..)" ]
             []
             (VarRef [] (LowercaseIdentifier "div"))
             (VarRef (MatchedImport False ["Html"]) (LowercaseIdentifier "div"))
-        , test "determines references to local variables"
+        test "determines references to local variables"
             [] []
             [ "a" ]
             (VarRef [] (LowercaseIdentifier "a"))
             (VarRef Local (LowercaseIdentifier "a"))
-        , test "determines unqualified references that are unmatched"
+        test "determines unqualified references that are unmatched"
             [] [] []
             (VarRef [] (LowercaseIdentifier "a"))
             (VarRef (UnmatchedUnqualified []) (LowercaseIdentifier "a"))
-        , test "determines when an unqualified reference might match"
+        test "determines when an unqualified reference might match"
             []
             [ "import Test exposing (..)" ]
             []
             (VarRef [] (LowercaseIdentifier "describe"))
             (VarRef (UnmatchedUnqualified [["Test"]]) (LowercaseIdentifier "describe"))
-        ]
-    , testGroup "applyReferences" $
+
+    describe "applyReferences" $
         let
             test ::
                 String
@@ -98,7 +95,7 @@ test_tests =
                 -> List String -- locals
                 -> Ref (MatchedNamespace [String])
                 -> Ref [String]
-                -> TestTree
+                -> SpecWith ()
             test name knownContents imports locals sourceAst' matchedAst' =
                 let
                     sourceAst = fmap (fmap $ fmap UppercaseIdentifier) sourceAst'
@@ -116,41 +113,41 @@ test_tests =
                                     []
                                     (I.Fix2 $ Identity $ VarExpr $ I.Fix2 $ Identity $ VarRef_ r)
                 in
-                testCase name $
+                it name $
                     applyReferences (makeImportInfo knownContents imports) (wrapExpr sourceAst)
-                        |> Expect.equals (wrapExpr matchedAst)
-        in
-        [ test "local reference is unqualified"
+                        `shouldBe` wrapExpr matchedAst
+        in do
+        test "local reference is unqualified"
             [] [] []
             (VarRef Local (LowercaseIdentifier "a"))
             (VarRef [] (LowercaseIdentifier "a"))
-        , test "unmatched, unqualified reference is unqualified"
+        test "unmatched, unqualified reference is unqualified"
             [] [] []
             (VarRef (UnmatchedUnqualified []) (LowercaseIdentifier "a"))
             (VarRef [] (LowercaseIdentifier "a"))
-        , test "unmatched, qualified reference is unchanged"
+        test "unmatched, qualified reference is unchanged"
             [] [] []
             (VarRef (Unmatched ["XYZ", "ABC"]) (LowercaseIdentifier "a"))
             (VarRef ["XYZ", "ABC"] (LowercaseIdentifier "a"))
-        , test "qualified, matched import becomes unqualified if explicitly exposed"
+        test "qualified, matched import becomes unqualified if explicitly exposed"
             []
             [ "import Html exposing (div)" ]
             []
             (VarRef (MatchedImport True ["Html"]) (LowercaseIdentifier "div"))
             (VarRef [] (LowercaseIdentifier "div"))
-        , test "qualified, matched import remains qualified if not exposed"
+        test "qualified, matched import remains qualified if not exposed"
             []
             [ "import Html" ]
             []
             (VarRef (MatchedImport True ["Html"]) (LowercaseIdentifier "div"))
             (VarRef ["Html"] (LowercaseIdentifier "div"))
-        , test "qualified, matched import remains qualified if explicitly exposed but hidden by a local"
+        test "qualified, matched import remains qualified if explicitly exposed but hidden by a local"
             []
             [ "import Html exposing (div)" ]
             [ "div" ]
             (VarRef (MatchedImport True ["Html"]) (LowercaseIdentifier "div"))
             (VarRef ["Html"] (LowercaseIdentifier "div"))
-        , test "qualified, matched import remains qualified if explicitly exposed but there are exposing(..) with unknown content"
+        test "qualified, matched import remains qualified if explicitly exposed but there are exposing(..) with unknown content"
             []
             [ "import Html exposing (div)"
             , "import Html.Extra exposing (..)"
@@ -158,7 +155,7 @@ test_tests =
             []
             (VarRef (MatchedImport True ["Html"]) (LowercaseIdentifier "div"))
             (VarRef ["Html"] (LowercaseIdentifier "div"))
-        , test "qualified, matched import becomes unqualified if explicitly exposed and there are exposing(..) with known content"
+        test "qualified, matched import becomes unqualified if explicitly exposed and there are exposing(..) with known content"
             [ ("Html.Extra", ["notDiv"]) ]
             [ "import Html exposing (div)"
             , "import Html.Extra exposing (..)"
@@ -166,26 +163,24 @@ test_tests =
             []
             (VarRef (MatchedImport True ["Html"]) (LowercaseIdentifier "div"))
             (VarRef [] (LowercaseIdentifier "div"))
-        , test "unqualified, matched import remains unqualified if possible"
+        test "unqualified, matched import remains unqualified if possible"
             []
             [ "import Html exposing (div)" ]
             []
             (VarRef (MatchedImport False ["Html"]) (LowercaseIdentifier "div"))
             (VarRef [] (LowercaseIdentifier "div"))
-        , test "unqualified, matched import becomes qualified if obscured by a local"
+        test "unqualified, matched import becomes qualified if obscured by a local"
             []
             [ "import Html exposing (div)" ]
             [ "div" ]
             (VarRef (MatchedImport False ["Html"]) (LowercaseIdentifier "div"))
             (VarRef ["Html"] (LowercaseIdentifier "div"))
-        , test "unqualified, matched import becomes qualified if no longer exposed"
+        test "unqualified, matched import becomes qualified if no longer exposed"
             []
             [ "import Html" ]
             []
             (VarRef (MatchedImport False ["Html"]) (LowercaseIdentifier "div"))
             (VarRef ["Html"] (LowercaseIdentifier "div"))
-        ]
-    ]
 
 
 makeImportInfo :: [(String, List String)] -> [String] -> ImportInfo [UppercaseIdentifier]
