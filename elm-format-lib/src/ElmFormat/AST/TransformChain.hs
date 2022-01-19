@@ -1,7 +1,9 @@
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE PolyKinds #-}
 
-module ElmFormat.AST.TransformChain where
+module ElmFormat.AST.TransformChain (TransformChain, Carrier, map, mapMaybe, fold2) where
+
+import Prelude hiding (map)
 import qualified Data.Indexed as I
 
 {-| This module helps with combining multiple AST transformations into a single transformation that can be applied in a single pass.
@@ -12,14 +14,16 @@ output is fully processed.
 -}
 
 
-newtype TransformChain a =
-    TransformChain { unChain :: Either a a }
+type TransformChain a = Carrier a -> Carrier a
+
+newtype Carrier a =
+    Carry { unCarry :: Either a a }
 
 
-map :: Eq a => (a -> a) -> TransformChain a -> TransformChain a
-map _ (TransformChain (Left a)) = TransformChain (Left a)
-map f (TransformChain (Right a)) =
-    TransformChain $
+map :: Eq a => (a -> a) -> Carrier a -> Carrier a
+map _ (Carry (Left a)) = Carry (Left a)
+map f (Carry (Right a)) =
+    Carry $
     case f a of
         new | new == a -> Right a
         new -> Left new
@@ -27,10 +31,10 @@ map f (TransformChain (Right a)) =
 
 {-| Use this over `map` when possible, because returning `Nothing` means we don't have to do an equals check on the result.
 -}
-mapMaybe :: Eq a => (a -> Maybe a) -> TransformChain a -> TransformChain a
-mapMaybe _ (TransformChain (Left a)) = TransformChain (Left a)
-mapMaybe f (TransformChain (Right a)) =
-    TransformChain $
+mapMaybe :: Eq a => (a -> Maybe a) -> Carrier a -> Carrier a
+mapMaybe _ (Carry (Left a)) = Carry (Left a)
+mapMaybe f (Carry (Right a)) =
+    Carry $
     case f a of
         Nothing -> Right a
         Just new | new == a -> Right a
@@ -38,7 +42,7 @@ mapMaybe f (TransformChain (Right a)) =
 
 
 fold2 :: I.HFunctor f => Functor ann =>
-    (forall j. TransformChain (I.Fix2 ann f j) -> TransformChain (I.Fix2 ann f j))
+    (forall j. Carrier (I.Fix2 ann f j) -> Carrier (I.Fix2 ann f j))
     -> I.Fix2 ann f i -> I.Fix2 ann f i
 fold2 transform =
-    I.foldTransform2 (unChain . transform . TransformChain . Right . I.Fix2)
+    I.foldTransform2 (unCarry . transform . Carry . Right . I.Fix2)
