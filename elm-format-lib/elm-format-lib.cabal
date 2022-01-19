@@ -103,9 +103,7 @@ library
     import: common-options
 
     exposed-modules:
-        AST.Listing
         AST.MatchReferences
-        AST.Module
         AST.Structure
         AST.V0_16
         CommandLine.InfoFormatter
@@ -136,9 +134,7 @@ test-suite efl-tests
     main-is: Spec.hs
 
     other-modules:
-        AST.Listing
         AST.MatchReferences
-        AST.Module
         AST.Structure
         AST.V0_16
         CommandLine.InfoFormatter

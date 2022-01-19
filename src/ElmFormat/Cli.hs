@@ -4,7 +4,6 @@ module ElmFormat.Cli (main, main') where
 import Prelude ()
 import Relude hiding (exitFailure, exitSuccess, putStr, putStrLn)
 
-import AST.Module (Module)
 import AST.Structure
 import AST.V0_16
 import CommandLine.Program (ProgramIO)
@@ -159,7 +158,7 @@ validate :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage ()
 validate elmVersion input@(inputFile, inputText) =
     case parseModule elmVersion input of
         Right modu ->
-            if inputText /= Render.render elmVersion (I.fold2 (I.Fix . extract) <$> modu) then
+            if inputText /= Render.render elmVersion (I.fold2 (I.Fix . extract) modu) then
                 Left $ FileWouldChange elmVersion inputFile
             else
                 Right ()
@@ -171,7 +170,7 @@ validate elmVersion input@(inputFile, inputText) =
 parseModule ::
     ElmVersion
     -> (FilePath, Text.Text)
-    -> Either InfoMessage (Module [UppercaseIdentifier] (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelNK))
+    -> Either InfoMessage (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ModuleNK)
 parseModule elmVersion (inputFile, inputText) =
     case Parse.parse elmVersion inputText of
         Result.Result _ (Result.Ok modu) ->
@@ -182,7 +181,7 @@ parseModule elmVersion (inputFile, inputText) =
 
 
 parseJson :: (FilePath, Text.Text)
-    -> Either InfoMessage (Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK))
+    -> Either InfoMessage (I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK)
 parseJson (inputFile, inputText) =
     case Aeson.eitherDecode (LB.fromChunks . return . encodeUtf8 $ inputText) of
         Right modu -> Right $ PublicAST.toModule modu
@@ -193,7 +192,7 @@ parseJson (inputFile, inputText) =
 
 format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
 format elmVersion input =
-    Render.render elmVersion . fmap (I.fold2 $ I.Fix . extract) <$> parseModule elmVersion input
+    Render.render elmVersion . I.fold2 (I.Fix . extract) <$> parseModule elmVersion input
 
 
 toJson :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text

@@ -6,7 +6,6 @@ import ElmVersion (ElmVersion)
 import AST.Structure
 import AST.V0_16
 
-import AST.Module (Module)
 import qualified Box
 import qualified Data.Text as Text
 import qualified ElmFormat.Render.Box as Render
@@ -15,7 +14,7 @@ import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified Data.Indexed as I
 
 
-render :: ElmVersion -> Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> Text.Text
+render :: ElmVersion -> I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK -> Text.Text
 render elmVersion modu =
     renderBox $ Fix.cata ElmStructure.render $ Render.formatModule elmVersion True 2 modu
 

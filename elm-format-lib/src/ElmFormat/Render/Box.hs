@@ -12,9 +12,7 @@ import Box ( Line, identifier, punc, space, render )
 import ElmVersion (ElmVersion(..))
 
 import AST.V0_16
-import qualified AST.Module
 import AST.Structure
-import qualified AST.Listing
 import qualified Cheapskate.Types as Markdown
 import qualified Control.Monad as Monad
 import qualified Data.Char as Char
@@ -142,13 +140,13 @@ removeDuplicates input =
                 else (ReversedList.push next acc, Set.insert next seen)
 
 
-sortVars :: Bool -> Set (C2 before after AST.Listing.Value) -> [[String]] -> ([[C2 before after AST.Listing.Value]], Comments)
+sortVars :: Bool -> Set (C2 before after ListingValue) -> [[String]] -> ([[C2 before after ListingValue]], Comments)
 sortVars forceMultiline fromExposing fromDocs =
     let
-        varOrder :: Commented c AST.Listing.Value -> (Int, String)
-        varOrder (C _ (AST.Listing.OpValue (SymbolIdentifier name))) = (1, name)
-        varOrder (C _ (AST.Listing.Union (C _ (UppercaseIdentifier name)) _)) = (2, name)
-        varOrder (C _ (AST.Listing.Value (LowercaseIdentifier name))) = (3, name)
+        varOrder :: Commented c ListingValue -> (Int, String)
+        varOrder (C _ (OpValue (SymbolIdentifier name))) = (1, name)
+        varOrder (C _ (Union (C _ (UppercaseIdentifier name)) _)) = (2, name)
+        varOrder (C _ (Value (LowercaseIdentifier name))) = (3, name)
 
         listedInDocs =
             fromDocs
@@ -162,9 +160,9 @@ sortVars forceMultiline fromExposing fromDocs =
                 |> Set.toList
                 |> List.sortOn varOrder
 
-        varName (C _ (AST.Listing.Value (LowercaseIdentifier name))) = name
-        varName (C _ (AST.Listing.OpValue (SymbolIdentifier name))) = name
-        varName (C _ (AST.Listing.Union (C _ (UppercaseIdentifier name)) _)) = name
+        varName (C _ (Value (LowercaseIdentifier name))) = name
+        varName (C _ (OpValue (SymbolIdentifier name))) = name
+        varName (C _ (Union (C _ (UppercaseIdentifier name)) _)) = name
 
         varSetToMap set =
             Set.toList set
@@ -195,26 +193,32 @@ sortVars forceMultiline fromExposing fromDocs =
         else ( listedInDocs ++ [remainingFromExposing | not (List.null remainingFromExposing)], commentsFromReorderedVars )
 
 
-formatModuleHeader :: ElmVersion -> Bool -> AST.Module.Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> (Maybe Elm, Maybe Elm, (Maybe Elm, List Elm))
-formatModuleHeader elmVersion addDefaultHeader modu =
+formatModuleHeader :: ElmVersion -> Bool -> I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK -> (Maybe Elm, Maybe Elm, (Maybe Elm, List Elm))
+formatModuleHeader elmVersion addDefaultHeader (I.Fix modu) =
     let
+      defaultHeader =
+            I.Fix $ ModuleHeader
+                Normal
+                (C ([], []) [UppercaseIdentifier "Main"])
+                Nothing
+                Nothing
+
       maybeHeader =
         if addDefaultHeader
-            then Just (AST.Module.header modu |> Maybe.fromMaybe AST.Module.defaultHeader)
-            else AST.Module.header modu
+            then Just (header modu |> Maybe.fromMaybe defaultHeader)
+            else header modu
 
       refName (VarRef _ (LowercaseIdentifier name)) = name
       refName (TagRef _ (UppercaseIdentifier name)) = name
       refName (OpRef (SymbolIdentifier name)) = name
 
-      varName (C _ (AST.Listing.Value (LowercaseIdentifier name))) = name
-      varName (C _ (AST.Listing.OpValue (SymbolIdentifier name))) = name
-      varName (C _ (AST.Listing.Union (C _ (UppercaseIdentifier name)) _)) = name
+      varName (C _ (Value (LowercaseIdentifier name))) = name
+      varName (C _ (OpValue (SymbolIdentifier name))) = name
+      varName (C _ (Union (C _ (UppercaseIdentifier name)) _)) = name
 
       documentedVars :: [[String]]
       documentedVars =
-          AST.Module.docs modu
-              |> extract
+          docs modu
               |> fmap Foldable.toList
               |> Maybe.fromMaybe []
               |> concatMap extractDocs
@@ -237,38 +241,36 @@ formatModuleHeader elmVersion addDefaultHeader modu =
               ['(', a, b, ')'] -> OpRef (SymbolIdentifier [a, b])
               s -> VarRef [] (LowercaseIdentifier s)
 
-      definedVars :: Set (C2 before after AST.Listing.Value)
+      definedVars :: Set (C2 before after ListingValue)
       definedVars =
-          AST.Module.body modu
-              |> I.unFix
-              |> (\(TopLevel decls) -> decls)
+          moduleBody modu
               |> concatMap extractVarName
               |> fmap (C ([], []))
               |> Set.fromList
 
       exportsList =
           case
-              AST.Module.exports (maybeHeader |> Maybe.fromMaybe AST.Module.defaultHeader)
+              exports (I.unFix $ fromMaybe defaultHeader maybeHeader)
           of
               Just (C _ e) -> e
-              Nothing -> AST.Listing.ClosedListing
+              Nothing -> ClosedListing
 
-      detailedListingToSet :: AST.Listing.Listing AST.Module.DetailedListing -> Set (C2 before after AST.Listing.Value)
-      detailedListingToSet (AST.Listing.OpenListing _) = Set.empty
-      detailedListingToSet AST.Listing.ClosedListing = Set.empty
-      detailedListingToSet (AST.Listing.ExplicitListing (AST.Module.DetailedListing values operators types) _) =
+      detailedListingToSet :: Listing DetailedListing -> Set (C2 before after ListingValue)
+      detailedListingToSet (OpenListing _) = Set.empty
+      detailedListingToSet ClosedListing = Set.empty
+      detailedListingToSet (ExplicitListing (DetailedListing values operators types) _) =
           Set.unions
-              [ Map.assocs values |> fmap (\(name, C c ()) -> C c (AST.Listing.Value name)) |> Set.fromList
-              , Map.assocs operators |> fmap (\(name, C c ()) -> C c (AST.Listing.OpValue name)) |> Set.fromList
-              , Map.assocs types |> fmap (\(name, C c (C preListing listing)) -> C c (AST.Listing.Union (C preListing name) listing)) |> Set.fromList
+              [ Map.assocs values |> fmap (\(name, C c ()) -> C c (Value name)) |> Set.fromList
+              , Map.assocs operators |> fmap (\(name, C c ()) -> C c (OpValue name)) |> Set.fromList
+              , Map.assocs types |> fmap (\(name, C c (C preListing listing)) -> C c (Union (C preListing name) listing)) |> Set.fromList
               ]
 
-      detailedListingIsMultiline :: AST.Listing.Listing a -> Bool
-      detailedListingIsMultiline (AST.Listing.ExplicitListing _ isMultiline) = isMultiline
+      detailedListingIsMultiline :: Listing a -> Bool
+      detailedListingIsMultiline (ExplicitListing _ isMultiline) = isMultiline
       detailedListingIsMultiline _ = False
 
       varsToExpose =
-          case AST.Module.exports =<< maybeHeader of
+          case exports =<< fmap I.unFix maybeHeader of
               Nothing ->
                   if all null documentedVars
                       then definedVars
@@ -281,25 +283,26 @@ formatModuleHeader elmVersion addDefaultHeader modu =
               varsToExpose
               documentedVars
 
-      extractVarName :: TopLevelStructure (I.Fix (ASTNS ns) 'TopLevelDeclarationNK) -> [AST.Listing.Value]
+      extractVarName :: TopLevelStructure (I.Fix (ASTNS ns) 'TopLevelDeclarationNK) -> [ListingValue]
       extractVarName decl =
           case I.unFix <$> decl of
               DocComment _ -> []
               BodyComment _ -> []
-              Entry (PortAnnotation (C _ (LowercaseIdentifier name)) _ _) -> [ AST.Listing.Value (LowercaseIdentifier name) ]
+              Entry (PortAnnotation (C _ (LowercaseIdentifier name)) _ _) -> [ Value (LowercaseIdentifier name) ]
               Entry (CommonDeclaration def) ->
                 case I.unFix def of
                     Definition pat _ _ _ ->
                         case I.unFix pat of
-                            VarPattern (LowercaseIdentifier name) -> [ AST.Listing.Value (LowercaseIdentifier name) ]
-                            RecordPattern fields -> AST.Listing.Value . extract <$> fields
+                            VarPattern (LowercaseIdentifier name) -> [ Value (LowercaseIdentifier name) ]
+                            RecordPattern fields -> Value . extract <$> fields
                             _ -> []
                     _ -> []
-              Entry (Datatype (C _ (NameWithArgs (UppercaseIdentifier name) _)) _) -> [ AST.Listing.Union (C [] (UppercaseIdentifier name)) (AST.Listing.OpenListing (C ([], []) ()))]
-              Entry (TypeAlias _ (C _ (NameWithArgs (UppercaseIdentifier name) _)) _) -> [ AST.Listing.Union (C [] (UppercaseIdentifier name)) AST.Listing.ClosedListing ]
+              Entry (Datatype (C _ (NameWithArgs (UppercaseIdentifier name) _)) _) -> [ Union (C [] (UppercaseIdentifier name)) (OpenListing (C ([], []) ()))]
+              Entry (TypeAlias _ (C _ (NameWithArgs (UppercaseIdentifier name) _)) _) -> [ Union (C [] (UppercaseIdentifier name)) ClosedListing ]
               Entry _ -> []
 
-      formatModuleLine' header@(AST.Module.Header srcTag name moduleSettings exports) =
+      formatModuleLine' :: AST (VariableNamespace ns) (I.Fix (ASTNS ns)) 'ModuleHeaderNK -> Elm
+      formatModuleLine' header_@(ModuleHeader srcTag name moduleSettings exports) =
         let
             (preExposing, postExposing) =
                 case exports of
@@ -308,7 +311,7 @@ formatModuleHeader elmVersion addDefaultHeader modu =
         in
         case elmVersion of
             Elm_0_16 ->
-                formatModuleLine_0_16 header
+                formatModuleLine_0_16 (I.Fix header_)
 
             Elm_0_17 ->
                 formatModuleLine sortedExports srcTag name moduleSettings preExposing postExposing
@@ -319,45 +322,45 @@ formatModuleHeader elmVersion addDefaultHeader modu =
             Elm_0_19 ->
                 formatModuleLine sortedExports srcTag name moduleSettings preExposing postExposing
 
-      docs =
-          fmap (formatDocComment elmVersion (ImportInfo.fromModule mempty modu)) $ extract $ AST.Module.docs modu
+      docs_ =
+          formatDocComment elmVersion (ImportInfo.fromModule mempty modu) <$> docs modu
     in
-    ( formatModuleLine' <$> maybeHeader
-    , docs
-    , formatImports modu
+    ( formatModuleLine' . I.unFix <$> maybeHeader
+    , docs_
+    , formatImports (I.Fix modu)
     )
 
 
-formatImports :: AST.Module.Module [UppercaseIdentifier] decl -> (Maybe Elm, [Elm])
-formatImports modu =
+formatImports :: I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK -> (Maybe Elm, [Elm])
+formatImports (I.Fix modu) =
     let
-        (C comments imports) =
-            AST.Module.imports modu
+        (C comments imports_) =
+            imports modu
     in
     ( formatComments comments
-    , imports
+    , imports_
         |> Map.assocs
         |> fmap (\(name, C pre method) -> formatImport (C pre name, method))
     )
 
 
-formatModuleLine_0_16 :: AST.Module.Header -> Elm
-formatModuleLine_0_16 header =
+formatModuleLine_0_16 :: I.Fix (ASTNS ns) 'ModuleHeaderNK -> Elm
+formatModuleLine_0_16 (I.Fix header) =
   let
-    exports =
-        case AST.Module.exports header of
+    exports_ =
+        case exports header of
             Just (C _ value) -> value
-            Nothing -> AST.Listing.OpenListing (C ([], []) ())
+            Nothing -> OpenListing (C ([], []) ())
 
     formatExports =
-        case formatListing formatDetailedListing exports of
+        case formatListing formatDetailedListing exports_ of
             Just listing ->
                 listing
             _ ->
                 pleaseReport "UNEXPECTED MODULE DECLARATION" "empty listing"
 
     whereComments =
-        case AST.Module.exports header of
+        case exports header of
             Nothing -> ([], [])
             Just (C (pre, post) _) -> (pre, post)
 
@@ -366,17 +369,17 @@ formatModuleLine_0_16 header =
   in
     ElmStructure.spaceSepOrIndented
         (keyword "module")
-        [ formatCommented $ formatUppercaseIdentifier' <$> AST.Module.name header
+        [ formatCommented $ formatUppercaseIdentifier' <$> name header
         , formatExports
         , whereClause
         ]
 
 
 formatModuleLine ::
-    ([[C2 before after AST.Listing.Value]], Comments)
-    -> AST.Module.SourceTag
+    ([[C2 before after ListingValue]], Comments)
+    -> SourceTag
     -> C2 before after [UppercaseIdentifier]
-    -> Maybe (C2 before after AST.Module.SourceSettings)
+    -> Maybe (C2 before after SourceSettings)
     -> Comments
     -> Comments
     -> Elm
@@ -384,15 +387,15 @@ formatModuleLine (varsToExpose, extraComments) srcTag name moduleSettings preExp
     let
         tag =
             case srcTag of
-                AST.Module.Normal ->
+                Normal ->
                     keyword "module"
 
-                AST.Module.Port comments ->
+                Port comments ->
                     ElmStructure.spaceSepOrIndented
                         (formatTailCommented (C comments $ keyword "port"))
                         [ keyword "module" ]
 
-                AST.Module.Effect comments ->
+                Effect comments ->
                     ElmStructure.spaceSepOrIndented
                         (formatTailCommented (C comments $ keyword "effect"))
                         [ keyword "module" ]
@@ -430,24 +433,22 @@ formatModuleLine (varsToExpose, extraComments) srcTag name moduleSettings preExp
       [ exports ]
 
 
-formatModule :: ElmVersion -> Bool -> Int -> AST.Module.Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> Elm
+formatModule :: ElmVersion -> Bool -> Int -> I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK -> Elm
 formatModule elmVersion addDefaultHeader spacing modu' =
     let
-        modu = I.fold2Identity (Normalize.shallow elmVersion) <$> modu'
+        modu = I.unFix $ I.fold2Identity (Normalize.shallow elmVersion) modu'
 
         spaceBeforeBody =
-            case I.unFix $ AST.Module.body modu of
-                TopLevel [] -> 0
-                TopLevel (BodyComment _ : _) -> spacing + 1
-                TopLevel _ -> spacing
+            case moduleBody modu of
+                [] -> 0
+                (BodyComment _ : _) -> spacing + 1
+                _ -> spacing
 
-        decls =
-          case I.unFix $ AST.Module.body modu of
-              TopLevel decls -> decls
+        decls = moduleBody modu
     in
     ElmStructure.module'
-        (formatComment <$> AST.Module.initialComments modu)
-        (formatModuleHeader elmVersion addDefaultHeader modu)
+        (formatComment <$> initialComments modu)
+        (formatModuleHeader elmVersion addDefaultHeader (I.Fix modu))
         spaceBeforeBody
         (formatModuleBody spacing elmVersion (ImportInfo.fromModule mempty modu) decls)
 
@@ -560,7 +561,7 @@ topLevelSpacer linesBetween a b =
 data ElmCodeBlock ns
     = DeclarationsCode [TopLevelStructure (I.Fix (ASTNS ns) 'TopLevelDeclarationNK)]
     | ExpressionsCode [TopLevelStructure (C0Eol (I.Fix (ASTNS ns) 'ExpressionNK))]
-    | ModuleCode (AST.Module.Module ns (I.Fix (ASTNS ns) 'TopLevelNK))
+    | ModuleCode (I.Fix (ASTNS ns) 'ModuleNK)
 
 
 -- TODO: there must be an existing haskell function that does this, right?
@@ -585,7 +586,7 @@ formatDocComment elmVersion importInfo blocks =
                         . Result.toMaybe . Parse.parseDeclarations elmVersion
                     , fmap (ExpressionsCode . fmap (fmap $ fmap $ I.fold2 $ I.Fix . extract))
                         . Result.toMaybe . Parse.parseExpressions elmVersion
-                    , fmap (ModuleCode . fmap (I.fold2 $ I.Fix . extract))
+                    , fmap (ModuleCode . I.fold2 (I.Fix . extract))
                         . Result.toMaybe . Parse.parseModule elmVersion
                     ]
 
@@ -629,14 +630,14 @@ formatDocComment elmVersion importInfo blocks =
         (Text.lines $ Text.pack content)
 
 
-formatImport :: AST.Module.UserImport -> Elm
+formatImport :: UserImport -> Elm
 formatImport (name@(C _ rawName), method) =
     let
         name' =
             formatPreCommented $ formatUppercaseIdentifier' <$> name
 
         requestedAs =
-            case AST.Module.alias method of
+            case alias method of
                 Just (C _ aliasName) | [aliasName] == rawName -> Nothing
                 other -> other
 
@@ -647,7 +648,7 @@ formatImport (name@(C _ rawName), method) =
 
         exposing =
           formatImportClause "exposing"
-            (formatListing formatDetailedListing <$> AST.Module.exposedVars method)
+            (formatListing formatDetailedListing <$> exposedVars method)
 
         formatImportClause :: Text -> C2 beforeKeyword afterKeyword (Maybe Elm) -> Maybe Elm
         formatImportClause keyw = \case
@@ -665,40 +666,40 @@ formatImport (name@(C _ rawName), method) =
     ElmStructure.import' name' as exposing
 
 
-formatListing :: (a -> [Elm]) -> AST.Listing.Listing a -> Maybe Elm
+formatListing :: (a -> [Elm]) -> Listing a -> Maybe Elm
 formatListing format listing =
     case listing of
-        AST.Listing.ClosedListing ->
+        ClosedListing ->
             Nothing
 
-        AST.Listing.OpenListing (C comments ()) ->
+        OpenListing (C comments ()) ->
             Just $ parens $ formatCommented $ C comments $ keyword ".."
 
-        AST.Listing.ExplicitListing vars multiline ->
+        ExplicitListing vars multiline ->
             case format vars of
                 [] -> Nothing
                 vars' -> Just $ ElmStructure.group False "(" "," ")" multiline vars'
 
 
-formatDetailedListing :: AST.Module.DetailedListing -> [Elm]
+formatDetailedListing :: DetailedListing -> [Elm]
 formatDetailedListing listing =
     concat
         [ formatCommentedMap
-            (\name () -> AST.Listing.OpValue name)
+            (\name () -> OpValue name)
             formatVarValue
-            (AST.Module.operators listing)
+            (operators listing)
         , formatCommentedMap
-            (\name (C inner listing_) -> AST.Listing.Union (C inner name) listing_)
+            (\name (C inner listing_) -> Union (C inner name) listing_)
             formatVarValue
-            (AST.Module.types listing)
+            (types listing)
         , formatCommentedMap
-            (\name () -> AST.Listing.Value name)
+            (\name () -> Value name)
             formatVarValue
-            (AST.Module.values listing)
+            (values listing)
         ]
 
 
-formatCommentedMap :: (k -> v -> a) -> (a -> Elm) -> AST.Listing.CommentedMap k v -> [Elm]
+formatCommentedMap :: (k -> v -> a) -> (a -> Elm) -> CommentedMap k v -> [Elm]
 formatCommentedMap construct format values =
     let
         format' (k, C c v)
@@ -707,16 +708,16 @@ formatCommentedMap construct format values =
     format' <$> Map.assocs values
 
 
-formatVarValue :: AST.Listing.Value -> Elm
+formatVarValue :: ListingValue -> Elm
 formatVarValue aval =
     case aval of
-        AST.Listing.Value val ->
+        Value val ->
             formatLowercaseIdentifier [] val
 
-        AST.Listing.OpValue op ->
+        OpValue op ->
             formatSymbolIdentifierInParens op
 
-        AST.Listing.Union name listing ->
+        Union name listing ->
             let
                 listing' =
                     formatListing

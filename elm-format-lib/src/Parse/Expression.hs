@@ -271,7 +271,7 @@ caseExpr elmVersion =
               , beforeArrow = preArrowComments
               , afterArrow = bodyComments
               , pattern = p
-              , body = result
+              , caseBranchBody = result
               }
 
     cases preComments =

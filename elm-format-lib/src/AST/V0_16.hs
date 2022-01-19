@@ -22,6 +22,8 @@ import ElmFormat.AST.Shared
 import qualified Data.Maybe as Maybe
 import Data.Text (Text)
 import Data.List.NonEmpty (NonEmpty)
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
 
 
 newtype ForceMultiline =
@@ -66,6 +68,18 @@ class AsCommentedList f where
     type CommentsFor f :: Type -> Type
     toCommentedList :: f a -> List (CommentsFor f a)
     fromCommentedList :: List (CommentsFor f a) -> Either Text (f a)
+
+
+type CommentedMap k v =
+    Map k (C2 'BeforeTerm 'AfterTerm v)
+
+mergeCommentedMap :: Ord k => (v -> v -> v) -> CommentedMap k v -> CommentedMap k v -> CommentedMap k v
+mergeCommentedMap merge left right =
+    let
+        merge' (C (pre1, post1) a) (C (pre2, post2) b) =
+            C (pre1 ++ pre2, post1 ++ post2) (merge a b)
+    in
+    Map.unionWith merge' left right
 
 
 {-| This represents a list of things separated by comments.
@@ -230,6 +244,74 @@ instance Foldable (NameWithArgs name) where
     foldMap f (NameWithArgs _ args) = foldMap (f . extract) args
 
 
+data SourceTag
+  = Normal
+  | Effect Comments
+  | Port Comments
+  deriving (Eq, Show)
+
+
+type SourceSettings =
+    [ ( C2 'BeforeTerm 'AfterTerm LowercaseIdentifier
+      , C2 'BeforeTerm 'AfterTerm UppercaseIdentifier
+      )
+    ]
+
+
+-- | A listing of values. Something like (a,b,c) or (..) or (a,b,..)
+data Listing a
+    = ExplicitListing a Bool
+    | OpenListing (C2 'BeforeTerm 'AfterTerm ())
+    | ClosedListing
+    deriving (Eq, Ord, Show, Functor) -- TODO: is Ord needed?
+
+mergeListing :: (a -> a -> a) -> Listing a -> Listing a -> Listing a
+mergeListing merge left right =
+    case (left, right) of
+        (ClosedListing, ClosedListing) -> ClosedListing
+        (ClosedListing, OpenListing comments) -> OpenListing comments
+        (OpenListing comments, ClosedListing) -> OpenListing comments
+        (OpenListing (C (pre1, post1) ()), OpenListing (C (pre2, post2) ())) -> OpenListing (C (pre1 ++ pre2, post1 ++ post2) ())
+        (ClosedListing, ExplicitListing a multiline) -> ExplicitListing a multiline
+        (ExplicitListing a multiline, ClosedListing) -> ExplicitListing a multiline
+        (OpenListing comments, ExplicitListing _a _multiline) -> OpenListing comments
+        (ExplicitListing _a _multiline, OpenListing comments) -> OpenListing comments
+        (ExplicitListing a multiline1, ExplicitListing b multiline2) -> ExplicitListing (merge a b) (multiline1 || multiline2)
+
+
+-- | A value that can be imported or exported
+data ListingValue
+    = Value !LowercaseIdentifier
+    | OpValue SymbolIdentifier
+    | Union (C1 'AfterTerm UppercaseIdentifier) (Listing (CommentedMap UppercaseIdentifier ()))
+    deriving (Eq, Ord, Show) -- TODO: is Ord needed?
+
+
+data DetailedListing = DetailedListing
+    { values :: CommentedMap LowercaseIdentifier ()
+    , operators :: CommentedMap SymbolIdentifier ()
+    , types :: CommentedMap UppercaseIdentifier (C1 'BeforeTerm (Listing (CommentedMap UppercaseIdentifier ())))
+    }
+    deriving (Eq, Show)
+
+instance Semigroup DetailedListing where
+    (DetailedListing av ao at) <> (DetailedListing bv bo bt) = DetailedListing (av <> bv) (ao <> bo) (at <> bt)
+
+instance Monoid DetailedListing where
+    mempty = DetailedListing mempty mempty mempty
+
+
+data ImportMethod = ImportMethod
+    { alias :: Maybe (C2 'BeforeSeparator 'AfterSeparator UppercaseIdentifier)
+    , exposedVars :: C2 'BeforeSeparator 'AfterSeparator (Listing DetailedListing)
+    }
+    deriving (Eq, Show)
+
+
+type UserImport
+    = (C1 'BeforeTerm [UppercaseIdentifier], ImportMethod)
+
+
 data TypeConstructor ctorRef
     = NamedConstructor ctorRef
     | TupleConstructor Int -- will be 2 or greater, indicating the number of elements in the tuple
@@ -270,7 +352,8 @@ data LocalName
 
 
 data NodeKind
-    = TopLevelNK
+    = ModuleNK
+    | ModuleHeaderNK
     | TypeRefNK
     | CtorRefNK
     | VarRefNK
@@ -301,9 +384,21 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
     -- Singletons
     --
 
-    TopLevel ::
-        [TopLevelStructure (getType 'TopLevelDeclarationNK)]
-        -> AST p getType 'TopLevelNK
+    Module ::
+        { initialComments :: Comments
+        , header :: Maybe (getType 'ModuleHeaderNK)
+        , docs :: Maybe Markdown.Blocks
+        , imports :: C1 'BeforeTerm (Map [UppercaseIdentifier] (C1 'BeforeTerm ImportMethod))
+        , moduleBody :: [TopLevelStructure (getType 'TopLevelDeclarationNK)]
+        }
+        -> AST p getType 'ModuleNK
+    ModuleHeader ::
+        { srcTag :: SourceTag
+        , name :: C2 'BeforeTerm 'AfterTerm [UppercaseIdentifier]
+        , moduleSettings :: Maybe (C2 'BeforeSeparator 'AfterSeparator SourceSettings)
+        , exports :: Maybe (C2 'BeforeSeparator 'AfterSeparator (Listing DetailedListing))
+        }
+        -> AST p getType 'ModuleHeaderNK
 
     TypeRef_ :: TypeRef p -> AST p getType 'TypeRefNK
     CtorRef_ :: CtorRef p -> AST p getType 'CtorRefNK
@@ -451,7 +546,7 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
         , beforeArrow :: Comments
         , afterArrow :: Comments
         , pattern :: getType 'PatternNK
-        , body :: getType 'ExpressionNK
+        , caseBranchBody :: getType 'ExpressionNK
         }
         -> AST p getType 'CaseBranchNK
 
@@ -549,7 +644,9 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
         -> AST p getType 'TypeNK
 
 deriving instance
-    ( Eq (getType 'CommonDeclarationNK)
+    ( Eq (getType 'ModuleNK)
+    , Eq (getType 'ModuleHeaderNK)
+    , Eq (getType 'CommonDeclarationNK)
     , Eq (getType 'TopLevelDeclarationNK)
     , Eq (getType 'TypeRefNK)
     , Eq (getType 'CtorRefNK)
@@ -565,7 +662,9 @@ deriving instance
     ) =>
     Eq (AST p getType kind)
 deriving instance
-    ( Show (getType 'CommonDeclarationNK)
+    ( Show (getType 'ModuleNK)
+    , Show (getType 'ModuleHeaderNK)
+    , Show (getType 'CommonDeclarationNK)
     , Show (getType 'TopLevelDeclarationNK)
     , Show (getType 'TypeRefNK)
     , Show (getType 'CtorRefNK)
@@ -583,14 +682,18 @@ deriving instance
 
 
 mapAll ::
-    (TypeRef p1 -> TypeRef p2) -> (CtorRef p1 -> CtorRef p2) -> (VarRef p1 -> VarRef p2)
+    (TypeRef p1 -> TypeRef p2)
+    -> (CtorRef p1 -> CtorRef p2)
+    -> (VarRef p1 -> VarRef p2)
     -> (forall kind. getType1 kind -> getType2 kind)
     -> (forall kind.
         AST p1 getType1 kind
         -> AST p2 getType2 kind
         )
 mapAll ftyp fctor fvar fast = \case
-    TopLevel tls -> TopLevel (fmap (fmap fast) tls)
+    Module c h d i b -> Module c (fmap fast h) d i (fmap (fmap fast) b)
+    ModuleHeader st n s e -> ModuleHeader st n s e
+
     TypeRef_ r -> TypeRef_ (ftyp r)
     CtorRef_ r -> CtorRef_ (fctor r)
     VarRef_ r -> VarRef_ (fvar r)
@@ -741,7 +844,7 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
             -> [LocalName]
         newDefinitionsAtNode node =
             case node of
-                TopLevel decls ->
+                Module _ _ _ _ decls ->
                     foldMap (foldMap namesFrom) decls
 
                 CommonDeclaration d ->

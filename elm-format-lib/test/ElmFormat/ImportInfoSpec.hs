@@ -3,8 +3,6 @@ module ElmFormat.ImportInfoSpec where
 import Elm.Utils ((|>))
 
 import AST.V0_16
-import AST.Module (ImportMethod(..), DetailedListing(..))
-import AST.Listing (Listing(..))
 import Test.Hspec
 
 import qualified Data.Map as Dict

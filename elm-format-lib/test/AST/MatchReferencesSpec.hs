@@ -5,7 +5,6 @@ import Elm.Utils ((|>))
 
 import AST.V0_16
 import AST.MatchReferences
-import AST.Module (ImportMethod(..))
 import AST.Structure
 import Data.Functor.Identity
 import qualified Data.Indexed as I

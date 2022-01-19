@@ -5,7 +5,6 @@ import Prelude hiding ((>>))
 import Elm.Utils ((|>), (>>))
 
 import AST.V0_16
-import AST.Module (Module)
 import AST.Structure
 import Test.Hspec
 import Test.Hspec.QuickCheck
@@ -32,18 +31,18 @@ assertStringToString source =
         result =
             Parse.parse ElmVersion.Elm_0_19 source'
                 |> Parse.toEither
-                |> fmap (fmap $ I.fold2 $ I.Fix . extract)
+                |> fmap (I.fold2 $ I.Fix . extract)
                 |> fmap (Render.render ElmVersion.Elm_0_19)
     in
         result `shouldBe` Right source'
 
 
-astToAst :: Module [UppercaseIdentifier] (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> Expectation
+astToAst :: I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ModuleNK -> Expectation
 astToAst ast =
     let
         result =
             ast
-                |> fmap (I.fold2 $ I.Fix . extract)
+                |> I.fold2 (I.Fix . extract)
                 |> Render.render ElmVersion.Elm_0_19
                 |> Parse.parse ElmVersion.Elm_0_19
                 |> Parse.toEither
@@ -51,13 +50,13 @@ astToAst ast =
         result `shouldBe` Right ast
 
 
-simpleAst :: Module [UppercaseIdentifier] (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelNK)
+simpleAst :: I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ModuleNK
 simpleAst =
     case Parse.toEither $ Parse.parse ElmVersion.Elm_0_19 $ Text.pack "module Main exposing (foo)\n\n\nfoo =\n  8\n" of
         Right ast -> ast
 
 
-reportFailedAst :: Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> [Char]
+reportFailedAst :: I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK -> [Char]
 reportFailedAst ast =
     let
         rendering = Render.render ElmVersion.Elm_0_19 ast |> Text.unpack

@@ -4,6 +4,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module AST.Structure
     ( ASTNS, ASTNS1
@@ -54,7 +55,9 @@ foldReferences ftype fctor fvar =
         -- See http://www.timphilipwilliams.com/posts/2013-01-16-fixing-gadts.html for relevant details.
         foldNode :: forall kind'. AST p (Const a) kind' -> Const a kind'
         foldNode = \case
-            TopLevel tls -> Const $ foldMap (foldMap getConst) tls
+            Module _ h d _ b -> Const $ maybe mempty getConst h <> maybe mempty getConst mempty d <> foldMap (foldMap getConst) b
+            ModuleHeader {} -> mempty
+
             TypeRef_ r -> Const $ ftype r
             CtorRef_ r -> Const $ fctor r
             VarRef_ r -> Const $ fvar r

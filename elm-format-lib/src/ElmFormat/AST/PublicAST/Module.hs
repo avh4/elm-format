@@ -10,10 +10,7 @@ import ElmFormat.AST.PublicAST.Expression
 import ElmFormat.AST.PublicAST.Type
 import Reporting.Annotation (Located(At))
 import qualified AST.V0_16 as AST
-import qualified AST.Module as AST
-import qualified AST.Listing as AST
 import Data.Map.Strict (Map)
-import qualified Data.Maybe as Maybe
 import qualified ElmFormat.ImportInfo as ImportInfo
 import qualified Data.Map.Strict as Map
 import qualified Data.Indexed as I
@@ -21,7 +18,6 @@ import AST.MatchReferences (fromMatched, matchReferences)
 import Data.Text (Text)
 import qualified Data.Either as Either
 import qualified Data.Text as Text
-import Data.Maybe (fromMaybe)
 
 
 data Module
@@ -31,14 +27,17 @@ data Module
         , body :: List (MaybeF LocatedIfRequested TopLevelStructure)
         }
 
-fromModule :: Config -> AST.Module [UppercaseIdentifier] (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelNK) -> Module
+fromModule :: Config -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ModuleNK -> Module
 fromModule config = \case
-    modu@(AST.Module _ maybeHeader _ (C _ imports) body) ->
+    I.Fix2 (At _ modu@(AST.Module _ maybeHeader _ (C _ imports) body)) ->
         let
-            header =
-                Maybe.fromMaybe AST.defaultHeader maybeHeader
+            name =
+                case maybeHeader of
+                    Nothing ->
+                        [UppercaseIdentifier "Main"]
 
-            (AST.Header _ (C _ name) _ _) = header
+                    Just (I.Fix2 (At _ (AST.ModuleHeader _ (C _ name) _ _))) ->
+                        name
 
             importInfo =
                 ImportInfo.fromModule mempty modu
@@ -49,22 +48,22 @@ fromModule config = \case
         Module
             (ModuleName name)
             (Map.mapWithKey (\m (C comments i) -> fromImportMethod m i) $ Map.mapKeys ModuleName imports)
-            (fromTopLevelStructures config $ normalize body)
+            (fromTopLevelStructures config $ fmap (fmap normalize) body)
 
-toModule :: Module -> AST.Module [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelNK)
+toModule :: Module -> I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK
 toModule (Module (ModuleName name) imports body) =
     -- TODO: remove this placeholder
-    AST.Module
+    I.Fix $ AST.Module
         []
-        (Just $ AST.Header
+        (Just $ I.Fix $ AST.ModuleHeader
             AST.Normal
             (C ([], []) name)
             Nothing
             Nothing
         )
-        (noRegion Nothing)
+        Nothing
         (C [] $ Map.mapKeys (\(ModuleName ns) -> ns) $ C [] . toImportMethod <$> imports)
-        (I.Fix $ AST.TopLevel $ mconcat $ fmap (toTopLevelStructures . extract) body)
+        (mconcat $ fmap (toTopLevelStructures . extract) body)
 
 instance ToJSON Module where
     toJSON = undefined
@@ -138,8 +137,8 @@ data TopLevelStructure
     | Comment_tls Comment
     | TODO_TopLevelStructure String
 
-fromTopLevelStructures :: Config -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelNK -> List (MaybeF LocatedIfRequested TopLevelStructure)
-fromTopLevelStructures config (I.Fix2 (At _ (AST.TopLevel decls))) =
+fromTopLevelStructures :: Config -> List (AST.TopLevelStructure (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)) -> List (MaybeF LocatedIfRequested TopLevelStructure)
+fromTopLevelStructures config decls =
     let
         toDefBuilder :: AST.TopLevelStructure
                      (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK) -> MaybeF LocatedIfRequested (DefinitionBuilder TopLevelStructure)

@@ -1,11 +1,11 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE TypeFamilies #-}
+
 module ElmFormat.ImportInfo (ImportInfo(..), fromModule, fromImports) where
 
 import AST.V0_16
-import AST.Listing (Listing(..), CommentedMap)
 import Elm.Utils ((|>))
 
-import AST.Module (Module, ImportMethod(..), DetailedListing(..))
-import qualified AST.Module
 import Data.Coapplicative
 import qualified Data.Bimap as Bimap
 import qualified Data.Map.Strict as Dict
@@ -13,6 +13,7 @@ import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 import qualified ElmFormat.KnownContents as KnownContents
 import ElmFormat.KnownContents (KnownContents)
+import qualified AST.V0_16 as AST
 
 data ImportInfo ns =
     ImportInfo
@@ -27,10 +28,10 @@ data ImportInfo ns =
 
 fromModule ::
     KnownContents
-    -> Module [UppercaseIdentifier] decl
+    -> AST p any 'ModuleNK
     -> ImportInfo [UppercaseIdentifier]
 fromModule knownContents modu =
-    fromImports knownContents (fmap extract $ extract $ AST.Module.imports $ modu)
+    fromImports knownContents (fmap extract $ extract $ AST.imports modu)
 
 
 fromImports ::
@@ -89,9 +90,9 @@ fromImports knownContents rawImports =
                 OpenListing _ ->
                     moduleContents moduleName
                 ExplicitListing details _ ->
-                    (fmap VarName $ Dict.keys $ AST.Module.values details)
-                    <> (fmap TypeName $ Dict.keys $ AST.Module.types details)
-                    <> (fmap CtorName $ foldMap (getCtorListings . extract . extract) $ Dict.elems $ AST.Module.types details)
+                    (fmap VarName $ Dict.keys $ AST.values details)
+                    <> (fmap TypeName $ Dict.keys $ AST.types details)
+                    <> (fmap CtorName $ foldMap (getCtorListings . extract . extract) $ Dict.elems $ AST.types details)
 
         getCtorListings :: Listing (CommentedMap name ()) -> [name]
         getCtorListings = \case
@@ -108,7 +109,7 @@ fromImports knownContents rawImports =
         aliases =
             let
                 getAlias importMethod =
-                    case AST.Module.alias importMethod of
+                    case AST.alias importMethod of
                         Just (C _ alias) ->
                             Just [alias]
 
@@ -125,7 +126,7 @@ fromImports knownContents rawImports =
                 |> Bimap.fromList
 
         noAlias importMethod =
-            case AST.Module.alias importMethod of
+            case AST.alias importMethod of
                 Just _ -> False
                 Nothing -> True
 

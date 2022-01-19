@@ -34,8 +34,6 @@ import ElmFormat.AST.Shared
 import AST.V0_16 (NodeKind(..), Pair(..))
 import AST.Structure (ASTNS, ASTNS1, mapNs)
 import qualified AST.V0_16 as AST
-import qualified AST.Module as AST
-import qualified AST.Listing as AST
 import Data.Indexed as I
 import Reporting.Annotation (Located, Region, Position)
 import qualified Reporting.Annotation as A
