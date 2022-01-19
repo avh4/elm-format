@@ -112,6 +112,7 @@ library
         CommandLine.Program
         CommandLine.ResolveFiles
         CommandLine.TransformFiles
+        ElmFormat.AST.TransformChain
         ElmFormat.AST.PublicAST
         ElmFormat.AST.Shared
         ElmFormat.ImportInfo
@@ -141,6 +142,7 @@ test-suite efl-tests
         AST.Structure
         AST.V0_16
         CommandLine.InfoFormatter
+        ElmFormat.AST.TransformChain
         ElmFormat.AST.PublicAST
         ElmFormat.AST.Shared
         ElmFormat.ImportInfo

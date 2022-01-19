@@ -8,6 +8,7 @@ module Data.Indexed where
 
 import Data.Kind
 import Control.Monad.Identity (Identity(..))
+import Data.Maybe (fromMaybe)
 
 
 -- Common typeclasses
@@ -36,6 +37,13 @@ deriving instance Ord (f (Fix f) i) => Ord (Fix f i)
 fold :: HFunctor f => (f a ~> a) -> (Fix f ~> a)
 fold f = f . hmap (fold f) . unFix
 
+foldTransform :: HFunctor f => (forall i. f a i -> Either (Fix f i) (a i)) -> (Fix f ~> a)
+foldTransform f = either (foldTransform f) id . f . hmap (foldTransform f) . unFix
+
+foldMaybeTransform :: HFunctor f => (forall i. f (Fix f) i -> Maybe (Fix f i)) -> (Fix f ~> Fix f)
+foldMaybeTransform f orig = fromMaybe orig $ f $ hmap (foldMaybeTransform f) $ unFix orig
+
+
 unfold :: HFunctor f => (a ~> f a) -> (a ~> Fix f)
 unfold f = Fix . hmap (unfold f) . f
 
@@ -48,15 +56,28 @@ deriving instance Eq (ann (f (Fix2 ann f) i)) => Eq (Fix2 ann f i)
 deriving instance Ord (ann (f (Fix2 ann f) i)) => Ord (Fix2 ann f i)
 
 fold2 ::
-    HFunctor f =>
-    Functor ann =>
+    HFunctor f => Functor ann =>
     (forall i. ann (f a i) -> a i)
     -> (Fix2 ann f ~> a)
 fold2 f = f . fmap (hmap $ fold2 f) . unFix2
 
+foldTransform2 ::
+    HFunctor f => Functor ann =>
+    (forall i. ann (f a i) -> Either (Fix2 ann f i) (a i))
+    -> (Fix2 ann f ~> a)
+foldTransform2 f =
+    either (foldTransform2 f) id . f . fmap (hmap $ foldTransform2 f) . unFix2
+
+foldMaybeTransform2 ::
+    HFunctor f => Functor ann =>
+    (forall i. ann (f (Fix2 ann f) i) -> Maybe (Fix2 ann f i))
+    -> (Fix2 ann f ~> Fix2 ann f)
+foldMaybeTransform2 f orig =
+    fromMaybe orig $ f $ hmap (foldMaybeTransform2 f) <$> unFix2 orig
+
+
 unfold2 ::
-    HFunctor f =>
-    Functor ann =>
+    HFunctor f => Functor ann =>
     (forall i. a i -> ann (f a i))
     -> (a ~> Fix2 ann f)
 unfold2 f = Fix2 . fmap (hmap $ unfold2 f) . f
