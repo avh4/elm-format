@@ -55,7 +55,7 @@ cabalProject name sourceFiles sourcePatterns deps testPatterns testDeps =
             need sourceFilesFromPatterns
             testFiles <- getDirectoryFiles "" testPatterns
             need testFiles
-            cmd_ "cabal" "v2-run" "-O0" (name ++ ":tests") "--" "-ffailed-examples"
+            cmd_ "cabal" "v2-run" "-O0" "--enable-tests" (name ++ ":tests") "--" "-ffailed-examples"
             writeFile' out ""
 
 
