@@ -354,6 +354,7 @@ data LocalName
 data NodeKind
     = ModuleNK
     | ModuleHeaderNK
+    | ModuleBodyNK
     | TypeRefNK
     | CtorRefNK
     | VarRefNK
@@ -397,7 +398,7 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
         , header :: Maybe (getType 'ModuleHeaderNK)
         , docs :: Maybe Markdown.Blocks
         , imports :: C1 'BeforeTerm (Map [UppercaseIdentifier] (C1 'BeforeTerm ImportMethod))
-        , moduleBody :: [TopLevelStructure (getType 'TopLevelDeclarationNK)]
+        , moduleBody :: getType 'ModuleBodyNK
         }
         -> AST p getType 'ModuleNK
     ModuleHeader ::
@@ -407,6 +408,9 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
         , exports :: Maybe (C2 'BeforeSeparator 'AfterSeparator (Listing DetailedListing))
         }
         -> AST p getType 'ModuleHeaderNK
+    ModuleBody ::
+        [TopLevelStructure (getType 'TopLevelDeclarationNK)]
+        -> AST p getType 'ModuleBodyNK
 
     --
     -- Declarations
@@ -650,6 +654,7 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
 deriving instance
     ( Eq (getType 'ModuleNK)
     , Eq (getType 'ModuleHeaderNK)
+    , Eq (getType 'ModuleBodyNK)
     , Eq (getType 'CommonDeclarationNK)
     , Eq (getType 'TopLevelDeclarationNK)
     , Eq (getType 'TypeRefNK)
@@ -668,6 +673,7 @@ deriving instance
 deriving instance
     ( Show (getType 'ModuleNK)
     , Show (getType 'ModuleHeaderNK)
+    , Show (getType 'ModuleBodyNK)
     , Show (getType 'CommonDeclarationNK)
     , Show (getType 'TopLevelDeclarationNK)
     , Show (getType 'TypeRefNK)
@@ -700,8 +706,10 @@ mapAll ftyp fctor fvar fast = \case
     VarRef_ r -> VarRef_ (fvar r)
 
     -- Module
-    Module c h d i b -> Module c (fmap fast h) d i (fmap (fmap fast) b)
+    Module c h d i b -> Module c (fmap fast h) d i (fast b)
     ModuleHeader st n s e -> ModuleHeader st n s e
+    ModuleBody ds -> ModuleBody (fmap (fmap fast) ds)
+
     -- Declaration
     Definition name args c e -> Definition (fast name) (fmap (fmap fast) args) c (fast e)
     TypeAnnotation name t -> TypeAnnotation name (fmap fast t)
@@ -848,7 +856,10 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
             -> [LocalName]
         newDefinitionsAtNode node =
             case node of
-                Module _ _ _ _ decls ->
+                Module _ _ _ _ body ->
+                    newDefinitionsAtNode (extract $ I.unFix2 body)
+
+                ModuleBody decls ->
                     foldMap (foldMap namesFrom) decls
 
                 CommonDeclaration d ->

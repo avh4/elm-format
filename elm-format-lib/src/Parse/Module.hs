@@ -27,6 +27,7 @@ elmModule elmVersion =
           ]
       (preImportComments, imports', postImportComments) <- imports elmVersion
       topLevels <-
+          fmap I.Fix2 $ addLocation $ fmap ModuleBody $
           do
               decls <- topLevel $ Decl.declaration elmVersion
               trailingComments <-

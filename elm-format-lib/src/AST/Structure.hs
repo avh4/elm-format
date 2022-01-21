@@ -60,8 +60,9 @@ foldReferences ftype fctor fvar =
             VarRef_ r -> fvar r
 
             -- Module
-            Module _ h d _ b -> maybe mempty getConst h <> maybe mempty getConst mempty d <> foldMap (foldMap getConst) b
+            Module _ h d _ b -> maybe mempty getConst h <> maybe mempty getConst mempty d <> getConst b
             ModuleHeader {} -> mempty
+            ModuleBody ds -> foldMap (foldMap getConst) ds
 
             -- Declarations
             Definition name args _ e -> getConst name <> foldMap (getConst . extract) args <> getConst e

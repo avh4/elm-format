@@ -73,6 +73,9 @@ instance Arbitrary (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'ModuleNK) whe
             name <- listOf1 capIdentifier
             listing <- listing
             moduleType <- fmap (\x -> if x then Port [] else Normal) arbitrary
+            let body = I.Fix2 $ pure $ ModuleBody
+                    [ Entry $ I.Fix2 $ pure $ CommonDeclaration $ I.Fix2 $ pure $ Definition (I.Fix2 $ pure $ Anything) [] [] (I.Fix2 $ pure $ TupleFunction 2)
+                    ]
             return $ I.Fix2 $ pure $ Module
                 []
                 (Just $ I.Fix2 $ pure $ ModuleHeader
@@ -83,4 +86,4 @@ instance Arbitrary (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'ModuleNK) whe
                 )
                 Nothing
                 (C [] empty)
-                [ Entry $ I.Fix2 $ pure $ CommonDeclaration $ I.Fix2 $ pure $ Definition (I.Fix2 $ pure $ Anything) [] [] (I.Fix2 $ pure $ TupleFunction 2)]
+                body

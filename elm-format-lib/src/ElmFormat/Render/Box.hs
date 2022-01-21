@@ -44,6 +44,7 @@ import Data.List.NonEmpty (NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Either.Extra
 import Data.Bifunctor (bimap)
+import Data.Map.Strict (Map)
 
 
 pleaseReport :: String -> String -> a
@@ -194,7 +195,7 @@ sortVars forceMultiline fromExposing fromDocs =
 
 
 formatModuleHeader :: ElmVersion -> Bool -> I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK -> (Maybe Elm, Maybe Elm, (Maybe Elm, List Elm))
-formatModuleHeader elmVersion addDefaultHeader (I.Fix modu) =
+formatModuleHeader elmVersion addDefaultHeader (I.Fix modu@(Module _ header docs imports (I.Fix (ModuleBody decls)))) =
     let
       defaultHeader =
             I.Fix $ ModuleHeader
@@ -205,8 +206,8 @@ formatModuleHeader elmVersion addDefaultHeader (I.Fix modu) =
 
       maybeHeader =
         if addDefaultHeader
-            then Just (header modu |> Maybe.fromMaybe defaultHeader)
-            else header modu
+            then Just (Maybe.fromMaybe defaultHeader header)
+            else header
 
       refName (VarRef _ (LowercaseIdentifier name)) = name
       refName (TagRef _ (UppercaseIdentifier name)) = name
@@ -218,7 +219,7 @@ formatModuleHeader elmVersion addDefaultHeader (I.Fix modu) =
 
       documentedVars :: [[String]]
       documentedVars =
-          docs modu
+          docs
               |> fmap Foldable.toList
               |> Maybe.fromMaybe []
               |> concatMap extractDocs
@@ -243,7 +244,7 @@ formatModuleHeader elmVersion addDefaultHeader (I.Fix modu) =
 
       definedVars :: Set (C2 before after ListingValue)
       definedVars =
-          moduleBody modu
+          decls
               |> concatMap extractVarName
               |> fmap (C ([], []))
               |> Set.fromList
@@ -323,20 +324,18 @@ formatModuleHeader elmVersion addDefaultHeader (I.Fix modu) =
                 formatModuleLine sortedExports srcTag name moduleSettings preExposing postExposing
 
       docs_ =
-          formatDocComment elmVersion (ImportInfo.fromModule mempty modu) <$> docs modu
+          formatDocComment elmVersion (ImportInfo.fromModule mempty modu) <$> docs
     in
     ( formatModuleLine' . I.unFix <$> maybeHeader
     , docs_
-    , formatImports (I.Fix modu)
+    , formatImports imports
     )
 
 
-formatImports :: I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK -> (Maybe Elm, [Elm])
-formatImports (I.Fix modu) =
-    let
-        (C comments imports_) =
-            imports modu
-    in
+formatImports ::
+    C1 'BeforeTerm (Map [UppercaseIdentifier] (C1 'BeforeTerm ImportMethod))
+    -> (Maybe Elm, [Elm])
+formatImports (C comments imports_) =
     ( formatComments comments
     , imports_
         |> Map.assocs
@@ -438,13 +437,13 @@ formatModule elmVersion addDefaultHeader spacing modu' =
     let
         modu = I.unFix $ I.fold2Identity (Normalize.shallow elmVersion) modu'
 
+        (ModuleBody decls) = I.unFix $ moduleBody modu
+
         spaceBeforeBody =
-            case moduleBody modu of
+            case decls of
                 [] -> 0
                 (BodyComment _ : _) -> spacing + 1
                 _ -> spacing
-
-        decls = moduleBody modu
     in
     ElmStructure.module'
         (formatComment <$> initialComments modu)

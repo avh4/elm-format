@@ -48,7 +48,7 @@ fromModule config = \case
         Module
             (ModuleName name)
             (Map.mapWithKey (\m (C comments i) -> fromImportMethod m i) $ Map.mapKeys ModuleName imports)
-            (fromTopLevelStructures config $ fmap (fmap normalize) body)
+            (fromModuleBody config $ normalize body)
 
 toModule :: Module -> I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK
 toModule (Module (ModuleName name) imports body) =
@@ -63,7 +63,23 @@ toModule (Module (ModuleName name) imports body) =
         )
         Nothing
         (C [] $ Map.mapKeys (\(ModuleName ns) -> ns) $ C [] . toImportMethod <$> imports)
-        (mconcat $ fmap (toTopLevelStructures . extract) body)
+        (toModuleBody body)
+
+
+fromModuleBody ::
+    Config
+    -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ModuleBodyNK
+    -> List (MaybeF LocatedIfRequested TopLevelStructure)
+fromModuleBody config = \case
+    I.Fix2 (At _ (AST.ModuleBody decls)) ->
+        fromTopLevelStructures config decls
+
+toModuleBody ::
+    List (MaybeF LocatedIfRequested TopLevelStructure)
+    -> I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleBodyNK
+toModuleBody decls =
+    I.Fix $ AST.ModuleBody $ foldMap (toTopLevelStructures . extract) decls
+
 
 instance ToJSON Module where
     toJSON = undefined
