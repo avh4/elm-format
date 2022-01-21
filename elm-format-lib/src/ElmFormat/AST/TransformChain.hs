@@ -1,7 +1,7 @@
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE PolyKinds #-}
 
-module ElmFormat.AST.TransformChain (TransformChain, Carrier, map, mapMaybe, fold2) where
+module ElmFormat.AST.TransformChain (TransformChain, Carrier, map, mapMaybe, fold2,fold) where
 
 import Prelude hiding (map)
 import qualified Data.Indexed as I
@@ -39,6 +39,13 @@ mapMaybe f (Carry (Right a)) =
         Nothing -> Right a
         Just new | new == a -> Right a
         Just new -> Left new
+
+
+fold :: I.HFunctor f =>
+    (forall j. Carrier (I.Fix f j) -> Carrier (I.Fix f j))
+    -> I.Fix f i -> I.Fix f i
+fold transform =
+    I.foldTransform (unCarry . transform . Carry . Right . I.Fix)
 
 
 fold2 :: I.HFunctor f => Functor ann =>
