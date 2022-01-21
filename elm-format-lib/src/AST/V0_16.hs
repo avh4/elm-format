@@ -384,6 +384,14 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
     -- Singletons
     --
 
+    TypeRef_ :: TypeRef p -> AST p getType 'TypeRefNK
+    CtorRef_ :: CtorRef p -> AST p getType 'CtorRefNK
+    VarRef_ :: VarRef p -> AST p getType 'VarRefNK
+
+    --
+    -- Module
+    --
+
     Module ::
         { initialComments :: Comments
         , header :: Maybe (getType 'ModuleHeaderNK)
@@ -399,10 +407,6 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
         , exports :: Maybe (C2 'BeforeSeparator 'AfterSeparator (Listing DetailedListing))
         }
         -> AST p getType 'ModuleHeaderNK
-
-    TypeRef_ :: TypeRef p -> AST p getType 'TypeRefNK
-    CtorRef_ :: CtorRef p -> AST p getType 'CtorRefNK
-    VarRef_ :: VarRef p -> AST p getType 'VarRefNK
 
     --
     -- Declarations
@@ -691,13 +695,13 @@ mapAll ::
         -> AST p2 getType2 kind
         )
 mapAll ftyp fctor fvar fast = \case
-    Module c h d i b -> Module c (fmap fast h) d i (fmap (fmap fast) b)
-    ModuleHeader st n s e -> ModuleHeader st n s e
-
     TypeRef_ r -> TypeRef_ (ftyp r)
     CtorRef_ r -> CtorRef_ (fctor r)
     VarRef_ r -> VarRef_ (fvar r)
 
+    -- Module
+    Module c h d i b -> Module c (fmap fast h) d i (fmap (fmap fast) b)
+    ModuleHeader st n s e -> ModuleHeader st n s e
     -- Declaration
     Definition name args c e -> Definition (fast name) (fmap (fmap fast) args) c (fast e)
     TypeAnnotation name t -> TypeAnnotation name (fmap fast t)

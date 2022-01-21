@@ -9,6 +9,7 @@ module Data.Indexed where
 import Data.Kind
 import Control.Monad.Identity (Identity(..))
 import Data.Maybe (fromMaybe)
+import Data.Functor.Const (Const(..))
 
 
 -- Common typeclasses
@@ -60,6 +61,12 @@ fold2 ::
     (forall i. ann (f a i) -> a i)
     -> (Fix2 ann f ~> a)
 fold2 f = f . fmap (hmap $ fold2 f) . unFix2
+
+foldConst2 ::
+    HFunctor f => Functor ann =>
+    (forall i. ann (f (Const a) i) -> a)
+    -> (forall i. Fix2 ann f i -> a)
+foldConst2 f = getConst . fold2 (Const . f)
 
 foldTransform2 ::
     HFunctor f => Functor ann =>
