@@ -7,6 +7,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE DeriveFoldable #-}
 
 module AST.V0_16 (module AST.V0_16, module ElmFormat.AST.Shared) where
 
@@ -24,6 +25,7 @@ import Data.Text (Text)
 import Data.List.NonEmpty (NonEmpty)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
+import Data.Bifoldable (Bifoldable(..))
 
 
 newtype ForceMultiline =
@@ -152,10 +154,7 @@ TODO: this should be replaced with (Sequence a)
 -}
 data OpenCommentedList a
     = OpenCommentedList [C2Eol 'BeforeTerm 'AfterTerm a] (C1Eol 'BeforeTerm a)
-    deriving (Eq, Show, Functor)
-
-instance Foldable OpenCommentedList where
-    foldMap f (OpenCommentedList rest last) = foldMap (f . extract) rest <> (f . extract) last
+    deriving (Eq, Show, Functor, Foldable)
 
 instance AsCommentedList OpenCommentedList where
     type CommentsFor OpenCommentedList = C2Eol 'BeforeTerm 'AfterTerm
@@ -197,7 +196,7 @@ data Pair key value =
         , _value :: C1 'BeforeTerm value
         , forceMultiline :: ForceMultiline
         }
-    deriving (Show, Eq, Functor)
+    deriving (Show, Eq, Functor, Foldable)
 
 instance Bifunctor Pair where
     bimap fa fb (Pair a b fm) =
@@ -234,14 +233,11 @@ assocToString assoc =
 
 data NameWithArgs name arg =
     NameWithArgs name [C1 'BeforeTerm arg]
-    deriving (Eq, Show, Functor)
+    deriving (Eq, Show, Functor, Foldable)
 
 instance Bifunctor NameWithArgs where
     bimap fname farg (NameWithArgs name args) =
         NameWithArgs (fname name) (fmap farg <$> args)
-
-instance Foldable (NameWithArgs name) where
-    foldMap f (NameWithArgs _ args) = foldMap (f . extract) args
 
 
 data SourceTag
@@ -315,7 +311,7 @@ type UserImport
 data TypeConstructor ctorRef
     = NamedConstructor ctorRef
     | TupleConstructor Int -- will be 2 or greater, indicating the number of elements in the tuple
-    deriving (Eq, Show, Functor)
+    deriving (Eq, Show, Functor, Foldable)
 
 
 data BinopsClause varRef expr =
@@ -326,22 +322,20 @@ instance Bifunctor BinopsClause where
     bimap fvr fe = \case
         BinopsClause c1 vr c2 e -> BinopsClause c1 (fvr vr) c2 (fe e)
 
+instance Bifoldable BinopsClause where
+    bifoldMap fa fb (BinopsClause _ a _ b) = fa a <> fb b
+
 
 data IfClause e =
     IfClause (C2 'BeforeTerm 'AfterTerm e) (C2 'BeforeTerm 'AfterTerm e)
-    deriving (Eq, Show, Functor)
+    deriving (Eq, Show, Functor, Foldable)
 
 
 data TopLevelStructure a
     = DocComment Markdown.Blocks
     | BodyComment Comment
     | Entry a
-    deriving (Eq, Show, Functor)
-
-instance Foldable TopLevelStructure where
-    foldMap _ (DocComment _) = mempty
-    foldMap _ (BodyComment _) = mempty
-    foldMap f (Entry a) = f a
+    deriving (Eq, Show, Functor, Foldable)
 
 
 data LocalName
@@ -770,11 +764,70 @@ mapAll ftyp fctor fvar fast = \case
     RecordType base fields c ml -> RecordType base (fmap (fmap fast) fields) c ml
     FunctionType first rest ml -> FunctionType (fmap fast first) (fmap fast rest) ml
 
-
 instance I.HFunctor (AST p) where
     -- TODO: it's probably worth making an optimized version of this
     hmap = mapAll id id id
 
+instance I.HFoldable (AST p) where
+    hFoldMap f = \case
+      TypeRef_ _ -> mempty
+      CtorRef_ _ -> mempty
+      VarRef_ _ -> mempty
+      Module _ header _ _ body -> foldMap f header <> f body
+      ModuleHeader {} -> mempty
+      ModuleBody defs -> foldMap (foldMap f) defs
+      Definition pat args _ expr -> f pat <> foldMap (f . extract) args <> f expr
+      TypeAnnotation _ typ -> f (extract typ)
+      CommonDeclaration def -> f def
+      Datatype _ tags -> foldMap (foldMap f) tags
+      TypeAlias _ _ typ -> f (extract typ)
+      PortAnnotation _ _ typ -> f typ
+      PortDefinition_until_0_16 _ _ typ -> f typ
+      Fixity_until_0_18 _ _ _ _ ref -> f ref
+      Fixity {} -> mempty
+      Unit _ -> mempty
+      Literal _ -> mempty
+      VarExpr var -> f var
+      App first rest _ -> f first <> foldMap (f . extract) rest
+      Unary _ expr -> f expr
+      Binops first rest _ -> f first <> foldMap (bifoldMap f f) rest
+      Parens term -> f (extract term)
+      ExplicitList terms _ _ -> foldMap f terms
+      Range a b -> f (extract a) <> f (extract b)
+      Tuple terms _ -> foldMap (f . extract) terms
+      TupleFunction _ -> mempty
+      Record _ fields _ _ -> foldMap (foldMap f) fields
+      Access term _ -> f term
+      AccessFunction _ -> mempty
+      Lambda pats _ expr _ -> foldMap (f . extract) pats <> f expr
+      If first rest last -> foldMap f first <> foldMap (foldMap f . extract) rest <> f (extract last)
+      Let defs _ expr -> foldMap f defs <> f expr
+      LetCommonDeclaration def -> f def
+      LetComment _ -> mempty
+      Case pred branches -> f (extract $ fst pred) <> foldMap f branches
+      CaseBranch _ _ _ pat expr -> f pat <> f expr
+      GLShader _ -> mempty
+      Anything -> mempty
+      UnitPattern _ -> mempty
+      LiteralPattern _ -> mempty
+      VarPattern _ -> mempty
+      OpPattern _ -> mempty
+      DataPattern ctor args -> f ctor <> foldMap (f . extract) args
+      PatternParens pat -> f (extract pat)
+      TuplePattern pats -> foldMap (f . extract) pats
+      EmptyListPattern _ -> mempty
+      ListPattern pats -> foldMap (f . extract) pats
+      ConsPattern first rest -> f (extract first) <> foldMap f rest
+      EmptyRecordPattern _ -> mempty
+      RecordPattern _ -> mempty
+      Alias pat _ -> f (extract pat)
+      UnitType _ -> mempty
+      TypeVariable _ -> mempty
+      TypeConstruction tc args _ -> foldMap f tc <> foldMap (f . extract) args
+      TypeParens t -> f $ extract t
+      TupleType ne _ -> foldMap (f . extract) ne
+      RecordType _ fs _ _ -> foldMap (foldMap f) fs
+      FunctionType ft se _ -> f (extract ft) <> foldMap f se
 
 
 --

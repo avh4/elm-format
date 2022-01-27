@@ -24,6 +24,8 @@ class HFunctor (f :: (k -> Type) -> k -> Type) where
 
 class HFoldable (t :: (k -> Type) -> k -> Type) where
     hFoldMap :: Monoid m => (forall i. f i -> m) -> t f a -> m
+    hFold :: Monoid m => t (Const m) a -> m
+    hFold = hFoldMap getConst
 
 
 -- Recursion schemes
