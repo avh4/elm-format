@@ -46,7 +46,7 @@ toEither res =
             Left $ map extract b
 
 
-import' :: ElmVersion -> Text -> Either [Syntax.Error] UserImport
+import' :: ElmVersion -> Text -> Either [Syntax.Error] (C1 'BeforeTerm [UppercaseIdentifier], ParsedAST 'ImportMethodNK)
 import' elmVersion =
     parse' (Parse.Module.import' elmVersion)
 

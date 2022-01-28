@@ -14,6 +14,7 @@ import qualified Data.Set as Set
 import qualified ElmFormat.KnownContents as KnownContents
 import ElmFormat.KnownContents (KnownContents)
 import qualified AST.V0_16 as AST
+import qualified Data.Indexed as I
 
 data ImportInfo ns =
     ImportInfo
@@ -28,26 +29,26 @@ data ImportInfo ns =
 
 fromModule ::
     KnownContents
-    -> AST p any 'ModuleNK
+    -> AST p (I.Fix (AST p)) 'ModuleNK
     -> ImportInfo [UppercaseIdentifier]
 fromModule knownContents modu =
-    fromImports knownContents (fmap extract $ extract $ AST.imports modu)
+    fromImports knownContents (fmap (I.unFix . extract) $ extract $ AST.imports modu)
 
 
 fromImports ::
     KnownContents
-    -> Dict.Map [UppercaseIdentifier] ImportMethod
+    -> Dict.Map [UppercaseIdentifier] (AST p (I.Fix (AST p)) 'ImportMethodNK)
     -> ImportInfo [UppercaseIdentifier]
 fromImports knownContents rawImports =
     let
-        defaultImports :: Dict.Map [UppercaseIdentifier] ImportMethod
+        defaultImports :: Dict.Map [UppercaseIdentifier] (AST p (I.Fix (AST p)) 'ImportMethodNK)
         defaultImports =
             Dict.fromList $
                 fmap (\(m, i) -> (fmap UppercaseIdentifier m, ImportMethod Nothing (C ([], []) i)))
-                [ ( [ "Basics" ], OpenListing (C ([], []) ()) )
-                , ( [ "List" ], ClosedListing )
+                [ ( [ "Basics" ], I.Fix $ ModuleListing $ OpenListing (C ([], []) ()) )
+                , ( [ "List" ], I.Fix $ ModuleListing ClosedListing )
                 , ( [ "Maybe" ]
-                  , ExplicitListing
+                  , I.Fix $ ModuleListing $ ExplicitListing
                       (DetailedListing mempty mempty $
                           Dict.fromList
                               [ ( UppercaseIdentifier "Maybe"
@@ -83,7 +84,8 @@ fromImports knownContents rawImports =
                     ]
                 _ -> KnownContents.get moduleName knownContents |> Maybe.fromMaybe []
 
-        getExposed moduleName (ImportMethod _ (C _ listing)) =
+        getExposed :: [UppercaseIdentifier] -> AST p (I.Fix (AST p)) 'ImportMethodNK -> Dict.Map LocalName [UppercaseIdentifier]
+        getExposed moduleName (ImportMethod _ (C _ (I.Fix (ModuleListing listing)))) =
             Dict.fromList $ fmap (flip (,) moduleName) $
             case listing of
                 ClosedListing -> []
@@ -137,7 +139,8 @@ fromImports knownContents rawImports =
 
         ambiguous = Dict.empty
 
-        exposesAll (ImportMethod _ (C _ listing)) =
+        exposesAll :: AST p (I.Fix (AST p)) 'ImportMethodNK -> Bool
+        exposesAll (ImportMethod _ (C _ (I.Fix (ModuleListing listing)))) =
             case listing of
                 ExplicitListing _ _ -> False
                 OpenListing _ -> True

@@ -19,6 +19,7 @@ import Test.Hspec
 
 import qualified Data.Map as Dict
 import Data.List.Split (splitOn)
+import Data.Coapplicative (extract)
 
 spec :: Spec
 spec = describe "AST.MatchReferences" $ do
@@ -36,6 +37,7 @@ spec = describe "AST.MatchReferences" $ do
                 let
                     sourceAst = fmap (fmap UppercaseIdentifier) sourceAst'
                     matchedAst = fmap (fmap $ fmap UppercaseIdentifier) matchedAst'
+                    wrapExpr :: (Ref ns -> I.Fix2 Identity (AST (VariableNamespace ns)) 'ExpressionNK)
                     wrapExpr r =
                         case locals of
                             [] ->
@@ -99,6 +101,7 @@ spec = describe "AST.MatchReferences" $ do
                 let
                     sourceAst = fmap (fmap $ fmap UppercaseIdentifier) sourceAst'
                     matchedAst = fmap (fmap UppercaseIdentifier) matchedAst'
+                    wrapExpr :: (Ref ns -> I.Fix2 Identity (AST (VariableNamespace ns)) 'ExpressionNK)
                     wrapExpr r =
                         case locals of
                             [] ->
@@ -199,12 +202,12 @@ makeKnownContent (moduleName, known) =
     )
 
 
-makeImportMethod :: String -> ([UppercaseIdentifier], ImportMethod)
+makeImportMethod :: String -> ([UppercaseIdentifier], ASTNS [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier])) 'ImportMethodNK)
 makeImportMethod importString =
     case Result.toMaybe $ Parse.parse importString (Parse.Module.import' Elm_0_19) of
         Nothing -> undefined -- Not handled: fix the test input to parse correctly
         Just (C _ moduleName, importMethod) ->
-            (moduleName, importMethod)
+            (moduleName, I.unFix $ I.fold2 (I.Fix . extract) importMethod)
 
 
 makeLetDeclaration :: String -> I.Fix2 Identity (ASTNS ns) 'LetDeclarationNK

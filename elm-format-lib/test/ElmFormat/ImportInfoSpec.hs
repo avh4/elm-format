@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 module ElmFormat.ImportInfoSpec where
 
 import Elm.Utils ((|>))
@@ -9,16 +10,24 @@ import qualified Data.Map as Dict
 import qualified Data.Set as Set
 import qualified ElmFormat.ImportInfo as ImportInfo
 import qualified ElmFormat.KnownContents as KnownContents
+import qualified Data.Indexed as I
+
 
 spec :: Spec
 spec =
     describe "ElmFormat.ImportInfo" $
     let
+        makeEntry ::
+            ([String], Maybe String, Listing DetailedListing)
+            -> ([UppercaseIdentifier], AST p (I.Fix (AST p)) 'ImportMethodNK)
         makeEntry (a, b, c) =
             ( fmap UppercaseIdentifier a
-            , ImportMethod (fmap (C ([], []) . UppercaseIdentifier) b) (C ([], []) c)
+            , ImportMethod (fmap (C ([], []) . UppercaseIdentifier) b) (C ([], []) $ I.Fix $ ModuleListing c)
             )
 
+        buildImportInfo ::
+            List ([String], Maybe String, Listing DetailedListing)
+            -> ImportInfo.ImportInfo [UppercaseIdentifier]
         buildImportInfo i =
             i
                 |> fmap makeEntry
@@ -30,6 +39,12 @@ spec =
             assertIncludes = assert "include" True
             assertExcludes = assert "exclude" False
 
+            assert ::
+                [Char]
+                -> Bool
+                -> List String
+                -> List ([String], Maybe String, Listing DetailedListing)
+                -> IO ()
             assert what expected name i =
                 let
                     set =

@@ -249,11 +249,12 @@ formatModuleHeader elmVersion addDefaultHeader (I.Fix modu@(Module _ header docs
               |> fmap (C ([], []))
               |> Set.fromList
 
+      exportsList :: Listing DetailedListing
       exportsList =
           case
               exports (I.unFix $ fromMaybe defaultHeader maybeHeader)
           of
-              Just (C _ e) -> e
+              Just (C _ (I.Fix (ModuleListing e))) -> e
               Nothing -> ClosedListing
 
       detailedListingToSet :: Listing DetailedListing -> Set (C2 before after ListingValue)
@@ -271,12 +272,12 @@ formatModuleHeader elmVersion addDefaultHeader (I.Fix modu@(Module _ header docs
       detailedListingIsMultiline _ = False
 
       varsToExpose =
-          case exports =<< fmap I.unFix maybeHeader of
+          case exports . I.unFix =<< maybeHeader of
               Nothing ->
                   if all null documentedVars
                       then definedVars
                       else definedVars |> Set.filter (\v -> Set.member (varName v) documentedVarsSet)
-              Just (C _ e) -> detailedListingToSet e
+              Just (C _ (I.Fix (ModuleListing e))) -> detailedListingToSet e
 
       sortedExports =
           sortVars
@@ -333,13 +334,13 @@ formatModuleHeader elmVersion addDefaultHeader (I.Fix modu@(Module _ header docs
 
 
 formatImports ::
-    C1 'BeforeTerm (Map [UppercaseIdentifier] (C1 'BeforeTerm ImportMethod))
+    C1 'BeforeTerm (Map [UppercaseIdentifier] (C1 'BeforeTerm (I.Fix (ASTNS ns) 'ImportMethodNK)))
     -> (Maybe Elm, [Elm])
 formatImports (C comments imports_) =
     ( formatComments comments
     , imports_
         |> Map.assocs
-        |> fmap (\(name, C pre method) -> formatImport (C pre name, method))
+        |> fmap (\(name, C pre method) -> formatImport (C pre name, I.unFix method))
     )
 
 
@@ -348,7 +349,7 @@ formatModuleLine_0_16 (I.Fix header) =
   let
     exports_ =
         case exports header of
-            Just (C _ value) -> value
+            Just (C _ (I.Fix (ModuleListing value))) -> value
             Nothing -> OpenListing (C ([], []) ())
 
     formatExports =
@@ -629,7 +630,7 @@ formatDocComment elmVersion importInfo blocks =
         (Text.lines $ Text.pack content)
 
 
-formatImport :: UserImport -> Elm
+formatImport :: (Commented Comments [UppercaseIdentifier], AST p (I.Fix (AST p)) 'ImportMethodNK) -> Elm
 formatImport (name@(C _ rawName), method) =
     let
         name' =
@@ -647,7 +648,7 @@ formatImport (name@(C _ rawName), method) =
 
         exposing =
           formatImportClause "exposing"
-            (formatListing formatDetailedListing <$> exposedVars method)
+            (formatListing formatDetailedListing . (\(ModuleListing l) -> l) . I.unFix <$> exposedVars method)
 
         formatImportClause :: Text -> C2 beforeKeyword afterKeyword (Maybe Elm) -> Maybe Elm
         formatImportClause keyw = \case

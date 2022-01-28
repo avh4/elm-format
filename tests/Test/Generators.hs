@@ -82,7 +82,7 @@ instance Arbitrary (I.Fix2 Identity (ASTNS [UppercaseIdentifier]) 'ModuleNK) whe
                   moduleType
                   (C ([], []) name)
                   Nothing
-                  (Just $ C ([], []) listing)
+                  (Just $ C ([], []) $ I.Fix2 $ pure $ ModuleListing listing)
                 )
                 Nothing
                 (C [] empty)

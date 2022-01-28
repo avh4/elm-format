@@ -40,14 +40,14 @@ fromModule config = \case
                         name
 
             importInfo =
-                ImportInfo.fromModule mempty modu
+                ImportInfo.fromModule mempty (I.hmap (I.fold2 (I.Fix . extract)) modu)
 
             normalize =
                 mapNs (fromMatched []) . matchReferences importInfo
         in
         Module
             (ModuleName name)
-            (Map.mapWithKey (\m (C comments i) -> fromImportMethod m i) $ Map.mapKeys ModuleName imports)
+            (Map.mapWithKey (\m (C comments i) -> fromImportMethod m (I.fold2 (I.Fix . extract) i)) $ Map.mapKeys ModuleName imports)
             (fromModuleBody config $ normalize body)
 
 toModule :: Module -> I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK
@@ -106,8 +106,8 @@ data Import
         }
     deriving (Generic)
 
-fromImportMethod :: ModuleName -> AST.ImportMethod -> Import
-fromImportMethod moduleName (AST.ImportMethod alias (C comments exposing)) =
+fromImportMethod :: ModuleName -> I.Fix (ASTNS [UppercaseIdentifier]) 'ImportMethodNK -> Import
+fromImportMethod moduleName (I.Fix (AST.ImportMethod alias (C comments (I.Fix (AST.ModuleListing exposing))))) =
     let
         as_ =
             case alias of
@@ -116,16 +116,16 @@ fromImportMethod moduleName (AST.ImportMethod alias (C comments exposing)) =
     in
     Import as_ exposing
 
-toImportMethod :: Import -> AST.ImportMethod
+toImportMethod :: Import -> I.Fix (ASTNS [UppercaseIdentifier]) 'ImportMethodNK
 toImportMethod (Import alias exposing) =
-    AST.ImportMethod
+    I.Fix $ AST.ImportMethod
         (case alias of
             ModuleName [single] ->
                 Just $ C ([], []) single
             _ ->
                 Nothing
         )
-        (C ([], []) exposing)
+        (C ([], []) $ I.Fix $ AST.ModuleListing exposing)
 
 instance ToJSON Import where
     toEncoding = genericToEncoding defaultOptions

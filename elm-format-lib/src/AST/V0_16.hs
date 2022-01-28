@@ -297,17 +297,6 @@ instance Monoid DetailedListing where
     mempty = DetailedListing mempty mempty mempty
 
 
-data ImportMethod = ImportMethod
-    { alias :: Maybe (C2 'BeforeSeparator 'AfterSeparator UppercaseIdentifier)
-    , exposedVars :: C2 'BeforeSeparator 'AfterSeparator (Listing DetailedListing)
-    }
-    deriving (Eq, Show)
-
-
-type UserImport
-    = (C1 'BeforeTerm [UppercaseIdentifier], ImportMethod)
-
-
 data TypeConstructor ctorRef
     = NamedConstructor ctorRef
     | TupleConstructor Int -- will be 2 or greater, indicating the number of elements in the tuple
@@ -347,6 +336,8 @@ data LocalName
 
 data NodeKind
     = ModuleNK
+    | ImportMethodNK
+    | ModuleListingNK
     | ModuleHeaderNK
     | ModuleBodyNK
     | TypeRefNK
@@ -391,15 +382,23 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
         { initialComments :: Comments
         , header :: Maybe (getType 'ModuleHeaderNK)
         , docs :: Maybe Markdown.Blocks
-        , imports :: C1 'BeforeTerm (Map [UppercaseIdentifier] (C1 'BeforeTerm ImportMethod))
+        , imports :: C1 'BeforeTerm (Map [UppercaseIdentifier] (C1 'BeforeTerm (getType 'ImportMethodNK)))
         , moduleBody :: getType 'ModuleBodyNK
         }
         -> AST p getType 'ModuleNK
+    ImportMethod ::
+        { alias :: Maybe (C2 'BeforeSeparator 'AfterSeparator UppercaseIdentifier)
+        , exposedVars :: C2 'BeforeSeparator 'AfterSeparator (getType 'ModuleListingNK)
+        }
+        -> AST p getType 'ImportMethodNK
+    ModuleListing ::
+        Listing DetailedListing
+        -> AST p getType 'ModuleListingNK
     ModuleHeader ::
         { srcTag :: SourceTag
         , name :: C2 'BeforeTerm 'AfterTerm [UppercaseIdentifier]
         , moduleSettings :: Maybe (C2 'BeforeSeparator 'AfterSeparator SourceSettings)
-        , exports :: Maybe (C2 'BeforeSeparator 'AfterSeparator (Listing DetailedListing))
+        , exports :: Maybe (C2 'BeforeSeparator 'AfterSeparator (getType 'ModuleListingNK))
         }
         -> AST p getType 'ModuleHeaderNK
     ModuleBody ::
@@ -647,6 +646,8 @@ data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
 
 deriving instance
     ( Eq (getType 'ModuleNK)
+    , Eq (getType 'ImportMethodNK)
+    , Eq (getType 'ModuleListingNK)
     , Eq (getType 'ModuleHeaderNK)
     , Eq (getType 'ModuleBodyNK)
     , Eq (getType 'CommonDeclarationNK)
@@ -666,6 +667,8 @@ deriving instance
     Eq (AST p getType kind)
 deriving instance
     ( Show (getType 'ModuleNK)
+    , Show (getType 'ImportMethodNK)
+    , Show (getType 'ModuleListingNK)
     , Show (getType 'ModuleHeaderNK)
     , Show (getType 'ModuleBodyNK)
     , Show (getType 'CommonDeclarationNK)
@@ -700,8 +703,10 @@ mapAll ftyp fctor fvar fast = \case
     VarRef_ r -> VarRef_ (fvar r)
 
     -- Module
-    Module c h d i b -> Module c (fmap fast h) d i (fast b)
-    ModuleHeader st n s e -> ModuleHeader st n s e
+    Module c h d i b -> Module c (fmap fast h) d (fmap (fmap $ fmap fast) i) (fast b)
+    ImportMethod as exp -> ImportMethod as (fmap fast exp)
+    ModuleListing lst -> ModuleListing lst
+    ModuleHeader st n s e -> ModuleHeader st n s (fmap (fmap fast) e)
     ModuleBody ds -> ModuleBody (fmap (fmap fast) ds)
 
     -- Declaration
@@ -773,8 +778,10 @@ instance I.HFoldable (AST p) where
       TypeRef_ _ -> mempty
       CtorRef_ _ -> mempty
       VarRef_ _ -> mempty
-      Module _ header _ _ body -> foldMap f header <> f body
-      ModuleHeader {} -> mempty
+      Module _ header _ imports body -> foldMap f header <> foldMap (foldMap $ foldMap f) imports <> f body
+      ImportMethod _ exp -> foldMap f exp
+      ModuleListing _ -> mempty
+      ModuleHeader _ _ _ exports -> foldMap (foldMap f) exports
       ModuleBody defs -> foldMap (foldMap f) defs
       Definition pat args _ expr -> f pat <> foldMap (f . extract) args <> f expr
       TypeAnnotation _ typ -> f (extract typ)

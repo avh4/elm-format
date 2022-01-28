@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GADTs #-}
 module Parse.Module (moduleDecl, elmModule, topLevel, import') where
 
 import qualified Control.Applicative
@@ -12,6 +13,7 @@ import qualified Data.Indexed as I
 import ElmVersion
 import Parse.IParser
 import Parse.Whitespace
+import Reporting.Annotation (Located(At))
 
 
 elmModule :: ElmVersion -> IParser (ParsedAST 'ModuleNK)
@@ -77,7 +79,7 @@ moduleDecl_0_16 elmVersion =
       preName <- whitespace
       names <- dotSep1 (capVar elmVersion) <?> "the name of this module"
       postName <- whitespace
-      exports <- option (OpenListing (C ([], []) ())) (listing $ detailedListing elmVersion)
+      exports <- fmap I.Fix2 $ addLocation $ ModuleListing <$> option (OpenListing (C ([], []) ())) (listing $ detailedListing elmVersion)
       preWhere <- whitespace
       reserved elmVersion "where"
       return $
@@ -110,7 +112,7 @@ moduleDecl_0_17 elmVersion =
 
       exports <-
         optionMaybe $
-        commentedKeyword elmVersion "exposing" (listing $ detailedListing elmVersion)
+        commentedKeyword elmVersion "exposing" (fmap I.Fix2 $ addLocation $ fmap ModuleListing $ listing $ detailedListing elmVersion)
           <|> try (listingWithoutExposing elmVersion)
 
       return $
@@ -120,19 +122,15 @@ moduleDecl_0_17 elmVersion =
           whereClause
           exports
 
-listingWithoutExposing :: ElmVersion -> IParser (C2 beforeKeyword afterKeyword (Listing DetailedListing))
+listingWithoutExposing :: ElmVersion -> IParser (C2 beforeKeyword afterKeyword (ParsedAST 'ModuleListingNK))
 listingWithoutExposing elmVersion = do
     let pre = []
     post <- whitespace
-    C (pre, post) <$> listing (detailedListing elmVersion)
+    C (pre, post) <$> fmap I.Fix2 (addLocation $ ModuleListing <$> listing (detailedListing elmVersion))
 
 mergePreCommented :: (a -> a -> a) -> C1 before a -> C1 before a -> C1 before a
 mergePreCommented merge (C pre1 left) (C pre2 right) =
     C (pre1 ++ pre2) (merge left right)
-
-mergeC2 :: (a -> b -> c) -> C2 before after a -> C2 before after b -> C2 before after c
-mergeC2 merge (C (pre1, post1) left) (C (pre2, post2) right) =
-    C (pre1 ++ pre2, post1 ++ post2) (merge left right)
 
 
 mergeDetailedListing :: DetailedListing -> DetailedListing -> DetailedListing
@@ -143,30 +141,41 @@ mergeDetailedListing left right =
         (mergeCommentedMap (mergePreCommented $ mergeListing $ mergeCommentedMap (<>)) (types left) (types right))
 
 
-imports :: ElmVersion -> IParser (Comments, Map [UppercaseIdentifier] (C1 'BeforeTerm ImportMethod), Comments)
+imports :: ElmVersion -> IParser (Comments, Map [UppercaseIdentifier] (C1 'BeforeTerm (ParsedAST 'ImportMethodNK)), Comments)
 imports elmVersion =
     let
-        merge :: C1 'BeforeTerm ImportMethod -> C1 'BeforeTerm ImportMethod -> C1 'BeforeTerm ImportMethod
-        merge (C comments1 import1) (C comments2 import2) =
-            C (comments1 ++ comments2) $
+        merge ::
+          C1 'BeforeTerm (ParsedAST 'ImportMethodNK)
+          -> C1 'BeforeTerm (ParsedAST 'ImportMethodNK)
+          -> C1 'BeforeTerm (ParsedAST 'ImportMethodNK)
+        merge (C comments1 (I.Fix2 (At region (ImportMethod as1 (C (preSep1, postSep1) (I.Fix2 (At importsRegion (ModuleListing imports1)))))))) (C comments2 (I.Fix2 (At _ (ImportMethod as2 (C (preSep2, postSep2) (I.Fix2 (At _ (ModuleListing imports2)))))))) =
+            C (comments1 ++ comments2) $ I.Fix2 $ At region $
                 ImportMethod
-                    (alias import1 Control.Applicative.<|> alias import2)
-                    (mergeC2 (mergeListing mergeDetailedListing) (exposedVars import1) (exposedVars import2))
+                    (as1 Control.Applicative.<|> as2)
+                    (C (preSep1 ++ preSep2, postSep1 ++ postSep2) $ I.Fix2 $ At importsRegion $ ModuleListing $ mergeListing mergeDetailedListing imports1 imports2)
 
-        step (comments, m, finalComments) (((C pre name), method), post) =
+        step (comments, m, finalComments) ((C pre name, method), post) =
             ( comments ++ finalComments
             , insertWith merge name (C pre method) m
             , post
             )
 
-        done :: [(UserImport, Comments)] -> (Comments, Map [UppercaseIdentifier] (C1 'BeforeTerm ImportMethod), Comments)
-        done results =
-            foldl step ([], empty, []) results
+        done ::
+          [(UserImport, Comments)]
+          -> (Comments, Map [UppercaseIdentifier] (C1 'BeforeTerm (ParsedAST 'ImportMethodNK)), Comments)
+        done =
+            foldl step ([], empty, [])
     in
     done <$> many ((,) <$> import' elmVersion <*> freshLine)
 
 
-import' :: ElmVersion -> IParser UserImport
+type UserImport =
+    ( C1 'BeforeTerm [UppercaseIdentifier]
+    , ParsedAST 'ImportMethodNK
+    )
+
+
+import' :: ElmVersion -> IParser ( C1 'BeforeTerm [UppercaseIdentifier], ParsedAST 'ImportMethodNK)
 import' elmVersion =
   expecting "an import" $
   do  try (reserved elmVersion "import")
@@ -175,11 +184,17 @@ import' elmVersion =
       method' <- method names
       return (C preName names, method')
   where
-    method :: [UppercaseIdentifier] -> IParser ImportMethod
+    method :: [UppercaseIdentifier] -> IParser (ParsedAST 'ImportMethodNK)
     method originalName =
+      fmap I.Fix2 $ addLocation $
       ImportMethod
         <$> option Nothing (Just <$> as' originalName)
-        <*> option (C ([], []) ClosedListing) (exposing <|> try (listingWithoutExposing elmVersion))
+        <*> choice
+                [ exposing
+                , try (listingWithoutExposing elmVersion)
+                , fmap (C ([], []) . I.Fix2) $ addLocation $ pure $ ModuleListing ClosedListing
+                ]
+        -- <*> fmap (fmap I.Fix2 . sequenceA) (addLocation $ fmap ModuleListing <$> option (C ([], []) ClosedListing) (exposing <|> try (listingWithoutExposing elmVersion)))
 
     as' :: [UppercaseIdentifier] -> IParser (C2 'BeforeSeparator 'AfterSeparator UppercaseIdentifier)
     as' moduleName =
@@ -187,15 +202,15 @@ import' elmVersion =
           postAs <- whitespace
           C (preAs, postAs) <$> capVar elmVersion <?> ("an alias for module `" ++ show moduleName ++ "`") -- TODO: do something correct instead of show
 
-    exposing :: IParser (C2 'BeforeSeparator 'AfterSeparator (Listing DetailedListing))
+    exposing :: IParser (C2 'BeforeSeparator 'AfterSeparator (ParsedAST 'ModuleListingNK))
     exposing =
       do  preExposing <- try (whitespace <* reserved elmVersion "exposing")
           postExposing <- whitespace
           imports <-
-            choice
-              [ listing $ detailedListing elmVersion
-              , listingWithoutParens elmVersion
-              ]
+              fmap I.Fix2 $ addLocation $ ModuleListing <$> choice
+                  [ listing $ detailedListing elmVersion
+                  , listingWithoutParens elmVersion
+                  ]
           return $ C (preExposing, postExposing) imports
 
 
@@ -203,8 +218,8 @@ listing :: IParser (Comments -> Comments -> a) -> IParser (Listing a)
 listing explicit =
   let
     subparser = choice
-        [ (\_ pre post _ -> (OpenListing (C (pre, post) ()))) <$> string ".."
-        , (\x pre post sawNewline -> (ExplicitListing (x pre post) sawNewline)) <$>
+        [ (\_ pre post _ -> OpenListing (C (pre, post) ())) <$> string ".."
+        , (\x pre post sawNewline -> ExplicitListing (x pre post) sawNewline) <$>
             explicit
         ]
   in
@@ -219,8 +234,8 @@ listingWithoutParens :: ElmVersion -> IParser (Listing DetailedListing)
 listingWithoutParens elmVersion =
   expecting "a listing of values and types to expose, but with missing parentheses" $
   choice
-    [ (\_ -> (OpenListing (C ([], []) ()))) <$> string ".."
-    , (\x -> (ExplicitListing (x [] []) False)) <$> detailedListing elmVersion
+    [ (\_ -> OpenListing (C ([], []) ())) <$> string ".."
+    , (\x -> ExplicitListing (x [] []) False) <$> detailedListing elmVersion
     ]
 
 
