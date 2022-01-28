@@ -1,7 +1,3 @@
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module CommandLine.TestWorld (TestWorldState, TestWorld, lastExitCode, init,uploadFile, downloadFile, eval,queueStdin,fullStdout,golden,fullStderr,expectExit,expectFileContents,goldenExitStdout, testWorld) where
 

@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module ElmFormat.Parse where
 
 import Elm.Utils ((|>))

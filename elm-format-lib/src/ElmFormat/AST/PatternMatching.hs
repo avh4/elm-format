@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 module ElmFormat.AST.PatternMatching where
 

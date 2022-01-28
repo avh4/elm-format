@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module Parse.PatternSpec where
 
 import Test.Hspec hiding (example)

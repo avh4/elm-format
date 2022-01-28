@@ -1,5 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeFamilies #-}
 module Parse.Pattern (term, expr) where
 
 import Parse.ParsecAdapter ((<|>), (<?>), char, choice, optionMaybe, try)

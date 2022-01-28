@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wall #-}
-{-# LANGUAGE FlexibleContexts #-}
 module Elm.Utils
     ( (|>), (<|), (>>)
     , List

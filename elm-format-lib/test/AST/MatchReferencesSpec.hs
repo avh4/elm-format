@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module AST.MatchReferencesSpec (spec) where
 
 import Elm.Utils ((|>))

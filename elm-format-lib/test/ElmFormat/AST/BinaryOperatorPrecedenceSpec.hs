@@ -1,5 +1,4 @@
 {-# OPTIONS_GHC -Wno-type-defaults #-}
-{-# LANGUAGE FlexibleContexts #-}
 module ElmFormat.AST.BinaryOperatorPrecedenceSpec where
 
 import Prelude hiding (or)

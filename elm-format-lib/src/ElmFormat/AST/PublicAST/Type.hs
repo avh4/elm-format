@@ -1,6 +1,4 @@
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE DataKinds #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module ElmFormat.AST.PublicAST.Type (Type_(..), CustomTypeVariant(..), mkCustomTypeVariant, fromCustomTypeVariant) where
 

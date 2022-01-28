@@ -1,6 +1,4 @@
-{-# LANGUAGE DataKinds #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
-{-# LANGUAGE TypeFamilies #-}
 
 module ElmFormat.NormalizeSpec where
 

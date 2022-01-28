@@ -1,5 +1,4 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
-{-# LANGUAGE TypeFamilies #-}
 module CommandLine.World.IO where
 
 import Prelude ()

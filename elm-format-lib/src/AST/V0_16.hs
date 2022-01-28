@@ -1,13 +1,8 @@
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE DeriveFoldable #-}
 
 module AST.V0_16 (module AST.V0_16, module ElmFormat.AST.Shared) where
 

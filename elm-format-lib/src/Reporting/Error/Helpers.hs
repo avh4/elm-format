@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wall #-}
 module Reporting.Error.Helpers where
 
 import Data.Function (on)

@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module ElmFormat.Render.Text where
 
 import Elm.Utils ((|>))

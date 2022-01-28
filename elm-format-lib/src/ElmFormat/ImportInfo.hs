@@ -1,6 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeFamilies #-}
-
 module ElmFormat.ImportInfo (ImportInfo(..), fromModule, fromImports) where
 
 import AST.V0_16

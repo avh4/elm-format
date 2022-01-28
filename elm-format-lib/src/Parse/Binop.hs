@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module Parse.Binop (binops) where
 
 import Parse.ParsecAdapter ((<|>), choice, try)

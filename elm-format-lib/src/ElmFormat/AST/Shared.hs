@@ -1,5 +1,3 @@
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
 module ElmFormat.AST.Shared where
 

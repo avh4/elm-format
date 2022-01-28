@@ -1,8 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE Rank2Types #-}
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 
 module ElmFormat.Render.Box where

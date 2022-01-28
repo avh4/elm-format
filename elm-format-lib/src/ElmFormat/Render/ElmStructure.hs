@@ -1,6 +1,3 @@
-{-# LANGUAGE ApplicativeDo #-}
-{-# OPTIONS_GHC -Wall #-}
-
 module ElmFormat.Render.ElmStructure
   ( spaceSepOrStack, forceableSpaceSepOrStack, forceableSpaceSepOrStack1
   , forceableRowOrStack

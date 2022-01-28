@@ -1,7 +1,6 @@
 -- This module is based on `Parse.Number` in the Elm compiler
 -- https://github.com/elm/compiler/blob/94715a520f499591ac6901c8c822bc87cd1af24f/compiler/src/Parse/Number.hs
 
-{-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE BangPatterns, UnboxedTuples #-}
 module Parse.Number
   ( Number(..)

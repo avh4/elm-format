@@ -36,16 +36,29 @@ common common-options
         -threaded
         -O2
         -Wall
+        -Wcompat
+        -Wredundant-constraints
         -Wno-name-shadowing
-        -Werror=overlapping-patterns
         -Werror=inaccessible-code
+        -Werror=missing-home-modules
         -Werror=overflowed-literals
-
+        -Werror=overlapping-patterns
     default-extensions:
+        ApplicativeDo
+        DataKinds
+        DeriveFoldable
         DeriveFunctor
+        DeriveTraversable
+        FlexibleContexts
+        FlexibleInstances
+        GeneralizedNewtypeDeriving
         LambdaCase
+        MultiParamTypeClasses
         OverloadedStrings
+        PolyKinds
         ScopedTypeVariables
+        TypeApplications
+        TypeFamilies
 
     hs-source-dirs:
         src

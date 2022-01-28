@@ -1,5 +1,4 @@
 {-# LANGUAGE Rank2Types #-}
-{-# LANGUAGE PolyKinds #-}
 
 module ElmFormat.AST.TransformChain (TransformChain, Carrier, map, mapMaybe, fold2,fold) where
 

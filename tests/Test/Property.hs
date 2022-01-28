@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module Test.Property where
 
 import Prelude hiding ((>>))

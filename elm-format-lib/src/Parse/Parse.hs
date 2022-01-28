@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module Parse.Parse (parse, parseModule, parseDeclarations, parseExpressions) where
 
 import Parse.ParsecAdapter (eof)

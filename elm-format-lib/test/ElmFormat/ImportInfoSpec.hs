@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module ElmFormat.ImportInfoSpec where
 
 import Elm.Utils ((|>))

@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module ElmFormat.Cli (main, main') where
 
 import Prelude ()

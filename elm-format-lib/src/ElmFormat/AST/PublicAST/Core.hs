@@ -1,6 +1,4 @@
 {-# LANGUAGE TupleSections #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module ElmFormat.AST.PublicAST.Core

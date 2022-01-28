@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 module Parse.Module (moduleDecl, elmModule, topLevel, import') where
 

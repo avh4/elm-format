@@ -1,7 +1,4 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE PolyKinds #-}
 module ElmFormat.AST.PublicAST.Module (Module(..), fromModule, toModule) where
 
 import ElmFormat.AST.PublicAST.Core

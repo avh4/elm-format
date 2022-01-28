@@ -1,5 +1,3 @@
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE DataKinds #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module ElmFormat.AST.PublicAST.Pattern (Pattern(..), mkListPattern) where
 

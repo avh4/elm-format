@@ -1,6 +1,4 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE QuantifiedConstraints #-}
 

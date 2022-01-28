@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 
 module Parse.Expression (term, typeAnnotation, definition, expr) where

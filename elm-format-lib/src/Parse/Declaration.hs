@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module Parse.Declaration where
 
 import Parse.ParsecAdapter ( (<|>), (<?>), choice, digit, optionMaybe, string, try )

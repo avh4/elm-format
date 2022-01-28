@@ -1,7 +1,6 @@
 -- This module is based on `Reporting.Error.Syntax` in the Elm compiler
 -- https://github.com/elm/compiler/blob/94715a520f499591ac6901c8c822bc87cd1af24f/compiler/src/Reporting/Error/Syntax.hs
 
-{-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Reporting.Error.Syntax
   ( Error(..)
