@@ -1,10 +1,18 @@
-{ sources ? import ./nix/sources.nix { } }:
+{ sources ? import ./nix/sources.nix { }, pkgs ? null }:
 
 let
-  haskellNix = import sources.haskellNix { };
-  pkgs = import haskellNix.sources.nixpkgs-unstable haskellNix.nixpkgsArgs;
+  haskell-nix = if pkgs == null then
+    let
+      haskellNix = import sources.haskellNix { };
+      finalPkgs =
+        import haskellNix.sources.nixpkgs-unstable haskellNix.nixpkgsArgs;
+    in finalPkgs.haskell-nix
 
-  pkgSet = pkgs.haskell-nix.mkCabalProjectPkgSet {
+  else
+    let haskellNix = import sources.haskellNix { inherit pkgs; };
+    in haskellNix.pkgs.haskell-nix;
+
+  pkgSet = haskell-nix.mkCabalProjectPkgSet {
     plan-pkgs = import ./pkgs.nix;
     pkg-def-extras = [ ];
     modules = [ ];

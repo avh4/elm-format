@@ -1,13 +1,16 @@
 { sources ? import nix/sources.nix, pkgs ? import sources.nixpkgs { } }:
 let
+  project = import ./default.nix { sources = sources; };
   niv = import sources.niv { };
+  haskellNix = import sources.haskellNix { };
+in project.shellFor {
+  # packages = p: [ ];
 
-  haskellPackages = pkgs.haskell.packages.ghc901;
-in haskellPackages.shellFor {
-  packages = p: [ ];
+  tools = { cabal = "latest"; };
+  #exactDeps = true;
+
   buildInputs = with pkgs; [
     # Tools required to build elm-format
-    cabal-install
     git
     python3
     jq
@@ -17,5 +20,6 @@ in haskellPackages.shellFor {
     cabal2nix
     niv.niv
     nixfmt
+    haskellNix.pkgs.haskell-nix.nix-tools.ghc901
   ];
 }
