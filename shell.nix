@@ -4,7 +4,7 @@ let
 
   haskellPackages = pkgs.haskell.packages.ghc901;
 in haskellPackages.shellFor {
-  packages = p: [];
+  packages = p: [ ];
   buildInputs = with pkgs; [
     # Tools required to build elm-format
     cabal-install
@@ -16,5 +16,6 @@ in haskellPackages.shellFor {
     ghcid
     cabal2nix
     niv.niv
+    nixfmt
   ];
 }
