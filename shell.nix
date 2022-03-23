@@ -1,21 +1,20 @@
-{ ... }:
+{ sources ? import nix/sources.nix, pkgs ? import sources.nixpkgs { } }:
 let
-  sources = import ./nix/sources.nix;
-
   niv = import sources.niv { };
 
-  nixpkgs = import sources.nixpkgs { };
-in with nixpkgs;
-stdenv.mkDerivation {
-  name = "elm-format";
-  buildInputs = [
+  haskellPackages = pkgs.haskell.packages.ghc901;
+in haskellPackages.shellFor {
+  packages = p: [];
+  buildInputs = with pkgs; [
     # Tools required to build elm-format
-    stack git python3
+    cabal-install
+    git
+    python3
+    jq
 
-    # Tools for updating nix config
+    # Dev tools
+    ghcid
+    cabal2nix
     niv.niv
-
-    # Tools needed by stack
-    libiconv gcc perl
   ];
 }
