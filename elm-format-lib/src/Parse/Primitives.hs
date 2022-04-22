@@ -2,7 +2,7 @@
 -- https://github.com/elm/compiler/blob/94715a520f499591ac6901c8c822bc87cd1af24f/compiler/src/Parse/Primitives.hs
 
 {-# OPTIONS_GHC -Wall -fno-warn-unused-do-bind -fno-warn-name-shadowing #-}
-{-# LANGUAGE BangPatterns, Rank2Types, UnboxedTuples #-}
+{-# LANGUAGE BangPatterns, Rank2Types #-}
 module Parse.Primitives
   -- ( fromByteString
   ( Parser(..)
@@ -27,8 +27,7 @@ import qualified Data.ByteString.Internal as B
 import Data.Word (Word8, Word16)
 import Foreign.Ptr (Ptr, plusPtr)
 import Foreign.Storable (peek)
-import Foreign.ForeignPtr (ForeignPtr, touchForeignPtr)
-import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
+import Foreign.ForeignPtr (ForeignPtr)
 
 import qualified Reporting.Annotation as A
 
@@ -75,8 +74,8 @@ instance Functor (Parser x) where
   fmap f (Parser parser) =
     Parser $ \state cok eok cerr eerr ->
       let
-        cok' a s = cok (f a) s
-        eok' a s = eok (f a) s
+        cok' a = cok (f a)
+        eok' a = eok (f a)
       in
       parser state cok' eok' cerr eerr
 
@@ -95,14 +94,14 @@ instance Applicative.Applicative (Parser x) where
       let
         cokF func s1 =
           let
-            cokA arg s2 = cok (func arg) s2
+            cokA arg = cok (func arg)
           in
           parserArg s1 cokA cokA cerr cerr
 
         eokF func s1 =
           let
-            cokA arg s2 = cok (func arg) s2
-            eokA arg s2 = eok (func arg) s2
+            cokA arg = cok (func arg)
+            eokA arg = eok (func arg)
           in
           parserArg s1 cokA eokA cerr eerr
       in
@@ -406,4 +405,4 @@ getCharWidth word
   | word < 0xe0 = 2
   | word < 0xf0 = 3
   | word < 0xf8 = 4
-  | True        = error "Need UTF-8 encoded input. Ran into unrecognized bits."
+  | otherwise   = error "Need UTF-8 encoded input. Ran into unrecognized bits."

@@ -1,16 +1,13 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE DataKinds #-}
 module Parse.Helpers where
 
 import Prelude hiding (until)
 import Control.Monad (guard)
 import qualified Data.Indexed as I
 import Data.Map.Strict hiding (foldl)
-import Parse.ParsecAdapter hiding (newline, spaces, State)
+import Parse.ParsecAdapter
 
 import AST.V0_16
 import qualified AST.Helpers as Help
-import AST.Structure (FixAST)
 import ElmVersion
 import qualified Parse.State as State
 import Parse.Comments
@@ -473,7 +470,10 @@ located parser =
       return (start, value, end)
 
 
-accessible :: ElmVersion -> IParser (FixAST A.Located typeRef ctorRef varRef 'ExpressionNK) -> IParser (FixAST A.Located typeRef ctorRef varRef 'ExpressionNK)
+accessible ::
+    ElmVersion
+    -> IParser (I.Fix2 A.Located (AST p) 'ExpressionNK)
+    -> IParser (I.Fix2 A.Located (AST p) 'ExpressionNK)
 accessible elmVersion exprParser =
   do  start <- Parsec.getPosition
       rootExpr <- exprParser
@@ -487,7 +487,7 @@ accessible elmVersion exprParser =
           accessible elmVersion $
             do  v <- lowVar elmVersion
                 end <- Parsec.getPosition
-                return $ I.Fix $ A.at start end $ Access rootExpr v
+                return $ I.Fix2 $ A.at start end $ Access rootExpr v
 
 
 dot :: IParser ()

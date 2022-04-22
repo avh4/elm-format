@@ -1,8 +1,7 @@
-module Integration.LiteralTest (tests) where
+module Integration.LiteralSpec (spec) where
 
 import Elm.Utils ((|>))
-import Test.Tasty
-import Test.Tasty.HUnit
+import Test.Hspec
 
 import qualified Data.Text as Text
 import qualified ElmFormat.Parse as Parse
@@ -10,10 +9,9 @@ import qualified ElmFormat.Render.Text as Render
 import qualified ElmVersion
 import qualified Reporting.Error.Syntax
 
-tests :: TestTree
-tests =
-    testGroup "Literals" $
-    map makeTest
+spec :: Spec
+spec = describe "Literals" $
+    mapM_ makeTest
     [ -- Booleans
     --   ("True", "True\n")
     -- , ("False", "False\n")
@@ -46,12 +44,11 @@ tests =
     ]
 
 
-makeTest :: (String, String) -> TestTree
+makeTest :: (String, String) -> SpecWith (Arg Expectation)
 makeTest (original, formatted) =
-    testCase original $
-        assertEqual "formatting should match"
-            (Right $ Text.pack formatted)
-            (format original)
+    it original $
+        Right (Text.pack formatted)
+        `shouldBe` format original
 
 
 format :: String -> Either [Reporting.Error.Syntax.Error] Text.Text

@@ -1,15 +1,15 @@
-module Data.FileTreeTest where
+module Data.FileTreeSpec where
 
 import Elm.Utils ((|>))
 import Data.FileTree (FileTree)
 import qualified Data.FileTree as FileTree
 import Data.Text (Text)
-import Test.Tasty.Hspec
+import Test.Hspec
 import System.FilePath (pathSeparator)
 
 
-spec_spec :: Spec
-spec_spec =
+spec :: Spec
+spec =
     describe "Data.FileTree" $ do
         it "can read and write a file" $ do
             (mempty :: FileTree Text)

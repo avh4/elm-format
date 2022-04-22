@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeFamilies #-}
 module CommandLine.World where
 
 import Prelude ()

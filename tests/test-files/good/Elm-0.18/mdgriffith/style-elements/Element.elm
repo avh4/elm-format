@@ -16,6 +16,7 @@ module Element exposing
     , bold, italic, strike, underline, sub, super
     , Device, classifyDevice, responsive
     , toHtml, embedStylesheet
+
     -- , numbered
     -- , bulleted
     )

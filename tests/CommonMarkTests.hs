@@ -2,8 +2,7 @@ module CommonMarkTests (construct) where
 
 import qualified CMark
 import Prelude hiding (init)
-import Test.Tasty
-import Test.Tasty.HUnit
+import Test.Hspec hiding (example)
 import qualified Data.Text as Strict
 import qualified Data.Text.Lazy as Text
 import qualified Data.Text.Lazy.IO as TextIO
@@ -19,8 +18,8 @@ data ParseState = ParseState
     , input :: [String]
     , output :: [String]
     , state :: State
-    , siblings :: [TestTree]
-    , children :: [TestTree]
+    , siblings :: [Spec]
+    , children :: [Spec]
     , example :: Int
     }
 
@@ -49,7 +48,7 @@ step (ParseState path input output state siblings children example) line =
             , siblings =
                 if null children
                     then siblings
-                    else testGroup path (reverse children) : siblings
+                    else describe path (sequence_ $ reverse children) : siblings
             , children = []
             , example = example
             }
@@ -115,13 +114,13 @@ step (ParseState path input output state siblings children example) line =
                     }
 
 
-done :: ParseState -> [TestTree]
+done :: ParseState -> [Spec]
 done (ParseState path input output state siblings children _) =
     -- validate parse finished cleanly?
-    reverse $ testGroup path children : siblings
+    reverse $ describe path (sequence_ children) : siblings
 
 
-makeTest :: Int -> String -> String -> String -> TestTree
+makeTest :: Int -> String -> String -> String -> Spec
 makeTest i name input output =
   let
       source = Strict.map (\c -> if c == '→' then '\t' else c) $ Strict.pack $ input
@@ -129,22 +128,16 @@ makeTest i name input output =
       formatted = ElmFormat.Render.Markdown.formatMarkdown (const Nothing) (Parse.Markdown.parse $ Strict.unpack source)
 
       -- specOutput = Strict.map (\c -> if c == '→' then '\t' else c) $ Strict.pack output
-
-      description = "formatted markdown should render the same as the original\n\n"
-          ++ Strict.unpack source
-          ++ "\n"
-          ++ formatted
   in
-  testCase ("Example " ++ show i ++ ": " ++ name) $
-      assertEqual description
-          (CMark.commonmarkToHtml [] $ source)
-          (CMark.commonmarkToHtml [] $ Strict.pack formatted)
+  it ("Example " ++ show i ++ ": " ++ name) $
+        CMark.commonmarkToHtml [] (Strict.pack formatted)
+        `shouldBe` CMark.commonmarkToHtml [] source
 
 
-construct :: IO TestTree
+construct :: IO Spec
 construct =
     do
         spec <- TextIO.readFile "tests/test-files/CommonMark/spec.txt"
         return $
-            testGroup "CommonMark" $
-                done $ foldl step init (Text.lines spec)
+            describe "CommonMark" $
+                sequence_ $ done $ foldl step init (Text.lines spec)

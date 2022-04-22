@@ -1,9 +1,5 @@
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
-module CommandLine.TestWorld (TestWorldState, TestWorld, lastExitCode, init,uploadFile, downloadFile, eval,queueStdin,fullStdout,golden,fullStderr,expectExit,expectFileContents,goldenExitStdout) where
+module CommandLine.TestWorld (TestWorldState, TestWorld, lastExitCode, init,uploadFile, downloadFile, eval,queueStdin,fullStdout,golden,fullStderr,expectExit,expectFileContents,goldenExitStdout, testWorld) where
 
 import Prelude hiding (putStr, putStrLn, readFile, writeFile, init)
 import CommandLine.World
@@ -18,13 +14,13 @@ import Control.Monad.Identity (Identity)
 import Test.Hspec.Golden ( Golden(..) )
 import qualified Data.Text.IO
 import Test.Hspec.Core.Spec (Example(..), Result(..), ResultStatus(..))
-import Test.Tasty.Hspec (shouldBe, Expectation)
+import Test.Hspec (shouldBe, Expectation)
 
 
 data TestWorldState =
     TestWorldState
         { filesystem :: FileTree Text
-        , stdio :: Stdio.State
+        , stdio :: Stdio.Stdio
         , _lastExitCode :: LastExitCode
         }
 
@@ -80,7 +76,7 @@ instance Lens TestWorldState (FileTree Text) where
     get = filesystem
     set x s = s { filesystem = x }
 
-instance Lens TestWorldState Stdio.State where
+instance Lens TestWorldState Stdio.Stdio where
     get = stdio
     set x s = s { stdio = x }
 
@@ -110,8 +106,7 @@ instance Monad m => World (State.StateT TestWorldState m) where
     putStr = modify . Stdio.putStr
     putStrLn = modify . Stdio.putStrLn
 
-    writeStdout text =
-        putStr text
+    writeStdout = putStr
 
     putStrStderr = modify . Stdio.putStrStderr
     putStrLnStderr = modify . Stdio.putStrLnStderr
@@ -143,7 +138,7 @@ eval = State.evalState
 
 queueStdin :: Text -> TestWorld ()
 queueStdin =
-    modify' (undefined :: Stdio.State) . over . Stdio.queueStdin
+    modify' (undefined :: Stdio.Stdio) . over . Stdio.queueStdin
 
 
 init :: TestWorldState
@@ -162,12 +157,12 @@ downloadFile =
 
 fullStdout :: TestWorld Text
 fullStdout =
-    gets' (undefined :: Stdio.State) $ from Stdio.fullStdout
+    gets' (undefined :: Stdio.Stdio) $ from Stdio.fullStdout
 
 
 fullStderr :: TestWorld Text
 fullStderr =
-    gets' (undefined :: Stdio.State) $ from Stdio.fullStderr
+    gets' (undefined :: Stdio.Stdio) $ from Stdio.fullStderr
 
 
 lastExitCode :: TestWorld (Maybe Int)

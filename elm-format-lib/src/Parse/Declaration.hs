@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module Parse.Declaration where
 
 import Parse.ParsecAdapter ( (<|>), (<?>), choice, digit, optionMaybe, string, try )
@@ -16,7 +15,7 @@ import Parse.Whitespace
 import Reporting.Annotation (Located)
 
 
-declaration :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+declaration :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 declaration elmVersion =
     typeDecl elmVersion <|> infixDecl elmVersion <|> port elmVersion <|> definition elmVersion
 
@@ -32,9 +31,9 @@ topLevelStructure entry =
 
 -- TYPE ANNOTATIONS and DEFINITIONS
 
-definition :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+definition :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 definition elmVersion =
-    fmap I.Fix $ addLocation $ fmap (CommonDeclaration . I.Fix) $ addLocation
+    fmap I.Fix2 $ addLocation $ fmap (CommonDeclaration . I.Fix2) $ addLocation
     (
         (Expr.typeAnnotation elmVersion TypeAnnotation
             <|> Expr.definition elmVersion Definition
@@ -45,9 +44,9 @@ definition elmVersion =
 
 -- TYPE ALIAS and UNION TYPES
 
-typeDecl :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+typeDecl :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 typeDecl elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do  try (reserved elmVersion "type") <?> "a type declaration"
       postType <- forcedWS
       isAlias <- optionMaybe (string "alias" >> forcedWS)
@@ -79,7 +78,7 @@ typeDecl elmVersion =
 -- INFIX
 
 
-infixDecl :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+infixDecl :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 infixDecl elmVersion =
     expecting "an infix declaration" $
     choice
@@ -88,9 +87,9 @@ infixDecl elmVersion =
         ]
 
 
-infixDecl_0_19 :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+infixDecl_0_19 :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 infixDecl_0_19 elmVersion =
-    fmap I.Fix $ addLocation $
+    fmap I.Fix2 $ addLocation $
     let
         assoc =
             choice
@@ -101,14 +100,14 @@ infixDecl_0_19 elmVersion =
     in
     Fixity
         <$> (try (reserved elmVersion "infix") *> preCommented assoc)
-        <*> (preCommented $ (\n -> read [n]) <$> digit)
-        <*> (commented symOpInParens)
+        <*> preCommented ((\n -> read [n]) <$> digit)
+        <*> commented symOpInParens
         <*> (equals *> preCommented (lowVar elmVersion))
 
 
-infixDecl_0_16 :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+infixDecl_0_16 :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 infixDecl_0_16 elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do  assoc <-
           choice
             [ try (reserved elmVersion "infixl") >> return L
@@ -118,15 +117,15 @@ infixDecl_0_16 elmVersion =
       digitComments <- forcedWS
       n <- digit
       opComments <- forcedWS
-      Fixity_until_0_18 assoc digitComments (read [n]) opComments <$> anyOp elmVersion
+      Fixity_until_0_18 assoc digitComments (read [n]) opComments . I.Fix2 <$> addLocation (VarRef_ <$> anyOp elmVersion)
 
 
 -- PORT
 
-port :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
+port :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)
 port elmVersion =
   expecting "a port declaration" $
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do  try (reserved elmVersion "port")
       preNameComments <- whitespace
       name <- lowVar elmVersion

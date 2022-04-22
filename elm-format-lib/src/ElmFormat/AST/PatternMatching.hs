@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 module ElmFormat.AST.PatternMatching where
 
@@ -17,18 +16,18 @@ TODO: retain all comments in the output
 TODO: make complete function so it doesn't crash on invalid source files
 -}
 matchType ::
-    List (C1 'BeforeTerm (ASTNS Located ns 'PatternNK))
-    -> ASTNS Located ns 'TypeNK
-    -> ( List (C1 'BeforeTerm (ASTNS Located ns 'PatternNK), ASTNS Located ns 'TypeNK)
-       , ASTNS Located ns 'TypeNK
+    List (C1 'BeforeTerm (I.Fix2 Located (ASTNS ns) 'PatternNK))
+    -> I.Fix2 Located (ASTNS ns) 'TypeNK
+    -> ( List (C1 'BeforeTerm (I.Fix2 Located (ASTNS ns) 'PatternNK), I.Fix2 Located (ASTNS ns) 'TypeNK)
+       , I.Fix2 Located (ASTNS ns) 'TypeNK
        )
 matchType [] typ = ( [], typ )
-matchType (pat : restPat) (I.Fix (At region (FunctionType (C eol typ) restTyp multiline))) =
+matchType (pat : restPat) (I.Fix2 (At region (FunctionType (C eol typ) restTyp multiline))) =
     let
         nextTyp =
             case toCommentedList restTyp of
                 [ (C _ single) ] -> single
-                ( (C (_, _, eol2) first) : rest ) -> I.Fix $ At region $ FunctionType (C eol2 first) (Sequence rest) multiline
+                ( (C (_, _, eol2) first) : rest ) -> I.Fix2 $ At region $ FunctionType (C eol2 first) (Sequence rest) multiline
 
         ( pats, retType ) =
             matchType restPat nextTyp

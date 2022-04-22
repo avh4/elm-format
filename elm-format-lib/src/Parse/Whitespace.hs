@@ -7,7 +7,7 @@ import Parse.IParser
 import qualified Parse.Markdown as Markdown
 import qualified Parse.State as State
 import qualified Reporting.Error.Syntax as Syntax
-import Parse.ParsecAdapter hiding (newline, spaces, State)
+import Parse.ParsecAdapter
 
 
 padded :: IParser a -> IParser (C2 before after a)

@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module Parse.Pattern (term, expr) where
 
 import Parse.ParsecAdapter ((<|>), (<?>), char, choice, optionMaybe, try)
@@ -16,31 +15,34 @@ import Parse.Whitespace
 import qualified Parse.ParsecAdapter as Parsec
 
 
-basic :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
+basic :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 basic elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
     choice
       [ char '_' >> return Anything
       , VarPattern <$> lowVar elmVersion
-      , chunksToPattern <$> dotSep1 (capVar elmVersion)
+      , chunksToPattern <$> addLocation (dotSep1 (capVar elmVersion))
       , LiteralPattern <$> Literal.literal
       ]
   where
     chunksToPattern chunks =
-        case reverse chunks of
-          [UppercaseIdentifier "True"] ->
+        case reverse <$> chunks of
+          A.At _ [UppercaseIdentifier "True"] ->
               LiteralPattern (Boolean True)
 
-          [UppercaseIdentifier "False"] ->
+          A.At _ [UppercaseIdentifier "False"] ->
               LiteralPattern (Boolean False)
 
-          (last:rest) ->
-              DataPattern (reverse rest, last) []
+          A.At at (last:rest) ->
+              DataPattern (I.Fix2 $ A.At at $ CtorRef_ (reverse rest, last)) []
 
-          [] -> error "dotSep1 returned empty list"
+          A.At _ [] -> error "dotSep1 returned empty list"
 
 
-asPattern :: ElmVersion -> IParser (FixAST Located typeRef ctorRef varRef 'PatternNK) -> IParser (FixAST Located typeRef ctorRef varRef 'PatternNK)
+asPattern ::
+  ElmVersion
+  -> IParser (I.Fix2 Located (AST p) 'PatternNK)
+  -> IParser (I.Fix2 Located (AST p) 'PatternNK)
 asPattern elmVersion patternParser =
   do  (start, pattern, _) <- located patternParser
 
@@ -49,7 +51,7 @@ asPattern elmVersion patternParser =
       case maybeAlias of
         Just (postPattern, alias) ->
             do  end <- Parsec.getPosition
-                return $ I.Fix $ A.at start end $ Alias (C postPattern pattern) alias
+                return $ I.Fix2 $ A.at start end $ Alias (C postPattern pattern) alias
 
         Nothing ->
             return pattern
@@ -61,9 +63,9 @@ asPattern elmVersion patternParser =
           return (preAs, C postAs var)
 
 
-record :: ElmVersion -> IParser (FixAST Located typeRef ctorRef varRef 'PatternNK)
+record :: ElmVersion -> IParser (I.Fix2 Located (AST p) 'PatternNK)
 record elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do
       result <- surround'' '{' '}' (lowVar elmVersion)
       return $
@@ -74,31 +76,31 @@ record elmVersion =
                   RecordPattern fields
 
 
-tuple :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
+tuple :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 tuple elmVersion =
   do  (start, patterns, end) <- located $ parens'' (expr elmVersion)
 
       return $
         case patterns of
           Left comments ->
-            I.Fix $ A.at start end $ UnitPattern comments
+            I.Fix2 $ A.at start end $ UnitPattern comments
 
           Right [] ->
-            I.Fix $ A.at start end $ UnitPattern []
+            I.Fix2 $ A.at start end $ UnitPattern []
 
           Right [C ([], []) pattern] ->
             pattern
 
           Right [pattern] ->
-            I.Fix $ A.at start end $ PatternParens pattern
+            I.Fix2 $ A.at start end $ PatternParens pattern
 
           Right patterns ->
-            I.Fix $ A.at start end $ TuplePattern patterns
+            I.Fix2 $ A.at start end $ TuplePattern patterns
 
 
-list :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
+list :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 list elmVersion =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do
     result <- braces'' (expr elmVersion)
     return $
@@ -109,24 +111,24 @@ list elmVersion =
           ListPattern patterns
 
 
-term :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
+term :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 term elmVersion =
   choice [ record elmVersion, tuple elmVersion, list elmVersion, basic elmVersion ]
     <?> "a pattern"
 
 
-patternConstructor :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
+patternConstructor :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 patternConstructor elmVersion =
-  fmap I.Fix $ addLocation $
-    do  v <- dotSep1 (capVar elmVersion)
-        case reverse v of
-          [UppercaseIdentifier "True"]  -> return $ LiteralPattern (Boolean True)
-          [UppercaseIdentifier "False"] -> return $ LiteralPattern (Boolean False)
-          (last:rest) -> DataPattern (reverse rest, last) <$> spacePrefix (term elmVersion)
-          [] -> error "dotSep1 returned empty list"
+  fmap I.Fix2 $ addLocation $
+    do  v <- addLocation $ dotSep1 (capVar elmVersion)
+        case reverse <$> v of
+          A.At _ [UppercaseIdentifier "True"]  -> return $ LiteralPattern (Boolean True)
+          A.At _ [UppercaseIdentifier "False"] -> return $ LiteralPattern (Boolean False)
+          A.At at (last:rest) -> DataPattern (I.Fix2 $ A.At at $ CtorRef_ (reverse rest, last)) <$> spacePrefix (term elmVersion)
+          A.At _ [] -> error "dotSep1 returned empty list"
 
 
-expr :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternNK)
+expr :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 expr elmVersion =
     asPattern elmVersion subPattern <?> "a pattern"
   where
@@ -138,4 +140,4 @@ expr elmVersion =
             Left pattern ->
               pattern
             Right (region, first, rest, _) ->
-              I.Fix $ A.At region $ ConsPattern first rest
+              I.Fix2 $ A.At region $ ConsPattern first rest

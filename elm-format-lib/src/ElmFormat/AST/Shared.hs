@@ -1,5 +1,3 @@
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
 module ElmFormat.AST.Shared where
 
@@ -16,7 +14,7 @@ import qualified Data.Char as Char
 -}
 
 
-type List a = [a]
+type List = []
 
 
 newtype LowercaseIdentifier =
@@ -45,9 +43,20 @@ instance Monoid c => Applicative (Commented c) where
     pure = C mempty
     liftA2 f (C ca a) (C cb b) = C (ca <> cb) (f a b)
 
+instance Foldable (Commented c) where
+    foldMap f (C _ a) = f a
+
+instance Traversable (Commented c) where
+    sequenceA (C c1 fa) = C c1 <$> fa
+
 instance Coapplicative (Commented c) where
     extract (C _ a) = a
     {-# INLINE extract #-}
+
+instance Monoid c => Monad (Commented c) where
+    (C c1 a) >>= f =
+        C (c1 <> c2) b
+        where (C c2 b) = f a
 
 
 data IntRepresentation

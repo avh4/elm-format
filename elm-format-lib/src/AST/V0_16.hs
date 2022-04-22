@@ -1,10 +1,8 @@
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module AST.V0_16 (module AST.V0_16, module ElmFormat.AST.Shared) where
 
@@ -19,6 +17,10 @@ import qualified Cheapskate.Types as Markdown
 import ElmFormat.AST.Shared
 import qualified Data.Maybe as Maybe
 import Data.Text (Text)
+import Data.List.NonEmpty (NonEmpty)
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
+import Data.Bifoldable (Bifoldable(..))
 
 
 newtype ForceMultiline =
@@ -63,6 +65,18 @@ class AsCommentedList f where
     type CommentsFor f :: Type -> Type
     toCommentedList :: f a -> List (CommentsFor f a)
     fromCommentedList :: List (CommentsFor f a) -> Either Text (f a)
+
+
+type CommentedMap k v =
+    Map k (C2 'BeforeTerm 'AfterTerm v)
+
+mergeCommentedMap :: Ord k => (v -> v -> v) -> CommentedMap k v -> CommentedMap k v -> CommentedMap k v
+mergeCommentedMap merge left right =
+    let
+        merge' (C (pre1, post1) a) (C (pre2, post2) b) =
+            C (pre1 ++ pre2, post1 ++ post2) (merge a b)
+    in
+    Map.unionWith merge' left right
 
 
 {-| This represents a list of things separated by comments.
@@ -135,10 +149,7 @@ TODO: this should be replaced with (Sequence a)
 -}
 data OpenCommentedList a
     = OpenCommentedList [C2Eol 'BeforeTerm 'AfterTerm a] (C1Eol 'BeforeTerm a)
-    deriving (Eq, Show, Functor)
-
-instance Foldable OpenCommentedList where
-    foldMap f (OpenCommentedList rest last) = foldMap (f . extract) rest <> (f . extract) last
+    deriving (Eq, Show, Functor, Foldable)
 
 instance AsCommentedList OpenCommentedList where
     type CommentsFor OpenCommentedList = C2Eol 'BeforeTerm 'AfterTerm
@@ -180,11 +191,11 @@ data Pair key value =
         , _value :: C1 'BeforeTerm value
         , forceMultiline :: ForceMultiline
         }
-    deriving (Show, Eq, Functor)
+    deriving (Show, Eq, Functor, Foldable)
 
-mapPair :: (a1 -> a2) -> (b1 -> b2) -> Pair a1 b1 -> Pair a2 b2
-mapPair fa fb (Pair k v fm) =
-    Pair (fa <$> k) (fb <$> v) fm
+instance Bifunctor Pair where
+    bimap fa fb (Pair a b fm) =
+        Pair (fa <$> a) (fb <$> b) fm
 
 
 data Multiline
@@ -217,15 +228,74 @@ assocToString assoc =
 
 data NameWithArgs name arg =
     NameWithArgs name [C1 'BeforeTerm arg]
-    deriving (Eq, Show, Functor)
-instance Foldable (NameWithArgs name) where
-    foldMap f (NameWithArgs _ args) = foldMap (f . extract) args
+    deriving (Eq, Show, Functor, Foldable)
+
+instance Bifunctor NameWithArgs where
+    bimap fname farg (NameWithArgs name args) =
+        NameWithArgs (fname name) (fmap farg <$> args)
+
+
+data SourceTag
+  = Normal
+  | Effect Comments
+  | Port Comments
+  deriving (Eq, Show)
+
+
+type SourceSettings =
+    [ ( C2 'BeforeTerm 'AfterTerm LowercaseIdentifier
+      , C2 'BeforeTerm 'AfterTerm UppercaseIdentifier
+      )
+    ]
+
+
+-- | A listing of values. Something like (a,b,c) or (..) or (a,b,..)
+data Listing a
+    = ExplicitListing a Bool
+    | OpenListing (C2 'BeforeTerm 'AfterTerm ())
+    | ClosedListing
+    deriving (Eq, Ord, Show, Functor) -- TODO: is Ord needed?
+
+mergeListing :: (a -> a -> a) -> Listing a -> Listing a -> Listing a
+mergeListing merge left right =
+    case (left, right) of
+        (ClosedListing, ClosedListing) -> ClosedListing
+        (ClosedListing, OpenListing comments) -> OpenListing comments
+        (OpenListing comments, ClosedListing) -> OpenListing comments
+        (OpenListing (C (pre1, post1) ()), OpenListing (C (pre2, post2) ())) -> OpenListing (C (pre1 ++ pre2, post1 ++ post2) ())
+        (ClosedListing, ExplicitListing a multiline) -> ExplicitListing a multiline
+        (ExplicitListing a multiline, ClosedListing) -> ExplicitListing a multiline
+        (OpenListing comments, ExplicitListing _a _multiline) -> OpenListing comments
+        (ExplicitListing _a _multiline, OpenListing comments) -> OpenListing comments
+        (ExplicitListing a multiline1, ExplicitListing b multiline2) -> ExplicitListing (merge a b) (multiline1 || multiline2)
+
+
+-- | A value that can be imported or exported
+data ListingValue
+    = Value !LowercaseIdentifier
+    | OpValue SymbolIdentifier
+    | Union (C1 'AfterTerm UppercaseIdentifier) (Listing (CommentedMap UppercaseIdentifier ()))
+    deriving (Eq, Ord, Show) -- TODO: is Ord needed?
+
+
+data DetailedListing = DetailedListing
+    { values :: CommentedMap LowercaseIdentifier ()
+    , operators :: CommentedMap SymbolIdentifier ()
+    , types :: CommentedMap UppercaseIdentifier (C1 'BeforeTerm (Listing (CommentedMap UppercaseIdentifier ())))
+    }
+    deriving (Eq, Show)
+
+instance Semigroup DetailedListing where
+    (DetailedListing av ao at) <> (DetailedListing bv bo bt) = DetailedListing (av <> bv) (ao <> bo) (at <> bt)
+
+instance Monoid DetailedListing where
+    mempty = DetailedListing mempty mempty mempty
 
 
 data TypeConstructor ctorRef
     = NamedConstructor ctorRef
     | TupleConstructor Int -- will be 2 or greater, indicating the number of elements in the tuple
-    deriving (Eq, Show, Functor)
+    deriving (Eq, Show, Functor, Foldable)
 
 
 data BinopsClause varRef expr =
@@ -236,22 +306,20 @@ instance Bifunctor BinopsClause where
     bimap fvr fe = \case
         BinopsClause c1 vr c2 e -> BinopsClause c1 (fvr vr) c2 (fe e)
 
+instance Bifoldable BinopsClause where
+    bifoldMap fa fb (BinopsClause _ a _ b) = fa a <> fb b
+
 
 data IfClause e =
     IfClause (C2 'BeforeTerm 'AfterTerm e) (C2 'BeforeTerm 'AfterTerm e)
-    deriving (Eq, Show, Functor)
+    deriving (Eq, Show, Functor, Foldable)
 
 
 data TopLevelStructure a
     = DocComment Markdown.Blocks
     | BodyComment Comment
     | Entry a
-    deriving (Eq, Show, Functor)
-
-instance Foldable TopLevelStructure where
-    foldMap _ (DocComment _) = mempty
-    foldMap _ (BodyComment _) = mempty
-    foldMap f (Entry a) = f a
+    deriving (Eq, Show, Functor, Foldable)
 
 
 data LocalName
@@ -262,7 +330,14 @@ data LocalName
 
 
 data NodeKind
-    = TopLevelNK
+    = ModuleNK
+    | ImportMethodNK
+    | ModuleListingNK
+    | ModuleHeaderNK
+    | ModuleBodyNK
+    | TypeRefNK
+    | CtorRefNK
+    | VarRefNK
     | CommonDeclarationNK
     | TopLevelDeclarationNK
     | ExpressionNK
@@ -272,11 +347,58 @@ data NodeKind
     | TypeNK
 
 
-data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind) where
+class ASTParameters p where
+    type TypeRef p :: Type
+    type CtorRef p :: Type
+    type VarRef p :: Type
 
-    TopLevel ::
+data VariableNamespace (ns :: Type)
+instance ASTParameters (VariableNamespace ns) where
+    type TypeRef (VariableNamespace ns) = (ns, UppercaseIdentifier)
+    type CtorRef (VariableNamespace ns) = (ns, UppercaseIdentifier)
+    type VarRef (VariableNamespace ns) = Ref ns
+
+
+data AST p (getType :: NodeKind -> Type) (kind :: NodeKind) where
+
+    --
+    -- Singletons
+    --
+
+    TypeRef_ :: TypeRef p -> AST p getType 'TypeRefNK
+    CtorRef_ :: CtorRef p -> AST p getType 'CtorRefNK
+    VarRef_ :: VarRef p -> AST p getType 'VarRefNK
+
+    --
+    -- Module
+    --
+
+    Module ::
+        { initialComments :: Comments
+        , header :: Maybe (getType 'ModuleHeaderNK)
+        , docs :: Maybe Markdown.Blocks
+        , imports :: C1 'BeforeTerm (Map [UppercaseIdentifier] (C1 'BeforeTerm (getType 'ImportMethodNK)))
+        , moduleBody :: getType 'ModuleBodyNK
+        }
+        -> AST p getType 'ModuleNK
+    ImportMethod ::
+        { alias :: Maybe (C2 'BeforeSeparator 'AfterSeparator UppercaseIdentifier)
+        , exposedVars :: C2 'BeforeSeparator 'AfterSeparator (getType 'ModuleListingNK)
+        }
+        -> AST p getType 'ImportMethodNK
+    ModuleListing ::
+        Listing DetailedListing
+        -> AST p getType 'ModuleListingNK
+    ModuleHeader ::
+        { srcTag :: SourceTag
+        , name :: C2 'BeforeTerm 'AfterTerm [UppercaseIdentifier]
+        , moduleSettings :: Maybe (C2 'BeforeSeparator 'AfterSeparator SourceSettings)
+        , exports :: Maybe (C2 'BeforeSeparator 'AfterSeparator (getType 'ModuleListingNK))
+        }
+        -> AST p getType 'ModuleHeaderNK
+    ModuleBody ::
         [TopLevelStructure (getType 'TopLevelDeclarationNK)]
-        -> AST typeRef ctorRef varRef getType 'TopLevelNK
+        -> AST p getType 'ModuleBodyNK
 
     --
     -- Declarations
@@ -287,99 +409,92 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind)
         -> [C1 'BeforeTerm (getType 'PatternNK)]
         -> Comments
         -> getType 'ExpressionNK
-        -> AST typeRef ctorRef varRef getType 'CommonDeclarationNK
+        -> AST p getType 'CommonDeclarationNK
     TypeAnnotation ::
         C1 'AfterTerm (Ref ())
         -> C1 'BeforeTerm (getType 'TypeNK)
-        -> AST typeRef ctorRef varRef getType 'CommonDeclarationNK
+        -> AST p getType 'CommonDeclarationNK
     CommonDeclaration ::
         getType 'CommonDeclarationNK
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> AST p getType 'TopLevelDeclarationNK
     Datatype ::
         { nameWithArgs :: C2 'BeforeTerm 'AfterTerm (NameWithArgs UppercaseIdentifier LowercaseIdentifier)
         , tags :: OpenCommentedList (NameWithArgs UppercaseIdentifier (getType 'TypeNK))
         }
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> AST p getType 'TopLevelDeclarationNK
     TypeAlias ::
         Comments
         -> C2 'BeforeTerm 'AfterTerm (NameWithArgs UppercaseIdentifier LowercaseIdentifier)
         -> C1 'BeforeTerm (getType 'TypeNK)
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> AST p getType 'TopLevelDeclarationNK
     PortAnnotation ::
         C2 'BeforeTerm 'AfterTerm LowercaseIdentifier
         -> Comments
         -> getType 'TypeNK
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> AST p getType 'TopLevelDeclarationNK
     PortDefinition_until_0_16 ::
         C2 'BeforeTerm 'AfterTerm LowercaseIdentifier
         -> Comments
         -> getType 'ExpressionNK
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> AST p getType 'TopLevelDeclarationNK
     Fixity_until_0_18 ::
         Assoc
         -> Comments
         -> Int
         -> Comments
-        -> varRef
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> getType 'VarRefNK
+        -> AST p getType 'TopLevelDeclarationNK
     Fixity ::
         C1 'BeforeTerm Assoc
         -> C1 'BeforeTerm Int
         -> C2 'BeforeTerm 'AfterTerm SymbolIdentifier
         -> C1 'BeforeTerm LowercaseIdentifier
-        -> AST typeRef ctorRef varRef getType 'TopLevelDeclarationNK
+        -> AST p getType 'TopLevelDeclarationNK
 
     --
     -- Expressions
     --
 
-    Unit ::
-        Comments
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
-    Literal ::
-        LiteralValue
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
-    VarExpr ::
-        varRef
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+    Unit :: Comments -> AST p getType 'ExpressionNK
+    Literal :: LiteralValue -> AST p getType 'ExpressionNK
+    VarExpr :: getType 'VarRefNK -> AST p getType 'ExpressionNK
 
     App ::
         getType 'ExpressionNK
-        -> [C1 'BeforeTerm (getType 'ExpressionNK)]
+        -> List (C1 'BeforeTerm (getType 'ExpressionNK))
         -> FunctionApplicationMultiline
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     Unary ::
         UnaryOperator
         -> getType 'ExpressionNK
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     Binops ::
         getType 'ExpressionNK
-        -> List (BinopsClause varRef (getType 'ExpressionNK)) -- Non-empty
+        -> List (BinopsClause (getType 'VarRefNK) (getType 'ExpressionNK)) -- Non-empty
         -> Bool
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     Parens ::
         C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
 
     ExplicitList ::
         { terms :: Sequence (getType 'ExpressionNK)
         , trailingComments_el :: Comments
         , forceMultiline_el :: ForceMultiline
         }
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     Range ::
         C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)
         -> C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)
-        -> Bool
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
 
     Tuple ::
         [C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)]
         -> Bool
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     TupleFunction ::
         Int -- will be 2 or greater, indicating the number of elements in the tuple
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
 
     Record ::
         { base_r :: Maybe (C2 'BeforeTerm 'AfterTerm LowercaseIdentifier)
@@ -387,54 +502,54 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind)
         , trailingComments_r :: Comments
         , forceMultiline_r :: ForceMultiline
         }
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     Access ::
         getType 'ExpressionNK
         -> LowercaseIdentifier
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     AccessFunction ::
         LowercaseIdentifier
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
 
     Lambda ::
         [C1 'BeforeTerm (getType 'PatternNK)]
         -> Comments
         -> getType 'ExpressionNK
         -> Bool
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     If ::
         IfClause (getType 'ExpressionNK)
         -> [C1 'BeforeTerm (IfClause (getType 'ExpressionNK))]
         -> C1 'BeforeTerm (getType 'ExpressionNK)
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     Let ::
         [getType 'LetDeclarationNK]
         -> Comments
         -> getType 'ExpressionNK
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     LetCommonDeclaration ::
         getType 'CommonDeclarationNK
-        -> AST typeRef ctorRef varRef getType 'LetDeclarationNK
+        -> AST p getType 'LetDeclarationNK
     LetComment ::
         Comment
-        -> AST typeRef ctorRef varRef getType 'LetDeclarationNK
+        -> AST p getType 'LetDeclarationNK
     Case ::
         (C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK), Bool)
         -> [getType 'CaseBranchNK]
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
     CaseBranch ::
         { beforePattern :: Comments
         , beforeArrow :: Comments
         , afterArrow :: Comments
         , pattern :: getType 'PatternNK
-        , body :: getType 'ExpressionNK
+        , caseBranchBody :: getType 'ExpressionNK
         }
-        -> AST typeRef ctorRef varRef getType 'CaseBranchNK
+        -> AST p getType 'CaseBranchNK
 
     -- for type checking and code gen only
     GLShader ::
         String
-        -> AST typeRef ctorRef varRef getType 'ExpressionNK
+        -> AST p getType 'ExpressionNK
 
 
     --
@@ -442,50 +557,50 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind)
     --
 
     Anything ::
-        AST typeRef ctorRef varRef getType 'PatternNK
+        AST p getType 'PatternNK
     UnitPattern ::
         Comments
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     LiteralPattern ::
         LiteralValue
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     VarPattern ::
         LowercaseIdentifier
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     OpPattern ::
         SymbolIdentifier
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     DataPattern ::
-        ctorRef
+        getType 'CtorRefNK
         -> [C1 'BeforeTerm (getType 'PatternNK)]
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     PatternParens ::
         C2 'BeforeTerm 'AfterTerm (getType 'PatternNK)
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     TuplePattern ::
         [C2 'BeforeTerm 'AfterTerm (getType 'PatternNK)]
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     EmptyListPattern ::
         Comments
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     ListPattern ::
         [C2 'BeforeTerm 'AfterTerm (getType 'PatternNK)]
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     ConsPattern ::
         { first_cp :: C0Eol (getType 'PatternNK)
         , rest_cp :: Sequence (getType 'PatternNK)
         }
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     EmptyRecordPattern ::
         Comments
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     RecordPattern ::
         [C2 'BeforeTerm 'AfterTerm LowercaseIdentifier]
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
     Alias ::
         C1 'AfterTerm (getType 'PatternNK)
         -> C1 'BeforeTerm LowercaseIdentifier
-        -> AST typeRef ctorRef varRef getType 'PatternNK
+        -> AST p getType 'PatternNK
 
 
     --
@@ -494,69 +609,100 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind)
 
     UnitType ::
         Comments
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
     TypeVariable ::
         LowercaseIdentifier
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
     TypeConstruction ::
-        TypeConstructor typeRef
+        TypeConstructor (getType 'TypeRefNK)
         -> [C1 'BeforeTerm (getType 'TypeNK)]
         -> ForceMultiline
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
     TypeParens ::
         C2 'BeforeTerm 'AfterTerm (getType 'TypeNK)
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
     TupleType ::
-        [C2Eol 'BeforeTerm 'AfterTerm (getType 'TypeNK)]
+        NonEmpty (C2Eol 'BeforeTerm 'AfterTerm (getType 'TypeNK))
         -> ForceMultiline
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
     RecordType ::
         { base_rt :: Maybe (C2 'BeforeTerm 'AfterTerm LowercaseIdentifier)
         , fields_rt :: Sequence (Pair LowercaseIdentifier (getType 'TypeNK))
         , trailingComments_rt :: Comments
         , forceMultiline_rt :: ForceMultiline
         }
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
     FunctionType ::
         { first_ft :: C0Eol (getType 'TypeNK)
         , rest_ft :: Sequence (getType 'TypeNK)
         , forceMultiline_ft :: ForceMultiline
         }
-        -> AST typeRef ctorRef varRef getType 'TypeNK
+        -> AST p getType 'TypeNK
 
 deriving instance
-    ( Eq typeRef, Eq ctorRef, Eq varRef
+    ( Eq (getType 'ModuleNK)
+    , Eq (getType 'ImportMethodNK)
+    , Eq (getType 'ModuleListingNK)
+    , Eq (getType 'ModuleHeaderNK)
+    , Eq (getType 'ModuleBodyNK)
     , Eq (getType 'CommonDeclarationNK)
     , Eq (getType 'TopLevelDeclarationNK)
+    , Eq (getType 'TypeRefNK)
+    , Eq (getType 'CtorRefNK)
+    , Eq (getType 'VarRefNK)
     , Eq (getType 'ExpressionNK)
     , Eq (getType 'LetDeclarationNK)
     , Eq (getType 'CaseBranchNK)
     , Eq (getType 'PatternNK)
     , Eq (getType 'TypeNK)
+    , Eq (TypeRef p) -- TODO: is there a way to not need UndecidableInstances for this?
+    , Eq (CtorRef p)
+    , Eq (VarRef p)
     ) =>
-    Eq (AST typeRef ctorRef varRef getType kind)
+    Eq (AST p getType kind)
 deriving instance
-    ( Show typeRef, Show ctorRef, Show varRef
+    ( Show (getType 'ModuleNK)
+    , Show (getType 'ImportMethodNK)
+    , Show (getType 'ModuleListingNK)
+    , Show (getType 'ModuleHeaderNK)
+    , Show (getType 'ModuleBodyNK)
     , Show (getType 'CommonDeclarationNK)
     , Show (getType 'TopLevelDeclarationNK)
+    , Show (getType 'TypeRefNK)
+    , Show (getType 'CtorRefNK)
+    , Show (getType 'VarRefNK)
     , Show (getType 'ExpressionNK)
     , Show (getType 'LetDeclarationNK)
     , Show (getType 'CaseBranchNK)
     , Show (getType 'PatternNK)
     , Show (getType 'TypeNK)
+    , Show (TypeRef p)
+    , Show (CtorRef p)
+    , Show (VarRef p)
     ) =>
-    Show (AST typeRef ctorRef varRef getType kind)
+    Show (AST p getType kind)
 
 
 mapAll ::
-    (typeRef1 -> typeRef2) -> (ctorRef1 -> ctorRef2) -> (varRef1 -> varRef2)
+    (TypeRef p1 -> TypeRef p2)
+    -> (CtorRef p1 -> CtorRef p2)
+    -> (VarRef p1 -> VarRef p2)
     -> (forall kind. getType1 kind -> getType2 kind)
     -> (forall kind.
-        AST typeRef1 ctorRef1 varRef1 getType1 kind
-        -> AST typeRef2 ctorRef2 varRef2 getType2 kind
+        AST p1 getType1 kind
+        -> AST p2 getType2 kind
         )
 mapAll ftyp fctor fvar fast = \case
-    TopLevel tls -> TopLevel (fmap (fmap fast) tls)
+    TypeRef_ r -> TypeRef_ (ftyp r)
+    CtorRef_ r -> CtorRef_ (fctor r)
+    VarRef_ r -> VarRef_ (fvar r)
+
+    -- Module
+    Module c h d i b -> Module c (fmap fast h) d (fmap (fmap $ fmap fast) i) (fast b)
+    ImportMethod as exp -> ImportMethod as (fmap fast exp)
+    ModuleListing lst -> ModuleListing lst
+    ModuleHeader st n s e -> ModuleHeader st n s (fmap (fmap fast) e)
+    ModuleBody ds -> ModuleBody (fmap (fmap fast) ds)
 
     -- Declaration
     Definition name args c e -> Definition (fast name) (fmap (fmap fast) args) c (fast e)
@@ -566,19 +712,19 @@ mapAll ftyp fctor fvar fast = \case
     TypeAlias c nameWithArgs t -> TypeAlias c nameWithArgs (fmap fast t)
     PortAnnotation name c t -> PortAnnotation name c (fast t)
     PortDefinition_until_0_16 name c e -> PortDefinition_until_0_16 name c (fast e)
-    Fixity_until_0_18 a c n c' name -> Fixity_until_0_18 a c n c' (fvar name)
+    Fixity_until_0_18 a c n c' name -> Fixity_until_0_18 a c n c' (fast name)
     Fixity a n op name -> Fixity a n op name
 
     -- Expressions
     Unit c -> Unit c
     Literal l -> Literal l
-    VarExpr var -> VarExpr (fvar var)
+    VarExpr var -> VarExpr (fast var)
     App first rest ml -> App (fast first) (fmap (fmap fast) rest) ml
     Unary op e -> Unary op (fast e)
-    Binops first ops ml -> Binops (fast first) (fmap (bimap fvar fast) ops) ml
+    Binops first ops ml -> Binops (fast first) (fmap (bimap fast fast) ops) ml
     Parens e -> Parens (fmap fast e)
     ExplicitList terms c ml -> ExplicitList (fmap fast terms) c ml
-    Range left right ml -> Range (fmap fast left) (fmap fast right) ml
+    Range left right -> Range (fmap fast left) (fmap fast right)
     Tuple terms ml -> Tuple (fmap (fmap fast) terms) ml
     TupleFunction n -> TupleFunction n
     Record base fields c ml -> Record base (fmap (fmap fast) fields) c ml
@@ -599,7 +745,7 @@ mapAll ftyp fctor fvar fast = \case
     LiteralPattern l -> LiteralPattern l
     VarPattern l -> VarPattern l
     OpPattern s -> OpPattern s
-    DataPattern ctor pats -> DataPattern (fctor ctor) (fmap (fmap fast) pats)
+    DataPattern ctor pats -> DataPattern (fast ctor) (fmap (fmap fast) pats)
     PatternParens pat -> PatternParens (fmap fast pat)
     TuplePattern pats -> TuplePattern (fmap (fmap fast) pats)
     EmptyListPattern c -> EmptyListPattern c
@@ -612,17 +758,78 @@ mapAll ftyp fctor fvar fast = \case
     -- Types
     UnitType c -> UnitType c
     TypeVariable name -> TypeVariable name
-    TypeConstruction name args forceMultiline -> TypeConstruction (fmap ftyp name) (fmap (fmap fast) args) forceMultiline
+    TypeConstruction name args forceMultiline -> TypeConstruction (fmap fast name) (fmap (fmap fast) args) forceMultiline
     TypeParens typ -> TypeParens (fmap fast typ)
     TupleType typs forceMultiline -> TupleType (fmap (fmap fast) typs) forceMultiline
     RecordType base fields c ml -> RecordType base (fmap (fmap fast) fields) c ml
     FunctionType first rest ml -> FunctionType (fmap fast first) (fmap fast rest) ml
 
-
-instance I.IFunctor (AST typeRef ctorRef varRef) where
+instance I.HFunctor (AST p) where
     -- TODO: it's probably worth making an optimized version of this
-    imap = mapAll id id id
+    hmap = mapAll id id id
 
+instance I.HFoldable (AST p) where
+    hFoldMap f = \case
+      TypeRef_ _ -> mempty
+      CtorRef_ _ -> mempty
+      VarRef_ _ -> mempty
+      Module _ header _ imports body -> foldMap f header <> foldMap (foldMap $ foldMap f) imports <> f body
+      ImportMethod _ exp -> foldMap f exp
+      ModuleListing _ -> mempty
+      ModuleHeader _ _ _ exports -> foldMap (foldMap f) exports
+      ModuleBody defs -> foldMap (foldMap f) defs
+      Definition pat args _ expr -> f pat <> foldMap (f . extract) args <> f expr
+      TypeAnnotation _ typ -> f (extract typ)
+      CommonDeclaration def -> f def
+      Datatype _ tags -> foldMap (foldMap f) tags
+      TypeAlias _ _ typ -> f (extract typ)
+      PortAnnotation _ _ typ -> f typ
+      PortDefinition_until_0_16 _ _ typ -> f typ
+      Fixity_until_0_18 _ _ _ _ ref -> f ref
+      Fixity {} -> mempty
+      Unit _ -> mempty
+      Literal _ -> mempty
+      VarExpr var -> f var
+      App first rest _ -> f first <> foldMap (f . extract) rest
+      Unary _ expr -> f expr
+      Binops first rest _ -> f first <> foldMap (bifoldMap f f) rest
+      Parens term -> f (extract term)
+      ExplicitList terms _ _ -> foldMap f terms
+      Range a b -> f (extract a) <> f (extract b)
+      Tuple terms _ -> foldMap (f . extract) terms
+      TupleFunction _ -> mempty
+      Record _ fields _ _ -> foldMap (foldMap f) fields
+      Access term _ -> f term
+      AccessFunction _ -> mempty
+      Lambda pats _ expr _ -> foldMap (f . extract) pats <> f expr
+      If first rest last -> foldMap f first <> foldMap (foldMap f . extract) rest <> f (extract last)
+      Let defs _ expr -> foldMap f defs <> f expr
+      LetCommonDeclaration def -> f def
+      LetComment _ -> mempty
+      Case pred branches -> f (extract $ fst pred) <> foldMap f branches
+      CaseBranch _ _ _ pat expr -> f pat <> f expr
+      GLShader _ -> mempty
+      Anything -> mempty
+      UnitPattern _ -> mempty
+      LiteralPattern _ -> mempty
+      VarPattern _ -> mempty
+      OpPattern _ -> mempty
+      DataPattern ctor args -> f ctor <> foldMap (f . extract) args
+      PatternParens pat -> f (extract pat)
+      TuplePattern pats -> foldMap (f . extract) pats
+      EmptyListPattern _ -> mempty
+      ListPattern pats -> foldMap (f . extract) pats
+      ConsPattern first rest -> f (extract first) <> foldMap f rest
+      EmptyRecordPattern _ -> mempty
+      RecordPattern _ -> mempty
+      Alias pat _ -> f (extract pat)
+      UnitType _ -> mempty
+      TypeVariable _ -> mempty
+      TypeConstruction tc args _ -> foldMap f tc <> foldMap (f . extract) args
+      TypeParens t -> f $ extract t
+      TupleType ne _ -> foldMap (f . extract) ne
+      RecordType _ fs _ _ -> foldMap (foldMap f) fs
+      FunctionType ft se _ -> f (extract ft) <> foldMap f se
 
 
 --
@@ -633,22 +840,23 @@ instance I.IFunctor (AST typeRef ctorRef varRef) where
 topDownReferencesWithContext ::
     forall
         context ns
-        typeRef2 ctorRef2 varRef2
+        p2
         ann kind.
     Functor ann =>
     Coapplicative ann =>
+    ASTParameters p2 =>
     (LocalName -> context -> context) -- TODO: since the caller typically passes a function that builds a Map or Set, this could be optimized by taking `List (LocalName)` instead of one at a time
-    -> (context -> (ns, UppercaseIdentifier) -> typeRef2)
-    -> (context -> (ns, UppercaseIdentifier) -> ctorRef2)
-    -> (context -> Ref ns -> varRef2)
+    -> (context -> (ns, UppercaseIdentifier) -> TypeRef p2)
+    -> (context -> (ns, UppercaseIdentifier) -> CtorRef p2)
+    -> (context -> Ref ns -> VarRef p2)
     -> context
-    -> I.Fix ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)) kind
-    -> I.Fix ann (AST typeRef2 ctorRef2 varRef2) kind
+    -> I.Fix2 ann (AST (VariableNamespace ns)) kind
+    -> I.Fix2 ann (AST p2) kind
 topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initialAst =
     let
         namesFromPattern' ::
-            forall a b c kind'. -- We actually only care about PatternNK' here
-            AST a b c (Const [LocalName]) kind'
+            forall p kind'. -- We actually only care about PatternNK' here
+            AST p (Const [LocalName]) kind'
             -> Const [LocalName] kind'
         namesFromPattern' = \case
             Anything -> mempty
@@ -668,17 +876,17 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
 
         namesFromPattern ::
             Coapplicative ann' =>
-            I.Fix ann' (AST a b c) kind'
+            I.Fix2 ann' (AST p) kind'
             -> [LocalName]
         namesFromPattern =
-            getConst . I.cata (namesFromPattern' . extract)
+            getConst . I.fold2 (namesFromPattern' . extract)
 
         namesFrom ::
             Coapplicative ann' =>
-            I.Fix ann' (AST a b c) kind'
+            I.Fix2 ann' (AST p) kind'
             -> [LocalName]
         namesFrom decl =
-            case extract $ I.unFix decl of
+            case extract $ I.unFix2 decl of
                 Definition p _ _ _ -> namesFromPattern p
                 TypeAnnotation _ _ -> mempty
 
@@ -697,17 +905,20 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
 
         newDefinitionsAtNode ::
             forall kind'.
-            AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)
-                (I.Fix ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)))
+            AST (VariableNamespace ns)
+                (I.Fix2 ann (AST (VariableNamespace ns)))
                 kind'
             -> [LocalName]
         newDefinitionsAtNode node =
             case node of
-                TopLevel decls ->
+                Module _ _ _ _ body ->
+                    newDefinitionsAtNode (extract $ I.unFix2 body)
+
+                ModuleBody decls ->
                     foldMap (foldMap namesFrom) decls
 
                 CommonDeclaration d ->
-                    newDefinitionsAtNode (extract $ I.unFix d)
+                    newDefinitionsAtNode (extract $ I.unFix2 d)
 
                 Definition first rest _ _ ->
                     foldMap namesFromPattern (first : fmap extract rest)
@@ -719,7 +930,7 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
                     foldMap namesFrom decls
 
                 LetCommonDeclaration d ->
-                    newDefinitionsAtNode (extract $ I.unFix d)
+                    newDefinitionsAtNode (extract $ I.unFix2 d)
 
                 CaseBranch _ _ _ p _ ->
                     namesFromPattern p
@@ -730,13 +941,13 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
         step ::
             forall kind'.
             context
-            -> AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)
-                (I.Fix ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)))
+            -> AST (VariableNamespace ns)
+                (I.Fix2 ann (AST (VariableNamespace ns)))
                 kind'
-            -> AST typeRef2 ctorRef2 varRef2
+            -> AST p2
                 (Compose
                     ((,) context)
-                    (I.Fix ann (AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns)))
+                    (I.Fix2 ann (AST (VariableNamespace ns)))
                 )
                 kind'
         step context node =
@@ -744,8 +955,8 @@ topDownReferencesWithContext defineLocal fType fCtor fVar initialContext initial
                 context' = foldl (flip defineLocal) context (newDefinitionsAtNode node)
             in
             mapAll (fType context') (fCtor context') (fVar context') id
-                $ I.imap (Compose . (,) context') node
+                $ I.hmap (Compose . (,) context') node
     in
-    I.ana
-        (\(Compose (context, ast)) -> step context <$> I.unFix ast)
+    I.unfold2
+        (\(Compose (context, ast)) -> step context <$> I.unFix2 ast)
         (Compose (initialContext, initialAst))

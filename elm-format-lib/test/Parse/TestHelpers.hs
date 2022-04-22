@@ -2,8 +2,7 @@ module Parse.TestHelpers where
 
 import Elm.Utils ((|>))
 
-import Test.Tasty
-import Test.Tasty.HUnit
+import Test.Hspec
 
 import AST.V0_16
 import AST.Structure
@@ -23,28 +22,28 @@ parseFullInput parser =
     (\x _ -> x) <$> parser <*> eof
 
 
-assertParse :: (Show a, Eq a) => IParser a -> String -> a -> Assertion
+assertParse :: (Show a, Eq a) => IParser a -> String -> a -> Expectation
 assertParse parser input expected =
     let
         output = iParse (parseFullInput parser) input
     in
         case output of
             Left err ->
-                assertEqual (show err) False True
+                expectationFailure (show err)
             Right result ->
-                assertEqual input expected result
+                expected `shouldBe` result
 
 
-assertParseFailure :: (Show a) => IParser a -> String -> Assertion
+assertParseFailure :: (Show a) => IParser a -> String -> Expectation
 assertParseFailure parser input =
     let
         output = iParse (parseFullInput parser) input
     in
         case output of
-            Left err ->
-                assertEqual (show err) True True
+            Left _ ->
+                pure ()
             Right result ->
-                assertEqual (show result) True False
+                expectationFailure ("Expected parse failure, but parsed: " <> show result)
 
 
 nowhere :: Region
@@ -52,9 +51,9 @@ nowhere = A.Region (A.Position 0 0) (A.Position 0 0)
 
 at ::
     Word16 -> Word16 -> Word16 -> Word16
-   -> AST (ns, UppercaseIdentifier) (ns, UppercaseIdentifier) (Ref ns) (ASTNS Located ns) kind
-   -> ASTNS Located ns kind
-at a b c d = I.Fix . A.At (A.Region (A.Position a b) (A.Position c d))
+   -> AST (VariableNamespace  ns) (I.Fix2 Located (ASTNS ns)) kind
+   -> I.Fix2 Located (ASTNS ns) kind
+at a b c d = I.Fix2 . A.At (A.Region (A.Position a b) (A.Position c d))
 
 
 {-| Checks that removing indentation causes parsing to fail.
@@ -62,12 +61,13 @@ at a b c d = I.Fix . A.At (A.Region (A.Position a b) (A.Position c d))
 For each "\n " in the input string, a test case will be generated checking that
 the given parser will fail if that "\n " is replaced by "\n".
 -}
-mustBeIndented :: Show a => IParser a -> [Char] -> TestTree
+mustBeIndented :: Show a => IParser a -> [Char] -> SpecWith ()
 mustBeIndented parser input =
-    input
+    describe "must be indented" $ do
+        input
         |> generateReplacements "\n " "\n"
-        |> List.map (testCase "" . assertParseFailure parser)
-        |> testGroup "must be indented"
+        |> List.map (it "" . assertParseFailure parser)
+        |> sequence_
 
 
 generateReplacements :: (Eq a) => [a] -> [a] -> [a] -> [[a]]

@@ -1,7 +1,4 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE PolyKinds #-}
 module ElmFormat.AST.PublicAST.Module (Module(..), fromModule, toModule) where
 
 import ElmFormat.AST.PublicAST.Core
@@ -10,10 +7,7 @@ import ElmFormat.AST.PublicAST.Expression
 import ElmFormat.AST.PublicAST.Type
 import Reporting.Annotation (Located(At))
 import qualified AST.V0_16 as AST
-import qualified AST.Module as AST
-import qualified AST.Listing as AST
 import Data.Map.Strict (Map)
-import qualified Data.Maybe as Maybe
 import qualified ElmFormat.ImportInfo as ImportInfo
 import qualified Data.Map.Strict as Map
 import qualified Data.Indexed as I
@@ -21,7 +15,6 @@ import AST.MatchReferences (fromMatched, matchReferences)
 import Data.Text (Text)
 import qualified Data.Either as Either
 import qualified Data.Text as Text
-import Data.Maybe (fromMaybe)
 
 
 data Module
@@ -31,42 +24,59 @@ data Module
         , body :: List (MaybeF LocatedIfRequested TopLevelStructure)
         }
 
-fromModule :: Config -> AST.Module [UppercaseIdentifier] (ASTNS Located [UppercaseIdentifier] 'TopLevelNK) -> Module
+fromModule :: Config -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ModuleNK -> Module
 fromModule config = \case
-    modu@(AST.Module _ maybeHeader _ (C _ imports) body) ->
+    I.Fix2 (At _ modu@(AST.Module _ maybeHeader _ (C _ imports) body)) ->
         let
-            header =
-                Maybe.fromMaybe AST.defaultHeader maybeHeader
+            name =
+                case maybeHeader of
+                    Nothing ->
+                        [UppercaseIdentifier "Main"]
 
-            (AST.Header _ (C _ name) _ _) = header
+                    Just (I.Fix2 (At _ (AST.ModuleHeader _ (C _ name) _ _))) ->
+                        name
 
             importInfo =
-                ImportInfo.fromModule mempty modu
+                ImportInfo.fromModule mempty (I.hmap (I.fold2 (I.Fix . extract)) modu)
 
             normalize =
                 mapNs (fromMatched []) . matchReferences importInfo
         in
         Module
             (ModuleName name)
-            (Map.mapWithKey (\m (C comments i) -> fromImportMethod m i) $ Map.mapKeys ModuleName imports)
-            (fromTopLevelStructures config $ normalize body)
+            (Map.mapWithKey (\m (C comments i) -> fromImportMethod m (I.fold2 (I.Fix . extract) i)) $ Map.mapKeys ModuleName imports)
+            (fromModuleBody config $ normalize body)
 
-toModule :: Module -> AST.Module [UppercaseIdentifier] (ASTNS Identity [UppercaseIdentifier] 'TopLevelNK)
+toModule :: Module -> I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK
 toModule (Module (ModuleName name) imports body) =
     -- TODO: remove this placeholder
-    AST.Module
+    I.Fix $ AST.Module
         []
-        (Just $ AST.Header
+        (Just $ I.Fix $ AST.ModuleHeader
             AST.Normal
             (C ([], []) name)
             Nothing
             Nothing
         )
-        (noRegion Nothing)
+        Nothing
         (C [] $ Map.mapKeys (\(ModuleName ns) -> ns) $ C [] . toImportMethod <$> imports)
-        (f $ AST.TopLevel $ mconcat $ fmap (toTopLevelStructures . extract) body)
-    where
-        f = I.Fix . Identity
+        (toModuleBody body)
+
+
+fromModuleBody ::
+    Config
+    -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ModuleBodyNK
+    -> List (MaybeF LocatedIfRequested TopLevelStructure)
+fromModuleBody config = \case
+    I.Fix2 (At _ (AST.ModuleBody decls)) ->
+        fromTopLevelStructures config decls
+
+toModuleBody ::
+    List (MaybeF LocatedIfRequested TopLevelStructure)
+    -> I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleBodyNK
+toModuleBody decls =
+    I.Fix $ AST.ModuleBody $ foldMap (toTopLevelStructures . extract) decls
+
 
 instance ToJSON Module where
     toJSON = undefined
@@ -93,8 +103,8 @@ data Import
         }
     deriving (Generic)
 
-fromImportMethod :: ModuleName -> AST.ImportMethod -> Import
-fromImportMethod moduleName (AST.ImportMethod alias (C comments exposing)) =
+fromImportMethod :: ModuleName -> I.Fix (ASTNS [UppercaseIdentifier]) 'ImportMethodNK -> Import
+fromImportMethod moduleName (I.Fix (AST.ImportMethod alias (C comments (I.Fix (AST.ModuleListing exposing))))) =
     let
         as_ =
             case alias of
@@ -103,16 +113,16 @@ fromImportMethod moduleName (AST.ImportMethod alias (C comments exposing)) =
     in
     Import as_ exposing
 
-toImportMethod :: Import -> AST.ImportMethod
+toImportMethod :: Import -> I.Fix (ASTNS [UppercaseIdentifier]) 'ImportMethodNK
 toImportMethod (Import alias exposing) =
-    AST.ImportMethod
+    I.Fix $ AST.ImportMethod
         (case alias of
             ModuleName [single] ->
                 Just $ C ([], []) single
             _ ->
                 Nothing
         )
-        (C ([], []) exposing)
+        (C ([], []) $ I.Fix $ AST.ModuleListing exposing)
 
 instance ToJSON Import where
     toEncoding = genericToEncoding defaultOptions
@@ -140,17 +150,17 @@ data TopLevelStructure
     | Comment_tls Comment
     | TODO_TopLevelStructure String
 
-fromTopLevelStructures :: Config -> ASTNS Located [UppercaseIdentifier] 'TopLevelNK -> List (MaybeF LocatedIfRequested TopLevelStructure)
-fromTopLevelStructures config (I.Fix (At _ (AST.TopLevel decls))) =
+fromTopLevelStructures :: Config -> List (AST.TopLevelStructure (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK)) -> List (MaybeF LocatedIfRequested TopLevelStructure)
+fromTopLevelStructures config decls =
     let
         toDefBuilder :: AST.TopLevelStructure
-                     (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK) -> MaybeF LocatedIfRequested (DefinitionBuilder TopLevelStructure)
+                     (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK) -> MaybeF LocatedIfRequested (DefinitionBuilder TopLevelStructure)
         toDefBuilder decl =
-            case fmap I.unFix decl of
+            case fmap I.unFix2 decl of
                 AST.Entry (At region entry) ->
                     JustF $ fromLocated config $ At region $
                     case entry of
-                        AST.CommonDeclaration (I.Fix (At _ def)) ->
+                        AST.CommonDeclaration (I.Fix2 (At _ def)) ->
                             Right def
 
                         AST.TypeAlias c1 (C (c2, c3) (AST.NameWithArgs name args)) (C c4 t) ->
@@ -175,19 +185,19 @@ fromTopLevelStructures config (I.Fix (At _ (AST.TopLevel decls))) =
     in
     mkDefinitions config DefinitionStructure $ fmap toDefBuilder decls
 
-toTopLevelStructures :: TopLevelStructure -> List (AST.TopLevelStructure (ASTNS Identity [UppercaseIdentifier] 'TopLevelDeclarationNK))
+toTopLevelStructures :: TopLevelStructure -> List (AST.TopLevelStructure (I.Fix (ASTNS [UppercaseIdentifier]) 'TopLevelDeclarationNK))
 toTopLevelStructures = \case
     DefinitionStructure def ->
-        AST.Entry . I.Fix . Identity . AST.CommonDeclaration <$> fromDefinition def
+        AST.Entry . I.Fix . AST.CommonDeclaration <$> fromDefinition def
 
     TypeAlias name parameters typ ->
-        pure $ AST.Entry $ I.Fix $ Identity $ AST.TypeAlias
+        pure $ AST.Entry $ I.Fix $ AST.TypeAlias
             []
             (C ([], []) (AST.NameWithArgs name (fmap (C []) parameters)))
             (C [] $ toRawAST typ)
 
     CustomType name parameters variants ->
-        pure $ AST.Entry $ I.Fix $ Identity $ AST.Datatype
+        pure $ AST.Entry $ I.Fix $ AST.Datatype
             (C ([], []) (AST.NameWithArgs name (fmap (C []) parameters)))
             (Either.fromRight undefined $ AST.fromCommentedList (C ([], [], Nothing) . fromCustomTypeVariant <$> variants))
 

@@ -1,6 +1,4 @@
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE DataKinds #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module ElmFormat.AST.PublicAST.Type (Type_(..), CustomTypeVariant(..), mkCustomTypeVariant, fromCustomTypeVariant) where
 
@@ -13,6 +11,8 @@ import qualified Data.ReversedList as ReversedList
 import Data.ReversedList (Reversed)
 import qualified Data.Either as Either
 import Data.Maybe (fromMaybe)
+import Data.List.NonEmpty (NonEmpty)
+import Reporting.Annotation (Located(At))
 
 
 data Type_
@@ -26,7 +26,7 @@ data Type_
         { name_tv :: LowercaseIdentifier
         }
     | TupleType
-        { terms :: List (LocatedIfRequested Type_) -- At least two items
+        { terms :: NonEmpty (LocatedIfRequested Type_) -- At least two items
         }
     | RecordType
         { base :: Maybe LowercaseIdentifier
@@ -45,7 +45,7 @@ instance ToPublicAST 'TypeNK where
         AST.UnitType comments ->
             UnitType
 
-        AST.TypeConstruction (AST.NamedConstructor ( namespace, name )) args forceMultine ->
+        AST.TypeConstruction (AST.NamedConstructor (I.Fix2 (At _ (AST.TypeRef_ ( namespace, name ))))) args forceMultine ->
             TypeReference
                 name
                 (ModuleName namespace)
@@ -58,7 +58,7 @@ instance ToPublicAST 'TypeNK where
             TypeVariable name
 
         AST.TypeParens (C comments t) ->
-            fromRawAST' config (extract $ I.unFix t)
+            fromRawAST' config (extract $ I.unFix2 t)
 
         AST.TupleType terms multiline ->
             TupleType
@@ -91,13 +91,13 @@ instance ToPublicAST 'TypeNK where
                         (ReversedList.toList acc, last)
 
 instance FromPublicAST 'TypeNK where
-    toRawAST' = \case
+    toRawAST' = I.Fix . \case
         UnitType ->
             AST.UnitType []
 
         TypeReference name (ModuleName namespace) args ->
             AST.TypeConstruction
-                (AST.NamedConstructor ( namespace, name ))
+                (AST.NamedConstructor $ I.Fix $ AST.TypeRef_ ( namespace, name ))
                 (C [] . toRawAST <$> args)
                 (AST.ForceMultiline False)
 
@@ -228,13 +228,13 @@ data CustomTypeVariant
         }
     deriving (Generic)
 
-mkCustomTypeVariant :: Config -> AST.NameWithArgs UppercaseIdentifier (ASTNS Located [UppercaseIdentifier] 'TypeNK) -> CustomTypeVariant
+mkCustomTypeVariant :: Config -> AST.NameWithArgs UppercaseIdentifier (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TypeNK) -> CustomTypeVariant
 mkCustomTypeVariant config (AST.NameWithArgs name args) =
     CustomTypeVariant
         name
         ((\(C c a) -> fromRawAST config a) <$> args)
 
-fromCustomTypeVariant :: CustomTypeVariant -> AST.NameWithArgs UppercaseIdentifier (ASTNS Identity [UppercaseIdentifier] 'TypeNK)
+fromCustomTypeVariant :: CustomTypeVariant -> AST.NameWithArgs UppercaseIdentifier (I.Fix (ASTNS [UppercaseIdentifier]) 'TypeNK)
 fromCustomTypeVariant = \case
     CustomTypeVariant name parameterTypes ->
         AST.NameWithArgs

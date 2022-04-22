@@ -17,18 +17,33 @@ build-type: Simple
 
 
 common common-options
-    ghc-options:
-        -O2 -Wall -Wno-name-shadowing
-
     default-language: Haskell2010
-
+    ghc-options:
+        -O2
+        -Wall
+        -Wcompat
+        -Wredundant-constraints
+        -Wno-name-shadowing
+        -Werror=inaccessible-code
+        -Werror=missing-home-modules
+        -Werror=overflowed-literals
+        -Werror=overlapping-patterns
     default-extensions:
+        ApplicativeDo
+        DataKinds
+        DeriveFoldable
         DeriveFunctor
-        MultiParamTypeClasses
-        LambdaCase
-        OverloadedStrings
-        ScopedTypeVariables
+        DeriveTraversable
+        FlexibleContexts
         FlexibleInstances
+        GeneralizedNewtypeDeriving
+        LambdaCase
+        MultiParamTypeClasses
+        OverloadedStrings
+        PolyKinds
+        ScopedTypeVariables
+        TypeApplications
+        TypeFamilies
 
     hs-source-dirs:
         src
@@ -51,6 +66,7 @@ common common-options
         ElmFormat.AST.PublicAST.Type
         ElmFormat.Render.Box
         ElmFormat.Render.ElmStructure
+        Indent
         Parse.Binop
         Parse.Comments
         Parse.Common
@@ -72,14 +88,14 @@ common common-options
         Parse.Whitespace
 
     build-depends:
-        aeson >= 2.0.1.0 && < 2.1,
+        aeson >= 2.0.3.0 && < 2.1,
         ansi-terminal >= 0.11 && < 0.12,
         ansi-wl-pprint >= 0.6.9 && < 0.7,
         array >= 0.5.4.0 && < 0.6,
         base >= 4.15.0.0 && < 5,
         bimap >= 0.4.0 && < 0.5,
         binary >= 0.8.9.0 && < 0.9,
-        bytestring >= 0.11.1.0 && < 0.12,
+        bytestring >= 0.10.12.1 && < 0.12,
         containers >= 0.6.5.1 && < 0.7,
         directory >= 1.3.7.0 && < 2,
         filepath >= 1.4.2.1 && < 2,
@@ -97,19 +113,19 @@ library
     import: common-options
 
     exposed-modules:
-        AST.Listing
         AST.MatchReferences
-        AST.Module
         AST.Structure
         AST.V0_16
         CommandLine.InfoFormatter
         CommandLine.Program
         CommandLine.ResolveFiles
         CommandLine.TransformFiles
+        ElmFormat.AST.TransformChain
         ElmFormat.AST.PublicAST
         ElmFormat.AST.Shared
         ElmFormat.ImportInfo
         ElmFormat.KnownContents
+        ElmFormat.Normalize
         ElmFormat.Parse
         ElmFormat.Render.Markdown
         ElmFormat.Render.Text
@@ -125,19 +141,19 @@ test-suite efl-tests
     type: exitcode-stdio-1.0
 
     hs-source-dirs: test
-    main-is: Tests.hs
+    main-is: Spec.hs
 
     other-modules:
-        AST.Listing
         AST.MatchReferences
-        AST.Module
         AST.Structure
         AST.V0_16
         CommandLine.InfoFormatter
+        ElmFormat.AST.TransformChain
         ElmFormat.AST.PublicAST
         ElmFormat.AST.Shared
         ElmFormat.ImportInfo
         ElmFormat.KnownContents
+        ElmFormat.Normalize
         ElmFormat.Parse
         ElmFormat.Render.Markdown
         ElmFormat.Render.Text
@@ -148,26 +164,26 @@ test-suite efl-tests
         Reporting.Result
 
     other-modules:
-        AST.MatchReferencesTest
-        BoxTest
-        ElmFormat.AST.BinaryOperatorPrecedenceTest
-        ElmFormat.ImportInfoTest
-        ElmFormat.Render.ElmStructureTest
-        Parse.ExpressionTest
-        Parse.HelpersTest
-        Parse.LiteralTest
-        Parse.PatternTest
+        AST.MatchReferencesSpec
+        BoxSpec
+        ElmFormat.AST.BinaryOperatorPrecedenceSpec
+        ElmFormat.ImportInfoSpec
+        ElmFormat.NormalizeSpec
+        ElmFormat.Render.ElmStructureSpec
+        IndentSpec
+        Parse.ExpressionSpec
+        Parse.HelpersSpec
+        Parse.LiteralSpec
+        Parse.PatternSpec
         Parse.TestHelpers
-        Parse.TestHelpersTest
-        Parse.TypeTest
+        Parse.TestHelpersSpec
+        Parse.TypeSpec
 
     build-depends:
         split >= 0.2.3.4 && < 0.3,
-        tasty >= 1.2 && < 2,
-        tasty-hspec >= 1.1.5.1 && < 1.2,
-        tasty-hunit >= 0.10.0.1 && < 0.11,
+        hspec >= 2.7.10 && < 3,
         avh4-lib,
         elm-format-test-lib
 
     build-tool-depends:
-        tasty-discover:tasty-discover >= 4.2.1 && < 5
+        hspec-discover:hspec-discover >= 2.7.10 && < 3

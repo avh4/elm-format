@@ -11,6 +11,7 @@ import qualified Data.Map.Strict as Dict
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 import qualified ElmFormat.ImportInfo as ImportInfo
+import qualified Data.Indexed as I
 
 
 data MatchedNamespace t
@@ -31,8 +32,8 @@ fromMatched empty (UnmatchedUnqualified _) = empty
 matchReferences ::
     (Coapplicative annf, Ord u) =>
     ImportInfo [u]
-    -> ASTNS annf [u] kind
-    -> ASTNS annf (MatchedNamespace [u]) kind
+    -> I.Fix2 annf (ASTNS [u]) kind
+    -> I.Fix2 annf (ASTNS (MatchedNamespace [u])) kind
 matchReferences importInfo =
     let
         aliases = Bimap.toMap $ ImportInfo._aliases importInfo
@@ -86,8 +87,8 @@ matchReferences importInfo =
 applyReferences ::
     (Coapplicative annf, Ord u) =>
     ImportInfo [u]
-    -> ASTNS annf (MatchedNamespace [u]) kind
-    -> ASTNS annf [u] kind
+    -> I.Fix2 annf (ASTNS (MatchedNamespace [u])) kind
+    -> I.Fix2 annf (ASTNS [u]) kind
 applyReferences importInfo =
     let
         aliases = Bimap.toMapR $ ImportInfo._aliases importInfo

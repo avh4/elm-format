@@ -1,7 +1,4 @@
 {-# LANGUAGE TupleSections #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module ElmFormat.AST.PublicAST.Core
@@ -35,8 +32,6 @@ import ElmFormat.AST.Shared
 import AST.V0_16 (NodeKind(..), Pair(..))
 import AST.Structure (ASTNS, ASTNS1, mapNs)
 import qualified AST.V0_16 as AST
-import qualified AST.Module as AST
-import qualified AST.Listing as AST
 import Data.Indexed as I
 import Reporting.Annotation (Located, Region, Position)
 import qualified Reporting.Annotation as A
@@ -72,17 +67,17 @@ class ToPublicAST (nk :: NodeKind) where
     type PublicAST nk
     fromRawAST' :: Config -> ASTNS1 Located [UppercaseIdentifier] nk -> PublicAST nk
 
-fromRawAST :: ToPublicAST nk => Config -> ASTNS Located [UppercaseIdentifier] nk -> LocatedIfRequested (PublicAST nk)
+fromRawAST :: ToPublicAST nk => Config -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) nk -> LocatedIfRequested (PublicAST nk)
 fromRawAST config =
-    fmap (fromRawAST' config) . fromLocated config . I.unFix
+    fmap (fromRawAST' config) . fromLocated config . I.unFix2
 
 
 class ToPublicAST nk => FromPublicAST (nk :: NodeKind) where
-    toRawAST' :: PublicAST nk -> ASTNS1 Identity [UppercaseIdentifier] nk
+    toRawAST' :: PublicAST nk -> I.Fix (ASTNS [UppercaseIdentifier]) nk
 
-toRawAST :: FromPublicAST nk => LocatedIfRequested (PublicAST nk) -> ASTNS Identity [UppercaseIdentifier] nk
+toRawAST :: FromPublicAST nk => LocatedIfRequested (PublicAST nk) -> I.Fix (ASTNS [UppercaseIdentifier]) nk
 toRawAST =
-    I.Fix . Identity . toRawAST' . extract
+    toRawAST' . extract
 
 
 --

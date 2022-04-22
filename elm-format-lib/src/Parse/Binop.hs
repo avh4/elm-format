@@ -1,10 +1,8 @@
-{-# LANGUAGE DataKinds #-}
 module Parse.Binop (binops) where
 
 import Parse.ParsecAdapter ((<|>), choice, try)
 
 import AST.V0_16
-import AST.Structure (FixAST)
 import Data.Coapplicative
 import qualified Data.Indexed as I
 import Parse.Helpers (commitIf, addLocation, multilineToBool)
@@ -14,17 +12,17 @@ import Reporting.Annotation (Located)
 
 
 binops
-    :: IParser (FixAST Located typeRef ctorRef varRef 'ExpressionNK)
-    -> IParser (FixAST Located typeRef ctorRef varRef 'ExpressionNK)
-    -> IParser varRef
-    -> IParser (FixAST Located typeRef ctorRef varRef 'ExpressionNK)
+    :: IParser (I.Fix2 Located (AST p) 'ExpressionNK)
+    -> IParser (I.Fix2 Located (AST p) 'ExpressionNK)
+    -> IParser (VarRef p)
+    -> IParser (I.Fix2 Located (AST p) 'ExpressionNK)
 binops term last anyOp =
-  fmap I.Fix $ addLocation $
+  fmap I.Fix2 $ addLocation $
   do  ((e, ops), multiline) <- trackNewline ((,) <$> term <*> nextOps)
       return $
         case ops of
           [] ->
-            extract $ I.unFix e
+            extract $ I.unFix2 e
           _ ->
             Binops e ops $ multilineToBool multiline
   where
@@ -32,7 +30,7 @@ binops term last anyOp =
       choice
         [ commitIf (whitespace >> anyOp) $
             do  preOpComments <- whitespace
-                op <- anyOp
+                op <- I.Fix2 <$> addLocation (VarRef_ <$> anyOp)
                 preExpressionComments <- whitespace
                 expr <- Left <$> try term <|> Right <$> last
                 case expr of

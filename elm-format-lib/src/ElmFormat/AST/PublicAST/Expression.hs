@@ -1,6 +1,4 @@
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
@@ -45,26 +43,26 @@ data LetDeclaration
     = LetDefinition Definition
     | Comment_ld Comment
 
-mkLetDeclarations :: Config -> List (ASTNS Located [UppercaseIdentifier] 'LetDeclarationNK) -> List (MaybeF LocatedIfRequested LetDeclaration)
+mkLetDeclarations :: Config -> List (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'LetDeclarationNK) -> List (MaybeF LocatedIfRequested LetDeclaration)
 mkLetDeclarations config decls =
     let
         toDefBuilder :: ASTNS1 Located [UppercaseIdentifier] 'LetDeclarationNK -> DefinitionBuilder LetDeclaration
         toDefBuilder = \case
-            AST.LetCommonDeclaration (I.Fix (At _ def)) ->
+            AST.LetCommonDeclaration (I.Fix2 (At _ def)) ->
                 Right def
 
             AST.LetComment comment ->
                 Left $ Comment_ld (mkComment comment)
     in
-    mkDefinitions config LetDefinition $ fmap (JustF . fmap toDefBuilder . fromLocated config . I.unFix) decls
+    mkDefinitions config LetDefinition $ fmap (JustF . fmap toDefBuilder . fromLocated config . I.unFix2) decls
 
-fromLetDeclaration :: LetDeclaration -> List (ASTNS Identity [UppercaseIdentifier] 'LetDeclarationNK)
+fromLetDeclaration :: LetDeclaration -> List (I.Fix (ASTNS [UppercaseIdentifier]) 'LetDeclarationNK)
 fromLetDeclaration = \case
     LetDefinition def ->
-        I.Fix . Identity . AST.LetCommonDeclaration <$> fromDefinition def
+        I.Fix . AST.LetCommonDeclaration <$> fromDefinition def
 
     Comment_ld comment ->
-        pure $ I.Fix $ Identity $ AST.LetComment (fromComment comment)
+        pure $ I.Fix $ AST.LetComment (fromComment comment)
 
 
 instance ToJSON LetDeclaration where
@@ -109,11 +107,11 @@ instance ToPublicAST 'CaseBranchNK where
                 (JustF $ fromRawAST config body)
 
 instance FromPublicAST 'CaseBranchNK where
-    toRawAST' = \case
+    toRawAST' = I.Fix . \case
         CaseBranch pattern body ->
             AST.CaseBranch [] [] []
                 (toRawAST pattern)
-                (maybeF (I.Fix . Identity . toRawAST') toRawAST body)
+                (maybeF toRawAST' toRawAST body)
 
 instance ToPairs CaseBranch where
     toPairs = \case
@@ -188,7 +186,7 @@ instance ToPublicAST 'ExpressionNK where
         AST.Literal lit ->
             LiteralExpression lit
 
-        AST.VarExpr var ->
+        AST.VarExpr (I.Fix2 (At _ (AST.VarRef_ var))) ->
             VariableReferenceExpression $ mkReference var
 
         AST.App expr args multiline ->
@@ -201,7 +199,7 @@ instance ToPublicAST 'ExpressionNK where
             case
                 BinaryOperatorPrecedence.parseElm0_19
                     first
-                    ((\(AST.BinopsClause c1 op c2 expr) -> (op, expr)) <$> rest)
+                    ((\(AST.BinopsClause c1 (I.Fix2 (At _ (AST.VarRef_ op))) c2 expr) -> (op, expr)) <$> rest)
             of
                 Right tree ->
                     extract $ buildTree tree
@@ -209,7 +207,7 @@ instance ToPublicAST 'ExpressionNK where
                 Left message ->
                     error ("invalid binary operator expression: " <> Text.unpack message)
             where
-                buildTree :: BinaryOperatorPrecedence.Tree (Ref [UppercaseIdentifier ]) (ASTNS Located [UppercaseIdentifier] 'ExpressionNK) -> MaybeF LocatedIfRequested Expression
+                buildTree :: BinaryOperatorPrecedence.Tree (Ref [UppercaseIdentifier ]) (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ExpressionNK) -> MaybeF LocatedIfRequested Expression
                 buildTree (BinaryOperatorPrecedence.Leaf e) =
                     JustF $ fromRawAST config e
                 buildTree (BinaryOperatorPrecedence.Branch op e1 e2) =
@@ -225,7 +223,7 @@ instance ToPublicAST 'ExpressionNK where
                 (FunctionApplicationDisplay ShowAsFunctionApplication)
 
         AST.Parens (C comments expr) ->
-            fromRawAST' config $ extract $ I.unFix expr
+            fromRawAST' config $ extract $ I.unFix2 expr
 
         AST.ExplicitList terms comments multiline ->
             ListLiteral
@@ -292,14 +290,14 @@ instance ToPublicAST 'ExpressionNK where
                 (fromRawAST config <$> branches)
                 (CaseDisplay False)
 
-        AST.Range _ _ _ ->
+        AST.Range _ _ ->
             error "Range syntax is not supported in Elm 0.19"
 
         AST.GLShader shader ->
             GLShader shader
 
 instance FromPublicAST 'ExpressionNK where
-    toRawAST' = \case
+    toRawAST' = I.Fix . \case
         UnitLiteral ->
             AST.Unit []
 
@@ -307,14 +305,14 @@ instance FromPublicAST 'ExpressionNK where
             AST.Literal lit
 
         VariableReferenceExpression var ->
-            AST.VarExpr $ toRef var
+            AST.VarExpr $ I.Fix $ AST.VarRef_ $ toRef var
 
         FunctionApplication function args display ->
             case (extract function, args) of
                 (UnaryOperator operator, [ single ]) ->
                     AST.Unary
                         operator
-                        (maybeF (I.Fix . Identity . toRawAST') toRawAST single)
+                        (maybeF toRawAST' toRawAST single)
 
                 (UnaryOperator _, []) ->
                     undefined
@@ -324,8 +322,8 @@ instance FromPublicAST 'ExpressionNK where
 
                 _ ->
                     AST.App
-                        (maybeF (I.Fix . Identity . toRawAST') toRawAST function)
-                        (C [] . maybeF (I.Fix . Identity . toRawAST') toRawAST <$> args)
+                        (maybeF toRawAST' toRawAST function)
+                        (C [] . maybeF toRawAST' toRawAST <$> args)
                         (AST.FAJoinFirst AST.JoinAll)
 
         UnaryOperator _ ->
@@ -633,9 +631,9 @@ data Definition
 mkDefinition ::
     Config
     -> ASTNS1 Located [UppercaseIdentifier] 'PatternNK
-    -> List (AST.C1 'AST.BeforeTerm (ASTNS Located [UppercaseIdentifier] 'PatternNK))
-    -> Maybe (AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (ASTNS Located [UppercaseIdentifier] 'TypeNK))
-    -> ASTNS Located [UppercaseIdentifier] 'ExpressionNK
+    -> List (AST.C1 'AST.BeforeTerm (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK))
+    -> Maybe (AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TypeNK))
+    -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ExpressionNK
     -> Definition
 mkDefinition config pat args annotation expr =
     case pat of
@@ -661,32 +659,32 @@ mkDefinition config pat args annotation expr =
                 , show expr
                 ]
 
-fromDefinition :: Definition -> List (ASTNS Identity [UppercaseIdentifier] 'CommonDeclarationNK)
+fromDefinition :: Definition -> List (I.Fix (ASTNS [UppercaseIdentifier]) 'CommonDeclarationNK)
 fromDefinition = \case
     Definition name parameters Nothing expression ->
-        pure $ I.Fix $ Identity $ AST.Definition
-            (I.Fix $ Identity $ AST.VarPattern name)
+        pure $ I.Fix $ AST.Definition
+            (I.Fix $ AST.VarPattern name)
             (C [] . toRawAST . pattern_tp <$> parameters)
             []
             (toRawAST expression)
 
     Definition name [] (Just typ) expression ->
-        [ I.Fix $ Identity $ AST.TypeAnnotation
+        [ I.Fix $ AST.TypeAnnotation
             (C [] $ VarRef () name)
             (C [] $ toRawAST typ)
-        , I.Fix $ Identity $ AST.Definition
-            (I.Fix $ Identity $ AST.VarPattern name)
+        , I.Fix $ AST.Definition
+            (I.Fix $ AST.VarPattern name)
             []
             []
             (toRawAST expression)
         ]
 
     Definition name parameters (Just typ) expression ->
-        [ I.Fix $ Identity $ AST.TypeAnnotation
+        [ I.Fix $ AST.TypeAnnotation
             (C [] $ VarRef () name)
             (C [] $ toRawAST $ LocatedIfRequested $ NothingF $ FunctionType typ (fromMaybe (LocatedIfRequested $ NothingF UnitType) . type_tp <$> parameters))
-        , I.Fix $ Identity $ AST.Definition
-            (I.Fix $ Identity $ AST.VarPattern name)
+        , I.Fix $ AST.Definition
+            (I.Fix $ AST.VarPattern name)
             (C [] . toRawAST . pattern_tp <$> parameters)
             []
             (toRawAST expression)
@@ -703,21 +701,21 @@ mkDefinitions ::
     -> List (MaybeF LocatedIfRequested a)
 mkDefinitions config fromDef items =
     let
-        collectAnnotation :: DefinitionBuilder a -> Maybe (LowercaseIdentifier, AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (ASTNS Located [UppercaseIdentifier] 'TypeNK))
+        collectAnnotation :: DefinitionBuilder a -> Maybe (LowercaseIdentifier, AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TypeNK))
         collectAnnotation decl =
             case decl of
                 Right (AST.TypeAnnotation (C preColon (VarRef () name)) (C postColon typ)) ->
                     Just (name, C (preColon, postColon) typ)
                 _ -> Nothing
 
-        annotations :: Map LowercaseIdentifier (AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (ASTNS Located [UppercaseIdentifier] 'TypeNK))
+        annotations :: Map LowercaseIdentifier (AST.C2 'AST.BeforeSeparator 'AST.AfterSeparator (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TypeNK))
         annotations =
             Map.fromList $ mapMaybe (collectAnnotation . extract) items
 
         merge :: DefinitionBuilder a -> Maybe a
         merge decl =
             case decl of
-                Right (AST.Definition (I.Fix (At _ pat)) args comments expr) ->
+                Right (AST.Definition (I.Fix2 (At _ pat)) args comments expr) ->
                     let
                         annotation =
                             case pat of
@@ -770,4 +768,3 @@ instance FromJSON Definition where
 
             _ ->
                 fail ("unexpected Definition tag: " <> tag)
-

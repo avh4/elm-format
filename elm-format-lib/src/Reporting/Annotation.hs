@@ -1,7 +1,6 @@
 -- This module is copied from the Elm compiler with small changes
 -- https://github.com/elm/compiler/blob/94715a520f499591ac6901c8c822bc87cd1af24f/compiler/src/Reporting/Annotation.hs
 
-{-# OPTIONS_GHC -Wall #-}
 module Reporting.Annotation
   ( Located(..)
   , Position(..)
@@ -21,7 +20,6 @@ import Control.Monad (liftM2)
 import Data.Coapplicative
 import Data.Binary (Binary, get, put)
 import Data.Word (Word16)
-import Data.String (unwords)
 
 
 
@@ -50,17 +48,13 @@ instance Foldable Located where
 
 
 instance Traversable Located where
-    traverse f (At region a) = fmap (At region) $ f a
+    traverse f (At region a) = At region <$> f a
 
 
 instance Coapplicative Located where
     extract (At _ x) = x
     {-# INLINE extract #-}
 
-
-traverse :: (Functor f) => (a -> f b) -> Located a -> f (Located b)
-traverse func (At region value) =
-  At region <$> func value
 
 
 toValue :: Located a -> a
@@ -69,8 +63,8 @@ toValue (At _ value) =
 
 
 merge :: Located a -> Located b -> value -> Located value
-merge (At r1 _) (At r2 _) value =
-  At (mergeRegions r1 r2) value
+merge (At r1 _) (At r2 _) =
+    At (mergeRegions r1 r2)
 
 
 
@@ -85,8 +79,8 @@ data Position =
 
 
 at :: Position -> Position -> a -> Located a
-at start end a =
-  At (Region start end) a
+at start end =
+    At (Region start end)
 
 
 
@@ -136,4 +130,3 @@ instance Binary Region where
 instance Binary Position where
   put (Position a b) = put a >> put b
   get = liftM2 Position get get
-

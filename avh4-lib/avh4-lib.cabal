@@ -17,17 +17,33 @@ build-type: Simple
 
 
 common common-options
-    ghc-options:
-        -O2 -Wall -Wno-name-shadowing
-
     default-language: Haskell2010
-
+    ghc-options:
+        -O2
+        -Wall
+        -Wcompat
+        -Wredundant-constraints
+        -Wno-name-shadowing
+        -Werror=inaccessible-code
+        -Werror=missing-home-modules
+        -Werror=overflowed-literals
+        -Werror=overlapping-patterns
     default-extensions:
+        ApplicativeDo
+        DataKinds
+        DeriveFoldable
         DeriveFunctor
-        MultiParamTypeClasses
+        DeriveTraversable
+        FlexibleContexts
+        FlexibleInstances
+        GeneralizedNewtypeDeriving
         LambdaCase
+        MultiParamTypeClasses
         OverloadedStrings
+        PolyKinds
         ScopedTypeVariables
+        TypeApplications
+        TypeFamilies
 
     hs-source-dirs:
         src
@@ -39,7 +55,7 @@ common common-options
         base >= 4.15.0.0 && < 5,
         bimap >= 0.4.0 && < 0.5,
         binary >= 0.8.9.0 && < 0.9,
-        bytestring >= 0.11.1.0 && < 0.12,
+        bytestring >= 0.10.12.1 && < 0.12,
         containers >= 0.6.5.1 && < 0.7,
         directory >= 1.3.7.0 && < 2,
         filepath >= 1.4.2.1 && < 2,
@@ -58,6 +74,7 @@ library
         CommandLine.World.IO
         Data.Coapplicative
         Data.Either.Extra
+        Data.Fix
         Data.Indexed
         Data.List.Extra
         Data.ReversedList
@@ -71,7 +88,7 @@ test-suite al-tests
     type: exitcode-stdio-1.0
 
     hs-source-dirs: test
-    main-is: Tests.hs
+    main-is: Spec.hs
 
     other-modules:
         CommandLine.Filesystem
@@ -79,6 +96,7 @@ test-suite al-tests
         CommandLine.World.IO
         Data.Coapplicative
         Data.Either.Extra
+        Data.Fix
         Data.Indexed
         Data.List.Extra
         Data.ReversedList
@@ -87,13 +105,12 @@ test-suite al-tests
         Regex
 
     other-modules:
-        Data.List.ExtraTest
-        Data.Text.ExtraTest
+        Data.Either.ExtraSpec
+        Data.List.ExtraSpec
+        Data.Text.ExtraSpec
 
     build-depends:
-        tasty >= 1.2 && < 2,
-        tasty-hspec >= 1.1.5.1 && < 1.2,
-        tasty-hunit >= 0.10.0.1 && < 0.11
+        hspec >= 2.7.10 && < 3
 
     build-tool-depends:
-        tasty-discover:tasty-discover >= 4.2.1 && < 5
+        hspec-discover:hspec-discover >= 2.7.10 && < 3

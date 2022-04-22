@@ -17,18 +17,34 @@ build-type: Simple
 
 
 common common-options
-
-    ghc-options:
-        -O2 -Wall -Wno-name-shadowing
-
     default-language: Haskell2010
+    ghc-options:
+        -O2
+        -Wall
+        -Wcompat
+        -Wredundant-constraints
+        -Wno-name-shadowing
+        -Werror=inaccessible-code
+        -Werror=missing-home-modules
+        -Werror=overflowed-literals
+        -Werror=overlapping-patterns
 
     default-extensions:
+        ApplicativeDo
+        DataKinds
+        DeriveFoldable
         DeriveFunctor
-        MultiParamTypeClasses
+        DeriveTraversable
+        FlexibleContexts
+        FlexibleInstances
+        GeneralizedNewtypeDeriving
         LambdaCase
+        MultiParamTypeClasses
         OverloadedStrings
+        PolyKinds
         ScopedTypeVariables
+        TypeApplications
+        TypeFamilies
 
     hs-source-dirs: .
 
