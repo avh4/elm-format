@@ -1,4 +1,4 @@
-module Main exposing (Foo, a, b)
+module Main exposing (Foo(..), a, b)
 
 
 type Foo
