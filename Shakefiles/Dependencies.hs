@@ -4,6 +4,7 @@ import Development.Shake
 import Development.Shake.Command
 import Development.Shake.FilePath
 import Development.Shake.Util
+import Shakefiles.Extra (addMacOSGhcOptionFFI)
 
 
 localBinDir :: String
@@ -12,7 +13,8 @@ localBinDir = "bin"
 
 cabalInstallExe :: String -> Action ()
 cabalInstallExe package =
-    cmd_ "cabal"
+    cmd_ "cabal" $
+        addMacOSGhcOptionFFI
         [ "v2-install"
         , package
         , "--installdir", localBinDir
@@ -41,7 +43,7 @@ rules = do
             , "cabal.project"
             , "cabal.project.freeze"
             ]
-        cmd_ "cabal" [ "v2-build", "--only-dependencies" ]
+        cmd_ "cabal" $ addMacOSGhcOptionFFI [ "v2-build", "--only-dependencies" ]
         writeFile' out ""
 
     "_build/cabal-test-dependencies.ok" %> \out -> do
@@ -50,7 +52,7 @@ rules = do
             , "cabal.project"
             , "cabal.project.freeze"
             ]
-        cmd_ "cabal" [ "v2-build", "--only-dependencies", "--enable-tests" ]
+        cmd_ "cabal" $ addMacOSGhcOptionFFI [ "v2-build", "--only-dependencies", "--enable-tests" ]
         writeFile' out ""
 
     shellcheck %> \out -> do
