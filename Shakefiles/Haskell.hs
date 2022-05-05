@@ -67,7 +67,7 @@ cabalBinPath projectName opt =
                 "elm-format" -> "0.8.5"
                 _ -> "0.0.0"
     in
-    "dist-newstyle/build" </> Shakefiles.Platform.cabalInstallOs </> "ghc-9.0.1" </> projectName ++ "-" ++ version </> "x" </> projectName </> opt </> "build" </> projectName </> projectName <.> exe
+    "dist-newstyle/build" </> Shakefiles.Platform.cabalInstallOs </> "ghc-9.0.2" </> projectName ++ "-" ++ version </> "x" </> projectName </> opt </> "build" </> projectName </> projectName <.> exe
 
 
 executable :: FilePath -> String -> String -> Rules ()
