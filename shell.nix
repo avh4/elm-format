@@ -2,7 +2,7 @@
 let
   niv = import sources.niv { };
 
-  haskellPackages = pkgs.haskell.packages.ghc901;
+  haskellPackages = pkgs.haskell.packages.ghc902;
 in haskellPackages.shellFor {
   packages = p: [ ];
   buildInputs = with pkgs; [
@@ -17,5 +17,6 @@ in haskellPackages.shellFor {
     cabal2nix
     niv.niv
     nixfmt
+    haskellPackages.haskell-language-server
   ];
 }
