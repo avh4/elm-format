@@ -4,6 +4,7 @@ packages:
     ./elm-format-lib,
     ./elm-format-test-lib,
     ./
+    ./Shakefile
 with-compiler: ghc-9.0.2
 
 constraints:

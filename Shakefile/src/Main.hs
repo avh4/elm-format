@@ -1,3 +1,5 @@
+{-# LANGUAGE NondecreasingIndentation #-}
+
 import Development.Shake
 import Development.Shake.Command
 import Development.Shake.FilePath
@@ -16,10 +18,10 @@ import Shakefiles.Extra
 main :: IO ()
 main = do
     shakefiles <- getDirectoryFilesIO ""
-        [ "Shakefile.hs"
-        , "Shakefiles//*.hs"
+        [ "Shakefile/build.cabal"
+        , "Shakefile/src//*.hs"
         ]
-    shakefilesHash <- getHashedShakeVersion [ "Shakefile.hs" ]
+    shakefilesHash <- getHashedShakeVersion shakefiles
     shakeArgs shakeOptions{
       shakeChange = ChangeModtimeAndDigest,
       shakeColor = True,

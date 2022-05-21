@@ -1,0 +1,28 @@
+cabal-version: 2.4
+
+Name:           build
+version:        0.0.0
+build-type:     Simple
+
+executable build
+    default-language: Haskell2010
+    ghc-options:
+        -rtsopts -threaded -with-rtsopts=-I0
+    default-extensions:
+        LambdaCase
+
+    hs-source-dirs: src
+    main-is: Main.hs
+
+    other-modules:
+        Shakefiles.Dependencies
+        Shakefiles.Extra
+        Shakefiles.Haskell
+        Shakefiles.Platform
+        Shakefiles.Shellcheck
+        Shakefiles.Signature
+
+    build-depends:
+        base >=4.15 && <5,
+        directory >= 1.3.7.0 && < 2,
+        shake >=0.19.6 && <0.20
