@@ -1,5 +1,5 @@
 module Box
-  ( Line, identifier, keyword, punc, literal, row, space
+  ( Line, identifier, keyword, punc, literal, space
   , Box(SingleLine, MustBreak), blankLine, line, mustBreak, stack', stack1, andThen
   , isLine, allSingles
   , indent, prefix, addSuffix
@@ -7,13 +7,10 @@ module Box
   ,allSingles2,allSingles3,lineLength,isSingle,isMustBreak,comment,stack,joinMustBreak,prefixOrIndent) where
 
 import Data.Fix
-import Elm.Utils (List)
 
 import qualified Data.Text as T
 import Indent (Indent)
 import qualified Indent
-import Data.Semigroup (sconcat)
-import Data.List.NonEmpty (NonEmpty((:|)))
 
 
 {-
@@ -58,14 +55,6 @@ literal =
 comment :: T.Text -> Line
 comment =
     Fix . Text
-
-
-{-# DEPRECATED row "use `(<>)` instead" #-}
-{-| join more Line elements into one
--}
-row :: List Line -> Line
-row [] = error $ "<elm-format: " ++ "UNEXPECTED ROW" ++ ": " ++ "no elements" ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
-row (first:rest) = sconcat (first:|rest)
 
 
 space :: Line
