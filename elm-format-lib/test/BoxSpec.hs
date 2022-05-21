@@ -37,10 +37,9 @@ word =
 
 block :: Text -> Box
 block text =
-    stack1
-        [ line $ w <> w
-        , line $ w <> w
-        ]
+    stack'
+        (line $ w <> w)
+        (line $ w <> w)
     where
         w = identifier text
 
@@ -60,33 +59,29 @@ spec = describe "Box" $ do
 
     it "stack1" $
         assertOutput "foo\nbar\n" $
-            stack1
-                [ word "foo"
-                , word "bar"
-                ]
+            stack'
+                (word "foo")
+                (word "bar")
     it "indent" $
         assertOutput "    a\n    b\n" $
-            indent $ stack1
-                [ word "a"
-                , word "b"
-                ]
+            indent $ stack'
+                (word "a")
+                (word "b")
 
     describe "prefix in front of block with indented lines" $ do
         it "when prefix is smaller than a TAB" $ do
-            prefix (keyword ">>") $ stack1
-                [ word "a"
-                , indent $ word "b"
-                ]
+            prefix (keyword ">>") $ stack'
+                (word "a")
+                (indent $ word "b")
             `shouldOutput`
             [ ">>a"
             , "    b"
             ]
 
         it "when prefix is longer than a TAB" $ do
-            prefix (keyword ">>>>>") $ stack1
-                [ word "a"
-                , indent $ word "b"
-                ]
+            prefix (keyword ">>>>>") $ stack'
+                (word "a")
+                (indent $ word "b")
             `shouldOutput`
             [ ">>>>>a"
             , "        b"

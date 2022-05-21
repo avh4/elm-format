@@ -110,10 +110,9 @@ render = \case
                 Box.line $ Box.punc left <> space <> Box.punc right
 
             [first] ->
-                Box.stack1
-                    [ Box.line $ Box.punc left <> space <> Box.literal first
-                    , Box.line $ Box.punc right
-                    ]
+                Box.stack'
+                    (Box.line $ Box.punc left <> space <> Box.literal first)
+                    (Box.line $ Box.punc right)
 
             (first:rest) ->
                 Box.line (Box.punc left <> space <> Box.literal first)
