@@ -15,7 +15,6 @@ import Box
       space,
       indent,
       isLine,
-      allSingles,
       prefix,
       lineLength,
       blankLine )
@@ -28,7 +27,6 @@ import qualified Data.List as List
 import Data.Maybe (maybeToList, catMaybes)
 import Data.Text (Text)
 import Data.List.NonEmpty (NonEmpty(..))
-import Data.Semigroup (sconcat)
 import qualified Data.List.NonEmpty as NonEmpty
 
 
@@ -47,7 +45,7 @@ data ElmF a
     | JoinMustBreak a a
     | Stack a (Int, a) [(Int, a)]
     | StackIndent a a [a]
-    | PrefixOrIndent a a
+    | PrefixOrIndent Text a
     | EqualsPair Bool a Text a
     | FunctionApplication FunctionApplicationMultiline a (NonEmpty a)
     | Case Text Text Bool a [a]
@@ -148,8 +146,8 @@ render = \case
     StackIndent a b rest ->
         Box.stack $ a :| (indent <$> (b:rest))
 
-    PrefixOrIndent a b ->
-        Box.prefixOrIndent a b
+    PrefixOrIndent prefix b ->
+        Box.prefixOrIndent (Just space) (Box.punc prefix) b
 
     EqualsPair forceMultiline left symbol right ->
         Box.rowOrIndent' forceMultiline
@@ -162,22 +160,19 @@ render = \case
             ]
 
     FunctionApplication forceMultiline first (arg0:|rest) ->
-        case
-            ( forceMultiline
-            , Box.allSingles (first :| [arg0])
-            , allSingles (first : arg0 : rest)
-            )
-        of
-            ( FAJoinFirst JoinAll, _, Right all' ) ->
-                Box.line $ sconcat $ NonEmpty.intersperse space $ NonEmpty.fromList all'
-
-            ( FAJoinFirst _, Right firstTwo, _) ->
-                Box.stack $
-                    Box.line (sconcat $ NonEmpty.intersperse space firstTwo)
-                    :| (indent <$> rest)
-
-            _ ->
-                Box.stack $ first :| (indent <$> (arg0:rest))
+        let
+            (forceFirst, forceRest) =
+                case forceMultiline of
+                    FAJoinFirst JoinAll -> (False, False)
+                    FAJoinFirst SplitAll -> (False, True)
+                    FASplitFirst -> (True, True)
+        in
+        Box.rowOrIndent' forceRest (Just space) $
+            Box.rowOrIndent' forceFirst (Just space)
+                [ first
+                , arg0
+                ]
+            :| rest
 
     Case caseWord ofWord forceMultilineSubject subject clauses ->
         let
@@ -322,23 +317,11 @@ render = \case
             []
 
     Range left dots right a b ->
-        case Box.allSingles2 a b of
-            Right (a', b') ->
-                Box.line $
-                    Box.punc left
-                    <> a'
-                    <> Box.punc dots
-                    <> b'
-                    <> Box.punc right
-
-            Left (a', b') ->
-                Box.stack
-                    [ Box.line $ Box.punc left
-                    , indent a'
-                    , Box.line $ Box.punc dots
-                    , indent b'
-                    , Box.line $ Box.punc right
-                    ]
+        Box.rowOrStack Nothing
+            [ Box.prefixOrIndent Nothing (Box.punc left) a
+            , Box.prefixOrIndent Nothing (Box.punc dots) b
+            , Box.line $ Box.punc right
+            ]
 
     OperatorPrefix False op rest ->
         if lineLength op < 4
@@ -580,7 +563,7 @@ spaceSepMustBreak inner eol =
     Fix $ JoinMustBreak inner eol
 
 
-prefixOrIndented :: Elm -> Elm -> Elm
+prefixOrIndented :: Text -> Elm -> Elm
 prefixOrIndented pre body =
     Fix $ PrefixOrIndent pre body
 

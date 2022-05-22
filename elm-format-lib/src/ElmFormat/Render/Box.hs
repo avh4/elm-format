@@ -1641,8 +1641,7 @@ formatType elmVersion atype =
                     ElmStructure.forceableSpaceSepOrStack1 False
                         $ NonEmpty.fromList $ catMaybes
                             [ formatComments preOp
-                            , Just $ ElmStructure.prefixOrIndented
-                                (keyword "->")
+                            , Just $ ElmStructure.prefixOrIndented "->"
                                 (formatC2Eol $
                                     (fmap $ typeParens ForLambda . formatType elmVersion)
                                     (C (postOp, [], eol) term)

@@ -239,23 +239,6 @@ spec = describe "ElmFormat.Render.ElmStructure" $ do
                 , ">"
                 ]
 
-    describe "range" $ do
-        it "common" $ do
-            ElmStructure.range "[" ".." "]" a b
-            `shouldOutput`
-            [ "[a..b]" ]
-
-        it "multiline" $ do
-            ElmStructure.range "[" ".." "]" aa b
-            `shouldOutput`
-            [ "["
-            , "    aa"
-            , "    aa"
-            , ".."
-            , "    b"
-            , "]"
-            ]
-
 
 shouldOutput :: Elm -> [Text] -> Expectation
 shouldOutput elm expected =

@@ -1,10 +1,10 @@
 module Box
   ( Line, identifier, keyword, punc, literal, space
   , Box(SingleLine, MustBreak), blankLine, line, mustBreak, stack', andThen
-  , isLine, allSingles
+  , isLine
   , indent, prefix, addSuffix
   , render
-  ,allSingles2,allSingles3,lineLength,comment,stack,joinMustBreak,prefixOrIndent, rowOrStack, rowOrStack', rowOrIndent, rowOrIndent') where
+  ,lineLength,comment,stack,joinMustBreak,prefixOrIndent, rowOrStack, rowOrStack', rowOrIndent, rowOrIndent') where
 
 import Data.Fix
 
@@ -151,19 +151,24 @@ joinMustBreak inner eol =
             stack' inner eol
 
 
-prefixOrIndent :: Box -> Box -> Box
-prefixOrIndent a b =
-    case ( a, b ) of
-        (SingleLine (Indented i1 a'), SingleLine (Indented _ b')) ->
-            SingleLine $ Indented i1 $
-            a' <> space <> b'
+{-# INLINE prefixOrIndent #-}
+prefixOrIndent :: Maybe Line -> Line -> Box -> Box
+prefixOrIndent joiner a b =
+    let
+        join a b =
+            case joiner of
+                Nothing -> a <> b
+                Just j -> a <> j <> b
+    in
+    case b of
+        SingleLine (Indented _ b') ->
+            line $ join a b'
 
-        (SingleLine (Indented i1 a'), MustBreak (Indented _ b')) ->
-            MustBreak $ Indented i1 $
-            a' <> space <> b'
+        MustBreak (Indented _ b') ->
+            mustBreak $ join a b'
 
         _ ->
-            stack' a (indent b)
+            stack' (line a) (indent b)
 
 
 mapLines :: (Indented Line -> Indented Line) -> Box -> Box
@@ -269,20 +274,6 @@ allSingles boxes =
             Right lines'
         _ ->
             Left boxes
-
-
-allSingles2 :: Box -> Box -> Either (Box, Box) (Line, Line)
-allSingles2 b1 b2 =
-    case allSingles [b1, b2] of
-        Right [l1, l2] -> Right (l1, l2)
-        _ -> Left (b1, b2)
-
-
-allSingles3 :: Box -> Box -> Box -> Either (Box, Box, Box) (Line, Line, Line)
-allSingles3 b1 b2 b3 =
-    case allSingles [b1, b2, b3] of
-        Right [l1, l2, l3] -> Right (l1, l2, l3)
-        _ -> Left (b1, b2, b3)
 
 
 {-
