@@ -290,10 +290,9 @@ xyz
 myPrefix abcde
          xyz
 -}
-prefix :: Line -> Block -> Block
-prefix pref =
+prefix :: Word -> Line -> Block -> Block
+prefix prefixLength pref =
     let
-        prefixLength = fromIntegral $ T.length $ renderLine mempty pref
         padLineWithSpaces (Indented i l) = Indented (Indent.spaces prefixLength <> i) l
 
         addPrefixToLine Blank = stripEnd pref

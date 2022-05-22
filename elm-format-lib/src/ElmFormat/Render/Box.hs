@@ -1088,7 +1088,7 @@ formatExpression elmVersion importInfo aexpr =
                     (formatPreCommented . fmap (syntaxParens SpaceSeparated . formatAst elmVersion importInfo) <$> pat1:|pats)
             in
             FormattedExpression AmbiguousEnd $
-            ElmStructure.lambda "\\" "->" multiline
+            ElmStructure.lambda '\\' "->" multiline
                 patterns'
                 (formatComments bodyComments)
                 (syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr)

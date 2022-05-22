@@ -27,6 +27,7 @@ import Data.Maybe (maybeToList, catMaybes)
 import Data.Text (Text)
 import Data.List.NonEmpty (NonEmpty(..))
 import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Text as Text
 
 
 data ElmF a
@@ -51,7 +52,7 @@ data ElmF a
     | CaseClause Bool a Text a
     | LetIn Text a Text a
     | IfElse Text a Text a [(Maybe a, a, a)] Text a
-    | Lambda Text Text Bool a (Maybe a) a
+    | Lambda Char Text Bool a (Maybe a) a
     | SectionedGroup Bool Text Text Text Bool (NonEmpty a) [(a, NonEmpty a)] (Maybe a)
     | GroupOfOne Text a Text
     | ExtensionGroup Text Text Text Text Bool a (NonEmpty a) [(a, NonEmpty a)] (Maybe a)
@@ -87,6 +88,7 @@ render = \case
             (first:rest) ->
                 Block.stack'
                     (Block.prefix
+                        (1 + fromIntegral (Text.length left))
                         (Block.comment left <> space)
                         (Block.stack $ Block.line . Block.comment <$>
                             first :| rest
@@ -107,6 +109,7 @@ render = \case
         let
             firstLine first =
                 Block.prefix
+                    (1 + fromIntegral (Text.length left))
                     (Block.punc left <> space)
                     (Block.line $ Block.comment first)
         in
@@ -259,7 +262,7 @@ render = \case
         Block.rowOrIndent' forceMultiline (Just space)
             [ Block.rowOrStack
                 (Just space)
-                [ Block.prefix (Block.punc start) args
+                [ Block.prefix 1 (Block.punc $ Text.singleton start) args
                 , Block.line $ Block.punc arrow
                 ]
             , Block.stack $ NonEmpty.fromList $ catMaybes
@@ -301,7 +304,9 @@ render = \case
 
     GroupOfOne left inner right ->
         Block.rowOrStack Nothing
-            [ Block.prefix (Block.punc left) inner
+            [ Block.prefix
+                (fromIntegral $ Text.length left)
+                (Block.punc left) inner
             , Block.line (Block.punc right)
             ]
 
@@ -329,13 +334,19 @@ render = \case
             ]
 
     OperatorPrefix False op rest ->
-        if lineLength op < 4
-            then Block.prefix op rest
+        let
+            len = fromIntegral $ lineLength op
+        in
+        if len < 4
+            then Block.prefix len op rest
             else Block.rowOrIndent Nothing [Block.line op, rest]
 
     OperatorPrefix True op rest ->
-        if lineLength op < 4
-            then Block.prefix (op <> space) rest
+        let
+            len = fromIntegral $ lineLength op
+        in
+        if len < 4
+            then Block.prefix (len + 1) (op <> space) rest
             else Block.rowOrIndent (Just space) [Block.line op, rest]
 
     Module initialComments (maybeHeader, docs, (importComments, imports)) spaceBeforeBody body ->
@@ -694,7 +705,7 @@ Formats as:
     \arg0 arg1 arg2 ->
         body
 -}
-lambda :: Text -> Text -> Bool -> Elm -> Maybe Elm -> Elm -> Elm
+lambda :: Char -> Text -> Bool -> Elm -> Maybe Elm -> Elm -> Elm
 lambda start arrow forceMultiline args bodyComments body =
     Fix $ Lambda start arrow forceMultiline args bodyComments body
 

@@ -70,7 +70,7 @@ spec = describe "Box" $ do
 
     describe "prefix in front of block with indented lines" $ do
         it "when prefix is smaller than a TAB" $ do
-            prefix (keyword ">>") $ stack'
+            prefix 2 (keyword ">>") $ stack'
                 (word "a")
                 (indent $ word "b")
             `shouldOutput`
@@ -79,7 +79,7 @@ spec = describe "Box" $ do
             ]
 
         it "when prefix is longer than a TAB" $ do
-            prefix (keyword ">>>>>") $ stack'
+            prefix 5 (keyword ">>>>>") $ stack'
                 (word "a")
                 (indent $ word "b")
             `shouldOutput`
