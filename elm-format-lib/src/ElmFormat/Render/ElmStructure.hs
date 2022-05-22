@@ -18,11 +18,9 @@ import Box
       allSingles,
       prefix,
       lineLength,
-      isSingle,
-      isMustBreak, blankLine )
+      blankLine )
 import AST.V0_16 (FunctionApplicationMultiline(..), Multiline(..))
 
-import Control.Monad (mzero, MonadPlus)
 import Data.Fix (Fix (Fix))
 
 import qualified Box
@@ -130,14 +128,14 @@ render = \case
             (a :| b : rest)
 
     WrapStackNoSpaces a b rest ->
-        firstOf
-            [ Box.line . sconcat
-              <$> traverse isSingle (a:|b:rest)
-            ]
-            $ render (stack0 a b rest)
+        Box.rowOrStack
+            Nothing
+            (a :| b : rest)
 
     WrapIndent a b rest ->
-        Box.rowOrIndent (Just space) (a :| b : rest)
+        Box.rowOrIndent
+            (Just space)
+            (a :| b : rest)
 
     JoinMustBreak inner eol ->
         Box.joinMustBreak inner eol
@@ -155,31 +153,14 @@ render = \case
         Box.prefixOrIndent a b
 
     EqualsPair forceMultiline left symbol right ->
-        firstOf
-            [ unless forceMultiline $
-              Box.line . sconcat . NonEmpty.intersperse space . NonEmpty.fromList <$> sequenceA
-                [ isSingle left
-                , pure $ Box.punc symbol
-                , isSingle right
-                ]
-
-            , Box.mustBreak . sconcat . NonEmpty.intersperse space . NonEmpty.fromList <$> sequenceA
-                [ isSingle left
-                , pure $ Box.punc symbol
-                , isMustBreak right
-                ]
-
-            , do
-                left' <- isSingle left
-                pure $ Box.stack'
-                    (Box.line $ left' <> space <> Box.punc symbol)
-                    (indent right)
-            ]
-            $ Box.stack1
+        Box.rowOrIndent' forceMultiline
+            (Just space)
+            [ Box.rowOrIndent (Just space)
                 [ left
-                , indent $ Box.line $ Box.punc symbol
-                , indent right
+                , Box.line $ Box.punc symbol
                 ]
+            , right
+            ]
 
     FunctionApplication forceMultiline first (arg0:|rest) ->
         case
@@ -217,24 +198,17 @@ render = \case
             opening
             (indent <$> List.intersperse blankLine clauses)
 
-    CaseClause forceArrowNewline pattern arrow body ->
-        case (forceArrowNewline, isSingle pattern) of
-            (False, Just pat') ->
-                Box.stack'
-                    (Box.line $ pat' <> space <> Box.keyword arrow)
-                    (indent body)
+    CaseClause False pattern arrow body ->
+        Box.stack'
+            (Box.addSuffix (space <> Box.keyword arrow) pattern)
+            (Box.indent body)
 
-            (False, Nothing) ->
-                Box.stack'
-                    (Box.addSuffix (space <> Box.keyword arrow) pattern)
-                    (Box.indent body)
-
-            (True, _) ->
-                Box.stack
-                    pattern
-                    [ Box.line $ Box.keyword arrow
-                    , Box.indent body
-                    ]
+    CaseClause True pattern arrow body ->
+        Box.stack
+            pattern
+            [ Box.line $ Box.keyword arrow
+            , Box.indent body
+            ]
 
     LetIn letWord defs inWord body ->
         Box.stack1
@@ -417,33 +391,14 @@ render = \case
                 [ exposing
                 ]
 
-    UnionListing name nameHasComments listing ->
-        case
-            ( listing
-            , isSingle <$> listing
-            , isSingle name
-            , nameHasComments
-            )
-        of
-            (_, Just (Just listing'), Just name', False) ->
-                Box.line $ name' <> listing'
+    UnionListing name _ Nothing ->
+        name
 
-            (Just listing', _, _, _) ->
-                render $ WrapIndent name listing' []
+    UnionListing name False (Just listing) ->
+        Box.rowOrIndent Nothing [name, listing]
 
-            (Nothing, _, _, _) ->
-                name
-
-
-firstOf :: [Maybe a] -> a -> a
-firstOf [] = id
-firstOf (Just a : _) = const a
-firstOf (Nothing : rest) = firstOf rest
-
-
-unless :: MonadPlus m => Bool -> m a -> m a
-unless False = id
-unless True = const mzero
+    UnionListing name True (Just listing) ->
+        Box.rowOrIndent (Just space) [name, listing]
 
 
 stack0 :: a -> a -> [a] -> ElmF a

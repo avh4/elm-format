@@ -4,7 +4,7 @@ module Box
   , isLine, allSingles
   , indent, prefix, addSuffix
   , render
-  ,allSingles2,allSingles3,lineLength,isSingle,isMustBreak,comment,stack,joinMustBreak,prefixOrIndent, rowOrStack, rowOrStack', rowOrIndent, rowOrIndent') where
+  ,allSingles2,allSingles3,lineLength,comment,stack,joinMustBreak,prefixOrIndent, rowOrStack, rowOrStack', rowOrIndent, rowOrIndent') where
 
 import Data.Fix
 
@@ -261,24 +261,6 @@ isLine b =
             Right l
         _ ->
             Left b
-
-
-isSingle :: Box -> Maybe Line
-isSingle b =
-    case b of
-        SingleLine (Indented _ l) ->
-            Just l
-        _ ->
-            Nothing
-
-
-isMustBreak :: Box -> Maybe Line
-isMustBreak b =
-    case b of
-        MustBreak (Indented _ l) ->
-            Just l
-        _ ->
-            Nothing
 
 
 destructure :: Box -> (Indented Line, [Indented Line])
