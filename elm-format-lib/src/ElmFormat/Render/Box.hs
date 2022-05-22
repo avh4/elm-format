@@ -4,7 +4,8 @@
 module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
-import Box ( Line, identifier, punc, space, render )
+import Text.PrettyPrint.Avh4.Block ( Line, punc, space )
+import qualified Text.PrettyPrint.Avh4.Block as Block
 import ElmVersion (ElmVersion(..))
 
 import AST.V0_16
@@ -49,7 +50,7 @@ pleaseReport what details =
     error $ "<elm-format: " ++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
 
 
-formatBinary :: Bool -> Elm -> [ ( Bool, Comments, Box.Line, Elm ) ] -> Elm
+formatBinary :: Bool -> Elm -> [ ( Bool, Comments, Block.Line, Elm ) ] -> Elm
 formatBinary multiline left ops =
     case ops of
         [] ->
@@ -592,11 +593,11 @@ formatDocComment elmVersion importInfo blocks =
             case result of
                 ModuleCode modu ->
                     formatModule elmVersion False 1 modu
-                        |> (Text.unpack . Box.render . Fix.cata ElmStructure.render)
+                        |> (Text.unpack . Block.render . Fix.cata ElmStructure.render)
 
                 DeclarationsCode declarations ->
                     formatModuleBody 1 elmVersion importInfo declarations
-                        |> fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render)
+                        |> fmap (Text.unpack . Block.render . Fix.cata ElmStructure.render)
                         |> fromMaybe ""
 
                 ExpressionsCode expressions ->
@@ -604,7 +605,7 @@ formatDocComment elmVersion importInfo blocks =
                         |> fmap (fmap $ formatEolCommented . fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo))
                         |> fmap (fmap $ (,) BodyUnnamed)
                         |> formatTopLevelBody 1 elmVersion importInfo
-                        |> fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render)
+                        |> fmap (Text.unpack . Block.render . Fix.cata ElmStructure.render)
                         |> fromMaybe ""
 
         content :: String
@@ -788,8 +789,8 @@ formatDeclaration elmVersion importInfo decl =
                     case formatOpenCommentedList $ ctor <$> tags of
                         [] -> pleaseReport "UNEXPECTED CUSTOM TYPE DECLARATION" "No variants"
                         first:rest ->
-                            ElmStructure.spaceSepOrPrefix (Box.punc "=") first
-                            : (ElmStructure.spaceSepOrPrefix (Box.punc "|") <$> rest)
+                            ElmStructure.spaceSepOrPrefix (Block.punc "=") first
+                            : (ElmStructure.spaceSepOrPrefix (Block.punc "|") <$> rest)
             in
             ElmStructure.stackIndent leftSide variants
 
@@ -929,7 +930,7 @@ formatAstNode elmVersion importInfo =
                 formatRight (C (preOp, postOp, eol) term) =
                     ( False
                     , preOp
-                    , Box.punc "::"
+                    , Block.punc "::"
                     , formatC2Eol $ C (postOp, [], eol) $ syntaxParens SpaceSeparated term
                     )
             in
@@ -1094,7 +1095,7 @@ formatExpression elmVersion importInfo aexpr =
 
         Unary Negative e ->
             FormattedExpression SyntaxSeparated $
-            ElmStructure.unary (Box.punc "-") $
+            ElmStructure.unary (Block.punc "-") $
             syntaxParens SpaceSeparated $ formatExpression elmVersion importInfo e -- TODO: This might need something stronger than SpaceSeparated?
 
         App left [] _ ->
@@ -1174,7 +1175,7 @@ formatExpression elmVersion importInfo aexpr =
             FormattedExpression SyntaxSeparated $
             formatExpression elmVersion importInfo expr
                 |> syntaxParens SpaceSeparated -- TODO: does this need a different context than SpaceSeparated?
-                |> ElmStructure.suffix (punc "." <> Box.identifier (Text.pack $ (\(LowercaseIdentifier l) -> l) field))
+                |> ElmStructure.suffix (punc "." <> Block.identifier (Text.pack $ (\(LowercaseIdentifier l) -> l) field))
 
         AccessFunction (LowercaseIdentifier field) ->
             FormattedExpression SyntaxSeparated $
@@ -1263,7 +1264,7 @@ formatRecordLike base' fields trailing multiline =
                 Nothing ->
                     ElmStructure.spaceSepOrStack
                         (ElmStructure.spaceSepOrPrefix
-                            (Box.punc "{")
+                            (Block.punc "{")
                             (ElmStructure.spaceSepOrIndented (formatCommented base) [keyword "|"])
                         )
                         [keyword "}"]
@@ -1338,7 +1339,7 @@ formatBinops ::
     -> Elm
 formatBinops left ops multiline =
     let
-        formatPair_ :: Bool -> BinopsClause (I.Fix (AST (VariableNamespace [UppercaseIdentifier])) 'VarRefNK) (FormatResult 'ExpressionNK) -> (Bool, Comments, Box.Line, Elm)
+        formatPair_ :: Bool -> BinopsClause (I.Fix (AST (VariableNamespace [UppercaseIdentifier])) 'VarRefNK) (FormatResult 'ExpressionNK) -> (Bool, Comments, Block.Line, Elm)
         formatPair_ isLast (BinopsClause po (I.Fix (VarRef_ o)) pe e) =
             let
                 isLeftPipe =
@@ -1714,17 +1715,17 @@ formatSymbolIdentifierInParens (SymbolIdentifier name) =
     ElmStructure.identifier $ "(" <> Text.pack name <> ")"
 
 
-formatInfixVar :: Ref [UppercaseIdentifier] -> Box.Line
+formatInfixVar :: Ref [UppercaseIdentifier] -> Block.Line
 formatInfixVar var =
     case var of
         VarRef namespace (LowercaseIdentifier name) ->
-            Box.punc "`" <> Box.identifier (Text.intercalate "." ((Text.pack . (\(UppercaseIdentifier n) -> n) <$> namespace) ++ [Text.pack name])) <> Box.punc "`"
+            Block.punc "`" <> Block.identifier (Text.intercalate "." ((Text.pack . (\(UppercaseIdentifier n) -> n) <$> namespace) ++ [Text.pack name])) <> Block.punc "`"
 
         TagRef namespace (UppercaseIdentifier name) ->
-            Box.punc "`" <> Box.identifier (Text.intercalate "." ((Text.pack . (\(UppercaseIdentifier n) -> n) <$> namespace) ++ [Text.pack name])) <> Box.punc "`"
+            Block.punc "`" <> Block.identifier (Text.intercalate "." ((Text.pack . (\(UppercaseIdentifier n) -> n) <$> namespace) ++ [Text.pack name])) <> Block.punc "`"
 
         OpRef (SymbolIdentifier op) ->
-            Box.identifier $ Text.pack op
+            Block.identifier $ Text.pack op
 
 
 formatQualifiedIdentifier :: [UppercaseIdentifier] -> Text -> Elm

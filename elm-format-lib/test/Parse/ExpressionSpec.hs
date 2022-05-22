@@ -5,7 +5,7 @@ import Test.Hspec hiding (example)
 import Parse.Expression
 import AST.V0_16
 import AST.Structure
-import qualified Box
+import qualified Text.PrettyPrint.Avh4.Block as Block
 import qualified Data.Bimap as Bimap
 import Data.Coapplicative
 import qualified Data.Indexed as I
@@ -40,7 +40,7 @@ importInfo =
 example' :: String -> String -> String -> SpecWith ()
 example' name input expected =
     it name $
-        assertParse (fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render . syntaxParens SyntaxSeparated . formatExpression Elm_0_19 importInfo . I.fold2 (I.Fix . extract)) (expr Elm_0_19)) input expected
+        assertParse (fmap (Text.unpack . Block.render . Fix.cata ElmStructure.render . syntaxParens SyntaxSeparated . formatExpression Elm_0_19 importInfo . I.fold2 (I.Fix . extract)) (expr Elm_0_19)) input expected
 
 
 commentedIntExpr :: (Word16, Word16, Word16, Word16) -> String -> String -> Int64 -> Commented ([Comment], [Comment]) (I.Fix2 Located (ASTNS ns) 'ExpressionNK)

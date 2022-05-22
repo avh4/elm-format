@@ -1,6 +1,6 @@
-module Box
+module Text.PrettyPrint.Avh4.Block
   ( Line, identifier, keyword, punc, literal, space
-  , Box(SingleLine, MustBreak), blankLine, line, mustBreak, stack', andThen
+  , Block(SingleLine, MustBreak), blankLine, line, mustBreak, stack', andThen
   , isLine
   , indent, prefix, addSuffix
   , render
@@ -9,8 +9,8 @@ module Box
 import Data.Fix
 
 import qualified Data.Text as T
-import Indent (Indent)
-import qualified Indent
+import Text.PrettyPrint.Avh4.Indent (Indent)
+import qualified Text.PrettyPrint.Avh4.Indent as Indent
 import Data.List.NonEmpty (NonEmpty ((:|)))
 import Data.Semigroup (sconcat)
 import qualified Data.List.NonEmpty as NonEmpty
@@ -71,8 +71,8 @@ data Indented a =
 
 
 {-
-Box contains Lines (at least one - can't be empty).
-Box either:
+Block contains Lines (at least one - can't be empty).
+Block either:
   - can appear in the middle of a line
       (Stack someLine [], thus can be joined without problems), or
   - has to appear on its own
@@ -85,23 +85,23 @@ Stack contains two or more lines.
 Sometimes (see `prefix`) the first line of Stack
   gets different treatment than the other lines.
 -}
-data Box
+data Block
     = SingleLine (Indented Line)
     | Stack (Indented Line) (Indented Line) [Indented Line]
     | MustBreak (Indented Line)
 
 
-blankLine :: Box
+blankLine :: Block
 blankLine =
     line $ literal ""
 
 
-line :: Line -> Box
+line :: Line -> Block
 line =
     SingleLine . mkIndentedLine
 
 
-mustBreak :: Line -> Box
+mustBreak :: Line -> Block
 mustBreak =
     MustBreak . mkIndentedLine
 
@@ -115,7 +115,7 @@ mkIndentedLine (Fix (Row (Fix Space) next)) =
 mkIndentedLine other = Indented mempty other
 
 
-stack' :: Box -> Box -> Box
+stack' :: Block -> Block -> Block
 stack' b1 b2 =
     let
         (line1first, line1rest) = destructure b1
@@ -127,16 +127,16 @@ stack' b1 b2 =
             Stack line1first first rest
 
 
-andThen :: [Box] -> Box -> Box
+andThen :: [Block] -> Block -> Block
 andThen rest first =
     foldl stack' first rest
 
 
-stack :: NonEmpty Box -> Box
+stack :: NonEmpty Block -> Block
 stack = foldr1 stack'
 
 
-joinMustBreak :: Box -> Box -> Box
+joinMustBreak :: Block -> Block -> Block
 joinMustBreak inner eol =
     case (inner, eol) of
         (SingleLine (Indented i1 inner'), SingleLine (Indented _ eol')) ->
@@ -152,7 +152,7 @@ joinMustBreak inner eol =
 
 
 {-# INLINE prefixOrIndent #-}
-prefixOrIndent :: Maybe Line -> Line -> Box -> Box
+prefixOrIndent :: Maybe Line -> Line -> Block -> Block
 prefixOrIndent joiner a b =
     let
         join a b =
@@ -171,12 +171,12 @@ prefixOrIndent joiner a b =
             stack' (line a) (indent b)
 
 
-mapLines :: (Indented Line -> Indented Line) -> Box -> Box
+mapLines :: (Indented Line -> Indented Line) -> Block -> Block
 mapLines fn =
     mapFirstLine fn fn
 
 
-mapFirstLine :: (Indented Line -> Indented Line) -> (Indented Line -> Indented Line) -> Box -> Box
+mapFirstLine :: (Indented Line -> Indented Line) -> (Indented Line -> Indented Line) -> Block -> Block
 mapFirstLine firstFn restFn b =
     case b of
         SingleLine l1 ->
@@ -187,7 +187,7 @@ mapFirstLine firstFn restFn b =
             MustBreak (firstFn l1)
 
 
-mapLastLine :: (Indented Line -> Indented Line) -> Box -> Box
+mapLastLine :: (Indented Line -> Indented Line) -> Block -> Block
 mapLastLine lastFn = \case
     SingleLine l1 ->
         SingleLine (lastFn l1)
@@ -199,55 +199,56 @@ mapLastLine lastFn = \case
         MustBreak (lastFn l1)
 
 
-indent :: Box -> Box
+indent :: Block -> Block
 indent =
     mapLines (\(Indented i l) -> Indented (Indent.tab <> i) l)
 
 
 {-# INLINE rowOrStack #-}
-rowOrStack :: Maybe Line -> NonEmpty Box -> Box
+rowOrStack :: Maybe Line -> NonEmpty Block -> Block
 rowOrStack = rowOrStack' False
 
 {-# INLINE rowOrStack' #-}
-rowOrStack' :: Bool -> Maybe Line -> NonEmpty Box -> Box
+rowOrStack' :: Bool -> Maybe Line -> NonEmpty Block -> Block
 rowOrStack' _ _ (single :| []) = single
-rowOrStack' forceMultiline (Just joiner) boxes =
-    case allSingles boxes of
+rowOrStack' forceMultiline (Just joiner) blocks =
+    case allSingles blocks of
         Right lines | not forceMultiline ->
             line $ sconcat $ NonEmpty.intersperse joiner lines
         _ ->
-            stack boxes
-rowOrStack' forceMultiline Nothing boxes =
-    case allSingles boxes of
+            stack blocks
+rowOrStack' forceMultiline Nothing blocks =
+    case allSingles blocks of
         Right lines | not forceMultiline ->
             line $ sconcat lines
         _ ->
-            stack boxes
+            stack blocks
 
 
 {-# INLINE rowOrIndent #-}
-rowOrIndent :: Maybe Line -> NonEmpty Box -> Box
+rowOrIndent :: Maybe Line -> NonEmpty Block -> Block
 rowOrIndent = rowOrIndent' False
 
+
 {-# INLINE rowOrIndent' #-}
-rowOrIndent' :: Bool -> Maybe Line -> NonEmpty Box -> Box
+rowOrIndent' :: Bool -> Maybe Line -> NonEmpty Block -> Block
 rowOrIndent' _ _ (single :| []) = single
-rowOrIndent' forceMultiline (Just joiner) boxes@(b1 :| rest) =
-    case allSingles boxes of
+rowOrIndent' forceMultiline (Just joiner) blocks@(b1 :| rest) =
+    case allSingles blocks of
         Right lines | not forceMultiline ->
             line $ sconcat $ NonEmpty.intersperse joiner lines
         _ ->
             stack (b1 :| (indent <$> rest))
-rowOrIndent' forceMultiline Nothing boxes@(b1 :| rest) =
-    case allSingles boxes of
+rowOrIndent' forceMultiline Nothing blocks@(b1 :| rest) =
+    case allSingles blocks of
         Right lines | not forceMultiline ->
             line $ sconcat lines
         _ ->
             stack (b1 :| (indent <$> rest))
 
 
-{-# DEPRECATED isLine "Rewrite to avoid inspecting the child boxes" #-}
-isLine :: Box -> Either Box Line
+{-# DEPRECATED isLine "Rewrite to avoid inspecting the child blocks" #-}
+isLine :: Block -> Either Block Line
 isLine b =
     case b of
         SingleLine (Indented _ l) ->
@@ -256,7 +257,7 @@ isLine b =
             Left b
 
 
-destructure :: Box -> (Indented Line, [Indented Line])
+destructure :: Block -> (Indented Line, [Indented Line])
 destructure b =
     case b of
         SingleLine l1 ->
@@ -267,20 +268,20 @@ destructure b =
             (l1, [])
 
 
-allSingles :: Traversable t => t Box -> Either (t Box) (t Line)
-allSingles boxes =
-    case mapM isLine boxes of
+allSingles :: Traversable t => t Block -> Either (t Block) (t Line)
+allSingles blocks =
+    case mapM isLine blocks of
         Right lines' ->
             Right lines'
         _ ->
-            Left boxes
+            Left blocks
 
 
 {-
 Add the prefix to the first line,
 pad the other lines with spaces of the same length
 
-NOTE: An exceptional case that we haven't really designed for is if the first line of the input Box is indented.
+NOTE: An exceptional case that we haven't really designed for is if the first line of the input Block is indented.
 
 EXAMPLE:
 abcde
@@ -289,7 +290,7 @@ xyz
 myPrefix abcde
          xyz
 -}
-prefix :: Line -> Box -> Box
+prefix :: Line -> Block -> Block
 prefix pref =
     let
         prefixLength = fromIntegral $ T.length $ renderLine pref
@@ -299,7 +300,7 @@ prefix pref =
     mapFirstLine (fmap addPrefixToLine) padLineWithSpaces
 
 
-addSuffix :: Line -> Box -> Box
+addSuffix :: Line -> Block -> Block
 addSuffix suffix =
     mapLastLine $ fmap (<> suffix)
 
@@ -320,9 +321,9 @@ renderLine line' =
             renderLine left <> renderLine right
 
 
-render :: Box -> T.Text
-render box' =
-    case box' of
+render :: Block -> T.Text
+render block' =
+    case block' of
         SingleLine line' ->
             T.snoc (T.stripEnd $ renderIndentedLine $ renderLine <$> line') '\n'
         Stack l1 l2 rest ->

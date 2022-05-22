@@ -1,4 +1,4 @@
-module Indent (Indent, tab,spaces,width) where
+module Text.PrettyPrint.Avh4.Indent (Indent, tab,spaces,width) where
 
 
 spacesInTab :: Word

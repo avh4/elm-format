@@ -10,19 +10,18 @@ module ElmFormat.Render.ElmStructure
 
 
 import Elm.Utils ((|>))
-import Box
-    ( Box(..),
+import Text.PrettyPrint.Avh4.Block
+    ( Block(..),
       space,
       indent,
       isLine,
-      prefix,
       lineLength,
       blankLine )
 import AST.V0_16 (FunctionApplicationMultiline(..), Multiline(..))
 
 import Data.Fix (Fix (Fix))
 
-import qualified Box
+import qualified Text.PrettyPrint.Avh4.Block as Block
 import qualified Data.List as List
 import Data.Maybe (maybeToList, catMaybes)
 import Data.Text (Text)
@@ -37,8 +36,8 @@ data ElmF a
     | DocComment Text Text [Text]
     | CommentBlock Text [Text] Text
     | MustBreakComment Text
-    | BoxLine Box.Line
-    | Suffix a Box.Line
+    | BoxLine Block.Line
+    | Suffix a Block.Line
     | WrapStack a a [a]
     | WrapStackNoSpaces a a [a]
     | WrapIndent a a [a]
@@ -57,7 +56,7 @@ data ElmF a
     | GroupOfOne Text a Text
     | ExtensionGroup Text Text Text Text Bool a (NonEmpty a) [(a, NonEmpty a)] (Maybe a)
     | Range Text Text Text a a
-    | OperatorPrefix Bool Box.Line a
+    | OperatorPrefix Bool Block.Line a
     | Module [a] (Maybe a, Maybe a, (Maybe a, [a])) Int (Maybe a)
     | Import a (Maybe a) (Maybe a)
     | UnionListing a Bool (Maybe a)
@@ -66,95 +65,95 @@ data ElmF a
 type Elm = Fix ElmF
 
 
-render :: ElmF Box -> Box
+render :: ElmF Block -> Block
 render = \case
     Keyword k ->
-        Box.line $ Box.keyword k
+        Block.line $ Block.keyword k
 
     Literal l ->
-        Box.line $ Box.literal l
+        Block.line $ Block.literal l
 
     Identifier name ->
-        Box.line $ Box.identifier name
+        Block.line $ Block.identifier name
 
     CommentBlock left inner right ->
         case inner of
             [] ->
-                Box.line $ Box.comment (left <> " " <> right)
+                Block.line $ Block.comment (left <> " " <> right)
 
             [single] ->
-                Box.line $ Box.comment (left <> " " <> single <> " " <> right)
+                Block.line $ Block.comment (left <> " " <> single <> " " <> right)
 
             (first:rest) ->
-                Box.stack'
-                    (Box.prefix
-                        (Box.comment (left <> " "))
-                        (Box.stack $ Box.line . Box.comment <$>
+                Block.stack'
+                    (Block.prefix
+                        (Block.comment (left <> " "))
+                        (Block.stack $ Block.line . Block.comment <$>
                             first :| rest
                         )
                     )
-                    (Box.line $ Box.comment right)
+                    (Block.line $ Block.comment right)
 
     MustBreakComment line ->
-        Box.mustBreak $ Box.comment line
+        Block.mustBreak $ Block.comment line
 
     BoxLine line ->
-        Box.line line
+        Block.line line
 
     Suffix a suf ->
-        Box.addSuffix suf a
+        Block.addSuffix suf a
 
     DocComment left right lines' ->
         case lines' of
             [] ->
-                Box.line $ Box.punc left <> space <> Box.punc right
+                Block.line $ Block.punc left <> space <> Block.punc right
 
             [first] ->
-                Box.stack'
-                    (Box.line $ Box.punc left <> space <> Box.literal first)
-                    (Box.line $ Box.punc right)
+                Block.stack'
+                    (Block.line $ Block.punc left <> space <> Block.literal first)
+                    (Block.line $ Block.punc right)
 
             (first:rest) ->
-                Box.line (Box.punc left <> space <> Box.literal first)
-                    |> Box.andThen (map (Box.line . Box.literal) rest)
-                    |> Box.andThen [ Box.line $ Box.punc right ]
+                Block.line (Block.punc left <> space <> Block.literal first)
+                    |> Block.andThen (map (Block.line . Block.literal) rest)
+                    |> Block.andThen [ Block.line $ Block.punc right ]
 
     WrapStack a b rest ->
-        Box.rowOrStack
+        Block.rowOrStack
             (Just space)
             (a :| b : rest)
 
     WrapStackNoSpaces a b rest ->
-        Box.rowOrStack
+        Block.rowOrStack
             Nothing
             (a :| b : rest)
 
     WrapIndent a b rest ->
-        Box.rowOrIndent
+        Block.rowOrIndent
             (Just space)
             (a :| b : rest)
 
     JoinMustBreak inner eol ->
-        Box.joinMustBreak inner eol
+        Block.joinMustBreak inner eol
 
     Stack a b rest ->
-        Box.stack $ a :| mconcat (pair <$> b:rest)
+        Block.stack $ a :| mconcat (pair <$> b:rest)
         where
             pair (n, x) =
-                List.replicate n Box.blankLine ++ [x]
+                List.replicate n Block.blankLine ++ [x]
 
     StackIndent a b rest ->
-        Box.stack $ a :| (indent <$> (b:rest))
+        Block.stack $ a :| (indent <$> (b:rest))
 
     PrefixOrIndent prefix b ->
-        Box.prefixOrIndent (Just space) (Box.punc prefix) b
+        Block.prefixOrIndent (Just space) (Block.punc prefix) b
 
     EqualsPair forceMultiline left symbol right ->
-        Box.rowOrIndent' forceMultiline
+        Block.rowOrIndent' forceMultiline
             (Just space)
-            [ Box.rowOrIndent (Just space)
+            [ Block.rowOrIndent (Just space)
                 [ left
-                , Box.line $ Box.punc symbol
+                , Block.line $ Block.punc symbol
                 ]
             , right
             ]
@@ -167,8 +166,8 @@ render = \case
                     FAJoinFirst SplitAll -> (False, True)
                     FASplitFirst -> (True, True)
         in
-        Box.rowOrIndent' forceRest (Just space) $
-            Box.rowOrIndent' forceFirst (Just space)
+        Block.rowOrIndent' forceRest (Just space) $
+            Block.rowOrIndent' forceFirst (Just space)
                 [ first
                 , arg0
                 ]
@@ -177,38 +176,38 @@ render = \case
     Case caseWord ofWord forceMultilineSubject subject clauses ->
         let
             opening =
-                Box.rowOrStack
+                Block.rowOrStack
                     (Just space)
-                    [ Box.rowOrIndent'
+                    [ Block.rowOrIndent'
                         forceMultilineSubject
                         (Just space)
-                        [ Box.line $ Box.keyword caseWord
+                        [ Block.line $ Block.keyword caseWord
                         , subject
                         ]
-                    , Box.line $ Box.keyword ofWord
+                    , Block.line $ Block.keyword ofWord
                     ]
         in
-        Box.stack $
+        Block.stack $
             opening :|
             (indent <$> List.intersperse blankLine clauses)
 
     CaseClause False pattern arrow body ->
-        Box.stack'
-            (Box.addSuffix (space <> Box.keyword arrow) pattern)
-            (Box.indent body)
+        Block.stack'
+            (Block.addSuffix (space <> Block.keyword arrow) pattern)
+            (Block.indent body)
 
     CaseClause True pattern arrow body ->
-        Box.stack
+        Block.stack
             [ pattern
-            , Box.line $ Box.keyword arrow
-            , Box.indent body
+            , Block.line $ Block.keyword arrow
+            , Block.indent body
             ]
 
     LetIn letWord defs inWord body ->
-        Box.stack
-            [ Box.line $ Box.keyword letWord
-            , Box.indent defs
-            , Box.line $ Box.keyword inWord
+        Block.stack
+            [ Block.line $ Block.keyword letWord
+            , Block.indent defs
+            , Block.line $ Block.keyword inWord
             , body
             ]
 
@@ -217,47 +216,47 @@ render = \case
             opening key cond =
                 render $ WrapStack
                     (render $ WrapIndent key cond [])
-                    (Box.line $ Box.keyword thenWord)
+                    (Block.line $ Block.keyword thenWord)
                     []
 
             formatElseIf (ifComments, cond, body) =
                 let
                     if' =
                         case ifComments of
-                            Nothing-> Box.line $ Box.keyword ifWord
+                            Nothing-> Block.line $ Block.keyword ifWord
                             Just c ->
-                                render $ WrapStack c (Box.line $ Box.keyword ifWord) []
+                                render $ WrapStack c (Block.line $ Block.keyword ifWord) []
 
                     key =
                         render $ WrapStack
-                            (Box.line $ Box.keyword elseWord)
+                            (Block.line $ Block.keyword elseWord)
                             if'
                             []
                 in
-                Box.stack
+                Block.stack
                     [ blankLine
                     , opening key cond
                     , indent body
                     ]
         in
-        Box.stack'
-            (opening (Box.line $ Box.keyword ifWord) condition)
+        Block.stack'
+            (opening (Block.line $ Block.keyword ifWord) condition)
             (indent ifBody)
-            |> Box.andThen (formatElseIf <$> elseIfs)
-            |> Box.andThen
+            |> Block.andThen (formatElseIf <$> elseIfs)
+            |> Block.andThen
                 [ blankLine
-                , Box.line $ Box.keyword elseWord
+                , Block.line $ Block.keyword elseWord
                 , indent elseBody
                 ]
 
     Lambda start arrow forceMultiline args bodyComments body ->
-        Box.rowOrIndent' forceMultiline (Just space)
-            [ Box.rowOrStack
+        Block.rowOrIndent' forceMultiline (Just space)
+            [ Block.rowOrStack
                 (Just space)
-                [ Box.prefix (Box.punc start) args
-                , Box.line $ Box.punc arrow
+                [ Block.prefix (Block.punc start) args
+                , Block.line $ Block.punc arrow
                 ]
-            , Box.stack $ NonEmpty.fromList $ catMaybes
+            , Block.stack $ NonEmpty.fromList $ catMaybes
                 [ bodyComments
                 , Just body
                 ]
@@ -273,12 +272,12 @@ render = \case
 
             final =
                 case extraFooter of
-                    Nothing -> Box.line $ Box.punc right
+                    Nothing -> Block.line $ Block.punc right
                     Just footer ->
-                        Box.stack
+                        Block.stack
                             [ blankLine
                             , footer
-                            , Box.line $ Box.punc right
+                            , Block.line $ Block.punc right
                             ]
 
             attempt innerSpaces' =
@@ -295,9 +294,9 @@ render = \case
             _ -> withInnerSpaces
 
     GroupOfOne left inner right ->
-        Box.rowOrStack Nothing
-            [ Box.prefix (Box.punc left) inner
-            , Box.line (Box.punc right)
+        Block.rowOrStack Nothing
+            [ Block.prefix (Block.punc left) inner
+            , Block.line (Block.punc right)
             ]
 
     ExtensionGroup left delim sep right forceMultiline base section1 moreSections extraFooter ->
@@ -309,29 +308,29 @@ render = \case
         in
         render $ (if forceMultiline then stack0 else WrapStack)
             (render $ (if forceMultiline then StackIndent else WrapIndent)
-                (render $ OperatorPrefix True (Box.punc left) base)
+                (render $ OperatorPrefix True (Block.punc left) base)
                 (renderSections True forceMultiline delim sep section1 moreSections)
                 extraFooter'
             )
-            (Box.line $ Box.punc right)
+            (Block.line $ Block.punc right)
             []
 
     Range left dots right a b ->
-        Box.rowOrStack Nothing
-            [ Box.prefixOrIndent Nothing (Box.punc left) a
-            , Box.prefixOrIndent Nothing (Box.punc dots) b
-            , Box.line $ Box.punc right
+        Block.rowOrStack Nothing
+            [ Block.prefixOrIndent Nothing (Block.punc left) a
+            , Block.prefixOrIndent Nothing (Block.punc dots) b
+            , Block.line $ Block.punc right
             ]
 
     OperatorPrefix False op rest ->
         if lineLength op < 4
-            then Box.prefix op rest
-            else Box.rowOrIndent Nothing [Box.line op, rest]
+            then Block.prefix op rest
+            else Block.rowOrIndent Nothing [Block.line op, rest]
 
     OperatorPrefix True op rest ->
         if lineLength op < 4
-            then Box.prefix (op <> space) rest
-            else Box.rowOrIndent (Just space) [Box.line op, rest]
+            then Block.prefix (op <> space) rest
+            else Block.rowOrIndent (Just space) [Block.line op, rest]
 
     Module initialComments (maybeHeader, docs, (importComments, imports)) spaceBeforeBody body ->
         let
@@ -348,7 +347,7 @@ render = \case
                     |> List.intersperse [blankLine]
                     |> concat
         in
-        Box.stack $ NonEmpty.fromList $ concat @[]
+        Block.stack $ NonEmpty.fromList $ concat @[]
             [ initialComments'
             , List.intercalate [ blankLine ] $ concat @[]
                 [ maybeToList $ return <$> maybeHeader
@@ -360,10 +359,10 @@ render = \case
             ]
 
     Import name as exposing ->
-        Box.rowOrIndent (Just space) $
-            Box.rowOrIndent
+        Block.rowOrIndent (Just space) $
+            Block.rowOrIndent
                 (Just space)
-                (Box.line (Box.keyword "import")
+                (Block.line (Block.keyword "import")
                     :| catMaybes
                         [ Just name
                         , as
@@ -377,10 +376,10 @@ render = \case
         name
 
     UnionListing name False (Just listing) ->
-        Box.rowOrIndent Nothing [name, listing]
+        Block.rowOrIndent Nothing [name, listing]
 
     UnionListing name True (Just listing) ->
-        Box.rowOrIndent (Just space) [name, listing]
+        Block.rowOrIndent (Just space) [name, listing]
 
 
 stack0 :: a -> a -> [a] -> ElmF a
@@ -388,23 +387,23 @@ stack0 a b rest =
     Stack a (0, b) ((,) 0 <$> rest)
 
 
-renderSections :: Bool -> Bool -> Text -> Text -> NonEmpty Box -> [(Box, NonEmpty Box)] -> Box
+renderSections :: Bool -> Bool -> Text -> Text -> NonEmpty Block -> [(Block, NonEmpty Block)] -> Block
 renderSections innerSpaces forceMultiline left sep (first0':|firsts') moreSections' =
     let
         renderItem innerSpaces' punc item =
             render $ OperatorPrefix
                 (innerSpaces' || punc == sep)
-                (Box.punc punc)
+                (Block.punc punc)
                 item
 
         renderLabeledSection innerSpaces' (label, items) =
-            Box.stack
+            Block.stack
                 [ blankLine
                 , label
                 , renderSections forceMultiline innerSpaces' sep sep items []
                 ]
     in
-    Box.rowOrStack' forceMultiline Nothing $
+    Block.rowOrStack' forceMultiline Nothing $
         renderItem innerSpaces left first0' :|
         (renderItem innerSpaces sep <$> firsts')
         ++ (renderLabeledSection innerSpaces <$> moreSections')
@@ -445,11 +444,11 @@ mustBreakComment :: Text -> Elm
 mustBreakComment = Fix . MustBreakComment
 
 
-line :: Box.Line -> Elm
+line :: Block.Line -> Elm
 line = Fix . BoxLine
 
 
-suffix :: Box.Line -> Elm -> Elm
+suffix :: Block.Line -> Elm -> Elm
 suffix suf a =
     Fix $ Suffix a suf
 
@@ -553,7 +552,7 @@ Formats as:
     opLong
         rest
 -}
-spaceSepOrPrefix :: Box.Line -> Elm -> Elm
+spaceSepOrPrefix :: Block.Line -> Elm -> Elm
 spaceSepOrPrefix op rest =
     Fix $ OperatorPrefix True op rest
 
@@ -615,7 +614,7 @@ application forceMultiline f args =
     Fix $ FunctionApplication forceMultiline f args
 
 
-unary :: Box.Line -> Elm -> Elm
+unary :: Block.Line -> Elm -> Elm
 unary op a =
     Fix $ OperatorPrefix False op a
 

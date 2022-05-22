@@ -9,7 +9,7 @@ import AST.Structure
 import Parse.TestHelpers
 import ElmVersion
 import ElmFormat.Render.Box (formatType, TypeParensRequired (NotRequired), typeParens)
-import qualified Box
+import qualified Text.PrettyPrint.Avh4.Block as Block
 import qualified Data.Text as Text
 import Parse.IParser
 import Reporting.Annotation (Located)
@@ -26,7 +26,7 @@ expr = Parse.Type.expr
 example :: String -> String -> String -> SpecWith ()
 example name input expected =
     it name $
-        assertParse (fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render . typeParens NotRequired . formatType Elm_0_19 . I.fold2 (I.Fix . extract)) (expr Elm_0_19)) input expected
+        assertParse (fmap (Text.unpack . Block.render . Fix.cata ElmStructure.render . typeParens NotRequired . formatType Elm_0_19 . I.fold2 (I.Fix . extract)) (expr Elm_0_19)) input expected
 
 
 spec :: Spec

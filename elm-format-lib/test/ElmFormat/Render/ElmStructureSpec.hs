@@ -7,7 +7,7 @@ import qualified Data.Text.Lazy as LazyText
 import qualified Data.Text as Text
 
 import AST.V0_16
-import Box
+import Text.PrettyPrint.Avh4.Block as Block
 import ElmFormat.Render.ElmStructure
 import Data.Text (Text)
 import qualified Data.Fix as Fix
@@ -28,7 +28,7 @@ trim text =
 
 assertOutput :: String -> Elm -> Expectation
 assertOutput expected actual =
-    expected `shouldBe` trim (Text.unpack $ Box.render $ Fix.cata ElmStructure.render actual)
+    expected `shouldBe` trim (Text.unpack $ Block.render $ Fix.cata ElmStructure.render actual)
 
 
 word :: Text -> Elm
@@ -242,5 +242,5 @@ spec = describe "ElmFormat.Render.ElmStructure" $ do
 
 shouldOutput :: Elm -> [Text] -> Expectation
 shouldOutput elm expected =
-    Box.render (Fix.cata ElmStructure.render elm)
+    Block.render (Fix.cata ElmStructure.render elm)
     `shouldBe` Text.unlines expected

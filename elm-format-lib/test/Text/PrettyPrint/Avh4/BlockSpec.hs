@@ -1,4 +1,4 @@
-module BoxSpec where
+module Text.PrettyPrint.Avh4.BlockSpec where
 
 import Elm.Utils ((|>))
 
@@ -6,7 +6,7 @@ import Test.Hspec
 import qualified Data.Text.Lazy as LazyText
 import qualified Data.Text as Text
 
-import Box
+import Text.PrettyPrint.Avh4.Block
 import Data.Text (Text)
 
 
@@ -25,17 +25,17 @@ assertLineOutput expected actual =
     assertOutput (expected ++ "\n") (line actual)
 
 
-assertOutput :: String -> Box -> Expectation
+assertOutput :: String -> Block -> Expectation
 assertOutput expected actual =
     expected `shouldBe` trim (Text.unpack $ render actual)
 
 
-word :: Text -> Box
+word :: Text -> Block
 word =
     line . identifier
 
 
-block :: Text -> Box
+block :: Text -> Block
 block text =
     stack'
         (line $ w <> w)
@@ -88,7 +88,7 @@ spec = describe "Box" $ do
             ]
 
 
-shouldOutput :: Box -> [Text] -> Expectation
-shouldOutput box expected =
-    Box.render box
+shouldOutput :: Block -> [Text] -> Expectation
+shouldOutput block expected =
+    render block
     `shouldBe` Text.unlines expected

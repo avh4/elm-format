@@ -8,7 +8,7 @@ import Parse.TestHelpers (assertParse, assertParseFailure)
 
 import qualified ElmVersion
 import qualified Data.Text as Text
-import qualified Box
+import qualified Text.PrettyPrint.Avh4.Block as Block
 import qualified Data.Fix as Fix
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 
@@ -16,7 +16,7 @@ import qualified ElmFormat.Render.ElmStructure as ElmStructure
 example :: String -> String -> String -> SpecWith ()
 example name input expected =
     it name $
-        assertParse (fmap (Text.unpack . Box.render . Fix.cata ElmStructure.render . formatLiteral ElmVersion.Elm_0_18) literal) input expected
+        assertParse (fmap (Text.unpack . Block.render . Fix.cata ElmStructure.render . formatLiteral ElmVersion.Elm_0_18) literal) input expected
 
 
 spec :: Spec

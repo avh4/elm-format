@@ -1,8 +1,8 @@
-module IndentSpec where
+module Text.PrettyPrint.Avh4.IndentSpec where
 
 import Test.Hspec
 import Test.Hspec.QuickCheck
-import qualified Indent
+import qualified Text.PrettyPrint.Avh4.Indent as Indent
 
 
 spec :: Spec
