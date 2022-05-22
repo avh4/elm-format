@@ -624,7 +624,7 @@ formatDocComment elmVersion importInfo blocks =
                     block
     in
     ElmStructure.docComment "{-|" "-}"
-        (Text.lines $ Text.pack content)
+        (fmap Text.stripEnd $ Text.lines $ Text.pack content)
 
 
 formatImport :: (Commented Comments [UppercaseIdentifier], AST p (I.Fix (AST p)) 'ImportMethodNK) -> Elm
@@ -1457,10 +1457,10 @@ formatComment :: Comment -> Elm
 formatComment comment =
     case comment of
         BlockComment c ->
-            ElmStructure.commentBlock "{-" "-}" (Text.pack <$> c)
+            ElmStructure.commentBlock "{-" "-}" (Text.stripEnd . Text.pack <$> c)
 
         LineComment c ->
-            ElmStructure.mustBreakComment ("--" <> Text.pack c)
+            ElmStructure.mustBreakComment ("--" <> Text.stripEnd (Text.pack c))
 
         CommentTrickOpener ->
             ElmStructure.mustBreakComment "{--}"

@@ -87,7 +87,7 @@ render = \case
             (first:rest) ->
                 Block.stack'
                     (Block.prefix
-                        (Block.comment (left <> " "))
+                        (Block.comment left <> space)
                         (Block.stack $ Block.line . Block.comment <$>
                             first :| rest
                         )
@@ -104,18 +104,24 @@ render = \case
         Block.addSuffix suf a
 
     DocComment left right lines' ->
+        let
+            firstLine first =
+                Block.prefix
+                    (Block.punc left <> space)
+                    (Block.line $ Block.comment first)
+        in
         case lines' of
             [] ->
                 Block.line $ Block.punc left <> space <> Block.punc right
 
             [first] ->
                 Block.stack'
-                    (Block.line $ Block.punc left <> space <> Block.literal first)
+                    (firstLine first)
                     (Block.line $ Block.punc right)
 
             (first:rest) ->
-                Block.line (Block.punc left <> space <> Block.literal first)
-                    |> Block.andThen (map (Block.line . Block.literal) rest)
+                firstLine first
+                    |> Block.andThen (Block.line . Block.comment <$> rest)
                     |> Block.andThen [ Block.line $ Block.punc right ]
 
     WrapStack a b rest ->

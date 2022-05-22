@@ -12,6 +12,7 @@ import qualified Text.PrettyPrint.Avh4.Indent as Indent
 import Data.List.NonEmpty (NonEmpty ((:|)))
 import Data.Semigroup (sconcat)
 import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Text as Text
 
 
 {-
@@ -26,6 +27,7 @@ data Line
     = Text T.Text
     | Row Line Line
     | Space
+    | Blank
 
 instance Semigroup Line where
     a <> b = Row a b
@@ -52,8 +54,10 @@ literal =
 
 
 comment :: T.Text -> Line
-comment =
-    Text
+comment text =
+    if Text.null text
+        then Blank
+        else Text text
 
 
 space :: Line
@@ -89,7 +93,7 @@ data Block
 
 blankLine :: Block
 blankLine =
-    line $ literal ""
+    line Blank
 
 
 line :: Line -> Block
@@ -103,7 +107,7 @@ mustBreak =
 
 
 mkIndentedLine :: Line -> Indented Line
-mkIndentedLine Space = Indented (Indent.spaces 1) (literal "")
+mkIndentedLine Space = Indented (Indent.spaces 1) Blank
 mkIndentedLine (Row Space next) =
     let (Indented i rest') = mkIndentedLine next
     in
@@ -289,11 +293,25 @@ myPrefix abcde
 prefix :: Line -> Block -> Block
 prefix pref =
     let
-        prefixLength = fromIntegral $ T.length $ renderLine pref
+        prefixLength = fromIntegral $ T.length $ renderLine mempty pref
         padLineWithSpaces (Indented i l) = Indented (Indent.spaces prefixLength <> i) l
+
+        addPrefixToLine Blank = stripEnd pref
         addPrefixToLine l = pref <> l
     in
     mapFirstLine (fmap addPrefixToLine) padLineWithSpaces
+
+
+stripEnd :: Line -> Line
+stripEnd = \case
+    Space -> Blank
+    Row r1 r2 ->
+        case (stripEnd r1, stripEnd r2) of
+            (r1', Blank) -> r1'
+            (Blank, r2') -> r2'
+            (r1', r2') -> Row r1' r2'
+    Text t -> Text t
+    Blank -> Blank
 
 
 addSuffix :: Line -> Block -> Block
@@ -301,32 +319,33 @@ addSuffix suffix =
     mapLastLine $ fmap (<> suffix)
 
 
-renderIndentedLine :: Indented T.Text -> T.Text
+renderIndentedLine :: Indented Line -> T.Text
 renderIndentedLine (Indented i line') =
-    T.replicate (Indent.width i) " " <> line'
+    renderLine i line'
 
 
-renderLine :: Line -> T.Text
-renderLine line' =
-    case line' of
-        Text text ->
-            text
-        Space ->
-            T.singleton ' '
-        Row left right ->
-            renderLine left <> renderLine right
+renderLine :: Indent -> Line -> T.Text
+renderLine i = \case
+    Text text ->
+        T.replicate (Indent.width i) " " <> text
+    Space ->
+        T.replicate (1 + Indent.width i) " "
+    Row left right ->
+        renderLine i left <> renderLine mempty right
+    Blank ->
+        T.empty
 
 
 render :: Block -> T.Text
 render block' =
     case block' of
         SingleLine line' ->
-            T.snoc (T.stripEnd $ renderIndentedLine $ renderLine <$> line') '\n'
+            T.snoc (renderIndentedLine line') '\n'
         Stack l1 l2 rest ->
-            T.unlines $ map (T.stripEnd . renderIndentedLine . fmap renderLine) (l1 : l2 : rest)
+            T.unlines $ fmap renderIndentedLine (l1 : l2 : rest)
         MustBreak line' ->
-            T.snoc (T.stripEnd $ renderIndentedLine $ renderLine <$> line') '\n'
+            T.snoc (renderIndentedLine line') '\n'
 
 
 lineLength :: Line -> Int
-lineLength = T.length . renderLine
+lineLength = T.length . renderLine mempty
