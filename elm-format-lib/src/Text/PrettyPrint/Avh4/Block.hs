@@ -6,8 +6,6 @@ module Text.PrettyPrint.Avh4.Block
   , render
   ,lineLength,comment,stack,joinMustBreak,prefixOrIndent, rowOrStack, rowOrStack', rowOrIndent, rowOrIndent') where
 
-import Data.Fix
-
 import qualified Data.Text as T
 import Text.PrettyPrint.Avh4.Indent (Indent)
 import qualified Text.PrettyPrint.Avh4.Indent as Indent
@@ -24,45 +22,43 @@ Space is self-explanatory,
   Text brings any string into the data structure,
   Row joins more of these elements onto one line.
 -}
-data LineF a
+data Line
     = Text T.Text
-    | Row a a
+    | Row Line Line
     | Space
 
-type Line = Fix LineF
-
 instance Semigroup Line where
-    a <> b = Fix $ Row a b
+    a <> b = Row a b
 
 
 identifier :: T.Text -> Line
 identifier =
-    Fix . Text
+    Text
 
 
 keyword :: T.Text -> Line
 keyword =
-    Fix . Text
+    Text
 
 
 punc :: T.Text -> Line
 punc =
-    Fix . Text
+    Text
 
 
 literal :: T.Text -> Line
 literal =
-    Fix . Text
+    Text
 
 
 comment :: T.Text -> Line
 comment =
-    Fix . Text
+    Text
 
 
 space :: Line
 space =
-    Fix Space
+    Space
 
 
 data Indented a =
@@ -107,8 +103,8 @@ mustBreak =
 
 
 mkIndentedLine :: Line -> Indented Line
-mkIndentedLine (Fix Space) = Indented (Indent.spaces 1) (literal "")
-mkIndentedLine (Fix (Row (Fix Space) next)) =
+mkIndentedLine Space = Indented (Indent.spaces 1) (literal "")
+mkIndentedLine (Row Space next) =
     let (Indented i rest') = mkIndentedLine next
     in
     Indented (Indent.spaces 1 <> i) rest'
@@ -312,7 +308,7 @@ renderIndentedLine (Indented i line') =
 
 renderLine :: Line -> T.Text
 renderLine line' =
-    case unFix line' of
+    case line' of
         Text text ->
             text
         Space ->
