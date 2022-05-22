@@ -1,9 +1,11 @@
+{-# LANGUAGE OverloadedLists #-}
+
 module ElmFormat.Render.ElmStructure
   ( spaceSepOrStack, forceableSpaceSepOrStack, forceableSpaceSepOrStack1
   , forceableRowOrStack
   , spaceSepOrIndented, forceableSpaceSepOrIndented, spaceSepOrPrefix, prefixOrIndented
   , equalsPair, definition
-  , application, group, group', extensionGroup, render,keyword, Elm,groupOfOne,parens,module',identifier,docComment,import',stackWithVariableSpacing,stack1,commentBlock,mustBreakComment,literal,case',caseBranch,unionListing,stackIndent,letIn,ifElse,spaceSepMustBreak,lambda,sectionedGroup,suffix,range,unary)
+  , application, group, group', extensionGroup, render,keyword, Elm,groupOfOne,parens,module',identifier,docComment,import',stackWithVariableSpacing,stack1,commentBlock,mustBreakComment,literal,case',caseBranch,unionListing,stackIndent,letIn,ifElse,spaceSepMustBreak,lambda,sectionedGroup,suffix,range,unary, line)
   where
 
 
@@ -26,7 +28,6 @@ import Data.Fix (Fix (Fix))
 import qualified Box
 import qualified Data.List as List
 import Data.Maybe (maybeToList, catMaybes)
-import Data.List (intersperse)
 import Data.Text (Text)
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Semigroup (sconcat)
@@ -40,6 +41,7 @@ data ElmF a
     | DocComment Text Text [Text]
     | CommentBlock Text [Text] Text
     | MustBreakComment Text
+    | BoxLine Box.Line
     | Suffix a Box.Line
     | WrapStack a a [a]
     | WrapStackNoSpaces a a [a]
@@ -59,7 +61,7 @@ data ElmF a
     | GroupOfOne Text a Text
     | ExtensionGroup Text Text Text Text Bool a (NonEmpty a) [(a, NonEmpty a)] (Maybe a)
     | Range Text Text Text a a
-    | OperatorPrefix Bool a a
+    | OperatorPrefix Bool Box.Line a
     | Module [a] (Maybe a, Maybe a, (Maybe a, [a])) Int (Maybe a)
     | Import a (Maybe a) (Maybe a)
     | UnionListing a Bool (Maybe a)
@@ -101,6 +103,9 @@ render = \case
     MustBreakComment line ->
         Box.mustBreak $ Box.comment line
 
+    BoxLine line ->
+        Box.line line
+
     Suffix a suf ->
         Box.addSuffix suf a
 
@@ -120,11 +125,9 @@ render = \case
                     |> Box.andThen [ Box.line $ Box.punc right ]
 
     WrapStack a b rest ->
-        firstOf
-            [ Box.line . sconcat . NonEmpty.intersperse space
-              <$> traverse isSingle (a:|b:rest)
-            ]
-            $ render (stack0 a b rest)
+        Box.rowOrStack
+            (Just space)
+            (a :| b : rest)
 
     WrapStackNoSpaces a b rest ->
         firstOf
@@ -134,11 +137,7 @@ render = \case
             $ render (stack0 a b rest)
 
     WrapIndent a b rest ->
-        firstOf
-            [ Box.line . sconcat . NonEmpty.intersperse space
-              <$> traverse isSingle (a:|b:rest)
-            ]
-            $ render (StackIndent a b rest)
+        Box.rowOrIndent (Just space) (a :| b : rest)
 
     JoinMustBreak inner eol ->
         Box.joinMustBreak inner eol
@@ -203,24 +202,16 @@ render = \case
     Case caseWord ofWord forceMultilineSubject subject clauses ->
         let
             opening =
-                case
-                    ( forceMultilineSubject
-                    , isLine subject
-                    )
-                of
-                    (False, Right subject'') ->
-                        Box.line $
-                            Box.keyword caseWord
-                            <> space
-                            <> subject''
-                            <> space
-                            <> Box.keyword ofWord
-                    _ ->
-                        Box.stack
-                            (Box.line $ Box.keyword caseWord)
-                            [ Box.indent subject
-                            , Box.line $ Box.keyword ofWord
-                            ]
+                Box.rowOrStack
+                    (Just space)
+                    [ Box.rowOrIndent'
+                        forceMultilineSubject
+                        (Just space)
+                        [ Box.line $ Box.keyword caseWord
+                        , subject
+                        ]
+                    , Box.line $ Box.keyword ofWord
+                    ]
         in
         Box.stack
             opening
@@ -292,46 +283,17 @@ render = \case
                 ]
 
     Lambda start arrow forceMultiline args bodyComments body ->
-        case
-            ( forceMultiline
-            , isLine args
-            , bodyComments
-            , isLine body
-            )
-        of
-            (False, Right args', Nothing, Right expr'') ->
-                Box.line $ sconcat $ NonEmpty.fromList
-                    [ Box.punc start
-                    , args'
-                    , space
-                    , Box.punc arrow
-                    , space
-                    , expr''
-                    ]
-
-            (_, Right args', _, _) ->
-                Box.stack'
-                    (Box.line $
-                        Box.punc start
-                        <> args'
-                        <> space
-                        <> Box.punc arrow
-                    )
-                    (indent $ Box.stack1 $ catMaybes
-                        [ bodyComments
-                        , Just body
-                        ]
-                    )
-
-            (_, Left args', _, _) ->
-                Box.stack
-                    (prefix (Box.punc start) args')
-                    [ Box.line $ Box.punc arrow
-                    , indent $ Box.stack1 $ catMaybes
-                        [ bodyComments
-                        , Just body
-                        ]
-                    ]
+        Box.rowOrIndent' forceMultiline (Just space)
+            [ Box.rowOrStack
+                (Just space)
+                [ Box.prefix (Box.punc start) args
+                , Box.line $ Box.punc arrow
+                ]
+            , Box.stack1 $ catMaybes
+                [ bodyComments
+                , Just body
+                ]
+            ]
 
     SectionedGroup innerSpaces left sep right forceMultiline section1 moreSections extraFooter ->
         let
@@ -345,10 +307,11 @@ render = \case
                 case extraFooter of
                     Nothing -> Box.line $ Box.punc right
                     Just footer ->
-                        render $ stack0
-                            blankLine
-                            footer
-                            [ Box.line $ Box.punc right ]
+                        Box.stack1
+                            [ blankLine
+                            , footer
+                            , Box.line $ Box.punc right
+                            ]
 
             attempt innerSpaces' =
                 render $ forceWrap (if innerSpaces' then WrapStack else WrapStackNoSpaces)
@@ -364,18 +327,10 @@ render = \case
             _ -> withInnerSpaces
 
     GroupOfOne left inner right ->
-        let
-            left' = Box.punc left
-            right' = Box.punc right
-        in
-        case isLine inner of
-            Right inner' ->
-                Box.line $ left' <> inner' <> right'
-
-            Left inner' ->
-                Box.stack'
-                    (prefix left' inner')
-                    (Box.line right')
+        Box.rowOrStack Nothing
+            [ Box.prefix (Box.punc left) inner
+            , Box.line (Box.punc right)
+            ]
 
     ExtensionGroup left delim sep right forceMultiline base section1 moreSections extraFooter ->
         let
@@ -386,7 +341,7 @@ render = \case
         in
         render $ (if forceMultiline then stack0 else WrapStack)
             (render $ (if forceMultiline then StackIndent else WrapIndent)
-                (render $ OperatorPrefix True (Box.line $ Box.punc left) base)
+                (render $ OperatorPrefix True (Box.punc left) base)
                 (renderSections True forceMultiline delim sep section1 moreSections)
                 extraFooter'
             )
@@ -412,22 +367,15 @@ render = \case
                     , Box.line $ Box.punc right
                     ]
 
-    OperatorPrefix innerSpaces op rest ->
-        let
-            withSpace o =
-                if innerSpaces
-                    then o <> space
-                    else o
-        in
-        case ( isLine op, isLine rest) of
-            ( Right op', Right rest' ) ->
-                Box.line $ withSpace op' <> rest'
+    OperatorPrefix False op rest ->
+        if lineLength op < 4
+            then Box.prefix op rest
+            else Box.rowOrIndent Nothing [Box.line op, rest]
 
-            ( Right op', _ ) | lineLength op' < 4 ->
-                prefix (withSpace op') rest
-
-            _ ->
-                Box.stack' op (indent rest)
+    OperatorPrefix True op rest ->
+        if lineLength op < 4
+            then Box.prefix (op <> space) rest
+            else Box.rowOrIndent (Just space) [Box.line op, rest]
 
     Module initialComments (maybeHeader, docs, (importComments, imports)) spaceBeforeBody body ->
         let
@@ -444,9 +392,9 @@ render = \case
                     |> List.intersperse [blankLine]
                     |> concat
         in
-        Box.stack1 $ concat
+        Box.stack1 $ concat @[]
             [ initialComments'
-            , List.intercalate [ blankLine ] $ concat
+            , List.intercalate [ blankLine ] $ concat @[]
                 [ maybeToList $ return <$> maybeHeader
                 , maybeToList $ return <$> docs
                 , [imports' | not (null imports')]
@@ -456,95 +404,18 @@ render = \case
             ]
 
     Import name as exposing ->
-        case
-            ( isLine name
-            , isLine <$> as
-            , isLine <$> exposing
-            )
-        of
-            ( Right name', Just (Right as'), Just (Right exposing') ) ->
-                Box.line $ sconcat $ NonEmpty.fromList $ intersperse space
-                    [ Box.keyword "import"
-                    , name'
-                    , as'
-                    , exposing'
-                    ]
-
-            (Right name', Just (Right as'), Nothing) ->
-                Box.line $ sconcat $ NonEmpty.fromList $ intersperse space
-                    [ Box.keyword "import"
-                    , name'
-                    , as'
-                    ]
-
-            (Right name', Nothing, Just (Right exposing')) ->
-                Box.line $ sconcat $ NonEmpty.fromList $ intersperse space
-                    [ Box.keyword "import"
-                    , name'
-                    , exposing'
-                    ]
-
-            (Right name', Nothing, Nothing) ->
-                Box.line $ sconcat $ NonEmpty.fromList $ intersperse space
-                    [ Box.keyword "import"
-                    , name'
-                    ]
-
-            ( Right name', Just (Right as'), Just _ ) ->
-                Box.stack1
-                    [ Box.line $ sconcat $ NonEmpty.fromList $ intersperse space
-                        [ Box.keyword "import"
-                        , name'
-                        , as'
+        Box.rowOrIndent (Just space) $
+            Box.rowOrIndent
+                (Just space)
+                (Box.line (Box.keyword "import")
+                    :| catMaybes
+                        [ Just name
+                        , as
                         ]
-                    , maybe undefined indent exposing
-                    ]
-
-            ( Right name', Just _, Just _ ) ->
-                Box.stack1
-                    [ Box.line $ sconcat $ NonEmpty.fromList $ intersperse space
-                        [ Box.keyword "import"
-                        , name'
-                        ]
-                    , maybe undefined indent as
-                    , maybe undefined indent exposing
-                    ]
-
-            ( Right name', Nothing, Just _ ) ->
-                Box.stack1
-                    [ Box.line $ sconcat $ NonEmpty.fromList $ intersperse space
-                        [ Box.keyword "import"
-                        , name'
-                        ]
-                    , maybe undefined indent exposing
-                    ]
-
-            ( _, Just _, Just _ ) ->
-                Box.stack1
-                    [ Box.line $ Box.keyword "import"
-                    , indent name
-                    , maybe undefined (indent . indent) as
-                    , maybe undefined (indent . indent) exposing
-                    ]
-
-            ( _, Nothing, Just _ ) ->
-                Box.stack1
-                    [ Box.line $ Box.keyword "import"
-                    , indent name
-                    , maybe undefined (indent . indent) exposing
-                    ]
-
-            ( _, Just _, Nothing ) ->
-                Box.stack1
-                    [ Box.line $ Box.keyword "import"
-                    , indent name
-                    , maybe undefined (indent . indent) as
-                    ]
-
-            ( _, Nothing, Nothing ) ->
-                Box.stack'
-                    (Box.line $ Box.keyword "import")
-                    (indent name)
+                )
+            :| catMaybes
+                [ exposing
+                ]
 
     UnionListing name nameHasComments listing ->
         case
@@ -583,17 +454,11 @@ stack0 a b rest =
 renderSections :: Bool -> Bool -> Text -> Text -> NonEmpty Box -> [(Box, NonEmpty Box)] -> Box
 renderSections innerSpaces forceMultiline left sep (first0':|firsts') moreSections' =
     let
-        forceWrap wrap =
-            if forceMultiline
-                then stack0
-                else wrap
-
         renderItem innerSpaces' punc item =
             render $ OperatorPrefix
                 (innerSpaces' || punc == sep)
-                (Box.line $ Box.punc punc)
+                (Box.punc punc)
                 item
-
 
         renderLabeledSection innerSpaces' (label, items) =
             Box.stack
@@ -601,17 +466,11 @@ renderSections innerSpaces forceMultiline left sep (first0':|firsts') moreSectio
                 [ label
                 , renderSections forceMultiline innerSpaces' sep sep items []
                 ]
-
-        joinItems a [] [] = a
-        joinItems a [] (b:rest) =
-            render $ forceWrap WrapStackNoSpaces a b rest
-        joinItems a (b:rest1) rest2 =
-            render $ forceWrap WrapStackNoSpaces a b (rest1 ++ rest2)
     in
-    joinItems
-        (renderItem innerSpaces left first0')
+    Box.rowOrStack' forceMultiline Nothing $
+        renderItem innerSpaces left first0' :|
         (renderItem innerSpaces sep <$> firsts')
-        (renderLabeledSection innerSpaces <$> moreSections')
+        ++ (renderLabeledSection innerSpaces <$> moreSections')
 
 
 keyword :: Text -> Elm
@@ -647,6 +506,10 @@ commentBlock left right inner =
 
 mustBreakComment :: Text -> Elm
 mustBreakComment = Fix . MustBreakComment
+
+
+line :: Box.Line -> Elm
+line = Fix . BoxLine
 
 
 suffix :: Box.Line -> Elm -> Elm
@@ -753,7 +616,7 @@ Formats as:
     opLong
         rest
 -}
-spaceSepOrPrefix :: Elm -> Elm -> Elm
+spaceSepOrPrefix :: Box.Line -> Elm -> Elm
 spaceSepOrPrefix op rest =
     Fix $ OperatorPrefix True op rest
 
@@ -815,7 +678,7 @@ application forceMultiline f args =
     Fix $ FunctionApplication forceMultiline f args
 
 
-unary :: Elm -> Elm -> Elm
+unary :: Box.Line -> Elm -> Elm
 unary op a =
     Fix $ OperatorPrefix False op a
 

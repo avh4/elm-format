@@ -4,13 +4,16 @@ module Box
   , isLine, allSingles
   , indent, prefix, addSuffix
   , render
-  ,allSingles2,allSingles3,lineLength,isSingle,isMustBreak,comment,stack,joinMustBreak,prefixOrIndent) where
+  ,allSingles2,allSingles3,lineLength,isSingle,isMustBreak,comment,stack,joinMustBreak,prefixOrIndent, rowOrStack, rowOrStack', rowOrIndent, rowOrIndent') where
 
 import Data.Fix
 
 import qualified Data.Text as T
 import Indent (Indent)
 import qualified Indent
+import Data.List.NonEmpty (NonEmpty ((:|)))
+import Data.Semigroup (sconcat)
+import qualified Data.List.NonEmpty as NonEmpty
 
 
 {-
@@ -208,6 +211,49 @@ indent =
     mapLines (\(Indented i l) -> Indented (Indent.tab <> i) l)
 
 
+{-# INLINE rowOrStack #-}
+rowOrStack :: Maybe Line -> NonEmpty Box -> Box
+rowOrStack = rowOrStack' False
+
+{-# INLINE rowOrStack' #-}
+rowOrStack' :: Bool -> Maybe Line -> NonEmpty Box -> Box
+rowOrStack' _ _ (single :| []) = single
+rowOrStack' forceMultiline (Just joiner) boxes@(b1 :| rest) =
+    case allSingles boxes of
+        Right lines | not forceMultiline ->
+            line $ sconcat $ NonEmpty.intersperse joiner lines
+        _ ->
+            stack b1 rest
+rowOrStack' forceMultiline Nothing boxes@(b1 :| rest) =
+    case allSingles boxes of
+        Right lines | not forceMultiline ->
+            line $ sconcat lines
+        _ ->
+            stack b1 rest
+
+
+{-# INLINE rowOrIndent #-}
+rowOrIndent :: Maybe Line -> NonEmpty Box -> Box
+rowOrIndent = rowOrIndent' False
+
+{-# INLINE rowOrIndent' #-}
+rowOrIndent' :: Bool -> Maybe Line -> NonEmpty Box -> Box
+rowOrIndent' _ _ (single :| []) = single
+rowOrIndent' forceMultiline (Just joiner) boxes@(b1 :| rest) =
+    case allSingles boxes of
+        Right lines | not forceMultiline ->
+            line $ sconcat $ NonEmpty.intersperse joiner lines
+        _ ->
+            stack b1 (indent <$> rest)
+rowOrIndent' forceMultiline Nothing boxes@(b1 :| rest) =
+    case allSingles boxes of
+        Right lines | not forceMultiline ->
+            line $ sconcat lines
+        _ ->
+            stack b1 (indent <$> rest)
+
+
+{-# DEPRECATED isLine "Rewrite to avoid inspecting the child boxes" #-}
 isLine :: Box -> Either Box Line
 isLine b =
     case b of

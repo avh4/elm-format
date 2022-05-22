@@ -24,31 +24,31 @@ module
 import
     --P
     Json.Decode
-        --Q
-        as
-            --R
-            Json
+    --Q
+    as
+        --R
+        Json
 import
     --M
     Maybe
-        --N
-        exposing
-            --O
-            ( --S
-              Maybe
-              --W
-                ( --X
-                  Just
-                  --Y
-                , --Z
-                  Nothing
-                  --AA
-                )
-              --T
-            , --U
-              map
-              --V
+    --N
+    exposing
+        --O
+        ( --S
+          Maybe
+          --W
+            ( --X
+              Just
+              --Y
+            , --Z
+              Nothing
+              --AA
             )
+          --T
+        , --U
+          map
+          --V
+        )
 import Signal
     exposing
         (--AB

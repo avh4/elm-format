@@ -381,5 +381,12 @@ caseStatement =
                 ->
                     --T
                     2
+
+        multilineSubjectRequested =
+            case
+                ()
+            of
+                () ->
+                    ()
     in
     {}

@@ -4455,11 +4455,11 @@
                     "sourceLocation": {
                         "end": {
                             "col": 7,
-                            "line": 385
+                            "line": 392
                         },
                         "start": {
                             "col": 5,
-                            "line": 385
+                            "line": 392
                         }
                     },
                     "tag": "RecordLiteral"
@@ -5004,12 +5004,94 @@
                             }
                         },
                         "tag": "Definition"
+                    },
+                    {
+                        "expression": {
+                            "branches": [
+                                {
+                                    "body": {
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 23,
+                                                "line": 390
+                                            },
+                                            "start": {
+                                                "col": 21,
+                                                "line": 390
+                                            }
+                                        },
+                                        "tag": "UnitLiteral"
+                                    },
+                                    "pattern": {
+                                        "sourceLocation": {
+                                            "end": {
+                                                "col": 19,
+                                                "line": 389
+                                            },
+                                            "start": {
+                                                "col": 17,
+                                                "line": 389
+                                            }
+                                        },
+                                        "tag": "UnitPattern"
+                                    },
+                                    "sourceLocation": {
+                                        "end": {
+                                            "col": 23,
+                                            "line": 390
+                                        },
+                                        "start": {
+                                            "col": 17,
+                                            "line": 389
+                                        }
+                                    }
+                                }
+                            ],
+                            "sourceLocation": {
+                                "end": {
+                                    "col": 23,
+                                    "line": 390
+                                },
+                                "start": {
+                                    "col": 13,
+                                    "line": 386
+                                }
+                            },
+                            "subject": {
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 19,
+                                        "line": 387
+                                    },
+                                    "start": {
+                                        "col": 17,
+                                        "line": 387
+                                    }
+                                },
+                                "tag": "UnitLiteral"
+                            },
+                            "tag": "CaseExpression"
+                        },
+                        "name": "multilineSubjectRequested",
+                        "parameters": [],
+                        "returnType": null,
+                        "sourceLocation": {
+                            "end": {
+                                "col": 23,
+                                "line": 390
+                            },
+                            "start": {
+                                "col": 9,
+                                "line": 385
+                            }
+                        },
+                        "tag": "Definition"
                     }
                 ],
                 "sourceLocation": {
                     "end": {
                         "col": 7,
-                        "line": 385
+                        "line": 392
                     },
                     "start": {
                         "col": 5,
@@ -5024,7 +5106,7 @@
             "sourceLocation": {
                 "end": {
                     "col": 7,
-                    "line": 385
+                    "line": 392
                 },
                 "start": {
                     "col": 1,

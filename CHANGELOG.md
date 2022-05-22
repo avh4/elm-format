@@ -3,6 +3,7 @@
 Format changes:
   - (bug fix) Comments at the end of an `exposing` clause in `module` lines are now separated by a blank line to match the format of literal lists, records, and tuples.
   - (invalid syntax) Record extensions with no fields now have only a single space before the closing `}`.
+  - `import` statements with heavy inline comments are less indented
 
 
 ## 0.8.5

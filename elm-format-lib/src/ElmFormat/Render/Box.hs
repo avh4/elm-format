@@ -49,7 +49,7 @@ pleaseReport what details =
     error $ "<elm-format: " ++ what ++ ": " ++ details ++ " -- please report this at https://github.com/avh4/elm-format/issues >"
 
 
-formatBinary :: Bool -> Elm -> [ ( Bool, Comments, Elm, Elm ) ] -> Elm
+formatBinary :: Bool -> Elm -> [ ( Bool, Comments, Box.Line, Elm ) ] -> Elm
 formatBinary multiline left ops =
     case ops of
         [] ->
@@ -59,7 +59,7 @@ formatBinary multiline left ops =
             if isLeftPipe then
                 ElmStructure.forceableSpaceSepOrIndented multiline
                     (ElmStructure.spaceSepOrStack left $
-                        maybeToList (formatComments comments) ++ [op]
+                        maybeToList (formatComments comments) ++ [ElmStructure.line op]
                     )
                     [formatBinary multiline next rest]
             else
@@ -788,8 +788,8 @@ formatDeclaration elmVersion importInfo decl =
                     case formatOpenCommentedList $ ctor <$> tags of
                         [] -> pleaseReport "UNEXPECTED CUSTOM TYPE DECLARATION" "No variants"
                         first:rest ->
-                            ElmStructure.spaceSepOrPrefix (keyword "=") first
-                            : (ElmStructure.spaceSepOrPrefix (keyword "|") <$> rest)
+                            ElmStructure.spaceSepOrPrefix (Box.punc "=") first
+                            : (ElmStructure.spaceSepOrPrefix (Box.punc "|") <$> rest)
             in
             ElmStructure.stackIndent leftSide variants
 
@@ -817,7 +817,7 @@ formatDeclaration elmVersion importInfo decl =
             ElmStructure.spaceSepOrIndented
                 (formatInfixAssociativity_0_18 assoc)
                 [ formatCommented' precedenceComments $ formatInfixPrecedence precedence
-                , formatCommented' nameComments $ formatInfixVar name
+                , formatCommented' nameComments $ ElmStructure.line $ formatInfixVar name
                 ]
 
         Fixity assoc precedence name value ->
@@ -929,7 +929,7 @@ formatAstNode elmVersion importInfo =
                 formatRight (C (preOp, postOp, eol) term) =
                     ( False
                     , preOp
-                    , keyword "::"
+                    , Box.punc "::"
                     , formatC2Eol $ C (postOp, [], eol) $ syntaxParens SpaceSeparated term
                     )
             in
@@ -1094,7 +1094,7 @@ formatExpression elmVersion importInfo aexpr =
 
         Unary Negative e ->
             FormattedExpression SyntaxSeparated $
-            ElmStructure.unary (keyword "-") $
+            ElmStructure.unary (Box.punc "-") $
             syntaxParens SpaceSeparated $ formatExpression elmVersion importInfo e -- TODO: This might need something stronger than SpaceSeparated?
 
         App left [] _ ->
@@ -1263,7 +1263,7 @@ formatRecordLike base' fields trailing multiline =
                 Nothing ->
                     ElmStructure.spaceSepOrStack
                         (ElmStructure.spaceSepOrPrefix
-                            (keyword "{")
+                            (Box.punc "{")
                             (ElmStructure.spaceSepOrIndented (formatCommented base) [keyword "|"])
                         )
                         [keyword "}"]
@@ -1338,7 +1338,7 @@ formatBinops ::
     -> Elm
 formatBinops left ops multiline =
     let
-        formatPair_ :: Bool -> BinopsClause (I.Fix (AST (VariableNamespace [UppercaseIdentifier])) 'VarRefNK) (FormatResult 'ExpressionNK) -> (Bool, Comments, Elm, Elm)
+        formatPair_ :: Bool -> BinopsClause (I.Fix (AST (VariableNamespace [UppercaseIdentifier])) 'VarRefNK) (FormatResult 'ExpressionNK) -> (Bool, Comments, Box.Line, Elm)
         formatPair_ isLast (BinopsClause po (I.Fix (VarRef_ o)) pe e) =
             let
                 isLeftPipe =
@@ -1715,19 +1715,17 @@ formatSymbolIdentifierInParens (SymbolIdentifier name) =
     ElmStructure.identifier $ "(" <> Text.pack name <> ")"
 
 
-formatInfixVar :: Ref [UppercaseIdentifier] -> Elm
+formatInfixVar :: Ref [UppercaseIdentifier] -> Box.Line
 formatInfixVar var =
     case var of
-        VarRef namespace name ->
-            ElmStructure.groupOfOne "`" "`" $
-            formatLowercaseIdentifier namespace name
+        VarRef namespace (LowercaseIdentifier name) ->
+            Box.punc "`" <> Box.identifier (Text.intercalate "." ((Text.pack . (\(UppercaseIdentifier n) -> n) <$> namespace) ++ [Text.pack name])) <> Box.punc "`"
 
-        TagRef namespace name ->
-            ElmStructure.groupOfOne "`" "`" $
-            formatUppercaseIdentifier namespace name
+        TagRef namespace (UppercaseIdentifier name) ->
+            Box.punc "`" <> Box.identifier (Text.intercalate "." ((Text.pack . (\(UppercaseIdentifier n) -> n) <$> namespace) ++ [Text.pack name])) <> Box.punc "`"
 
-        OpRef op ->
-            formatSymbolIdentifierAsInfix op
+        OpRef (SymbolIdentifier op) ->
+            Box.identifier $ Text.pack op
 
 
 formatQualifiedIdentifier :: [UppercaseIdentifier] -> Text -> Elm
