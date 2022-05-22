@@ -1,6 +1,6 @@
 module Box
   ( Line, identifier, keyword, punc, literal, space
-  , Box(SingleLine, MustBreak), blankLine, line, mustBreak, stack', stack1, andThen
+  , Box(SingleLine, MustBreak), blankLine, line, mustBreak, stack', andThen
   , isLine, allSingles
   , indent, prefix, addSuffix
   , render
@@ -132,20 +132,8 @@ andThen rest first =
     foldl stack' first rest
 
 
-stack :: Box -> [Box] -> Box
-stack first rest = stack1 (first:rest)
-
-
-{-# DEPRECATED stack1 "Prefer `stack` or `stack'`" #-}
-stack1 :: [Box] -> Box
-stack1 children =
-    case children of
-        [] ->
-            error "stack1: empty structure"
-        [first] ->
-            first
-        boxes ->
-            foldr1 stack' boxes
+stack :: NonEmpty Box -> Box
+stack = foldr1 stack'
 
 
 joinMustBreak :: Box -> Box -> Box
@@ -218,18 +206,18 @@ rowOrStack = rowOrStack' False
 {-# INLINE rowOrStack' #-}
 rowOrStack' :: Bool -> Maybe Line -> NonEmpty Box -> Box
 rowOrStack' _ _ (single :| []) = single
-rowOrStack' forceMultiline (Just joiner) boxes@(b1 :| rest) =
+rowOrStack' forceMultiline (Just joiner) boxes =
     case allSingles boxes of
         Right lines | not forceMultiline ->
             line $ sconcat $ NonEmpty.intersperse joiner lines
         _ ->
-            stack b1 rest
-rowOrStack' forceMultiline Nothing boxes@(b1 :| rest) =
+            stack boxes
+rowOrStack' forceMultiline Nothing boxes =
     case allSingles boxes of
         Right lines | not forceMultiline ->
             line $ sconcat lines
         _ ->
-            stack b1 rest
+            stack boxes
 
 
 {-# INLINE rowOrIndent #-}
@@ -244,13 +232,13 @@ rowOrIndent' forceMultiline (Just joiner) boxes@(b1 :| rest) =
         Right lines | not forceMultiline ->
             line $ sconcat $ NonEmpty.intersperse joiner lines
         _ ->
-            stack b1 (indent <$> rest)
+            stack (b1 :| (indent <$> rest))
 rowOrIndent' forceMultiline Nothing boxes@(b1 :| rest) =
     case allSingles boxes of
         Right lines | not forceMultiline ->
             line $ sconcat lines
         _ ->
-            stack b1 (indent <$> rest)
+            stack (b1 :| (indent <$> rest))
 
 
 {-# DEPRECATED isLine "Rewrite to avoid inspecting the child boxes" #-}

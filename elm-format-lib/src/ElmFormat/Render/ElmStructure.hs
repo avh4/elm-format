@@ -91,9 +91,8 @@ render = \case
                 Box.stack'
                     (Box.prefix
                         (Box.comment (left <> " "))
-                        (Box.stack
-                            (Box.line $ Box.comment first)
-                            (Box.line . Box.comment <$> rest)
+                        (Box.stack $ Box.line . Box.comment <$>
+                            first :| rest
                         )
                     )
                     (Box.line $ Box.comment right)
@@ -141,13 +140,13 @@ render = \case
         Box.joinMustBreak inner eol
 
     Stack a b rest ->
-        Box.stack a (mconcat (pair <$> b:rest))
+        Box.stack $ a :| mconcat (pair <$> b:rest)
         where
             pair (n, x) =
                 List.replicate n Box.blankLine ++ [x]
 
     StackIndent a b rest ->
-        Box.stack a (indent <$> (b:rest))
+        Box.stack $ a :| (indent <$> (b:rest))
 
     PrefixOrIndent a b ->
         Box.prefixOrIndent a b
@@ -173,12 +172,12 @@ render = \case
                 Box.line $ sconcat $ NonEmpty.intersperse space $ NonEmpty.fromList all'
 
             ( FAJoinFirst _, Right firstTwo, _) ->
-                Box.stack
-                    (Box.line $ sconcat $ NonEmpty.intersperse space firstTwo)
-                    (indent <$> rest)
+                Box.stack $
+                    Box.line (sconcat $ NonEmpty.intersperse space firstTwo)
+                    :| (indent <$> rest)
 
             _ ->
-                Box.stack first (indent <$> (arg0:rest))
+                Box.stack $ first :| (indent <$> (arg0:rest))
 
     Case caseWord ofWord forceMultilineSubject subject clauses ->
         let
@@ -194,8 +193,8 @@ render = \case
                     , Box.line $ Box.keyword ofWord
                     ]
         in
-        Box.stack
-            opening
+        Box.stack $
+            opening :|
             (indent <$> List.intersperse blankLine clauses)
 
     CaseClause False pattern arrow body ->
@@ -205,13 +204,13 @@ render = \case
 
     CaseClause True pattern arrow body ->
         Box.stack
-            pattern
-            [ Box.line $ Box.keyword arrow
+            [ pattern
+            , Box.line $ Box.keyword arrow
             , Box.indent body
             ]
 
     LetIn letWord defs inWord body ->
-        Box.stack1
+        Box.stack
             [ Box.line $ Box.keyword letWord
             , Box.indent defs
             , Box.line $ Box.keyword inWord
@@ -241,8 +240,8 @@ render = \case
                             []
                 in
                 Box.stack
-                    blankLine
-                    [ opening key cond
+                    [ blankLine
+                    , opening key cond
                     , indent body
                     ]
         in
@@ -263,7 +262,7 @@ render = \case
                 [ Box.prefix (Box.punc start) args
                 , Box.line $ Box.punc arrow
                 ]
-            , Box.stack1 $ catMaybes
+            , Box.stack $ NonEmpty.fromList $ catMaybes
                 [ bodyComments
                 , Just body
                 ]
@@ -281,7 +280,7 @@ render = \case
                 case extraFooter of
                     Nothing -> Box.line $ Box.punc right
                     Just footer ->
-                        Box.stack1
+                        Box.stack
                             [ blankLine
                             , footer
                             , Box.line $ Box.punc right
@@ -333,7 +332,7 @@ render = \case
                     <> Box.punc right
 
             Left (a', b') ->
-                Box.stack1
+                Box.stack
                     [ Box.line $ Box.punc left
                     , indent a'
                     , Box.line $ Box.punc dots
@@ -366,7 +365,7 @@ render = \case
                     |> List.intersperse [blankLine]
                     |> concat
         in
-        Box.stack1 $ concat @[]
+        Box.stack $ NonEmpty.fromList $ concat @[]
             [ initialComments'
             , List.intercalate [ blankLine ] $ concat @[]
                 [ maybeToList $ return <$> maybeHeader
@@ -417,8 +416,8 @@ renderSections innerSpaces forceMultiline left sep (first0':|firsts') moreSectio
 
         renderLabeledSection innerSpaces' (label, items) =
             Box.stack
-                blankLine
-                [ label
+                [ blankLine
+                , label
                 , renderSections forceMultiline innerSpaces' sep sep items []
                 ]
     in
