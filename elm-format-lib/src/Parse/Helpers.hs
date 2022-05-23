@@ -1,4 +1,4 @@
-module Parse.Helpers where
+module Parse.Helpers (commitIf, addLocation, multilineToBool, comma, shader, reserved, capVar, spacePrefix, lowVar, equals, pipeSep1, expecting, symOpInParens, anyOp, hasType, var, rLabel, braces, braces', parens', located, parens, commaSep1, brackets', lenientEquals, accessible, constrainedSpacePrefix, rightArrow, symOp, dotSep1, commentedKeyword, brackets, keyValue, commaSep1Set', commaSep1', iParse, surround'', parens'', braces'', separated, cons, lenientHasType) where
 
 import Prelude hiding (until)
 import Control.Monad (guard)
@@ -13,7 +13,6 @@ import qualified Parse.State as State
 import Parse.Comments
 import Parse.IParser
 import Parse.Whitespace
-import qualified Parse.Primitives as P
 import qualified Parse.ParsecAdapter as Parsec
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
@@ -167,11 +166,6 @@ comma =
   const () <$> char ',' <?> "a comma ','"
 
 
-semicolon :: IParser ()
-semicolon =
-  const () <$> char ';' <?> "a semicolon ';'"
-
-
 verticalBar :: IParser ()
 verticalBar =
   const () <$> char '|' <?> "a vertical bar '|'"
@@ -263,11 +257,6 @@ commaSep1Set' parser merge =
     do
         values <- commaSep1' parser
         return $ \pre post -> toSet merge $ values pre post
-
-
-commaSep :: IParser (Comments -> Comments -> a) -> IParser (Maybe (Comments -> Comments -> [a]))
-commaSep term =
-    option Nothing (Just <$> commaSep1 term)
 
 
 pipeSep1 :: IParser a -> IParser (ExposedCommentedList a)
@@ -506,29 +495,6 @@ commentedKeyword elmVersion word parser =
     return $ C (pre, post) value
 
 
--- ODD COMBINATORS
-
--- Behaves the same as `Parse.ParsecAdapter.fail` except that the consumed
--- continuation is called instead of the empty continuation.
-failure :: String -> IParser String
-failure msg =
-  P.Parser $ \s _ _ cerr _ ->
-    let
-      (P.Parser p) = parserFail $ parseError (Message msg)
-    in
-    -- This looks really unsound, but `p` which was created with `fail` will
-    -- only ever call the empty error continuation (which in this case
-    -- re-routes to the consumed error continuation)
-    p s undefined undefined undefined cerr
-
-
-until :: IParser a -> IParser b -> IParser b
-until p end =
-    go
-  where
-    go = end <|> (p >> go)
-
-
 -- BASIC LANGUAGE LITERALS
 
 shader :: IParser String
@@ -545,16 +511,3 @@ closeShader builder =
     , do  c <- anyChar
           closeShader (builder . (c:))
     ]
-
-
-sandwich :: Char -> String -> String
-sandwich delim s =
-  delim : s ++ [delim]
-
-
-escaped :: Char -> IParser String
-escaped delim =
-  try $ do
-    _ <- char '\\'
-    c <- char '\\' <|> char delim
-    return ['\\', c]
