@@ -2,6 +2,8 @@ module CommandLine.World where
 
 import Prelude ()
 import Relude hiding (getLine, putStr)
+import qualified Data.ByteString.Lazy as LB
+import qualified Data.ByteString.Builder as B
 
 
 data FileType
@@ -11,12 +13,12 @@ data FileType
 
 
 class Monad m => World m where
-    readUtf8File :: FilePath -> m Text
-    readUtf8FileWithPath :: FilePath -> m (FilePath, Text)
+    readUtf8File :: FilePath -> m ByteString
+    readUtf8FileWithPath :: FilePath -> m (FilePath, ByteString)
     readUtf8FileWithPath filePath =
         (,) filePath <$> readUtf8File filePath
-    writeUtf8File :: FilePath -> Text -> m ()
-    writeUtf8FileNoOverwrite :: FilePath -> Text -> m ()
+    writeUtf8File :: FilePath -> B.Builder -> m ()
+    writeUtf8FileNoOverwrite :: FilePath -> B.Builder -> m ()
     writeUtf8FileNoOverwrite path content =
         do
             exists <- doesFileExist path
@@ -41,7 +43,7 @@ class Monad m => World m where
 
     getProgName :: m Text
 
-    getStdin :: m Text
+    getStdin :: m LB.ByteString
     getLine :: m Text
     getYesOrNo :: m Bool
     getYesOrNo =
@@ -53,7 +55,7 @@ class Monad m => World m where
             _   -> putStr "Must type 'y' for yes or 'n' for no: " *> getYesOrNo
     putStr :: Text -> m ()
     putStrLn :: Text -> m ()
-    writeStdout :: Text -> m ()
+    writeStdout :: B.Builder -> m ()
     flushStdout :: m ()
     putStrStderr :: Text -> m ()
     putStrLnStderr :: Text -> m()

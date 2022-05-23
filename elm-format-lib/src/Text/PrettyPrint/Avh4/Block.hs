@@ -1,30 +1,48 @@
 module Text.PrettyPrint.Avh4.Block
-  ( Line, identifier, keyword, punc, literal, space
-  , Block(SingleLine, MustBreak), blankLine, line, mustBreak, stack', andThen
-  , isLine
-  , indent, prefix, addSuffix
-  , render
-  ,lineLength,comment,stack,joinMustBreak,prefixOrIndent, rowOrStack, rowOrStack', rowOrIndent, rowOrIndent') where
+  ( Line
+  , identifier, identifierByteString, identifierText
+  , keyword, keywordByteString, keywordText
+  , punc, puncByteString, puncText
+  , literal, literalByteString, literalText
+  , commentByteString, commentText
+  , space
 
-import qualified Data.Text as T
+  , Block(SingleLine, MustBreak), blankLine, line, mustBreak
+  , stack, stack', andThen
+  , indent, prefix, addSuffix, joinMustBreak
+  , prefixOrIndent, rowOrStack, rowOrStack', rowOrIndent, rowOrIndent'
+  , render
+
+  -- DEPRECATED
+  , isLine, lineLength
+  ) where
+
+import Data.Text (Text)
 import Text.PrettyPrint.Avh4.Indent (Indent)
 import qualified Text.PrettyPrint.Avh4.Indent as Indent
 import Data.List.NonEmpty (NonEmpty ((:|)))
 import Data.Semigroup (sconcat)
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Text as Text
+import qualified Data.ByteString.Builder as B
+import qualified Data.Text.Lazy
+import qualified Data.Text.Lazy.Encoding
+import qualified Data.Text.Encoding
+import Data.ByteString (ByteString)
+import qualified Data.ByteString as ByteString
 
 
-{-
-A line is ALWAYS just one line.
+{-| A `Line` is ALWAYS just one single line of text,
+and can always be combined horizontally with other `Line`s.
 
-Space is self-explanatory,
-  Tab aligns to the nearest multiple of 4 spaces,
-  Text brings any string into the data structure,
-  Row joins more of these elements onto one line.
+- `Space` is a single horizontal space,
+- `Blank` is a line with no content.
+- `Text` brings any text into the data structure. (Uses `ByteString.Builder` for the possibility of optimal performance)
+- `Row` joins multiple elements onto one line.
+
 -}
 data Line
-    = Text T.Text
+    = Text B.Builder
     | Row Line Line
     | Space
     | Blank
@@ -33,31 +51,76 @@ instance Semigroup Line where
     a <> b = Row a b
 
 
-identifier :: T.Text -> Line
-identifier =
-    Text
+{-# INLINE mkTextText #-}
+mkTextText :: Text -> Line
+mkTextText = mkTextByteString . Data.Text.Encoding.encodeUtf8
 
 
-keyword :: T.Text -> Line
-keyword =
-    Text
+{-# INLINE mkTextByteString #-}
+mkTextByteString :: ByteString -> Line
+mkTextByteString = Text . B.byteString
 
 
-punc :: T.Text -> Line
-punc =
-    Text
+identifier :: B.Builder -> Line
+identifier = Text
+
+{-| For better performance, if you can avoid allocating the `ByteString`, use `identifier` instead. -}
+identifierByteString :: ByteString -> Line
+identifierByteString = mkTextByteString
+
+{-| For better performance, if you can avoid allocating the `Text`, use `identifierByteString` or `identifier` instead. -}
+identifierText :: Text -> Line
+identifierText = mkTextText
 
 
-literal :: T.Text -> Line
-literal =
-    Text
+keyword :: B.Builder -> Line
+keyword = Text
+
+{-| For better performance, if you can avoid allocating the `ByteString`, use `keyword` instead. -}
+keywordByteString :: ByteString -> Line
+keywordByteString = mkTextByteString
+
+{-| For better performance, if you can avoid allocating the `Text`, use `keywordByteString` or `keyword` instead. -}
+keywordText :: Text -> Line
+keywordText = mkTextText
 
 
-comment :: T.Text -> Line
-comment text =
+punc :: B.Builder -> Line
+punc = Text
+
+{-| For better performance, if you can avoid allocating the `ByteString`, use `punc` instead. -}
+puncByteString :: ByteString -> Line
+puncByteString = mkTextByteString
+
+{-| For better performance, if you can avoid allocating the `Text`, use `puncByteString` or `punc` instead. -}
+puncText :: Text -> Line
+puncText = mkTextText
+
+
+literal :: B.Builder -> Line
+literal = Text
+
+{-| For better performance, if you can avoid allocating the `ByteString`, use `literal` instead. -}
+literalByteString :: ByteString -> Line
+literalByteString = mkTextByteString
+
+{-| For better performance, if you can avoid allocating the `Text`, use `literalByteString` or `literal` instead. -}
+literalText :: Text -> Line
+literalText = mkTextText
+
+
+commentByteString :: ByteString -> Line
+commentByteString bs =
+    if ByteString.null bs
+        then Blank
+        else mkTextByteString bs
+
+{-| For better performance, if you can avoid allocating the `Text`, use `commentByteString` instead. -}
+commentText :: Text -> Line
+commentText text =
     if Text.null text
         then Blank
-        else Text text
+        else mkTextText text
 
 
 space :: Line
@@ -70,17 +133,18 @@ data Indented a =
     deriving (Functor)
 
 
-{-
-Block contains Lines (at least one - can't be empty).
+{-| `Block` contains Lines (at least one; it can't be empty).
+
 Block either:
   - can appear in the middle of a line
       (Stack someLine [], thus can be joined without problems), or
   - has to appear on its own
       (Stack someLine moreLines OR MustBreak someLine).
 
-MustBreak is only used for `--` comments.
-
-Stack contains two or more lines.
+- `SingleLine` is a single line, and the indentation level for the line.
+- `MustBreak` is a single line (and its indentation level)) that cannot have anything joined to its right side.
+  Notably, it is used for `--` comments.
+- `Stack` contains two or more lines, and the indentation level for each.
 
 Sometimes (see `prefix`) the first line of Stack
   gets different treatment than the other lines.
@@ -318,33 +382,38 @@ addSuffix suffix =
     mapLastLine $ fmap (<> suffix)
 
 
-renderIndentedLine :: Indented Line -> T.Text
+renderIndentedLine :: Indented Line -> B.Builder
 renderIndentedLine (Indented i line') =
-    renderLine i line'
+    renderLine i line' <> B.char7 '\n'
 
 
-renderLine :: Indent -> Line -> T.Text
+spaces :: Int -> B.Builder
+spaces i =
+    B.byteString (ByteString.replicate i 0x20 {- space -})
+
+
+renderLine :: Indent -> Line -> B.Builder
 renderLine i = \case
     Text text ->
-        T.replicate (Indent.width i) " " <> text
+        spaces (Indent.width i) <> text
     Space ->
-        T.replicate (1 + Indent.width i) " "
+        spaces (1 + Indent.width i)
     Row left right ->
         renderLine i left <> renderLine mempty right
     Blank ->
-        T.empty
+        mempty
 
 
-render :: Block -> T.Text
-render block' =
-    case block' of
-        SingleLine line' ->
-            T.snoc (renderIndentedLine line') '\n'
-        Stack l1 l2 rest ->
-            T.unlines $ fmap renderIndentedLine (l1 : l2 : rest)
-        MustBreak line' ->
-            T.snoc (renderIndentedLine line') '\n'
+render :: Block -> B.Builder
+render = \case
+    SingleLine line' ->
+        renderIndentedLine line'
+    Stack l1 l2 rest ->
+        foldMap renderIndentedLine (l1 : l2 : rest)
+    MustBreak line' ->
+        renderIndentedLine line'
 
 
+{-# DEPRECATED lineLength "Instead, determine the length from your inputs instead of calculating it after formatting. This is deprecated because it prevents ByteString.Builder performance optimization best practices." #-}
 lineLength :: Line -> Int
-lineLength = T.length . renderLine mempty
+lineLength = fromIntegral . Data.Text.Lazy.length . Data.Text.Lazy.Encoding.decodeUtf8 . B.toLazyByteString . renderLine mempty

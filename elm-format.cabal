@@ -75,7 +75,7 @@ common common-options
         aeson >= 2.0.3.0 && < 2.1,
         ansi-wl-pprint >= 0.6.9 && < 0.7,
         base >= 4.15.0.0 && < 5,
-        bytestring >= 0.10.12.1 && < 0.12,
+        bytestring >= 0.11.2.0 && < 0.12,
         containers >= 0.6.5.1 && < 0.7,
         optparse-applicative >= 0.16.1.0 && < 0.17,
         relude >= 1.0.0.1 && < 1.1,

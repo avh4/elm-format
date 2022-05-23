@@ -3,11 +3,17 @@ module Integration.LiteralSpec (spec) where
 import Elm.Utils ((|>))
 import Test.Hspec
 
+import qualified Data.ByteString.Builder as B
+import Data.Text (Text)
 import qualified Data.Text as Text
+import qualified Data.Text.Encoding as Text
+import qualified Data.Text.Lazy as Lazy
+import qualified Data.Text.Lazy.Encoding as Lazy
 import qualified ElmFormat.Parse as Parse
-import qualified ElmFormat.Render.Text as Render
+import qualified ElmFormat.Render.ByteStringBuilder as Render
 import qualified ElmVersion
 import qualified Reporting.Error.Syntax
+
 
 spec :: Spec
 spec = describe "Literals" $
@@ -44,17 +50,13 @@ spec = describe "Literals" $
     ]
 
 
-makeTest :: (String, String) -> SpecWith (Arg Expectation)
+makeTest :: (Text, Text) -> SpecWith (Arg Expectation)
 makeTest (original, formatted) =
-    it original $
-        Right (Text.pack formatted)
+    it (Text.unpack original) $
+        Right (Lazy.fromStrict formatted)
         `shouldBe` format original
 
 
-format :: String -> Either [Reporting.Error.Syntax.Error] Text.Text
+format :: Text -> Either [Reporting.Error.Syntax.Error] Lazy.Text
 format source =
-    source
-        |> Text.pack
-        |> Parse.parseLiteral
-        |> Parse.toEither
-        |> fmap (Render.renderLiteral ElmVersion.Elm_0_18)
+    Lazy.decodeUtf8 . B.toLazyByteString . Render.renderLiteral ElmVersion.Elm_0_18 <$> Parse.toEither (Parse.parseLiteral (Text.encodeUtf8 source))

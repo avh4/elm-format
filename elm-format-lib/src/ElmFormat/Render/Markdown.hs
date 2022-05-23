@@ -4,15 +4,17 @@ import Cheapskate.Types
 import qualified Data.Char as Char
 import Data.Foldable (fold, toList)
 import qualified Data.List as List
-import Data.Maybe (fromMaybe)
 import qualified Data.Text as Text
 import Data.Text (Text)
 import Data.Text.Extra (longestSpanOf, LongestSpanResult(..))
 import Elm.Utils ((|>))
 import qualified Regex
+import qualified Data.ByteString.Builder as B
+import qualified Data.Text.Lazy.Encoding as Lazy
+import qualified Data.Text.Lazy as Lazy
 
 
-formatMarkdown :: (String -> Maybe String) -> Blocks -> String
+formatMarkdown :: (String -> Maybe B.Builder) -> Blocks -> B.Builder
 formatMarkdown formatCode blocks =
     let
         blocks' =
@@ -36,6 +38,8 @@ formatMarkdown formatCode blocks =
                 (_ : []) -> needsInitialBlanks
                 _ -> True
     in
+        B.stringUtf8 $
+        -- TODO: rewrite the rest of this module to be able to create ByteString.Builders directly without intermediate String/Text allocation
         formatMarkdown' formatCode False needsInitialBlanks needsTrailingBlanks blocks'
 
 
@@ -45,7 +49,7 @@ mapWithPrev f (first:rest) =
     f Nothing first : zipWith (\prev next -> f (Just prev) next) (first:rest) rest
 
 
-formatMarkdown' :: (String -> Maybe String) -> Bool -> Bool -> Bool -> [Block] -> String
+formatMarkdown' :: (String -> Maybe B.Builder) -> Bool -> Bool -> Bool -> [Block] -> String
 formatMarkdown' formatCode isListItem needsInitialBlanks needsTrailingBlanks blocks =
     let
         intersperse =
@@ -68,7 +72,7 @@ data Context
     | AfterIndentedList
 
 
-formatMardownBlock :: (String -> Maybe String) -> Context -> Block -> String
+formatMardownBlock :: (String -> Maybe B.Builder) -> Context -> Block -> String
 formatMardownBlock formatCode context block =
     case block of
         ElmDocs terms ->
@@ -97,7 +101,10 @@ formatMardownBlock formatCode context block =
                     lang' == "elm" || lang' == ""
 
                 formatted =
-                    fromMaybe (Text.unpack $ ensureNewline code) $
+                    maybe
+                        (Text.unpack $ ensureNewline code)
+                        (Lazy.unpack . Lazy.decodeUtf8 . B.toLazyByteString)
+                        $
                         if isElm
                             then formatCode $ Text.unpack code
                             else Nothing
@@ -129,7 +136,7 @@ formatMardownBlock formatCode context block =
             fold $ fmap formatRef refs
 
 
-formatListItem :: (String -> Maybe String) -> (Int, Blocks) -> String
+formatListItem :: (String -> Maybe B.Builder) -> (Int, Blocks) -> String
 formatListItem formatCode (i, item)=
     let
         pref =

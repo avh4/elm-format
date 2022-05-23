@@ -10,10 +10,15 @@ import Test.Hspec.QuickCheck
 import Test.QuickCheck.IO ()
 import Reporting.Annotation (Located)
 
+import qualified Data.ByteString.Builder as B
+import qualified Data.ByteString.Lazy as LB
 import qualified Data.Text as Text
+import qualified Data.Text.Encoding as Text
+import qualified Data.Text.Lazy as Lazy
+import qualified Data.Text.Lazy.Encoding as Lazy
 import qualified Data.Maybe as Maybe
 import qualified ElmFormat.Parse as Parse
-import qualified ElmFormat.Render.Text as Render
+import qualified ElmFormat.Render.ByteStringBuilder as Render
 import qualified ElmVersion
 import qualified Test.Generators ()
 import qualified Test.ElmSourceGenerators
@@ -28,10 +33,11 @@ assertStringToString source =
         source' = Text.pack source
 
         result =
-            Parse.parse ElmVersion.Elm_0_19 source'
+            Parse.parse ElmVersion.Elm_0_19 (Text.encodeUtf8 source')
                 |> Parse.toEither
                 |> fmap (I.fold2 $ I.Fix . extract)
                 |> fmap (Render.render ElmVersion.Elm_0_19)
+                |> fmap (Lazy.toStrict . Lazy.decodeUtf8 . B.toLazyByteString)
     in
         result `shouldBe` Right source'
 
@@ -43,6 +49,8 @@ astToAst ast =
             ast
                 |> I.fold2 (I.Fix . extract)
                 |> Render.render ElmVersion.Elm_0_19
+                |> B.toLazyByteString
+                |> LB.toStrict
                 |> Parse.parse ElmVersion.Elm_0_19
                 |> Parse.toEither
     in
@@ -51,16 +59,23 @@ astToAst ast =
 
 simpleAst :: I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ModuleNK
 simpleAst =
-    case Parse.toEither $ Parse.parse ElmVersion.Elm_0_19 $ Text.pack "module Main exposing (foo)\n\n\nfoo =\n  8\n" of
+    case Parse.toEither $ Parse.parse ElmVersion.Elm_0_19 $ Text.encodeUtf8 "module Main exposing (foo)\n\n\nfoo =\n  8\n" of
         Right ast -> ast
 
 
-reportFailedAst :: I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK -> [Char]
+reportFailedAst :: I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK -> String
 reportFailedAst ast =
     let
-        rendering = Render.render ElmVersion.Elm_0_19 ast |> Text.unpack
+        rendering =
+            Render.render ElmVersion.Elm_0_19 ast
+                |> B.toLazyByteString
+                |> Lazy.decodeUtf8
+                |> Lazy.unpack
+
         result =
             Render.render ElmVersion.Elm_0_19 ast
+                |> B.toLazyByteString
+                |> LB.toStrict
                 |> Parse.parse ElmVersion.Elm_0_19
                 |> show
     in
@@ -88,7 +103,7 @@ propertyTests =
     describe "valid Elm files" $ do
         prop "should parse" $
             forAll Test.ElmSourceGenerators.elmModule $ withCounterexample id $
-              Text.pack >> Parse.parse ElmVersion.Elm_0_19 >> Parse.toMaybe >> Maybe.isJust
+              Text.pack >> Text.encodeUtf8 >> Parse.parse ElmVersion.Elm_0_19 >> Parse.toMaybe >> Maybe.isJust
 
         -- testProperty "should parse to the same AST after formatting"
         --     $ forAll Test.ElmSourceGenerators.elmModule $ withCounterexample id

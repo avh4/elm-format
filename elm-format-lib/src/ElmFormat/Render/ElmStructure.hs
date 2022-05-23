@@ -28,13 +28,15 @@ import Data.Text (Text)
 import Data.List.NonEmpty (NonEmpty(..))
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Text as Text
+import qualified Data.ByteString.Builder as B
+import qualified Data.Text.Encoding as Text
 
 
 data ElmF a
-    = Keyword Text
-    | Literal Text
-    | Identifier Text
-    | DocComment Text Text [Text]
+    = Keyword B.Builder
+    | Literal B.Builder
+    | Identifier B.Builder
+    | DocComment Word B.Builder B.Builder [Text]
     | CommentBlock Text [Text] Text
     | MustBreakComment Text
     | BoxLine Block.Line
@@ -45,18 +47,18 @@ data ElmF a
     | JoinMustBreak a a
     | Stack a (Int, a) [(Int, a)]
     | StackIndent a a [a]
-    | PrefixOrIndent Text a
-    | EqualsPair Bool a Text a
+    | PrefixOrIndent B.Builder a
+    | EqualsPair Bool a B.Builder a
     | FunctionApplication FunctionApplicationMultiline a (NonEmpty a)
-    | Case Text Text Bool a [a]
-    | CaseClause Bool a Text a
-    | LetIn Text a Text a
-    | IfElse Text a Text a [(Maybe a, a, a)] Text a
-    | Lambda Char Text Bool a (Maybe a) a
-    | SectionedGroup Bool Text Text Text Bool (NonEmpty a) [(a, NonEmpty a)] (Maybe a)
-    | GroupOfOne Text a Text
-    | ExtensionGroup Text Text Text Text Bool a (NonEmpty a) [(a, NonEmpty a)] (Maybe a)
-    | Range Text Text Text a a
+    | Case B.Builder B.Builder Bool a [a]
+    | CaseClause Bool a B.Builder a
+    | LetIn B.Builder a B.Builder a
+    | IfElse B.Builder a B.Builder a [(Maybe a, a, a)] B.Builder a
+    | Lambda Char B.Builder Bool a (Maybe a) a
+    | SectionedGroup Bool B.Builder B.Builder B.Builder Bool (NonEmpty a) [(a, NonEmpty a)] (Maybe a)
+    | GroupOfOne Word B.Builder a B.Builder
+    | ExtensionGroup B.Builder B.Builder B.Builder B.Builder Bool a (NonEmpty a) [(a, NonEmpty a)] (Maybe a)
+    | Range B.Builder B.Builder B.Builder a a
     | OperatorPrefix Bool Block.Line a
     | Module [a] (Maybe a, Maybe a, (Maybe a, [a])) Int (Maybe a)
     | Import a (Maybe a) (Maybe a)
@@ -80,24 +82,24 @@ render = \case
     CommentBlock left inner right ->
         case inner of
             [] ->
-                Block.line $ Block.comment (left <> " " <> right)
+                Block.line $ Block.commentText (left <> " " <> right)
 
             [single] ->
-                Block.line $ Block.comment (left <> " " <> single <> " " <> right)
+                Block.line $ Block.commentText (left <> " " <> single <> " " <> right)
 
             (first:rest) ->
                 Block.stack'
                     (Block.prefix
                         (1 + fromIntegral (Text.length left))
-                        (Block.comment left <> space)
-                        (Block.stack $ Block.line . Block.comment <$>
+                        (Block.commentText left <> space)
+                        (Block.stack $ Block.line . Block.commentText <$>
                             first :| rest
                         )
                     )
-                    (Block.line $ Block.comment right)
+                    (Block.line $ Block.commentText right)
 
     MustBreakComment line ->
-        Block.mustBreak $ Block.comment line
+        Block.mustBreak $ Block.commentText line
 
     BoxLine line ->
         Block.line line
@@ -105,13 +107,13 @@ render = \case
     Suffix a suf ->
         Block.addSuffix suf a
 
-    DocComment left right lines' ->
+    DocComment leftLen left right lines' ->
         let
             firstLine first =
                 Block.prefix
-                    (1 + fromIntegral (Text.length left))
+                    (1 + leftLen)
                     (Block.punc left <> space)
-                    (Block.line $ Block.comment first)
+                    (Block.line $ Block.commentText first)
         in
         case lines' of
             [] ->
@@ -124,7 +126,7 @@ render = \case
 
             (first:rest) ->
                 firstLine first
-                    |> Block.andThen (Block.line . Block.comment <$> rest)
+                    |> Block.andThen (Block.line . Block.commentText <$> rest)
                     |> Block.andThen [ Block.line $ Block.punc right ]
 
     WrapStack a b rest ->
@@ -262,7 +264,7 @@ render = \case
         Block.rowOrIndent' forceMultiline (Just space)
             [ Block.rowOrStack
                 (Just space)
-                [ Block.prefix 1 (Block.punc $ Text.singleton start) args
+                [ Block.prefix 1 (Block.punc $ B.char7 start) args
                 , Block.line $ Block.punc arrow
                 ]
             , Block.stack $ NonEmpty.fromList $ catMaybes
@@ -302,11 +304,9 @@ render = \case
             (False, Right _) -> attempt False
             _ -> withInnerSpaces
 
-    GroupOfOne left inner right ->
+    GroupOfOne leftLen left inner right ->
         Block.rowOrStack Nothing
-            [ Block.prefix
-                (fromIntegral $ Text.length left)
-                (Block.punc left) inner
+            [ Block.prefix leftLen (Block.punc left) inner
             , Block.line (Block.punc right)
             ]
 
@@ -404,38 +404,38 @@ stack0 a b rest =
     Stack a (0, b) ((,) 0 <$> rest)
 
 
-renderSections :: Bool -> Bool -> Text -> Text -> NonEmpty Block -> [(Block, NonEmpty Block)] -> Block
+renderSections :: Bool -> Bool -> B.Builder -> B.Builder -> NonEmpty Block -> [(Block, NonEmpty Block)] -> Block
 renderSections innerSpaces forceMultiline left sep (first0':|firsts') moreSections' =
     let
         renderItem innerSpaces' punc item =
             render $ OperatorPrefix
-                (innerSpaces' || punc == sep)
+                innerSpaces'
                 (Block.punc punc)
                 item
 
-        renderLabeledSection innerSpaces' (label, items) =
+        renderLabeledSection (label, items) =
             Block.stack
                 [ blankLine
                 , label
-                , renderSections forceMultiline innerSpaces' sep sep items []
+                , renderSections True forceMultiline sep sep items []
                 ]
     in
     Block.rowOrStack' forceMultiline Nothing $
         renderItem innerSpaces left first0' :|
-        (renderItem innerSpaces sep <$> firsts')
-        ++ (renderLabeledSection innerSpaces <$> moreSections')
+        (renderItem True sep <$> firsts')
+        ++ (renderLabeledSection <$> moreSections')
 
 
 keyword :: Text -> Elm
-keyword = Fix . Keyword
+keyword = Fix . Keyword . Text.encodeUtf8Builder
 
 
 literal :: Text -> Elm
-literal = Fix . Literal
+literal = Fix . Literal . Text.encodeUtf8Builder
 
 
 identifier :: Text -> Elm
-identifier = Fix . Identifier
+identifier = Fix . Identifier . Text.encodeUtf8Builder
 
 
 parens :: Elm -> Elm
@@ -444,12 +444,12 @@ parens = groupOfOne "(" ")"
 
 groupOfOne :: Text -> Text -> Elm -> Elm
 groupOfOne left right inner =
-    Fix $ GroupOfOne left inner right
+    Fix $ GroupOfOne (fromIntegral $ Text.length left) (Text.encodeUtf8Builder left) inner (Text.encodeUtf8Builder right)
 
 
 docComment :: Text -> Text -> [Text] -> Elm
 docComment left right lines' =
-    Fix $ DocComment left right lines'
+    Fix $ DocComment (fromIntegral $ Text.length left)  (Text.encodeUtf8Builder left) (Text.encodeUtf8Builder right) lines'
 
 
 commentBlock :: Text -> Text -> [Text] -> Elm
@@ -581,7 +581,7 @@ spaceSepMustBreak inner eol =
 
 prefixOrIndented :: Text -> Elm -> Elm
 prefixOrIndented pre body =
-    Fix $ PrefixOrIndent pre body
+    Fix $ PrefixOrIndent (Text.encodeUtf8Builder pre) body
 
 
 {-|
@@ -596,7 +596,7 @@ Formats as:
       =
       right
 -}
-equalsPair :: Text -> Bool -> Elm -> Elm -> Elm
+equalsPair :: B.Builder -> Bool -> Elm -> Elm -> Elm
 equalsPair symbol forceMultiline left right =
     Fix $ EqualsPair forceMultiline left symbol right
 
@@ -606,9 +606,9 @@ An equalsPair where the left side is an application
 -}
 definition :: Text -> Bool -> Elm -> [Elm] -> Elm -> Elm
 definition symbol forceMultiline first [] =
-    equalsPair symbol forceMultiline first
+    equalsPair (Text.encodeUtf8Builder symbol) forceMultiline first
 definition symbol forceMultiline first (arg0:args) =
-    equalsPair symbol forceMultiline
+    equalsPair (Text.encodeUtf8Builder symbol) forceMultiline
         (application (FAJoinFirst JoinAll) first (arg0:|args))
 
 
@@ -651,7 +651,7 @@ Formats as:
 -}
 case' :: Text -> Text -> Bool -> Elm -> [Elm] -> Elm
 case' caseWord ofWord forceMultilineSubect subject clauses =
-    Fix $ Case caseWord ofWord forceMultilineSubect subject clauses
+    Fix $ Case (Text.encodeUtf8Builder caseWord) (Text.encodeUtf8Builder ofWord) forceMultilineSubect subject clauses
 
 
 {-|
@@ -666,7 +666,7 @@ Formats as:
 -}
 caseBranch :: Text -> Bool -> Elm -> Elm -> Elm
 caseBranch arrow forceArrowNewline pattern body =
-    Fix $ CaseClause forceArrowNewline pattern arrow body
+    Fix $ CaseClause forceArrowNewline pattern (Text.encodeUtf8Builder arrow) body
 
 
 {-|
@@ -679,7 +679,7 @@ Formats as:
 -}
 letIn :: Text -> Text -> Elm -> Elm -> Elm
 letIn letWord inWord defs body =
-    Fix $ LetIn letWord defs inWord body
+    Fix $ LetIn (Text.encodeUtf8Builder letWord) defs (Text.encodeUtf8Builder inWord) body
 
 
 {-|
@@ -694,7 +694,7 @@ Formats as:
 -}
 ifElse :: Text -> Text -> Text -> Elm -> Elm -> [(Maybe Elm, Elm, Elm)] -> Elm -> Elm
 ifElse ifWord thenWord elseWord condition ifBody elseIfs elseBody =
-    Fix $ IfElse ifWord condition thenWord ifBody elseIfs elseWord elseBody
+    Fix $ IfElse (Text.encodeUtf8Builder ifWord) condition (Text.encodeUtf8Builder thenWord) ifBody elseIfs (Text.encodeUtf8Builder elseWord) elseBody
 
 
 {-|
@@ -707,7 +707,7 @@ Formats as:
 -}
 lambda :: Char -> Text -> Bool -> Elm -> Maybe Elm -> Elm -> Elm
 lambda start arrow forceMultiline args bodyComments body =
-    Fix $ Lambda start arrow forceMultiline args bodyComments body
+    Fix $ Lambda start (Text.encodeUtf8Builder arrow) forceMultiline args bodyComments body
 
 
 {-|
@@ -742,7 +742,7 @@ Formats like `group` if there is no extraFooter, or as:
 -}
 group' :: Bool -> Text -> Text -> Maybe Elm -> Text -> Bool -> [Elm] -> Elm
 group' _ left _ Nothing right _ [] =
-    Fix $ Keyword (left <> right)
+    Fix $ Keyword (Text.encodeUtf8Builder $ left <> right)
 group' innerSpaces left _ (Just extraFooter) right _ [] =
     groupOfOne left right extraFooter
 group' innerSpaces left sep extraFooter right forceMultiline (first:rest) =
@@ -765,7 +765,7 @@ Formats like `group'` if there are no labelled sections, or as:
 -}
 sectionedGroup :: Bool -> Text -> Text -> Text -> Bool -> NonEmpty Elm -> [(Elm, NonEmpty Elm)] -> Maybe Elm -> Elm
 sectionedGroup innerSpaces left sep right forceMultiline section1 sections extraFooter =
-    Fix $ SectionedGroup innerSpaces left sep right forceMultiline section1 sections extraFooter
+    Fix $ SectionedGroup innerSpaces (Text.encodeUtf8Builder left) (Text.encodeUtf8Builder sep) (Text.encodeUtf8Builder right) forceMultiline section1 sections extraFooter
 
 {-|
 Formats as:
@@ -782,7 +782,7 @@ Formats as:
 -}
 extensionGroup :: Text -> Text -> Text -> Text -> Bool -> Elm -> NonEmpty Elm -> [(Elm, NonEmpty Elm)] -> Maybe Elm -> Elm
 extensionGroup left delim sep right forceMultiline base section1 sections extraFooter =
-    Fix $ ExtensionGroup left delim sep right forceMultiline base section1 sections extraFooter
+    Fix $ ExtensionGroup (Text.encodeUtf8Builder left) (Text.encodeUtf8Builder delim) (Text.encodeUtf8Builder sep) (Text.encodeUtf8Builder right) forceMultiline base section1 sections extraFooter
 
 
 {-|
@@ -798,4 +798,4 @@ Formats as:
 -}
 range :: Text -> Text -> Text -> Elm -> Elm -> Elm
 range left dots right a b =
-    Fix $ Range left dots right a b
+    Fix $ Range (Text.encodeUtf8Builder left) (Text.encodeUtf8Builder dots) (Text.encodeUtf8Builder right) a b

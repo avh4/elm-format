@@ -17,6 +17,7 @@ import qualified Parse.Primitives as P
 import qualified Parse.ParsecAdapter as Parsec
 import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Syntax
+import Data.ByteString (ByteString)
 
 
 reserveds :: [String]
@@ -39,12 +40,12 @@ expecting = flip (<?>)
 
 -- SETUP
 
-iParse :: IParser a -> String -> Either ParsecError a
+iParse :: IParser a -> ByteString -> Either ParsecError a
 iParse =
     iParseWithState State.init
 
 
-iParseWithState :: State.State -> IParser a -> String -> Either ParsecError a
+iParseWithState :: State.State -> IParser a -> ByteString -> Either ParsecError a
 iParseWithState state aParser input =
   runIndent $ runParserT aParser state input
 
@@ -557,12 +558,3 @@ escaped delim =
     _ <- char '\\'
     c <- char '\\' <|> char delim
     return ['\\', c]
-
-
-processAs :: IParser a -> String -> IParser a
-processAs processor s =
-    calloutParser s processor
-  where
-    calloutParser :: String -> IParser a -> IParser a
-    calloutParser inp p =
-      either (parserFail . const . const) return (iParse p inp)

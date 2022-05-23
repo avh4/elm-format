@@ -18,15 +18,15 @@ import qualified CommandLine.TransformFiles as TransformFiles
 import qualified Data.Text as Text
 import qualified ElmFormat.CliFlags as Flags
 import qualified ElmFormat.Parse as Parse
-import qualified ElmFormat.Render.Text as Render
+import qualified ElmFormat.Render.ByteStringBuilder as Render
 import qualified ElmFormat.Version
 import qualified Reporting.Result as Result
 import qualified ElmFormat.AST.PublicAST as PublicAST
 import qualified Data.Aeson as Aeson
-import qualified Data.ByteString.Char8 as B
-import qualified Data.ByteString.Lazy.Char8 as LB
+import qualified Data.ByteString.Lazy as LB
 import qualified Data.Indexed as I
 import Data.Coapplicative (extract)
+import qualified Data.ByteString.Builder as B
 
 
 data WhatToDo
@@ -153,11 +153,15 @@ autoDetectElmVersion =
             else return $ Right Elm_0_19
 
 
-validate :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage ()
+validate :: ElmVersion -> (FilePath, ByteString) -> Either InfoMessage ()
 validate elmVersion input@(inputFile, inputText) =
     case parseModule elmVersion input of
         Right modu ->
-            if inputText /= Render.render elmVersion (I.fold2 (I.Fix . extract) modu) then
+            let
+                output :: B.Builder
+                output = Render.render elmVersion (I.fold2 (I.Fix . extract) modu)
+            in
+            if LB.fromStrict inputText /= B.toLazyByteString output then
                 Left $ FileWouldChange elmVersion inputFile
             else
                 Right ()
@@ -168,7 +172,7 @@ validate elmVersion input@(inputFile, inputText) =
 
 parseModule ::
     ElmVersion
-    -> (FilePath, Text.Text)
+    -> (FilePath, ByteString)
     -> Either InfoMessage (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ModuleNK)
 parseModule elmVersion (inputFile, inputText) =
     case Parse.parse elmVersion inputText of
@@ -179,22 +183,22 @@ parseModule elmVersion (inputFile, inputText) =
             Left $ ParseError inputFile errs
 
 
-parseJson :: (FilePath, Text.Text)
+parseJson :: (FilePath, ByteString)
     -> Either InfoMessage (I.Fix (ASTNS [UppercaseIdentifier]) 'ModuleNK)
 parseJson (inputFile, inputText) =
-    case Aeson.eitherDecode (LB.fromChunks . return . encodeUtf8 $ inputText) of
+    case Aeson.eitherDecode (LB.fromStrict $ inputText) of
         Right modu -> Right $ PublicAST.toModule modu
 
         Left message ->
             Left $ JsonParseError inputFile (Text.pack message)
 
 
-format :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
+format :: ElmVersion -> (FilePath, ByteString) -> Either InfoMessage B.Builder
 format elmVersion input =
     Render.render elmVersion . I.fold2 (I.Fix . extract) <$> parseModule elmVersion input
 
 
-toJson :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
+toJson :: ElmVersion -> (FilePath, ByteString) -> Either InfoMessage B.Builder
 toJson elmVersion (inputFile, inputText) =
     let
         config =
@@ -202,11 +206,11 @@ toJson elmVersion (inputFile, inputText) =
                 { PublicAST.showSourceLocation = True
                 }
     in
-    decodeUtf8 . B.concat . LB.toChunks . Aeson.encode . PublicAST.fromModule config
+    B.lazyByteString . Aeson.encode . PublicAST.fromModule config
     <$> parseModule elmVersion (inputFile, inputText)
 
 
-fromJson :: ElmVersion -> (FilePath, Text.Text) -> Either InfoMessage Text.Text
+fromJson :: ElmVersion -> (FilePath, ByteString) -> Either InfoMessage B.Builder
 fromJson elmVersion input =
     Render.render elmVersion <$> parseJson input
 

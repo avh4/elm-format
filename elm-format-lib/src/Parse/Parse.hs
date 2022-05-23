@@ -14,26 +14,27 @@ import qualified Reporting.Annotation as A
 import qualified Reporting.Error.Syntax as Error
 import qualified Reporting.Result as Result
 import Parse.IParser
+import Data.ByteString (ByteString)
 
 
-parseModule :: ElmVersion -> String -> Result.Result () Error.Error (ParsedAST 'ModuleNK)
+parseModule :: ElmVersion -> ByteString -> Result.Result () Error.Error (ParsedAST 'ModuleNK)
 parseModule elmVersion src =
     parse src (Parse.Module.elmModule elmVersion)
 
 
-parseDeclarations :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure (ParsedAST 'TopLevelDeclarationNK)]
+parseDeclarations :: ElmVersion -> ByteString -> Result.Result () Error.Error [TopLevelStructure (ParsedAST 'TopLevelDeclarationNK)]
 parseDeclarations elmVersion src =
     parse src (Parse.Module.topLevel (Parse.Declaration.declaration elmVersion) <* eof)
 
 
-parseExpressions :: ElmVersion -> String -> Result.Result () Error.Error [TopLevelStructure (C0Eol (ParsedAST 'ExpressionNK))]
+parseExpressions :: ElmVersion -> ByteString -> Result.Result () Error.Error [TopLevelStructure (C0Eol (ParsedAST 'ExpressionNK))]
 parseExpressions elmVersion src =
     parse src (Parse.Module.topLevel (withEol $ Parse.Expression.expr elmVersion) <* eof)
 
 
 -- RUN PARSERS
 
-parse :: String -> IParser a -> Result.Result wrn Error.Error a
+parse :: ByteString -> IParser a -> Result.Result wrn Error.Error a
 parse source parser =
   case iParse parser source of
     Right result ->

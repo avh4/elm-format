@@ -12,11 +12,12 @@ import qualified System.Directory
 import qualified System.Environment
 import qualified System.Exit
 import qualified System.IO
+import qualified Data.ByteString.Builder as B
 
 
 instance World IO where
-    readUtf8File path = decodeUtf8 <$> readFileBS path
-    writeUtf8File path content = writeFileBS path $ encodeUtf8 content
+    readUtf8File = readFileBS
+    writeUtf8File = B.writeFile
 
     doesFileExist = System.Directory.doesFileExist
     doesDirectoryExist = System.Directory.doesDirectoryExist
@@ -24,11 +25,11 @@ instance World IO where
 
     getProgName = fmap Text.pack System.Environment.getProgName
 
-    getStdin = decodeUtf8 <$> toStrict <$> Lazy.getContents
+    getStdin = Lazy.getContents
     getLine = Data.Text.IO.getLine
     putStr = Data.Text.IO.putStr
     putStrLn = Data.Text.IO.putStrLn
-    writeStdout content = putBS $ encodeUtf8 content
+    writeStdout = B.hPutBuilder stdout
     flushStdout = System.IO.hFlush stdout
     putStrStderr = Data.Text.IO.hPutStr stderr
     putStrLnStderr = Data.Text.IO.hPutStrLn stderr

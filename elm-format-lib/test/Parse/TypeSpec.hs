@@ -10,23 +10,25 @@ import Parse.TestHelpers
 import ElmVersion
 import ElmFormat.Render.Box (formatType, TypeParensRequired (NotRequired), typeParens)
 import qualified Text.PrettyPrint.Avh4.Block as Block
-import qualified Data.Text as Text
 import Parse.IParser
 import Reporting.Annotation (Located)
 import qualified Data.Fix as Fix
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified Data.Indexed as I
 import Data.Coapplicative (extract)
+import qualified Data.Text.Lazy as Lazy
+import qualified Data.ByteString.Builder as B
+import qualified Data.Text.Lazy.Encoding as Lazy
 
 
 expr :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'TypeNK)
 expr = Parse.Type.expr
 
 
-example :: String -> String -> String -> SpecWith ()
+example :: String -> Lazy.Text -> Lazy.Text -> SpecWith ()
 example name input expected =
     it name $
-        assertParse (fmap (Text.unpack . Block.render . Fix.cata ElmStructure.render . typeParens NotRequired . formatType Elm_0_19 . I.fold2 (I.Fix . extract)) (expr Elm_0_19)) input expected
+        assertParse (fmap (Lazy.decodeUtf8 . B.toLazyByteString . Block.render . Fix.cata ElmStructure.render . typeParens NotRequired . formatType Elm_0_19 . I.fold2 (I.Fix . extract)) (expr Elm_0_19)) input expected
 
 
 spec :: Spec

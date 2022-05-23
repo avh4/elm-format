@@ -15,11 +15,17 @@ import Test.Hspec.Golden ( Golden(..) )
 import qualified Data.Text.IO
 import Test.Hspec.Core.Spec (Example(..), Result(..), ResultStatus(..))
 import Test.Hspec (shouldBe, Expectation)
+import qualified Data.Text.Lazy.Encoding as Lazy
+import qualified Data.Text.Lazy as Lazy
+import qualified Data.ByteString.Builder as B
+import Data.ByteString (ByteString)
+import qualified Data.Text.Encoding as Text
+import qualified Data.ByteString.Lazy as LB
 
 
 data TestWorldState =
     TestWorldState
-        { filesystem :: FileTree Text
+        { filesystem :: FileTree ByteString
         , stdio :: Stdio.Stdio
         , _lastExitCode :: LastExitCode
         }
@@ -72,7 +78,7 @@ instance (Monad m, Lens s t) => Has t (State.StateT s m) where
 -- Lens definitions
 --
 
-instance Lens TestWorldState (FileTree Text) where
+instance Lens TestWorldState (FileTree ByteString) where
     get = filesystem
     set x s = s { filesystem = x }
 
@@ -90,9 +96,9 @@ instance Lens TestWorldState LastExitCode where
 --
 
 instance Monad m => World (State.StateT TestWorldState m) where
-    doesFileExist = gets . (FileTree.doesFileExist :: FilePath -> FileTree Text -> Bool)
-    doesDirectoryExist = gets . (FileTree.doesDirectoryExist :: FilePath -> FileTree Text -> Bool)
-    listDirectory = gets . (FileTree.listDirectory :: FilePath -> FileTree Text -> [FilePath])
+    doesFileExist = gets . (FileTree.doesFileExist @ByteString)
+    doesDirectoryExist = gets . (FileTree.doesDirectoryExist @ByteString)
+    listDirectory = gets . (FileTree.listDirectory @ByteString)
 
     readUtf8File path =
         gets $ orError . FileTree.read path
@@ -100,13 +106,13 @@ instance Monad m => World (State.StateT TestWorldState m) where
             orError (Just a) = a
             orError Nothing = error $ path ++ ": does not exist"
 
-    writeUtf8File = modify <<< FileTree.write
+    writeUtf8File = modify <<< (\path -> FileTree.write path . LB.toStrict. B.toLazyByteString)
 
-    getStdin = state Stdio.getStdin
+    getStdin = Lazy.encodeUtf8 . Lazy.fromStrict <$> state Stdio.getStdin
     putStr = modify . Stdio.putStr
     putStrLn = modify . Stdio.putStrLn
 
-    writeStdout = putStr
+    writeStdout = putStr . Lazy.toStrict . Lazy.decodeUtf8 . B.toLazyByteString
 
     putStrStderr = modify . Stdio.putStrStderr
     putStrLnStderr = modify . Stdio.putStrLnStderr
@@ -123,10 +129,10 @@ infixr 8 <<<
 (<<<) f g a b = f $ g a b
 
 
-testWorld :: [(String, String)] -> TestWorldState
+testWorld :: [(String, Text)] -> TestWorldState
 testWorld files =
       TestWorldState
-          { filesystem = foldl (\t (p, c) -> FileTree.write p c t) mempty $ fmap (fmap Text.pack) files
+          { filesystem = foldl (\t (p, c) -> FileTree.write p c t) mempty $ fmap (fmap Text.encodeUtf8) files
           , stdio = Stdio.empty
           , _lastExitCode = LastExitCode Nothing
           }
@@ -146,13 +152,13 @@ init = testWorld []
 
 
 uploadFile :: FilePath -> Text -> TestWorld ()
-uploadFile  =
-    modify' (undefined :: FileTree Text) <<< over <<< FileTree.write
+uploadFile path text  =
+    modify @(FileTree ByteString) (over $ FileTree.write path (Text.encodeUtf8 text))
 
 
 downloadFile :: FilePath -> TestWorld (Maybe Text)
 downloadFile =
-    gets' (undefined :: FileTree Text) . from . FileTree.read
+    fmap (fmap Text.decodeUtf8) . gets @(FileTree ByteString) . from . FileTree.read
 
 
 fullStdout :: TestWorld Text

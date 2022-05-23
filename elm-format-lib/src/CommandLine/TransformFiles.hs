@@ -12,7 +12,9 @@ import qualified CommandLine.InfoFormatter as InfoFormatter
 import CommandLine.World (World)
 import qualified CommandLine.World as World
 import Control.Monad.State hiding (runState)
-import Data.Text (Text)
+import Data.ByteString (ByteString)
+import qualified Data.ByteString.Builder as B
+import qualified Data.ByteString.Lazy as LB
 
 
 
@@ -21,26 +23,31 @@ data Result a
     | Changed FilePath a
 
 
-checkChange :: Eq a => (FilePath, a) -> a -> Result a
-checkChange (inputFile, inputText) outputText =
-    if inputText == outputText
-        then NoChange inputFile outputText
-        else Changed inputFile outputText
+checkChange :: (FilePath, ByteString) -> B.Builder -> Result B.Builder
+checkChange (inputFile, inputText) output =
+    let
+        outputText :: LB.ByteString
+        outputText =
+            B.toLazyByteString output
+    in
+    if LB.fromStrict inputText == outputText
+        then NoChange inputFile output
+        else Changed inputFile output
 
 
-updateFile :: World m => Result Text -> m ()
+updateFile :: World m => Result B.Builder -> m ()
 updateFile result =
     case result of
         NoChange _ _ -> return ()
         Changed outputFile outputText -> World.writeUtf8File outputFile outputText
 
 
-readStdin :: World m => m (FilePath, Text)
+readStdin :: World m => m (FilePath, ByteString)
 readStdin =
-    (,) "<STDIN>" <$> World.getStdin
+    (,) "<STDIN>" . LB.toStrict <$> World.getStdin
 
 
-readFromFile :: World m => (FilePath -> StateT s m ()) -> FilePath -> StateT s m (FilePath, Text)
+readFromFile :: World m => (FilePath -> StateT s m ()) -> FilePath -> StateT s m (FilePath, ByteString)
 readFromFile onProcessingFile filePath =
     onProcessingFile filePath
         *> lift (World.readUtf8FileWithPath filePath)
@@ -61,7 +68,7 @@ applyTransformation ::
     (FilePath -> info)
     -> Bool
     -> ([FilePath] -> prompt)
-    -> ((FilePath, Text) -> Either info Text)
+    -> ((FilePath, ByteString) -> Either info B.Builder)
     -> TransformMode
     -> m Bool
 applyTransformation processingFile autoYes confirmPrompt transform mode =
@@ -92,16 +99,16 @@ applyTransformation processingFile autoYes confirmPrompt transform mode =
             lift (transform <$> World.readUtf8FileWithPath inputFile) >>= logErrorOr onInfo (lift . World.writeStdout)
 
         FileToFile inputFile outputFile ->
-            (transform <$> readFromFile (onInfo . processingFile) inputFile) >>= logErrorOr onInfo (lift . World.writeUtf8File outputFile)
+            readFromFile (onInfo . processingFile) inputFile >>= logErrorOr onInfo (lift . World.writeUtf8File outputFile) . transform
 
         FilesInPlace first rest ->
             do
                 canOverwrite <- lift $ approve (first:rest)
                 if canOverwrite
-                    then all id <$> mapM formatFile (first:rest)
+                    then and <$> mapM formatFile (first:rest)
                     else return True
             where
-                formatFile file = ((\i -> checkChange i <$> transform i) <$> readFromFile (onInfo . processingFile) file) >>= logErrorOr onInfo (lift . updateFile)
+                formatFile file = readFromFile (onInfo . processingFile) file >>= logErrorOr onInfo (lift . updateFile) . (\i -> checkChange i <$> transform i)
 
 
 data ValidateMode
@@ -113,7 +120,7 @@ validateNoChanges ::
     World m =>
     InfoFormatter.Loggable info =>
     (FilePath -> info)
-    -> ((FilePath, Text) -> Either info ())
+    -> ((FilePath, ByteString) -> Either info ())
     -> ValidateMode
     -> m Bool
 validateNoChanges processingFile validate mode =

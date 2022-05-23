@@ -19,6 +19,8 @@ import Test.Hspec
 import qualified Data.Map as Dict
 import Data.List.Split (splitOn)
 import Data.Coapplicative (extract)
+import Data.Text (Text)
+import qualified Data.Text.Encoding as Text
 
 spec :: Spec
 spec = describe "AST.MatchReferences" $ do
@@ -27,7 +29,7 @@ spec = describe "AST.MatchReferences" $ do
             test ::
                 String
                 -> [(String, List String)] -- knownContents
-                -> List String -- imports
+                -> List Text -- imports
                 -> List String -- locals
                 -> Ref [String]
                 -> Ref (MatchedNamespace [String])
@@ -91,7 +93,7 @@ spec = describe "AST.MatchReferences" $ do
             test ::
                 String
                 -> [(String, List String)] -- knownContents
-                -> List String -- imports
+                -> List Text -- imports
                 -> List String -- locals
                 -> Ref (MatchedNamespace [String])
                 -> Ref [String]
@@ -184,7 +186,7 @@ spec = describe "AST.MatchReferences" $ do
             (VarRef ["Html"] (LowercaseIdentifier "div"))
 
 
-makeImportInfo :: [(String, List String)] -> [String] -> ImportInfo [UppercaseIdentifier]
+makeImportInfo :: [(String, List String)] -> [Text] -> ImportInfo [UppercaseIdentifier]
 makeImportInfo knownContentsRaw imports =
     let
         knownContents = knownContentsRaw |> fmap makeKnownContent |> Dict.fromList
@@ -201,9 +203,9 @@ makeKnownContent (moduleName, known) =
     )
 
 
-makeImportMethod :: String -> ([UppercaseIdentifier], ASTNS [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier])) 'ImportMethodNK)
+makeImportMethod :: Text -> ([UppercaseIdentifier], ASTNS [UppercaseIdentifier] (I.Fix (ASTNS [UppercaseIdentifier])) 'ImportMethodNK)
 makeImportMethod importString =
-    case Result.toMaybe $ Parse.parse importString (Parse.Module.import' Elm_0_19) of
+    case Result.toMaybe $ Parse.parse (Text.encodeUtf8 importString) (Parse.Module.import' Elm_0_19) of
         Nothing -> undefined -- Not handled: fix the test input to parse correctly
         Just (C _ moduleName, importMethod) ->
             (moduleName, I.unFix $ I.fold2 (I.Fix . extract) importMethod)

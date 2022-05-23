@@ -9,7 +9,6 @@ import qualified Text.PrettyPrint.Avh4.Block as Block
 import qualified Data.Bimap as Bimap
 import Data.Coapplicative
 import qualified Data.Indexed as I
-import qualified Data.Text as Text
 import Parse.ParsecAdapter (string)
 import ElmFormat.ImportInfo (ImportInfo(..))
 import ElmFormat.Render.Box (formatExpression, syntaxParens, SyntaxContext (SyntaxSeparated))
@@ -20,13 +19,16 @@ import Data.Word (Word16)
 import GHC.Int (Int64)
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import qualified Data.Fix as Fix
+import qualified Data.Text.Lazy as Lazy
+import qualified Data.ByteString.Builder as B
+import qualified Data.Text.Lazy.Encoding as Lazy
 
 
 pending :: I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ExpressionNK
 pending = at 0 0 0 0 $ Unit []
 
 
-example :: String -> String -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ExpressionNK -> SpecWith ()
+example :: String -> Lazy.Text -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'ExpressionNK -> SpecWith ()
 example name input expected =
     it name $
         assertParse (expr Elm_0_19) input expected
@@ -37,10 +39,10 @@ importInfo =
     ImportInfo mempty Bimap.empty mempty mempty mempty
 
 
-example' :: String -> String -> String -> SpecWith ()
+example' :: String -> Lazy.Text -> Lazy.Text -> SpecWith ()
 example' name input expected =
     it name $
-        assertParse (fmap (Text.unpack . Block.render . Fix.cata ElmStructure.render . syntaxParens SyntaxSeparated . formatExpression Elm_0_19 importInfo . I.fold2 (I.Fix . extract)) (expr Elm_0_19)) input expected
+        assertParse (fmap (Lazy.decodeUtf8 . B.toLazyByteString . Block.render . Fix.cata ElmStructure.render . syntaxParens SyntaxSeparated . formatExpression Elm_0_19 importInfo . I.fold2 (I.Fix . extract)) (expr Elm_0_19)) input expected
 
 
 commentedIntExpr :: (Word16, Word16, Word16, Word16) -> String -> String -> Int64 -> Commented ([Comment], [Comment]) (I.Fix2 Located (ASTNS ns) 'ExpressionNK)

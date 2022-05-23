@@ -15,6 +15,9 @@ import qualified Reporting.Annotation as A
 import qualified Data.List as List
 import qualified Data.List.Split as List
 import Data.Word (Word16)
+import qualified Data.Text.Lazy as Lazy
+import qualified Data.Text.Lazy.Encoding as Lazy
+import qualified Data.ByteString.Lazy as BS
 
 
 parseFullInput :: IParser a -> IParser a
@@ -22,10 +25,12 @@ parseFullInput parser =
     (\x _ -> x) <$> parser <*> eof
 
 
-assertParse :: (Show a, Eq a) => IParser a -> String -> a -> Expectation
+assertParse :: (Show a, Eq a) => IParser a -> Lazy.Text -> a -> Expectation
 assertParse parser input expected =
     let
-        output = iParse (parseFullInput parser) input
+        output =
+            iParse (parseFullInput parser)
+                (BS.toStrict $ Lazy.encodeUtf8 input)
     in
         case output of
             Left err ->
@@ -34,10 +39,12 @@ assertParse parser input expected =
                 expected `shouldBe` result
 
 
-assertParseFailure :: (Show a) => IParser a -> String -> Expectation
+assertParseFailure :: (Show a) => IParser a -> Lazy.Text -> Expectation
 assertParseFailure parser input =
     let
-        output = iParse (parseFullInput parser) input
+        output =
+            iParse (parseFullInput parser)
+                (BS.toStrict $ Lazy.encodeUtf8 input)
     in
         case output of
             Left _ ->
@@ -61,12 +68,16 @@ at a b c d = I.Fix2 . A.At (A.Region (A.Position a b) (A.Position c d))
 For each "\n " in the input string, a test case will be generated checking that
 the given parser will fail if that "\n " is replaced by "\n".
 -}
-mustBeIndented :: Show a => IParser a -> [Char] -> SpecWith ()
-mustBeIndented parser input =
+mustBeIndented :: Show a => IParser a -> Lazy.Text -> SpecWith ()
+mustBeIndented parser input' =
+    -- TODO: rewrite generateReplacements to work on Lazy.Text so we don't have to unpack and re-pack Strings
+    let
+        input = Lazy.unpack input'
+    in
     describe "must be indented" $ do
         input
         |> generateReplacements "\n " "\n"
-        |> List.map (it "" . assertParseFailure parser)
+        |> List.map (it "" . assertParseFailure parser . Lazy.pack)
         |> sequence_
 
 

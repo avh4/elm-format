@@ -8,9 +8,10 @@ import Parse.IParser
 import Parse.ParsecAdapter (lower)
 
 import Parse.TestHelpers
+import qualified Data.Text.Lazy as Lazy
 
 
-example :: (Show a, Eq a) => IParser a -> String -> String -> a -> SpecWith ()
+example :: (Show a, Eq a) => IParser a -> String -> Lazy.Text -> a -> SpecWith ()
 example parser name input expected =
     it name $
         assertParse parser input expected

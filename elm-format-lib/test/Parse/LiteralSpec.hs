@@ -7,16 +7,18 @@ import Parse.Literal (literal)
 import Parse.TestHelpers (assertParse, assertParseFailure)
 
 import qualified ElmVersion
-import qualified Data.Text as Text
 import qualified Text.PrettyPrint.Avh4.Block as Block
 import qualified Data.Fix as Fix
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
+import qualified Data.Text.Lazy as Lazy
+import qualified Data.ByteString.Builder as B
+import qualified Data.Text.Lazy.Encoding as Lazy
 
 
-example :: String -> String -> String -> SpecWith ()
+example :: String -> Lazy.Text -> Lazy.Text -> SpecWith ()
 example name input expected =
     it name $
-        assertParse (fmap (Text.unpack . Block.render . Fix.cata ElmStructure.render . formatLiteral ElmVersion.Elm_0_18) literal) input expected
+        assertParse (fmap (Lazy.decodeUtf8 . B.toLazyByteString . Block.render . Fix.cata ElmStructure.render . formatLiteral ElmVersion.Elm_0_18) literal) input expected
 
 
 spec :: Spec

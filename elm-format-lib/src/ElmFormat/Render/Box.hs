@@ -42,6 +42,11 @@ import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Either.Extra
 import Data.Bifunctor (bimap)
 import Data.Map.Strict (Map)
+import qualified Data.ByteString.Builder as B
+import qualified Data.Text.Lazy.Encoding as Lazy
+import qualified Data.Text.Lazy as Lazy
+import Data.ByteString (ByteString)
+import qualified Data.ByteString.Lazy as BS
 
 
 pleaseReport :: String -> String -> a
@@ -575,7 +580,7 @@ firstOf options value =
 formatDocComment :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> Markdown.Blocks -> Elm
 formatDocComment elmVersion importInfo blocks =
     let
-        parse :: String -> Maybe (ElmCodeBlock [UppercaseIdentifier])
+        parse :: ByteString -> Maybe (ElmCodeBlock [UppercaseIdentifier])
         parse source =
             source
                 |> firstOf
@@ -588,16 +593,16 @@ formatDocComment elmVersion importInfo blocks =
                     ]
 
         format ::
-            ElmCodeBlock [UppercaseIdentifier] -> String
+            ElmCodeBlock [UppercaseIdentifier] -> B.Builder
         format result =
             case result of
                 ModuleCode modu ->
                     formatModule elmVersion False 1 modu
-                        |> (Text.unpack . Block.render . Fix.cata ElmStructure.render)
+                        |> (Block.render . Fix.cata ElmStructure.render)
 
                 DeclarationsCode declarations ->
                     formatModuleBody 1 elmVersion importInfo declarations
-                        |> fmap (Text.unpack . Block.render . Fix.cata ElmStructure.render)
+                        |> fmap (Block.render . Fix.cata ElmStructure.render)
                         |> fromMaybe ""
 
                 ExpressionsCode expressions ->
@@ -605,12 +610,12 @@ formatDocComment elmVersion importInfo blocks =
                         |> fmap (fmap $ formatEolCommented . fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo))
                         |> fmap (fmap $ (,) BodyUnnamed)
                         |> formatTopLevelBody 1 elmVersion importInfo
-                        |> fmap (Text.unpack . Block.render . Fix.cata ElmStructure.render)
+                        |> fmap (Block.render . Fix.cata ElmStructure.render)
                         |> fromMaybe ""
 
-        content :: String
+        content :: B.Builder
         content =
-            ElmFormat.Render.Markdown.formatMarkdown (fmap format . parse) $ fmap cleanBlock blocks
+            ElmFormat.Render.Markdown.formatMarkdown (fmap format . parse . BS.toStrict . Lazy.encodeUtf8 . Lazy.pack) $ fmap cleanBlock blocks
 
         cleanBlock :: Markdown.Block -> Markdown.Block
         cleanBlock block =
@@ -624,7 +629,8 @@ formatDocComment elmVersion importInfo blocks =
                     block
     in
     ElmStructure.docComment "{-|" "-}"
-        (fmap Text.stripEnd $ Text.lines $ Text.pack content)
+        -- TODO: push stripEnd down into the markdown formatting so we can avoid decoding and re-encoding the buffer
+        (fmap (Lazy.toStrict . Lazy.stripEnd) $ Lazy.lines $ Lazy.decodeUtf8 $ B.toLazyByteString content)
 
 
 formatImport :: (Commented Comments [UppercaseIdentifier], AST p (I.Fix (AST p)) 'ImportMethodNK) -> Elm
@@ -983,7 +989,7 @@ formatAstNode elmVersion importInfo =
                 ]
 
 
-formatRecordPair :: Text -> (C2 before after LowercaseIdentifier, C2 before after Elm, Bool) -> Elm
+formatRecordPair :: B.Builder -> (C2 before after LowercaseIdentifier, C2 before after Elm, Bool) -> Elm
 formatRecordPair delim (C (pre, postK) k, v, forceMultiline) =
     formatPreCommented $ C pre $
     ElmStructure.equalsPair delim forceMultiline
@@ -991,7 +997,7 @@ formatRecordPair delim (C (pre, postK) k, v, forceMultiline) =
         (formatCommented v)
 
 
-formatPair :: Text -> Pair Elm Elm -> Elm
+formatPair :: B.Builder -> Pair Elm Elm -> Elm
 formatPair delim (Pair a b (ForceMultiline forceMultiline)) =
     ElmStructure.equalsPair delim forceMultiline
         (formatTailCommented a)
@@ -1175,7 +1181,7 @@ formatExpression elmVersion importInfo aexpr =
             FormattedExpression SyntaxSeparated $
             formatExpression elmVersion importInfo expr
                 |> syntaxParens SpaceSeparated -- TODO: does this need a different context than SpaceSeparated?
-                |> ElmStructure.suffix (punc "." <> Block.identifier (Text.pack $ (\(LowercaseIdentifier l) -> l) field))
+                |> ElmStructure.suffix (punc "." <> Block.identifier (B.stringUtf8 $ (\(LowercaseIdentifier l) -> l) field))
 
         AccessFunction (LowercaseIdentifier field) ->
             FormattedExpression SyntaxSeparated $
@@ -1719,13 +1725,15 @@ formatInfixVar :: Ref [UppercaseIdentifier] -> Block.Line
 formatInfixVar var =
     case var of
         VarRef namespace (LowercaseIdentifier name) ->
-            Block.punc "`" <> Block.identifier (Text.intercalate "." ((Text.pack . (\(UppercaseIdentifier n) -> n) <$> namespace) ++ [Text.pack name])) <> Block.punc "`"
+            -- TODO: rewrite to use ByteString.Builder and avoid Text allocation
+            Block.punc "`" <> Block.identifierText (Text.intercalate "." ((Text.pack . (\(UppercaseIdentifier n) -> n) <$> namespace) ++ [Text.pack name])) <> Block.punc "`"
 
         TagRef namespace (UppercaseIdentifier name) ->
-            Block.punc "`" <> Block.identifier (Text.intercalate "." ((Text.pack . (\(UppercaseIdentifier n) -> n) <$> namespace) ++ [Text.pack name])) <> Block.punc "`"
+            -- TODO: rewrite to use ByteString.Builder and avoid Text allocation
+            Block.punc "`" <> Block.identifierText (Text.intercalate "." ((Text.pack . (\(UppercaseIdentifier n) -> n) <$> namespace) ++ [Text.pack name])) <> Block.punc "`"
 
         OpRef (SymbolIdentifier op) ->
-            Block.identifier $ Text.pack op
+            Block.identifier $ B.stringUtf8 op
 
 
 formatQualifiedIdentifier :: [UppercaseIdentifier] -> Text -> Elm

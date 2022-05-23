@@ -11,12 +11,13 @@ import Reporting.Annotation (Located)
 
 import Parse.TestHelpers
 import qualified Data.Indexed as I
+import qualified Data.Text.Lazy as Lazy
 
 
 expr :: ElmVersion -> IParser (I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK)
 expr = Parse.Pattern.expr
 
-example :: String -> String -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK -> SpecWith ()
+example :: String -> Lazy.Text -> I.Fix2 Located (ASTNS [UppercaseIdentifier]) 'PatternNK -> SpecWith ()
 example name input expected =
     it name $
         assertParse (expr Elm_0_19) input expected

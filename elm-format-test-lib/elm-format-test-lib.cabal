@@ -51,6 +51,7 @@ common common-options
 
     build-depends:
         base >= 4.15.0.0 && < 5,
+        bytestring >= 0.11.2.0 && < 0.12,
         containers >= 0.6.5.1 && < 0.7,
         filepath >= 1.4.2.1 && < 1.5,
         hspec >= 2.7.10 && < 3,

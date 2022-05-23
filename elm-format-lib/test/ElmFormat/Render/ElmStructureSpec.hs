@@ -1,10 +1,6 @@
 module ElmFormat.Render.ElmStructureSpec where
 
-import Elm.Utils ((|>))
-
 import Test.Hspec
-import qualified Data.Text.Lazy as LazyText
-import qualified Data.Text as Text
 
 import AST.V0_16
 import Text.PrettyPrint.Avh4.Block as Block
@@ -14,21 +10,14 @@ import qualified Data.Fix as Fix
 import qualified ElmFormat.Render.ElmStructure as ElmStructure
 import Data.List.NonEmpty(NonEmpty(..))
 import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Text.Lazy as Lazy
+import qualified Data.Text.Lazy.Encoding as Lazy
+import qualified Data.ByteString.Builder as B
 
 
-trim :: String -> String
-trim text =
-    text
-        |> LazyText.pack
-        |> LazyText.lines
-        |> map LazyText.stripEnd
-        |> LazyText.unlines
-        |> LazyText.unpack
-
-
-assertOutput :: String -> Elm -> Expectation
+assertOutput :: Lazy.Text -> Elm -> Expectation
 assertOutput expected actual =
-    expected `shouldBe` trim (Text.unpack $ Block.render $ Fix.cata ElmStructure.render actual)
+    expected `shouldBe` Lazy.decodeUtf8 (B.toLazyByteString $ Block.render $ Fix.cata ElmStructure.render actual)
 
 
 word :: Text -> Elm
@@ -59,7 +48,7 @@ spec = describe "ElmFormat.Render.ElmStructure" $ do
             application (FAJoinFirst JoinAll) a (b:|[c])
     it "application (multiline)" $
         assertOutput
-            ( unlines
+            ( Lazy.unlines
                 [ "aa"
                 , "aa"
                 , "    bb"
@@ -240,7 +229,7 @@ spec = describe "ElmFormat.Render.ElmStructure" $ do
                 ]
 
 
-shouldOutput :: Elm -> [Text] -> Expectation
+shouldOutput :: Elm -> [Lazy.Text] -> Expectation
 shouldOutput elm expected =
-    Block.render (Fix.cata ElmStructure.render elm)
-    `shouldBe` Text.unlines expected
+    Lazy.decodeUtf8 (B.toLazyByteString $ Block.render $ Fix.cata ElmStructure.render elm)
+    `shouldBe` Lazy.unlines expected

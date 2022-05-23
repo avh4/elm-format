@@ -1,47 +1,36 @@
 module Text.PrettyPrint.Avh4.BlockSpec where
 
-import Elm.Utils ((|>))
-
 import Test.Hspec
-import qualified Data.Text.Lazy as LazyText
-import qualified Data.Text as Text
 
 import Text.PrettyPrint.Avh4.Block
-import Data.Text (Text)
+import Data.ByteString (ByteString)
+import qualified Data.Text.Lazy as Lazy
+import qualified Data.ByteString.Builder as B
+import qualified Data.Text.Lazy.Encoding as Lazy
 
 
-trim :: String -> String
-trim text =
-    text
-        |> LazyText.pack
-        |> LazyText.lines
-        |> map LazyText.stripEnd
-        |> LazyText.unlines
-        |> LazyText.unpack
-
-
-assertLineOutput :: String -> Line -> Expectation
+assertLineOutput :: Lazy.Text -> Line -> Expectation
 assertLineOutput expected actual =
-    assertOutput (expected ++ "\n") (line actual)
+    assertOutput (expected <> "\n") (line actual)
 
 
-assertOutput :: String -> Block -> Expectation
+assertOutput :: Lazy.Text -> Block -> Expectation
 assertOutput expected actual =
-    expected `shouldBe` trim (Text.unpack $ render actual)
+    expected `shouldBe` Lazy.decodeUtf8 (B.toLazyByteString $ render actual)
 
 
-word :: Text -> Block
+word :: ByteString -> Block
 word =
-    line . identifier
+    line . identifierByteString
 
 
-block :: Text -> Block
+block :: ByteString -> Block
 block text =
     stack'
         (line $ w <> w)
         (line $ w <> w)
     where
-        w = identifier text
+        w = identifierByteString text
 
 
 spec :: Spec
@@ -88,7 +77,7 @@ spec = describe "Box" $ do
             ]
 
 
-shouldOutput :: Block -> [Text] -> Expectation
+shouldOutput :: Block -> [Lazy.Text] -> Expectation
 shouldOutput block expected =
-    render block
-    `shouldBe` Text.unlines expected
+    Lazy.decodeUtf8 (B.toLazyByteString $ render block)
+    `shouldBe` Lazy.unlines expected

@@ -3,8 +3,10 @@ module CommonMarkTests (construct) where
 import qualified CMark
 import Prelude hiding (init)
 import Test.Hspec hiding (example)
+import qualified Data.ByteString.Builder as B
 import qualified Data.Text as Strict
 import qualified Data.Text.Lazy as Text
+import qualified Data.Text.Lazy.Encoding as Text
 import qualified Data.Text.Lazy.IO as TextIO
 import qualified ElmFormat.Render.Markdown
 import qualified Parse.Markdown
@@ -130,7 +132,7 @@ makeTest i name input output =
       -- specOutput = Strict.map (\c -> if c == '→' then '\t' else c) $ Strict.pack output
   in
   it ("Example " ++ show i ++ ": " ++ name) $
-        CMark.commonmarkToHtml [] (Strict.pack formatted)
+        CMark.commonmarkToHtml [] (Text.toStrict $ Text.decodeUtf8 $ B.toLazyByteString formatted)
         `shouldBe` CMark.commonmarkToHtml [] source
 
 
