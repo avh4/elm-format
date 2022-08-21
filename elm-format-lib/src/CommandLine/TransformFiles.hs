@@ -127,7 +127,7 @@ validateNoChanges processingFile validate mode =
             lift (validate <$> readStdin) >>= logError onInfo
 
         ValidateFiles first rest ->
-            and <$> mapM validateFile (first:rest)
+            and <$> World.mapMConcurrently validateFile (first:rest)
             where
                 validateFile file =
                     (validate <$> readFromFile (onInfo . processingFile) file)

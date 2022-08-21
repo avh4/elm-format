@@ -61,3 +61,5 @@ class Monad m => World m where
 
     exitFailure :: m ()
     exitSuccess :: m ()
+
+    mapMConcurrently :: (Traversable t, NFData b) => (a -> m b) -> t a -> m (t b)

@@ -6,6 +6,7 @@ import Prelude ()
 import Relude hiding (getLine, putStr)
 
 import CommandLine.World
+import qualified Control.Concurrent.PooledIO.Final as Pool
 import qualified Data.Text as Text
 import qualified Data.Text.IO
 import qualified Data.ByteString.Lazy as Lazy
@@ -36,3 +37,5 @@ instance World IO where
 
     exitFailure = System.Exit.exitFailure
     exitSuccess = System.Exit.exitSuccess
+
+    mapMConcurrently f = Pool.run . traverse (Pool.fork . f)
