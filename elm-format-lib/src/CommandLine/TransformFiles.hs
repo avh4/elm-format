@@ -117,21 +117,31 @@ validateNoChanges ::
     -> ValidateMode
     -> m Bool
 validateNoChanges processingFile validate mode =
-    let
-        infoMode = ForMachine
-        onInfo = InfoFormatter.onInfo infoMode
-    in
-    runState (InfoFormatter.init infoMode) (InfoFormatter.done infoMode) $
+    -- let
+    --     infoMode = ForMachine
+    --     onInfo = InfoFormatter.onInfo infoMode
+    -- in
+    -- runState (InfoFormatter.init infoMode) (InfoFormatter.done infoMode) $
     case mode of
         ValidateStdin ->
-            lift (validate <$> readStdin) >>= logError onInfo
+            -- lift (validate <$> readStdin) >>= logError onInfo
+            undefined
 
         ValidateFiles first rest ->
-            and <$> World.mapMConcurrently validateFile (first:rest)
+            and <$> World.mapMConcurrently validateFile2 (first:rest)
             where
-                validateFile file =
-                    (validate <$> readFromFile (onInfo . processingFile) file)
-                        >>= logError onInfo
+                validateFile2 :: World m => FilePath -> m Bool
+                validateFile2 filePath =
+                    do
+                        content <- World.readUtf8File filePath
+                        logError onInfo2 (validate (filePath, content))
+
+                onInfo2 :: World m => error -> m ()
+                onInfo2 _ = return ()
+
+                -- validateFile file =
+                --     (validate <$> readFromFile (onInfo . processingFile) file)
+                --         >>= logError onInfo
 
 
 logErrorOr :: Monad m => (error -> m ()) -> (a -> m ()) -> Either error a -> m Bool

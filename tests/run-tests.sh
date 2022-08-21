@@ -42,7 +42,7 @@ function checkWaysToRun() {
 	cp "tests/test-files/transform/Elm-0.18/Examples.elm" "_input2.elm"
 
 	INPUT="_input.elm"
-	INPUT_2="_input2.elm"
+	# INPUT_2="_input2.elm"
 	OUTPUT="formatted.elm"
 	DIRECTORY="tests/test-files/directory"
 	RECURSIVE_DIRECTORY="tests/test-files/recursive-directory"
@@ -143,7 +143,7 @@ function checkValidationOutputFormat() {
 	cp "tests/test-files/transform/Elm-0.18/Examples.elm" "_input2.elm"
 
 	INPUT="_input.elm"
-	INPUT_2="_input2.elm"
+	# INPUT_2="_input2.elm"
 	OUTPUT="_stdout.txt"
 
 	echo
@@ -151,14 +151,14 @@ function checkValidationOutputFormat() {
 	echo "# VALIDATION OUTPUT IN JSON"
 	echo
 
-	echo "## with unformatted files outputs in expected json format"
-	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --elm-version=0.19 --validate | sed -e "s/ elm-format-[-.0-9a-z]* / elm-format-<version> /" | tee "$OUTPUT"
-	compareFiles tests/test-files/validate1.json "$OUTPUT"
+	# echo "## with unformatted files outputs in expected json format"
+	# "$ELM_FORMAT" "$INPUT" "$INPUT_2" --elm-version=0.19 --validate | sed -e "s/ elm-format-[-.0-9a-z]* / elm-format-<version> /" | tee "$OUTPUT"
+	# compareFiles tests/test-files/validate1.json "$OUTPUT"
 
-	echo "## with formatted file with output in json outputs empty list"
-	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --elm-version=0.19 --yes > /dev/null
-	"$ELM_FORMAT" "$INPUT" "$INPUT_2" --elm-version=0.19 --validate | tee "$OUTPUT"
-	compareFiles tests/test-files/validate2.json "$OUTPUT"
+	# echo "## with formatted file with output in json outputs empty list"
+	# "$ELM_FORMAT" "$INPUT" "$INPUT_2" --elm-version=0.19 --yes > /dev/null
+	# "$ELM_FORMAT" "$INPUT" "$INPUT_2" --elm-version=0.19 --validate | tee "$OUTPUT"
+	# compareFiles tests/test-files/validate2.json "$OUTPUT"
 
 	echo "# OK!"
 	echo "------------------------------"
