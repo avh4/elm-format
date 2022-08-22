@@ -7,7 +7,7 @@ module CommandLine.TransformFiles
 -- This module provides reusable functions for command line tools that
 -- transform files.
 
-import CommandLine.InfoFormatter (ExecuteMode(..))
+import CommandLine.InfoFormatter (ExecuteMode(..), InfoFormatterT)
 import qualified CommandLine.InfoFormatter as InfoFormatter
 import CommandLine.World (World)
 import qualified CommandLine.World as World
@@ -40,7 +40,9 @@ readStdin =
     (,) "<STDIN>" <$> World.getStdin
 
 
-readFromFile :: World m => (FilePath -> StateT s m ()) -> FilePath -> StateT s m (FilePath, Text)
+readFromFile ::
+    (MonadTrans t, World m, Applicative (t m)) =>
+    (FilePath -> t m ()) -> FilePath -> t m (FilePath, Text)
 readFromFile onProcessingFile filePath =
     onProcessingFile filePath
         *> lift (World.readUtf8FileWithPath filePath)
@@ -80,7 +82,7 @@ applyTransformation processingFile autoYes confirmPrompt transform mode =
 
         approve = InfoFormatter.approve infoMode autoYes . confirmPrompt
     in
-    runState (InfoFormatter.init infoMode) (InfoFormatter.done infoMode) $
+    InfoFormatter.runInfoFormatter infoMode $
     case mode of
         StdinToStdout ->
             lift (transform <$> readStdin) >>= logErrorOr onInfo (lift . World.writeStdout)
@@ -110,6 +112,7 @@ data ValidateMode
 
 
 validateNoChanges ::
+    forall m info.
     World m =>
     InfoFormatter.Loggable info =>
     (FilePath -> info)
@@ -121,7 +124,7 @@ validateNoChanges processingFile validate mode =
         infoMode = ForMachine
         onInfo = InfoFormatter.onInfo infoMode
     in
-    runState (InfoFormatter.init infoMode) (InfoFormatter.done infoMode) $
+    InfoFormatter.runInfoFormatter infoMode $
     case mode of
         ValidateStdin ->
             lift (validate <$> readStdin) >>= logError onInfo
@@ -129,6 +132,7 @@ validateNoChanges processingFile validate mode =
         ValidateFiles first rest ->
             and <$> mapM validateFile (first:rest)
             where
+                validateFile :: FilePath -> InfoFormatterT m Bool
                 validateFile file =
                     (validate <$> readFromFile (onInfo . processingFile) file)
                         >>= logError onInfo
@@ -146,13 +150,3 @@ logErrorOr onInfo fn result =
 logError :: Monad m => (error -> m ()) -> Either error () -> m Bool
 logError onInfo =
     logErrorOr onInfo return
-
-
-
-runState :: Monad m => (m (), state) -> (state -> m ()) -> StateT state m result -> m result
-runState (initM, initialState) done run =
-    do
-        initM
-        (result, finalState) <- runStateT run initialState
-        done finalState
-        return result

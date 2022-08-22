@@ -1,7 +1,10 @@
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module CommandLine.InfoFormatter
     ( ToConsole(..), Loggable(..)
     , onInfo, approve
     , ExecuteMode(..), init, done
+    , runInfoFormatter, InfoFormatterT
     ) where
 
 import Prelude hiding (init, putStrLn)
@@ -15,6 +18,7 @@ import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as LB
 import qualified Data.Aeson.Encoding.Internal as AesonInternal
+import Data.Kind (Type)
 
 
 class ToConsole a where
@@ -25,8 +29,22 @@ class ToConsole a => Loggable a where
     jsonInfoMessage :: a -> Maybe Aeson.Encoding
 
 
-onInfo :: (World m, Loggable info) => ExecuteMode -> info -> StateT Bool m ()
+newtype InfoFormatterT (m :: Type -> Type) a
+    = InfoFormatterT (StateT Bool m a)
+    deriving (Functor, Applicative, Monad, MonadTrans)
+
+runInfoFormatter :: World m => ExecuteMode -> InfoFormatterT m a -> m a
+runInfoFormatter mode (InfoFormatterT run) = do
+    let (initM, initialState) = init mode
+    initM
+    (result, finalState) <- runStateT run initialState
+    done mode finalState
+    return result
+
+
+onInfo :: (World m, Loggable info) => ExecuteMode -> info -> InfoFormatterT m ()
 onInfo mode info =
+    InfoFormatterT $
     case mode of
         ForMachine ->
             maybe (lift $ return ()) json $ jsonInfoMessage info
