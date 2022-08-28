@@ -19,6 +19,8 @@ import Test.Hspec.Golden ( Golden(..) )
 import qualified Data.Text.IO
 import Test.Hspec.Core.Spec (Example(..), Result(..), ResultStatus(..))
 import Test.Tasty.Hspec (shouldBe, Expectation)
+import qualified System.IO.Unsafe
+import Control.Concurrent.MVar
 
 
 data TestWorldState =
@@ -214,14 +216,23 @@ instance Example a => Example (TestWorld a) where
     evaluateExample e =
         evaluateExample (State.evalState e init)
 
+-- Stolen from: https://github.com/supermario/elm-tooling-compiler/blob/0f63c27e0f334ca680a568034953f9b3d16ba3db/ext-common/Ext/Common.hs#L82-L94
+-- This is needed by the tests using `goldenExitStdout` when using `-with-rtsopts=-N`
+-- which fail with this error otherwise:
+--
+--     uncaught exception: IOException of type ResourceBusy
+--     ./tests/usage.stdout/actual: openFile: resource busy (file is locked)
+{-# NOINLINE fileLock #-}
+fileLock :: MVar ()
+fileLock = System.IO.Unsafe.unsafePerformIO $ newMVar ()
 
 golden :: FilePath -> Text -> Golden Text
 golden name actualOutput =
     Golden
         { output = actualOutput
         , encodePretty = Text.unpack
-        , writeToFile = Data.Text.IO.writeFile
-        , readFromFile = Data.Text.IO.readFile
+        , writeToFile = \a b -> withMVar fileLock (\_ -> Data.Text.IO.writeFile a b)
+        , readFromFile = \a -> withMVar fileLock (\_ -> Data.Text.IO.readFile a)
         , testName = name
         , directory = "."
         , failFirstTime = True
