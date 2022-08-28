@@ -14,7 +14,6 @@ import qualified CommandLine.World as World
 import Control.Monad.State hiding (runState)
 import qualified Data.Either as Either
 import Data.Text (Text)
-import Relude.DeepSeq (NFData)
 
 
 
@@ -114,16 +113,21 @@ data ValidateMode
 validateNoChanges ::
     World m =>
     InfoFormatter.Loggable info =>
-    NFData info =>
     ((FilePath, Text) -> Either info ())
     -> ValidateMode
     -> m Bool
 validateNoChanges validate mode =
+    let
+        newValidate filePath content =
+            case validate (filePath, content) of
+                Left info -> Left (fmap InfoFormatter.aesonToText (InfoFormatter.jsonInfoMessage info))
+                Right value -> Right value
+    in
     case mode of
         ValidateStdin ->
             do
                 (filePath, content) <- readStdin
-                let result = validate (filePath, content)
+                let result = newValidate filePath content
                 World.putStrLn (InfoFormatter.resultsToJsonString [result])
                 return (Either.isRight result)
 
@@ -136,7 +140,7 @@ validateNoChanges validate mode =
                 validateFile filePath =
                     do
                         content <- World.readUtf8File filePath
-                        return (validate (filePath, content))
+                        return (newValidate filePath content)
 
 
 logErrorOr :: Monad m => (error -> m ()) -> (a -> m ()) -> Either error a -> m Bool

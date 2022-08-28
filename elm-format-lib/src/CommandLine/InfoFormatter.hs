@@ -2,7 +2,7 @@ module CommandLine.InfoFormatter
     ( ToConsole(..), Loggable(..)
     , onInfo, approve
     , ExecuteMode(..), init, done
-    , resultsToJsonString) where
+    , resultsToJsonString, aesonToText) where
 
 import Prelude hiding (init, putStrLn)
 
@@ -80,12 +80,14 @@ json jsvalue =
         lift $ World.putStrLn $ T.decodeUtf8 $ B.concat $ LB.toChunks $ AesonInternal.encodingToLazyByteString jsvalue
         put True
 
-resultsToJsonString :: Loggable info => [Either info ()] -> Text
+resultsToJsonString :: [Either (Maybe Text) ()] -> Text
 resultsToJsonString results =
     "[" <> lines <> "\n]"
     where
-        lines = intercalate "\n," $ map aesonToText $ Maybe.mapMaybe handleResult results
-        aesonToText = T.decodeUtf8 . B.concat . LB.toChunks . AesonInternal.encodingToLazyByteString
+        lines = intercalate "\n," $ Maybe.mapMaybe handleResult results
         handleResult = \case
-            Left info -> jsonInfoMessage info
+            Left info -> info
             Right () -> Nothing
+
+aesonToText :: AesonInternal.Encoding' a -> Text
+aesonToText = T.decodeUtf8 . B.concat . LB.toChunks . AesonInternal.encodingToLazyByteString
