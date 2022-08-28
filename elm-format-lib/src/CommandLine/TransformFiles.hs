@@ -94,7 +94,7 @@ applyTransformation processingFile autoYes confirmPrompt transform mode =
             do
                 canOverwrite <- InfoFormatter.approve autoYes $ confirmPrompt $ first:rest
                 if canOverwrite
-                    then and <$> mapM formatFile (first:rest)
+                    then and <$> World.mapMConcurrently formatFile (first:rest)
                     else return True
             where
                 formatFile file = readFromFile (onInfo . processingFile) file >>= logErrorOr onInfo updateFile . (\i -> checkChange i <$> transform i)
