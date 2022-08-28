@@ -7,11 +7,9 @@ module CommandLine.TransformFiles
 -- This module provides reusable functions for command line tools that
 -- transform files.
 
-import CommandLine.InfoFormatter (ExecuteMode(..))
 import qualified CommandLine.InfoFormatter as InfoFormatter
 import CommandLine.World (World)
 import qualified CommandLine.World as World
-import Control.Monad.State hiding (runState)
 import qualified Data.Either as Either
 import Data.Text (Text)
 
@@ -41,10 +39,11 @@ readStdin =
     (,) "<STDIN>" <$> World.getStdin
 
 
-readFromFile :: World m => (FilePath -> StateT s m ()) -> FilePath -> StateT s m (FilePath, Text)
+readFromFile :: World m => (FilePath -> m ()) -> FilePath -> m (FilePath, Text)
 readFromFile onProcessingFile filePath =
-    onProcessingFile filePath
-        *> lift (World.readUtf8FileWithPath filePath)
+    do
+        onProcessingFile filePath
+        World.readUtf8FileWithPath filePath
 
 
 data TransformMode
@@ -75,34 +74,30 @@ applyTransformation processingFile autoYes confirmPrompt transform mode =
                 FileToFile _ _ -> False
                 FilesInPlace _ _ -> False
 
-        infoMode = ForHuman usesStdout
+        onInfo info = InfoFormatter.putStrLn' usesStdout (InfoFormatter.toConsole info)
 
-        onInfo = InfoFormatter.onInfo infoMode
-
-        approve = InfoFormatter.approve infoMode autoYes . confirmPrompt
     in
-    runState (InfoFormatter.init infoMode) (InfoFormatter.done infoMode) $
     case mode of
         StdinToStdout ->
-            lift (transform <$> readStdin) >>= logErrorOr onInfo (lift . World.writeStdout)
+            readStdin >>= logErrorOr onInfo World.writeStdout . transform
 
         StdinToFile outputFile ->
-            lift (transform <$> readStdin) >>= logErrorOr onInfo (lift . World.writeUtf8File outputFile)
+            readStdin >>= logErrorOr onInfo (World.writeUtf8File outputFile) . transform
 
         FileToStdout inputFile ->
-            lift (transform <$> World.readUtf8FileWithPath inputFile) >>= logErrorOr onInfo (lift . World.writeStdout)
+            World.readUtf8FileWithPath inputFile >>= logErrorOr onInfo World.writeStdout . transform
 
         FileToFile inputFile outputFile ->
-            (transform <$> readFromFile (onInfo . processingFile) inputFile) >>= logErrorOr onInfo (lift . World.writeUtf8File outputFile)
+            readFromFile (onInfo . processingFile) inputFile >>= logErrorOr onInfo (World.writeUtf8File outputFile) . transform
 
         FilesInPlace first rest ->
             do
-                canOverwrite <- lift $ approve (first:rest)
+                canOverwrite <- InfoFormatter.approve autoYes $ confirmPrompt $ first:rest
                 if canOverwrite
-                    then all id <$> mapM formatFile (first:rest)
+                    then and <$> mapM formatFile (first:rest)
                     else return True
             where
-                formatFile file = ((\i -> checkChange i <$> transform i) <$> readFromFile (onInfo . processingFile) file) >>= logErrorOr onInfo (lift . updateFile)
+                formatFile file = readFromFile (onInfo . processingFile) file >>= logErrorOr onInfo updateFile . (\i -> checkChange i <$> transform i)
 
 
 data ValidateMode
@@ -151,12 +146,3 @@ logErrorOr onInfo fn result =
 
         Right value ->
             fn value *> return True
-
-
-runState :: Monad m => (m (), state) -> (state -> m ()) -> StateT state m result -> m result
-runState (initM, initialState) done run =
-    do
-        initM
-        (result, finalState) <- runStateT run initialState
-        done finalState
-        return result
