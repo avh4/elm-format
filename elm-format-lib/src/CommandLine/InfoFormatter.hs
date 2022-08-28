@@ -2,18 +2,19 @@ module CommandLine.InfoFormatter
     ( ToConsole(..), Loggable(..)
     , onInfo, approve
     , ExecuteMode(..), init, done
-    ) where
+    , resultsToJsonString) where
 
 import Prelude hiding (init, putStrLn)
 
 import CommandLine.World (World)
 import qualified CommandLine.World as World
 import Control.Monad.State
-import Data.Text (Text)
+import Data.Text (Text, intercalate)
 import qualified Data.Text.Encoding as T
 import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as LB
+import qualified Data.Maybe as Maybe
 import qualified Data.Aeson.Encoding.Internal as AesonInternal
 
 
@@ -78,3 +79,13 @@ json jsvalue =
         when printComma (lift $ World.putStr ",")
         lift $ World.putStrLn $ T.decodeUtf8 $ B.concat $ LB.toChunks $ AesonInternal.encodingToLazyByteString jsvalue
         put True
+
+resultsToJsonString :: Loggable info => [Either info ()] -> Text
+resultsToJsonString results =
+    "[" <> lines <> "\n]"
+    where
+        lines = intercalate "\n," $ map aesonToText $ Maybe.mapMaybe handleResult results
+        aesonToText = T.decodeUtf8 . B.concat . LB.toChunks . AesonInternal.encodingToLazyByteString
+        handleResult = \case
+            Left info -> jsonInfoMessage info
+            Right () -> Nothing

@@ -216,7 +216,6 @@ doIt elmVersion autoYes whatToDo =
     case whatToDo of
         Validate validateMode ->
             TransformFiles.validateNoChanges
-                ProcessingFile
                 (validate elmVersion)
                 validateMode
 

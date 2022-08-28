@@ -12,7 +12,9 @@ import qualified CommandLine.InfoFormatter as InfoFormatter
 import CommandLine.World (World)
 import qualified CommandLine.World as World
 import Control.Monad.State hiding (runState)
+import qualified Data.Either as Either
 import Data.Text (Text)
+import Relude.DeepSeq (NFData)
 
 
 
@@ -112,36 +114,29 @@ data ValidateMode
 validateNoChanges ::
     World m =>
     InfoFormatter.Loggable info =>
-    (FilePath -> info)
-    -> ((FilePath, Text) -> Either info ())
+    NFData info =>
+    ((FilePath, Text) -> Either info ())
     -> ValidateMode
     -> m Bool
-validateNoChanges processingFile validate mode =
-    -- let
-    --     infoMode = ForMachine
-    --     onInfo = InfoFormatter.onInfo infoMode
-    -- in
-    -- runState (InfoFormatter.init infoMode) (InfoFormatter.done infoMode) $
+validateNoChanges validate mode =
     case mode of
         ValidateStdin ->
-            -- lift (validate <$> readStdin) >>= logError onInfo
-            undefined
+            do
+                (filePath, content) <- readStdin
+                let result = validate (filePath, content)
+                World.putStrLn (InfoFormatter.resultsToJsonString [result])
+                return (Either.isRight result)
 
         ValidateFiles first rest ->
-            and <$> World.mapMConcurrently validateFile2 (first:rest)
+            do
+                results <- World.mapMConcurrently validateFile (first:rest)
+                World.putStrLn (InfoFormatter.resultsToJsonString results)
+                return (all Either.isRight results)
             where
-                validateFile2 :: World m => FilePath -> m Bool
-                validateFile2 filePath =
+                validateFile filePath =
                     do
                         content <- World.readUtf8File filePath
-                        logError onInfo2 (validate (filePath, content))
-
-                onInfo2 :: World m => error -> m ()
-                onInfo2 _ = return ()
-
-                -- validateFile file =
-                --     (validate <$> readFromFile (onInfo . processingFile) file)
-                --         >>= logError onInfo
+                        return (validate (filePath, content))
 
 
 logErrorOr :: Monad m => (error -> m ()) -> (a -> m ()) -> Either error a -> m Bool
@@ -152,11 +147,6 @@ logErrorOr onInfo fn result =
 
         Right value ->
             fn value *> return True
-
-logError :: Monad m => (error -> m ()) -> Either error () -> m Bool
-logError onInfo =
-    logErrorOr onInfo return
-
 
 
 runState :: Monad m => (m (), state) -> (state -> m ()) -> StateT state m result -> m result
