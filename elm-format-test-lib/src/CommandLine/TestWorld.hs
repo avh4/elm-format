@@ -122,6 +122,8 @@ instance Monad m => World (State.StateT TestWorldState m) where
     exitSuccess = modify $ const (LastExitCode $ Just 0)
     exitFailure = modify $ const (LastExitCode $ Just 1)
 
+    mapMConcurrently = mapM
+
 
 infixr 8 <<<
 (<<<) :: (c -> z) -> (a -> b -> c) -> a -> b -> z
