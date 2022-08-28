@@ -82,9 +82,9 @@ json jsvalue =
 
 resultsToJsonString :: [Either (Maybe Text) ()] -> Text
 resultsToJsonString results =
-    "[" <> lines <> "\n]"
+    if null lines then "[]" else "[" <> intercalate "\n," lines <> "\n]"
     where
-        lines = intercalate "\n," $ Maybe.mapMaybe handleResult results
+        lines = Maybe.mapMaybe handleResult results
         handleResult = \case
             Left info -> info
             Right () -> Nothing
