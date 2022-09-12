@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module ElmFormat.Cli (main, main') where
+module ElmFormat.Cli (mainIO, main, main') where
 
 import Prelude ()
 import Relude hiding (exitFailure, exitSuccess, putStr, putStrLn)
@@ -10,6 +10,7 @@ import AST.V0_16
 import CommandLine.Program (ProgramIO)
 import CommandLine.TransformFiles (TransformMode(..), ValidateMode(..))
 import CommandLine.World
+import CommandLine.World.RealWorld (runRealWorld)
 import ElmFormat.Messages
 import ElmVersion
 import Reporting.Annotation (Located)
@@ -107,14 +108,16 @@ determineWhatToDoFromConfig config resolvedInputFiles =
         mode <- determineMode (Flags._validate config) (Flags._json config)
         determineWhatToDo source destination mode
 
+mainIO :: List String -> IO ()
+mainIO = runRealWorld . main
 
-main :: World m => [String] -> m ()
+main :: World m => List String -> m ()
 main =
     main'
         ElmFormat.Version.asString
         ElmFormat.Version.experimental
 
-main' :: World m => String -> Maybe String -> [String] -> m ()
+main' :: World m => String -> Maybe String -> List String -> m ()
 main' elmFormatVersion experimental args =
     Program.run (Flags.parser elmFormatVersion experimental) run' args
     where
