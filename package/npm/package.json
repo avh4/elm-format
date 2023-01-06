@@ -2,13 +2,11 @@
   "name": "elm-format",
   "version": "0.8.5",
   "description": "Install elm-format",
-  "preferGlobal": true,
   "main": "index.js",
   "scripts": {
-    "install": "binwrap-install",
-    "prepare": "binwrap-prepare",
+    "install": "node index.js",
     "prepublish": "npm test",
-    "test": "eslint . && binwrap-test"
+    "test": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -23,6 +21,7 @@
     "url": "https://github.com/avh4/elm-format/issues"
   },
   "files": [
+    "binary.js",
     "index.js",
     "bin"
   ],
@@ -30,8 +29,10 @@
   "bin": {
     "elm-format": "bin/elm-format"
   },
-  "dependencies": {
-    "binwrap": "^0.2.3"
+  "optionalDependencies": {
+    "@avh4/elm-format-darwin-x64": "0.8.5",
+    "@avh4/elm-format-linux-x64": "0.8.5",
+    "@avh4/elm-format-win32-x64": "0.8.5"
   },
   "devDependencies": {
     "eslint": "^7.19.0"

@@ -1,3 +1,4 @@
 /node_modules/
-/bin/
+/packages/*/elm-format
+/packages/*/elm-format.exe
 /unpacked_bin/

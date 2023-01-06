@@ -59,6 +59,22 @@ Then `cd elm-tooling`, push the resulting branch, and make a PR to <https://gith
 
 ## NPM
 
+Repeat this for all the binary packages in `package/npm/packages/`. This uses `package/npm/packages/elm-format-darwin-x64` as an example.
+
+1. Go to the folder: `cd package/npm/packages/elm-format-darwin-x64`
+1. Copy the appropriate binary to `./elm-format`. For Windows: `./elm-format.exe`
+1. Double-check that you put the right binary in the right package: `file elm-format`
+1. Double-check that the file is executable: `ls -l elm-format`
+1. In `package.json` of the binary package, bump the version for example to `"0.8.6"`.
+1. In `package.json` of the main npm package, update `"optionalDependencies"` to point to the bumped version. For example: `"@avh4/elm-format-darwin-x64": "0.8.6"`.
+
+   Note: Pin the versions of the binary packages _exactly_ – no version ranges. This means that installing `elm-format@0.8.6` installs the exact same bytes in two years as today.
+1. Publish the package: `npm publish --access=public`
+
+   `--access=public` is needed because scoped packages are private by default.
+
+Then publish the main npm package:
+
 ```sh
 cd package/npm
 npm install
