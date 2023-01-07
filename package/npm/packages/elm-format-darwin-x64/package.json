@@ -5,5 +5,5 @@
   "repository": "https://github.com/avh4/elm-format",
   "license": "BSD-3-Clause",
   "os": [ "darwin" ],
-  "cpu": [ "x64" ]
+  "cpu": [ "x64", "arm64" ]
 }

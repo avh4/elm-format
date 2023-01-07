@@ -16,6 +16,12 @@ module.exports = function () {
 
   var subPackageName = `@avh4/elm-format-${requested}`;
 
+  // Temporary code to support ARM Mac via Rosetta until we have a native binary.
+  if (process.platform === "darwin" && process.arch === "arm64") {
+    // Note: remove "arm64" from this package when adding elm-format-darwin-arm64.
+    subPackageName = "@avh4/elm-format-darwin-x64";
+  }
+
   if (!(subPackageName in package.optionalDependencies)) {
     exitFailure(
       `The elm-format npm package does not support your platform (${requested}).`
