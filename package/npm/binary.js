@@ -8,16 +8,15 @@ module.exports = function () {
 
   var requested = `${os}-${arch}`;
   var current = `${process.platform}-${process.arch}`;
+  var subPackageName = `@avh4/elm-format-${requested}`;
+
   if (requested !== current) {
     console.error(
       `WARNING: Using binaries for the requested platform (${requested}) instead of for the actual platform (${current}).`
     );
   }
-
-  var subPackageName = `@avh4/elm-format-${requested}`;
-
   // Temporary code to support ARM Mac via Rosetta until we have a native binary.
-  if (process.platform === "darwin" && process.arch === "arm64") {
+  else if (requested === "darwin-arm64") {
     // Note: remove "arm64" from this package when adding elm-format-darwin-arm64.
     subPackageName = "@avh4/elm-format-darwin-x64";
   }
@@ -28,7 +27,7 @@ module.exports = function () {
     );
   }
 
-  var fileName = process.platform === "win32" ? "elm-format.exe" : "elm-format";
+  var fileName = os === "win32" ? "elm-format.exe" : "elm-format";
 
   try {
     var subBinaryPath = require.resolve(`${subPackageName}/${fileName}`);
@@ -49,7 +48,7 @@ module.exports = function () {
   );
 
   // On Windows, npm always invokes `node` so we cannot do any optimizations there either.
-  if (process.platform === "win32" || isYarnBerry) {
+  if (os === "win32" || isYarnBerry) {
     return subBinaryPath;
   }
 
