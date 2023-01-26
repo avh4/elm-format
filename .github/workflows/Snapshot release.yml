@@ -5,6 +5,7 @@ on:
     branches:
       - 'json'
       - 'new-parser-2021'
+      - 'snapshot/**'
 
 defaults:
   run:
