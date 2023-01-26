@@ -1,8 +1,5 @@
 { sources ? import nix/sources.nix, pkgs ? import sources.nixpkgs { } }:
-let
-  niv = import sources.niv { };
-
-  haskellPackages = pkgs.haskell.packages.ghc902;
+let haskellPackages = pkgs.haskell.packages.ghc902;
 in haskellPackages.shellFor {
   packages = p: [ ];
   buildInputs = with pkgs; [
@@ -15,7 +12,7 @@ in haskellPackages.shellFor {
     # Dev tools
     ghcid
     cabal2nix
-    niv.niv
+    niv
     nixfmt
     haskellPackages.haskell-language-server
   ];
