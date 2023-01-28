@@ -1,6 +1,6 @@
 {
   "name": "@avh4/elm-format-win32-x64",
-  "version": "0.8.5",
+  "version": "0.8.6-0",
   "description": "The Windows 64-bit binary for elm-format.",
   "repository": "https://github.com/avh4/elm-format",
   "license": "BSD-3-Clause",

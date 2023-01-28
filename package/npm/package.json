@@ -1,6 +1,6 @@
 {
   "name": "elm-format",
-  "version": "0.8.5",
+  "version": "0.8.6-0",
   "description": "Install elm-format",
   "main": "index.js",
   "scripts": {
@@ -30,9 +30,9 @@
     "elm-format": "bin/elm-format"
   },
   "optionalDependencies": {
-    "@avh4/elm-format-darwin-x64": "0.8.5",
-    "@avh4/elm-format-linux-x64": "0.8.5",
-    "@avh4/elm-format-win32-x64": "0.8.5"
+    "@avh4/elm-format-darwin-x64": "0.8.6-0",
+    "@avh4/elm-format-linux-x64": "0.8.6-0",
+    "@avh4/elm-format-win32-x64": "0.8.6-0"
   },
   "devDependencies": {
     "eslint": "^7.19.0"
