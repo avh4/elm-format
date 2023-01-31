@@ -17,6 +17,7 @@ jobs:
         os:
         - windows-latest
         - macOS-latest
+        - self-hosted
 
     name: release-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
