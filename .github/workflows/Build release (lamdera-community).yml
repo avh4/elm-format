@@ -72,3 +72,6 @@ jobs:
       with:
         name: elm-format-${{ github.sha }}-${{ runner.os }}
         path: dist/
+    - name: Show ghcup log
+      if: always()
+      run: cat ~/.ghcup/logs || true
