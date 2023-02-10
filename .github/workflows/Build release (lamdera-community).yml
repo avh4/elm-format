@@ -56,9 +56,9 @@ jobs:
         ./ghcup install cabal recommended
         ./ghcup set cabal recommended
         echo "$HOME/.cabal/bin" >> "$GITHUB_PATH"
-        ls -l "$HOME/.cabal/bin"
+        ls -l "$HOME/.cabal/bin" || true
         echo "$HOME/.ghcup/bin" >> "$GITHUB_PATH"
-        ls -l "$HOME/.ghcup/bin"
+        ls -l "$HOME/.ghcup/bin" || true
     - name: Verify Haskell version
       run: |
         cabal --version
