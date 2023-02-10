@@ -35,16 +35,16 @@ cabalProject name sourceFiles sourcePatterns deps testPatterns testDeps =
     do
         "_build/cabal/" </> name </> "build.ok" %> \out -> do
             hash <- needProjectFiles
-            cmd_ "cabal" $ addMacOSGhcOptionFFI ["v2-build", "-O0", (name ++ ":libs"), "--enable-tests"]
+            cmd_ "cabal" "v2-build" "-O0"  (name ++ ":libs") "--enable-tests"
             writeFile' out hash
 
         cabalBinPath name "noopt" %> \out -> do
             _ <- needProjectFiles
-            cmd_ "cabal" $ addMacOSGhcOptionFFI ["v2-build", "-O0", (name ++ ":exes"), "--enable-tests"]
+            cmd_ "cabal" "v2-build" "-O0" (name ++ ":exes") "--enable-tests"
 
         cabalBinPath name "opt" %> \out -> do
             _ <- needProjectFiles
-            cmd_ "cabal" $ addMacOSGhcOptionFFI ["v2-build", "-O2", (name ++ ":exes")]
+            cmd_ "cabal" "v2-build" "-O2" (name ++ ":exes")
 
         "_build/cabal/" </> name </> "test.ok" %> \out -> do
             need globalConfig
@@ -55,7 +55,7 @@ cabalProject name sourceFiles sourcePatterns deps testPatterns testDeps =
             need sourceFilesFromPatterns
             testFiles <- getDirectoryFiles "" testPatterns
             need testFiles
-            cmd_ "cabal" $ addMacOSGhcOptionFFI ["v2-test", "-O0", (name ++ ":tests"), "--test-show-details=streaming"]
+            cmd_ "cabal" "v2-test" "-O0" (name ++ ":tests") "--test-show-details=streaming"
             writeFile' out ""
 
 
