@@ -55,6 +55,7 @@ jobs:
         ./ghcup set ghc 9.2.5
         ./ghcup install cabal recommended
         ./ghcup set cabal recommended
+        export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
     - name: Verify Haskell version
       run: |
         cabal --version
