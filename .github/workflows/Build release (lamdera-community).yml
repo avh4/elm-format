@@ -47,6 +47,7 @@ jobs:
         curl -o ghcup https://downloads.haskell.org/~ghcup/0.1.19.0/aarch64-apple-darwin-ghcup-0.1.19.0
         chmod 0555 ./ghcup
         file ./ghcup
+        export GHCUP_USE_XDG_DIRS=1
         ./ghcup list
         ./ghcup unset ghc || true
         ./ghcup install ghc 9.2.5
