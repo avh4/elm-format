@@ -38,11 +38,18 @@ jobs:
       run: |
         rm -Rfv ~/.ghcup/ghc/9.2.5
         rm -Rfv ~/.ghcup/cabal/3.8.1.0
-    - uses: haskell/actions/setup@v2
-      name: Setup Haskell
-      id: setup-haskell
-      with:
-        ghc-version: 9.2.5
+    # - uses: haskell/actions/setup@v2
+    #   name: Setup Haskell
+    #   id: setup-haskell
+    #   with:
+    #     ghc-version: 9.2.5
+    - name: Setup Haskell
+      run: |
+        curl -o ghcup https://downloads.haskell.org/~ghcup/0.1.19.0/aarch64-apple-darwin-ghcup-0.1.19.0
+        file ./ghcup
+        ./ghcup unset ghc
+        ./ghcup install ghc 9.2.5
+        ./ghcup set ghc 9.2.5
     - name: Verify Haskell version
       run: |
         cabal --version
