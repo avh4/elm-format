@@ -66,8 +66,6 @@ jobs:
         cabal --version
         ghc --version
         ghc --print-build-platform
-        echo [[ $(ghc --numeric-version) == "${{ matrix.build.ghc.version }}" ]]
-        echo [[ $(ghc --print-build-platform) == "${{ matrix.build.ghc.build-platform }}" ]]
         [[ $(ghc --numeric-version) == "${{ matrix.build.ghc.version }}" ]]
         [[ $(ghc --print-build-platform) == "${{ matrix.build.ghc.build-platform }}" ]]
     - uses: actions/cache@v3
