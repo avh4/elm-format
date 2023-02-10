@@ -1,20 +1,22 @@
-module Shakefiles.Platform (Platform(..), Shakefiles.Platform.all, platform, zipFormatFor, cabalInstallOs, githubRunnerOs, binExt) where
+module Shakefiles.Platform (Platform(..), Shakefiles.Platform.all, platform, zipFormatFor, cabalInstallOs, ciArchiveLabel, binExt) where
 
 import qualified System.Info
 
 
-data Platform = Linux | Mac | Windows
+data Platform = Linux | MacX86 | MacArm64 | Windows
 
 instance Show Platform where
     show Linux = "linux-x64"
-    show Mac = "mac-x64"
+    show MacX86 = "mac-x64"
+    show MacArm64 = "mac-arm64"
     show Windows = "win-x64"
 
 
 all :: [Platform]
 all =
     [ Linux
-    , Mac
+    , MacX86
+    , MacArm64
     , Windows
     ]
 
@@ -23,8 +25,9 @@ platform :: Platform
 platform =
     case (System.Info.os, System.Info.arch) of
         ("linux", "x86_64") -> Linux
-        ("darwin", "x86_64") -> Mac
-        ("osx", "x86_64") -> Mac
+        ("darwin", "x86_64") -> MacX86
+        ("darwin", "aarch64") -> MacArm64
+        ("osx", "x86_64") -> MacX86
         ("mingw32", "x86_64") -> Windows
         ("win32", "x86_64") -> Windows
         other -> error ("unhandled operating system: " ++ show other)
@@ -33,22 +36,25 @@ platform =
 zipFormatFor :: Platform -> String
 zipFormatFor = \case
     Linux -> "tgz"
-    Mac -> "tgz"
+    MacX86 -> "tgz"
+    MacArm64 -> "tgz"
     Windows -> "zip"
 
 
 binExt :: Platform -> String
 binExt = \case
     Linux -> ""
-    Mac -> ""
+    MacX86 -> ""
+    MacArm64 -> ""
     Windows -> ".exe"
 
 
-githubRunnerOs :: Platform -> String
-githubRunnerOs = \case
+ciArchiveLabel :: Platform -> String
+ciArchiveLabel = \case
     Linux -> "Linux"
     Windows -> "Windows"
-    Mac -> "macOS"
+    MacX86 -> "macOS-x86"
+    MacArm64 -> "macOS-arm64"
 
 
 cabalInstallOs :: String

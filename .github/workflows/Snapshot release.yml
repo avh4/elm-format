@@ -5,6 +5,7 @@ on:
     branches:
       - 'json'
       - 'new-parser-2021'
+      - 'snapshot/**'
 
 defaults:
   run:
@@ -32,24 +33,27 @@ jobs:
       with:
         key: ${{ secrets.SNAPSHOT_SSH_KEY }}
         known_hosts: ${{ secrets.SNAPSHOT_KNOWN_HOSTS }}
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Workaround for https://github.com/actions/checkout/issues/290
       run: git fetch --tags --prune --unshallow --force
-    - uses: haskell/actions/setup@v1
+    - name: Workaround for https://github.com/actions/runner-images/issues/7061
+      if: ${{ runner.os == 'Linux' }}
+      run: sudo chown -R "$USER" /usr/local/.ghcup
+    - uses: haskell/actions/setup@v2
       name: Setup Haskell
       id: setup-haskell
       with:
-        ghc-version: 9.0.2
+        ghc-version: 9.2.5
     - name: Verify Haskell version
       run: |
         cabal --version
         ghc --version
-        [[ $(ghc --numeric-version) == 9.0.2 ]]
-    - uses: actions/cache@v2
-      name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+        [[ $(ghc --numeric-version) == 9.2.5 ]]
+    - uses: actions/cache@v3
+      name: Cache cabal-release-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
       with:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
-        key: cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+        key: cabal-release-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
     - run: cabal v2-update
     - run: ./build.sh -- dist-dependencies
     - run: ./build.sh -- dist

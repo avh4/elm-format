@@ -18,7 +18,7 @@ import Control.Monad.Identity (Identity)
 import Test.Hspec.Golden ( Golden(..) )
 import qualified Data.Text.IO
 import Test.Hspec.Core.Spec (Example(..), Result(..), ResultStatus(..))
-import Test.Tasty.Hspec (shouldBe, Expectation)
+import Test.Hspec (shouldBe, Expectation)
 import qualified System.IO.Unsafe
 import Control.Concurrent.MVar
 
