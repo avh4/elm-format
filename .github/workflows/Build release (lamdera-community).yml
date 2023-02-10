@@ -17,9 +17,8 @@ jobs:
         build:
         - name: macOS-ARM64
           runner: [ self-hosted, macOS, ARM64 ]
-          ghc:
-            version: "9.2.5"
-            build-platform: aarch64-apple-darwin
+          ghc-version: "9.2.5"
+          ghc-build-platform: aarch64-apple-darwin
 
     name: release-${{ matrix.build.name }}
     runs-on: ${{ matrix.build.runner }}
@@ -47,8 +46,8 @@ jobs:
         ./ghcup list
         export GHCUP_SKIP_UPDATE_CHECK=1
         ./ghcup unset ghc || true
-        ./ghcup install ghc ${{ matrix.ghc.version }}
-        ./ghcup set ghc ${{ matrix.ghc.version }}
+        ./ghcup install ghc "${{ matrix.ghc-version }}"
+        ./ghcup set ghc "${{ matrix.ghc-version }}"
         ./ghcup install cabal recommended
         ./ghcup set cabal recommended
         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
@@ -63,10 +62,10 @@ jobs:
         cabal --version
         ghc --version
         ghc --print-build-platform
-        echo [[ $(ghc --numeric-version) == ${{ matrix.ghc.version }} ]]
-        echo [[ $(ghc --print-build-platform) == ${{ matrix.ghc-build-platform }} ]]
-        [[ $(ghc --numeric-version) == ${{ matrix.ghc.version }} ]]
-        [[ $(ghc --print-build-platform) == ${{ matrix.ghc-build-platform }} ]]
+        echo [[ $(ghc --numeric-version) == "${{ matrix.ghc-version }}" ]]
+        echo [[ $(ghc --print-build-platform) == "${{ matrix.ghc-build-platform }}" ]]
+        [[ $(ghc --numeric-version) == "${{ matrix.ghc-version }}" ]]
+        [[ $(ghc --print-build-platform) == "${{ matrix.ghc-build-platform }}" ]]
     - uses: actions/cache@v3
       name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:
