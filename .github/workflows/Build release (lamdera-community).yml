@@ -17,6 +17,7 @@ jobs:
         build:
         - name: macOS-ARM64
           runner: [ self-hosted, macOS, ARM64 ]
+          archive-label: macOS-arm64
           ghc:
             version: "9.2.5"
             build-platform: aarch64-apple-darwin
@@ -78,5 +79,5 @@ jobs:
     - run: ./build.sh -- dist
     - uses: actions/upload-artifact@v3
       with:
-        name: elm-format-${{ github.sha }}-${{ runner.os }}
+        name: elm-format-${{ github.sha }}-${{ matrix.build.archive-label }}
         path: dist/

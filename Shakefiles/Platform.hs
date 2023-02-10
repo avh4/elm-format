@@ -1,4 +1,4 @@
-module Shakefiles.Platform (Platform(..), Shakefiles.Platform.all, platform, zipFormatFor, cabalInstallOs, githubRunnerOs, binExt) where
+module Shakefiles.Platform (Platform(..), Shakefiles.Platform.all, platform, zipFormatFor, cabalInstallOs, ciArchiveLabel, binExt) where
 
 import qualified System.Info
 
@@ -49,12 +49,12 @@ binExt = \case
     Windows -> ".exe"
 
 
-githubRunnerOs :: Platform -> String
-githubRunnerOs = \case
+ciArchiveLabel :: Platform -> String
+ciArchiveLabel = \case
     Linux -> "Linux"
     Windows -> "Windows"
-    MacX86 -> "macOS"
-    MacArm64 -> "macOS"
+    MacX86 -> "macOS-x86"
+    MacArm64 -> "macOS-arm64"
 
 
 cabalInstallOs :: String
