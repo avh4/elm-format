@@ -38,6 +38,8 @@ jobs:
         cabal --version
         ghc --version
         [[ $(ghc --numeric-version) == 9.2.5 ]]
+        file "$(which cabal)"
+        file "$(which ghc)"
     - uses: actions/cache@v3
       name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:
