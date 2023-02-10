@@ -31,6 +31,7 @@ jobs:
         uname -m
         arch
         arch -arm64 uname -m
+        file ~/runner-setups/elm-format/_work/_tool/ghcup/0.1.19.0/arm64/ghcup
     - name: Workaround for https://github.com/actions/checkout/issues/290
       run: git fetch --tags --prune --unshallow --force
     - name: Clean x86 ghcup cache
