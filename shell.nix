@@ -1,5 +1,5 @@
 { sources ? import nix/sources.nix, pkgs ? import sources.nixpkgs { } }:
-let haskellPackages = pkgs.haskell.packages.ghc902;
+let haskellPackages = pkgs.haskell.packages.ghc925;
 in haskellPackages.shellFor {
   packages = p: [ ];
   buildInputs = with pkgs; [

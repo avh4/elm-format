@@ -3,7 +3,7 @@
 module ElmFormat.AST.BinaryOperatorPrecedenceTest where
 
 import Prelude hiding (or)
-import Test.Tasty.Hspec
+import Test.Hspec
 import qualified ElmFormat.AST.BinaryOperatorPrecedence as BinaryOperatorPrecedence
 import ElmFormat.AST.BinaryOperatorPrecedence (Tree(..), Precedence(..), Associativity(..))
 import ElmFormat.AST.Shared
