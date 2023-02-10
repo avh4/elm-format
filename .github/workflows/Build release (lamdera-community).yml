@@ -74,4 +74,4 @@ jobs:
         path: dist/
     - name: Show ghcup log
       if: always()
-      run: cat ~/.ghcup/logs || true
+      run: (find ~/.ghcup/logs -print0 | xargs -0 cat) || true
