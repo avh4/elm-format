@@ -52,7 +52,9 @@ jobs:
         ./ghcup install cabal recommended
         ./ghcup set cabal recommended
         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-        echo "cabal-store=$HOME/.cabal/store" >> "$GITHUB_OUTPUT"
+        cabalStore="$GITHUB_WORKSPACE/_cabal-store"
+        ~/.local/bin/cabal --store-dir="$cabalStore" v2-configure
+        echo "cabal-store=$cabalStore" >> "$GITHUB_OUTPUT"
     - name: Workaround for https://gitlab.haskell.org/ghc/ghc/-/issues/20592#note_436353
       run: |
         echo "C_INCLUDE_PATH=$(xcrun --show-sdk-path)/usr/include/ffi" >> "$GITHUB_ENV"
