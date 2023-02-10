@@ -61,11 +61,15 @@ jobs:
         ls -l "$HOME/.ghcup/bin" || true
     - name: Verify Haskell version
       run: |
+        echo "$PATH"
+        cat "$GITHUB_PATH"
+        which cabal
+        file "$(which cabal)"
         cabal --version
+        which ghc
+        file "$(which ghc)"
         ghc --version
         [[ $(ghc --numeric-version) == 9.2.5 ]]
-        file "$(which cabal)"
-        file "$(which ghc)"
     - uses: actions/cache@v3
       name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:
