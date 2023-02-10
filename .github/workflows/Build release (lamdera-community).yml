@@ -17,6 +17,9 @@ jobs:
         build:
         - name: macOS-ARM64
           runner: [ self-hosted, macOS, ARM64 ]
+          ghc:
+            version: 9.2.5
+            build-platform: aarch64-apple-darwin
 
     name: release-${{ matrix.build.name }}
     runs-on: ${{ matrix.build.runner }}
@@ -34,11 +37,6 @@ jobs:
         file ~/runner-setups/elm-format/_work/_tool/ghcup/0.1.19.0/arm64/ghcup
     - name: Workaround for https://github.com/actions/checkout/issues/290
       run: git fetch --tags --prune --unshallow --force
-    # - uses: haskell/actions/setup@v2
-    #   name: Setup Haskell
-    #   id: setup-haskell
-    #   with:
-    #     ghc-version: 9.2.5
     - name: Setup Haskell
       id: setup-haskell
       run: |
@@ -49,19 +47,24 @@ jobs:
         ./ghcup list
         export GHCUP_SKIP_UPDATE_CHECK=1
         ./ghcup unset ghc || true
-        ./ghcup install ghc 9.2.5
-        ./ghcup set ghc 9.2.5
+        ./ghcup install ghc "${{ matrix.ghc.version }}"
+        ./ghcup set ghc "${{ matrix.ghc.version }}"
         ./ghcup install cabal recommended
         ./ghcup set cabal recommended
         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
         echo "cabal-store=$HOME/.cabal/store" >> "$GITHUB_OUTPUT"
+    - name: Workaround for https://gitlab.haskell.org/ghc/ghc/-/issues/20592#note_436353
+      run: |
+        echo "C_INCLUDE_PATH=$(xcrun --show-sdk-path)/usr/include/ffi" >> "$GITHUB_ENV"
+        cat "$GITHUB_ENV"
     - name: Verify Haskell version
       run: |
         file "$(which cabal)"
         cabal --version
         ghc --version
         ghc --print-build-platform
-        [[ $(ghc --numeric-version) == 9.2.5 ]]
+        [[ $(ghc --numeric-version) == "${{ matrix.ghc.version }}"
+        [[ $(ghc --print-build-platform) == "${{ matrix.ghc-build-platform }}" ]]
     - uses: actions/cache@v3
       name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:
