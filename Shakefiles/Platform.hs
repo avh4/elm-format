@@ -3,10 +3,16 @@ module Shakefiles.Platform (Platform(..), Shakefiles.Platform.all, platform, zip
 import qualified System.Info
 
 
-data Platform = Linux | MacX86 | MacArm64 | Windows
+data Platform
+    = LinuxX86
+    | LinuxAarch64
+    | MacX86
+    | MacArm64
+    | Windows
 
 instance Show Platform where
-    show Linux = "linux-x64"
+    show LinuxX86 = "linux-x64"
+    show LinuxAarch64 = "linux-aarch64"
     show MacX86 = "mac-x64"
     show MacArm64 = "mac-arm64"
     show Windows = "win-x64"
@@ -14,7 +20,8 @@ instance Show Platform where
 
 all :: [Platform]
 all =
-    [ Linux
+    [ LinuxX86
+    , LinuxAarch64
     , MacX86
     , MacArm64
     , Windows
@@ -24,7 +31,8 @@ all =
 platform :: Platform
 platform =
     case (System.Info.os, System.Info.arch) of
-        ("linux", "x86_64") -> Linux
+        ("linux", "x86_64") -> LinuxX86
+        ("linux", "aarch64") -> LinuxAarch64
         ("darwin", "x86_64") -> MacX86
         ("darwin", "aarch64") -> MacArm64
         ("osx", "x86_64") -> MacX86
@@ -35,7 +43,8 @@ platform =
 
 zipFormatFor :: Platform -> String
 zipFormatFor = \case
-    Linux -> "tgz"
+    LinuxX86 -> "tgz"
+    LinuxAarch64 -> "tgz"
     MacX86 -> "tgz"
     MacArm64 -> "tgz"
     Windows -> "zip"
@@ -43,7 +52,8 @@ zipFormatFor = \case
 
 binExt :: Platform -> String
 binExt = \case
-    Linux -> ""
+    LinuxX86 -> ""
+    LinuxAarch64 -> ""
     MacX86 -> ""
     MacArm64 -> ""
     Windows -> ".exe"
@@ -51,7 +61,8 @@ binExt = \case
 
 ciArchiveLabel :: Platform -> String
 ciArchiveLabel = \case
-    Linux -> "Linux"
+    LinuxX86 -> "Linux-x86"
+    LinuxAarch64 -> "Linux-aarch64"
     Windows -> "Windows"
     MacX86 -> "macOS-x86"
     MacArm64 -> "macOS-arm64"

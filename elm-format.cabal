@@ -93,6 +93,6 @@ test-Suite elm-format-tests
         tasty-quickcheck >= 0.10.1 && < 0.11,
         QuickCheck >= 2.12.6.1 && < 3,
         quickcheck-io >= 0.2.0 && < 0.3,
-        bimap >= 0.4.0 && < 0.5,
+        bimap >= 0.4.0 && < 0.6,
         cmark >= 0.6 && < 0.7,
         elm-format-test-lib
