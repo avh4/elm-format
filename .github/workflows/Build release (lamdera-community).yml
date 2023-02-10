@@ -25,7 +25,7 @@ jobs:
     - name: Configure environment
       run: |
         git config --global core.autocrlf false
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Workaround for https://github.com/actions/checkout/issues/290
       run: git fetch --tags --prune --unshallow --force
     - uses: haskell/actions/setup@v2
@@ -38,7 +38,7 @@ jobs:
         cabal --version
         ghc --version
         [[ $(ghc --numeric-version) == 9.2.5 ]]
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
@@ -46,7 +46,7 @@ jobs:
     - run: cabal v2-update
     - run: ./build.sh -- dist-dependencies
     - run: ./build.sh -- dist
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: elm-format-${{ github.sha }}-${{ runner.os }}
         path: dist/
