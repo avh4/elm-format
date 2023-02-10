@@ -26,6 +26,11 @@ jobs:
       run: |
         git config --global core.autocrlf false
     - uses: actions/checkout@v3
+    - name: Check platform
+      run: |
+        uname -m
+        arch
+        arch -arm64 uname -m
     - name: Workaround for https://github.com/actions/checkout/issues/290
       run: git fetch --tags --prune --unshallow --force
     - name: Clean x86 ghcup cache
