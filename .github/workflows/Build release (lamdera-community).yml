@@ -63,8 +63,8 @@ jobs:
         cabal --version
         ghc --version
         ghc --print-build-platform
-        [[ $(ghc --numeric-version) == "${{ matrix.ghc.version }}" ]]
-        [[ $(ghc --print-build-platform) == "${{ matrix.ghc-build-platform }}" ]]
+        [[ $(ghc --numeric-version) == ${{matrix.ghc.version}} ]]
+        [[ $(ghc --print-build-platform) == ${{matrix.ghc-build-platform}} ]]
     - uses: actions/cache@v3
       name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:
@@ -77,6 +77,3 @@ jobs:
       with:
         name: elm-format-${{ github.sha }}-${{ runner.os }}
         path: dist/
-    - name: Show ghcup log
-      if: always()
-      run: (find ~/.ghcup/logs -print0 | xargs -0 cat) || true
