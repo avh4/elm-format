@@ -15,5 +15,6 @@ in haskellPackages.shellFor {
     niv
     nixfmt
     haskellPackages.haskell-language-server
+    unzip
   ];
 }

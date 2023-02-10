@@ -112,7 +112,8 @@ executable target projectName gitDescribe =
                 ]
         let buildOnCi =
                 [ Shakefiles.Platform.Windows
-                , Shakefiles.Platform.Mac
+                , Shakefiles.Platform.MacX86
+                , Shakefiles.Platform.MacArm64
                 ]
 
         forEach buildInDocker $ \target -> do
@@ -134,7 +135,7 @@ executable target projectName gitDescribe =
                 cmd_ "tar" "zcvf" out "-C" binDir binFile
 
         forEach buildOnCi $ \target -> do
-            let githubRunnerOs = Shakefiles.Platform.githubRunnerOs target
+            let ciArchiveLabel = Shakefiles.Platform.ciArchiveLabel target
             let zipExt = Shakefiles.Platform.zipFormatFor target
 
             [ "_build" </> "github-ci" </> "unzipped" </> projectName ++ "-*-" ++ show target <.> zipExt,
@@ -143,7 +144,7 @@ executable target projectName gitDescribe =
                 let outDir = takeDirectory zip
                 let tag = drop (length projectName + 1) $ (reverse . drop (length (show target) + 1) . reverse) $ dropExtension $ takeFileName zip
                 StdoutTrim sha <- cmd "git" "rev-list" "-n1" ("tags/" ++ tag)
-                let ciArchive = "downloads" </> projectName ++ "-" ++ sha ++ "-" ++ githubRunnerOs <.> "zip"
+                let ciArchive = "downloads" </> projectName ++ "-" ++ sha ++ "-" ++ ciArchiveLabel <.> "zip"
                 need [ ciArchive ]
                 liftIO $ removeFiles "." [ zip, sig ]
                 cmd_ "unzip" "-o" "-d" outDir ciArchive

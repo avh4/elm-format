@@ -1,8 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches: '**'
   pull_request:
     branches:
     - main
@@ -37,15 +35,10 @@ jobs:
       with:
         ghc-version: 9.2.5
     - uses: actions/cache@v3
-      name: Cache cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+      name: Cache cabal-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
       with:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
-        key: cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
-    # - uses: actions/cache@v3
-    #   name: Cache dist
-    #   with:
-    #     path: dist-newstyle
-    #     key: dist-v1-${{ runner.os }}
+        key: cabal-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
     - run: cabal v2-update
     - run: ./build.sh -- dependencies
     - run: ./build.sh -- build
