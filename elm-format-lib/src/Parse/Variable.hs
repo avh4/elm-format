@@ -24,7 +24,7 @@ import qualified Data.Char as Char
 --import qualified Data.Set as Set
 import Data.Word (Word8)
 import Foreign.Ptr (Ptr, plusPtr)
-import GHC.Exts (Char(C#), Int#, (+#), (-#), chr#, uncheckedIShiftL#, word2Int#)
+import GHC.Exts (Char(C#), Int#, (+#), (-#), chr#, uncheckedIShiftL#, word2Int#, word8ToWord#)
 import GHC.Word (Word8(W8#))
 --
 --import qualified AST.Source as Src
@@ -387,4 +387,4 @@ chr4 pos firstWord =
 
 unpack :: Word8 -> Int#
 unpack (W8# word#) =
-  word2Int# word#
+  word2Int# (word8ToWord# word#)

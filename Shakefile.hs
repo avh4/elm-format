@@ -20,7 +20,11 @@ main = do
       shakeChange = ChangeModtimeAndDigest,
       shakeColor = True,
       shakeVersion = shakefilesHash
-    } $ do
+    } rules
+
+
+rules :: Rules ()
+rules = do
 
     StdoutTrim gitDescribe <- liftIO $ cmd "git" [ "describe", "--abbrev=8", "--match", "[0-9]*", "--always" ]
     StdoutTrim gitSha <- liftIO $ cmd "git" [ "describe", "--always", "--match", "NOT A TAG", "--dirty" ]
