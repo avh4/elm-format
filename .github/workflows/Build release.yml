@@ -15,10 +15,10 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - name: windows-latest
+          - name: windows
             runner: windows-latest
             archive-label: Windows
-          - name: macOS-latest
+          - name: macOS-x86
             runner: macOS-latest
             archive-label: macOS-x86
 
