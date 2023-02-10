@@ -47,8 +47,8 @@ jobs:
         ./ghcup list
         export GHCUP_SKIP_UPDATE_CHECK=1
         ./ghcup unset ghc || true
-        ./ghcup install ghc "${{ matrix.ghc.version }}"
-        ./ghcup set ghc "${{ matrix.ghc.version }}"
+        ./ghcup install ghc ${{ matrix.ghc.version }}
+        ./ghcup set ghc ${{ matrix.ghc.version }}
         ./ghcup install cabal recommended
         ./ghcup set cabal recommended
         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
