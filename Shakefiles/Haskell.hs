@@ -108,7 +108,7 @@ executable target projectName gitDescribe =
                 Shakefiles.Platform.all
 
         let buildInDocker =
-                [ Shakefiles.Platform.Linux
+                [ Shakefiles.Platform.LinuxX86
                 ]
         let buildOnCi =
                 [ Shakefiles.Platform.Windows
