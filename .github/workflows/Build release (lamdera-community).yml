@@ -49,10 +49,12 @@ jobs:
         file ./ghcup
         export GHCUP_USE_XDG_DIRS=1
         ./ghcup list
+        export GHCUP_SKIP_UPDATE_CHECK=1
         ./ghcup unset ghc || true
         ./ghcup install ghc 9.2.5
         ./ghcup set ghc 9.2.5
         ./ghcup install cabal recommended
+        ./ghcup set cabal recommended
     - name: Verify Haskell version
       run: |
         cabal --version
