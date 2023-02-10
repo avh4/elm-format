@@ -70,10 +70,10 @@ jobs:
         [[ $(ghc --numeric-version) == "${{ matrix.build.ghc.version }}" ]]
         [[ $(ghc --print-build-platform) == "${{ matrix.build.ghc.build-platform }}" ]]
     - uses: actions/cache@v3
-      name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+      name: Cache cabal-release-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
       with:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
-        key: cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+        key: cabal-release-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
     - run: cabal v2-update
     - run: ./build.sh -- dist-dependencies
     - run: ./build.sh -- dist
