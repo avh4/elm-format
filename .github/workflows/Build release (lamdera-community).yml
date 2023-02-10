@@ -40,6 +40,7 @@ jobs:
     #   with:
     #     ghc-version: 9.2.5
     - name: Setup Haskell
+      id: setup-haskell
       run: |
         curl -o ghcup https://downloads.haskell.org/~ghcup/0.1.19.0/aarch64-apple-darwin-ghcup-0.1.19.0
         chmod 0555 ./ghcup
@@ -53,17 +54,13 @@ jobs:
         ./ghcup install cabal recommended
         ./ghcup set cabal recommended
         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-        ls -l "$HOME/.local/bin" || true
+        echo "cabal-store=$HOME/.cabal/store" >> "$GITHUB_OUTPUT"
     - name: Verify Haskell version
       run: |
-        echo "$PATH"
-        cat "$GITHUB_PATH"
-        which cabal
         file "$(which cabal)"
         cabal --version
-        which ghc
-        file "$(which ghc)"
         ghc --version
+        ghc --print-build-platform
         [[ $(ghc --numeric-version) == 9.2.5 ]]
     - uses: actions/cache@v3
       name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
