@@ -27,18 +27,18 @@ jobs:
     - name: Configure environment
       run: |
         git config --global core.autocrlf false
-    - uses: actions/checkout@v2
-    - uses: haskell/actions/setup@v1
+    - uses: actions/checkout@v3
+    - uses: haskell/actions/setup@v2
       name: Setup Haskell
       id: setup-haskell
       with:
         ghc-version: 9.2.5
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: Cache cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
       with:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
         key: cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
-    # - uses: actions/cache@v2
+    # - uses: actions/cache@v3
     #   name: Cache dist
     #   with:
     #     path: dist-newstyle
