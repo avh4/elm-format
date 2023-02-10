@@ -112,7 +112,8 @@ executable target projectName gitDescribe =
                 ]
         let buildOnCi =
                 [ Shakefiles.Platform.Windows
-                , Shakefiles.Platform.Mac
+                , Shakefiles.Platform.MacX86
+                , Shakefiles.Platform.MacArm64
                 ]
 
         forEach buildInDocker $ \target -> do
