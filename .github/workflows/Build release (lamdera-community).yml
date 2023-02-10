@@ -30,8 +30,8 @@ jobs:
       run: git fetch --tags --prune --unshallow --force
     - name: Check ghcup cache
       run: |
-        (find ~/.ghcup/ghc/bin | xargs -n1 file) || true
-        (find ~/.ghcup/cabal/bin | xargs -n1 file) || true
+        (find ~/.ghcup/ghc/9.2.5/bin | xargs -n1 file) || true
+        (find ~/.ghcup/cabal/*/bin | xargs -n1 file) || true
     - uses: haskell/actions/setup@v2
       name: Setup Haskell
       id: setup-haskell
