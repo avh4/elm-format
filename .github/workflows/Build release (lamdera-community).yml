@@ -46,6 +46,7 @@ jobs:
     - name: Setup Haskell
       run: |
         curl -o ghcup https://downloads.haskell.org/~ghcup/0.1.19.0/aarch64-apple-darwin-ghcup-0.1.19.0
+        chmod 0555 ./ghcup
         file ./ghcup
         ./ghcup unset ghc
         ./ghcup install ghc 9.2.5
