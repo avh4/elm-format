@@ -1,8 +1,12 @@
+inputs:
+  cabal-store:
+    required: false
+    default: ~/.cabal/store
 runs:
   using: "composite"
   steps:
     - name: Cache ~/.cabal/store
       uses: actions/cache@v3
       with:
-        path: ${{ steps.setup-haskell.outputs.cabal-store }}
+        path: ${{ inputs.cabal-store }}
         key: cabal-v3-${{ runner.os }}-${{ runner.arch }}

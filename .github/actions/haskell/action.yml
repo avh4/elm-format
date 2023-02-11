@@ -19,5 +19,7 @@ runs:
         file "$(which cabal)"
         file "$(which ghc)"
     - uses: ./.github/actions/cache-haskell-deps
+      with:
+        cabal-store: ${{ steps.setup-haskell.outputs.cabal-store }}
     - shell: bash
       run: cabal v2-update
