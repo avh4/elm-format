@@ -3,13 +3,13 @@ cradle:
     - path: "./Shakefile/src"
       component: "build-elm-format:exe:build-elm-format"
 
-    - path: "./avh4-lib/"
+    - path: "./avh4-lib/src/"
       component: "lib:avh4-lib"
 
     - path: "./avh4-lib/test/"
       component: "avh4-lib:test:al-tests"
 
-    - path: "./elm-format-lib/"
+    - path: "./elm-format-lib/src/"
       component: "lib:elm-format-lib"
 
     - path: "./elm-format-lib/test/"
@@ -18,7 +18,7 @@ cradle:
     - path: "./elm-format-markdown/"
       component: "lib:elm-format-markdown"
 
-    - path: "./elm-format-test-lib/"
+    - path: "./elm-format-test-lib/src/"
       component: "lib:elm-format-test-lib"
 
     - path: "./elm-format-test-lib/test/"
