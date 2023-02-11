@@ -47,7 +47,7 @@ common common-options
         pooled-io >= 0.0.2 && < 0.1,
         process >= 1.6.13.2 && < 2,
         relude >= 1.1.0.0 && < 1.2,
-        text >= 1.2.5.0 && < 2
+        text >= 2.0 && < 3
 
 
 library
