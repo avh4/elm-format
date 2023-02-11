@@ -1,0 +1,33 @@
+name: Touch cache
+
+on:
+  schedule:
+  - cron: "16 11 * * 3,6"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+        - ubuntu-latest
+        - windows-latest
+        # - macOS-latest
+
+    name: touch-cache-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/cache@v3
+      name: Cache ~/.cabal/store
+      with:
+        path: ${{ steps.setup-haskell.outputs.cabal-store }}
+        key: cabal-v3-${{ runner.os }}-${{ runner.arch }}
+    - uses: actions/cache@v3
+      name: Cache .shake.cache
+      with:
+        path: .shake.cache
+        key: shake-v1-${{ runner.os }}-${{ runner.arch }}
