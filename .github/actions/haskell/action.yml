@@ -18,8 +18,12 @@ runs:
         [[ $(ghc --numeric-version) == 9.2.5 ]]
         file "$(which cabal)"
         file "$(which ghc)"
-    - uses: ./.github/actions/cache-haskell-deps
+    - name: Cache ~/.cabal/store
+      uses: actions/cache@v3
       with:
-        cabal-store: ${{ steps.setup-haskell.outputs.cabal-store }}
+        path: ${{ steps.setup-haskell.outputs.cabal-store }}
+        key: cabal-v3-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
+        restore-keys: |
+          cabal-v3-${{ runner.os }}-${{ runner.arch }}-
     - shell: bash
       run: cabal v2-update
