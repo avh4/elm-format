@@ -19,7 +19,7 @@ jobs:
         os:
         - ubuntu-latest
         - macOS-latest
-        # - windows-latest
+        - windows-latest
 
     name: snapshot-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -38,6 +38,9 @@ jobs:
     - uses: ./.github/actions/haskell
     - run: ./dev/build.sh -- dist-dependencies
     - run: ./dev/build.sh -- dist
+    - name: Install rsync (Windows)
+      if: runner.os == 'Windows'
+      uses: GuillaumeFalourd/setup-rsync@2b503a403f7185e6872bbc56f903d7395ddd75a2
     - name: Upload snapshot
       run: |
         branchName="${BRANCH#refs/heads/}"
