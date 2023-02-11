@@ -24,5 +24,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
+    - name: Configure environment
+      run: |
+        git config --global core.autocrlf false
+    - uses: actions/checkout@v3
     - uses: ./.github/actions/cache-haskell-deps
     - uses: ./.github/actions/cache-build
