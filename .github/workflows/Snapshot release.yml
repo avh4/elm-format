@@ -39,6 +39,10 @@ jobs:
     - run: ./dev/build.sh -- dist-dependencies
     - run: ./dev/build.sh -- dist
     - name: Upload snapshot
-      run: rsync -va --mkpath dist/ "${{ secrets.SNAPSHOT_DEST }}/${BRANCH#refs/heads/}/$(git describe)/"
+      run: |
+        branchName="${BRANCH#refs/heads/}"
+        mkdir -pv "_upload/$branchName/"
+        mv -v dist "_upload/$branchName/$(git describe)/"
+        rsync -va _upload/ "${{ secrets.SNAPSHOT_DEST }}/"
       env:
         BRANCH: ${{ github.ref }}
