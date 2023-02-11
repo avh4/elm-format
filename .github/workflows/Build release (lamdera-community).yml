@@ -30,14 +30,13 @@ jobs:
       run: |
         git config --global core.autocrlf false
     - uses: actions/checkout@v3
+    - uses: ./.github/actions/git-tags
     - name: Check platform
       run: |
         uname -m
         arch
         arch -arm64 uname -m
         file ~/runner-setups/elm-format/_work/_tool/ghcup/0.1.19.0/arm64/ghcup
-    - name: Workaround for https://github.com/actions/checkout/issues/290
-      run: git fetch --tags --prune --unshallow --force
     - name: Setup Haskell
       id: setup-haskell
       run: |

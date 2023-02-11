@@ -1,0 +1,7 @@
+name: Fetch git tags
+
+runs:
+  using: "composite"
+  steps:
+    - name: Workaround for https://github.com/actions/checkout/issues/290
+      run: git fetch --tags --prune --unshallow --force
