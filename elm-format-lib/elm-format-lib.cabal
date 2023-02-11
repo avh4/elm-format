@@ -85,7 +85,7 @@ common common-options
         filepath >= 1.4.2.1 && < 2,
         ghc-prim >= 0.5.2,
         mtl >= 2.2.2 && < 3,
-        optparse-applicative >= 0.16.1.0 && < 0.17,
+        optparse-applicative >= 0.17.0.0 && < 0.18,
         process >= 1.6.13.2 && < 2,
         relude >= 1.1.0.0 && < 1.2,
         text >= 1.2.5.0 && < 2,
