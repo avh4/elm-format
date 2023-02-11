@@ -14,12 +14,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-        - windows-latest
-        - macOS-latest
+        build:
+          - name: windows
+            runner: windows-latest
+            archive-label: Windows
+          - name: macOS-x86
+            runner: macOS-latest
+            archive-label: macOS-x86
 
-    name: release-${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: release-${{ matrix.build.name }}
+    runs-on: ${{ matrix.build.runner }}
 
     steps:
     - name: Configure environment
@@ -32,33 +36,38 @@ jobs:
         rm private.key
       env:
         GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Workaround for https://github.com/actions/checkout/issues/290
       run: git fetch --tags --prune --unshallow --force
-    - uses: haskell/actions/setup@v1
+    - name: Workaround for https://github.com/actions/runner-images/issues/7061
+      if: ${{ runner.os == 'Linux' }}
+      run: sudo chown -R "$USER" /usr/local/.ghcup
+    - uses: haskell/actions/setup@v2
       name: Setup Haskell
       id: setup-haskell
       with:
-        ghc-version: 9.0.2
+        ghc-version: 9.2.5
     - name: Verify Haskell version
       run: |
         cabal --version
         ghc --version
-        [[ $(ghc --numeric-version) == 9.0.2 ]]
-    - uses: actions/cache@v2
-      name: Cache cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+        [[ $(ghc --numeric-version) == 9.2.5 ]]
+        file "$(which cabal)"
+        file "$(which ghc)"
+    - uses: actions/cache@v3
+      name: Cache ~/.cabal/store
       with:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
-        key: cabal-release-v1-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+        key: cabal-v3-${{ runner.os }}-${{ runner.arch }}
     - run: cabal v2-update
-    - run: ./build.sh -- dist-dependencies
-    - run: ./build.sh -- dist
-    - name: Sign artifacts
-      run: |
-        for i in dist/*; do
-          gpg --verbose --local-user 1508E30E65C8C21F --output "$i".sig --detach-sig "$i"
-        done
-    - uses: actions/upload-artifact@v2
+    - run: ./dev/build.sh -- dist-dependencies
+    - run: ./dev/build.sh -- dist
+    # - name: Sign artifacts
+    #  run: |
+    #    for i in dist/*; do
+    #      gpg --verbose --local-user 1508E30E65C8C21F --output "$i".sig --detach-sig "$i"
+    #    done
+    - uses: actions/upload-artifact@v3
       with:
-        name: elm-format-${{ github.sha }}-${{ runner.os }}
+        name: elm-format-${{ github.sha }}-${{ matrix.build.archive-label }}
         path: dist/

@@ -40,7 +40,7 @@ brew install keybase
 
 ## Publishing
 
-1. Run `./build.sh publish-<new version>`
+1. Run `dev/build.sh publish-<new version>`
 1. Go to the release page for the new tag on github.
 1. Enter the contents of `Release Notes/<new version>.md` as the release notes.
 1. Upload the zip, tgz and asc files.
@@ -51,7 +51,7 @@ brew install keybase
 
 ```sh
 cd package/elm-tooling
-./build.sh
+dev/build.sh
 ```
 
 Then `cd elm-tooling`, push the resulting branch, and make a PR to <https://github.com/elm-tooling/elm-tooling-cli> with the title "`Add elm-format <new version>`"
@@ -92,7 +92,7 @@ npm dist-tag add elm-format@<new version> latest-0.19.1
 
 ```sh
 cd package/nix
-./build.sh
+dev/build.sh
 ```
 
 Then `cd nixpkgs`, push the resulting branch, and make a PR to <https://github.com/NixOS/nixpkgs> with the title "`elm-format: <old version> -> <new version>`"

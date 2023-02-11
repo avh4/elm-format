@@ -7,11 +7,11 @@ tasks:
     init: |
       curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 BOOTSTRAP_HASKELL_MINIMAL=1 sh
       source "$GHCUP_INSTALL_BASE_PREFIX/.ghcup/env"
-      ghcup install ghc 9.0.2
-      ghcup set ghc 9.0.2
+      ghcup install ghc 9.2.5
+      ghcup set ghc 9.2.5
       ghcup install cabal
       cabal update
-      ./build.sh
+      ./dev/build.sh
     command: ./_build/elm-format
 
 vscode:

@@ -15,12 +15,17 @@ import Shakefiles.Extra
 
 main :: IO ()
 main = do
-    shakefilesHash <- getHashedShakeVersion [ "Shakefile.hs" ]
+    shakefiles <- getDirectoryFilesIO "" [ "Shakefile/src//*.hs" ]
+    shakefilesHash <- getHashedShakeVersion shakefiles
     shakeArgs shakeOptions{
       shakeChange = ChangeModtimeAndDigest,
       shakeColor = True,
       shakeVersion = shakefilesHash
-    } $ do
+    } rules
+
+
+rules :: Rules ()
+rules = do
 
     StdoutTrim gitDescribe <- liftIO $ cmd "git" [ "describe", "--abbrev=8", "--match", "[0-9]*", "--always" ]
     StdoutTrim gitSha <- liftIO $ cmd "git" [ "describe", "--always", "--match", "NOT A TAG", "--dirty" ]
@@ -53,6 +58,7 @@ main = do
         removeFilesAfter "dist-newstyle" [ "//*" ]
         removeFilesAfter "_build" [ "//*" ]
         removeFilesAfter ".shake" [ "//*" ]
+        removeFilesAfter ".shake.cache" [ "//*" ]
         removeFilesAfter "."
             [ "_input.elm"
             , "_input2.elm"

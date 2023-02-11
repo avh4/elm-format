@@ -11,7 +11,7 @@ rules shellcheck = do
 
     "_build/shellcheck.ok" %> \out -> do
         scriptFiles <- getDirectoryFiles ""
-            [ "build.sh"
+            [ "dev/build.sh"
             , "tests/run-tests.sh"
             , "package/elm-tooling/build.sh"
             , "package/elm-tooling/generate.sh"

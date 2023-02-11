@@ -4,7 +4,7 @@ import Elm.Utils ((|>))
 import Data.FileTree (FileTree)
 import qualified Data.FileTree as FileTree
 import Data.Text (Text)
-import Test.Tasty.Hspec
+import Test.Hspec
 import System.FilePath (pathSeparator)
 
 

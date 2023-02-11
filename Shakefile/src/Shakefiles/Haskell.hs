@@ -67,7 +67,7 @@ cabalBinPath projectName opt =
                 "elm-format" -> "0.8.5"
                 _ -> "0.0.0"
     in
-    "dist-newstyle/build" </> Shakefiles.Platform.cabalInstallOs </> "ghc-9.0.2" </> projectName ++ "-" ++ version </> "x" </> projectName </> opt </> "build" </> projectName </> projectName <.> exe
+    "dist-newstyle/build" </> Shakefiles.Platform.cabalInstallOs </> "ghc-9.2.5" </> projectName ++ "-" ++ version </> "x" </> projectName </> opt </> "build" </> projectName </> projectName <.> exe
 
 
 executable :: FilePath -> String -> String -> Rules ()
@@ -108,11 +108,12 @@ executable target projectName gitDescribe =
                 Shakefiles.Platform.all
 
         let buildInDocker =
-                [ Shakefiles.Platform.Linux
+                [ Shakefiles.Platform.LinuxX86
                 ]
         let buildOnCi =
                 [ Shakefiles.Platform.Windows
-                , Shakefiles.Platform.Mac
+                , Shakefiles.Platform.MacX86
+                , Shakefiles.Platform.MacArm64
                 ]
 
         forEach buildInDocker $ \target -> do
@@ -134,7 +135,7 @@ executable target projectName gitDescribe =
                 cmd_ "tar" "zcvf" out "-C" binDir binFile
 
         forEach buildOnCi $ \target -> do
-            let githubRunnerOs = Shakefiles.Platform.githubRunnerOs target
+            let ciArchiveLabel = Shakefiles.Platform.ciArchiveLabel target
             let zipExt = Shakefiles.Platform.zipFormatFor target
 
             [ "_build" </> "github-ci" </> "unzipped" </> projectName ++ "-*-" ++ show target <.> zipExt,
@@ -143,7 +144,7 @@ executable target projectName gitDescribe =
                 let outDir = takeDirectory zip
                 let tag = drop (length projectName + 1) $ (reverse . drop (length (show target) + 1) . reverse) $ dropExtension $ takeFileName zip
                 StdoutTrim sha <- cmd "git" "rev-list" "-n1" ("tags/" ++ tag)
-                let ciArchive = "downloads" </> projectName ++ "-" ++ sha ++ "-" ++ githubRunnerOs <.> "zip"
+                let ciArchive = "downloads" </> projectName ++ "-" ++ sha ++ "-" ++ ciArchiveLabel <.> "zip"
                 need [ ciArchive ]
                 liftIO $ removeFiles "." [ zip, sig ]
                 cmd_ "unzip" "-o" "-d" outDir ciArchive

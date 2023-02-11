@@ -2,7 +2,8 @@ name: CI
 
 on:
   push:
-    branches: '**'
+    branches:
+    - main
   pull_request:
     branches:
     - main
@@ -27,31 +28,34 @@ jobs:
     - name: Configure environment
       run: |
         git config --global core.autocrlf false
-    - uses: actions/checkout@v2
-    - uses: haskell/actions/setup@v1
+    - uses: actions/checkout@v3
+    - name: Workaround for https://github.com/actions/runner-images/issues/7061
+      if: ${{ runner.os == 'Linux' }}
+      run: sudo chown -R "$USER" /usr/local/.ghcup
+    - uses: haskell/actions/setup@v2
       name: Setup Haskell
       id: setup-haskell
       with:
-        ghc-version: 9.0.2
-    - uses: actions/cache@v2
-      name: Cache cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
+        ghc-version: 9.2.5
+    - uses: actions/cache@v3
+      name: Cache ~/.cabal/store
       with:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
-        key: cabal-v2-${{ runner.os }}-${{ hashFiles('cabal.project.freeze') }}
-    # - uses: actions/cache@v2
-    #   name: Cache dist
-    #   with:
-    #     path: dist-newstyle
-    #     key: dist-v1-${{ runner.os }}
+        key: cabal-v3-${{ runner.os }}-${{ runner.arch }}
     - run: cabal v2-update
-    - run: ./build.sh -- dependencies
-    - run: ./build.sh -- build
+    - uses: actions/cache@v3
+      name: Cache .shake.cache
+      with:
+        path: .shake.cache
+        key: shake-v1-${{ runner.os }}-${{ runner.arch }}
+    - run: ./dev/build.sh -- dependencies
+    - run: ./dev/build.sh -- build
     - name: Tests
       if: runner.os != 'Windows'
       run: |
-        ./build.sh
+        ./dev/build.sh
     - name: Tests (for Windows)
       if: runner.os == 'Windows'
       run: |
-        ./build.sh -- unit-tests
+        ./dev/build.sh -- unit-tests
         echo "##[warning]integration tests are currently disabled on Windows CI"

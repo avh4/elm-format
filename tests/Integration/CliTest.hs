@@ -1,7 +1,7 @@
 module Integration.CliTest (spec_spec) where
 
 import CommandLine.TestWorld
-import Test.Tasty.Hspec hiding (Success)
+import Test.Hspec
 import qualified ElmFormat.Cli as ElmFormat
 import Data.Text (Text)
 import qualified Data.Text as Text
