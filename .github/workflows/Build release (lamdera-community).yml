@@ -70,13 +70,13 @@ jobs:
         [[ $(ghc --numeric-version) == "${{ matrix.build.ghc.version }}" ]]
         [[ $(ghc --print-build-platform) == "${{ matrix.build.ghc.build-platform }}" ]]
     - uses: actions/cache@v3
-      name: Cache cabal-release-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
+      name: Cache ~/.cabal/store
       with:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
-        key: cabal-release-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
+        key: cabal-v3-${{ runner.os }}-${{ runner.arch }}
     - run: cabal v2-update
-    - run: ./build.sh -- dist-dependencies
-    - run: ./build.sh -- dist
+    - run: ./dev/build.sh -- dist-dependencies
+    - run: ./dev/build.sh -- dist
     - uses: actions/upload-artifact@v3
       with:
         name: elm-format-${{ github.sha }}-${{ matrix.build.archive-label }}
