@@ -3,8 +3,8 @@ set -euxo pipefail
 
 
 ## Run tests
-./build.sh -- clean
-./build.sh
+./dev/build.sh -- clean
+./dev/build.sh
 
 ## Build binaries
-./build.sh -- dist
+./dev/build.sh -- dist

@@ -15,7 +15,8 @@ import Shakefiles.Extra
 
 main :: IO ()
 main = do
-    shakefilesHash <- getHashedShakeVersion [ "Shakefile.hs" ]
+    shakefiles <- getDirectoryFilesIO "" [ "Shakefile/src//*.hs" ]
+    shakefilesHash <- getHashedShakeVersion shakefiles
     shakeArgs shakeOptions{
       shakeChange = ChangeModtimeAndDigest,
       shakeColor = True,
@@ -57,6 +58,7 @@ rules = do
         removeFilesAfter "dist-newstyle" [ "//*" ]
         removeFilesAfter "_build" [ "//*" ]
         removeFilesAfter ".shake" [ "//*" ]
+        removeFilesAfter ".shake.cache" [ "//*" ]
         removeFilesAfter "."
             [ "_input.elm"
             , "_input2.elm"
