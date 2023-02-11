@@ -55,10 +55,10 @@ jobs:
         file "$(which cabal)"
         file "$(which ghc)"
     - uses: actions/cache@v3
-      name: Cache cabal-release-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
+      name: Cache cabal-v3-${{ runner.os }}-${{ runner.arch }}
       with:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
-        key: cabal-release-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
+        key: cabal-v3-${{ runner.os }}-${{ runner.arch }}
     - run: cabal v2-update
     - run: ./dev/build.sh -- dist-dependencies
     - run: ./dev/build.sh -- dist
