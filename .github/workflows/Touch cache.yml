@@ -3,9 +3,6 @@ name: Touch cache
 on:
   schedule:
   - cron: "16 11 * * 3,6"
-  push:
-    branches:
-    - ci-cache
 
 defaults:
   run:
