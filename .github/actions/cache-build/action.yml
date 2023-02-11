@@ -6,3 +6,8 @@ runs:
       with:
         path: .shake.cache
         key: shake-v1-${{ runner.os }}-${{ runner.arch }}
+    - name: Cache dist-newstyle
+      uses: actions/cache@v3
+      with:
+        path: dist-newstyle
+        key: cabal-dist-v1-${{ runner.os }}-${{ runner.arch }}
