@@ -1,0 +1,8 @@
+runs:
+  using: "composite"
+  steps:
+    - name: Cache .shake.cache
+      uses: actions/cache@v3
+      with:
+        path: .shake.cache
+        key: shake-v1-${{ runner.os }}-${{ runner.arch }}

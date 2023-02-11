@@ -22,8 +22,4 @@ jobs:
 
     steps:
     - uses: ./.github/actions/cache-haskell-deps
-    - uses: actions/cache@v3
-      name: Cache .shake.cache
-      with:
-        path: .shake.cache
-        key: shake-v1-${{ runner.os }}-${{ runner.arch }}
+    - uses: ./.github/actions/cache-build

@@ -30,11 +30,7 @@ jobs:
         git config --global core.autocrlf false
     - uses: actions/checkout@v3
     - uses: ./.github/actions/haskell
-    - uses: actions/cache@v3
-      name: Cache .shake.cache
-      with:
-        path: .shake.cache
-        key: shake-v1-${{ runner.os }}-${{ runner.arch }}
+    - uses: ./.github/actions/cache-build
     - run: ./dev/build.sh -- dependencies
     - run: ./dev/build.sh -- build
     - name: Tests
