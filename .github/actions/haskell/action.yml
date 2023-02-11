@@ -1,0 +1,24 @@
+runs:
+  using: "composite"
+  steps:
+    - name: Workaround for https://github.com/actions/runner-images/issues/7061
+      if: ${{ runner.os == 'Linux' }}
+      run: sudo chown -R "$USER" /usr/local/.ghcup
+    - uses: haskell/actions/setup@v2
+      name: Setup Haskell
+      id: setup-haskell
+      with:
+        ghc-version: 9.2.5
+    - name: Verify Haskell version
+      run: |
+        cabal --version
+        ghc --version
+        [[ $(ghc --numeric-version) == 9.2.5 ]]
+        file "$(which cabal)"
+        file "$(which ghc)"
+    - uses: actions/cache@v3
+      name: Cache ~/.cabal/store
+      with:
+        path: ${{ steps.setup-haskell.outputs.cabal-store }}
+        key: cabal-v3-${{ runner.os }}-${{ runner.arch }}
+    - run: cabal v2-update

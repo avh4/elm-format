@@ -29,20 +29,7 @@ jobs:
       run: |
         git config --global core.autocrlf false
     - uses: actions/checkout@v3
-    - name: Workaround for https://github.com/actions/runner-images/issues/7061
-      if: ${{ runner.os == 'Linux' }}
-      run: sudo chown -R "$USER" /usr/local/.ghcup
-    - uses: haskell/actions/setup@v2
-      name: Setup Haskell
-      id: setup-haskell
-      with:
-        ghc-version: 9.2.5
-    - uses: actions/cache@v3
-      name: Cache ~/.cabal/store
-      with:
-        path: ${{ steps.setup-haskell.outputs.cabal-store }}
-        key: cabal-v3-${{ runner.os }}-${{ runner.arch }}
-    - run: cabal v2-update
+    - uses: ./.github/actions/haskell
     - uses: actions/cache@v3
       name: Cache .shake.cache
       with:
