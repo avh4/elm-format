@@ -306,7 +306,7 @@ ghcup install ghc 9.2.5
 ghcup set ghc 9.2.5
 
 # build
-./build.sh -- build
+dev/build.sh -- build
 
 # run the built elm-format
 ./_build/elm-format
@@ -315,5 +315,5 @@ ghcup set ghc 9.2.5
 ### Running tests
 
 ```bash
-./build.sh
+dev/build.sh
 ```

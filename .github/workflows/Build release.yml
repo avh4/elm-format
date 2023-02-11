@@ -60,8 +60,8 @@ jobs:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
         key: cabal-release-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
     - run: cabal v2-update
-    - run: ./build.sh -- dist-dependencies
-    - run: ./build.sh -- dist
+    - run: ./dev/build.sh -- dist-dependencies
+    - run: ./dev/build.sh -- dist
     # - name: Sign artifacts
     #  run: |
     #    for i in dist/*; do

@@ -40,14 +40,14 @@ jobs:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
         key: cabal-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
     - run: cabal v2-update
-    - run: ./build.sh -- dependencies
-    - run: ./build.sh -- build
+    - run: ./dev/build.sh -- dependencies
+    - run: ./dev/build.sh -- build
     - name: Tests
       if: runner.os != 'Windows'
       run: |
-        ./build.sh
+        ./dev/build.sh
     - name: Tests (for Windows)
       if: runner.os == 'Windows'
       run: |
-        ./build.sh -- unit-tests
+        ./dev/build.sh -- unit-tests
         echo "##[warning]integration tests are currently disabled on Windows CI"
