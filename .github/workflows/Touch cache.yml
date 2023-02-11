@@ -21,11 +21,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/cache@v3
-      name: Cache ~/.cabal/store
-      with:
-        path: ${{ steps.setup-haskell.outputs.cabal-store }}
-        key: cabal-v3-${{ runner.os }}-${{ runner.arch }}
+    - uses: ./.github/actions/cache-haskell-deps
     - uses: actions/cache@v3
       name: Cache .shake.cache
       with:
