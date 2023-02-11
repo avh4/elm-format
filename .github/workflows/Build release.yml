@@ -41,12 +41,4 @@ jobs:
     - uses: ./.github/actions/haskell
     - run: ./dev/build.sh -- dist-dependencies
     - run: ./dev/build.sh -- dist
-    # - name: Sign artifacts
-    #  run: |
-    #    for i in dist/*; do
-    #      gpg --verbose --local-user 1508E30E65C8C21F --output "$i".sig --detach-sig "$i"
-    #    done
-    - uses: actions/upload-artifact@v3
-      with:
-        name: elm-format-${{ github.sha }}-${{ matrix.build.archive-label }}
-        path: dist/
+    - uses: ./.github/actions/release-artifact

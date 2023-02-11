@@ -72,7 +72,4 @@ jobs:
     - run: cabal v2-update
     - run: ./dev/build.sh -- dist-dependencies
     - run: ./dev/build.sh -- dist
-    - uses: actions/upload-artifact@v3
-      with:
-        name: elm-format-${{ github.sha }}-${{ matrix.build.archive-label }}
-        path: dist/
+    - uses: ./.github/actions/release-artifact
