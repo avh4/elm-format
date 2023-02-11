@@ -38,7 +38,7 @@ jobs:
       with:
         ghc-version: 9.2.5
     - uses: actions/cache@v3
-      name: Cache cabal-v3-${{ runner.os }}-${{ runner.arch }}
+      name: Cache ~/.cabal/store
       with:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
         key: cabal-v3-${{ runner.os }}-${{ runner.arch }}

@@ -70,7 +70,7 @@ jobs:
         [[ $(ghc --numeric-version) == "${{ matrix.build.ghc.version }}" ]]
         [[ $(ghc --print-build-platform) == "${{ matrix.build.ghc.build-platform }}" ]]
     - uses: actions/cache@v3
-      name: Cache cabal-v3-${{ runner.os }}-${{ runner.arch }}
+      name: Cache ~/.cabal/store
       with:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
         key: cabal-v3-${{ runner.os }}-${{ runner.arch }}
