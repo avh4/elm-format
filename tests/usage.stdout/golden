@@ -2,6 +2,7 @@ elm-format x.x.x
 
 Usage: elm-format [INPUT] [--output FILE] [--yes] [--validate] [--stdin] 
                   [--elm-version VERSION]
+
   Format Elm source files.
 
 Available options:
