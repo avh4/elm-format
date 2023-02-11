@@ -15,11 +15,6 @@ module.exports = function () {
       `WARNING: Using binaries for the requested platform (${requested}) instead of for the actual platform (${current}).`
     );
   }
-  // Temporary code to support ARM Mac via Rosetta until we have a native binary.
-  else if (requested === "darwin-arm64") {
-    // Note: remove "arm64" from this package when adding elm-format-darwin-arm64.
-    subPackageName = "@avh4/elm-format-darwin-x64";
-  }
 
   if (!(subPackageName in package.optionalDependencies)) {
     exitFailure(

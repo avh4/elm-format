@@ -1,9 +1,9 @@
 {
-  "name": "@avh4/elm-format-darwin-x64",
+  "name": "@avh4/elm-format-darwin-arm64",
   "version": "0.8.6-0",
-  "description": "The macOS 64-bit binary for elm-format.",
+  "description": "The macOS ARM 64-bit binary for elm-format.",
   "repository": "https://github.com/avh4/elm-format",
   "license": "BSD-3-Clause",
   "os": [ "darwin" ],
-  "cpu": [ "x64" ]
+  "cpu": [ "arm64" ]
 }

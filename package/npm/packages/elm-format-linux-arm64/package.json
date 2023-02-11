@@ -1,0 +1,9 @@
+{
+  "name": "@avh4/elm-format-linux-arm64",
+  "version": "0.8.6-0",
+  "description": "The Linux ARM 64-bit binary for elm-format.",
+  "repository": "https://github.com/avh4/elm-format",
+  "license": "BSD-3-Clause",
+  "os": [ "linux" ],
+  "cpu": [ "arm64" ]
+}
