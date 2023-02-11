@@ -19,7 +19,7 @@ jobs:
         os:
         - ubuntu-latest
         - macOS-latest
-        # - windows-latest
+        - windows-latest
 
     name: snapshot-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -34,30 +34,18 @@ jobs:
         key: ${{ secrets.SNAPSHOT_SSH_KEY }}
         known_hosts: ${{ secrets.SNAPSHOT_KNOWN_HOSTS }}
     - uses: actions/checkout@v3
-    - name: Workaround for https://github.com/actions/checkout/issues/290
-      run: git fetch --tags --prune --unshallow --force
-    - name: Workaround for https://github.com/actions/runner-images/issues/7061
-      if: ${{ runner.os == 'Linux' }}
-      run: sudo chown -R "$USER" /usr/local/.ghcup
-    - uses: haskell/actions/setup@v2
-      name: Setup Haskell
-      id: setup-haskell
-      with:
-        ghc-version: 9.2.5
-    - name: Verify Haskell version
-      run: |
-        cabal --version
-        ghc --version
-        [[ $(ghc --numeric-version) == 9.2.5 ]]
-    - uses: actions/cache@v3
-      name: Cache ~/.cabal/store
-      with:
-        path: ${{ steps.setup-haskell.outputs.cabal-store }}
-        key: cabal-v3-${{ runner.os }}-${{ runner.arch }}
-    - run: cabal v2-update
+    - uses: ./.github/actions/git-tags
+    - uses: ./.github/actions/haskell
     - run: ./dev/build.sh -- dist-dependencies
     - run: ./dev/build.sh -- dist
+    - name: Install rsync (Windows)
+      if: runner.os == 'Windows'
+      uses: GuillaumeFalourd/setup-rsync@2b503a403f7185e6872bbc56f903d7395ddd75a2
     - name: Upload snapshot
-      run: rsync -va dist/ "${{ secrets.SNAPSHOT_DEST }}/${BRANCH#refs/heads/}/$(git describe)/"
+      run: |
+        branchName="${BRANCH#refs/heads/}"
+        mkdir -pv "_upload/$branchName/"
+        mv -v dist "_upload/$branchName/$(git describe)/"
+        rsync -va _upload/ "${{ secrets.SNAPSHOT_DEST }}/"
       env:
         BRANCH: ${{ github.ref }}
