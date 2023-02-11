@@ -13,7 +13,7 @@ import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as LB
 import qualified Data.Maybe as Maybe
-import qualified Data.Aeson.Encoding.Internal as AesonInternal
+import qualified Data.Aeson.Encoding as AesonEncoding
 
 
 class ToConsole a where
@@ -49,5 +49,5 @@ resultsToJsonString results =
             Left info -> info
             Right () -> Nothing
 
-aesonToText :: AesonInternal.Encoding' a -> Text
-aesonToText = T.decodeUtf8 . B.concat . LB.toChunks . AesonInternal.encodingToLazyByteString
+aesonToText :: AesonEncoding.Encoding' a -> Text
+aesonToText = T.decodeUtf8 . B.concat . LB.toChunks . AesonEncoding.encodingToLazyByteString
