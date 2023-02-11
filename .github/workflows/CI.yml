@@ -43,6 +43,11 @@ jobs:
         path: ${{ steps.setup-haskell.outputs.cabal-store }}
         key: cabal-v3-${{ runner.os }}-${{ runner.arch }}
     - run: cabal v2-update
+    - uses: actions/cache@v3
+      name: Cache .shake.cache
+      with:
+        path: .shake.cache
+        key: shake-v1-${{ runner.os }}-${{ runner.arch }}
     - run: ./dev/build.sh -- dependencies
     - run: ./dev/build.sh -- build
     - name: Tests
