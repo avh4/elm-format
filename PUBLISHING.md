@@ -62,15 +62,15 @@ Then `cd elm-tooling`, push the resulting branch, and make a PR to <https://gith
 1. `cd package/npm`
 1. Create `elm-format-<new-version>.nix` and fill it out with the necessary information.
     - To get the sha256, run `nix-prefetch fetchzip --url <release url>`
-1. `nix-build`
-1. For each folder in `result/elm-format-*-*`, go to the folder and `npm publish --access=public`
+1. `nix-shell --pure`
+1. For each folder in `./elm-format-*-*`, go to the folder and `npm publish --access=public`
 
    `--access=public` is needed because scoped packages are private by default.
 
 Then publish the main npm package:
 
 ```sh
-cd package/npm/result/elm-format
+cd elm-format
 npm install
 # for experimental releases
 # npm publish --tag exp
