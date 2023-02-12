@@ -14,7 +14,9 @@ in haskellPackages.shellFor {
     cabal2nix
     niv
     nixfmt
+    alejandra
     haskellPackages.haskell-language-server
     unzip
+    nix-prefetch
   ];
 }
