@@ -1,0 +1,14 @@
+inputs:
+  cabal-store:
+    required: false
+    default: ~/.cabal/store
+runs:
+  using: "composite"
+  steps:
+    - name: Cache ~/.cabal/store
+      uses: actions/cache@v3
+      with:
+        path: ${{ inputs.cabal-store }}
+        key: cabal-v3-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('cabal.project.freeze') }}
+        restore-keys: |
+          cabal-v3-${{ runner.os }}-${{ runner.arch }}-
