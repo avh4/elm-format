@@ -22,6 +22,7 @@
     license = "BSD-3-Clause";
     os = [platformInfo.npm.os];
     cpu = [platformInfo.npm.cpu];
+    files = ["elm-format${binExt}"];
   });
 
   readme = builtins.toFile "README.md" ''
