@@ -27,7 +27,7 @@
     releaseConfig.binaries);
 
   basePackage = import ./base-package.nix pkgs {
-    inherit (releaseConfig) name version prerelease;
+    inherit (releaseConfig) name version prerelease elmVersions experimental;
     npmScope = releaseConfig.scope or null;
     inherit binaryPackages;
   };

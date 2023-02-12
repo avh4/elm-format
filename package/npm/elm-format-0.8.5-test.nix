@@ -4,6 +4,12 @@
   prerelease = "rc.1";
   scope = "avh4";
   defaultBinaryScope = "avh4";
+  experimental = false;
+  elmVersions = [
+    "0.18.0"
+    "0.19.0"
+    "0.19.1"
+  ];
 
   binaries = {
     linux-x64 = {

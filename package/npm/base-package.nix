@@ -2,6 +2,7 @@
   stdenvNoCC,
   substituteAll,
   lib,
+  writeShellScript,
   ...
 }: {
   name,
@@ -9,6 +10,8 @@
   prerelease ? null,
   npmScope,
   binaryPackages,
+  experimental,
+  elmVersions,
 }: let
   concatLines = lib.concatMapStrings (s: s + "\n");
 
@@ -41,6 +44,35 @@
   copyStaticFile = file: ''
     cp ${./. + ("/" + file)} $out/${file}
   '';
+
+  publish-sh = let
+    distTag = tag: ''npm dist-tag add ${npmPackageName}@${npmVersion} ${tag}'';
+
+    distTagElmVersion = elmVersion:
+      distTag "latest-${elmVersion}";
+
+    primaryTag =
+      if prerelease != null
+      then "rc"
+      else if experimental
+      then "exp"
+      else "latest";
+  in
+    writeShellScript "publish.sh"
+    (concatLines [
+      ''
+        set -euxo pipefail
+        npm publish --tag ${primaryTag}
+      ''
+      (
+        if prerelease == null
+        then ''
+          ${distTag "exp"}
+          ${concatLines (map distTagElmVersion elmVersions)}
+        ''
+        else ""
+      )
+    ]);
 in
   stdenvNoCC.mkDerivation {
     name = "${name}-${npmVersion}";
@@ -52,5 +84,6 @@ in
       mkdir -p $out/bin
       ${copyStaticFile "README.md"}
       ${concatLines (map copyStaticFile packageFiles)}
+      cp "${publish-sh}" "$out/publish.sh"
     '';
   }

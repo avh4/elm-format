@@ -1,4 +1,8 @@
-{stdenvNoCC, ...}: {
+{
+  stdenvNoCC,
+  writeShellScript,
+  ...
+}: {
   name,
   platform,
   baseVersion,
@@ -28,6 +32,13 @@
   readme = builtins.toFile "README.md" ''
     This is the ${platform} binary for [${name}](${projectUrl}).
   '';
+
+  publish-sh =
+    writeShellScript "publish.sh"
+    ''
+      set -euxo pipefail
+      npm publish --access=public
+    '';
 in
   stdenvNoCC.mkDerivation {
     name = "${packageName}-${npmPackageVersion}";
@@ -40,6 +51,7 @@ in
       cp "${readme}" "$out/README.md"
       cp -L "elm-format${binExt}" "$out/elm-format${binExt}"
       chmod +x "$out/elm-format${binExt}"
+      cp "${publish-sh}" "$out/publish.sh"
     '';
   }
   // {inherit npmPackageName npmPackageVersion;}
