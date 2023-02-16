@@ -7,7 +7,7 @@ Synopsis:
     Common code used by elm-format and elm-refactor
 
 License: BSD-3-Clause
-License-file: ../LICENSE
+License-file: LICENSE
 
 Author:     Aaron VonderHaar
 Maintainer: gruen0aermel@gmail.com
