@@ -6,4 +6,4 @@ module ElmFormat.AST.PublicAST
 
 import ElmFormat.AST.PublicAST.Core (ToPublicAST(..), FromPublicAST(..))
 import ElmFormat.AST.PublicAST.Config
-import ElmFormat.AST.PublicAST.Module (fromModule, toModule)
+import ElmFormat.AST.PublicAST.Module (fromModule, toModule, Module(..))
