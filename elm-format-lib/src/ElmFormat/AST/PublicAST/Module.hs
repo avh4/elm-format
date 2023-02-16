@@ -2,7 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE PolyKinds #-}
-module ElmFormat.AST.PublicAST.Module (Module(..), fromModule, toModule) where
+module ElmFormat.AST.PublicAST.Module (Module(..), fromModule, toModule, TopLevelStructure(..)) where
 
 import ElmFormat.AST.PublicAST.Core
 import ElmFormat.AST.PublicAST.Comment
