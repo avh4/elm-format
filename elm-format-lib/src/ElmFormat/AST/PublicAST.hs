@@ -5,7 +5,7 @@ module ElmFormat.AST.PublicAST
     , module ElmFormat.AST.PublicAST.MaybeF
     ) where
 
-import ElmFormat.AST.PublicAST.Core (ToPublicAST(..), FromPublicAST(..))
+import ElmFormat.AST.PublicAST.Core (ToPublicAST(..), FromPublicAST(..), LocatedIfRequested(..))
 import ElmFormat.AST.PublicAST.Config
 import ElmFormat.AST.PublicAST.Module (fromModule, toModule, Module(..))
 import ElmFormat.AST.PublicAST.MaybeF
