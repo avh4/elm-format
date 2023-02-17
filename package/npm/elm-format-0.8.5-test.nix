@@ -1,9 +1,9 @@
 {
   name = "elm-format-test";
   version = "0.8.5";
-  prerelease = "rc.1";
+  prerelease = "rc.3";
   scope = "avh4";
-  defaultBinaryScope = "avh4";
+  binaryPackageScope = "avh4";
   experimental = false;
   elmVersions = [
     "0.18.0"

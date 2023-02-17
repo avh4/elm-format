@@ -11,12 +11,13 @@
   projectUrl ? "https://github.com/avh4/elm-format",
   binarySrc,
 }: let
-  packageName = "${name}-${platform}";
-  npmPackageName = "@${npmScope}/${packageName}";
-  npmPackageVersion = "${baseVersion}-${binaryVersion}";
-
   platformInfo = (import ./platform-info.nix)."${platform}";
   inherit (platformInfo) binExt;
+  npmPlatformString = with platformInfo.npm; "${os}-${cpu}";
+
+  packageName = "${name}-${npmPlatformString}";
+  npmPackageName = "@${npmScope}/${packageName}";
+  npmPackageVersion = "${baseVersion}-${binaryVersion}";
 
   package-json = builtins.toFile "package.json" (builtins.toJSON {
     name = npmPackageName;
@@ -54,4 +55,7 @@ in
       cp "${publish-sh}" "$out/publish.sh"
     '';
   }
-  // {inherit npmPackageName npmPackageVersion;}
+  // {
+    inherit npmPackageName npmPackageVersion;
+    npmUnscopedPackageName = packageName;
+  }

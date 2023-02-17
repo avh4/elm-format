@@ -9,6 +9,7 @@
   version,
   prerelease ? null,
   npmScope,
+  binaryPackageScope,
   binaryPackages,
   experimental,
   elmVersions,
@@ -41,8 +42,14 @@
 
   packageFiles = package-json.files;
 
-  copyStaticFile = file: ''
-    cp ${./. + ("/" + file)} $out/${file}
+  copyTemplateFile = file: let
+    template = ./. + ("/" + file);
+    rendered = substituteAll {
+      src = template;
+      inherit name npmPackageName binaryPackageScope;
+    };
+  in ''
+    cp ${rendered} $out/${file}
   '';
 
   publish-sh = let
@@ -57,12 +64,17 @@
       else if experimental
       then "exp"
       else "latest";
+
+    extraPublishArgs =
+      if npmScope == null
+      then ""
+      else "--access=public";
   in
     writeShellScript "publish.sh"
     (concatLines [
       ''
         set -euxo pipefail
-        npm publish --tag ${primaryTag}
+        npm publish --tag ${primaryTag} ${extraPublishArgs}
       ''
       (
         if prerelease == null
@@ -82,8 +94,8 @@ in
       mkdir -p $out
       cp ${builtins.toFile "package.json" (builtins.toJSON package-json)} $out/package.json
       mkdir -p $out/bin
-      ${copyStaticFile "README.md"}
-      ${concatLines (map copyStaticFile packageFiles)}
+      ${copyTemplateFile "README.md"}
+      ${concatLines (map copyTemplateFile packageFiles)}
       cp "${publish-sh}" "$out/publish.sh"
     '';
   }

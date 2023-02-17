@@ -8,7 +8,7 @@ module.exports = function () {
 
   var requested = `${os}-${arch}`;
   var current = `${process.platform}-${process.arch}`;
-  var subPackageName = `@avh4/elm-format-${requested}`;
+  var subPackageName = `@@binaryPackageScope@/@name@-${requested}`;
 
   if (requested !== current) {
     console.error(
@@ -18,7 +18,7 @@ module.exports = function () {
 
   if (!(subPackageName in package.optionalDependencies)) {
     exitFailure(
-      `The elm-format npm package does not support your platform (${requested}).`
+      `The @npmPackageName@ npm package does not support your platform (${requested}).`
     );
   }
 

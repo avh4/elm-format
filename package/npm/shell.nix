@@ -2,7 +2,14 @@
   workspace = import ./. {inherit pkgs;};
 in
   pkgs.mkShell {
-    buildInputs = with pkgs; [nodejs];
+    buildInputs = with pkgs; [
+      # Required
+      nodejs
+
+      # Debugging tools
+      jq
+      jless
+    ];
     shellHook = ''
       cd ${workspace}
       export PS1="[Publishing elm-format] "

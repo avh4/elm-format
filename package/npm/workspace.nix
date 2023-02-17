@@ -17,7 +17,7 @@
         inherit name platform;
         baseVersion = version;
         binaryVersion = src.v;
-        npmScope = src.scope or releaseConfig.defaultBinaryScope;
+        npmScope = releaseConfig.binaryPackageScope;
         binarySrc = fetchzip {
           inherit (src) url sha256;
           inherit name version;
@@ -27,7 +27,7 @@
     releaseConfig.binaries);
 
   basePackage = import ./base-package.nix pkgs {
-    inherit (releaseConfig) name version prerelease elmVersions experimental;
+    inherit (releaseConfig) name version prerelease elmVersions experimental binaryPackageScope;
     npmScope = releaseConfig.scope or null;
     inherit binaryPackages;
   };
