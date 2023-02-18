@@ -1,0 +1,37 @@
+name: Check published packages (nixpkgs)
+
+on:
+  workflow_dispatch:
+    inputs:
+      nixpkgsChannel:
+        required: true
+        default: 'nixpkgs-unstable'
+      package:
+        required: true
+        default: 'elmPackages.elm-format'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macOS-latest
+
+    name: Check nixpkgs (${{ matrix.os }}) ${{ github.event.inputs.nixpkgsChannel }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: cachix/install-nix-action@v19
+        with:
+          nix_path: nixpkgs=channel:${{ github.event.inputs.nixpkgsChannel }}
+      - name: Environment info
+        run: |
+          echo -n 'nixpkgs '; nix-instantiate --eval -E '(import <nixpkgs> {}).lib.version'
+          nix --version
+      - name: Fetch packages
+        run: |
+          nix-shell -p "${{ github.event.inputs.package }}" --run true
+      - name: Check elm-format
+        run: |
+          nix-shell -p "${{ github.event.inputs.package }}" --run 'elm-format && file $(which elm-format)'
