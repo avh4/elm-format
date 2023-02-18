@@ -1,6 +1,7 @@
 { sources ? import nix/sources.nix, pkgs ? import sources.nixpkgs { } }:
 let haskellPackages = pkgs.haskell.packages.ghc925;
 in haskellPackages.shellFor {
+  name = "elm-format";
   packages = p: [ ];
   buildInputs = with pkgs; [
     # Tools required to build elm-format
