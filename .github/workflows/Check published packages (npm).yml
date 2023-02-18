@@ -1,0 +1,38 @@
+name: Check published packages (npm)
+
+on:
+  workflow_dispatch:
+    inputs:
+      npmPackage:
+        required: true
+        default: 'elm-format@latest'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macOS-latest
+
+    name: check-npm-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Environment info
+        run: |
+          echo -n 'node: '; node --version
+          echo -n 'npm: '; npm --version
+      - name: Set up workspace
+        run: |
+          echo '{}' > package.json
+      - name: Install ${{ github.event.inputs.npmPackage }}
+        run: |
+          npm install --save-dev "${{ github.event.inputs.npmPackage }}"
+      - name: Check result
+        shell: bash  # workaround for https://github.com/MicrosoftDocs/PowerShell-Docs/issues/2361
+        run: |
+          npm list -a
+          ./node_modules/.bin/elm-format
+          find . -type f -name 'elm-format*' -print0 | xargs -0 file
