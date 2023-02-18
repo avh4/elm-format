@@ -1,4 +1,4 @@
-name: Check published packages (npm)
+name: Check npm packages
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ jobs:
           - windows-latest
           - macOS-latest
 
-    name: check-npm-${{ matrix.os }}
+    name: ${{ matrix.os }} ${{ github.event.inputs.npmPackage }}
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -30,7 +30,7 @@ jobs:
       - name: Install ${{ github.event.inputs.npmPackage }}
         run: |
           npm install --save-dev "${{ github.event.inputs.npmPackage }}"
-      - name: Check result
+      - name: Check elm-format
         shell: bash  # workaround for https://github.com/MicrosoftDocs/PowerShell-Docs/issues/2361
         run: |
           npm list -a
