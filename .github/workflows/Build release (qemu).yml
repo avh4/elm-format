@@ -48,10 +48,14 @@ jobs:
               ;;
           esac
         run: |
+          set -x
+
           # Check platform
           uname -a
           pwd
+          ls
           echo "$HOME"
+          curl --version
 
           # Install Haskell
           export BOOTSTRAP_HASKELL_NONINTERACTIVE=1
