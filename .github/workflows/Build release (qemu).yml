@@ -1,0 +1,79 @@
+name: Build release (qemu)
+
+on:
+  push:
+    tags: '*'
+    branches: 'release/*'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        build:
+        - arch: aarch64
+          distro: alpine_latest
+          archive-label: linux-aarch64
+          ghc:
+            version: "9.2.5"
+
+    name: ${{ matrix.build.archive-label }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Configure environment
+      run: |
+        git config --global core.autocrlf false
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/git-tags
+    - name: Build on ${{ matrix.build.arch }} ${{ matrix.build.distro }}
+      uses: uraimo/run-on-arch-action@v2
+      with:
+        arch: ${{ matrix.build.arch }}
+        distro: ${{ matrix.build.distro }}
+        # githubToken
+        setup: |
+          mkdir -pv "${PWD}/dist"
+        dockerRunArgs: |
+          --volume "${PWD}/dist:/dist"
+        run: |
+          # Check platform
+          uname -a
+          pwd
+          echo "$HOME"
+
+          # Install Haskell
+          export BOOTSTRAP_HASKELL_NONINTERACTIVE=1
+          export BOOTSTRAP_HASKELL_MINIMAL=1
+          curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+          find ~/.ghcup/bin
+          export PATH="$HOME/.ghcup/bin:$PATH"
+          file $(which ghcup)
+
+          export GHCUP_USE_XDG_DIRS=1
+          ghcup list
+          export GHCUP_SKIP_UPDATE_CHECK=1
+          ghcup unset ghc || true
+          ghcup install ghc "${{ matrix.build.ghc.version }}"
+          ghcup set ghc "${{ matrix.build.ghc.version }}"
+          ghcup install cabal recommended
+          ghcup set cabal recommended
+          find ~/.local/bin || true
+          export PATH="$HOME/.local/bin:$PATH"
+          cabalStore="$GITHUB_WORKSPACE/_cabal-store"
+
+          # Verify Haskell version
+          file "$(which cabal)"
+          cabal --version
+          ghc --version
+          ghc --print-build-platform
+
+          # Build
+          cabal v2-update
+          ./dev/build.sh -- dist-dependencies
+          ./dev/build.sh -- dist
+    - uses: ./.github/actions/release-artifact
