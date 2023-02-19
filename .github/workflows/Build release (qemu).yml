@@ -40,6 +40,13 @@ jobs:
           mkdir -pv "${PWD}/dist"
         dockerRunArgs: |
           --volume "${PWD}/dist:/dist"
+        install: |
+          case "${{ matrix.build.distro }}" in
+            alpine*)
+              apk update
+              apk add curl
+              ;;
+          esac
         run: |
           # Check platform
           uname -a
