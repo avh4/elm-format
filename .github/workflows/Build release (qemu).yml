@@ -58,29 +58,26 @@ jobs:
           curl --version
 
           # Install Haskell
-          export BOOTSTRAP_HASKELL_NONINTERACTIVE=1
-          export BOOTSTRAP_HASKELL_MINIMAL=1
-          curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
-          find ~/.ghcup/bin
-          export PATH="$HOME/.ghcup/bin:$PATH"
-          file $(which ghcup)
+          curl -o ghcup https://downloads.haskell.org/~ghcup/0.1.19.0/aarch64-linux-ghcup-0.1.19.0
+          chmod 0555 ./ghcup
+          file ./ghcup
 
           export GHCUP_USE_XDG_DIRS=1
-          ghcup list
+          ./ghcup list
           export GHCUP_SKIP_UPDATE_CHECK=1
-          ghcup unset ghc || true
-          ghcup install ghc "${{ matrix.build.ghc.version }}"
-          ghcup set ghc "${{ matrix.build.ghc.version }}"
-          ghcup install cabal recommended
-          ghcup set cabal recommended
+          ./ghcup unset ghc || true
+          ./ghcup install ghc "${{ matrix.build.ghc.version }}"
+          ./ghcup set ghc "${{ matrix.build.ghc.version }}"
+          ./ghcup install cabal recommended
+          ./ghcup set cabal recommended
           find ~/.local/bin || true
           export PATH="$HOME/.local/bin:$PATH"
-          cabalStore="$GITHUB_WORKSPACE/_cabal-store"
 
           # Verify Haskell version
           file "$(which cabal)"
           cabal --version
           ghc --version
+          ghc --numeric-version
           ghc --print-build-platform
 
           # Build
