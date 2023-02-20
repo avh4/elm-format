@@ -73,10 +73,15 @@ let
     };
   };
 
+  # This is the haskell package set that includes elm-format and all its dependencies
   haskellPackages = pkgs.haskell.packages.project.extend elmFormatPackages;
+
+  # This is a haskell package set for the same ghc version that does not have any package overries
+  # (Because our override aren't compatible with haskell-language-server, etc)
+  haskellTools = pkgs.haskell.packages."${compiler}";
 in {
   elm-format = haskellPackages.elm-format;
 
-  # Made available for debugging
-  inherit haskellPackages pkgs;
+  # Used by shell.nix
+  inherit pkgs haskellPackages haskellTools;
 }
