@@ -9,6 +9,7 @@ executable build-elm-format
   other-modules:
       Paths_build_elm_format
       Shakefiles.Dependencies
+      Shakefiles.ElmFormat.IntegrationTests
       Shakefiles.Extra
       Shakefiles.Haskell
       Shakefiles.Platform
