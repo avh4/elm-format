@@ -73,14 +73,25 @@ let
     };
   };
 
+  mkHaskellPackages = p:
+    (p.haskell.packages.project.extend elmFormatPackages).extend (self: super:
+      with pkgs.haskell.lib; {
+        elm-format-static = justStaticExecutables super.elm-format;
+      });
+
   # This is the haskell package set that includes elm-format and all its dependencies
-  haskellPackages = pkgs.haskell.packages.project.extend elmFormatPackages;
+  haskellPackages = mkHaskellPackages pkgs;
 
   # This is a haskell package set for the same ghc version that does not have any package overries
   # (Because our override aren't compatible with haskell-language-server, etc)
   haskellTools = pkgs.haskell.packages."${compiler}";
 in {
   elm-format = haskellPackages.elm-format;
+  dist = {
+    native = (mkHaskellPackages pkgs.pkgsStatic).elm-format-static;
+    aarch64 = (mkHaskellPackages
+      pkgs.pkgsCross.aarch64-multiplatform-musl.pkgsStatic).elm-format-static;
+  };
 
   # Used by shell.nix
   inherit pkgs haskellPackages haskellTools;
