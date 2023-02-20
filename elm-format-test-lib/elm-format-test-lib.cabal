@@ -7,7 +7,7 @@ Synopsis:
     Test helpers used by elm-format-tests and elm-refactor-tests
 
 License: BSD-3-Clause
-License-file: ../LICENSE
+License-file: LICENSE
 
 Author:     Aaron VonderHaar
 Maintainer: gruen0aermel@gmail.com
@@ -43,7 +43,7 @@ common common-options
         mtl >= 2.2.2 && < 3,
         split >= 0.2.3.4 && < 0.3,
         tasty >= 1.2 && < 2,
-        tasty-hspec >= 1.2.0.3 && < 1.3,
+        tasty-hspec >= 1.2.0.1 && < 1.3,
         tasty-hunit >= 0.10.0.1 && < 0.11,
         text >= 2.0 && < 3,
         avh4-lib
