@@ -1,4 +1,4 @@
-{ nixpkgs ? <nixpkgs>, compiler ? "ghc925" }:
+{ sources ? import ./nix/sources.nix, compiler ? "ghc925" }:
 
 let
   haskellPackageOverrides = pkgs: self: super:
@@ -32,7 +32,7 @@ let
         };
     };
 
-  pkgs = import nixpkgs {
+  pkgs = import sources.nixpkgs {
     config = {
       packageOverrides = pkgs: rec {
         haskell = pkgs.haskell // {
