@@ -12,6 +12,7 @@ import qualified Shakefiles.Shellcheck
 import qualified Shakefiles.Dependencies
 import qualified Shakefiles.Signature
 import Shakefiles.Extra
+import qualified Shakefiles.NixBuild
 
 
 main :: IO ()
@@ -129,6 +130,8 @@ rules = do
         [ "elm-format-test-lib" ]
 
     Shakefiles.Haskell.executable elmFormat "elm-format" gitDescribe
+
+    Shakefiles.NixBuild.rules
 
     Shakefiles.ElmFormat.IntegrationTests.rules gitSha elmFormat
 

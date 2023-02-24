@@ -89,7 +89,8 @@ in {
   elm-format = haskellPackages.elm-format;
   dist = {
     native = (mkHaskellPackages pkgs.pkgsStatic).elm-format-static;
-    aarch64 = (mkHaskellPackages
+    linux-x64 = (mkHaskellPackages pkgs.pkgsStatic).elm-format-static;
+    linux-aarch64 = (mkHaskellPackages
       pkgs.pkgsCross.aarch64-multiplatform-musl.pkgsStatic).elm-format-static;
   };
 
