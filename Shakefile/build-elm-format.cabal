@@ -12,6 +12,7 @@ executable build-elm-format
       Shakefiles.ElmFormat.IntegrationTests
       Shakefiles.Extra
       Shakefiles.Haskell
+      Shakefiles.NestedCheckout
       Shakefiles.NixBuild
       Shakefiles.Platform
       Shakefiles.Shellcheck

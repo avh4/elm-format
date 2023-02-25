@@ -2,6 +2,7 @@ module Shakefiles.NixBuild where
 
 import Development.Shake
 import Development.Shake.FilePath
+import qualified System.Directory
 
 rules :: Rules ()
 rules = do
@@ -25,4 +26,13 @@ rules = do
         let gcroot = "_build/nix-build/gcroots/default" </> attr
 
         cmd_ "nix-build" "-A" attr "-o" gcroot
+        copyFileChanged (gcroot </> foldl (</>) "" rest) out
+
+    "_build/nix-build/from-git/*/out/default/*/bin/elm-format" %> \out -> do
+        let (b1:b2:b3:sha:_:_:attr:rest) = splitDirectories out
+        gcroot <- liftIO $ System.Directory.makeAbsolute (b1 </> b2 </> b3 </> sha </> "gcroots/default" </> attr)
+
+        let checkoutDir = "_build/git/checkout" </> sha
+        need [ checkoutDir <.> "ok" ]
+        cmd_ (Cwd checkoutDir) "nix-build" "-A" attr "-o" gcroot
         copyFileChanged (gcroot </> foldl (</>) "" rest) out

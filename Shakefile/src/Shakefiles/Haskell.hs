@@ -108,7 +108,10 @@ executable target projectName gitDescribe =
                 Shakefiles.Platform.all
 
         let buildInDocker =
+                []
+        let buildViaNix =
                 [ Shakefiles.Platform.LinuxX86
+                , Shakefiles.Platform.LinuxAarch64
                 ]
         let buildOnCi =
                 [ Shakefiles.Platform.Windows
@@ -130,6 +133,17 @@ executable target projectName gitDescribe =
                 let tag = takeDirectory1 $ dropDirectory1 out
                 StdoutTrim sha <- cmd "git" "rev-list" "-n1" ("tags/" ++ tag)
                 let binDir = "_build" </> "docker" </> sha </> show target
+                let binFile = projectName ++ Shakefiles.Platform.binExt target
+                need [ binDir </> binFile ]
+                cmd_ "tar" "zcvf" out "-C" binDir binFile
+
+        forEach buildViaNix $ \target -> do
+            let zipExt = Shakefiles.Platform.zipFormatFor target
+
+            ("publish" </> "*" </> projectName ++ "-*-" ++ show target <.> zipExt) %> \out -> do
+                let tag = takeDirectory1 $ dropDirectory1 out
+                StdoutTrim sha <- cmd "git" "rev-list" "-n1" ("tags/" ++ tag)
+                let binDir = "_build" </> "nix-build" </> "from-git" </> sha </> "out" </> "default" </> "dist." <> show target </> "bin"
                 let binFile = projectName ++ Shakefiles.Platform.binExt target
                 need [ binDir </> binFile ]
                 cmd_ "tar" "zcvf" out "-C" binDir binFile
