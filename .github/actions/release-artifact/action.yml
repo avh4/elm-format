@@ -1,3 +1,6 @@
+inputs:
+  gpg-signing-key:
+    required: true
 runs:
   using: "composite"
   steps:
@@ -8,7 +11,7 @@ runs:
         gpg --import private.key
         rm -v private.key
       env:
-        GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+        GPG_SIGNING_KEY: ${{ inputs.gpg-signing-key }}
     - name: Sign artifacts
       shell: bash
       run: |

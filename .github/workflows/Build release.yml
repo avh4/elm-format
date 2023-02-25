@@ -35,3 +35,5 @@ jobs:
     - run: ./dev/build.sh -- dist-dependencies
     - run: ./dev/build.sh -- dist
     - uses: ./.github/actions/release-artifact
+      with:
+        gpg-signing-key: ${{ secrets.GPG_SIGNING_KEY }}
