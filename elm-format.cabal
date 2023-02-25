@@ -1,7 +1,7 @@
 cabal-version: 2.4
 
 Name: elm-format
-version: 0.8.5
+version: 0.8.6
 
 Synopsis:
     A source code formatter for Elm

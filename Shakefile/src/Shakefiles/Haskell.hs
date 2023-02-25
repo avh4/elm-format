@@ -64,7 +64,7 @@ cabalBinPath projectName opt =
     let
         version =
             case projectName of
-                "elm-format" -> "0.8.5"
+                "elm-format" -> "0.8.6"
                 _ -> "0.0.0"
     in
     "dist-newstyle/build" </> Shakefiles.Platform.cabalInstallOs </> "ghc-9.2.5" </> projectName ++ "-" ++ version </> "x" </> projectName </> opt </> "build" </> projectName </> projectName <.> exe

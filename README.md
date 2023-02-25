@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
-[![latest version: 0.8.5](https://img.shields.io/badge/version-0.8.5-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.5)
+[![latest version: 0.8.6](https://img.shields.io/badge/version-0.8.6-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.6)
 
 # elm-format
 
@@ -26,7 +26,7 @@ elm-format --help  # See other command line options
 ```
 
 
-## Installation [![(latest version: 0.8.5)](https://img.shields.io/badge/version-0.8.5-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.5)
+## Installation [![(latest version: 0.8.6)](https://img.shields.io/badge/version-0.8.6-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.6)
 
 To install `elm-format`:
 
@@ -34,7 +34,7 @@ To install `elm-format`:
 npm install -g elm-format
 ```
 
-or download the version appropriate for your OS from the [release page](https://github.com/avh4/elm-format/releases/tag/0.8.5),
+or download the version appropriate for your OS from the [release page](https://github.com/avh4/elm-format/releases/tag/0.8.6),
 unzip it,
 and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.
 
