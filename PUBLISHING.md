@@ -75,9 +75,12 @@ Then `cd elm-tooling`, push the resulting branch, and make a PR to <https://gith
 
 ## Nix
 
+You must checkout the exact commit that is tagged for the release (so that `git describe` prints only the tag name),
+and then run:
+
 ```sh
 cd package/nix
-dev/build.sh
+./build.sh
 ```
 
 Then `cd nixpkgs`, push the resulting branch, and make a PR to <https://github.com/NixOS/nixpkgs> with the title "`elm-format: <old version> -> <new version>`"
