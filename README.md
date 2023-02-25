@@ -292,6 +292,9 @@ This is for WebStorm and other JetBrains IDEs like IntelliJ and PyCharm.
 
 Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
+Use the instructions below to get started.
+More detailed information is available in [`./dev/Documentation/`](./dev/Documentation/).
+
 ### Building from source
 
 1. Install Haskell ghcup following the instructions for your operating system: https://www.haskell.org/ghcup/
