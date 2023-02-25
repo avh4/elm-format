@@ -1,11 +1,18 @@
 runs:
   using: "composite"
   steps:
-    # - name: Sign artifacts
-    #  run: |
-    #    for i in dist/*; do
-    #      gpg --verbose --local-user 1508E30E65C8C21F --output "$i".sig --detach-sig "$i"
-    #    done
+    - name: Configure GPG Key
+      run: |
+        echo "$GPG_SIGNING_KEY" | base64 --decode > private.key
+        gpg --import private.key
+        rm -v private.key
+      env:
+        GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+    - name: Sign artifacts
+     run: |
+       for i in dist/*; do
+         gpg --verbose --local-user 1508E30E65C8C21F --armor --detach-sign "$i"
+       done
     - uses: actions/upload-artifact@v3
       with:
         name: elm-format-${{ github.sha }}-${{ matrix.build.archive-label }}

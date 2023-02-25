@@ -29,13 +29,6 @@ jobs:
     - name: Configure environment
       run: |
         git config --global core.autocrlf false
-    - name: Configure GPG Key
-      run: |
-        echo "$GPG_SIGNING_KEY" | base64 --decode > private.key
-        gpg --import private.key
-        rm private.key
-      env:
-        GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
     - uses: actions/checkout@v3
     - uses: ./.github/actions/git-tags
     - uses: ./.github/actions/haskell
