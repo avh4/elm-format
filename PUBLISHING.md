@@ -3,12 +3,7 @@
 
 ## Workstation setup
 
-### Mac
-
-```bash
-brew update
-brew install keybase
-```
+You will need an appropriate GPG signing key created and set as the default key.
 
 
 ## Preparation
