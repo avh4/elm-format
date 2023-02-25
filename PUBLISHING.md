@@ -19,7 +19,6 @@ brew install keybase
 1. Update the version number in `elm-format.cabal`.
 1. If this is a stable release, update references to the version in `README.md`.
 1. Update `ElmFormat.Version.experimental` to `Just <survey URL>` for experimental versions and `Nothing` otherwise.
-1. `(cd package/npm && npm version "<new version>")`
 1. Commit the changes "Bump version to \<new version>"
 1. Create a signed tag for the new version. `git tag -s <new version> -m <new version>`
 1. Push the tag. `git push origin <new version>`
@@ -32,9 +31,9 @@ brew install keybase
 1. Download the artifacts from the successful build (keep them as zip files), and put them in `downloads/`
 
 
-## Platforms built in docker (Linux)
+## Platforms built via nix (Linux)
 
-1. Make sure you have [Docker](https://docs.docker.com/get-docker/) installed and running
+1. Make sure you have [Nix](https://nixos.org/) installed
 1. The binaries will be built automatically in the next section
 
 
