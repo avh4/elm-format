@@ -22,8 +22,10 @@ You will need an appropriate GPG signing key created and set as the default key.
 
 ## Platforms built on CI (Mac / Windows)
 
-1. Pushing the tag should have triggered a build at <https://github.com/avh4/elm-format/actions?query=workflow%3A%22Build+release%22>
-1. Download the artifacts from the successful build (keep them as zip files), and put them in `downloads/`
+1. Pushing the tag should have triggered a builds at:
+    - <https://github.com/avh4/elm-format/actions/workflows/Build%20release.yml>
+    - <https://github.com/avh4/elm-format/actions/workflows/Build%20release%20(lamdera-community).yml>
+1. Download the artifacts from the successful builds (keep them as zip files), and put them in `downloads/`
 
 
 ## Platforms built via nix (Linux)
