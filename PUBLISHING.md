@@ -50,7 +50,7 @@ brew install keybase
 
 ```sh
 cd package/elm-tooling
-dev/build.sh
+./build.sh
 ```
 
 Then `cd elm-tooling`, push the resulting branch, and make a PR to <https://github.com/elm-tooling/elm-tooling-cli> with the title "`Add elm-format <new version>`"
