@@ -1,8 +1,18 @@
-{ sources ? import nix/sources.nix, pkgs ? import sources.nixpkgs { } }:
-let haskellPackages = pkgs.haskell.packages.ghc925;
+args@{ ... }:
+let
+  default = import ./. args;
+  inherit (default) pkgs haskellPackages haskellTools;
 in haskellPackages.shellFor {
   name = "elm-format";
-  packages = p: [ ];
+  packages = p:
+    with p; [
+      elm-format-build
+      elm-format
+      avh4-lib
+      elm-format-lib
+      elm-format-test-lib
+      elm-format-markdown
+    ];
   buildInputs = with pkgs; [
     # Tools required to build elm-format
     cabal-install
@@ -11,12 +21,12 @@ in haskellPackages.shellFor {
     jq
 
     # Dev tools
-    ghcid
+    haskellTools.ghcid
     cabal2nix
     niv
     nixfmt
     alejandra
-    haskellPackages.haskell-language-server
+    haskellTools.haskell-language-server
     unzip
     nix-prefetch
   ];
