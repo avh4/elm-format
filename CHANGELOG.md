@@ -1,3 +1,18 @@
+## 0.8.6
+
+New features:
+  - File are now processed in parallel
+
+Bug fixes:
+  - `module exposing` listings containing comments no longer add extra leading spaces
+
+Other changes:
+  - Native binaries are now provided for MacOS ARM64 (previous version required Rosetta)
+  - Native (statically-linked) binaries are now provided for Linux ARM64 (aarch64)
+  - The npm installer now has zero dependencies
+  - Performance optimization, making use of Elm 0.19's parser, thanks to @emmabastas's contributions via Google Summer of Code
+
+
 ## 0.8.5
 
 Feature changes:
