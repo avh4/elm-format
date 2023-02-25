@@ -67,16 +67,10 @@ Then `cd elm-tooling`, push the resulting branch, and make a PR to <https://gith
     - Fill out the `binaries` info for each supported platform
         - To get the sha256, run `nix-prefetch fetchzip --url <release url>`
         - `v` is the sub-patch version for this binary and can be incremented as needed (but should be reset to `"1"` on each new elm-format version)
+1. Update `default.nix` to point to the new `elm-format-<new-version>.nix`
 1. `nix-shell --pure`
 1. For each folder in `./elm-format-*-*`, go to the folder and `./publish.sh`
-
-Then publish the main npm package:
-
-```sh
-cd elm-format
-npm install
-./publish.sh
-```
+1. For the main package, `cd elm-format` and `./publish.sh`
 
 
 ## Nix
