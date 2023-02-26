@@ -15,12 +15,11 @@ to verify the downloaded binaries before publishing.
 1. Remove the old key:
     - `rm ./keys/github-actions.pub`
 1. Create the new key:
-    - `minisign -G -s ./XXX_NEW_PRIVATE_KEY -p ./keys/github-actions.pub`
-    - Leave the password blank
+    - `minisign -G -W -s ./XXX_NEW_PRIVATE_KEY -p ./keys/github-actions.pub`
 1. Get the private key:
-    - `cat ./XXX_NEW_PRIVATE_KEY`
+    - `cat ./XXX_NEW_PRIVATE_KEY | base64`
     - Copy the result as the value of `MINISIGN_PRIVATE_KEY` at <https://github.com/avh4/elm-format/settings/secrets/actions>
 1. Securely delete the private key:
-    - `shred -vz XXX_NEW_PRIVATE_KEY`
+    - `shred -uvz XXX_NEW_PRIVATE_KEY`
 1. Check in the changes to `./keys/github-actions.pub`
 1. Push to a branch whose name starts with "release/" to trigger the Build Release workflows, and make sure they succeed.

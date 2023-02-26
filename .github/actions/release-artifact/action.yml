@@ -24,8 +24,10 @@ runs:
     - name: Sign artifacts
       shell: bash
       run: |
-        echo "$MINISIGN_PRIVATE_KEY" > private.key
+        echo "$MINISIGN_PRIVATE_KEY" | base64 --decode > private.key
+        chmod 400 private.key
         for i in dist/*; do
+          echo "Signing $i"
           minisign -S -s private.key -t "$GITHUB_WORKFLOW_REF $GITHUB_RUN_ID $GITHUB_RUN_ATTEMPT" -m "$i"
         done
         rm -v private.key
