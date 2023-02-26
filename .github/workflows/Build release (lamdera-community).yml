@@ -74,4 +74,4 @@ jobs:
     - run: ./dev/build.sh -- dist
     - uses: ./.github/actions/release-artifact
       with:
-        gpg-signing-key: ${{ secrets.GPG_SIGNING_KEY }}
+        minisign-key: ${{ secrets.MINISIGN_PRIVATE_KEY }}

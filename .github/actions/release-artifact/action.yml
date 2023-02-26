@@ -1,23 +1,36 @@
 inputs:
-  gpg-signing-key:
+  minisign-key:
     required: true
 runs:
   using: "composite"
   steps:
-    - name: Configure GPG Key
+    - name: Install minisign (Linux)
+      if: runner.os == 'Linux'
       shell: bash
       run: |
-        echo "$GPG_SIGNING_KEY" | base64 --decode > private.key
-        gpg --import private.key
-        rm -v private.key
-      env:
-        GPG_SIGNING_KEY: ${{ inputs.gpg-signing-key }}
+        sudo apt-get update
+        sudo apt-get install minisign
+    - name: Install minisign (MacOS)
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        brew update
+        brew install minisign
+    - name: Install minisign (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        choco install minisign
     - name: Sign artifacts
       shell: bash
       run: |
+        echo "$MINISIGN_PRIVATE_KEY" > private.key
         for i in dist/*; do
-          gpg --verbose --local-user 1508E30E65C8C21F --armor --detach-sign "$i"
+          minisign -S -s private.key -t "$GITHUB_WORKFLOW_REF $GITHUB_RUN_ID $GITHUB_RUN_ATTEMPT" -m "$i"
         done
+        rm -v private.key
+      env:
+        MINISIGN_PRIVATE_KEY: ${{ inputs.minisign-key }}
     - uses: actions/upload-artifact@v3
       with:
         name: elm-format-${{ github.sha }}-${{ matrix.build.archive-label }}

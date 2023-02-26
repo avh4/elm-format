@@ -30,5 +30,6 @@ in haskellPackages.shellFor {
     unzip
     nix-prefetch
     nodejs
+    minisign
   ];
 }
