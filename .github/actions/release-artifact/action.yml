@@ -20,7 +20,9 @@ runs:
       if: runner.os == 'Windows'
       shell: bash
       run: |
-        choco install minisign
+        curl -L -o minisign.zip https://github.com/jedisct1/minisign/releases/download/0.11/minisign-0.11-win64.zip
+        unzip minisign.zip
+        echo "$(pwd)/minisign-win64" >> "$GITHUB_PATH"
     - name: Sign artifacts
       shell: bash
       run: |
