@@ -5,6 +5,7 @@ New features:
 
 Bug fixes:
   - `module exposing` listings containing comments no longer add extra leading spaces
+  - Redundant import aliases (when the alias is the same as the module name) are now removed
 
 Other changes:
   - Native binaries are now provided for MacOS ARM64 (previous version required Rosetta)
