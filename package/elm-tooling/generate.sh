@@ -22,9 +22,9 @@ function print-version() {
 }
 
 echo "\"$VERSION\": {"
-print-version linux-x64 linux-x64 tgz
-print-version linux-arm64 linux-aarch64 tgz
 print-version darwin-arm64 mac-arm64 tgz
 print-version darwin-x64 mac-x64 tgz
+print-version linux-arm64 linux-aarch64 tgz
+print-version linux-x64 linux-x64 tgz
 print-version win32-x64 win-x64 zip .exe
 echo "},"

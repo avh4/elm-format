@@ -32,5 +32,8 @@ mv tmp elm-tooling/src/KnownTools.ts
 
 pushd elm-tooling
 npm ci
+# See https://elm-tooling.github.io/elm-tooling-cli/contributing/#adding-a-new-version
 ./node_modules/.bin/jest --updateSnapshot
+./node_modules/.bin/ts-node scripts/TestAllDownloads.ts update
+npm test
 popd

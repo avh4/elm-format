@@ -13,7 +13,7 @@ You will need an appropriate GPG signing key created and set as the default key.
 1. Create `Release Notes/<new version>.md` to draft the release notes.
 1. Update the version number in `elm-format.cabal`.
 1. If this is a stable release, update references to the version in `README.md`.
-1. Update `ElmFormat.Version.experimental` to `Just <survey URL>` for experimental versions and `Nothing` otherwise.
+1. In `src/ElmFormat/Version.hs`, update `ElmFormat.Version.experimental` to `Just <survey URL>` for experimental versions and `Nothing` otherwise.
 1. Commit the changes "Bump version to \<new version>"
 1. Create a signed tag for the new version. `git tag -s <new version> -m <new version>`
 1. Push the tag. `git push origin <new version>`
@@ -58,7 +58,7 @@ Then `cd elm-tooling`, push the resulting branch, and make a PR to <https://gith
 1. `cd package/npm`
 1. Create `elm-format-<new-version>.nix`:
     - Fill out the release info
-        - `prerelease` is optional and should have the format `(alpha|beta|rc).[0-9]+` if present
+        - `prerelease` is null for normal releases, or should have the format `(alpha|beta|rc).[0-9]+` for prereleases
         - `scope` is optional and will create a scoped top-level package (don't set it for normal releases)
         - `binaryPackageScope` is the scope that the binary packages will be published under
     - Fill out the `binaries` info for each supported platform
