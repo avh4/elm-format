@@ -14,4 +14,4 @@ rules = do
     "//*.asc" %> \out -> do
         let src = dropExtension out
         need [ src ]
-        cmd_ "gpg" "--detach-sign" "--armor" src
+        cmd_ "gpg" "--detach-sign" "--armor" "--output" out src
