@@ -1,0 +1,23 @@
+name: build-elm-format
+version:        0.0.0
+build-type:     Simple
+
+default-extensions:
+  - LambdaCase
+
+ghc-options:
+  - -rtsopts
+  - -threaded
+  - -with-rtsopts=-I0
+
+dependencies:
+  base: ">= 4.16.2.0"
+  directory: ">= 1.3.6.2"
+  shake: ">=0.19.6 && <0.20"
+
+
+executables:
+  build-elm-format:
+    main: Main.hs
+    source-dirs:
+      - src
