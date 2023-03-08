@@ -53,7 +53,6 @@ let
         mkPkg "elm-format-lib" ./elm-format-lib { inherit aeson text; };
       elm-format-test-lib = mkPkg "elm-format-test-lib" ./elm-format-test-lib {
         inherit text;
-        hspec-golden = self.hspec-golden_0_1_0_3;
       };
       elm-format-markdown =
         mkPkg "elm-format-markdown" ./elm-format-markdown { inherit text; };

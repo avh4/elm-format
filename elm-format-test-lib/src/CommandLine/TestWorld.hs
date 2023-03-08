@@ -21,6 +21,7 @@ import Test.Hspec.Core.Spec (Example(..), Result(..), ResultStatus(..))
 import Test.Hspec (shouldBe, Expectation)
 import qualified System.IO.Unsafe
 import Control.Concurrent.MVar
+import System.FilePath ((</>))
 
 
 data TestWorldState =
@@ -233,8 +234,8 @@ golden name actualOutput =
         , encodePretty = Text.unpack
         , writeToFile = \a b -> withMVar fileLock (\_ -> Data.Text.IO.writeFile a b)
         , readFromFile = \a -> withMVar fileLock (\_ -> Data.Text.IO.readFile a)
-        , testName = name
-        , directory = "."
+        , goldenFile = "." </> name </> "golden"
+        , actualFile = Just ("." </> name </> "actual")
         , failFirstTime = True
         }
 
