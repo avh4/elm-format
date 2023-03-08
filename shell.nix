@@ -21,6 +21,7 @@ in haskellPackages.shellFor {
     jq
 
     # Dev tools
+    hpack
     haskellTools.ghcid
     cabal2nix
     niv
