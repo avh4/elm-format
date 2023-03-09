@@ -6,4 +6,5 @@ set -euo pipefail
 (cd elm-format-markdown && hpack)
 (cd elm-format-lib && hpack)
 (cd elm-format-test-lib && hpack)
+hpack
 exec cabal run build-elm-format:exe:build-elm-format -- --share "$@"
