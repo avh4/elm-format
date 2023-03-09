@@ -1,174 +1,229 @@
-cabal-version: 2.4
+cabal-version: 2.2
 
-Name: elm-format-lib
-version: 0.0.0.1
+-- This file has been generated from package.yaml by hpack version 0.35.1.
+--
+-- see: https://github.com/sol/hpack
 
-Synopsis:
-    Common code used by elm-format and elm-refactor
-
-License: BSD-3-Clause
-License-file: LICENSE
-
-Author:     Aaron VonderHaar
-Maintainer: gruen0aermel@gmail.com
-Copyright:  See https://github.com/avh4/elm-format/blob/master/LICENSE
-
-build-type: Simple
-
-
-common common-options
-    ghc-options:
-        -O2 -Wall -Wno-name-shadowing
-
-    default-language: Haskell2010
-
-    default-extensions:
-        DeriveFunctor
-        MultiParamTypeClasses
-        LambdaCase
-        OverloadedStrings
-        ScopedTypeVariables
-        FlexibleInstances
-
-    hs-source-dirs:
-        src
-
-    other-modules:
-        AST.Helpers
-        Box
-        Data.Utf8
-        Elm.String
-        ElmFormat.AST.BinaryOperatorPrecedence
-        ElmFormat.AST.PatternMatching
-        ElmFormat.AST.PublicAST.Comment
-        ElmFormat.AST.PublicAST.Config
-        ElmFormat.AST.PublicAST.Core
-        ElmFormat.AST.PublicAST.Expression
-        ElmFormat.AST.PublicAST.MaybeF
-        ElmFormat.AST.PublicAST.Module
-        ElmFormat.AST.PublicAST.Pattern
-        ElmFormat.AST.PublicAST.Reference
-        ElmFormat.AST.PublicAST.Type
-        ElmFormat.Render.Box
-        ElmFormat.Render.ElmStructure
-        Parse.Binop
-        Parse.Comments
-        Parse.Common
-        Parse.Declaration
-        Parse.Expression
-        Parse.Helpers
-        Parse.IParser
-        Parse.Literal
-        Parse.Module
-        Parse.Number
-        Parse.Parse
-        Parse.ParsecAdapter
-        Parse.Pattern
-        Parse.Primitives
-        Parse.State
-        Parse.String
-        Parse.Type
-        Parse.Variable
-        Parse.Whitespace
-
-    build-depends:
-        aeson >= 2.1.0.0 && < 2.2,
-        ansi-terminal >= 0.11 && < 0.12,
-        ansi-wl-pprint >= 0.6.9 && < 0.7,
-        array >= 0.5.4.0 && < 0.6,
-        base >= 4.15.0.0 && < 5,
-        bimap >= 0.4.0 && < 0.6,
-        binary >= 0.8.9.0 && < 0.9,
-        bytestring >= 0.11.3.0 && < 0.12,
-        containers >= 0.6.5.1 && < 0.7,
-        directory >= 1.3.6.2 && < 2,
-        filepath >= 1.4.2.1 && < 2,
-        ghc-prim >= 0.5.2,
-        mtl >= 2.2.2 && < 3,
-        optparse-applicative >= 0.17.0.0 && < 0.18,
-        process >= 1.6.13.2 && < 2,
-        relude >= 1.1.0.0 && < 1.2,
-        text >= 2.0 && < 3,
-        avh4-lib,
-        elm-format-markdown
-
+name:           elm-format-lib
+version:        0.0.0.1
+synopsis:       Common code used by elm-format and elm-refactor
+author:         Aaron VonderHaar
+maintainer:     gruen0aermel@gmail.com
+copyright:      See https://github.com/avh4/elm-format/blob/master/LICENSE
+license:        BSD-3-Clause
+license-file:   LICENSE
+build-type:     Simple
 
 library
-    import: common-options
-
-    exposed-modules:
-        AST.Listing
-        AST.MatchReferences
-        AST.Module
-        AST.Structure
-        AST.V0_16
-        CommandLine.InfoFormatter
-        CommandLine.Program
-        CommandLine.ResolveFiles
-        CommandLine.TransformFiles
-        ElmFormat.AST.PublicAST
-        ElmFormat.AST.Shared
-        ElmFormat.ImportInfo
-        ElmFormat.KnownContents
-        ElmFormat.Parse
-        ElmFormat.Render.Markdown
-        ElmFormat.Render.Text
-        ElmVersion
-        Parse.Markdown
-        Reporting.Annotation
-        Reporting.Error.Syntax
-        Reporting.Result
-
+  exposed-modules:
+      AST.Listing
+      AST.MatchReferences
+      AST.Module
+      AST.Structure
+      AST.V0_16
+      CommandLine.InfoFormatter
+      CommandLine.Program
+      CommandLine.ResolveFiles
+      CommandLine.TransformFiles
+      ElmFormat.AST.PublicAST
+      ElmFormat.AST.Shared
+      ElmFormat.ImportInfo
+      ElmFormat.KnownContents
+      ElmFormat.Parse
+      ElmFormat.Render.Markdown
+      ElmFormat.Render.Text
+      ElmVersion
+      Parse.Markdown
+      Reporting.Annotation
+      Reporting.Error.Syntax
+      Reporting.Result
+  other-modules:
+      AST.Helpers
+      Box
+      Data.Utf8
+      Elm.String
+      ElmFormat.AST.BinaryOperatorPrecedence
+      ElmFormat.AST.PatternMatching
+      ElmFormat.AST.PublicAST.Comment
+      ElmFormat.AST.PublicAST.Config
+      ElmFormat.AST.PublicAST.Core
+      ElmFormat.AST.PublicAST.Expression
+      ElmFormat.AST.PublicAST.MaybeF
+      ElmFormat.AST.PublicAST.Module
+      ElmFormat.AST.PublicAST.Pattern
+      ElmFormat.AST.PublicAST.Reference
+      ElmFormat.AST.PublicAST.Type
+      ElmFormat.Render.Box
+      ElmFormat.Render.ElmStructure
+      Parse.Binop
+      Parse.Comments
+      Parse.Common
+      Parse.Declaration
+      Parse.Expression
+      Parse.Helpers
+      Parse.IParser
+      Parse.Literal
+      Parse.Module
+      Parse.Number
+      Parse.Parse
+      Parse.ParsecAdapter
+      Parse.Pattern
+      Parse.Primitives
+      Parse.State
+      Parse.String
+      Parse.Type
+      Parse.Variable
+      Parse.Whitespace
+      Reporting.Error.Docs
+      Paths_elm_format_lib
+  autogen-modules:
+      Paths_elm_format_lib
+  hs-source-dirs:
+      src
+  default-extensions:
+      DeriveFunctor
+      FlexibleInstances
+      LambdaCase
+      MultiParamTypeClasses
+      OverloadedStrings
+      ScopedTypeVariables
+  ghc-options: -O2 -Wall -Wno-name-shadowing
+  build-depends:
+      aeson >=2.1.0.0 && <2.2
+    , ansi-terminal ==0.11.*
+    , ansi-wl-pprint >=0.6.9 && <0.7
+    , array >=0.5.4.0 && <0.6
+    , avh4-lib
+    , base >=4.15.0.0 && <5
+    , bimap >=0.4.0 && <0.6
+    , binary >=0.8.9.0 && <0.9
+    , bytestring >=0.11.3.0 && <0.12
+    , containers >=0.6.5.1 && <0.7
+    , directory >=1.3.6.2 && <2
+    , elm-format-markdown
+    , filepath >=1.4.2.1 && <2
+    , ghc-prim >=0.5.2
+    , mtl >=2.2.2 && <3
+    , optparse-applicative >=0.17.0.0 && <0.18
+    , process >=1.6.13.2 && <2
+    , relude >=1.1.0.0 && <1.2
+    , text >=2.0 && <3
+  default-language: Haskell2010
 
 test-suite efl-tests
-    import: common-options
-    type: exitcode-stdio-1.0
-
-    hs-source-dirs: test
-    main-is: Tests.hs
-
-    other-modules:
-        AST.Listing
-        AST.MatchReferences
-        AST.Module
-        AST.Structure
-        AST.V0_16
-        CommandLine.InfoFormatter
-        ElmFormat.AST.PublicAST
-        ElmFormat.AST.Shared
-        ElmFormat.ImportInfo
-        ElmFormat.KnownContents
-        ElmFormat.Parse
-        ElmFormat.Render.Markdown
-        ElmFormat.Render.Text
-        ElmVersion
-        Parse.Markdown
-        Reporting.Annotation
-        Reporting.Error.Syntax
-        Reporting.Result
-
-    other-modules:
-        AST.MatchReferencesTest
-        BoxTest
-        ElmFormat.AST.BinaryOperatorPrecedenceTest
-        ElmFormat.ImportInfoTest
-        ElmFormat.Render.ElmStructureTest
-        Parse.ExpressionTest
-        Parse.HelpersTest
-        Parse.LiteralTest
-        Parse.PatternTest
-        Parse.TestHelpers
-        Parse.TestHelpersTest
-        Parse.TypeTest
-
-    build-depends:
-        hspec >= 2.7.4 && < 3,
-        split >= 0.2.3.4 && < 0.3,
-        tasty >= 1.2 && < 2,
-        tasty-hspec >= 1.2.0.1 && < 1.3,
-        tasty-hunit >= 0.10.0.1 && < 0.11,
-        avh4-lib,
-        elm-format-test-lib
-
-    build-tool-depends:
-        tasty-discover:tasty-discover >= 4.2.1 && < 5
+  type: exitcode-stdio-1.0
+  main-is: Tests.hs
+  other-modules:
+      AST.MatchReferencesTest
+      BoxTest
+      ElmFormat.AST.BinaryOperatorPrecedenceTest
+      ElmFormat.ImportInfoTest
+      ElmFormat.Render.ElmStructureTest
+      Parse.ExpressionTest
+      Parse.HelpersTest
+      Parse.LiteralTest
+      Parse.PatternTest
+      Parse.TestHelpers
+      Parse.TestHelpersTest
+      Parse.TypeTest
+      AST.Helpers
+      AST.Listing
+      AST.MatchReferences
+      AST.Module
+      AST.Structure
+      AST.V0_16
+      Box
+      CommandLine.InfoFormatter
+      CommandLine.Program
+      CommandLine.ResolveFiles
+      CommandLine.TransformFiles
+      Data.Utf8
+      Elm.String
+      ElmFormat.AST.BinaryOperatorPrecedence
+      ElmFormat.AST.PatternMatching
+      ElmFormat.AST.PublicAST
+      ElmFormat.AST.PublicAST.Comment
+      ElmFormat.AST.PublicAST.Config
+      ElmFormat.AST.PublicAST.Core
+      ElmFormat.AST.PublicAST.Expression
+      ElmFormat.AST.PublicAST.MaybeF
+      ElmFormat.AST.PublicAST.Module
+      ElmFormat.AST.PublicAST.Pattern
+      ElmFormat.AST.PublicAST.Reference
+      ElmFormat.AST.PublicAST.Type
+      ElmFormat.AST.Shared
+      ElmFormat.ImportInfo
+      ElmFormat.KnownContents
+      ElmFormat.Parse
+      ElmFormat.Render.Box
+      ElmFormat.Render.ElmStructure
+      ElmFormat.Render.Markdown
+      ElmFormat.Render.Text
+      ElmVersion
+      Parse.Binop
+      Parse.Comments
+      Parse.Common
+      Parse.Declaration
+      Parse.Expression
+      Parse.Helpers
+      Parse.IParser
+      Parse.Literal
+      Parse.Markdown
+      Parse.Module
+      Parse.Number
+      Parse.Parse
+      Parse.ParsecAdapter
+      Parse.Pattern
+      Parse.Primitives
+      Parse.State
+      Parse.String
+      Parse.Type
+      Parse.Variable
+      Parse.Whitespace
+      Reporting.Annotation
+      Reporting.Error.Docs
+      Reporting.Error.Syntax
+      Reporting.Result
+      Paths_elm_format_lib
+  autogen-modules:
+      Paths_elm_format_lib
+  hs-source-dirs:
+      test
+      src
+  default-extensions:
+      DeriveFunctor
+      FlexibleInstances
+      LambdaCase
+      MultiParamTypeClasses
+      OverloadedStrings
+      ScopedTypeVariables
+  ghc-options: -O2 -Wall -Wno-name-shadowing
+  build-tool-depends:
+      tasty-discover:tasty-discover >=4.2.1 && <5
+  build-depends:
+      aeson >=2.1.0.0 && <2.2
+    , ansi-terminal ==0.11.*
+    , ansi-wl-pprint >=0.6.9 && <0.7
+    , array >=0.5.4.0 && <0.6
+    , avh4-lib
+    , base >=4.15.0.0 && <5
+    , bimap >=0.4.0 && <0.6
+    , binary >=0.8.9.0 && <0.9
+    , bytestring >=0.11.3.0 && <0.12
+    , containers >=0.6.5.1 && <0.7
+    , directory >=1.3.6.2 && <2
+    , elm-format-markdown
+    , elm-format-test-lib
+    , filepath >=1.4.2.1 && <2
+    , ghc-prim >=0.5.2
+    , hspec >=2.7.4 && <3
+    , mtl >=2.2.2 && <3
+    , optparse-applicative >=0.17.0.0 && <0.18
+    , process >=1.6.13.2 && <2
+    , relude >=1.1.0.0 && <1.2
+    , split >=0.2.3.4 && <0.3
+    , tasty >=1.2 && <2
+    , tasty-hspec >=1.2.0.1 && <1.3
+    , tasty-hunit >=0.10.0.1 && <0.11
+    , text >=2.0 && <3
+  default-language: Haskell2010

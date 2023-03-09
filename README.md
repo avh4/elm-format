@@ -304,6 +304,7 @@ cd elm-format
 # initial setup
 ghcup install ghc 9.2.5
 ghcup set ghc 9.2.5
+cabal install hpack
 
 # build
 dev/build.sh -- build
