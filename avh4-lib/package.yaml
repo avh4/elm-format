@@ -10,7 +10,7 @@ copyright:  See https://github.com/avh4/elm-format/blob/master/LICENSE
 
 build-type: Simple
 
-# language: Haskell2010
+language: Haskell2010
 
 default-extensions:
   - DeriveFunctor
@@ -43,8 +43,8 @@ dependencies:
 
 
 library:
-    source-dirs:
-      - src
+  source-dirs:
+    - src
 
 
 tests:
