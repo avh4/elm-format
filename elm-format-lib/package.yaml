@@ -91,4 +91,4 @@ tests:
       elm-format-test-lib: {}
 
     build-tools:
-      tasty-discover:tasty-discover: ">= 4.2.1 && < 5"
+      tasty-discover: ">= 4.2.1 && < 5"

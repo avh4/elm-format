@@ -1,74 +1,88 @@
-cabal-version: 2.4
+cabal-version: 2.2
 
-Name: elm-format-test-lib
-version: 0.0.0.1
+-- This file has been generated from package.yaml by hpack version 0.35.1.
+--
+-- see: https://github.com/sol/hpack
 
-Synopsis:
-    Test helpers used by elm-format-tests and elm-refactor-tests
-
-License: BSD-3-Clause
-License-file: LICENSE
-
-Author:     Aaron VonderHaar
-Maintainer: gruen0aermel@gmail.com
-Copyright:  See https://github.com/avh4/elm-format/blob/master/LICENSE
-
-build-type: Simple
-
-
-common common-options
-    ghc-options:
-        -O2 -Wall -Wno-name-shadowing
-
-    default-language: Haskell2010
-
-    default-extensions:
-        DeriveFunctor
-        LambdaCase
-        OverloadedStrings
-        ScopedTypeVariables
-
-    hs-source-dirs: src
-
-    other-modules:
-        TestWorld.Stdio
-
-    build-depends:
-        base >= 4.15.0.0 && < 5,
-        containers >= 0.6.5.1 && < 0.7,
-        filepath >= 1.4.2.1 && < 1.5,
-        hspec >= 2.7.4 && < 3,
-        hspec-core >= 2.7.4 && < 3,
-        hspec-golden >= 0.2.0.0 && < 0.3,
-        mtl >= 2.2.2 && < 3,
-        split >= 0.2.3.4 && < 0.3,
-        tasty >= 1.2 && < 2,
-        tasty-hspec >= 1.2.0.1 && < 1.3,
-        tasty-hunit >= 0.10.0.1 && < 0.11,
-        text >= 2.0 && < 3,
-        avh4-lib
-
+name:           elm-format-test-lib
+version:        0.0.0.1
+synopsis:       Test helpers used by elm-format-tests and elm-refactor-tests
+author:         Aaron VonderHaar
+maintainer:     gruen0aermel@gmail.com
+copyright:      See https://github.com/avh4/elm-format/blob/master/LICENSE
+license:        BSD-3-Clause
+license-file:   LICENSE
+build-type:     Simple
 
 library
-    import: common-options
-
-    exposed-modules:
-        CommandLine.TestWorld
-        Data.FileTree
-        Expect
-
+  exposed-modules:
+      CommandLine.TestWorld
+      Data.FileTree
+      Expect
+  other-modules:
+      TestWorld.Stdio
+      Paths_elm_format_test_lib
+  autogen-modules:
+      Paths_elm_format_test_lib
+  hs-source-dirs:
+      src
+  default-extensions:
+      DeriveFunctor
+      LambdaCase
+      OverloadedStrings
+      ScopedTypeVariables
+  ghc-options: -O2 -Wall -Wno-name-shadowing
+  build-depends:
+      avh4-lib
+    , base >=4.15.0.0 && <5
+    , containers >=0.6.5.1 && <0.7
+    , filepath >=1.4.2.1 && <1.5
+    , hspec >=2.7.4 && <3
+    , hspec-core >=2.7.4 && <3
+    , hspec-golden >=0.2.0.0 && <0.3
+    , mtl >=2.2.2 && <3
+    , split >=0.2.3.4 && <0.3
+    , tasty >=1.2 && <2
+    , tasty-hspec >=1.2.0.1 && <1.3
+    , tasty-hunit >=0.10.0.1 && <0.11
+    , text >=2.0 && <3
+  default-language: Haskell2010
 
 test-suite elm-format-test-lib-tests
-    import: common-options
-    type: exitcode-stdio-1.0
-
-    hs-source-dirs: test
-    main-is: Tests.hs
-
-    other-modules:
-        Data.FileTree
-        Data.FileTreeTest
-        Expect
-
-    build-tool-depends:
-        tasty-discover:tasty-discover >= 4.2.1 && < 5
+  type: exitcode-stdio-1.0
+  main-is: Tests.hs
+  other-modules:
+      Data.FileTreeTest
+      CommandLine.TestWorld
+      Data.FileTree
+      Expect
+      TestWorld.Stdio
+      Paths_elm_format_test_lib
+  autogen-modules:
+      Paths_elm_format_test_lib
+  hs-source-dirs:
+      test
+      src
+  default-extensions:
+      DeriveFunctor
+      LambdaCase
+      OverloadedStrings
+      ScopedTypeVariables
+  ghc-options: -O2 -Wall -Wno-name-shadowing
+  build-tool-depends:
+      tasty-discover:tasty-discover >=4.2.1 && <5
+  build-depends:
+      avh4-lib
+    , base >=4.15.0.0 && <5
+    , containers >=0.6.5.1 && <0.7
+    , filepath >=1.4.2.1 && <1.5
+    , hspec >=2.7.4 && <3
+    , hspec-core >=2.7.4 && <3
+    , hspec-golden >=0.2.0.0 && <0.3
+    , mtl >=2.2.2 && <3
+    , split >=0.2.3.4 && <0.3
+    , tasty >=1.2 && <2
+    , tasty-hspec >=1.2.0.1 && <1.3
+    , tasty-hunit >=0.10.0.1 && <0.11
+    , text >=2.0 && <3
+  default-language: Haskell2010
