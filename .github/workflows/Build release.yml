@@ -32,9 +32,6 @@ jobs:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/git-tags
     - uses: ./.github/actions/haskell
-    - name: "Configure static binaries (Windows)"
-      if: runner.os == 'Windows'
-      run: cabal v2-configure --enable-executable-stripping --enable-executable-static
     - run: ./dev/build.sh -- dist-dependencies
     - run: ./dev/build.sh -- dist
     - uses: ./.github/actions/release-artifact

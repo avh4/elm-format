@@ -27,3 +27,6 @@ runs:
           cabal-v3-${{ runner.os }}-${{ runner.arch }}-
     - shell: bash
       run: cabal v2-update
+    - name: "Configure static binaries (Windows)"
+      if: runner.os == 'Windows'
+      run: cabal v2-configure --enable-executable-stripping --enable-executable-static
