@@ -52,6 +52,7 @@ jobs:
         ./ghcup install cabal recommended
         ./ghcup set cabal recommended
         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        echo "$HOME/.cabal/bin" >> "$GITHUB_PATH"
         export PATH="$HOME/.local/bin:$PATH"
         cabalStore="$GITHUB_WORKSPACE/_cabal-store"
         ~/.local/bin/cabal --store-dir="$cabalStore" v2-configure
@@ -70,7 +71,11 @@ jobs:
         [[ $(ghc --print-build-platform) == "${{ matrix.build.ghc.build-platform }}" ]]
     - uses: ./.github/actions/cache-haskell-deps
     - run: cabal v2-update
-    - run: cabal install hpack
+    - name: Install hpack
+      run: |
+        cabal install hpack
+        which hpack
+        hpack --version
     - run: ./dev/build.sh -- dist-dependencies
     - run: ./dev/build.sh -- dist
     - uses: ./.github/actions/release-artifact
