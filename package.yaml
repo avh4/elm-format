@@ -1,0 +1,84 @@
+name: elm-format
+version: 0.8.6
+
+synopsis: A source code formatter for Elm
+description: |
+  A simple way to format your Elm code according to the official
+  style guide.
+category: Build Tool
+homepage: https://elm-lang.org
+git: git://github.com/avh4/elm-format.git
+
+license: BSD-3-Clause
+license-file: LICENSE
+author:     Aaron VonderHaar
+maintainer: gruen0aermel@gmail.com
+copyright:  See https://github.com/avh4/elm-format/blob/master/LICENSE
+
+build-type: Simple
+extra-source-files: README.md
+
+language: Haskell2010
+
+default-extensions:
+  - DeriveFunctor
+  - LambdaCase
+  - OverloadedStrings
+  - ScopedTypeVariables
+
+ghc-options:
+  - -threaded
+  - -with-rtsopts=-N
+  - -O2
+  - -Wall
+  - -Wno-name-shadowing
+
+dependencies:
+  aeson: ">= 2.1.0.0 && < 2.2"
+  ansi-wl-pprint: ">= 0.6.9 && < 0.7"
+  base: ">= 4.15.0.0 && < 5"
+  bytestring: ">= 0.11.3.0 && < 0.12"
+  containers: ">= 0.6.5.1 && < 0.7"
+  optparse-applicative: ">= 0.17.0.0 && < 0.18"
+  relude: ">= 1.1.0.0 && < 1.2"
+  text: ">= 2.0 && < 3"
+  avh4-lib: {}
+  elm-format-lib: {}
+
+
+executables:
+  elm-format:
+    main: Main.hs
+    source-dirs:
+      - src
+      - generated
+
+    generated-other-modules:
+      - Build_elm_format
+
+
+tests:
+  elm-format-tests:
+    main: Test.hs
+    source-dirs:
+      - tests
+      - src
+      - generated
+
+    when:
+      - condition: false
+        other-modules:
+          - Main  # exclude the executable's Main
+          - CommonMarkTests  # currently broken
+
+    dependencies:
+      hspec: ">= 2.7.4 && < 3"
+      mtl: ">= 2.2.2 && < 3"
+      tasty: ">= 1.2 && < 2"
+      tasty-hspec: ">= 1.2.0.1 && < 1.3"
+      tasty-hunit: ">= 0.10.0.1 && < 0.11"
+      tasty-quickcheck: ">= 0.10.1 && < 0.11"
+      QuickCheck: ">= 2.12.6.1 && < 3"
+      quickcheck-io: ">= 0.2.0 && < 0.3"
+      bimap: ">= 0.4.0 && < 0.6"
+      elm-format-test-lib: {}

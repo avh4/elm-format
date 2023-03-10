@@ -27,6 +27,10 @@ runs:
           cabal-v3-${{ runner.os }}-${{ runner.arch }}-
     - shell: bash
       run: cabal v2-update
+    - name: Install hpack
+      shell: bash
+      run: |
+        cabal install hpack
     - name: "Configure static binaries (Windows)"
       if: runner.os == 'Windows'
       shell: bash

@@ -11,7 +11,7 @@ You will need an appropriate GPG signing key created and set as the default key.
 1. Start a new branch from `origin/main` named `release/<new version>`
 1. Edit `CHANGELOG.md` to set the correct version number.
 1. Create `Release Notes/<new version>.md` to draft the release notes.
-1. Update the version number in `elm-format.cabal`.
+1. Update the version number in the top-level `package.yaml`, and run `dev/build.sh`.
 1. If this is a stable release, update references to the version in `README.md`.
 1. In `src/ElmFormat/Version.hs`, update `ElmFormat.Version.experimental` to `Just <survey URL>` for experimental versions and `Nothing` otherwise.
 1. Commit the changes "Bump version to \<new version>"

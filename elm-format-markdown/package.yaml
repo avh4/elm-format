@@ -1,0 +1,36 @@
+name: elm-format-markdown
+version: 0.0.0.1
+
+synopsis: Markdown parsing for Elm documentation comments
+license: BSD-3-Clause
+license-file: LICENSE
+author:     Aaron VonderHaar
+maintainer: gruen0aermel@gmail.com
+copyright:  See https://github.com/avh4/elm-format/blob/master/LICENSE
+
+build-type: Simple
+
+language: Haskell2010
+
+default-extensions:
+  - DeriveFunctor
+  - LambdaCase
+  - MultiParamTypeClasses
+  - OverloadedStrings
+  - ScopedTypeVariables
+
+ghc-options:
+  - -O2
+  - -Wall
+  - -Wno-name-shadowing
+
+dependencies:
+  base: ">= 4.15.0.0 && < 5"
+  containers: ">= 0.6.5.1 && < 0.7"
+  mtl: ">= 2.2.2 && < 3"
+  text: ">= 2.0 && < 3"
+
+
+library:
+  source-dirs:
+    - .

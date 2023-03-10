@@ -1,5 +1,9 @@
 cabal-version: 1.12
 
+-- This file has been generated from package.yaml by hpack version 0.35.1.
+--
+-- see: https://github.com/sol/hpack
+
 name:           build-elm-format
 version:        0.0.0
 build-type:     Simple
@@ -7,7 +11,6 @@ build-type:     Simple
 executable build-elm-format
   main-is: Main.hs
   other-modules:
-      Paths_build_elm_format
       Shakefiles.Dependencies
       Shakefiles.ElmFormat.IntegrationTests
       Shakefiles.Extra
@@ -17,6 +20,7 @@ executable build-elm-format
       Shakefiles.Platform
       Shakefiles.Shellcheck
       Shakefiles.Signature
+      Paths_build_elm_format
   hs-source-dirs:
       src
   default-extensions:
