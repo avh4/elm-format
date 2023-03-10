@@ -75,7 +75,7 @@ jobs:
       shell: bash
       run: |
         echo $PATH
-        ls ~/.cabal/bin/ || true
+        ls -l $HOME/.cabal/bin/ || true
         which hpack || true
         if [[ ! -e ~/.cabal/bin/hpack ]]; then
           cabal install hpack
