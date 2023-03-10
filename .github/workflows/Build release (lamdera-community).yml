@@ -73,7 +73,9 @@ jobs:
     - run: cabal v2-update
     - name: Install hpack
       run: |
-        cabal install hpack
+        if ! which hpack; then
+          cabal install hpack
+        fi
         which hpack
         hpack --version
     - run: ./dev/build.sh -- dist-dependencies
