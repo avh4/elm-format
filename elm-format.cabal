@@ -5,7 +5,7 @@ cabal-version: 2.2
 -- see: https://github.com/sol/hpack
 
 name:           elm-format
-version:        0.8.5
+version:        0.8.6
 synopsis:       A source code formatter for Elm
 description:    A simple way to format your Elm code according to the official
                 style guide.

@@ -22,14 +22,18 @@ popd
 
 
 (
-  sed -e '/^  "elm-format":/,$d' elm-tooling/helpers/known-tools.ts
-  sed -e '/^  "elm-format":/,/^  }/p;d' elm-tooling/helpers/known-tools.ts | head -n-1
+  sed -e '/^  "elm-format":/,$d' elm-tooling/src/KnownTools.ts
+  sed -e '/^  "elm-format":/,/^  }/p;d' elm-tooling/src/KnownTools.ts | head -n-1
   ./generate.sh "$ELM_FORMAT_VERSION" | sed -e 's/^/    /'
   echo "  },"
-  sed -e '1,/^  "elm-format":/d;1,/^  }/d' elm-tooling/helpers/known-tools.ts
+  sed -e '1,/^  "elm-format":/d;1,/^  }/d' elm-tooling/src/KnownTools.ts
 ) > tmp
-mv tmp elm-tooling/helpers/known-tools.ts
+mv tmp elm-tooling/src/KnownTools.ts
 
 pushd elm-tooling
+npm ci
+# See https://elm-tooling.github.io/elm-tooling-cli/contributing/#adding-a-new-version
 ./node_modules/.bin/jest --updateSnapshot
+./node_modules/.bin/ts-node scripts/TestAllDownloads.ts update
+npm test
 popd

@@ -8,7 +8,7 @@ ELM_FORMAT_VERSION="$(git describe --abbrev=8)"
 BRANCH="elm-format-$ELM_FORMAT_VERSION"
 
 if [ ! -d nixpkgs ]; then
-  git clone --depth 10 --branch master https://github.com/NixOS/nixpkgs.git nixpkgs
+  git clone --branch master https://github.com/NixOS/nixpkgs.git nixpkgs
 fi
 
 pushd nixpkgs

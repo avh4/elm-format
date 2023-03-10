@@ -64,7 +64,7 @@ cabalBinPath projectName opt =
     let
         version =
             case projectName of
-                "elm-format" -> "0.8.5"
+                "elm-format" -> "0.8.6"
                 _ -> "0.0.0"
     in
     "dist-newstyle/build" </> Shakefiles.Platform.cabalInstallOs </> "ghc-9.2.5" </> projectName ++ "-" ++ version </> "x" </> projectName </> opt </> "build" </> projectName </> projectName <.> exe
@@ -153,8 +153,10 @@ executable target projectName gitDescribe =
             let zipExt = Shakefiles.Platform.zipFormatFor target
 
             [ "_build" </> "github-ci" </> "unzipped" </> projectName ++ "-*-" ++ show target <.> zipExt,
-              "_build" </> "github-ci" </> "unzipped" </> projectName ++ "-*-" ++ show target <.> zipExt <.> "sig"
+              "_build" </> "github-ci" </> "unzipped" </> projectName ++ "-*-" ++ show target <.> zipExt <.> "minisig"
               ] &%> \[zip, sig] -> do
+                let pubkey = "keys/github-actions.pub"
+                need [ pubkey ]
                 let outDir = takeDirectory zip
                 let tag = drop (length projectName + 1) $ (reverse . drop (length (show target) + 1) . reverse) $ dropExtension $ takeFileName zip
                 StdoutTrim sha <- cmd "git" "rev-list" "-n1" ("tags/" ++ tag)
@@ -162,7 +164,7 @@ executable target projectName gitDescribe =
                 need [ ciArchive ]
                 liftIO $ removeFiles "." [ zip, sig ]
                 cmd_ "unzip" "-o" "-d" outDir ciArchive
-                cmd_ "gpgv" "--keyring" "keys/github-actions.gpg" sig zip
+                cmd_ "minisign" "-V" "-p" pubkey "-x" sig "-m" zip
 
             "publish" </> "*" </> projectName ++ "-*-" ++ show target <.> zipExt %> \out -> do
                 let source = "_build" </> "github-ci" </> "unzipped" </> takeFileName out

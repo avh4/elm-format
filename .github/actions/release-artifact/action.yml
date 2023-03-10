@@ -1,11 +1,40 @@
+inputs:
+  minisign-key:
+    required: true
 runs:
   using: "composite"
   steps:
-    # - name: Sign artifacts
-    #  run: |
-    #    for i in dist/*; do
-    #      gpg --verbose --local-user 1508E30E65C8C21F --output "$i".sig --detach-sig "$i"
-    #    done
+    - name: Install minisign (Linux)
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install minisign
+    - name: Install minisign (MacOS)
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        brew update
+        brew install minisign
+    - name: Install minisign (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        curl -L -o minisign.zip https://github.com/jedisct1/minisign/releases/download/0.11/minisign-0.11-win64.zip
+        unzip minisign.zip
+        echo "$(pwd)/minisign-win64" >> "$GITHUB_PATH"
+    - name: Sign artifacts
+      shell: bash
+      run: |
+        echo "$MINISIGN_PRIVATE_KEY" | base64 --decode > private.key
+        chmod 400 private.key
+        for i in dist/*; do
+          echo "Signing $i"
+          minisign -S -s private.key -t "$GITHUB_WORKFLOW_REF $GITHUB_RUN_ID $GITHUB_RUN_ATTEMPT" -m "$i"
+        done
+        rm -v private.key
+      env:
+        MINISIGN_PRIVATE_KEY: ${{ inputs.minisign-key }}
     - uses: actions/upload-artifact@v3
       with:
         name: elm-format-${{ github.sha }}-${{ matrix.build.archive-label }}

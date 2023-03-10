@@ -70,6 +70,16 @@ jobs:
         [[ $(ghc --print-build-platform) == "${{ matrix.build.ghc.build-platform }}" ]]
     - uses: ./.github/actions/cache-haskell-deps
     - run: cabal v2-update
+    - name: Install hpack
+      shell: bash
+      run: |
+        cabal install --installdir=./.bin hpack
+        echo "$(pwd)/.bin" >> "$GITHUB_PATH"
+        export PATH="$(pwd)/.bin:$PATH"
+        which hpack
+        hpack --version
     - run: ./dev/build.sh -- dist-dependencies
     - run: ./dev/build.sh -- dist
     - uses: ./.github/actions/release-artifact
+      with:
+        minisign-key: ${{ secrets.MINISIGN_PRIVATE_KEY }}

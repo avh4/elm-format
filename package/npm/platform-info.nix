@@ -6,7 +6,7 @@
     };
     binExt = "";
   };
-  linux-arm64 = {
+  linux-aarch64 = {
     npm = {
       os = "linux";
       cpu = "arm64";

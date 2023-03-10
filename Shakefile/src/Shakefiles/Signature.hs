@@ -13,5 +13,5 @@ rules = do
 
     "//*.asc" %> \out -> do
         let src = dropExtension out
-        need [ src, keybaseConfig ]
-        cmd_ "keybase" "pgp" "sign" "--detached" "--infile" src "--outfile" out
+        need [ src ]
+        cmd_ "gpg" "--detach-sign" "--armor" "--output" out src
