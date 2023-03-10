@@ -52,8 +52,7 @@ jobs:
         ./ghcup install cabal recommended
         ./ghcup set cabal recommended
         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-        echo "$HOME/.cabal/bin" >> "$GITHUB_PATH"
-        export PATH="$HOME/.local/bin:$HOME/.cabal/bin:$PATH"
+        export PATH="$HOME/.local/bin:$PATH"
         cabalStore="$GITHUB_WORKSPACE/_cabal-store"
         ~/.local/bin/cabal --store-dir="$cabalStore" v2-configure
         echo "cabal-store=$cabalStore" >> "$GITHUB_OUTPUT"
@@ -74,12 +73,10 @@ jobs:
     - name: Install hpack
       shell: bash
       run: |
-        echo $PATH
-        ls -l $HOME/.cabal/bin/ || true
-        which hpack || true
-        if [[ ! -e ~/.cabal/bin/hpack ]]; then
-          cabal install hpack
-        fi
+        cabal install --installdir=./.bin hpack
+        echo "$(pwd)/.bin" >> "$GITHUB_PATH"
+        export PATH="$(pwd)/.bin:$PATH"
+        which hpack
         hpack --version
     - run: ./dev/build.sh -- dist-dependencies
     - run: ./dev/build.sh -- dist
