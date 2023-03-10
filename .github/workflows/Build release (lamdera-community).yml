@@ -72,14 +72,14 @@ jobs:
     - uses: ./.github/actions/cache-haskell-deps
     - run: cabal v2-update
     - name: Install hpack
+      shell: bash
       run: |
         echo $PATH
         ls ~/.cabal/bin/ || true
         which hpack || true
-        if ! which hpack; then
+        if [[ ! -e ~/.cabal/bin/hpack ]]; then
           cabal install hpack
         fi
-        which hpack
         hpack --version
     - run: ./dev/build.sh -- dist-dependencies
     - run: ./dev/build.sh -- dist
