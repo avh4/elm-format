@@ -63,6 +63,12 @@ rules = do
     phonyPrefix "publish-" $ \version ->
         need [ "elm-format-publish-" ++ version ]
 
+    phony "ci" $ need
+        [ "build"
+        , "test"
+        , "docs"
+        ]
+
     phony "clean" $ do
         removeFilesAfter "dist-newstyle" [ "//*" ]
         removeFilesAfter "_build" [ "//*" ]
