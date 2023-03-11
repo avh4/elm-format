@@ -32,5 +32,6 @@ in haskellPackages.shellFor {
     nix-prefetch
     nodejs
     minisign
+    simple-http-server
   ];
 }

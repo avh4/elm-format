@@ -36,9 +36,10 @@ jobs:
     - name: Tests
       if: runner.os != 'Windows'
       run: |
-        ./dev/build.sh
+        ./dev/build.sh -- test
     - name: Tests (for Windows)
       if: runner.os == 'Windows'
       run: |
         ./dev/build.sh -- unit-tests
         echo "##[warning]integration tests are currently disabled on Windows CI"
+    - run: ./dev/build.sh -- docs

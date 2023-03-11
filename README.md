@@ -316,8 +316,4 @@ dev/build.sh -- build
 ./_build/elm-format
 ```
 
-### Running tests
-
-```bash
-dev/build.sh
-```
+See [`dev/Documentation`](dev/Documentation/README.md) for more contributor and build command documentation.
