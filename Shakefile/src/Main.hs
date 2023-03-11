@@ -50,6 +50,9 @@ rules = do
     phony "generated" $ need
         [ "generated/Build_elm_format.hs"
         ]
+    phony "docs" $ need
+        [ "_build/docs/elm-format-lib.ok"
+        ]
     phony "unit-tests" $ need
         [ "_build/cabal/elm-format-lib/test.ok"
         , "_build/cabal/elm-format-test-lib/test.ok"
@@ -142,3 +145,11 @@ rules = do
     Shakefiles.NestedCheckout.rules
 
     Shakefiles.Shellcheck.rules shellcheck
+
+    --
+    -- Dev tools
+    --
+
+    phony "serve:docs" $ do
+        need [ "docs" ]
+        cmd_ "simple-http-server" "--index" "_build/docs/public"

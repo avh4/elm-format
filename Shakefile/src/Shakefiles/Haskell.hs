@@ -10,6 +10,15 @@ import qualified Shakefiles.Platform
 import Data.Char (isSpace)
 import Data.List (dropWhileEnd, stripPrefix)
 import Shakefiles.Extra
+import System.Directory (createDirectoryIfMissing)
+import Data.Yaml (FromJSON, (.:))
+import Data.Yaml.TH (FromJSON(..))
+import qualified Data.Yaml as Yaml
+import qualified Data.Aeson.Key as Key
+
+
+docsDir :: FilePath
+docsDir = "_build/docs/public"
 
 
 cabalProject :: String -> [String] -> [String] -> [String] -> [String] -> [String] -> Rules ()
@@ -33,6 +42,12 @@ cabalProject name sourceFiles sourcePatterns deps testPatterns testDeps =
             liftIO $ getHashedShakeVersion allFiles
     in
     do
+        "_build/cabal/" </> name </> "version" %> \out -> do
+            let packageYaml = name </> "package.yaml"
+            need [ packageYaml ]
+            (VersionFromYaml version) <- Yaml.decodeFileThrow packageYaml
+            writeFileChanged out version
+
         "_build/cabal/" </> name </> "build.ok" %> \out -> do
             hash <- needProjectFiles
             cmd_ "cabal" "v2-build" "-O0"  (name ++ ":libs") "--enable-tests"
@@ -57,6 +72,29 @@ cabalProject name sourceFiles sourcePatterns deps testPatterns testDeps =
             need testFiles
             cmd_ "cabal" "v2-test" "-O0" (name ++ ":tests") "--test-show-details=streaming"
             writeFile' out ""
+
+        "_build/cabal/" </> name </> "haddock.ok" %> \out -> do
+            hash <- needProjectFiles
+            cmd_ "cabal" "v2-haddock"
+                "--haddock-html"
+                --"--haddock-for-hackage" -- broken in current haddock
+                name
+            writeFile' out hash
+
+        "_build/docs/" </> name <.> "ok" %> \out -> do
+            let haddockOk = "_build/cabal" </> name </> "haddock.ok"
+            need [ haddockOk ]
+            buildDir <- cabalBuildDir name
+            let docsBuildDir = buildDir </> "doc" </> "html" </> name
+            liftIO $ createDirectoryIfMissing True docsDir
+            cmd_ "rsync" "-a" "--delete" (docsBuildDir <> "/") (docsDir </> name <> "/")
+            copyFileChanged haddockOk out
+
+
+cabalBuildDir :: String -> Action FilePath
+cabalBuildDir projectName = do
+    version <- readFile' ("_build/cabal" </> projectName </> "version")
+    return $ "dist-newstyle" </> "build" </> Shakefiles.Platform.cabalInstallOs </> "ghc-9.2.5" </> projectName ++ "-" ++ version
 
 
 cabalBinPath :: String -> String -> FilePath
@@ -169,3 +207,11 @@ executable target projectName gitDescribe =
             "publish" </> "*" </> projectName ++ "-*-" ++ show target <.> zipExt %> \out -> do
                 let source = "_build" </> "github-ci" </> "unzipped" </> takeFileName out
                 copyFileChanged source out
+
+
+newtype VersionFromYaml =
+  VersionFromYaml String
+
+instance FromJSON VersionFromYaml where
+  parseJSON = Yaml.withObject "hpack" $ \o -> VersionFromYaml
+    <$> o .: Key.fromString "version"
