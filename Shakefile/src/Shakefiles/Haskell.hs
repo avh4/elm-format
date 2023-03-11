@@ -10,11 +10,12 @@ import qualified Shakefiles.Platform
 import Data.Char (isSpace)
 import Data.List (dropWhileEnd, stripPrefix)
 import Shakefiles.Extra
-import System.Directory (createDirectoryIfMissing)
+import System.Directory (createDirectoryIfMissing, removeDirectoryRecursive)
 import Data.Yaml (FromJSON, (.:))
 import Data.Yaml.TH (FromJSON(..))
 import qualified Data.Yaml as Yaml
 import qualified Data.Aeson.Key as Key
+import Relude.Bool.Guard (whenM)
 
 
 docsDir :: FilePath
@@ -87,7 +88,11 @@ cabalProject name sourceFiles sourcePatterns deps testPatterns testDeps =
             buildDir <- cabalBuildDir name
             let docsBuildDir = buildDir </> "doc" </> "html" </> name
             liftIO $ createDirectoryIfMissing True docsDir
-            cmd_ "rsync" "-a" "--delete" (docsBuildDir <> "/") (docsDir </> name <> "/")
+            let docsOutDir =  docsDir </> name
+            whenM
+                (doesDirectoryExist docsOutDir)
+                (liftIO $ removeDirectoryRecursive docsOutDir)
+            cmd_ "cp" "-r" (docsBuildDir <> "/") docsOutDir
             copyFileChanged haddockOk out
 
 
