@@ -1,7 +1,4 @@
-type Foo
-    = A
-    | B
-    | C
+type Foo = A | B | C
 
 a = A
 
