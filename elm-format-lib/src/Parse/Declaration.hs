@@ -18,7 +18,7 @@ import Reporting.Annotation (Located)
 
 declaration :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'TopLevelDeclarationNK)
 declaration elmVersion =
-    typeDecl elmVersion <|> infixDecl elmVersion <|> port elmVersion <|> definition elmVersion
+    typeDecl elmVersion <|> try (infixDecl elmVersion) <|> port elmVersion <|> definition elmVersion
 
 
 topLevelStructure :: IParser a -> IParser (TopLevelStructure a)

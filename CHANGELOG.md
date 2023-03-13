@@ -3,6 +3,9 @@
 New features:
   - `case ... then` is now auto-corrected to `case ... of`
 
+Bug fixes:
+  - Top-level declarations named "infix" no longer make files unprocessable
+
 
 ## 0.8.6
 
