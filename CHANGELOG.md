@@ -1,3 +1,9 @@
+## main
+
+New features:
+  - `case ... then` is now auto-corrected to `case ... of`
+
+
 ## 0.8.6
 
 New features:
