@@ -252,7 +252,7 @@ caseExpr elmVersion =
   fmap I.Fix $ addLocation $
   do  try (reserved elmVersion "case")
       (e, multilineSubject) <- trackNewline $ padded (expr elmVersion)
-      reserved elmVersion "of"
+      _ <- reserved elmVersion "of" <|> reserved elmVersion "then"
       firstPatternComments <- whitespace
       result <- cases firstPatternComments
       return $ Case (e, multilineToBool multilineSubject) result
