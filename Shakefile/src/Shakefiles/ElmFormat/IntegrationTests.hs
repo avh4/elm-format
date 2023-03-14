@@ -3,24 +3,26 @@ module Shakefiles.ElmFormat.IntegrationTests where
 import Control.Monad (forM_)
 import Development.Shake
 import Development.Shake.FilePath
+import Shakefiles.Prelude
+import qualified Shakefiles.Haskell.Hpc as Hpc
+import Relude (whenM)
+import System.Directory (removeFile)
+import qualified Shakefiles.ListFiles as ListFiles
 
 rules :: String -> FilePath -> Rules ()
 rules gitSha elmFormat = do
     phony "integration-tests" $
         need
             [ "_build/run-tests.ok"
-            , "_build/tests/test-files/good-json.ok"
-            , "_build/tests/test-files/good-json-roundtrip.ok"
-            , "_build/tests/test-files/good/Elm-0.19.ok"
-            , "_build/tests/test-files/good/Elm-0.18.ok"
-            , "_build/tests/test-files/good/Elm-0.17.ok"
-            , "_build/tests/test-files/transform/Elm-0.19.ok"
-            , "_build/tests/test-files/transform/Elm-0.18.ok"
-            , "_build/tests/test-files/transform/Elm-0.17.ok"
-            , "_build/tests/test-files/bad/Elm-0.19.ok"
-            , "_build/tests/test-files/bad/Elm-0.18.ok"
-            , "_build/tests/test-files/bad/Elm-0.17.ok"
-            , "_build/tests/test-files/from-json/Elm-0.19.ok"
+            , "_build/integration-tests/good-json.ok"
+            , "_build/integration-tests/good-json-roundtrip.ok"
+            , "_build/integration-tests/good/Elm-0.19.ok"
+            , "_build/integration-tests/good/Elm-0.18.ok"
+            , "_build/integration-tests/good/Elm-0.17.ok"
+            , "_build/integration-tests/transform/Elm-0.19.ok"
+            , "_build/integration-tests/transform/Elm-0.18.ok"
+            , "_build/integration-tests/bad/Elm-0.19.ok"
+            , "_build/integration-tests/from-json/Elm-0.19.ok"
             ]
 
     "_build/run-tests.ok" %> \out -> do
@@ -46,25 +48,52 @@ rules gitSha elmFormat = do
         need oks
         writeFile' out (unlines oks)
 
+    "_build/hpc/run/integration-tests.tix" %> \out ->
+          Hpc.mergeTixFiles
+              [ "_build/hpc/run/integration-tests/good/Elm-0.19.tix"
+              , "_build/hpc/run/integration-tests/good/Elm-0.18.tix"
+              , "_build/hpc/run/integration-tests/good/Elm-0.17.tix"
+              , "_build/hpc/run/integration-tests/transform/Elm-0.19.tix"
+              , "_build/hpc/run/integration-tests/transform/Elm-0.18.tix"
+              , "_build/hpc/run/integration-tests/bad/Elm-0.19.tix"
+              , "_build/hpc/run/integration-tests/from-json/Elm-0.19.tix"
+              ]
+              out
+
 
     -- Elm files
+
+    "_build/integration-tests/*/*.ok" %> \out -> do
+        let exampleType = takeDirectory1 $ nTimes 2 dropDirectory1 out
+        let runProfile = dropExtension $ takeFileName out
+        let sourceExt = case exampleType of
+              "from-json" -> "json"
+              _ -> "elm"
+        sourceFiles <- ListFiles.read ("_build/list-files/tests/test-files" </> exampleType </> runProfile) sourceExt
+        let oks = case exampleType of
+              "good" -> [ "_build" </> f -<.> "elm_matches" | f <- sourceFiles]
+              "bad" -> [ "_build" </> f -<.> "elm_bad_matches" | f <- sourceFiles ]
+              "transform" -> [ "_build" </> f -<.> "elm_transform_matches" | f <- sourceFiles, takeExtension (dropExtension f) /= ".formatted" ]
+              "from-json" -> ["_build" </> f -<.> "elm_from_json_matches" | f <- sourceFiles ]
+              _ -> error ("unknown example type: " <> exampleType)
+        need oks
+        writeFile' out (unlines sourceFiles)
+
+    "_build/hpc/run/integration-tests/*/*.tix" %> \out -> do
+        let exampleType = takeDirectory1 $ nTimes 4 dropDirectory1 out
+        let runProfile = dropExtension $ takeFileName out
+        let sourceExt = case exampleType of
+              "from-json" -> "json"
+              _ -> "elm"
+        sourceFiles <- ListFiles.read ("tests/test-files" </> exampleType </> runProfile) sourceExt
+        let tixs = ["_build/hpc/run/integration-tests" </> f -<.> "tix" | f <- sourceFiles]
+        Hpc.mergeTixFiles tixs out
 
     let elmVersions = [ "0.17", "0.18", "0.19" ]
 
     forM_ elmVersions $ \elmVersion -> do
-        ("_build/tests/test-files/good/Elm-" ++ elmVersion ++ ".ok") %> \out -> do
-            elmFiles <- getDirectoryFiles ""
-                [ "tests/test-files/good/Elm-" ++ elmVersion ++ "//*.elm"
-                ]
-            let oks = ["_build" </> f -<.> "elm_matches" | f <- elmFiles]
-            need oks
-            writeFile' out (unlines elmFiles)
-
         ("_build/tests/test-files/good/Elm-" ++ elmVersion ++ "/prof.ok") %> \out -> do
-            alwaysRerun
-            elmFiles <- getDirectoryFiles ""
-                [ "tests/test-files/good/Elm-" ++ elmVersion ++ "//*.elm"
-                ]
+            elmFiles <- ListFiles.read ("tests/test-files/good/Elm-" <> elmVersion) "elm"
             let oks = ["_profile" </> f -<.> (gitSha ++ ".prof") | f <- elmFiles]
             need oks
             writeFile' out (unlines oks)
@@ -74,6 +103,26 @@ rules gitSha elmFormat = do
             let elmFormatProf = "_build" </> "bin" </> "elm-format" </> "profile" </> "elm-format" <.> exe
             need [ elmFormatProf, source ]
             cmd_ elmFormatProf source "--output" "/dev/null" ("--elm-version=" ++ elmVersion) "+RTS" "-p" ("-po" ++ (out -<.> ""))
+
+        ("_build/hpc/run/integration-tests/tests/test-files/*/Elm-" <> elmVersion <> "//*.tix") %> \out -> do
+            let sourceBase = nTimes 4 dropDirectory1 out
+            let exampleType = takeDirectory1 $ nTimes 2 dropDirectory1 sourceBase
+            let elmFormatHpc = "_build" </> "bin" </> "elm-format" </> "coverage" </> "elm-format" <.> exe
+            let sourceExt = case exampleType of
+                  "from-json" -> "json"
+                  _ -> "elm"
+            let source = sourceBase -<.> sourceExt
+            need [ elmFormatHpc, source ]
+            whenM (doesFileExist out)
+                (liftIO $ removeFile out)
+            case exampleType of
+                "bad" ->  do
+                    (Exit _) <- cmd (AddEnv "HPCTIXFILE" out) elmFormatHpc source "--output" "/dev/null" ("--elm-version=" ++ elmVersion)
+                    return ()
+                "from-json" -> do
+                    cmd_ (AddEnv "HPCTIXFILE" out) elmFormatHpc "--from-json" source
+                _ -> do
+                    cmd_ (AddEnv "HPCTIXFILE" out) elmFormatHpc source "--output" "/dev/null" ("--elm-version=" ++ elmVersion)
 
         ("_build/tests/test-files/*/Elm-" ++ elmVersion ++ "//*.elm_formatted") %> \out -> do
             let source = dropDirectory1 $ out -<.> "elm"
@@ -85,30 +134,6 @@ rules gitSha elmFormat = do
             need [ elmFormat, source ]
             (Stderr stderr, Exit _) <- cmd (FileStdin source) BinaryPipes elmFormat "--stdin" ("--elm-version=" ++ elmVersion)
             cmd_ (FileStdout out) (Stdin stderr) BinaryPipes "tr" [ "-d", "\r" ]
-
-        ("_build/tests/test-files/transform/Elm-" ++ elmVersion ++ ".ok") %> \out -> do
-            elmFiles <- getDirectoryFiles ""
-                [ "tests/test-files/transform/Elm-" ++ elmVersion ++ "//*.elm"
-                ]
-            let oks = ["_build" </> f -<.> "elm_transform_matches" | f <- elmFiles, takeExtension (dropExtension f) /= ".formatted" ]
-            need oks
-            writeFile' out (unlines oks)
-
-        ("_build/tests/test-files/bad/Elm-" ++ elmVersion ++ ".ok") %> \out -> do
-            elmFiles <- getDirectoryFiles ""
-                [ "tests/test-files/bad/Elm-" ++ elmVersion ++ "//*.elm"
-                ]
-            let oks = ["_build" </> f -<.> "elm_bad_matches" | f <- elmFiles ]
-            need oks
-            writeFile' out (unlines elmFiles)
-
-        ("_build/tests/test-files/from-json/Elm-" ++ elmVersion ++ ".ok") %> \out -> do
-            jsonFiles <- getDirectoryFiles ""
-                [ "tests/test-files/from-json/Elm-" ++ elmVersion ++ "//*.json"
-                ]
-            let oks = ["_build" </> f -<.> "elm_from_json_matches" | f <- jsonFiles ]
-            need oks
-            writeFile' out (unlines oks)
 
     "_build/tests//*.elm_from_json" %> \out -> do
         let source = dropDirectory1 $ out -<.> "json"
@@ -146,7 +171,7 @@ rules gitSha elmFormat = do
 
     -- JSON files
 
-    "_build/tests/test-files/good-json.ok" %> \out -> do
+    "_build/integration-tests/good-json.ok" %> \out -> do
         jsonFiles <- getDirectoryFiles ""
             [ "tests/test-files/good//*.json"
             ]
@@ -168,7 +193,7 @@ rules gitSha elmFormat = do
         cmd_ "diff" "--strip-trailing-cr" "-u" actual expected
         writeFile' out ""
 
-    "_build/tests/test-files/good-json-roundtrip.ok" %> \out -> do
+    "_build/integration-tests/good-json-roundtrip.ok" %> \out -> do
         jsonFiles <- getDirectoryFiles ""
             [ "tests/test-files/good//*.json"
             ]

@@ -33,5 +33,6 @@ in haskellPackages.shellFor {
     nodejs
     minisign
     simple-http-server
+    haskellTools.hpc
   ];
 }
