@@ -71,8 +71,9 @@ rules gitSha elmFormat = do
 
         ("_profile/tests/test-files/good/Elm-" ++ elmVersion ++ "//*." ++ gitSha ++ ".prof") %> \out -> do
             let source = dropDirectory1 $ dropExtensions out <.> "elm"
-            need [ "_build/bin/elm-format-prof", source ]
-            cmd_ "_build/bin/elm-format-prof" source "--output" "/dev/null" ("--elm-version=" ++ elmVersion) "+RTS" "-p" ("-po" ++ (out -<.> ""))
+            let elmFormatProf = "_build" </> "bin" </> "elm-format" </> "profile" </> "elm-format" <.> exe
+            need [ elmFormatProf, source ]
+            cmd_ elmFormatProf source "--output" "/dev/null" ("--elm-version=" ++ elmVersion) "+RTS" "-p" ("-po" ++ (out -<.> ""))
 
         ("_build/tests/test-files/*/Elm-" ++ elmVersion ++ "//*.elm_formatted") %> \out -> do
             let source = dropDirectory1 $ out -<.> "elm"

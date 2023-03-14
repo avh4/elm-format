@@ -33,7 +33,7 @@ rules = do
     StdoutTrim gitDescribe <- liftIO $ cmd "git" [ "describe", "--abbrev=8", "--match", "[0-9]*", "--always" ]
     StdoutTrim gitSha <- liftIO $ cmd "git" [ "describe", "--always", "--match", "NOT A TAG", "--dirty" ]
 
-    let elmFormat = "_build" </> "elm-format" <.> exe
+    let elmFormat = "_build" </> "bin" </> "elm-format" </> "O0" </> "elm-format" <.> exe
 
     shellcheck <- Shakefiles.Dependencies.rules
 
@@ -142,7 +142,7 @@ rules = do
         ]
         [ "elm-format-test-lib" ]
 
-    Shakefiles.Haskell.executable elmFormat "elm-format" gitDescribe
+    Shakefiles.Haskell.executable "elm-format" "elm-format" gitDescribe
 
     Shakefiles.NixBuild.rules
 

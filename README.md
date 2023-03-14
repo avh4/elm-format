@@ -313,7 +313,7 @@ cabal install hpack
 dev/build.sh -- build
 
 # run the built elm-format
-./_build/elm-format
+./_build/bin/elm-format/O0/elm-format
 ```
 
 See [`dev/Documentation`](dev/Documentation/README.md) for more contributor and build command documentation.
