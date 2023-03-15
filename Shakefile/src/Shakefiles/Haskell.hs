@@ -1,22 +1,22 @@
 module Shakefiles.Haskell (cabalProject, executable) where
 
+import qualified Data.Aeson.Key as Key
+import Data.Char (isSpace)
+import Data.List (dropWhileEnd, stripPrefix)
+import Data.Yaml (FromJSON, (.:))
+import qualified Data.Yaml as Yaml
+import Data.Yaml.TH (FromJSON (..))
 import Development.Shake
 import Development.Shake.Command
 import Development.Shake.FilePath
 import Development.Shake.Util
-import qualified System.Directory
+import Relude.Bool.Guard (whenM)
+import Shakefiles.Extra
 import Shakefiles.Platform (platform)
 import qualified Shakefiles.Platform
-import Data.Char (isSpace)
-import Data.List (dropWhileEnd, stripPrefix)
-import Shakefiles.Extra
 import System.Directory (createDirectoryIfMissing, removeDirectoryRecursive)
-import Data.Yaml (FromJSON, (.:))
-import Data.Yaml.TH (FromJSON(..))
-import qualified Data.Yaml as Yaml
-import qualified Data.Aeson.Key as Key
-import Relude.Bool.Guard (whenM)
-
+import qualified System.Directory
+import Shakefiles.Prelude
 
 docsDir :: FilePath
 docsDir = "_build/docs/public"
@@ -39,28 +39,41 @@ cabalProject name sourceFiles sourcePatterns deps testPatterns testDeps =
                     , sourceFiles
                     , sourceFilesFromPatterns
                     ]
-            need allFiles
-            liftIO $ getHashedShakeVersion allFiles
+            hashNeed allFiles
     in
     do
-        "_build/cabal/" </> name </> "version" %> \out -> do
+        "_build/cabal" </> name </> "version" %> \out -> do
             let packageYaml = name </> "package.yaml"
             need [ packageYaml ]
             (VersionFromYaml version) <- Yaml.decodeFileThrow packageYaml
             writeFileChanged out version
 
-        "_build/cabal/" </> name </> "build.ok" %> \out -> do
+        "_build/cabal" </> name </> "build.ok" %> \out -> do
             hash <- needProjectFiles
-            cmd_ "cabal" "v2-build" "-O0"  (name ++ ":libs") "--enable-tests"
+            cmd_ "cabal" "v2-build" "-O0" (name ++ ":libs") "--enable-tests"
             writeFile' out hash
 
-        cabalBinPath name "noopt" %> \out -> do
-            _ <- needProjectFiles
-            cmd_ "cabal" "v2-build" "-O0" (name ++ ":exes") "--enable-tests"
+        let exeRule variantName cabalFlags = do
+              let projectName = name
+              let exeName = name
+              "_build/bin" </> projectName </> variantName </> exeName <.> exe %> \out -> do
+                  _ <- needProjectFiles
+                  let cabalTarget = projectName <> ":exe:" <> exeName
+                  let builddirFlag = "--builddir=dist-newstyle/_" <> variantName
+                  StdoutTrim cabalOutput <- cmd "cabal" "list-bin" builddirFlag cabalFlags cabalTarget
+                  cmd_ "cabal" "v2-build" builddirFlag cabalFlags cabalTarget
+                  copyFileChanged cabalOutput out
 
-        cabalBinPath name "opt" %> \out -> do
-            _ <- needProjectFiles
-            cmd_ "cabal" "v2-build" "-O2" (name ++ ":exes")
+        exeRule "O0" ["-O0", "--enable-tests"]
+        exeRule "O2" ["-O2"]
+        exeRule "profile"
+            [ "-O2"
+            , "--enable-profiling"
+            , "--enable-executable-profiling"
+            , "--enable-library-profiling"
+            , "--ghc-options=-fprof-auto -rtsopts"
+            ]
+        exeRule "coverage" [ "--enable-coverage" ]
 
         "_build/cabal/" </> name </> "test.ok" %> \out -> do
             need globalConfig
@@ -102,29 +115,15 @@ cabalBuildDir projectName = do
     return $ "dist-newstyle" </> "build" </> Shakefiles.Platform.cabalInstallOs </> "ghc-9.2.5" </> projectName ++ "-" ++ version
 
 
-cabalBinPath :: String -> String -> FilePath
-cabalBinPath projectName opt =
-    let
-        version =
-            case projectName of
-                "elm-format" -> "0.8.6"
-                _ -> "0.0.0"
-    in
-    "dist-newstyle/build" </> Shakefiles.Platform.cabalInstallOs </> "ghc-9.2.5" </> projectName ++ "-" ++ version </> "x" </> projectName </> opt </> "build" </> projectName </> projectName <.> exe
-
-
-executable :: FilePath -> String -> String -> Rules ()
-executable target projectName gitDescribe =
+executable :: String -> String -> String -> Rules ()
+executable projectName exeName gitDescribe =
     do
-        target %> \out -> do
-            copyFileChanged (cabalBinPath projectName "noopt") out
-
         phony ("dist-" ++ projectName) $ need
             [ "dist" </> projectName ++ "-" ++ gitDescribe ++ "-" ++ show platform <.> Shakefiles.Platform.zipFormatFor platform
             ]
 
-        ("_build" </> "dist" </> show platform </> projectName <.> exe) %> \out -> do
-            let binDist = cabalBinPath projectName "opt"
+        ("_build" </> "dist" </> show platform </> exeName <.> exe) %> \out -> do
+            let binDist = "_build" </> "bin" </> "elm-format" </> "O2" </> "elm-format" <.> exe
             need [ binDist ]
             cmd_ "strip" "-o" out binDist
 

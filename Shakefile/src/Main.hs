@@ -14,6 +14,9 @@ import qualified Shakefiles.Signature
 import Shakefiles.Extra
 import qualified Shakefiles.NixBuild
 import qualified Shakefiles.NestedCheckout
+import Shakefiles.Prelude
+import qualified Shakefiles.Haskell.Hpc
+import qualified Shakefiles.ListFiles
 
 
 main :: IO ()
@@ -33,7 +36,7 @@ rules = do
     StdoutTrim gitDescribe <- liftIO $ cmd "git" [ "describe", "--abbrev=8", "--match", "[0-9]*", "--always" ]
     StdoutTrim gitSha <- liftIO $ cmd "git" [ "describe", "--always", "--match", "NOT A TAG", "--dirty" ]
 
-    let elmFormat = "_build" </> "elm-format" <.> exe
+    let elmFormat = "_build" </> "bin" </> "elm-format" </> "O0" </> "elm-format" <.> exe
 
     shellcheck <- Shakefiles.Dependencies.rules
 
@@ -59,6 +62,10 @@ rules = do
         , "_build/cabal/elm-format/test.ok"
         ]
     phony "profile" $ need [ "_build/tests/test-files/prof.ok" ]
+    phony "coverage" $ need
+        [ "_build/hpc/report/integration-tests.ok"
+        , "_build/hpc/markup/integration-tests.ok"
+        ]
     phony "dist" $ need [ "dist-elm-format" ]
     phonyPrefix "publish-" $ \version ->
         need [ "elm-format-publish-" ++ version ]
@@ -142,7 +149,8 @@ rules = do
         ]
         [ "elm-format-test-lib" ]
 
-    Shakefiles.Haskell.executable elmFormat "elm-format" gitDescribe
+    Shakefiles.Haskell.executable "elm-format" "elm-format" gitDescribe
+    Shakefiles.Haskell.Hpc.rules gitSha
 
     Shakefiles.NixBuild.rules
 
@@ -152,6 +160,8 @@ rules = do
 
     Shakefiles.Shellcheck.rules shellcheck
 
+    Shakefiles.ListFiles.rules
+
     --
     -- Dev tools
     --
@@ -159,3 +169,7 @@ rules = do
     phony "serve:docs" $ do
         need [ "docs" ]
         cmd_ "simple-http-server" "--index" "_build/docs/public"
+
+    phony "serve:coverage" $ do
+        need [ "coverage" ]
+        cmd_ "simple-http-server" "--index" "_coverage"
