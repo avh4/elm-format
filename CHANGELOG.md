@@ -2,6 +2,7 @@
 
 New features:
   - `case ... then` is now auto-corrected to `case ... of`
+  - `=>` is now auto-corrected to `->`
 
 Bug fixes:
   - Top-level declarations named "infix" no longer make files unprocessable
