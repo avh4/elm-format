@@ -3,10 +3,10 @@
 module Parse.Helpers where
 
 import Prelude hiding (until)
-import Control.Monad (guard)
+import Control.Monad (guard, void, when)
 import qualified Data.Indexed as I
 import Data.Map.Strict hiding (foldl)
-import Parse.ParsecAdapter hiding (newline, spaces, State)
+import Parse.ParsecAdapter
 
 import AST.V0_16
 import qualified AST.Helpers as Help
@@ -136,47 +136,47 @@ symOpInParens =
 
 equals :: IParser ()
 equals =
-  const () <$> char '=' <?> "="
+  void (char '=' <?> "=")
 
 
 lenientEquals :: IParser ()
 lenientEquals =
-  const () <$> (char '=' <|> char ':') <?> "="
+  void ((char '=' <|> char ':') <?> "=")
 
 
 rightArrow :: IParser ()
 rightArrow =
-  const () <$> (string "->" <|> string "\8594") <?> "->"
+  void ((string "->" <|> string "\8594" <|> string "=>") <?> "->")
 
 
 cons :: IParser ()
 cons =
-  const () <$> string "::" <?> "a cons operator '::'"
+  void (string "::" <?> "a cons operator '::'")
 
 
 hasType :: IParser ()
 hasType =
-  const () <$> char ':' <?> "the \"has type\" symbol ':'"
+  void (char ':' <?> "the \"has type\" symbol ':'")
 
 
 lenientHasType :: IParser ()
 lenientHasType =
-  const () <$> (char ':' <|> char '=') <?> "the \"has type\" symbol ':'"
+  void ((char ':' <|> char '=') <?> "the \"has type\" symbol ':'")
 
 
 comma :: IParser ()
 comma =
-  const () <$> char ',' <?> "a comma ','"
+  void (char ',' <?> "a comma ','")
 
 
 semicolon :: IParser ()
 semicolon =
-  const () <$> char ';' <?> "a semicolon ';'"
+  void (char ';' <?> "a semicolon ';'")
 
 
 verticalBar :: IParser ()
 verticalBar =
-  const () <$> char '|' <?> "a vertical bar '|'"
+  void (char '|' <?> "a vertical bar '|'")
 
 
 commitIf :: IParser any -> IParser a -> IParser a
@@ -339,7 +339,7 @@ constrainedSpacePrefix :: IParser a -> IParser [(C1 before a, Multiline)]
 constrainedSpacePrefix parser =
   constrainedSpacePrefix' parser constraint
   where
-    constraint empty = if empty then notFollowedBy (char '-') else return ()
+    constraint empty = when empty $ notFollowedBy (char '-')
 
 
 constrainedSpacePrefix' :: IParser a -> (Bool -> IParser b) -> IParser [(C1 before a, Multiline)]
@@ -439,7 +439,7 @@ surround'' leftDelim rightDelim inner =
     sep''' =
       do
         v <- (\pre a post -> C (pre, post) a) <$> whitespace <*> inner <*> whitespace
-        option [v] ((\x -> v : x) <$> (char ',' >> sep'''))
+        option [v] ((v :) <$> (char ',' >> sep'''))
     sep'' =
       do
           pre <- whitespace
@@ -448,7 +448,7 @@ surround'' leftDelim rightDelim inner =
               Nothing ->
                   return $ Left pre
               Just v' ->
-                  Right <$> option [v'] ((\x -> v' : x) <$> (char ',' >> sep'''))
+                  Right <$> option [v'] ((v' :) <$> (char ',' >> sep'''))
   in
     do
       _ <- char leftDelim
@@ -501,8 +501,7 @@ commentedKeyword elmVersion word parser =
   do
     pre <- try (whitespace <* reserved elmVersion word)
     post <- whitespace
-    value <- parser
-    return $ C (pre, post) value
+    C (pre, post) <$> parser
 
 
 -- ODD COMBINATORS
