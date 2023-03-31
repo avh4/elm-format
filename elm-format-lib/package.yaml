@@ -23,24 +23,18 @@ default-extensions:
 ghc-options:
   - -O2
   - -Wall
+  - -Wunused-packages
   - -Wno-name-shadowing
 
 dependencies:
   aeson: ">= 2.1.0.0 && < 2.2"
-  ansi-terminal: ">= 0.11 && < 0.12"
-  ansi-wl-pprint: ">= 0.6.9 && < 0.7"
-  array: ">= 0.5.4.0 && < 0.6"
   base: ">= 4.15.0.0 && < 5"
   bimap: ">= 0.4.0 && < 0.6"
   binary: ">= 0.8.9.0 && < 0.9"
   bytestring: ">= 0.11.3.0 && < 0.12"
   containers: ">= 0.6.5.1 && < 0.7"
-  directory: ">= 1.3.6.2 && < 2"
-  filepath: ">= 1.4.2.1 && < 2"
-  ghc-prim: ">= 0.5.2"
   mtl: ">= 2.2.2 && < 3"
   optparse-applicative: ">= 0.17.0.0 && < 0.18"
-  process: ">= 1.6.13.2 && < 2"
   relude: ">= 1.1.0.0 && < 1.2"
   text: ">= 2.0 && < 3"
   avh4-lib: {}
