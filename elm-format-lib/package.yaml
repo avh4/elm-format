@@ -33,6 +33,7 @@ dependencies:
   binary: ">= 0.8.9.0 && < 0.9"
   bytestring: ">= 0.11.3.0 && < 0.12"
   containers: ">= 0.6.5.1 && < 0.7"
+  ghc-prim: ">= 0.5.2"
   mtl: ">= 2.2.2 && < 3"
   optparse-applicative: ">= 0.17.0.0 && < 0.18"
   relude: ">= 1.1.0.0 && < 1.2"
