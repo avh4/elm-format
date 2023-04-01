@@ -35,9 +35,9 @@ rules gitSha elmFormat = do
             , "tests/test-files/recursive-directory//*.elm"
             , "tests/test-files/*.json"
             ]
-        need testFiles
+        hash <- hashNeed testFiles
         cmd_ ("bash" <.> exe) script elmFormat
-        writeFile' out ""
+        writeFile' out (unlines $ hash : testFiles)
 
     "_build/tests/test-files/prof.ok" %> \out -> do
         let oks =
@@ -69,7 +69,7 @@ rules gitSha elmFormat = do
         let sourceExt = case exampleType of
               "from-json" -> "json"
               _ -> "elm"
-        sourceFiles <- ListFiles.read ("_build/list-files/tests/test-files" </> exampleType </> runProfile) sourceExt
+        sourceFiles <- ListFiles.read ("tests/test-files" </> exampleType </> runProfile) sourceExt
         let oks = case exampleType of
               "good" -> [ "_build" </> f -<.> "elm_matches" | f <- sourceFiles]
               "bad" -> [ "_build" </> f -<.> "elm_bad_matches" | f <- sourceFiles ]
