@@ -35,9 +35,9 @@ rules gitSha elmFormat = do
             , "tests/test-files/recursive-directory//*.elm"
             , "tests/test-files/*.json"
             ]
-        need testFiles
+        hash <- hashNeed testFiles
         cmd_ ("bash" <.> exe) script elmFormat
-        writeFile' out ""
+        writeFile' out (unlines $ hash : testFiles)
 
     "_build/tests/test-files/prof.ok" %> \out -> do
         let oks =
