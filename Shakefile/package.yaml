@@ -11,6 +11,7 @@ ghc-options:
   - -rtsopts
   - -threaded
   - -with-rtsopts=-I0
+  - -Werror=unused-packages
 
 dependencies:
   aeson: ">= 2.0.0.0"
