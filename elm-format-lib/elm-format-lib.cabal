@@ -87,25 +87,18 @@ library
       MultiParamTypeClasses
       OverloadedStrings
       ScopedTypeVariables
-  ghc-options: -O2 -Wall -Wno-name-shadowing
+  ghc-options: -O2 -Wall -Werror=unused-packages -Wno-name-shadowing
   build-depends:
       aeson >=2.1.0.0 && <2.2
-    , ansi-terminal ==0.11.*
-    , ansi-wl-pprint >=0.6.9 && <0.7
-    , array >=0.5.4.0 && <0.6
     , avh4-lib
     , base >=4.15.0.0 && <5
     , bimap >=0.4.0 && <0.6
     , binary >=0.8.9.0 && <0.9
     , bytestring >=0.11.3.0 && <0.12
     , containers >=0.6.5.1 && <0.7
-    , directory >=1.3.6.2 && <2
     , elm-format-markdown
-    , filepath >=1.4.2.1 && <2
-    , ghc-prim >=0.5.2
     , mtl >=2.2.2 && <3
     , optparse-applicative >=0.17.0.0 && <0.18
-    , process >=1.6.13.2 && <2
     , relude >=1.1.0.0 && <1.2
     , text >=2.0 && <3
   default-language: Haskell2010
@@ -197,29 +190,22 @@ test-suite efl-tests
       MultiParamTypeClasses
       OverloadedStrings
       ScopedTypeVariables
-  ghc-options: -O2 -Wall -Wno-name-shadowing
+  ghc-options: -O2 -Wall -Werror=unused-packages -Wno-name-shadowing
   build-tool-depends:
       tasty-discover:tasty-discover >=4.2.1 && <5
   build-depends:
       aeson >=2.1.0.0 && <2.2
-    , ansi-terminal ==0.11.*
-    , ansi-wl-pprint >=0.6.9 && <0.7
-    , array >=0.5.4.0 && <0.6
     , avh4-lib
     , base >=4.15.0.0 && <5
     , bimap >=0.4.0 && <0.6
     , binary >=0.8.9.0 && <0.9
     , bytestring >=0.11.3.0 && <0.12
     , containers >=0.6.5.1 && <0.7
-    , directory >=1.3.6.2 && <2
     , elm-format-markdown
     , elm-format-test-lib
-    , filepath >=1.4.2.1 && <2
-    , ghc-prim >=0.5.2
     , hspec >=2.7.4 && <3
     , mtl >=2.2.2 && <3
     , optparse-applicative >=0.17.0.0 && <0.18
-    , process >=1.6.13.2 && <2
     , relude >=1.1.0.0 && <1.2
     , split >=0.2.3.4 && <0.3
     , tasty >=1.2 && <2

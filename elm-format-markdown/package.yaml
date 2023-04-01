@@ -22,6 +22,7 @@ default-extensions:
 ghc-options:
   - -O2
   - -Wall
+  - -Werror=unused-packages
   - -Wno-name-shadowing
 
 dependencies:

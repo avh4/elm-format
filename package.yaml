@@ -31,6 +31,7 @@ ghc-options:
   - -with-rtsopts=-N
   - -O2
   - -Wall
+  - -Werror=unused-packages
   - -Wno-name-shadowing
 
 dependencies:
@@ -38,7 +39,6 @@ dependencies:
   ansi-wl-pprint: ">= 0.6.9 && < 0.7"
   base: ">= 4.15.0.0 && < 5"
   bytestring: ">= 0.11.3.0 && < 0.12"
-  containers: ">= 0.6.5.1 && < 0.7"
   optparse-applicative: ">= 0.17.0.0 && < 0.18"
   relude: ">= 1.1.0.0 && < 1.2"
   text: ">= 2.0 && < 3"
@@ -73,12 +73,10 @@ tests:
 
     dependencies:
       hspec: ">= 2.7.4 && < 3"
-      mtl: ">= 2.2.2 && < 3"
       tasty: ">= 1.2 && < 2"
       tasty-hspec: ">= 1.2.0.1 && < 1.3"
       tasty-hunit: ">= 0.10.0.1 && < 0.11"
       tasty-quickcheck: ">= 0.10.1 && < 0.11"
       QuickCheck: ">= 2.12.6.1 && < 3"
       quickcheck-io: ">= 0.2.0 && < 0.3"
-      bimap: ">= 0.4.0 && < 0.6"
       elm-format-test-lib: {}

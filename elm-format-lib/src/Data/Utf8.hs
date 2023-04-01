@@ -65,7 +65,7 @@ import GHC.Exts
   )
 import GHC.IO
 import GHC.ST (ST(ST), runST)
-import GHC.Prim
+import GHC.Exts
 import GHC.Word (Word8(W8#))
 
 import qualified Parse.Primitives as P

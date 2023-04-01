@@ -33,7 +33,7 @@ library
       MultiParamTypeClasses
       OverloadedStrings
       ScopedTypeVariables
-  ghc-options: -O2 -Wall -Wno-name-shadowing
+  ghc-options: -O2 -Wall -Werror=unused-packages -Wno-name-shadowing
   build-depends:
       base >=4.15.0.0 && <5
     , containers >=0.6.5.1 && <0.7

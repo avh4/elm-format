@@ -39,16 +39,11 @@ library
       MultiParamTypeClasses
       OverloadedStrings
       ScopedTypeVariables
-  ghc-options: -O2 -Wall -Wno-name-shadowing
+  ghc-options: -O2 -Wall -Werror=unused-packages -Wno-name-shadowing
   build-depends:
-      ansi-terminal ==0.11.*
-    , ansi-wl-pprint >=0.6.9 && <0.7
-    , array >=0.5.4.0 && <0.6
+      array >=0.5.4.0 && <0.6
     , base >=4.15.0.0 && <5
-    , bimap >=0.4.0 && <0.6
-    , binary >=0.8.9.0 && <0.9
     , bytestring >=0.11.3.0 && <0.12
-    , containers >=0.6.5.1 && <0.7
     , directory >=1.3.6.2 && <2
     , filepath >=1.4.2.1 && <2
     , mtl >=2.2.2 && <3
@@ -87,18 +82,13 @@ test-suite al-tests
       MultiParamTypeClasses
       OverloadedStrings
       ScopedTypeVariables
-  ghc-options: -O2 -Wall -Wno-name-shadowing
+  ghc-options: -O2 -Wall -Werror=unused-packages -Wno-name-shadowing
   build-tool-depends:
       tasty-discover:tasty-discover >=4.2.1 && <5
   build-depends:
-      ansi-terminal ==0.11.*
-    , ansi-wl-pprint >=0.6.9 && <0.7
-    , array >=0.5.4.0 && <0.6
+      array >=0.5.4.0 && <0.6
     , base >=4.15.0.0 && <5
-    , bimap >=0.4.0 && <0.6
-    , binary >=0.8.9.0 && <0.9
     , bytestring >=0.11.3.0 && <0.12
-    , containers >=0.6.5.1 && <0.7
     , directory >=1.3.6.2 && <2
     , filepath >=1.4.2.1 && <2
     , mtl >=2.2.2 && <3
