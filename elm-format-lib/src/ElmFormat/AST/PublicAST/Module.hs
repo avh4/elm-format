@@ -21,7 +21,6 @@ import AST.MatchReferences (fromMatched, matchReferences)
 import Data.Text (Text)
 import qualified Data.Either as Either
 import qualified Data.Text as Text
-import Data.Maybe (fromMaybe)
 
 
 data Module

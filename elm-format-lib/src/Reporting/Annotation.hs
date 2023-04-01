@@ -21,7 +21,6 @@ import Control.Monad (liftM2)
 import Data.Coapplicative
 import Data.Binary (Binary, get, put)
 import Data.Word (Word16)
-import Data.String (unwords)
 
 
 
@@ -56,11 +55,6 @@ instance Traversable Located where
 instance Coapplicative Located where
     extract (At _ x) = x
     {-# INLINE extract #-}
-
-
-traverse :: (Functor f) => (a -> f b) -> Located a -> f (Located b)
-traverse func (At region value) =
-  At region <$> func value
 
 
 toValue :: Located a -> a
