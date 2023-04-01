@@ -31,3 +31,14 @@ leftPipe a =
         a <|
             a <|
                 ()
+
+
+{-| elm-format will auto-correct `=>` to `->` when used in types and lambda introductions,
+but for Elm <= 0.18, it is valid as an expression and should be untouched in that usage.
+-}
+fatArrowOperator =
+    let
+        (=>) a b =
+            ()
+    in
+    1 => 2 => 3
