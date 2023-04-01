@@ -15,6 +15,10 @@
 /_build/
 /dist-newstyle/
 /bin/
+/Shakefile/build-elm-format.cabal
+/elm-format-lib/elm-format-lib.cabal
+/elm-format-markdown/elm-format-markdown.cabal
+/elm-format.cabal
 
 # Output files
 /dist/
