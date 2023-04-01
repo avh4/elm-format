@@ -69,7 +69,7 @@ rules gitSha elmFormat = do
         let sourceExt = case exampleType of
               "from-json" -> "json"
               _ -> "elm"
-        sourceFiles <- ListFiles.read ("_build/list-files/tests/test-files" </> exampleType </> runProfile) sourceExt
+        sourceFiles <- ListFiles.read ("tests/test-files" </> exampleType </> runProfile) sourceExt
         let oks = case exampleType of
               "good" -> [ "_build" </> f -<.> "elm_matches" | f <- sourceFiles]
               "bad" -> [ "_build" </> f -<.> "elm_bad_matches" | f <- sourceFiles ]
