@@ -151,27 +151,20 @@ application forceMultiline first args =
       first
 
     arg0 : rest ->
-      case
-        ( forceMultiline
-        , first
-        , arg0
-        , allSingles rest
-        )
-      of
-        ( FAJoinFirst JoinAll, SingleLine first', SingleLine arg0', Right rest' ) ->
-          (first' : arg0' : rest' )
-            |> List.intersperse space
-            |> row
-            |> line
+      Block.rowOrIndentForce splitRest (Just space) $
+          Block.rowOrIndentForce splitFirst (Just space) [ first, arg0 ]
+          :| rest
+      where
+        (splitFirst, splitRest) =
+            case forceMultiline of
+                FASplitFirst -> (True, True)
+                FAJoinFirst forceRest ->
+                    ( False
+                    , case forceRest of
+                        SplitAll -> True
+                        JoinAll -> False
+                    )
 
-        ( FAJoinFirst _, SingleLine first', SingleLine arg0', _) ->
-          stack1
-            $ line ( row [ first', space, arg0' ])
-              : map indent rest
-
-        _ ->
-          stack1
-            $ first : map indent (arg0 : rest)
 
 {-|
 `group True '<' ';' '>'` formats as:
