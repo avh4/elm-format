@@ -1629,7 +1629,7 @@ formatRecordLike ::
 formatRecordLike base' fields trailing multiline =
     case (base', fields) of
       ( Just base, pairs' ) ->
-          ElmStructure.extensionGroup'
+          ElmStructure.extensionGroup' '{' '}'
               ((\(ForceMultiline b) -> b) multiline)
               (formatCommented base)
               (formatSequence '|' ',' Nothing

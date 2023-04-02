@@ -6,17 +6,14 @@ module ElmFormat.Render.ElmStructure
   , forceableRowOrStack
   , spaceSepOrIndented, forceableSpaceSepOrIndented, spaceSepOrPrefix, prefixOrIndented
   , equalsPair, definition
-  , application, group, group', extensionGroup, extensionGroup' )
+  , application, group, group', extensionGroup' )
   where
 
 
-import Elm.Utils ((|>))
-import Box hiding (Line, space)
 import AST.V0_16 (FunctionApplicationMultiline(..), Multiline(..))
 import Box.BlockAdapter (Block, space, Line)
 import Data.List.NonEmpty (NonEmpty(..))
 
-import qualified Data.List as List
 import qualified Box.BlockAdapter as Block
 
 
@@ -116,7 +113,7 @@ Formats as:
 equalsPair :: String -> Bool -> Block -> Block -> Block
 equalsPair symbol forceMultiline left right =
     Block.rowOrIndentForce forceMultiline (Just space)
-      [ Block.rowOrIndent (Just space) [ left, line $ punc symbol ]
+      [ Block.rowOrIndent (Just space) [ left, Block.line $ Block.string7 symbol ]
       , right
       ]
 
@@ -231,57 +228,12 @@ Formats as:
       , rest1
     }
 -}
-extensionGroup :: Bool -> Block -> Block -> [Block] -> Block
-extensionGroup multiline base first rest =
-  case
-    ( multiline
-    , isLine base
-    , allSingles (first : rest)
-    )
-  of
-    (False, Right base', Right fields') ->
-      line $ row
-        [ punc "{"
-        , space
-        , base'
-        , space
-        , punc "|"
-        , space
-        , row (List.intersperse (row [punc ",", space]) fields')
-        , space
-        , punc "}"
-        ]
-
-    _ ->
-      stack1
-        [ prefix (row [punc "{", space]) base
-        , stack1
-            ( prefix (row [punc "|", space]) first
-            : map (prefix (row [punc ",", space])) rest)
-            |> indent
-        , line $ punc "}"
-        ]
-
-
-extensionGroup' :: Bool -> Block -> Block -> Block
-extensionGroup' multiline base fields =
-  case
-    ( multiline
-    , base
-    , fields
-    )
-  of
-    (False, SingleLine base', SingleLine fields') ->
-      line $ row $ List.intersperse space
-        [ punc "{"
-        , base'
-        , fields'
-        , punc "}"
-        ]
-
-    _ ->
-      stack1
-        [ prefix (row [punc "{", space]) base
-        , indent fields
-        , line $ punc "}"
+extensionGroup' :: Char -> Char -> Bool -> Block -> Block -> Block
+extensionGroup' open close multiline base fields =
+      Block.rowOrStackForce multiline (Just space)
+        [ Block.rowOrIndentForce multiline (Just space)
+            [ Block.prefix 2 (Block.char7 open <> Block.space) base,
+              fields
+            ],
+          Block.line $ Block.char7 close
         ]
