@@ -3,6 +3,8 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE TypeApplications #-}
 
 module ElmFormat.Render.Box where
 
@@ -61,19 +63,12 @@ pleaseReport what details =
 
 
 surround :: Char -> Char -> Block -> Block
-surround left right b =
-  let
-    left' = punc [left]
-    right' = punc [right]
-  in
-    case b of
-      SingleLine b' ->
-          line $ row [ left', b', right' ]
-      _ ->
-          stack1
-              [ prefix left' b
-              , line right'
-              ]
+surround open close block =
+  Block.rowOrStack
+    Nothing
+    [ Block.prefix 1 (Block.char7 open) block,
+      Block.line $ Block.char7 close
+    ]
 
 
 parens :: Block -> Block
@@ -90,7 +85,7 @@ formatBinary multiline left ops =
             if isLeftPipe then
                 ElmStructure.forceableSpaceSepOrIndented multiline
                     (ElmStructure.spaceSepOrStack left $
-                        concat
+                        concat @[]
                             [ Maybe.maybeToList $ formatComments comments
                             , [line $ Block.stringUtf8 op]
                             ]
@@ -286,7 +281,7 @@ formatModuleHeader elmVersion addDefaultHeader modu =
       detailedListingToSet (AST.Listing.OpenListing _) = Set.empty
       detailedListingToSet AST.Listing.ClosedListing = Set.empty
       detailedListingToSet (AST.Listing.ExplicitListing (AST.Module.DetailedListing values operators types) _) =
-          Set.unions
+          Set.unions @[]
               [ Map.assocs values |> fmap (\(name, C c ()) -> C c (AST.Listing.Value name)) |> Set.fromList
               , Map.assocs operators |> fmap (\(name, C c ()) -> C c (AST.Listing.OpValue name)) |> Set.fromList
               , Map.assocs types |> fmap (\(name, C c (C preListing listing)) -> C c (AST.Listing.Union (C preListing name) listing)) |> Set.fromList
@@ -354,7 +349,7 @@ formatModuleHeader elmVersion addDefaultHeader modu =
       imports =
           formatImports elmVersion modu
   in
-  List.intercalate [ blankLine ] $ concat
+  List.intercalate [ blankLine ] $ concat @[]
       [ maybeToList $ fmap (return . formatModuleLine') maybeHeader
       , maybeToList $ fmap return docs
       , if null imports
@@ -529,7 +524,7 @@ formatModule elmVersion addDefaultHeader spacing modu =
               TopLevel decls -> decls
     in
       stack1 $
-          concat
+          concat @[]
               [ initialComments'
               , formatModuleHeader elmVersion addDefaultHeader modu
               , List.replicate spaceBeforeBody blankLine
@@ -894,7 +889,7 @@ formatListing format listing =
 
 formatDetailedListing :: ElmVersion -> AST.Module.DetailedListing -> [Block]
 formatDetailedListing elmVersion listing =
-    concat
+    concat @[]
         [ formatCommentedMap
             (\name () -> AST.Listing.OpValue name)
             (formatVarValue elmVersion)
@@ -1127,7 +1122,7 @@ formatDefinition ::
 formatDefinition elmVersion importInfo name args comments expr =
   let
     body =
-      stack1 $ concat
+      stack1 $ concat @[]
         [ map formatComment comments
         , [ syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr ]
         ]
@@ -1802,7 +1797,7 @@ formatComments comments =
 formatCommented_ :: Bool -> C2 before after Block -> Block
 formatCommented_ forceMultiline (C (pre, post) inner) =
     ElmStructure.forceableSpaceSepOrStack1 forceMultiline $
-        concat
+        concat @[]
             [ Maybe.maybeToList $ formatComments pre
             , [inner]
             , Maybe.maybeToList $ formatComments post
@@ -2079,7 +2074,7 @@ formatType elmVersion atype =
                 formatRight (C (preOp, postOp, eol) term) =
                     ElmStructure.forceableSpaceSepOrStack1
                         False
-                        $ concat
+                        $ concat @[]
                             [ Maybe.maybeToList $ formatComments preOp
                             , [ ElmStructure.prefixOrIndented
                                   (punc "->")
