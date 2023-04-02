@@ -5,11 +5,15 @@ module Box
   , isLine, allSingles, lineLength
   , indent, prefix, addSuffix
   , render
+  , joinMustBreak, prefixOrIndent, rowOrStackForce, rowOrIndentForce
   ) where
 
 import Elm.Utils ((|>))
 
 import qualified Data.Text as T
+import qualified Data.List.NonEmpty as NonEmpty
+import Data.List.NonEmpty (NonEmpty(..))
+import Data.List (intersperse)
 
 
 {-
@@ -203,6 +207,69 @@ addSuffix suffix b =
             line l1
                 |> andThen (map line $ init ls)
                 |> andThen [ line $ row [ last ls, suffix ] ]
+
+
+joinMustBreak :: Box -> Box -> Box
+joinMustBreak inner eol =
+    case (inner, eol) of
+        (SingleLine inner', SingleLine eol') ->
+            SingleLine $ Row [ inner', space, eol' ]
+        (SingleLine inner', MustBreak eol') ->
+            MustBreak $ Row [ inner', space, eol' ]
+        _ ->
+            stack' inner eol
+
+
+prefixOrIndent :: Maybe Line -> Line -> Box -> Box
+prefixOrIndent joiner a b =
+   case b of
+      SingleLine b' ->
+        line $ join a b'
+      MustBreak b' ->
+        mustBreak $ join a b'
+      _ ->
+        stack' (line a) (indent b)
+  where
+      join a_ b_ =
+        case joiner of
+          Nothing -> Row [ a_, b_ ]
+          Just j -> Row [ a_, j, b_ ]
+
+
+rowOrStackForce :: Bool -> Maybe Line -> NonEmpty Box -> Box
+rowOrStackForce _ _ (single :| []) = single
+rowOrStackForce forceMultiline (Just joiner) blocks =
+  case allSingles $ NonEmpty.toList blocks of
+    Right lines_
+      | not forceMultiline ->
+          line $ Row $ intersperse joiner lines_
+    _ ->
+      stack1 $ NonEmpty.toList blocks
+rowOrStackForce forceMultiline Nothing blocks =
+  case allSingles $ NonEmpty.toList blocks of
+    Right lines_
+      | not forceMultiline ->
+          line $ Row lines_
+    _ ->
+      stack1 $ NonEmpty.toList blocks
+
+
+rowOrIndentForce :: Bool -> Maybe Line -> NonEmpty Box -> Box
+rowOrIndentForce _ _ (single :| []) = single
+rowOrIndentForce forceMultiline (Just joiner) blocks@(b1 :| rest) =
+  case allSingles $ NonEmpty.toList blocks of
+    Right lines_
+      | not forceMultiline ->
+          line $ Row $ intersperse joiner lines_
+    _ ->
+      stack1 (b1 : (indent <$> rest))
+rowOrIndentForce forceMultiline Nothing blocks@(b1 :| rest) =
+  case allSingles $ NonEmpty.toList blocks of
+    Right lines_
+      | not forceMultiline ->
+          line $ Row lines_
+    _ ->
+      stack1 (b1 : (indent <$> rest))
 
 
 renderLine :: Int -> Line -> T.Text
