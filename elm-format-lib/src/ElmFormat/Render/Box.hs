@@ -55,6 +55,7 @@ import Text.Printf (printf)
 import qualified Box.BlockAdapter as Block
 import Box.BlockAdapter (Line, Block)
 import qualified Data.Bifunctor as Bifunctor
+import ElmFormat.Render.ElmStructure (spaceSepOrIndented)
 
 pleaseReport'' :: String -> String -> String
 pleaseReport'' what details =
@@ -406,32 +407,13 @@ formatModuleLine_0_16 header =
         case AST.Module.exports header of
             Nothing -> ([], [])
             Just (C (pre, post) _) -> (pre, post)
-
-    whereClause =
-        formatCommented (C whereComments $ line $ keyword "where")
   in
-    case
-      ( formatCommented $ line . formatQualifiedUppercaseIdentifier elmVersion <$> AST.Module.name header
+  spaceSepOrIndented
+      (line $ keyword "module")
+      [ formatCommented $ line . formatQualifiedUppercaseIdentifier elmVersion <$> AST.Module.name header
       , formatExports
-      , whereClause
-      )
-    of
-      (SingleLine name', SingleLine exports', SingleLine where') ->
-        line $ row
-          [ keyword "module"
-          , space
-          , name'
-          , row [ space, exports' ]
-          , space
-          , where'
-          ]
-      (name', exports', _) ->
-        stack1
-          [ line $ keyword "module"
-          , indent name'
-          , indent exports'
-          , indent whereClause
-          ]
+      , formatCommented (C whereComments $ line $ keyword "where")
+      ]
 
 
 formatModuleLine ::
