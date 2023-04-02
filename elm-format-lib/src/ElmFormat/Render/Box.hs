@@ -7,7 +7,7 @@
 module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
-import Box
+import Box hiding (Line, Box)
 import ElmVersion (ElmVersion(..))
 
 import AST.V0_16
@@ -42,6 +42,7 @@ import qualified Reporting.Annotation as A
 import qualified Reporting.Result as Result
 import Text.Printf (printf)
 import qualified Box.BlockAdapter as Block
+import Box.BlockAdapter (Line, Block)
 
 pleaseReport'' :: String -> String -> String
 pleaseReport'' what details =
@@ -54,12 +55,12 @@ pleaseReport' what details =
     keyword $ pleaseReport'' what details
 
 
-pleaseReport :: String -> String -> Box
+pleaseReport :: String -> String -> Block
 pleaseReport what details =
     line $ pleaseReport' what details
 
 
-surround :: Char -> Char -> Box -> Box
+surround :: Char -> Char -> Block -> Block
 surround left right b =
   let
     left' = punc [left]
@@ -75,11 +76,11 @@ surround left right b =
               ]
 
 
-parens :: Box -> Box
+parens :: Block -> Block
 parens = surround '(' ')'
 
 
-formatBinary :: Bool -> Box -> [ ( Bool, Comments, String, Box ) ] -> Box
+formatBinary :: Bool -> Block -> [ ( Bool, Comments, String, Block ) ] -> Block
 formatBinary multiline left ops =
     case ops of
         [] ->
@@ -223,7 +224,7 @@ sortVars forceMultiline fromExposing fromDocs =
         else ( listedInDocs ++ if List.null remainingFromExposing then [] else [ remainingFromExposing ], commentsFromReorderedVars )
 
 
-formatModuleHeader :: Coapplicative annf => ElmVersion -> Bool -> AST.Module.Module [UppercaseIdentifier] (ASTNS annf [UppercaseIdentifier] 'TopLevelNK) -> [Box]
+formatModuleHeader :: Coapplicative annf => ElmVersion -> Bool -> AST.Module.Module [UppercaseIdentifier] (ASTNS annf [UppercaseIdentifier] 'TopLevelNK) -> [Block]
 formatModuleHeader elmVersion addDefaultHeader modu =
   let
       maybeHeader =
@@ -362,7 +363,7 @@ formatModuleHeader elmVersion addDefaultHeader modu =
       ]
 
 
-formatImports :: ElmVersion -> AST.Module.Module [UppercaseIdentifier] decl -> [Box]
+formatImports :: ElmVersion -> AST.Module.Module [UppercaseIdentifier] decl -> [Block]
 formatImports elmVersion modu =
     let
         (C comments imports) =
@@ -379,7 +380,7 @@ formatImports elmVersion modu =
         |> concat
 
 
-formatModuleLine_0_16 :: AST.Module.Header -> Box
+formatModuleLine_0_16 :: AST.Module.Header -> Block
 formatModuleLine_0_16 header =
   let
     elmVersion = Elm_0_16
@@ -436,7 +437,7 @@ formatModuleLine ::
     -> Maybe (C2 before after AST.Module.SourceSettings)
     -> Comments
     -> Comments
-    -> Box
+    -> Block
 formatModuleLine elmVersion (varsToExpose, extraComments) srcTag name moduleSettings preExposing postExposing =
   let
     tag =
@@ -506,7 +507,7 @@ formatModuleLine elmVersion (varsToExpose, extraComments) srcTag name moduleSett
       [ exports ]
 
 
-formatModule :: Coapplicative annf => ElmVersion -> Bool -> Int -> AST.Module.Module [UppercaseIdentifier] (ASTNS annf [UppercaseIdentifier] 'TopLevelNK) -> Box
+formatModule :: Coapplicative annf => ElmVersion -> Bool -> Int -> AST.Module.Module [UppercaseIdentifier] (ASTNS annf [UppercaseIdentifier] 'TopLevelNK) -> Block
 formatModule elmVersion addDefaultHeader spacing modu =
     let
         initialComments' =
@@ -536,7 +537,7 @@ formatModule elmVersion addDefaultHeader spacing modu =
               ]
 
 
-formatModuleBody :: forall annf. Coapplicative annf => Int -> ElmVersion -> ImportInfo [UppercaseIdentifier] -> [TopLevelStructure (ASTNS annf [UppercaseIdentifier] 'TopLevelDeclarationNK)] -> Maybe Box
+formatModuleBody :: forall annf. Coapplicative annf => Int -> ElmVersion -> ImportInfo [UppercaseIdentifier] -> [TopLevelStructure (ASTNS annf [UppercaseIdentifier] 'TopLevelDeclarationNK)] -> Maybe Block
 formatModuleBody linesBetween elmVersion importInfo body =
     let
         entryType :: ASTNS annf ns 'TopLevelDeclarationNK -> BodyEntryType
@@ -590,8 +591,8 @@ formatTopLevelBody ::
     Int
     -> ElmVersion
     -> ImportInfo [UppercaseIdentifier]
-    -> [TopLevelStructure (BodyEntryType, Box)]
-    -> Maybe Box
+    -> [TopLevelStructure (BodyEntryType, Block)]
+    -> Maybe Block
 formatTopLevelBody linesBetween elmVersion importInfo body =
     let
         extraLines n =
@@ -653,7 +654,7 @@ firstOf options value =
                 Nothing -> firstOf rest value
 
 
-formatDocComment :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> Markdown.Blocks -> Box
+formatDocComment :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> Markdown.Blocks -> Block
 formatDocComment elmVersion importInfo blocks =
     let
         parse :: String -> Maybe (ElmCodeBlock Identity [UppercaseIdentifier])
@@ -707,7 +708,7 @@ formatDocComment elmVersion importInfo blocks =
     formatDocCommentString content
 
 
-formatDocCommentString :: String -> Box
+formatDocCommentString :: String -> Block
 formatDocCommentString docs =
     case lines docs of
         [] ->
@@ -723,7 +724,7 @@ formatDocCommentString docs =
                 |> andThen [ line $ punc "-}" ]
 
 
-formatImport :: ElmVersion -> AST.Module.UserImport -> Box
+formatImport :: ElmVersion -> AST.Module.UserImport -> Block
 formatImport elmVersion (name@(C _ rawName), method) =
     let
         requestedAs =
@@ -744,7 +745,7 @@ formatImport elmVersion (name@(C _ rawName), method) =
             "exposing"
             (AST.Module.exposedVars method)
 
-        formatImportClause :: (a -> Maybe Box) -> String -> C2 beforeKeyword afterKeyword a -> Maybe Box
+        formatImportClause :: (a -> Maybe Block) -> String -> C2 beforeKeyword afterKeyword a -> Maybe Block
         formatImportClause format keyw input =
           case fmap format input of
             C ([], []) Nothing ->
@@ -876,7 +877,7 @@ formatImport elmVersion (name@(C _ rawName), method) =
             ]
 
 
-formatListing :: (a -> [Box]) -> AST.Listing.Listing a -> Maybe Box
+formatListing :: (a -> [Block]) -> AST.Listing.Listing a -> Maybe Block
 formatListing format listing =
     case listing of
         AST.Listing.ClosedListing ->
@@ -891,7 +892,7 @@ formatListing format listing =
                 vars' -> Just $ ElmStructure.group False "(" "," ")" multiline vars'
 
 
-formatDetailedListing :: ElmVersion -> AST.Module.DetailedListing -> [Box]
+formatDetailedListing :: ElmVersion -> AST.Module.DetailedListing -> [Block]
 formatDetailedListing elmVersion listing =
     concat
         [ formatCommentedMap
@@ -909,7 +910,7 @@ formatDetailedListing elmVersion listing =
         ]
 
 
-formatCommentedMap :: (k -> v -> a) -> (a -> Box) ->  AST.Listing.CommentedMap k v -> [Box]
+formatCommentedMap :: (k -> v -> a) -> (a -> Block) ->  AST.Listing.CommentedMap k v -> [Block]
 formatCommentedMap construct format values =
     let
         format' (k, C c v)
@@ -920,7 +921,7 @@ formatCommentedMap construct format values =
         |> fmap format'
 
 
-formatVarValue :: ElmVersion -> AST.Listing.Value -> Box
+formatVarValue :: ElmVersion -> AST.Listing.Value -> Block
 formatVarValue elmVersion aval =
     case aval of
         AST.Listing.Value val ->
@@ -970,7 +971,7 @@ formatVarValue elmVersion aval =
                     name'
 
 
-formatTopLevelStructure :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> TopLevelStructure Box -> Box
+formatTopLevelStructure :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> TopLevelStructure Block -> Block
 formatTopLevelStructure elmVersion importInfo topLevelStructure =
     case topLevelStructure of
         DocComment docs ->
@@ -985,7 +986,7 @@ formatTopLevelStructure elmVersion importInfo topLevelStructure =
 
 formatCommonDeclaration ::
     Coapplicative annf =>
-    ElmVersion -> ImportInfo [UppercaseIdentifier] -> ASTNS annf [UppercaseIdentifier] 'CommonDeclarationNK -> Box
+    ElmVersion -> ImportInfo [UppercaseIdentifier] -> ASTNS annf [UppercaseIdentifier] 'CommonDeclarationNK -> Block
 formatCommonDeclaration elmVersion importInfo decl =
     case extract $ I.unFix $ I.convert (Identity . extract) decl of
         Definition name args comments expr ->
@@ -997,7 +998,7 @@ formatCommonDeclaration elmVersion importInfo decl =
 
 formatDeclaration ::
     Coapplicative annf =>
-    ElmVersion -> ImportInfo [UppercaseIdentifier] -> ASTNS annf [UppercaseIdentifier] 'TopLevelDeclarationNK -> Box
+    ElmVersion -> ImportInfo [UppercaseIdentifier] -> ASTNS annf [UppercaseIdentifier] 'TopLevelDeclarationNK -> Block
 formatDeclaration elmVersion importInfo decl =
     case extract $ I.unFix $ I.convert (Identity . extract) decl of
         CommonDeclaration def ->
@@ -1104,7 +1105,7 @@ formatDeclaration elmVersion importInfo decl =
                 ]
 
 
-formatNameWithArgs :: ElmVersion -> NameWithArgs UppercaseIdentifier LowercaseIdentifier -> Box
+formatNameWithArgs :: ElmVersion -> NameWithArgs UppercaseIdentifier LowercaseIdentifier -> Block
 formatNameWithArgs elmVersion (NameWithArgs name args) =
   case allSingles $ fmap (formatPreCommented . fmap (line . formatLowercaseIdentifier elmVersion [])) args of
     Right args' ->
@@ -1122,7 +1123,7 @@ formatDefinition ::
     -> [C1 before (ASTNS Identity [UppercaseIdentifier] 'PatternNK)]
     -> Comments
     -> ASTNS Identity [UppercaseIdentifier] 'ExpressionNK
-    -> Box
+    -> Block
 formatDefinition elmVersion importInfo name args comments expr =
   let
     body =
@@ -1139,7 +1140,7 @@ formatDefinition elmVersion importInfo name args comments expr =
 
 formatTypeAnnotation ::
     Coapplicative annf =>
-    ElmVersion -> C1 after (Ref ()) -> C1 before (ASTNS annf [UppercaseIdentifier] 'TypeNK) -> Box
+    ElmVersion -> C1 after (Ref ()) -> C1 before (ASTNS annf [UppercaseIdentifier] 'TypeNK) -> Block
 formatTypeAnnotation elmVersion name typ =
   ElmStructure.definition ":" False
     (formatTailCommented $ fmap (line . formatVar elmVersion . fmap (\() -> [])) name)
@@ -1149,7 +1150,7 @@ formatTypeAnnotation elmVersion name typ =
 
 formatPattern ::
     Coapplicative annf =>
-    ElmVersion -> ASTNS annf [UppercaseIdentifier] 'PatternNK -> (SyntaxContext, Box)
+    ElmVersion -> ASTNS annf [UppercaseIdentifier] 'PatternNK -> (SyntaxContext, Block)
 formatPattern elmVersion apattern =
     case extract $ I.unFix apattern of
         Anything ->
@@ -1256,7 +1257,7 @@ formatPattern elmVersion apattern =
                 ]
 
 
-formatRecordPair :: ElmVersion -> String -> (v -> Box) -> (C2 before after LowercaseIdentifier, C2 before after v, Bool) -> Box
+formatRecordPair :: ElmVersion -> String -> (v -> Block) -> (C2 before after LowercaseIdentifier, C2 before after v, Bool) -> Block
 formatRecordPair elmVersion delim formatValue (C (pre, postK) k, v, forceMultiline) =
     ElmStructure.equalsPair delim forceMultiline
       (formatCommented $ line . formatLowercaseIdentifier elmVersion [] <$> C ([], postK) k)
@@ -1265,7 +1266,7 @@ formatRecordPair elmVersion delim formatValue (C (pre, postK) k, v, forceMultili
     |> formatPreCommented
 
 
-formatPair :: String -> Pair Line Box -> Box
+formatPair :: String -> Pair Line Block -> Block
 formatPair delim (Pair a b (ForceMultiline forceMultiline)) =
     ElmStructure.equalsPair delim forceMultiline
         (formatTailCommented $ fmap line a)
@@ -1274,7 +1275,7 @@ formatPair delim (Pair a b (ForceMultiline forceMultiline)) =
 
 negativeCasePatternWorkaround ::
     Coapplicative annf =>
-    ASTNS annf [UppercaseIdentifier] 'PatternNK -> Box -> Box
+    ASTNS annf [UppercaseIdentifier] 'PatternNK -> Block -> Block
 negativeCasePatternWorkaround pattern =
     case extract $ I.unFix pattern of
         LiteralPattern (IntNum i _) | i < 0 -> parens
@@ -1289,7 +1290,7 @@ data SyntaxContext
     | AmbiguousEnd
 
 
-syntaxParens :: SyntaxContext -> (SyntaxContext, Box) -> Box
+syntaxParens :: SyntaxContext -> (SyntaxContext, Block) -> Block
 syntaxParens outer (inner, box) =
     parensIf (needsParensInContext inner outer) box
     where
@@ -1312,7 +1313,7 @@ needsParensInContext inner outer =
 formatExpression ::
     ElmVersion -> ImportInfo [UppercaseIdentifier]
     -> ASTNS Identity [UppercaseIdentifier] 'ExpressionNK
-    -> (SyntaxContext, Box)
+    -> (SyntaxContext, Block)
 formatExpression elmVersion importInfo aexpr =
     case extract $ I.unFix aexpr of
         Literal lit ->
@@ -1448,7 +1449,7 @@ formatExpression elmVersion importInfo aexpr =
 
         Let defs bodyComments expr ->
             let
-                spacer :: AST typeRef ctorRef varRef (I.Fix Identity (AST typeRef ctorRef varRef)) 'LetDeclarationNK -> AST typeRef ctorRef varRef getType 'LetDeclarationNK -> [Box]
+                spacer :: AST typeRef ctorRef varRef (I.Fix Identity (AST typeRef ctorRef varRef)) 'LetDeclarationNK -> AST typeRef ctorRef varRef getType 'LetDeclarationNK -> [Block]
                 spacer first _ =
                     case first of
                         LetCommonDeclaration (I.Fix (Identity (Definition _ _ _ _))) ->
@@ -1595,7 +1596,7 @@ formatExpression elmVersion importInfo aexpr =
 formatCommentedExpression ::
     ElmVersion -> ImportInfo [UppercaseIdentifier]
     -> C2 before after (ASTNS Identity [UppercaseIdentifier] 'ExpressionNK)
-    -> Box
+    -> Block
 formatCommentedExpression elmVersion importInfo (C (pre, post) e) =
     let
         commented' =
@@ -1611,7 +1612,7 @@ formatPreCommentedExpression ::
     Coapplicative annf =>
     ElmVersion -> ImportInfo [UppercaseIdentifier] -> SyntaxContext
     -> C1 before (ASTNS annf [UppercaseIdentifier] 'ExpressionNK)
-    -> Box
+    -> Block
 formatPreCommentedExpression elmVersion importInfo context (C pre e) =
     let
         (pre', e') =
@@ -1624,8 +1625,8 @@ formatPreCommentedExpression elmVersion importInfo context (C pre e) =
 
 
 formatRecordLike ::
-    Maybe (C2 before after Box) -> Sequence Box -> Comments -> ForceMultiline
-    -> Box
+    Maybe (C2 before after Block) -> Sequence Block -> Comments -> ForceMultiline
+    -> Block
 formatRecordLike base' fields trailing multiline =
     case (base', fields) of
       ( Just base, pairs' ) ->
@@ -1644,7 +1645,7 @@ formatRecordLike base' fields trailing multiline =
               pairs'
 
 
-formatSequence :: Char -> Char -> Maybe Char -> ForceMultiline -> Comments -> Sequence Box -> Box
+formatSequence :: Char -> Char -> Maybe Char -> ForceMultiline -> Comments -> Sequence Block -> Block
 formatSequence left delim right (ForceMultiline multiline) trailing (Sequence (first:rest)) =
     let
         formatItem delim_ (C (pre, post, eol) item) =
@@ -1676,7 +1677,7 @@ formatBinops ::
     -> ASTNS Identity [UppercaseIdentifier] 'ExpressionNK
     -> [BinopsClause (Ref [UppercaseIdentifier]) (ASTNS Identity [UppercaseIdentifier] 'ExpressionNK)]
     -> Bool
-    -> Box
+    -> Block
 formatBinops elmVersion importInfo left ops multiline =
     let
         formatPair_ isLast (BinopsClause po o pe e) =
@@ -1706,7 +1707,7 @@ formatRange_0_17 ::
     -> C2 before after (ASTNS Identity [UppercaseIdentifier] 'ExpressionNK)
     -> C2 before after (ASTNS Identity [UppercaseIdentifier] 'ExpressionNK)
     -> Bool
-    -> Box
+    -> Block
 formatRange_0_17 elmVersion importInfo left right multiline =
     case
         ( multiline
@@ -1745,7 +1746,7 @@ formatRange_0_18 ::
     ElmVersion -> ImportInfo [UppercaseIdentifier]
     -> C2 before after (ASTNS annf [UppercaseIdentifier] 'ExpressionNK)
     -> C2 before after (ASTNS annf [UppercaseIdentifier] 'ExpressionNK)
-    -> (SyntaxContext, Box)
+    -> (SyntaxContext, Block)
 formatRange_0_18 elmVersion importInfo left right =
     case (left, right) of
         (C (preLeft, []) left', C (preRight, []) right') ->
@@ -1769,7 +1770,7 @@ formatRange_0_18 elmVersion importInfo left right =
                 |> formatExpression elmVersion importInfo
 
 
-formatUnit :: Char -> Char -> Comments -> Box
+formatUnit :: Char -> Char -> Comments -> Block
 formatUnit left right comments =
   case (left, comments) of
     (_, []) ->
@@ -1788,7 +1789,7 @@ formatUnit left right comments =
             stack1 comments'
 
 
-formatComments :: Comments -> Maybe Box
+formatComments :: Comments -> Maybe Block
 formatComments comments =
     case fmap formatComment comments of
         [] ->
@@ -1798,7 +1799,7 @@ formatComments comments =
             Just $ ElmStructure.spaceSepOrStack first rest
 
 
-formatCommented_ :: Bool -> C2 before after Box -> Box
+formatCommented_ :: Bool -> C2 before after Block -> Block
 formatCommented_ forceMultiline (C (pre, post) inner) =
     ElmStructure.forceableSpaceSepOrStack1 forceMultiline $
         concat
@@ -1808,32 +1809,32 @@ formatCommented_ forceMultiline (C (pre, post) inner) =
             ]
 
 
-formatCommented :: C2 before after Box -> Box
+formatCommented :: C2 before after Block -> Block
 formatCommented =
   formatCommented_ False
 
 
-formatPreCommented :: C1 before Box -> Box
+formatPreCommented :: C1 before Block -> Block
 formatPreCommented (C pre inner) =
     formatCommented' pre inner
 
 
-formatCommented' :: Comments -> Box -> Box
+formatCommented' :: Comments -> Block -> Block
 formatCommented' pre inner =
     formatCommented (C (pre, []) inner)
 
 
-formatTailCommented :: C1 after Box -> Box
+formatTailCommented :: C1 after Block -> Block
 formatTailCommented (C post inner) =
   formatCommented (C ([], post) inner)
 
 
-formatC2Eol :: C2Eol before after Box -> Box
+formatC2Eol :: C2Eol before after Block -> Block
 formatC2Eol (C (pre, post, eol) a) =
     formatCommented $ C (pre, post) $ formatEolCommented $ C eol a
 
 
-formatEolCommented :: C0Eol Box -> Box
+formatEolCommented :: C0Eol Block -> Block
 formatEolCommented (C post inner) =
   case (post, inner) of
     (Nothing, box) -> box
@@ -1843,7 +1844,7 @@ formatEolCommented (C post inner) =
       stack1 [ box, formatComment $ LineComment eol ]
 
 
-formatCommentedStack :: C2 before after Box -> Box
+formatCommentedStack :: C2 before after Block -> Block
 formatCommentedStack (C (pre, post) inner) =
   stack1 $
     map formatComment pre
@@ -1851,25 +1852,25 @@ formatCommentedStack (C (pre, post) inner) =
       ++ map formatComment post
 
 
-formatPreCommentedStack :: C1 before Box -> Box
+formatPreCommentedStack :: C1 before Block -> Block
 formatPreCommentedStack (C pre inner) =
   formatCommentedStack (C (pre, []) inner)
 
 
-formatKeywordCommented :: String -> C2 beforeKeyword afterKeyword Box -> Box
+formatKeywordCommented :: String -> C2 beforeKeyword afterKeyword Block -> Block
 formatKeywordCommented word (C (pre, post) value) =
   ElmStructure.spaceSepOrIndented
     (formatCommented $ fmap (line . keyword) (C (pre, post) word))
     [ value ]
 
 
-formatOpenCommentedList :: OpenCommentedList Box -> [Box]
+formatOpenCommentedList :: OpenCommentedList Block -> [Block]
 formatOpenCommentedList (OpenCommentedList rest (C (preLst, eol) lst)) =
     fmap formatC2Eol rest
         ++ [formatC2Eol $ C (preLst, [], eol) lst]
 
 
-formatComment :: Comment -> Box
+formatComment :: Comment -> Block
 formatComment comment =
     case comment of
         BlockComment c ->
@@ -1905,7 +1906,7 @@ formatComment comment =
             mustBreak $ row [ punc "{--", literal c, punc "-}" ]
 
 
-formatLiteral :: ElmVersion -> LiteralValue -> Box
+formatLiteral :: ElmVersion -> LiteralValue -> Block
 formatLiteral elmVersion lit =
     case lit of
         IntNum i DecimalInt ->
@@ -1946,7 +1947,7 @@ data StringStyle
     deriving (Eq)
 
 
-formatString :: ElmVersion -> StringStyle -> String -> Box
+formatString :: ElmVersion -> StringStyle -> String -> Block
 formatString elmVersion style s =
   case style of
       SChar ->
@@ -2034,7 +2035,7 @@ data TypeParensInner
     | ForTypeConstruction
 
 
-typeParens :: TypeParensRequired -> (TypeParensInner, Box) -> Box
+typeParens :: TypeParensRequired -> (TypeParensInner, Block) -> Block
 typeParens outer (inner, box) =
     if typeParensNeeded outer inner then parens box else box
 
@@ -2054,7 +2055,7 @@ commaSpace =
         ]
 
 
-formatTypeConstructor :: ElmVersion -> TypeConstructor ([UppercaseIdentifier], UppercaseIdentifier) -> Box
+formatTypeConstructor :: ElmVersion -> TypeConstructor ([UppercaseIdentifier], UppercaseIdentifier) -> Block
 formatTypeConstructor elmVersion ctor =
     case ctor of
         NamedConstructor (namespace, name) ->
@@ -2066,7 +2067,7 @@ formatTypeConstructor elmVersion ctor =
 
 formatType ::
     Coapplicative annf =>
-    ElmVersion -> ASTNS annf [UppercaseIdentifier] 'TypeNK -> (TypeParensInner, Box)
+    ElmVersion -> ASTNS annf [UppercaseIdentifier] 'TypeNK -> (TypeParensInner, Block)
 formatType elmVersion atype =
     case extract $ I.unFix atype of
         UnitType comments ->
