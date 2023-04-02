@@ -4,7 +4,7 @@ module Box
   , Box(SingleLine, MustBreak), blankLine, line, mustBreak, stack', stack1, andThen
   , isLine, allSingles, lineLength
   , indent, prefix, addSuffix
-  , render
+  , render, renderLine
   , joinMustBreak, prefixOrIndent, rowOrStackForce, rowOrIndentForce
   ) where
 
@@ -29,6 +29,9 @@ data Line
     | Row [Line]
     | Space
     | Tab
+
+instance Semigroup Line where
+  (<>) a b = Row [ a, b ]
 
 
 identifier :: String -> Line

@@ -41,6 +41,7 @@ import qualified Parse.Parse as Parse
 import qualified Reporting.Annotation as A
 import qualified Reporting.Result as Result
 import Text.Printf (printf)
+import qualified Box.BlockAdapter as Block
 
 pleaseReport'' :: String -> String -> String
 pleaseReport'' what details =
@@ -78,7 +79,7 @@ parens :: Box -> Box
 parens = surround '(' ')'
 
 
-formatBinary :: Bool -> Box -> [ ( Bool, Comments, Box, Box ) ] -> Box
+formatBinary :: Bool -> Box -> [ ( Bool, Comments, String, Box ) ] -> Box
 formatBinary multiline left ops =
     case ops of
         [] ->
@@ -90,14 +91,14 @@ formatBinary multiline left ops =
                     (ElmStructure.spaceSepOrStack left $
                         concat
                             [ Maybe.maybeToList $ formatComments comments
-                            , [op]
+                            , [line $ Block.stringUtf8 op]
                             ]
                     )
                     [formatBinary multiline next rest]
             else
                 formatBinary
                     multiline
-                    (ElmStructure.forceableSpaceSepOrIndented multiline left [formatCommented' comments $ ElmStructure.spaceSepOrPrefix op next])
+                    (ElmStructure.forceableSpaceSepOrIndented multiline left [formatCommented' comments $ ElmStructure.spaceSepOrPrefix (fromIntegral $ length op) (Block.stringUtf8 op) next])
                     rest
 
 
@@ -1171,7 +1172,7 @@ formatPattern elmVersion apattern =
                 formatRight (C (preOp, postOp, eol) term) =
                     ( False
                     , preOp
-                    , line $ punc "::"
+                    , "::"
                     , formatC2Eol $
                         (fmap $ syntaxParens SpaceSeparated . formatPattern elmVersion)
                         (C (postOp, [], eol) term)
@@ -1690,7 +1691,7 @@ formatBinops elmVersion importInfo left ops multiline =
             in
             ( isLeftPipe
             , po
-            , (line . formatInfixVar elmVersion) o
+            , Text.unpack $ Box.renderLine 0 $ formatInfixVar elmVersion o
             , formatCommented' pe $ syntaxParens formatContext $ formatExpression elmVersion importInfo e
             )
     in
@@ -2080,7 +2081,7 @@ formatType elmVersion atype =
                         $ concat
                             [ Maybe.maybeToList $ formatComments preOp
                             , [ ElmStructure.prefixOrIndented
-                                  (line $ punc "->")
+                                  (punc "->")
                                   (formatC2Eol $
                                       (fmap $ typeParens ForLambda . formatType elmVersion)
                                       (C (postOp, [], eol) term)

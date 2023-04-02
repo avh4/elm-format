@@ -9,15 +9,18 @@ module ElmFormat.Render.ElmStructure
 
 
 import Elm.Utils ((|>))
-import Box
+import Box hiding (Line, space)
 import AST.V0_16 (FunctionApplicationMultiline(..), Multiline(..))
+import Box.BlockAdapter (Block, space, Line)
+import Data.List.NonEmpty (NonEmpty(..))
 
 import qualified Data.List as List
+import qualified Box.BlockAdapter as Block
 
 
 {-| Same as `forceableSpaceSepOrStack False`
 -}
-spaceSepOrStack :: Box -> [Box] -> Box
+spaceSepOrStack :: Block -> [Block] -> Block
 spaceSepOrStack =
     forceableSpaceSepOrStack False
 
@@ -31,35 +34,19 @@ Formats as:
     rest0
     rest1
 -}
-forceableSpaceSepOrStack :: Bool -> Box -> [Box] -> Box
+forceableSpaceSepOrStack :: Bool -> Block -> [Block] -> Block
 forceableSpaceSepOrStack forceMultiline first rest =
-    case
-      ( forceMultiline, first, allSingles rest, rest )
-    of
-      ( False, SingleLine first', Right rest', _ ) ->
-        line $ row $ List.intersperse space (first' : rest')
+    Block.rowOrStackForce forceMultiline (Just space) (first :| rest)
 
 
-      _ ->
-        stack1 (first : rest)
-
-
-forceableRowOrStack :: Bool -> Box -> [Box] -> Box
+forceableRowOrStack :: Bool -> Block -> [Block] -> Block
 forceableRowOrStack forceMultiline first rest =
-    case
-      ( forceMultiline, first, allSingles rest, rest )
-    of
-      ( False, SingleLine first', Right rest', _ ) ->
-        line $ row (first' : rest')
-
-
-      _ ->
-        stack1 (first : rest)
+    Block.rowOrStackForce forceMultiline Nothing (first :| rest)
 
 
 {-| Same as `forceableSpaceSepOrStack`
 -}
-forceableSpaceSepOrStack1 :: Bool -> [Box] -> Box
+forceableSpaceSepOrStack1 :: Bool -> [Block] -> Block
 forceableSpaceSepOrStack1 forceMultiline boxes =
     case boxes of
         (first:rest) ->
@@ -79,23 +66,14 @@ Formats as:
       rest1
       rest2
 -}
-spaceSepOrIndented :: Box -> [Box] -> Box
+spaceSepOrIndented :: Block -> [Block] -> Block
 spaceSepOrIndented =
     forceableSpaceSepOrIndented False
 
 
-forceableSpaceSepOrIndented :: Bool -> Box -> [Box] -> Box
+forceableSpaceSepOrIndented :: Bool -> Block -> [Block] -> Block
 forceableSpaceSepOrIndented forceMultiline first rest =
-  case
-    ( forceMultiline, first, allSingles rest, rest )
-  of
-    ( False, SingleLine first', Right rest', _ ) ->
-      line $ row $ List.intersperse space (first' : rest')
-
-
-    _ ->
-      stack1
-        ( first : map indent rest)
+    Block.rowOrIndentForce forceMultiline (Just space) (first :| rest)
 
 
 {-|
@@ -109,30 +87,16 @@ Formats as:
     opLong
         rest
 -}
-spaceSepOrPrefix :: Box -> Box -> Box
-spaceSepOrPrefix op rest =
-    case ( op, rest) of
-        ( SingleLine op', SingleLine rest' ) ->
-            line $ row [ op', space, rest' ]
-
-        ( SingleLine op', _ ) | lineLength 0 op' < 4 ->
-            prefix (row [ op', space ]) rest
-
-        _ ->
-            stack1 [ op, indent rest ]
+spaceSepOrPrefix :: Word -> Line -> Block -> Block
+spaceSepOrPrefix opLen op rest =
+    if opLen >= 4
+        then Block.rowOrIndent (Just space) (Block.line op :| [ rest ])
+        else Block.prefix opLen (op <> space) rest
 
 
-prefixOrIndented :: Box -> Box -> Box
-prefixOrIndented a b =
-    case ( a, b ) of
-        ( SingleLine a', SingleLine b' ) ->
-            line $ row [ a', space, b' ]
-
-        ( SingleLine a', MustBreak b' ) ->
-            mustBreak $ row [ a', space, b' ]
-
-        _ ->
-            stack1 [ a, indent b ]
+prefixOrIndented :: Line -> Block -> Block
+prefixOrIndented =
+    Block.prefixOrIndent (Just space)
 
 
 {-|
