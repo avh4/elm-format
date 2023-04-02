@@ -5,6 +5,15 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE TypeApplications #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Avoid lambda using `infix`" #-}
+{-# HLINT ignore "Redundant ==" #-}
+{-# HLINT ignore "Use :" #-}
+{-# HLINT ignore "Use <$>" #-}
+{-# HLINT ignore "Use guards" #-}
+{-# HLINT ignore "Use if" #-}
+{-# HLINT ignore "Use list comprehension" #-}
+{-# HLINT ignore "Use record patterns" #-}
 
 module ElmFormat.Render.Box where
 
@@ -45,6 +54,7 @@ import qualified Reporting.Result as Result
 import Text.Printf (printf)
 import qualified Box.BlockAdapter as Block
 import Box.BlockAdapter (Line, Block)
+import qualified Data.Bifunctor as Bifunctor
 
 pleaseReport'' :: String -> String -> String
 pleaseReport'' what details =
@@ -155,7 +165,7 @@ removeDuplicates input =
     where
         step :: Ord a => (Reversed [a], Set a) -> [a] -> (Reversed [a], Set a)
         step (acc, seen) next =
-            case foldl stepChildren (ReversedList.empty, seen) next |> (\(a,b) -> (ReversedList.toList a, b)) of
+            case foldl stepChildren (ReversedList.empty, seen) next |> Bifunctor.first ReversedList.toList of
                 ([], seen') -> (acc, seen')
                 (children', seen') -> (ReversedList.push children' acc, seen')
 
@@ -401,7 +411,7 @@ formatModuleLine_0_16 header =
         formatCommented (C whereComments $ line $ keyword "where")
   in
     case
-      ( formatCommented $ (line . formatQualifiedUppercaseIdentifier elmVersion) <$> AST.Module.name header
+      ( formatCommented $ line . formatQualifiedUppercaseIdentifier elmVersion <$> AST.Module.name header
       , formatExports
       , whereClause
       )
@@ -510,7 +520,7 @@ formatModule elmVersion addDefaultHeader spacing modu =
             [] ->
               []
             comments ->
-              (fmap formatComment comments)
+              fmap formatComment comments
                 ++ [ blankLine, blankLine ]
 
         spaceBeforeBody =
@@ -959,7 +969,7 @@ formatVarValue elmVersion aval =
                 (Just listing', name', _, _) ->
                   stack1
                     [ name'
-                    , indent $ listing'
+                    , indent listing'
                     ]
 
                 (Nothing, name', _, _) ->
@@ -1004,7 +1014,7 @@ formatDeclaration elmVersion importInfo decl =
                 ctor (NameWithArgs tag args') =
                     case allSingles $ map (formatPreCommented .fmap (typeParens ForCtor . formatType elmVersion)) args' of
                         Right args'' ->
-                            line $ row $ List.intersperse space $ (formatUppercaseIdentifier elmVersion tag):args''
+                            line $ row $ List.intersperse space $ formatUppercaseIdentifier elmVersion tag:args''
                         Left [] ->
                             line $ formatUppercaseIdentifier elmVersion tag
                         Left args'' ->
@@ -1104,11 +1114,11 @@ formatNameWithArgs :: ElmVersion -> NameWithArgs UppercaseIdentifier LowercaseId
 formatNameWithArgs elmVersion (NameWithArgs name args) =
   case allSingles $ fmap (formatPreCommented . fmap (line . formatLowercaseIdentifier elmVersion [])) args of
     Right args' ->
-      line $ row $ List.intersperse space ((formatUppercaseIdentifier elmVersion name):args')
+      line $ row $ List.intersperse space (formatUppercaseIdentifier elmVersion name : args')
     Left args' ->
       stack1 $
         [ line $ formatUppercaseIdentifier elmVersion name ]
-        ++ (fmap indent args')
+        ++ fmap indent args'
 
 
 formatDefinition ::
@@ -1325,22 +1335,22 @@ formatExpression elmVersion importInfo aexpr =
                 Elm_0_19 -> formatRange_0_18 elmVersion importInfo left right
 
         ExplicitList exprs trailing multiline ->
-            (,) SyntaxSeparated $ 
+            (,) SyntaxSeparated $
             formatSequence '[' ',' (Just ']')
                 multiline
                 trailing
                 (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo <$> exprs)
 
         Binops left ops multiline ->
-            (,) InfixSeparated $ 
+            (,) InfixSeparated $
             formatBinops elmVersion importInfo left ops multiline
 
         Lambda patterns bodyComments expr multiline ->
-            (,) AmbiguousEnd $ 
+            (,) AmbiguousEnd $
             case
                 ( multiline
                 , allSingles $ fmap (formatPreCommented . fmap (syntaxParens SpaceSeparated . formatPattern elmVersion)) patterns
-                , bodyComments == []
+                , List.null bodyComments
                 , syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr
                 )
             of
@@ -1524,7 +1534,7 @@ formatExpression elmVersion importInfo aexpr =
                                    , indent body'
                                    ]
                         (_, _, pat', body') ->
-                            stack1 $
+                            stack1
                               [ pat'
                               , line $ keyword "->"
                               , indent body'
@@ -1551,7 +1561,7 @@ formatExpression elmVersion importInfo aexpr =
             (,) SyntaxSeparated $
             formatExpression elmVersion importInfo expr
                 |> syntaxParens SpaceSeparated -- TODO: does this need a different context than SpaceSeparated?
-                |> addSuffix (row $ [punc ".", formatLowercaseIdentifier elmVersion [] field])
+                |> addSuffix (row [punc ".", formatLowercaseIdentifier elmVersion [] field])
 
         AccessFunction (LowercaseIdentifier field) ->
             (,) SyntaxSeparated $
@@ -1986,9 +1996,9 @@ formatString elmVersion style s =
     hex char =
       case ElmVersion.style_0_19_stringEscape elmVersion of
           True ->
-              "\\u{" ++ (printf "%04X" $ Char.ord char) ++ "}"
+              "\\u{" ++ printf "%04X" (Char.ord char) ++ "}"
           False ->
-              "\\x" ++ (printf fmt $ Char.ord char)
+              "\\x" ++ printf fmt (Char.ord char)
       where
         fmt =
           if Char.ord char <= 0xFF then
@@ -2007,9 +2017,9 @@ formatString elmVersion style s =
                         if next == '"' then
                             step okay (quotes + 1) rest
                         else if quotes >= 3 then
-                            step (next : (concat $ replicate quotes "\"\\") ++ okay) 0 rest
+                            step (next : concat (replicate quotes "\"\\") ++ okay) 0 rest
                         else if quotes > 0 then
-                            step (next : (replicate quotes '"') ++ okay) 0 rest
+                            step (next : replicate quotes '"' ++ okay) 0 rest
                         else
                             step (next : okay) 0 rest
         in
