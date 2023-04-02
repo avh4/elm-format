@@ -468,26 +468,13 @@ formatModuleLine elmVersion (varsToExpose, extraComments) srcTag name moduleSett
         |> Maybe.fromMaybe []
 
     nameClause =
-      case
-        ( tag
-        , formatCommented $ fmap (line . formatQualifiedUppercaseIdentifier elmVersion) name
-        )
-      of
-        (SingleLine tag', SingleLine name') ->
-          line $ row
-            [ tag'
-            , space
-            , name'
-            ]
-
-        (tag', name') ->
-          stack1
-            [ tag'
-            , indent name'
-            ]
+      spaceSepOrIndented
+        tag
+        [ formatCommented $ fmap (line . formatQualifiedUppercaseIdentifier elmVersion) name
+        ]
   in
-  ElmStructure.spaceSepOrIndented
-      (ElmStructure.spaceSepOrIndented
+  spaceSepOrIndented
+      (spaceSepOrIndented
           nameClause
           (whereClause ++ [formatCommented (C (preExposing, postExposing) $ line $ keyword "exposing")])
       )
