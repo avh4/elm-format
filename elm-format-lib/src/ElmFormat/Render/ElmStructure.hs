@@ -180,36 +180,43 @@ application forceMultiline first args =
     ; child2
     >
 -}
-group :: Bool -> String -> String -> String -> Bool -> [Box] -> Box
+group :: Bool -> String -> String -> String -> Bool -> [Block] -> Block
 group innerSpaces left sep right forceMultiline children =
   group' innerSpaces left sep [] right forceMultiline children
 
 
-group' :: Bool -> String -> String -> [Box] -> String -> Bool -> [Box] -> Box
-group' innerSpaces left sep extraFooter right forceMultiline children =
-  case (forceMultiline, allSingles children, allSingles extraFooter) of
-    (_, Right [], Right efs) ->
-      line $ row $ concat @[] [[punc left], efs, [punc right]]
-
-    (False, Right ls, Right efs) ->
-      line $ row $ concat @[]
-        [ if innerSpaces then [punc left, space] else [punc left]
-        , List.intersperse (row [punc sep, space]) (ls ++ efs)
-        , if innerSpaces then [space, punc right] else [punc right]
-        ]
-
-    _ ->
-      case children of
-        [] ->
-          -- TODO: might lose extraFooter in this case, but can that ever happen?
-          line $ row [ punc left, punc right]
-
-        (first:rest) ->
-          stack1 $
-            prefix (row [punc left, space]) first
-            : map (prefix $ row [punc sep, space]) rest
-            ++ extraFooter
-            ++ [ line $ punc right ]
+group' :: Bool -> String -> String -> [Block] -> String -> Bool -> [Block] -> Block
+group' _ open _ [] close _ [] =
+  Block.line $ Block.string7 open <> Block.string7 close
+group' innerSpaces open _ (extraFooter0 : extraFooter) close forceMultiline [] =
+  Block.rowOrStackForce
+    forceMultiline
+    (if innerSpaces then Just Block.space else Nothing)
+    [ Block.rowOrStackForce forceMultiline Nothing $
+        formatStart extraFooter0
+          :| extraFooter,
+      Block.line (Block.string7 close)
+    ]
+  where
+    formatStart =
+      if innerSpaces || forceMultiline
+        then Block.prefix 2 (Block.string7 open <> space)
+        else Block.prefix 1 (Block.string7 open)
+group' innerSpaces open sep extraFooter close forceMultiline (first : rest) =
+  Block.rowOrStackForce
+    forceMultiline
+    (if innerSpaces then Just Block.space else Nothing)
+    [ Block.rowOrStackForce forceMultiline Nothing $
+        formatEntry open (innerSpaces || forceMultiline) first
+          :| fmap (formatEntry sep True) rest
+          <> extraFooter,
+      Block.line (Block.string7 close)
+    ]
+  where
+    formatEntry char useSpace entry =
+      if useSpace
+        then Block.prefix 2 (Block.string7 char <> space) entry
+        else Block.prefix 1 (Block.string7 char) entry
 
 {-|
 Formats as:
@@ -224,7 +231,7 @@ Formats as:
       , rest1
     }
 -}
-extensionGroup :: Bool -> Box -> Box -> [Box] -> Box
+extensionGroup :: Bool -> Block -> Block -> [Block] -> Block
 extensionGroup multiline base first rest =
   case
     ( multiline
@@ -256,7 +263,7 @@ extensionGroup multiline base first rest =
         ]
 
 
-extensionGroup' :: Bool -> Box -> Box -> Box
+extensionGroup' :: Bool -> Block -> Block -> Block
 extensionGroup' multiline base fields =
   case
     ( multiline
