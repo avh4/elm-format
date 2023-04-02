@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -Wall #-}
 module ElmFormat.Render.ElmStructure
   ( spaceSepOrStack, forceableSpaceSepOrStack, forceableSpaceSepOrStack1
@@ -111,45 +113,18 @@ Formats as:
       =
       right
 -}
-equalsPair :: String -> Bool -> Box -> Box -> Box
+equalsPair :: String -> Bool -> Block -> Block -> Block
 equalsPair symbol forceMultiline left right =
-  case (forceMultiline, left, right) of
-    ( False, SingleLine left', SingleLine right' ) ->
-      line $ row
-        [ left'
-        , space
-        , punc symbol
-        , space
-        , right'
-        ]
-
-    ( _, SingleLine left', MustBreak right' ) ->
-      mustBreak $ row
-        [ left'
-        , space
-        , punc symbol
-        , space
-        , right'
-        ]
-
-    ( _, SingleLine left', right' ) ->
-      stack1
-        [ line $ row [ left', space, punc symbol ]
-        , indent right'
-        ]
-
-    ( _, left', right' ) ->
-      stack1
-        [ left'
-        , indent $ line $ punc symbol
-        , indent right'
-        ]
+    Block.rowOrIndentForce forceMultiline (Just space)
+      [ Block.rowOrIndent (Just space) [ left, line $ punc symbol ]
+      , right
+      ]
 
 
 {-|
 An equalsPair where the left side is an application
 -}
-definition :: String -> Bool -> Box -> [Box] -> Box -> Box
+definition :: String -> Bool -> Block -> [Block] -> Block -> Block
 definition symbol forceMultiline first rest =
   equalsPair symbol forceMultiline
     (application (FAJoinFirst JoinAll) first rest)
@@ -169,7 +144,7 @@ Formats as:
       rest1
       rest2
 -}
-application :: FunctionApplicationMultiline -> Box -> [Box] -> Box
+application :: FunctionApplicationMultiline -> Block -> [Block] -> Block
 application forceMultiline first args =
   case args of
     [] ->
@@ -221,10 +196,10 @@ group' :: Bool -> String -> String -> [Box] -> String -> Bool -> [Box] -> Box
 group' innerSpaces left sep extraFooter right forceMultiline children =
   case (forceMultiline, allSingles children, allSingles extraFooter) of
     (_, Right [], Right efs) ->
-      line $ row $ concat [[punc left], efs, [punc right]]
+      line $ row $ concat @[] [[punc left], efs, [punc right]]
 
     (False, Right ls, Right efs) ->
-      line $ row $ concat
+      line $ row $ concat @[]
         [ if innerSpaces then [punc left, space] else [punc left]
         , List.intersperse (row [punc sep, space]) (ls ++ efs)
         , if innerSpaces then [space, punc right] else [punc right]
