@@ -3,8 +3,7 @@ module
     Main
     {- A -} exposing
     ( a
-    , b
-      --A
+    , b --A
     , --A
       c
     )

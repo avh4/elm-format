@@ -29,6 +29,7 @@ data Line
     | Row [Line]
     | Space
     | Tab
+    deriving (Eq, Show)
 
 instance Semigroup Line where
   (<>) a b = Row [ a, b ]
@@ -84,6 +85,7 @@ data Box
     = SingleLine Line
     | Stack Line Line [Line]
     | MustBreak Line
+    deriving (Eq, Show)
 
 
 blankLine :: Box
@@ -170,13 +172,20 @@ destructure b =
             (l1, [])
 
 
-allSingles :: [Box] -> Either [Box] [Line]
+allSingles :: [Box] -> Either [Box] ([Line], Bool)
 allSingles boxes =
-    case sequence $ map isLine boxes of
-        Right lines' ->
-            Right lines'
-        _ ->
-            Left boxes
+  allSingles' ([], True, False) (reverse boxes)
+  where
+    allSingles' (acc, _, isMustBreak) [] =
+      Right (acc, isMustBreak)
+    allSingles' (acc, isLast, isMustBreak) (next:rest) =
+      case next of
+        SingleLine l -> allSingles' (l:acc, False, isMustBreak) rest
+        MustBreak l ->
+          if isLast
+            then allSingles' (l:acc, False, True) rest
+            else Left boxes
+        Stack _ _ _ -> Left boxes
 
 
 {-
@@ -241,38 +250,42 @@ prefixOrIndent joiner a b =
 
 rowOrStackForce :: Bool -> Maybe Line -> NonEmpty Box -> Box
 rowOrStackForce _ _ (single :| []) = single
-rowOrStackForce forceMultiline (Just joiner) blocks =
+rowOrStackForce forceMultiline joiner blocks =
   case allSingles $ NonEmpty.toList blocks of
-    Right lines_
+    Right (lines_, isMustBreak)
       | not forceMultiline ->
-          line $ Row $ intersperse joiner lines_
-    _ ->
-      stack1 $ NonEmpty.toList blocks
-rowOrStackForce forceMultiline Nothing blocks =
-  case allSingles $ NonEmpty.toList blocks of
-    Right lines_
-      | not forceMultiline ->
-          line $ Row lines_
+          mkBlock $ mkRow lines_
+          where
+            mkBlock =
+              if isMustBreak
+                then mustBreak
+                else line
+            mkRow =
+              case joiner of
+                Just j -> Row . intersperse j
+                Nothing -> Row
     _ ->
       stack1 $ NonEmpty.toList blocks
 
 
 rowOrIndentForce :: Bool -> Maybe Line -> NonEmpty Box -> Box
 rowOrIndentForce _ _ (single :| []) = single
-rowOrIndentForce forceMultiline (Just joiner) blocks@(b1 :| rest) =
+rowOrIndentForce forceMultiline joiner blocks@(b1 :| rest) =
   case allSingles $ NonEmpty.toList blocks of
-    Right lines_
+    Right (lines_, isMustBreak)
       | not forceMultiline ->
-          line $ Row $ intersperse joiner lines_
+          mkBlock $ mkRow lines_
+          where
+            mkBlock =
+              if isMustBreak
+                then mustBreak
+                else line
+            mkRow =
+              case joiner of
+                Just j -> Row . intersperse j
+                Nothing -> Row
     _ ->
-      stack1 (b1 : (indent <$> rest))
-rowOrIndentForce forceMultiline Nothing blocks@(b1 :| rest) =
-  case allSingles $ NonEmpty.toList blocks of
-    Right lines_
-      | not forceMultiline ->
-          line $ Row lines_
-    _ ->
-      stack1 (b1 : (indent <$> rest))
+      stack1 $ b1 : (indent <$> rest)
 
 
 renderLine :: Int -> Line -> T.Text
@@ -325,7 +338,7 @@ spacesToNextTab startColumn =
 
 tabLength :: Int -> Int
 tabLength startColumn =
-  spacesInTab - (spacesToNextTab startColumn)
+  spacesInTab - spacesToNextTab startColumn
 
 {-
 What happens here is we take a row and start building its contents

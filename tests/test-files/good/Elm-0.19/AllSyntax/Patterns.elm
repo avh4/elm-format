@@ -69,7 +69,8 @@ equivalentCons
     ( [ y, x ]
     , y :: [ x ]
     , y :: x :: []
-      -- keep multiline
+    , [-- keep multiline
+      ]
     )
     =
     ()

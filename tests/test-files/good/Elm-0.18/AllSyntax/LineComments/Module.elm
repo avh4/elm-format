@@ -35,8 +35,7 @@ import
         exposing
             --O
             ( --S
-              Maybe
-              --W
+              Maybe --W
                 ( --X
                   Just
                   --Y
@@ -62,8 +61,7 @@ import Task
     exposing
         ( andMap
         , andThen
-        , fail
-          -- AE
+        , fail -- AE
         , fromMaybe
         , fromResult
         , map
@@ -73,8 +71,7 @@ import Task
         , map5
         , mapError
         , onError
-        , succeed
-          -- AD
+        , succeed -- AD
         , toMaybe
         , toResult
         )

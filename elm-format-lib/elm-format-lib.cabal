@@ -112,6 +112,7 @@ test-suite efl-tests
       BoxTest
       ElmFormat.AST.BinaryOperatorPrecedenceTest
       ElmFormat.ImportInfoTest
+      ElmFormat.Render.BoxTest
       ElmFormat.Render.ElmStructureTest
       Parse.ExpressionTest
       Parse.HelpersTest

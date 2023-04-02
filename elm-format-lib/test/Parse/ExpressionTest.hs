@@ -95,7 +95,7 @@ test_tests =
         , example "qualified" "Bar.Baz.foo" $ at 1 1 1 12 $ VarExpr $ VarRef [UppercaseIdentifier "Bar", UppercaseIdentifier "Baz"] $ LowercaseIdentifier "foo"
 
         , testGroup "symbolic operator"
-            [ example "" "(+)" $ at 1 1 1 4 $ VarExpr $ (OpRef $ SymbolIdentifier "+")
+            [ example "" "(+)" $ at 1 1 1 4 $ VarExpr $ OpRef $ SymbolIdentifier "+"
             , testCase "does not allow whitespace" $
                 assertParseFailure (expr Elm_0_19) "( + )"
             , testCase "doew not allow comments" $
@@ -178,10 +178,10 @@ test_tests =
         ]
 
     , testGroup "Tuple"
-        [ example "" "(1,2)" $ at 1 1 1 6 $ Tuple [intExpr' (1,2,1,3) 1, intExpr' (1,4,1,5) 2] False
-        , example "whitespace" "( 1 , 2 )" $ at 1 1 1 10 $ Tuple [intExpr' (1,3,1,4) 1, intExpr' (1,7,1,8) 2] False
-        , example "comments" "({-A-}1{-B-},{-C-}2{-D-})" $ at 1 1 1 26 $ Tuple [commentedIntExpr (1,7,1,8) "A" "B" 1, commentedIntExpr (1,19,1,20) "C" "D" 2] False
-        , example "newlines" "(\n 1\n ,\n 2\n )" $ at 1 1 5 3 $ Tuple [intExpr' (2,2,2,3) 1, intExpr' (4,2,4,3) 2] True
+        [ example' "" "(1,2)" "( 1, 2 )\n"
+        , example' "whitespace" "( 1 , 2 )" "( 1, 2 )\n"
+        , example' "comments" "({-A-}1{-B-},{-C-}2{-D-})" "( {- A -} 1\n\n{- B -}\n, {- C -} 2\n\n{- D -}\n)\n"
+        , example' "newlines" "(\n 1\n ,\n 2\n )" "( 1\n, 2\n)\n"
         ]
 
     , testGroup "tuple constructor"
@@ -285,7 +285,7 @@ test_tests =
         , example "newlines" "let\n a\n =\n b\nin\n z" $ at 1 1 6 3 (Let [at 2 2 4 3 $ LetCommonDeclaration $ at 2 2 4 3 $ Definition (at 2 2 2 3 (VarPattern (LowercaseIdentifier "a"))) [] [] (at 4 2 4 3 (VarExpr (VarRef [] $ LowercaseIdentifier "b")))] [] (at 6 2 6 3 (VarExpr (VarRef [] $ LowercaseIdentifier "z"))))
         , testCase "must have at least one definition" $
             assertParseFailure (expr Elm_0_19) "let in z"
-        , testGroup "declarations must start at the same column" $
+        , testGroup "declarations must start at the same column"
             [ testCase "(1)" $ assertParseFailure (expr Elm_0_19) "let a=b\n   c=d\nin z"
             , testCase "(2)" $ assertParseFailure (expr Elm_0_19) "let a=b\n     c=d\nin z"
             , testCase "(3)" $ assertParseFailure (expr Elm_0_19) "let  a=b\n   c=d\nin z"
@@ -299,7 +299,7 @@ test_tests =
         , example "comments" "case{-A-}9{-B-}of{-C-}\n{-D-}1{-E-}->{-F-}10{-G-}\n{-H-}_{-I-}->{-J-}20" $ at 1 1 3 21 (Case (C ([BlockComment ["A"]], [BlockComment ["B"]]) (at 1 10 1 11 (Literal (IntNum 9 DecimalInt))),False) [at 2 6 2 21 $ CaseBranch [BlockComment ["C"],BlockComment ["D"]] [BlockComment ["E"]] [BlockComment ["F"]] (at 2 6 2 7 $ LiteralPattern $ IntNum 1 DecimalInt) (at 2 19 2 21 $ Literal $ IntNum 10 DecimalInt), at 2 21 3 21 $ CaseBranch [BlockComment ["G"],BlockComment ["H"]] [BlockComment ["I"]] [BlockComment ["J"]] (at 3 6 3 7 Anything) (at 3 19 3 21 $ Literal $ IntNum 20 DecimalInt)])
         , example "newlines" "case\n 9\n of\n 1\n ->\n 10\n _\n ->\n 20" $ at 1 1 9 4 (Case (C ([], []) (at 2 2 2 3 (Literal (IntNum 9 DecimalInt))),True) [at 4 2 6 4 $ CaseBranch [] [] [] (at 4 2 4 3 $ LiteralPattern $ IntNum 1 DecimalInt) (at 6 2 6 4 $ Literal $ IntNum 10 DecimalInt), at 6 4 9 4 $ CaseBranch [] [] [] (at 7 2 7 3 Anything) (at 9 2 9 4 $ Literal $ IntNum 20 DecimalInt)])
         , testCase "should not consume trailing whitespace" $
-            assertParse (expr Elm_0_19>> string "\nX") "case 9 of\n 1->10\n _->20\nX" $ "\nX"
+            assertParse (expr Elm_0_19>> string "\nX") "case 9 of\n 1->10\n _->20\nX" "\nX"
         , testGroup "clauses must start at the same column"
             [ testCase "(1)" $ assertParseFailure (expr Elm_0_19) "case 9 of\n 1->10\n_->20"
             , testCase "(2)" $ assertParseFailure (expr Elm_0_19) "case 9 of\n 1->10\n  _->20"

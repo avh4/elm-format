@@ -6,14 +6,10 @@
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Avoid lambda using `infix`" #-}
 {-# HLINT ignore "Redundant ==" #-}
-{-# HLINT ignore "Use :" #-}
-{-# HLINT ignore "Use <$>" #-}
 {-# HLINT ignore "Use guards" #-}
 {-# HLINT ignore "Use if" #-}
 {-# HLINT ignore "Use list comprehension" #-}
-{-# HLINT ignore "Use record patterns" #-}
 
 module ElmFormat.Render.Box where
 
@@ -35,7 +31,7 @@ import qualified Data.Indexed as I
 import qualified Data.List as List
 import Data.List.Extra
 import qualified Data.Map.Strict as Map
-import Data.Maybe (fromMaybe, maybeToList)
+import Data.Maybe (fromMaybe, maybeToList, listToMaybe)
 import qualified Data.Maybe as Maybe
 import Data.ReversedList (Reversed)
 import qualified Data.ReversedList as ReversedList
@@ -55,7 +51,7 @@ import Text.Printf (printf)
 import qualified Box.BlockAdapter as Block
 import Box.BlockAdapter (Line, Block)
 import qualified Data.Bifunctor as Bifunctor
-import ElmFormat.Render.ElmStructure (spaceSepOrIndented)
+import ElmFormat.Render.ElmStructure (spaceSepOrIndented, spaceSepOrStack)
 
 pleaseReport'' :: String -> String -> String
 pleaseReport'' what details =
@@ -970,6 +966,15 @@ formatCommonDeclaration elmVersion importInfo decl =
             formatTypeAnnotation elmVersion name typ
 
 
+-- | temporary during conversion to Block API:
+-- like `allSingles`, but does not give Lines if mustBreak is True
+allSingles' :: [Block] -> Either [Block] [Line]
+allSingles' blocks =
+  case allSingles blocks of
+    Right (lines, False) -> Right lines
+    _ -> Left blocks
+
+
 formatDeclaration ::
     Coapplicative annf =>
     ElmVersion -> ImportInfo [UppercaseIdentifier] -> ASTNS annf [UppercaseIdentifier] 'TopLevelDeclarationNK -> Block
@@ -982,7 +987,7 @@ formatDeclaration elmVersion importInfo decl =
             let
                 ctor (NameWithArgs tag args') =
                     case allSingles $ map (formatPreCommented .fmap (typeParens ForCtor . formatType elmVersion)) args' of
-                        Right args'' ->
+                        Right (args'', isMustBreak) ->
                             line $ row $ List.intersperse space $ formatUppercaseIdentifier elmVersion tag:args''
                         Left [] ->
                             line $ formatUppercaseIdentifier elmVersion tag
@@ -1082,7 +1087,7 @@ formatDeclaration elmVersion importInfo decl =
 formatNameWithArgs :: ElmVersion -> NameWithArgs UppercaseIdentifier LowercaseIdentifier -> Block
 formatNameWithArgs elmVersion (NameWithArgs name args) =
   case allSingles $ fmap (formatPreCommented . fmap (line . formatLowercaseIdentifier elmVersion [])) args of
-    Right args' ->
+    Right (args', isMustBreak) ->
       line $ row $ List.intersperse space (formatUppercaseIdentifier elmVersion name : args')
     Left args' ->
       stack1 $
@@ -1323,7 +1328,7 @@ formatExpression elmVersion importInfo aexpr =
                 , syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr
                 )
             of
-                (False, Right patterns', True, SingleLine expr') ->
+                (False, Right (patterns', isMustBreak), True, SingleLine expr') ->
                     line $ row
                         [ punc "\\"
                         , row $ List.intersperse space patterns'
@@ -1332,7 +1337,7 @@ formatExpression elmVersion importInfo aexpr =
                         , space
                         , expr'
                         ]
-                (_, Right patterns', _, expr') ->
+                (_, Right (patterns', isMustBreak), _, expr') ->
                     stack1
                         [ line $ row
                             [ punc "\\"
@@ -1518,9 +1523,12 @@ formatExpression elmVersion importInfo aexpr =
                             |> map indent
                         )
 
-        Tuple exprs multiline ->
+        Tuple exprs trailing multiline ->
             (,) SyntaxSeparated $
-            ElmStructure.group True "(" "," ")" multiline $ map (formatCommentedExpression elmVersion importInfo) exprs
+            formatSequence '(' ',' (Just ')')
+                multiline
+                trailing
+                (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo <$> exprs)
 
         TupleFunction n ->
             (,) SyntaxSeparated $
@@ -1755,7 +1763,7 @@ formatUnit left right comments =
 
     _ ->
       surround left right $
-        case allSingles $ map formatComment comments of
+        case allSingles' $ map formatComment comments of
           Right comments' ->
             line $ row $ List.intersperse space comments'
 
@@ -1805,17 +1813,24 @@ formatTailCommented (C post inner) =
 
 formatC2Eol :: C2Eol before after Block -> Block
 formatC2Eol (C (pre, post, eol) a) =
-    formatCommented $ C (pre, post) $ formatEolCommented $ C eol a
+    let
+        forceMultilinePost =
+          case listToMaybe post of
+              Just (LineComment _) -> True
+              _ -> False
+    in
+    formatCommented_ forceMultilinePost $ C (pre, post) $ formatEolCommented $ C eol a
 
 
 formatEolCommented :: C0Eol Block -> Block
 formatEolCommented (C post inner) =
-  case (post, inner) of
-    (Nothing, box) -> box
-    (Just eol, SingleLine result) ->
-      mustBreak $ row [ result, space, punc "--", literal eol ]
-    (Just eol, box) ->
-      stack1 [ box, formatComment $ LineComment eol ]
+  case post of
+    Nothing -> inner
+    Just eol ->
+      spaceSepOrStack
+        inner
+        [ formatComment $ LineComment eol
+        ]
 
 
 formatCommentedStack :: C2 before after Block -> Block

@@ -231,9 +231,9 @@ instance ToPublicAST 'ExpressionNK where
             ListLiteral
                 ((\(C comments a) -> fromRawAST config a) <$> AST.toCommentedList terms)
 
-        AST.Tuple terms multiline ->
+        AST.Tuple terms comments multiline ->
             TupleLiteral
-                (fmap (\(C comments a) -> fromRawAST config a) terms)
+                ((\(C comments a) -> fromRawAST config a) <$> AST.toCommentedList terms)
 
         AST.TupleFunction n | n <= 1 ->
             error ("INVALID TUPLE CONSTRUCTOR: " ++ show n)
@@ -339,8 +339,9 @@ instance FromPublicAST 'ExpressionNK where
 
         TupleLiteral terms ->
             AST.Tuple
-                (C ([], []) . toRawAST <$> terms)
-                True
+                (Either.fromRight undefined $ AST.fromCommentedList $ C ([], [], Nothing) . toRawAST <$> terms)
+                []
+                (AST.ForceMultiline True)
 
         RecordLiteral base fields display ->
             AST.Record
