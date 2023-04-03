@@ -14,7 +14,7 @@
 module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
-import Box ( identifier, keyword, literal, punc, render, renderLine, row, Box(SingleLine) )
+import Box ( identifier, keyword, literal, punc, render, renderLine, Box(SingleLine) )
 import ElmVersion (ElmVersion(..))
 
 import AST.V0_16
@@ -884,8 +884,8 @@ formatDeclaration elmVersion importInfo decl =
                             , formatCommented $ formatNameWithArgs elmVersion <$> nameWithArgs
                             ]
                         , indent $ Block.stack $ NonEmpty.fromList $ mconcat
-                            [ pure $ prefix 2 (row [punc "=", space]) first
-                            , fmap (prefix 2 (row [punc "|", space])) rest
+                            [ pure $ prefix 2 (punc "=" <> space) first
+                            , fmap (prefix 2 (punc "|" <> space)) rest
                             ]
                         ]
             where
@@ -1345,7 +1345,7 @@ formatExpression elmVersion importInfo aexpr =
             (,) SyntaxSeparated $
             formatExpression elmVersion importInfo expr
                 |> syntaxParens SpaceSeparated -- TODO: does this need a different context than SpaceSeparated?
-                |> addSuffix (row [punc ".", formatLowercaseIdentifier elmVersion [] field])
+                |> addSuffix (punc "." <> formatLowercaseIdentifier elmVersion [] field)
 
         AccessFunction (LowercaseIdentifier field) ->
             (,) SyntaxSeparated $
@@ -1375,11 +1375,7 @@ formatExpression elmVersion importInfo aexpr =
 
         GLShader src ->
           (,) SyntaxSeparated $
-          line $ row
-            [ punc "[glsl|"
-            , literal src
-            , punc "|]"
-            ]
+          line $ punc "[glsl|" <> literal src <> punc "|]"
 
 
 formatCommentedExpression ::
@@ -1439,7 +1435,7 @@ formatSequence left delim right (ForceMultiline multiline) trailing (Sequence (f
     let
         formatItem delim_ (C (pre, post, eol) item) =
             maybe id (\a b -> Block.stack [ blankLine, a, b ]) (formatComments pre) $
-            prefix 2 (row [ punc [delim_], space ]) $
+            prefix 2 (punc [delim_] <> space) $
             formatC2Eol $ C (post, [], eol) item
     in
         spaceSepOrStackForce multiline $
@@ -1505,7 +1501,7 @@ formatRange_0_17 elmVersion importInfo left right multiline =
         )
     of
         (False, SingleLine left', SingleLine right') ->
-            line $ row
+            line $ sconcat
                 [ punc "["
                 , left'
                 , punc ".."
@@ -1670,7 +1666,7 @@ formatComment comment =
                 [] ->
                     line $ punc "{- -}"
                 [l] ->
-                    line $ row
+                    line $ sconcat
                         [ punc "{-"
                         , space
                         , literal l
@@ -1680,13 +1676,13 @@ formatComment comment =
                 first:rest ->
                     Block.stack
                         [ prefix 3
-                            (row [ punc "{-", space ])
+                            (punc "{-" <> space)
                             (Block.stack $ line . literal <$> (first :| rest))
                         , line $ punc "-}"
                         ]
 
         LineComment c ->
-            Block.mustBreak $ row [ punc "--", literal c ]
+            Block.mustBreak $ punc "--" <> literal c
 
         CommentTrickOpener ->
             Block.mustBreak $ punc "{--}"
@@ -1695,7 +1691,7 @@ formatComment comment =
             Block.mustBreak $ punc "--}"
 
         CommentTrickBlock c ->
-            Block.mustBreak $ row [ punc "{--", literal c, punc "-}" ]
+            Block.mustBreak $ punc "{--" <> literal c <> punc "-}"
 
 
 formatLiteral :: ElmVersion -> LiteralValue -> Block
@@ -1750,7 +1746,7 @@ formatString elmVersion style s =
         stringBox "\"\"\"" escapeMultiQuote
   where
     stringBox quotes escaper =
-      line $ row
+      line $ sconcat
           [ punc quotes
           , literal $ escaper $ concatMap fix s
           , punc quotes
@@ -1840,11 +1836,7 @@ typeParensNeeded outer = \case
 
 
 commaSpace :: Line
-commaSpace =
-    row
-        [ punc ","
-        , space
-        ]
+commaSpace = punc "," <> space
 
 
 formatTypeConstructor :: ElmVersion -> TypeConstructor ([UppercaseIdentifier], UppercaseIdentifier) -> Block
@@ -1928,11 +1920,9 @@ formatVar elmVersion var =
             case namespace of
                 [] -> identifier $ formatVarName'' elmVersion name
                 _ ->
-                    row
-                        [ formatQualifiedUppercaseIdentifier elmVersion namespace
-                        , punc "."
-                        , identifier $ formatVarName'' elmVersion name
-                        ]
+                  formatQualifiedUppercaseIdentifier elmVersion namespace
+                  <> punc "."
+                  <> identifier (formatVarName'' elmVersion name)
 
         OpRef name ->
             formatSymbolIdentifierInParens name
@@ -1947,15 +1937,11 @@ formatInfixVar :: ElmVersion -> Ref [UppercaseIdentifier] -> Line
 formatInfixVar elmVersion var =
     case var of
         VarRef _ _ ->
-            row [ punc "`"
-                , formatVar elmVersion var
-                , punc "`"
-                ]
+            punc "`" <> formatVar elmVersion var <> punc "`"
+
         TagRef _ _ ->
-            row [ punc "`"
-                , formatVar elmVersion var
-                , punc "`"
-                ]
+            punc "`" <> formatVar elmVersion var <> punc "`"
+
         OpRef (SymbolIdentifier name) ->
             identifier name
 
@@ -1965,11 +1951,9 @@ formatLowercaseIdentifier elmVersion namespace (LowercaseIdentifier name) =
     case (elmVersion, namespace, name) of
         (_, [], _) -> identifier $ formatVarName' elmVersion name
         _ ->
-            row
-                [ formatQualifiedUppercaseIdentifier elmVersion namespace
-                , punc "."
-                , identifier $ formatVarName' elmVersion name
-                ]
+           formatQualifiedUppercaseIdentifier elmVersion namespace
+           <> punc "."
+           <> identifier (formatVarName' elmVersion name)
 
 
 formatUppercaseIdentifier :: ElmVersion -> UppercaseIdentifier -> Line
