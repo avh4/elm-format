@@ -1574,19 +1574,15 @@ formatUnit :: Char -> Char -> Comments -> Block
 formatUnit left right comments =
   case (left, comments) of
     (_, []) ->
-      line $ punc [left, right]
+        line $ punc [left, right]
 
-    ('{', (LineComment _):_) ->
-      surround left right $ prefix space $ stack1 $ map formatComment comments
+    ('{', first@(LineComment _):rest) ->
+        surround left right $ prefix space $ Block.stack $
+            formatComment <$> first :| rest
 
-    _ ->
-      surround left right $
-        case allSingles' $ map formatComment comments of
-          Right comments' ->
-            line $ row $ List.intersperse space comments'
-
-          Left comments' ->
-            stack1 comments'
+    (_, first:rest) ->
+        surround left right $
+            spaceSepOrStack (formatComment <$> first :| rest)
 
 
 formatComments :: Comments -> Maybe Block
