@@ -1225,54 +1225,46 @@ formatExpression elmVersion importInfo aexpr =
         If if' elseifs (C elsComments els) ->
             let
                 opening key cond =
-                    case (key, cond) of
-                        (SingleLine key', SingleLine cond') ->
-                            line $ row
-                                [ key'
-                                , space
-                                , cond'
-                                , space
-                                , keyword "then"
-                                ]
-                        _ ->
-                            stack1
-                                [ key
-                                , cond |> indent
-                                , line $ keyword "then"
-                                ]
+                    spaceSepOrStack
+                        [ spaceSepOrIndented
+                            [ key
+                            , formatCommentedExpression elmVersion importInfo cond
+                            ]
+                        , line $ keyword "then"
+                        ]
 
                 formatIf (IfClause cond body) =
-                    stack1
-                        [ opening (line $ keyword "if") $ formatCommentedExpression elmVersion importInfo cond
-                        , indent $ formatCommented_ True $ fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) body
+                    Block.stack
+                        [ opening (line $ keyword "if") cond
+                        , indent $ formatClauseBody body
                         ]
 
                 formatElseIf (C ifComments (IfClause cond body)) =
-                  let
-                    key =
-                      case formatPreCommented (C ifComments $ line $ keyword "if") of
-                        SingleLine key' ->
-                          line $ row [ keyword "else", space, key' ]
-                        key' ->
-                          stack1
-                            [ line $ keyword "else"
-                            , key'
-                            ]
-                  in
-                    stack1
-                      [ blankLine
-                      , opening key $ formatCommentedExpression elmVersion importInfo cond
-                      , indent $ formatCommented_ True $ fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) body
-                      ]
-            in
-                (,) AmbiguousEnd $
-                formatIf if'
-                    |> andThen (fmap formatElseIf elseifs)
-                    |> andThen
+                    let
+                        key =
+                            spaceSepOrStack
+                                [ line $ keyword "else"
+                                , formatPreCommented (C ifComments $ line $ keyword "if")
+                                ]
+                    in
+                    Block.stack
                         [ blankLine
-                        , line $ keyword "else"
-                        , indent $ formatCommented_ True $ fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) (C (elsComments, []) els)
+                        , opening key cond
+                        , indent $ formatClauseBody body
                         ]
+            in
+            (,) AmbiguousEnd $
+            Block.stack $
+                formatIf if'
+                :| (formatElseIf <$> elseifs)
+                ++ [ blankLine
+                   , line $ keyword "else"
+                   , indent $ formatClauseBody (C (elsComments, []) els)
+                   ]
+            where
+                formatClauseBody =
+                    formatCommented_ True .
+                    fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo)
 
         Let defs bodyComments expr ->
             let
