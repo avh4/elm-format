@@ -14,7 +14,7 @@
 module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
-import Box ( identifier, keyword, literal, punc, render, renderLine, row, stack', Box(SingleLine) )
+import Box ( identifier, keyword, literal, punc, render, renderLine, row, Box(SingleLine) )
 import ElmVersion (ElmVersion(..))
 
 import AST.V0_16
@@ -1438,7 +1438,7 @@ formatSequence :: Char -> Char -> Maybe Char -> ForceMultiline -> Comments -> Se
 formatSequence left delim right (ForceMultiline multiline) trailing (Sequence (first:rest)) =
     let
         formatItem delim_ (C (pre, post, eol) item) =
-            maybe id (stack' . stack' blankLine) (formatComments pre) $
+            maybe id (\a b -> Block.stack [ blankLine, a, b ]) (formatComments pre) $
             prefix 2 (row [ punc [delim_], space ]) $
             formatC2Eol $ C (post, [], eol) item
     in
@@ -1447,7 +1447,7 @@ formatSequence left delim right (ForceMultiline multiline) trailing (Sequence (f
                 formatItem left first
                 :| fmap (formatItem delim) rest
             )
-            :| (maybe [] (flip (:) [] . stack' blankLine) (formatComments trailing) ++ Maybe.maybeToList (fmap (line . punc . flip (:) []) right))
+            :| (maybe [] (\a -> pure $ Block.stack [ blankLine, a]) (formatComments trailing) ++ Maybe.maybeToList (fmap (line . punc . flip (:) []) right))
 formatSequence left _ (Just right) _ trailing (Sequence []) =
     formatUnit left right trailing
 formatSequence left _ Nothing _ trailing (Sequence []) =

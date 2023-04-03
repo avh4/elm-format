@@ -49,9 +49,6 @@ mustBreak = Box.mustBreak
 stack :: NonEmpty Block -> Block
 stack = Box.stack1 . NonEmpty.toList
 
-stackForce :: Block -> Block -> Block
-stackForce = Box.stack'
-
 andThen :: [Block] -> Block -> Block
 andThen = Box.andThen
 
