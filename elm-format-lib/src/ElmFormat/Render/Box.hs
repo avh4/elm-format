@@ -22,7 +22,6 @@ import qualified AST.Module
 import AST.Structure
 import qualified AST.Listing
 import qualified Cheapskate.Types as Markdown
-import qualified Control.Monad as Monad
 import qualified Data.Char as Char
 import Data.Coapplicative
 import qualified Data.Foldable as Foldable
@@ -31,7 +30,7 @@ import qualified Data.Indexed as I
 import qualified Data.List as List
 import Data.List.Extra
 import qualified Data.Map.Strict as Map
-import Data.Maybe (fromMaybe, maybeToList, listToMaybe)
+import Data.Maybe (fromMaybe, maybeToList, listToMaybe, catMaybes)
 import qualified Data.Maybe as Maybe
 import Data.ReversedList (Reversed)
 import qualified Data.ReversedList as ReversedList
@@ -706,154 +705,48 @@ formatDocCommentString docs =
 formatImport :: ElmVersion -> AST.Module.UserImport -> Block
 formatImport elmVersion (name@(C _ rawName), method) =
     let
-        requestedAs =
+        normalizedAs =
             case AST.Module.alias method of
-                Just (C _ aliasName) | [aliasName] == rawName -> Nothing
+                Just (C _ requestedAs) | [requestedAs] == rawName -> Nothing
                 other -> other
 
-        as =
-            requestedAs
-                |> fmap (formatImportClause
+        exposing = AST.Module.exposedVars method
+    in
+    spaceSepOrIndented
+        (Block.prefixOrIndent (Just space)
+            (keyword "import")
+            (formatName name)
+        )
+        (catMaybes
+            [ formatAsClause =<< normalizedAs
+            , formatExposingClause exposing
+            ]
+        )
+    where
+        formatName = formatPreCommented . fmap (line . formatQualifiedUppercaseIdentifier elmVersion)
+
+        formatAsClause =
+            formatImportClause "as"
                 (Just . line . formatUppercaseIdentifier elmVersion)
-                "as")
-                |> Monad.join
 
-        exposing =
-          formatImportClause
-            (formatListing (formatDetailedListing elmVersion))
-            "exposing"
-            (AST.Module.exposedVars method)
+        formatExposingClause =
+            formatImportClause "exposing"
+                (formatListing (formatDetailedListing elmVersion))
 
-        formatImportClause :: (a -> Maybe Block) -> String -> C2 beforeKeyword afterKeyword a -> Maybe Block
-        formatImportClause format keyw input =
+        formatImportClause :: String -> (a -> Maybe Block) -> C2 beforeKeyword afterKeyword a -> Maybe Block
+        formatImportClause keyw format input =
           case fmap format input of
             C ([], []) Nothing ->
               Nothing
 
             C (preKeyword, postKeyword) (Just listing') ->
-              case
-                ( formatPreCommented (C preKeyword $ line $ keyword keyw)
-                , formatPreCommented (C postKeyword listing')
-                )
-              of
-                (SingleLine keyword', SingleLine listing'') ->
-                  Just $ line $ row
-                    [ keyword'
-                    , space
-                    , listing''
-                    ]
-
-                (keyword', listing'') ->
-                  Just $ stack1
-                    [ keyword'
-                    , indent listing''
+                Just $ spaceSepOrIndented
+                    (formatPreCommented (C preKeyword $ line $ keyword keyw))
+                    [ formatPreCommented (C postKeyword listing')
                     ]
 
             _ ->
               Just $ pleaseReport "UNEXPECTED IMPORT" "import clause comments with no clause"
-    in
-    case
-        ( formatPreCommented $ fmap (line . formatQualifiedUppercaseIdentifier elmVersion) name
-        , as
-        , exposing
-        )
-    of
-        ( SingleLine name', Just (SingleLine as'), Just (SingleLine exposing') ) ->
-          line $ row
-            [ keyword "import"
-            , space
-            , name'
-            , space
-            , as'
-            , space
-            , exposing'
-            ]
-
-        (SingleLine name', Just (SingleLine as'), Nothing) ->
-          line $ row
-            [ keyword "import"
-            , space
-            , name'
-            , space
-            , as'
-            ]
-
-        (SingleLine name', Nothing, Just (SingleLine exposing')) ->
-          line $ row
-            [ keyword "import"
-            , space
-            , name'
-            , space
-            , exposing'
-            ]
-
-        (SingleLine name', Nothing, Nothing) ->
-          line $ row
-            [ keyword "import"
-            , space
-            , name'
-            ]
-
-        ( SingleLine name', Just (SingleLine as'), Just exposing' ) ->
-          stack1
-            [ line $ row
-              [ keyword "import"
-              , space
-              , name'
-              , space
-              , as'
-              ]
-            , indent exposing'
-            ]
-
-        ( SingleLine name', Just as', Just exposing' ) ->
-          stack1
-            [ line $ row
-              [ keyword "import"
-              , space
-              , name'
-              ]
-            , indent as'
-            , indent exposing'
-            ]
-
-        ( SingleLine name', Nothing, Just exposing' ) ->
-          stack1
-            [ line $ row
-              [ keyword "import"
-              , space
-              , name'
-              ]
-            , indent exposing'
-            ]
-
-        ( name', Just as', Just exposing' ) ->
-          stack1
-            [ line $ keyword "import"
-            , indent name'
-            , indent $ indent as'
-            , indent $ indent exposing'
-            ]
-
-        ( name', Nothing, Just exposing' ) ->
-          stack1
-            [ line $ keyword "import"
-            , indent name'
-            , indent $ indent exposing'
-            ]
-
-        ( name', Just as', Nothing ) ->
-          stack1
-            [ line $ keyword "import"
-            , indent name'
-            , indent $ indent as'
-            ]
-
-        ( name', Nothing, Nothing ) ->
-          stack1
-            [ line $ keyword "import"
-            , indent name'
-            ]
 
 
 formatListing :: (a -> [Block]) -> AST.Listing.Listing a -> Maybe Block

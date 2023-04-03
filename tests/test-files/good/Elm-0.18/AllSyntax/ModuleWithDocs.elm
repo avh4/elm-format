@@ -9,7 +9,8 @@ module AllSyntax.ModuleWithDocs exposing
 
 -}
 
-import Dict as D
+import Dict
+    as D
     exposing
         ( Dict
         , empty
