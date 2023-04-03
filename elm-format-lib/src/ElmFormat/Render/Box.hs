@@ -869,15 +869,6 @@ formatCommonDeclaration elmVersion importInfo decl =
             formatTypeAnnotation elmVersion name typ
 
 
--- | temporary during conversion to Block API:
--- like `allSingles`, but does not give Lines if mustBreak is True
-allSingles' :: [Block] -> Either [Block] [Line]
-allSingles' blocks =
-  case allSingles blocks of
-    Right (lines, False) -> Right lines
-    _ -> Left blocks
-
-
 formatDeclaration ::
     Coapplicative annf =>
     ElmVersion -> ImportInfo [UppercaseIdentifier] -> ASTNS annf [UppercaseIdentifier] 'TopLevelDeclarationNK -> Block
