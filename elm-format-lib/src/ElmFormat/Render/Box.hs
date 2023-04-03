@@ -930,24 +930,14 @@ formatDeclaration elmVersion importInfo decl =
             (formatCommented' bodyComments $ syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr)
 
         Fixity_until_0_18 assoc precedenceComments precedence nameComments name ->
-            case
-                ( formatCommented' nameComments $ line $ formatInfixVar elmVersion name
+            spaceSepOrIndented
+                [ line $ case assoc of
+                    L -> keyword "infixl"
+                    R -> keyword "infixr"
+                    N -> keyword "infix"
                 , formatCommented' precedenceComments $ line $ literal $ show precedence
-                )
-            of
-                (SingleLine name', SingleLine precedence') ->
-                    line $ row
-                        [ case assoc of
-                                L -> keyword "infixl"
-                                R -> keyword "infixr"
-                                N -> keyword "infix"
-                        , space
-                        , precedence'
-                        , space
-                        , name'
-                        ]
-                _ ->
-                    pleaseReport "TODO" "multiline fixity declaration"
+                , formatCommented' nameComments $ line $ formatInfixVar elmVersion name
+                ]
 
         Fixity assoc precedence name value ->
             let
