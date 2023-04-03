@@ -14,7 +14,7 @@
 module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
-import Box ( identifier, keyword, literal, punc, render, renderLine, row, stack', stack1, Box(SingleLine) )
+import Box ( identifier, keyword, literal, punc, render, renderLine, row, stack', Box(SingleLine) )
 import ElmVersion (ElmVersion(..))
 
 import AST.V0_16
@@ -52,7 +52,7 @@ import Box.BlockAdapter hiding (rowOrStackForce)
 import qualified Data.Bifunctor as Bifunctor
 import ElmFormat.Render.ElmStructure
 import qualified Data.List.NonEmpty as NonEmpty
-import Data.List.NonEmpty (NonEmpty (..))
+import Data.List.NonEmpty (NonEmpty (..), nonEmpty)
 import Data.Semigroup (Semigroup(sconcat))
 import AST.Listing (Listing(..))
 
@@ -514,13 +514,12 @@ formatModule elmVersion addDefaultHeader spacing modu =
           case extract $ I.unFix $ AST.Module.body modu of
               TopLevel decls -> decls
     in
-      stack1 $
-          concat @[]
-              [ initialComments'
-              , formatModuleHeader elmVersion addDefaultHeader modu
-              , List.replicate spaceBeforeBody blankLine
-              , maybeToList $ formatModuleBody spacing elmVersion (ImportInfo.fromModule mempty modu) decls
-              ]
+      Block.stack $ NonEmpty.fromList $ mconcat
+          [ initialComments'
+          , formatModuleHeader elmVersion addDefaultHeader modu
+          , List.replicate spaceBeforeBody blankLine
+          , maybeToList $ formatModuleBody spacing elmVersion (ImportInfo.fromModule mempty modu) decls
+          ]
 
 
 formatModuleBody :: forall annf. Coapplicative annf => Int -> ElmVersion -> ImportInfo [UppercaseIdentifier] -> [TopLevelStructure (ASTNS annf [UppercaseIdentifier] 'TopLevelDeclarationNK)] -> Maybe Block
@@ -612,9 +611,7 @@ formatTopLevelBody linesBetween elmVersion importInfo body =
                 (formatTopLevelStructure elmVersion importInfo . fmap snd)
                 body
     in
-        case boxes of
-            [] -> Nothing
-            _ -> Just $ stack1 boxes
+    Block.stack <$> nonEmpty boxes
 
 
 data ElmCodeBlock annf ns
@@ -967,13 +964,13 @@ formatDefinition ::
     -> Block
 formatDefinition elmVersion importInfo name args comments expr =
   let
-    body =
-      stack1 $ concat @[]
-        [ map formatComment comments
-        , [ syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr ]
-        ]
+      body =
+          Block.stack $
+              NonEmpty.prependList
+                  (formatComment <$> comments)
+                  [ syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr ]
   in
-    ElmStructure.definition "=" True
+  ElmStructure.definition "=" True
       (syntaxParens SpaceSeparated $ formatPattern elmVersion name)
       (map (\(C x y) -> formatCommented' x $ syntaxParens SpaceSeparated $ formatPattern elmVersion y) args)
       body
@@ -1288,9 +1285,10 @@ formatExpression elmVersion importInfo aexpr =
                         )
                     |> andThen
                         [ line $ keyword "in"
-                        , stack1 $
-                            fmap formatComment bodyComments
-                            ++ [syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr]
+                        , Block.stack $
+                            NonEmpty.prependList
+                                (formatComment <$> bodyComments)
+                                [syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr]
                         ]
 
         Case (subject,multiline) clauses ->
@@ -1515,7 +1513,7 @@ formatRange_0_17 elmVersion importInfo left right multiline =
                 , punc "]"
                 ]
         (_, left', right') ->
-            stack1
+            Block.stack
                 [ line $ punc "["
                 , indent left'
                 , line $ punc ".."
@@ -1679,11 +1677,11 @@ formatComment comment =
                         , space
                         , punc "-}"
                         ]
-                ls ->
-                    stack1
+                first:rest ->
+                    Block.stack
                         [ prefix 3
                             (row [ punc "{-", space ])
-                            (stack1 $ map (line . literal) ls)
+                            (Block.stack $ line . literal <$> (first :| rest))
                         , line $ punc "-}"
                         ]
 
