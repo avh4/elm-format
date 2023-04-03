@@ -1,9 +1,9 @@
 {-# LANGUAGE OverloadedLists #-}
 {-# OPTIONS_GHC -Wall #-}
 module ElmFormat.Render.ElmStructure
-  ( spaceSepOrStack, forceableSpaceSepOrStack, forceableSpaceSepOrStack1
-  , forceableRowOrStack
-  , spaceSepOrIndented, forceableSpaceSepOrIndented, spaceSepOrPrefix, prefixOrIndented
+  ( spaceSepOrStack, spaceSepOrStackForce
+  , rowOrStackForce
+  , spaceSepOrIndented, spaceSepOrIndentedForce, spaceSepOrPrefix, prefixOrIndented
   , equalsPair, definition
   , application, group, group', extensionGroup' )
   where
@@ -16,11 +16,11 @@ import Data.List.NonEmpty (NonEmpty(..))
 import qualified Box.BlockAdapter as Block
 
 
-{-| Same as `forceableSpaceSepOrStack False`
+{-| Same as `spaceSepOrStackForce False`
 -}
-spaceSepOrStack :: Block -> [Block] -> Block
+spaceSepOrStack :: NonEmpty Block -> Block
 spaceSepOrStack =
-    forceableSpaceSepOrStack False
+    spaceSepOrStackForce False
 
 
 {-|
@@ -32,26 +32,14 @@ Formats as:
     rest0
     rest1
 -}
-forceableSpaceSepOrStack :: Bool -> Block -> [Block] -> Block
-forceableSpaceSepOrStack forceMultiline first rest =
-    Block.rowOrStackForce forceMultiline (Just space) (first :| rest)
+spaceSepOrStackForce :: Bool -> NonEmpty Block -> Block
+spaceSepOrStackForce forceMultiline =
+    Block.rowOrStackForce forceMultiline (Just space)
 
 
-forceableRowOrStack :: Bool -> Block -> [Block] -> Block
-forceableRowOrStack forceMultiline first rest =
-    Block.rowOrStackForce forceMultiline Nothing (first :| rest)
-
-
-{-| Same as `forceableSpaceSepOrStack`
--}
-forceableSpaceSepOrStack1 :: Bool -> [Block] -> Block
-forceableSpaceSepOrStack1 forceMultiline boxes =
-    case boxes of
-        (first:rest) ->
-            forceableSpaceSepOrStack forceMultiline first rest
-
-        _ ->
-            error "forceableSpaceSepOrStack1 with empty list"
+rowOrStackForce :: Bool -> NonEmpty Block -> Block
+rowOrStackForce forceMultiline =
+    Block.rowOrStackForce forceMultiline Nothing
 
 
 {-|
@@ -64,14 +52,14 @@ Formats as:
       rest1
       rest2
 -}
-spaceSepOrIndented :: Block -> [Block] -> Block
+spaceSepOrIndented :: NonEmpty Block -> Block
 spaceSepOrIndented =
-    forceableSpaceSepOrIndented False
+    spaceSepOrIndentedForce False
 
 
-forceableSpaceSepOrIndented :: Bool -> Block -> [Block] -> Block
-forceableSpaceSepOrIndented forceMultiline first rest =
-    Block.rowOrIndentForce forceMultiline (Just space) (first :| rest)
+spaceSepOrIndentedForce :: Bool -> NonEmpty Block -> Block
+spaceSepOrIndentedForce forceMultiline =
+    Block.rowOrIndentForce forceMultiline (Just space)
 
 
 {-|

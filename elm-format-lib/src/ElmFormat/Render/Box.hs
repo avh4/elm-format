@@ -14,7 +14,7 @@
 module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
-import Box hiding (Line, Box, mustBreak)
+import Box hiding (rowOrStackForce, Line, Box, mustBreak)
 import ElmVersion (ElmVersion(..))
 
 import AST.V0_16
@@ -50,7 +50,7 @@ import Text.Printf (printf)
 import qualified Box.BlockAdapter as Block
 import Box.BlockAdapter (Line, Block)
 import qualified Data.Bifunctor as Bifunctor
-import ElmFormat.Render.ElmStructure (spaceSepOrIndented, spaceSepOrStack)
+import ElmFormat.Render.ElmStructure
 import qualified Data.List.NonEmpty as NonEmpty
 import Data.List.NonEmpty (NonEmpty (..))
 import Data.Semigroup (Semigroup(sconcat))
@@ -97,18 +97,24 @@ formatBinary multiline left ops =
 
         ( isLeftPipe, comments, op, next ) : rest ->
             if isLeftPipe then
-                ElmStructure.forceableSpaceSepOrIndented multiline
-                    (ElmStructure.spaceSepOrStack left $
+                spaceSepOrIndentedForce multiline
+                    [ spaceSepOrStack $ left :|
                         concat @[]
                             [ Maybe.maybeToList $ formatComments comments
                             , [line $ Block.stringUtf8 op]
                             ]
-                    )
-                    [formatBinary multiline next rest]
+                    , formatBinary multiline next rest
+                    ]
             else
                 formatBinary
                     multiline
-                    (ElmStructure.forceableSpaceSepOrIndented multiline left [formatCommented' comments $ ElmStructure.spaceSepOrPrefix (fromIntegral $ length op) (Block.stringUtf8 op) next])
+                    (spaceSepOrIndentedForce multiline
+                        [ left
+                        , formatCommented' comments $
+                            spaceSepOrPrefix
+                                (fromIntegral $ length op)
+                                (Block.stringUtf8 op) next
+                        ])
                     rest
 
 
@@ -412,8 +418,8 @@ formatModuleLine_0_16 header =
             Just (C (pre, post) _) -> (pre, post)
   in
   spaceSepOrIndented
-      (line $ keyword "module")
-      [ formatCommented $ line . formatQualifiedUppercaseIdentifier elmVersion <$> AST.Module.name header
+      [ line $ keyword "module"
+      , formatCommented $ line . formatQualifiedUppercaseIdentifier elmVersion <$> AST.Module.name header
       , formatExports
       , formatCommented (C whereComments $ line $ keyword "where")
       ]
@@ -436,14 +442,16 @@ formatModuleLine elmVersion (varsToExpose, extraComments) srcTag name moduleSett
           line $ keyword "module"
 
         AST.Module.Port comments ->
-          ElmStructure.spaceSepOrIndented
-            (formatTailCommented (C comments $ line $ keyword "port"))
-            [ line $ keyword "module" ]
+          spaceSepOrIndented
+              [ formatTailCommented (C comments $ line $ keyword "port")
+              , line $ keyword "module"
+              ]
 
         AST.Module.Effect comments ->
-          ElmStructure.spaceSepOrIndented
-            (formatTailCommented (C comments $ line $ keyword "effect"))
-            [ line $ keyword "module" ]
+          spaceSepOrIndented
+            [ formatTailCommented (C comments $ line $ keyword "effect")
+            , line $ keyword "module"
+            ]
 
     exports =
           case varsToExpose of
@@ -472,16 +480,17 @@ formatModuleLine elmVersion (varsToExpose, extraComments) srcTag name moduleSett
 
     nameClause =
       spaceSepOrIndented
-        tag
-        [ formatCommented $ fmap (line . formatQualifiedUppercaseIdentifier elmVersion) name
+        [ tag
+        , formatCommented $ fmap (line . formatQualifiedUppercaseIdentifier elmVersion) name
         ]
   in
   spaceSepOrIndented
-      (spaceSepOrIndented
+      [ spaceSepOrIndented $
           nameClause
-          (whereClause ++ [formatCommented (C (preExposing, postExposing) $ line $ keyword "exposing")])
-      )
-      [ exports ]
+          :| whereClause
+          ++ pure (formatCommented (C (preExposing, postExposing) $ line $ keyword "exposing"))
+      , exports
+      ]
 
 
 formatModule :: Coapplicative annf => ElmVersion -> Bool -> Int -> AST.Module.Module [UppercaseIdentifier] (ASTNS annf [UppercaseIdentifier] 'TopLevelNK) -> Block
@@ -713,16 +722,14 @@ formatImport elmVersion (name@(C _ rawName), method) =
 
         exposing = AST.Module.exposedVars method
     in
-    spaceSepOrIndented
-        (Block.prefixOrIndent (Just space)
+    spaceSepOrIndented $ 
+        Block.prefixOrIndent (Just space)
             (keyword "import")
             (formatName name)
-        )
-        (catMaybes
+        :| catMaybes
             [ formatAsClause =<< normalizedAs
             , formatExposingClause exposing
             ]
-        )
     where
         formatName = formatPreCommented . fmap (line . formatQualifiedUppercaseIdentifier elmVersion)
 
@@ -742,8 +749,8 @@ formatImport elmVersion (name@(C _ rawName), method) =
 
             C (preKeyword, postKeyword) (Just listing') ->
                 Just $ spaceSepOrIndented
-                    (formatPreCommented (C preKeyword $ line $ keyword keyw))
-                    [ formatPreCommented (C postKeyword listing')
+                    [ formatPreCommented (C preKeyword $ line $ keyword keyw)
+                    , formatPreCommented (C postKeyword listing')
                     ]
 
             _ ->
@@ -822,7 +829,7 @@ formatVarValue elmVersion aval =
                         (Nothing, Nothing) -> []
                         (Just c, Nothing) -> pure c
                         (Nothing, Just l) -> pure l
-                        (Just c, Just l) -> pure $ spaceSepOrStack c [l]
+                        (Just c, Just l) -> pure $ spaceSepOrStack [c, l]
             in
             Block.rowOrIndent spacer $
                 formatName name
@@ -885,8 +892,8 @@ formatDeclaration elmVersion importInfo decl =
                 first:rest ->
                     Block.stack
                         [ spaceSepOrIndented
-                            (line $ keyword "type")
-                            [ formatCommented $ formatNameWithArgs elmVersion <$> nameWithArgs
+                            [ line $ keyword "type"
+                            , formatCommented $ formatNameWithArgs elmVersion <$> nameWithArgs
                             ]
                         , indent $ Block.stack $ NonEmpty.fromList $ mconcat
                             [ pure $ prefix (row [punc "=", space]) first
@@ -895,9 +902,9 @@ formatDeclaration elmVersion importInfo decl =
                         ]
             where
                 formatCtor (NameWithArgs tag args') =
-                    spaceSepOrIndented
-                        (line $ formatUppercaseIdentifier elmVersion tag)
-                        (formatArg <$> args')
+                    spaceSepOrIndented $
+                        line (formatUppercaseIdentifier elmVersion tag)
+                        :| (formatArg <$> args')
 
                 formatArg =
                     formatPreCommented . fmap (typeParens ForCtor . formatType elmVersion)
@@ -950,9 +957,9 @@ formatDeclaration elmVersion importInfo decl =
                         R -> keyword "right"
                         N -> keyword "non  "
             in
-            ElmStructure.spaceSepOrIndented
-                (line $ keyword "infix")
-                [ formatPreCommented $ fmap (line . formatAssoc) assoc
+            spaceSepOrIndented
+                [ line $ keyword "infix"
+                , formatPreCommented $ fmap (line . formatAssoc) assoc
                 , formatPreCommented $ fmap (line . literal . show) precedence
                 , formatCommented $ fmap (line . formatSymbolIdentifierInParens) name
                 , line $ keyword "="
@@ -962,9 +969,9 @@ formatDeclaration elmVersion importInfo decl =
 
 formatNameWithArgs :: ElmVersion -> NameWithArgs UppercaseIdentifier LowercaseIdentifier -> Block
 formatNameWithArgs elmVersion (NameWithArgs name args) =
-    spaceSepOrIndented
-        (line $ formatUppercaseIdentifier elmVersion name)
-        (formatArg <$> args)
+    spaceSepOrIndented $
+        line (formatUppercaseIdentifier elmVersion name)
+        :| (formatArg <$> args)
     where
         formatArg = formatPreCommented . fmap (line . formatLowercaseIdentifier elmVersion [])
 
@@ -1509,12 +1516,12 @@ formatSequence left delim right (ForceMultiline multiline) trailing (Sequence (f
             prefix (row [ punc [delim_], space ]) $
             formatC2Eol $ C (post, [], eol) item
     in
-        ElmStructure.forceableSpaceSepOrStack multiline
-            (ElmStructure.forceableRowOrStack multiline
-                (formatItem left first)
-                (map (formatItem delim) rest)
+        spaceSepOrStackForce multiline $
+            rowOrStackForce multiline (
+                formatItem left first
+                :| fmap (formatItem delim) rest
             )
-            (maybe [] (flip (:) [] . stack' blankLine) (formatComments trailing) ++ Maybe.maybeToList (fmap (line . punc . flip (:) []) right))
+            :| (maybe [] (flip (:) [] . stack' blankLine) (formatComments trailing) ++ Maybe.maybeToList (fmap (line . punc . flip (:) []) right))
 formatSequence left _ (Just right) _ trailing (Sequence []) =
     formatUnit left right trailing
 formatSequence left _ Nothing _ trailing (Sequence []) =
@@ -1652,17 +1659,16 @@ formatComments comments =
             Nothing
 
         (first:rest) ->
-            Just $ ElmStructure.spaceSepOrStack first rest
+            Just $ spaceSepOrStack (first :| rest)
 
 
 formatCommented_ :: Bool -> C2 before after Block -> Block
 formatCommented_ forceMultiline (C (pre, post) inner) =
-    ElmStructure.forceableSpaceSepOrStack1 forceMultiline $
-        concat @[]
-            [ Maybe.maybeToList $ formatComments pre
-            , [inner]
-            , Maybe.maybeToList $ formatComments post
-            ]
+    spaceSepOrStackForce forceMultiline $ NonEmpty.fromList $ mconcat
+        [ Maybe.maybeToList $ formatComments pre
+        , [inner]
+        , Maybe.maybeToList $ formatComments post
+        ]
 
 
 formatCommented :: C2 before after Block -> Block
@@ -1702,9 +1708,9 @@ formatEolCommented (C post inner) =
     Nothing -> inner
     Just eol ->
       spaceSepOrStack
-        inner
-        [ formatComment $ LineComment eol
-        ]
+          [ inner
+          , formatComment $ LineComment eol
+          ]
 
 
 formatCommentedStack :: C2 before after Block -> Block
@@ -1722,9 +1728,10 @@ formatPreCommentedStack (C pre inner) =
 
 formatKeywordCommented :: String -> C2 beforeKeyword afterKeyword Block -> Block
 formatKeywordCommented word (C (pre, post) value) =
-  ElmStructure.spaceSepOrIndented
-    (formatCommented $ fmap (line . keyword) (C (pre, post) word))
-    [ value ]
+    spaceSepOrIndented
+        [ formatCommented $ fmap (line . keyword) (C (pre, post) word)
+        , value
+        ]
 
 
 formatOpenCommentedList :: OpenCommentedList Block -> [Block]
@@ -1940,24 +1947,21 @@ formatType elmVersion atype =
         FunctionType first rest (ForceMultiline forceMultiline) ->
             let
                 formatRight (C (preOp, postOp, eol) term) =
-                    ElmStructure.forceableSpaceSepOrStack1
-                        False
-                        $ concat @[]
-                            [ Maybe.maybeToList $ formatComments preOp
-                            , [ ElmStructure.prefixOrIndented
-                                  (punc "->")
-                                  (formatC2Eol $
-                                      (fmap $ typeParens ForLambda . formatType elmVersion)
-                                      (C (postOp, [], eol) term)
-                                  )
-                              ]
-                            ]
+                    spaceSepOrStackForce False $ NonEmpty.fromList $ mconcat
+                        [ Maybe.maybeToList $ formatComments preOp
+                        , [ prefixOrIndented
+                              (punc "->")
+                              (formatC2Eol $
+                                  (fmap $ typeParens ForLambda . formatType elmVersion)
+                                  (C (postOp, [], eol) term)
+                              )
+                          ]
+                        ]
             in
                 (,) ForFunctionType $
-                ElmStructure.forceableSpaceSepOrStack
-                    forceMultiline
-                    (formatEolCommented (typeParens ForLambda . formatType elmVersion <$> first))
-                    (formatRight <$> toCommentedList rest)
+                spaceSepOrStackForce forceMultiline $
+                    formatEolCommented (typeParens ForLambda . formatType elmVersion <$> first)
+                    :| (formatRight <$> toCommentedList rest)
 
         TypeVariable var ->
             (,) NotNeeded $
