@@ -14,7 +14,7 @@
 module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
-import Box hiding (rowOrStackForce, Line, Box, mustBreak)
+import Box ( identifier, keyword, literal, punc, render, renderLine, row, stack', stack1, Box(SingleLine) )
 import ElmVersion (ElmVersion(..))
 
 import AST.V0_16
@@ -47,8 +47,8 @@ import qualified Parse.Parse as Parse
 import qualified Reporting.Annotation as A
 import qualified Reporting.Result as Result
 import Text.Printf (printf)
-import qualified Box.BlockAdapter as Block
-import Box.BlockAdapter (Line, Block)
+import qualified Box.BlockAdapter as Block hiding (rowOrStackForce)
+import Box.BlockAdapter hiding (rowOrStackForce)
 import qualified Data.Bifunctor as Bifunctor
 import ElmFormat.Render.ElmStructure
 import qualified Data.List.NonEmpty as NonEmpty
@@ -887,8 +887,8 @@ formatDeclaration elmVersion importInfo decl =
                             , formatCommented $ formatNameWithArgs elmVersion <$> nameWithArgs
                             ]
                         , indent $ Block.stack $ NonEmpty.fromList $ mconcat
-                            [ pure $ prefix (row [punc "=", space]) first
-                            , fmap (prefix (row [punc "|", space])) rest
+                            [ pure $ prefix 2 (row [punc "=", space]) first
+                            , fmap (prefix 2 (row [punc "|", space])) rest
                             ]
                         ]
             where
@@ -1181,7 +1181,7 @@ formatExpression elmVersion importInfo aexpr =
             (,) AmbiguousEnd $
             spaceSepOrIndentedForce multiline
                 [ spaceSepOrStack
-                    [ prefix (punc "\\") $
+                    [ prefix 1 (punc "\\") $
                         spaceSepOrStack $ formatPattern' <$> (first :| rest)
                     , line $ punc "->"
                     ]
@@ -1201,7 +1201,7 @@ formatExpression elmVersion importInfo aexpr =
 
         Unary Negative e ->
             (,) SyntaxSeparated $
-            prefix (punc "-") $ syntaxParens SpaceSeparated $ formatExpression elmVersion importInfo e -- TODO: This might need something stronger than SpaceSeparated?
+            prefix 1 (punc "-") $ syntaxParens SpaceSeparated $ formatExpression elmVersion importInfo e -- TODO: This might need something stronger than SpaceSeparated?
 
         App left [] _ ->
             formatExpression elmVersion importInfo left
@@ -1441,7 +1441,7 @@ formatSequence left delim right (ForceMultiline multiline) trailing (Sequence (f
     let
         formatItem delim_ (C (pre, post, eol) item) =
             maybe id (stack' . stack' blankLine) (formatComments pre) $
-            prefix (row [ punc [delim_], space ]) $
+            prefix 2 (row [ punc [delim_], space ]) $
             formatC2Eol $ C (post, [], eol) item
     in
         spaceSepOrStackForce multiline $
@@ -1568,7 +1568,7 @@ formatUnit left right comments =
         line $ punc [left, right]
 
     ('{', first@(LineComment _):rest) ->
-        surround left right $ prefix space $ Block.stack $
+        surround left right $ prefix 1 space $ Block.stack $
             formatComment <$> first :| rest
 
     (_, first:rest) ->
@@ -1681,7 +1681,7 @@ formatComment comment =
                         ]
                 ls ->
                     stack1
-                        [ prefix
+                        [ prefix 3
                             (row [ punc "{-", space ])
                             (stack1 $ map (line . literal) ls)
                         , line $ punc "-}"
