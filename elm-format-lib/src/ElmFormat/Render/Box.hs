@@ -1305,63 +1305,41 @@ formatExpression elmVersion importInfo aexpr =
         Case (subject,multiline) clauses ->
             let
                 opening =
-                  case
-                    ( multiline
-                    , formatCommentedExpression elmVersion importInfo subject
-                    )
-                  of
-                      (False, SingleLine subject') ->
-                          line $ row
-                              [ keyword "case"
-                              , space
-                              , subject'
-                              , space
-                              , keyword "of"
-                              ]
-                      (_, subject') ->
-                          stack1
-                              [ line $ keyword "case"
-                              , indent subject'
-                              , line $ keyword "of"
-                              ]
+                    spaceSepOrStack
+                        [ spaceSepOrIndentedForce multiline
+                            [ line $ keyword "case"
+                            , formatCommentedExpression elmVersion importInfo subject
+                            ]
+                        , line $ keyword "of"
+                        ]
 
-                clause (CaseBranch prePat postPat preExpr pat expr) =
-                    case
-                      ( postPat
-                      , formatPattern elmVersion pat
-                          |> syntaxParens SyntaxSeparated
-                          |> negativeCasePatternWorkaround pat
-                      , formatCommentedStack (fmap (syntaxParens SyntaxSeparated . formatPattern elmVersion) (C (prePat, postPat) pat))
-                          |> negativeCasePatternWorkaround pat
-                      , formatPreCommentedStack $ fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo) (C preExpr expr)
-                      )
-                    of
-                        (_, _, SingleLine pat', body') ->
-                            stack1
-                                [ line $ row [ pat', space, keyword "->"]
-                                , indent body'
-                                ]
-                        ([], SingleLine pat', _, body') ->
-                            stack1 $
-                                fmap formatComment prePat
-                                ++ [ line $ row [ pat', space, keyword "->"]
-                                   , indent body'
-                                   ]
-                        (_, _, pat', body') ->
-                            stack1
-                              [ pat'
-                              , line $ keyword "->"
-                              , indent body'
-                              ]
+                formatBranch (CaseBranch prePat postPat preExpr pat expr) =
+                    Block.stack
+                        [ formatPreCommentedStack $ C prePat $
+                          spaceSepOrStack
+                            [ formatBranchPattern (C ([], postPat) pat)
+                                |> negativeCasePatternWorkaround pat
+                            , line $ keyword "->"
+                            ]
+                        , indent $ formatBody (C preExpr expr)
+                        ]
             in
-                (,) AmbiguousEnd $ -- TODO: not tested
+            (,) AmbiguousEnd $ -- TODO: not tested
+            Block.stack $
                 opening
-                    |> andThen
-                        (clauses
-                            |> fmap (clause . extract . I.unFix)
-                            |> List.intersperse blankLine
-                            |> map indent
-                        )
+                :| (clauses
+                        |> fmap (formatBranch . extract . I.unFix)
+                        |> List.intersperse blankLine
+                        |> fmap indent
+                    )
+            where
+                formatBranchPattern =
+                    formatCommentedStack
+                    . fmap (syntaxParens SyntaxSeparated . formatPattern elmVersion)
+
+                formatBody =
+                    formatPreCommentedStack
+                    . fmap (syntaxParens SyntaxSeparated . formatExpression elmVersion importInfo)
 
         Tuple exprs trailing multiline ->
             (,) SyntaxSeparated $
@@ -1674,10 +1652,10 @@ formatEolCommented (C post inner) =
 
 formatCommentedStack :: C2 before after Block -> Block
 formatCommentedStack (C (pre, post) inner) =
-  stack1 $
-    map formatComment pre
-      ++ [ inner ]
-      ++ map formatComment post
+  Block.stack $
+      NonEmpty.prependList
+          (formatComment <$> pre)
+          (inner :| (formatComment <$> post))
 
 
 formatPreCommentedStack :: C1 before Block -> Block
