@@ -1182,46 +1182,31 @@ formatExpression elmVersion importInfo aexpr =
             (,) InfixSeparated $
             formatBinops elmVersion importInfo left ops multiline
 
-        Lambda patterns bodyComments expr multiline ->
+        Lambda [] _ _ _ ->
             (,) AmbiguousEnd $
-            case
-                ( multiline
-                , allSingles $ fmap (formatPreCommented . fmap (syntaxParens SpaceSeparated . formatPattern elmVersion)) patterns
-                , List.null bodyComments
-                , syntaxParens SyntaxSeparated $ formatExpression elmVersion importInfo expr
-                )
-            of
-                (False, Right (patterns', isMustBreak), True, SingleLine expr') ->
-                    line $ row
-                        [ punc "\\"
-                        , row $ List.intersperse space patterns'
-                        , space
-                        , punc "->"
-                        , space
-                        , expr'
-                        ]
-                (_, Right (patterns', isMustBreak), _, expr') ->
-                    stack1
-                        [ line $ row
-                            [ punc "\\"
-                            , row $ List.intersperse space patterns'
-                            , space
-                            , punc "->"
-                            ]
-                        , indent $ stack1 $
-                            fmap formatComment bodyComments
-                            ++ [ expr' ]
-                        ]
-                (_, Left [], _, _) ->
-                    pleaseReport "UNEXPECTED LAMBDA" "no patterns"
-                (_, Left patterns', _, expr') ->
-                    stack1
-                        [ prefix (punc "\\") $ stack1 patterns'
-                        , line $ punc "->"
-                        , indent $ stack1 $
-                            fmap formatComment bodyComments
-                            ++ [ expr' ]
-                        ]
+            pleaseReport "UNEXPECTED LAMBDA" "no patterns"
+
+        Lambda (first:rest) bodyComments expr multiline ->
+            (,) AmbiguousEnd $
+            spaceSepOrIndentedForce multiline
+                [ spaceSepOrStack
+                    [ prefix (punc "\\") $
+                        spaceSepOrStack $ formatPattern' <$> (first :| rest)
+                    , line $ punc "->"
+                    ]
+                , Block.stack $
+                    NonEmpty.prependList
+                        (fmap formatComment bodyComments)
+                        [ formatExpr' expr ]
+                ]
+            where
+                formatPattern' =
+                    formatPreCommented
+                    . fmap (syntaxParens SpaceSeparated . formatPattern elmVersion)
+
+                formatExpr' =
+                    syntaxParens SyntaxSeparated
+                    . formatExpression elmVersion importInfo
 
         Unary Negative e ->
             (,) SyntaxSeparated $
