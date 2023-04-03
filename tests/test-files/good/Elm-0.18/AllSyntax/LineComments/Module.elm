@@ -35,7 +35,8 @@ import
     exposing
         --O
         ( --S
-          Maybe --W
+          Maybe
+            --W
             ( --X
               Just
               --Y

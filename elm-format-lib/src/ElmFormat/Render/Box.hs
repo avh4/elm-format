@@ -52,8 +52,9 @@ import Box.BlockAdapter (Line, Block)
 import qualified Data.Bifunctor as Bifunctor
 import ElmFormat.Render.ElmStructure (spaceSepOrIndented, spaceSepOrStack)
 import qualified Data.List.NonEmpty as NonEmpty
-import Data.List.NonEmpty (NonEmpty)
+import Data.List.NonEmpty (NonEmpty (..))
 import Data.Semigroup (Semigroup(sconcat))
+import AST.Listing (Listing(..))
 
 pleaseReport'' :: String -> String -> String
 pleaseReport'' what details =
@@ -802,45 +803,38 @@ formatVarValue elmVersion aval =
         AST.Listing.OpValue (SymbolIdentifier name) ->
             line $ identifier $ "(" ++ name ++ ")"
 
-        AST.Listing.Union name listing ->
-            case
-              ( formatListing
-                  (formatCommentedMap
-                      (\name_ () -> name_)
-                      (line . formatUppercaseIdentifier elmVersion)
-                  )
-                  listing
-              , formatTailCommented $ fmap (line . formatUppercaseIdentifier elmVersion) name
-              , (\(C c _) -> c) name
-              , elmVersion
-              )
-            of
-                (Just _, _, _, Elm_0_19) ->
-                    formatTailCommented $
-                        fmap (\n -> line $ row [ formatUppercaseIdentifier elmVersion n, keyword "(..)" ])
-                        name
+        AST.Listing.Union (C postName name) listing' ->
+            let
+                listing =
+                    case (ElmVersion.syntax_0_19_disallowExplicitUnionListings elmVersion, listing') of
+                        (True, ExplicitListing _ _) -> OpenListing (C ([], []) ())
+                        _ -> listing'
 
-                (Just (SingleLine listing'), SingleLine name', [], _) ->
-                    line $ row
-                        [ name'
-                        , listing'
-                        ]
+                comments = formatComments postName
 
-                (Just (SingleLine listing'), SingleLine name', _, _) ->
-                    line $ row
-                        [ name'
-                        , space
-                        , listing'
-                        ]
+                spacer =
+                    case comments of
+                        Just _ -> Just space
+                        Nothing -> Nothing
 
-                (Just listing', name', _, _) ->
-                  stack1
-                    [ name'
-                    , indent listing'
-                    ]
+                listingClause =
+                    case (formatComments postName, formatListing' listing) of
+                        (Nothing, Nothing) -> []
+                        (Just c, Nothing) -> pure c
+                        (Nothing, Just l) -> pure l
+                        (Just c, Just l) -> pure $ spaceSepOrStack c [l]
+            in
+            Block.rowOrIndent spacer $
+                formatName name
+                :| listingClause
+            where
+                formatName = line . formatUppercaseIdentifier elmVersion
 
-                (Nothing, name', _, _) ->
-                    name'
+                formatListing' =
+                    formatListing $
+                        formatCommentedMap
+                            (\name_ () -> name_)
+                            (line . formatUppercaseIdentifier elmVersion)
 
 
 formatTopLevelStructure :: ElmVersion -> ImportInfo [UppercaseIdentifier] -> TopLevelStructure Block -> Block
