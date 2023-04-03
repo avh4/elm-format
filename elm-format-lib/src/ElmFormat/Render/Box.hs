@@ -14,7 +14,7 @@
 module ElmFormat.Render.Box where
 
 import Elm.Utils ((|>))
-import Box hiding (Line, Box)
+import Box hiding (Line, Box, mustBreak)
 import ElmVersion (ElmVersion(..))
 
 import AST.V0_16
@@ -1883,16 +1883,16 @@ formatComment comment =
                         ]
 
         LineComment c ->
-            mustBreak $ row [ punc "--", literal c ]
+            Block.mustBreak $ row [ punc "--", literal c ]
 
         CommentTrickOpener ->
-            mustBreak $ punc "{--}"
+            Block.mustBreak $ punc "{--}"
 
         CommentTrickCloser ->
-            mustBreak $ punc "--}"
+            Block.mustBreak $ punc "--}"
 
         CommentTrickBlock c ->
-            mustBreak $ row [ punc "{--", literal c, punc "-}" ]
+            Block.mustBreak $ row [ punc "{--", literal c, punc "-}" ]
 
 
 formatLiteral :: ElmVersion -> LiteralValue -> Block
