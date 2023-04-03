@@ -52,6 +52,9 @@ import qualified Box.BlockAdapter as Block
 import Box.BlockAdapter (Line, Block)
 import qualified Data.Bifunctor as Bifunctor
 import ElmFormat.Render.ElmStructure (spaceSepOrIndented, spaceSepOrStack)
+import qualified Data.List.NonEmpty as NonEmpty
+import Data.List.NonEmpty (NonEmpty)
+import Data.Semigroup (Semigroup(sconcat))
 
 pleaseReport'' :: String -> String -> String
 pleaseReport'' what details =
@@ -80,6 +83,10 @@ surround open close block =
 
 parens :: Block -> Block
 parens = surround '(' ')'
+
+
+spaceSep :: NonEmpty Line -> Line
+spaceSep = sconcat . NonEmpty.intersperse space
 
 
 formatBinary :: Bool -> Block -> [ ( Bool, Comments, String, Block ) ] -> Block
@@ -682,16 +689,18 @@ formatDocCommentString :: String -> Block
 formatDocCommentString docs =
     case lines docs of
         [] ->
-            line $ row [ punc "{-|", space, punc "-}" ]
+            line $ punc "{-|" <> space <> punc "-}"
         [first] ->
-            stack1
-                [ line $ row [ punc "{-|", space, literal first ]
+            Block.stack
+                [ line $ punc "{-|" <> space <> literal first
                 , line $ punc "-}"
                 ]
         (first:rest) ->
-            line (row [ punc "{-|", space, literal first ])
-                |> andThen (map (line . literal) rest)
-                |> andThen [ line $ punc "-}" ]
+            Block.stack $ NonEmpty.fromList $ mconcat
+                [ pure $ line $ punc "{-|" <> space <> literal first
+                , fmap (line . literal) rest
+                , pure $ line $ punc "-}"
+                ]
 
 
 formatImport :: ElmVersion -> AST.Module.UserImport -> Block
@@ -984,47 +993,27 @@ formatDeclaration elmVersion importInfo decl =
             formatCommonDeclaration elmVersion importInfo def
 
         Datatype nameWithArgs tags ->
-            let
-                ctor (NameWithArgs tag args') =
-                    case allSingles $ map (formatPreCommented .fmap (typeParens ForCtor . formatType elmVersion)) args' of
-                        Right (args'', isMustBreak) ->
-                            line $ row $ List.intersperse space $ formatUppercaseIdentifier elmVersion tag:args''
-                        Left [] ->
-                            line $ formatUppercaseIdentifier elmVersion tag
-                        Left args'' ->
-                            stack1
-                                [ line $ formatUppercaseIdentifier elmVersion tag
-                                , stack1 args''
-                                    |> indent
-                                ]
-            in
-                case
-                    formatOpenCommentedList $ fmap ctor tags
-                of
-                    [] -> error "List can't be empty"
-                    first:rest ->
-                        case formatCommented $ fmap (formatNameWithArgs elmVersion) nameWithArgs of
-                        SingleLine nameWithArgs' ->
-                            stack1
-                            [ line $ row
-                                [ keyword "type"
-                                , space
-                                , nameWithArgs'
-                                ]
-                            , first
-                                |> prefix (row [punc "=", space])
-                                |> andThen (map (prefix (row [punc "|", space])) rest)
-                                |> indent
+            case formatOpenCommentedList $ formatCtor <$> tags of
+                [] -> error "List can't be empty"
+                first:rest ->
+                    Block.stack
+                        [ spaceSepOrIndented
+                            (line $ keyword "type")
+                            [ formatCommented $ formatNameWithArgs elmVersion <$> nameWithArgs
                             ]
-                        nameWithArgs' ->
-                            stack1
-                            [ line $ keyword "type"
-                            , indent nameWithArgs'
-                            , first
-                                |> prefix (row [punc "=", space])
-                                |> andThen (map (prefix (row [punc "|", space])) rest)
-                                |> indent
+                        , indent $ Block.stack $ NonEmpty.fromList $ mconcat
+                            [ pure $ prefix (row [punc "=", space]) first
+                            , fmap (prefix (row [punc "|", space])) rest
                             ]
+                        ]
+            where
+                formatCtor (NameWithArgs tag args') =
+                    spaceSepOrIndented
+                        (line $ formatUppercaseIdentifier elmVersion tag)
+                        (formatArg <$> args')
+
+                formatArg =
+                    formatPreCommented . fmap (typeParens ForCtor . formatType elmVersion)
 
         TypeAlias preAlias nameWithArgs typ ->
             ElmStructure.definition "=" True
@@ -1086,13 +1075,11 @@ formatDeclaration elmVersion importInfo decl =
 
 formatNameWithArgs :: ElmVersion -> NameWithArgs UppercaseIdentifier LowercaseIdentifier -> Block
 formatNameWithArgs elmVersion (NameWithArgs name args) =
-  case allSingles $ fmap (formatPreCommented . fmap (line . formatLowercaseIdentifier elmVersion [])) args of
-    Right (args', isMustBreak) ->
-      line $ row $ List.intersperse space (formatUppercaseIdentifier elmVersion name : args')
-    Left args' ->
-      stack1 $
-        [ line $ formatUppercaseIdentifier elmVersion name ]
-        ++ fmap indent args'
+    spaceSepOrIndented
+        (line $ formatUppercaseIdentifier elmVersion name)
+        (formatArg <$> args)
+    where
+        formatArg = formatPreCommented . fmap (line . formatLowercaseIdentifier elmVersion [])
 
 
 formatDefinition ::
