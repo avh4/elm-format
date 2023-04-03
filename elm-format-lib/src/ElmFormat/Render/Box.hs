@@ -1084,27 +1084,19 @@ formatPattern elmVersion apattern =
             ElmStructure.group True "{" "," "}" False $ map (formatCommented . fmap (line . formatLowercaseIdentifier elmVersion [])) fields
 
         Alias pattern name ->
-          (,) SpaceSeparated $
-          case
-            ( formatTailCommented $ fmap (syntaxParens SpaceSeparated . formatPattern elmVersion) pattern
-            , formatPreCommented $ fmap (line . formatLowercaseIdentifier elmVersion []) name
-            )
-          of
-            (SingleLine pattern', SingleLine name') ->
-              line $ row
-                [ pattern'
-                , space
-                , keyword "as"
-                , space
-                , name'
+            (,) SpaceSeparated $
+            spaceSepOrIndented
+                [ spaceSepOrStack
+                    [ formatPattern' pattern
+                    , line $ keyword "as"
+                    ]
+                , formatAliasName name
                 ]
-
-            (pattern', name') ->
-              stack1
-                [ pattern'
-                , line $ keyword "as"
-                , indent name'
-                ]
+            where
+                formatPattern' =
+                    formatTailCommented . fmap (syntaxParens SpaceSeparated . formatPattern elmVersion)
+                formatAliasName = 
+                    formatPreCommented . fmap (line . formatLowercaseIdentifier elmVersion [])
 
 
 formatRecordPair :: ElmVersion -> String -> (v -> Block) -> (C2 before after LowercaseIdentifier, C2 before after v, Bool) -> Block
