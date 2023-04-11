@@ -8,7 +8,7 @@ let
     with pkgs.haskell.lib; rec {
       hedgehog = self.hedgehog_1_2;
       relude = overrideCabal super.relude (orig: { doCheck = false; });
-      text = self.text_2_0_1;
+      text = self.text_2_0_2;
       unordered-containers =
         overrideCabal super.unordered-containers (orig: { doCheck = false; });
     };
@@ -18,8 +18,8 @@ let
     let
       inherit (pkgs) lib;
 
-      aeson = self.aeson_2_1_1_0;
-      text = self.text_2_0_1;
+      aeson = self.aeson_2_1_2_1;
+      text = self.text_2_0_2;
 
       mkPkg = name: path: args:
         overrideCabal (self.callCabal2nix name path args) (orig: {
