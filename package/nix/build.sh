@@ -8,17 +8,17 @@ ELM_FORMAT_VERSION="$(git describe --abbrev=8)"
 BRANCH="elm-format-$ELM_FORMAT_VERSION"
 
 if [ ! -d nixpkgs ]; then
-  git clone --branch master https://github.com/NixOS/nixpkgs.git nixpkgs
+  git clone --branch nixpkgs-unstable https://github.com/NixOS/nixpkgs.git nixpkgs
 fi
 
 pushd nixpkgs
-git fetch origin master
+git fetch origin nixpkgs-unstable
 git reset --hard
 if git branch | grep " ${BRANCH}$"; then
-  git checkout "$BRANCH"
-  git reset --hard origin/master
+  git switch "$BRANCH"
+  git reset --hard origin/nixpkgs-unstable
 else
-  git checkout -b "$BRANCH" origin/master
+  git switch -c "$BRANCH" origin/nixpkgs-unstable
   git reset --hard
 fi
 popd
