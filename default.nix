@@ -7,7 +7,7 @@ let
   haskellPackageOverrides = pkgs: self: super:
     with pkgs.haskell.lib; rec {
       hedgehog = self.hedgehog_1_2;
-      relude = overrideCabal super.relude (orig: { doCheck = false; });
+      relude = overrideCabal super.relude_1_2_0_0 (orig: { doCheck = false; });
       text = self.text_2_0_2;
       unordered-containers =
         overrideCabal super.unordered-containers (orig: { doCheck = false; });
