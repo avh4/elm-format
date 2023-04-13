@@ -960,11 +960,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 7,
-                        "line": 75
+                        "line": 76
                     },
                     "start": {
                         "col": 5,
-                        "line": 75
+                        "line": 76
                     }
                 },
                 "tag": "UnitLiteral"
@@ -976,7 +976,7 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 6,
-                                "line": 73
+                                "line": 74
                             },
                             "start": {
                                 "col": 5,
@@ -1116,6 +1116,21 @@
                                     }
                                 },
                                 "tag": "ListPattern"
+                            },
+                            {
+                                "prefix": [],
+                                "rest": null,
+                                "sourceLocation": {
+                                    "end": {
+                                        "col": 8,
+                                        "line": 73
+                                    },
+                                    "start": {
+                                        "col": 7,
+                                        "line": 72
+                                    }
+                                },
+                                "tag": "ListPattern"
                             }
                         ]
                     },
@@ -1126,7 +1141,7 @@
             "sourceLocation": {
                 "end": {
                     "col": 7,
-                    "line": 75
+                    "line": 76
                 },
                 "start": {
                     "col": 1,
@@ -1140,11 +1155,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 7,
-                        "line": 79
+                        "line": 80
                     },
                     "start": {
                         "col": 5,
-                        "line": 79
+                        "line": 80
                     }
                 },
                 "tag": "UnitLiteral"
@@ -1159,11 +1174,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 15,
-                                        "line": 78
+                                        "line": 79
                                     },
                                     "start": {
                                         "col": 14,
-                                        "line": 78
+                                        "line": 79
                                     }
                                 },
                                 "tag": "VariableDefinition"
@@ -1175,11 +1190,11 @@
                                         "sourceLocation": {
                                             "end": {
                                                 "col": 21,
-                                                "line": 78
+                                                "line": 79
                                             },
                                             "start": {
                                                 "col": 20,
-                                                "line": 78
+                                                "line": 79
                                             }
                                         },
                                         "tag": "VariableDefinition"
@@ -1189,11 +1204,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 27,
-                                        "line": 78
+                                        "line": 79
                                     },
                                     "start": {
                                         "col": 20,
-                                        "line": 78
+                                        "line": 79
                                     }
                                 },
                                 "tag": "ListPattern"
@@ -1211,11 +1226,11 @@
                                         "sourceLocation": {
                                             "end": {
                                                 "col": 35,
-                                                "line": 78
+                                                "line": 79
                                             },
                                             "start": {
                                                 "col": 34,
-                                                "line": 78
+                                                "line": 79
                                             }
                                         },
                                         "tag": "VariableDefinition"
@@ -1225,11 +1240,11 @@
                                     "sourceLocation": {
                                         "end": {
                                             "col": 40,
-                                            "line": 78
+                                            "line": 79
                                         },
                                         "start": {
                                             "col": 39,
-                                            "line": 78
+                                            "line": 79
                                         }
                                     },
                                     "tag": "AnythingPattern"
@@ -1237,11 +1252,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 40,
-                                        "line": 78
+                                        "line": 79
                                     },
                                     "start": {
                                         "col": 34,
-                                        "line": 78
+                                        "line": 79
                                     }
                                 },
                                 "tag": "ListPattern"
@@ -1249,11 +1264,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 49,
-                                    "line": 78
+                                    "line": 79
                                 },
                                 "start": {
                                     "col": 33,
-                                    "line": 78
+                                    "line": 79
                                 }
                             },
                             "tag": "PatternAlias"
@@ -1261,11 +1276,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 50,
-                                "line": 78
+                                "line": 79
                             },
                             "start": {
                                 "col": 14,
-                                "line": 78
+                                "line": 79
                             }
                         },
                         "tag": "ListPattern"
@@ -1277,11 +1292,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 7,
-                    "line": 79
+                    "line": 80
                 },
                 "start": {
                     "col": 1,
-                    "line": 78
+                    "line": 79
                 }
             },
             "tag": "Definition"
@@ -1291,11 +1306,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 7,
-                        "line": 83
+                        "line": 84
                     },
                     "start": {
                         "col": 5,
-                        "line": 83
+                        "line": 84
                     }
                 },
                 "tag": "UnitLiteral"
@@ -1317,11 +1332,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 16,
-                                "line": 82
+                                "line": 83
                             },
                             "start": {
                                 "col": 8,
-                                "line": 82
+                                "line": 83
                             }
                         },
                         "tag": "RecordPattern"
@@ -1333,11 +1348,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 7,
-                    "line": 83
+                    "line": 84
                 },
                 "start": {
                     "col": 1,
-                    "line": 82
+                    "line": 83
                 }
             },
             "tag": "Definition"
@@ -1347,11 +1362,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 7,
-                        "line": 91
+                        "line": 92
                     },
                     "start": {
                         "col": 5,
-                        "line": 91
+                        "line": 92
                     }
                 },
                 "tag": "UnitLiteral"
@@ -1364,11 +1379,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 86
+                                "line": 87
                             },
                             "start": {
                                 "col": 13,
-                                "line": 86
+                                "line": 87
                             }
                         },
                         "tag": "RecordPattern"
@@ -1381,11 +1396,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 14,
-                                "line": 87
+                                "line": 88
                             },
                             "start": {
                                 "col": 5,
-                                "line": 87
+                                "line": 88
                             }
                         },
                         "tag": "RecordPattern"
@@ -1398,11 +1413,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 6,
-                                "line": 89
+                                "line": 90
                             },
                             "start": {
                                 "col": 5,
-                                "line": 88
+                                "line": 89
                             }
                         },
                         "tag": "RecordPattern"
@@ -1414,11 +1429,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 7,
-                    "line": 91
+                    "line": 92
                 },
                 "start": {
                     "col": 1,
-                    "line": 86
+                    "line": 87
                 }
             },
             "tag": "Definition"
@@ -1428,11 +1443,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 7,
-                        "line": 95
+                        "line": 96
                     },
                     "start": {
                         "col": 5,
-                        "line": 95
+                        "line": 96
                     }
                 },
                 "tag": "UnitLiteral"
@@ -1449,11 +1464,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 12,
-                                    "line": 94
+                                    "line": 95
                                 },
                                 "start": {
                                     "col": 10,
-                                    "line": 94
+                                    "line": 95
                                 }
                             },
                             "tag": "UnitPattern"
@@ -1461,11 +1476,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 17,
-                                "line": 94
+                                "line": 95
                             },
                             "start": {
                                 "col": 10,
-                                "line": 94
+                                "line": 95
                             }
                         },
                         "tag": "PatternAlias"
@@ -1477,11 +1492,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 7,
-                    "line": 95
+                    "line": 96
                 },
                 "start": {
                     "col": 1,
-                    "line": 94
+                    "line": 95
                 }
             },
             "tag": "Definition"
@@ -1494,11 +1509,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 101
+                                    "line": 102
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 101
+                                    "line": 102
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -1515,11 +1530,11 @@
                                     "sourceLocation": {
                                         "end": {
                                             "col": 33,
-                                            "line": 100
+                                            "line": 101
                                         },
                                         "start": {
                                             "col": 20,
-                                            "line": 100
+                                            "line": 101
                                         }
                                     },
                                     "tag": "DataPattern"
@@ -1533,11 +1548,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 33,
-                                    "line": 100
+                                    "line": 101
                                 },
                                 "start": {
                                     "col": 9,
-                                    "line": 100
+                                    "line": 101
                                 }
                             },
                             "tag": "DataPattern"
@@ -1545,11 +1560,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 101
+                                "line": 102
                             },
                             "start": {
                                 "col": 9,
-                                "line": 100
+                                "line": 101
                             }
                         }
                     },
@@ -1558,11 +1573,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 104
+                                    "line": 105
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 104
+                                    "line": 105
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -1573,11 +1588,11 @@
                                     "sourceLocation": {
                                         "end": {
                                             "col": 21,
-                                            "line": 103
+                                            "line": 104
                                         },
                                         "start": {
                                             "col": 20,
-                                            "line": 103
+                                            "line": 104
                                         }
                                     },
                                     "tag": "AnythingPattern"
@@ -1591,11 +1606,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 21,
-                                    "line": 103
+                                    "line": 104
                                 },
                                 "start": {
                                     "col": 9,
-                                    "line": 103
+                                    "line": 104
                                 }
                             },
                             "tag": "DataPattern"
@@ -1603,11 +1618,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 104
+                                "line": 105
                             },
                             "start": {
                                 "col": 15,
-                                "line": 101
+                                "line": 102
                             }
                         }
                     },
@@ -1616,11 +1631,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 107
+                                    "line": 108
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 107
+                                    "line": 108
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -1635,11 +1650,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 22,
-                                    "line": 106
+                                    "line": 107
                                 },
                                 "start": {
                                     "col": 9,
-                                    "line": 106
+                                    "line": 107
                                 }
                             },
                             "tag": "DataPattern"
@@ -1647,11 +1662,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 107
+                                "line": 108
                             },
                             "start": {
                                 "col": 15,
-                                "line": 104
+                                "line": 105
                             }
                         }
                     }
@@ -1659,11 +1674,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 15,
-                        "line": 107
+                        "line": 108
                     },
                     "start": {
                         "col": 5,
-                        "line": 99
+                        "line": 100
                     }
                 },
                 "subject": {
@@ -1671,11 +1686,11 @@
                     "sourceLocation": {
                         "end": {
                             "col": 11,
-                            "line": 99
+                            "line": 100
                         },
                         "start": {
                             "col": 10,
-                            "line": 99
+                            "line": 100
                         }
                     },
                     "tag": "VariableReference"
@@ -1690,11 +1705,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 55,
-                                "line": 98
+                                "line": 99
                             },
                             "start": {
                                 "col": 54,
-                                "line": 98
+                                "line": 99
                             }
                         },
                         "tag": "VariableDefinition"
@@ -1706,11 +1721,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 15,
-                    "line": 107
+                    "line": 108
                 },
                 "start": {
                     "col": 1,
-                    "line": 98
+                    "line": 99
                 }
             },
             "tag": "Definition"
@@ -1723,11 +1738,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 113
+                                    "line": 114
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 113
+                                    "line": 114
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -1744,11 +1759,11 @@
                                     "sourceLocation": {
                                         "end": {
                                             "col": 27,
-                                            "line": 112
+                                            "line": 113
                                         },
                                         "start": {
                                             "col": 20,
-                                            "line": 112
+                                            "line": 113
                                         }
                                     },
                                     "tag": "DataPattern"
@@ -1762,11 +1777,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 27,
-                                    "line": 112
+                                    "line": 113
                                 },
                                 "start": {
                                     "col": 9,
-                                    "line": 112
+                                    "line": 113
                                 }
                             },
                             "tag": "DataPattern"
@@ -1774,11 +1789,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 113
+                                "line": 114
                             },
                             "start": {
                                 "col": 9,
-                                "line": 112
+                                "line": 113
                             }
                         }
                     },
@@ -1787,11 +1802,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 116
+                                    "line": 117
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 116
+                                    "line": 117
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -1807,11 +1822,11 @@
                                         "sourceLocation": {
                                             "end": {
                                                 "col": 16,
-                                                "line": 115
+                                                "line": 116
                                             },
                                             "start": {
                                                 "col": 15,
-                                                "line": 115
+                                                "line": 116
                                             }
                                         },
                                         "tag": "AnythingPattern"
@@ -1825,11 +1840,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 16,
-                                        "line": 115
+                                        "line": 116
                                     },
                                     "start": {
                                         "col": 10,
-                                        "line": 115
+                                        "line": 116
                                     }
                                 },
                                 "tag": "DataPattern"
@@ -1837,11 +1852,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 22,
-                                    "line": 115
+                                    "line": 116
                                 },
                                 "start": {
                                     "col": 9,
-                                    "line": 115
+                                    "line": 116
                                 }
                             },
                             "tag": "PatternAlias"
@@ -1849,11 +1864,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 116
+                                "line": 117
                             },
                             "start": {
                                 "col": 15,
-                                "line": 113
+                                "line": 114
                             }
                         }
                     },
@@ -1862,11 +1877,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 119
+                                    "line": 120
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 119
+                                    "line": 120
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -1886,11 +1901,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 16,
-                                        "line": 118
+                                        "line": 119
                                     },
                                     "start": {
                                         "col": 9,
-                                        "line": 118
+                                        "line": 119
                                     }
                                 },
                                 "tag": "DataPattern"
@@ -1898,11 +1913,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 21,
-                                    "line": 118
+                                    "line": 119
                                 },
                                 "start": {
                                     "col": 9,
-                                    "line": 118
+                                    "line": 119
                                 }
                             },
                             "tag": "PatternAlias"
@@ -1910,11 +1925,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 119
+                                "line": 120
                             },
                             "start": {
                                 "col": 15,
-                                "line": 116
+                                "line": 117
                             }
                         }
                     },
@@ -1923,11 +1938,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 122
+                                    "line": 123
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 122
+                                    "line": 123
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -1952,11 +1967,11 @@
                                     "sourceLocation": {
                                         "end": {
                                             "col": 23,
-                                            "line": 121
+                                            "line": 122
                                         },
                                         "start": {
                                             "col": 10,
-                                            "line": 121
+                                            "line": 122
                                         }
                                     },
                                     "tag": "DataPattern"
@@ -1964,11 +1979,11 @@
                                 "sourceLocation": {
                                     "end": {
                                         "col": 28,
-                                        "line": 121
+                                        "line": 122
                                     },
                                     "start": {
                                         "col": 10,
-                                        "line": 121
+                                        "line": 122
                                     }
                                 },
                                 "tag": "PatternAlias"
@@ -1976,11 +1991,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 34,
-                                    "line": 121
+                                    "line": 122
                                 },
                                 "start": {
                                     "col": 9,
-                                    "line": 121
+                                    "line": 122
                                 }
                             },
                             "tag": "PatternAlias"
@@ -1988,11 +2003,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 122
+                                "line": 123
                             },
                             "start": {
                                 "col": 15,
-                                "line": 119
+                                "line": 120
                             }
                         }
                     },
@@ -2001,11 +2016,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 15,
-                                    "line": 125
+                                    "line": 126
                                 },
                                 "start": {
                                     "col": 13,
-                                    "line": 125
+                                    "line": 126
                                 }
                             },
                             "tag": "UnitLiteral"
@@ -2014,11 +2029,11 @@
                             "sourceLocation": {
                                 "end": {
                                     "col": 10,
-                                    "line": 124
+                                    "line": 125
                                 },
                                 "start": {
                                     "col": 9,
-                                    "line": 124
+                                    "line": 125
                                 }
                             },
                             "tag": "AnythingPattern"
@@ -2026,11 +2041,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 15,
-                                "line": 125
+                                "line": 126
                             },
                             "start": {
                                 "col": 15,
-                                "line": 122
+                                "line": 123
                             }
                         }
                     }
@@ -2038,11 +2053,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 15,
-                        "line": 125
+                        "line": 126
                     },
                     "start": {
                         "col": 5,
-                        "line": 111
+                        "line": 112
                     }
                 },
                 "subject": {
@@ -2050,11 +2065,11 @@
                     "sourceLocation": {
                         "end": {
                             "col": 11,
-                            "line": 111
+                            "line": 112
                         },
                         "start": {
                             "col": 10,
-                            "line": 111
+                            "line": 112
                         }
                     },
                     "tag": "VariableReference"
@@ -2069,11 +2084,11 @@
                         "sourceLocation": {
                             "end": {
                                 "col": 57,
-                                "line": 110
+                                "line": 111
                             },
                             "start": {
                                 "col": 56,
-                                "line": 110
+                                "line": 111
                             }
                         },
                         "tag": "VariableDefinition"
@@ -2085,11 +2100,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 15,
-                    "line": 125
+                    "line": 126
                 },
                 "start": {
                     "col": 1,
-                    "line": 110
+                    "line": 111
                 }
             },
             "tag": "Definition"

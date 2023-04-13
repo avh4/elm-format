@@ -1,3 +1,9 @@
+## dev
+
+Format changes:
+  - Multi-line `import` statements are now formatted slightly different (and with less indentation)
+
+
 ## 0.8.7
 
 New features:
@@ -117,7 +123,7 @@ Bug fixes:
   - On Windows, special folders are now correctly skipped when traversing the filesystem
   - Initial comments in doc comment code blocks are no longer removed
 
-Syntax changes:
+Format changes:
   - Infix operator precedence and associativity declarations are now grouped together
   - `if` expressions now have blank lines between clauses
   - Comments immediately following `import`s now have spacing consistent with other top-level comments
@@ -161,7 +167,7 @@ Other changes:
 Notes:
   - Support for Elm 0.16 is deprecated (but is still available with the `--elm-version=0.16` option).
 
-Syntax changes:
+Format changes:
   - Removed a workaround for an Elm 0.16 compiler bug that added extra parenthesis to qualified type tags in pattern matches
   - End-of-line `--` comments are now kept on their original line when appropriate
   - `--` comments in the middle of binary operator sequences no longer push the following expression to the next line
@@ -210,7 +216,7 @@ Bug fixes:
 
 ## 0.4.0-alpha
 
-Syntax changes:
+Format changes:
   - multiline expressions with long infix operators now indent in a more appropriate way
   - The `<|` operator is now handled specially and is placed at the end of the preceding line
   - line breaks are now allowed before the first arguments to functions

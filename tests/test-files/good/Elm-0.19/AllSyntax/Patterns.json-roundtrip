@@ -45,7 +45,7 @@ consList ( a :: b :: c, a :: b :: c, d :: e :: f, d :: e :: f, d :: e :: f ) =
     ()
 
 
-equivalentCons ( [ y, x ], [ y, x ], [ y, x ] ) =
+equivalentCons ( [ y, x ], [ y, x ], [ y, x ], [] ) =
     ()
 
 

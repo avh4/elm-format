@@ -6,11 +6,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 11,
-                    "line": 36
+                    "line": 37
                 },
                 "start": {
                     "col": 1,
-                    "line": 34
+                    "line": 35
                 }
             },
             "tag": "CustomType",
@@ -33,11 +33,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 6,
-                        "line": 40
+                        "line": 41
                     },
                     "start": {
                         "col": 5,
-                        "line": 40
+                        "line": 41
                     }
                 },
                 "tag": "IntLiteral",
@@ -49,11 +49,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 40
+                    "line": 41
                 },
                 "start": {
                     "col": 1,
-                    "line": 39
+                    "line": 40
                 }
             },
             "tag": "Definition"
@@ -66,11 +66,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 6,
-                        "line": 44
+                        "line": 45
                     },
                     "start": {
                         "col": 5,
-                        "line": 44
+                        "line": 45
                     }
                 },
                 "tag": "IntLiteral",
@@ -82,11 +82,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 44
+                    "line": 45
                 },
                 "start": {
                     "col": 1,
-                    "line": 43
+                    "line": 44
                 }
             },
             "tag": "Definition"
@@ -99,11 +99,11 @@
                 "sourceLocation": {
                     "end": {
                         "col": 6,
-                        "line": 48
+                        "line": 49
                     },
                     "start": {
                         "col": 5,
-                        "line": 48
+                        "line": 49
                     }
                 },
                 "tag": "IntLiteral",
@@ -115,11 +115,11 @@
             "sourceLocation": {
                 "end": {
                     "col": 6,
-                    "line": 48
+                    "line": 49
                 },
                 "start": {
                     "col": 1,
-                    "line": 47
+                    "line": 48
                 }
             },
             "tag": "Definition"

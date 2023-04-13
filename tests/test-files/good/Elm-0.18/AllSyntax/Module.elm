@@ -1,6 +1,7 @@
 module AllSyntax.Module exposing (CustomType(TagA), a, b, c)
 
-import Dict as D
+import Dict
+    as D
     exposing
         ( Dict
         , empty

@@ -28,12 +28,16 @@ assertLineOutput expected actual =
 assertOutput :: String -> Box -> Assertion
 assertOutput expected actual =
     assertEqual expected expected $
-        trim $ Text.unpack $ render $ actual
+        trim $ Text.unpack $ render actual
 
 
 word :: String -> Box
 word =
     line . identifier
+
+
+mb :: String -> Box
+mb = mustBreak . identifier
 
 
 block :: String -> Box
@@ -48,7 +52,7 @@ block text =
 
 test_tests :: TestTree
 test_tests =
-    testGroup "ElmFormat.Render.BoxTest"
+    testGroup "Box"
     [ testCase "keyword" $
         assertLineOutput "module" $ keyword "module"
     , testCase "identifier" $
@@ -75,4 +79,13 @@ test_tests =
     , testCase "indent (with leading spaces)" $
         assertOutput "    a\n" $
             prefix space $ indent $ line $ identifier "a"
+
+    , testCase "allSingles (empty)" $
+        allSingles [] @?= Right ([], False)
+    , testCase "allSingles (all single)" $
+        allSingles [ word "a", word "b" ] @?= Right ([identifier "a", identifier "b"], False)
+    , testCase "allSingles (ends with mustBreak)" $
+        allSingles [ word "a", mb "b" ] @?= Right ([identifier "a", identifier "b"], True)
+    , testCase "allSingles (inner mustBreak)" $
+        allSingles [ mb "a", word "b" ] @?= Left [mb "a", word "b"]
     ]

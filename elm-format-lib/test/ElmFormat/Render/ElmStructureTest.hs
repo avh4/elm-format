@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedLists #-}
 module ElmFormat.Render.ElmStructureTest where
 
 import Elm.Utils ((|>))
@@ -10,6 +11,7 @@ import qualified Data.Text as Text
 import AST.V0_16
 import Box
 import ElmFormat.Render.ElmStructure
+import qualified Box.BlockAdapter as Block
 
 
 trim :: String -> String
@@ -30,7 +32,7 @@ assertLineOutput expected actual =
 assertOutput :: String -> Box -> Assertion
 assertOutput expected actual =
     assertEqual expected expected $
-        trim $ Text.unpack $ render $ actual
+        trim $ Text.unpack $ render actual
 
 
 word :: String -> Box
@@ -88,4 +90,10 @@ test_tests =
     , testCase "group (forced multiline)" $
         assertOutput "( a\n, b\n, c\n)\n" $
             group True "(" "," ")" True [ word "a", word "b", word "c" ]
+    , testCase "equalsPair (multiline right)" $
+        assertOutput "a %\n    bb\n    bb\n" $
+            equalsPair "%" False (word "a") (block "b")
+    , testCase "equalsPair (mustBreak right)" $
+        assertOutput "a % b\nc\n" $
+            Block.rowOrStack Nothing [equalsPair "%" False (word "a") (mustBreak $ identifier "b"), word "c"]
     ]

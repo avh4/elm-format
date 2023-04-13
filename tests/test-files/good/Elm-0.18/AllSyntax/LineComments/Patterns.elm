@@ -100,8 +100,7 @@ record
 
 
 asAlias
-    (()
-     --O
+    (() --O
      as
         --P
         x

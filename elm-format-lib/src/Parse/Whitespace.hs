@@ -7,7 +7,7 @@ import Parse.IParser
 import qualified Parse.Markdown as Markdown
 import qualified Parse.State as State
 import qualified Reporting.Error.Syntax as Syntax
-import Parse.ParsecAdapter hiding (newline, spaces, State)
+import Parse.ParsecAdapter
 
 
 padded :: IParser a -> IParser (C2 before after a)
@@ -25,7 +25,7 @@ spaces =
       comment = ((: []) <$> multiComment)
       space =
         blank
-        <|> (const [CommentTrickOpener] <$> (try $ string "{--}"))
+        <|> (const [CommentTrickOpener] <$> try (string "{--}"))
         <|> comment
         <?> Syntax.whitespace
   in
@@ -105,7 +105,7 @@ restOfLine :: IParser (Maybe String)
 restOfLine =
     many (char ' ') *>
         choice
-            [ Just . fst <$> (try (string "--") *> (anyUntil $ (lookAhead simpleNewline) <|> eof))
+            [ Just . fst <$> (try (string "--") *> anyUntil (lookAhead simpleNewline <|> eof))
             , return Nothing
             ]
 

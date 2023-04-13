@@ -5,7 +5,6 @@ module Parse.Expression (term, typeAnnotation, definition, expr) where
 
 import Data.Coapplicative
 import qualified Data.Indexed as I
-import Data.Maybe (fromMaybe)
 
 import Parse.ParsecAdapter
 import qualified Parse.Binop as Binop
@@ -94,9 +93,7 @@ parensTerm elmVersion =
   choice
     [ try (addLocation $ parens' opFn )
     , try (addLocation $ parens' tupleFn)
-    , do
-          (start, e, end) <- located $ parens (parened <|> unit)
-          return $ A.at start end e
+    , addLocation $ parens' parened
     ]
   where
     opFn =
@@ -107,17 +104,17 @@ parensTerm elmVersion =
           return $ TupleFunction (length commas + 1)
 
     parened =
-      do  expressions <- commaSep1 ((\e a b -> C (a, b) e) <$> expr elmVersion)
-          return $ \pre post multiline ->
-            case expressions pre post of
-              [single] ->
-                  Parens single
+      do  ((expressions, trailing), multiline) <- trackNewline $ sectionedGroup (expr elmVersion)
+          return $
+            case expressions of
+              Sequence [] ->
+                  Unit trailing
+
+              Sequence [C (pre2, pre3, eol) single] ->
+                  Parens $ C (pre2 <> pre3, eolToComment eol <> trailing) single
 
               expressions' ->
-                  Tuple expressions' multiline
-
-    unit =
-        return $ \pre post _ -> Unit (pre ++ post)
+                  Tuple expressions' trailing (ForceMultiline $ multilineToBool multiline)
 
 
 recordTerm :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
@@ -132,13 +129,12 @@ recordTerm elmVersion =
 
 term :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
 term elmVersion =
-  (choice
+  choice
       [ fmap I.Fix $ addLocation (Literal <$> Literal.literal)
       , listTerm elmVersion
       , accessor elmVersion
       , negative elmVersion
       ]
-  )
     <|> accessible elmVersion
         (varTerm elmVersion
             <|> parensTerm elmVersion
@@ -170,7 +166,7 @@ appExpr elmVersion =
                     multiline =
                         case
                             ( initialTermMultiline
-                            , fromMaybe (JoinAll) $ fmap snd $ head' ts
+                            , maybe JoinAll snd $ head' ts
                             , any (isMultiline . snd) $ tail ts
                             )
                         of
@@ -325,7 +321,7 @@ definition ::
         (ASTNS Located [UppercaseIdentifier] 'PatternNK
           -> [C1 before (ASTNS Located [UppercaseIdentifier] 'PatternNK)]
           -> Comments
-          -> (ASTNS Located [UppercaseIdentifier] 'ExpressionNK)
+          -> ASTNS Located [UppercaseIdentifier] 'ExpressionNK
           -> a
         )
     -> IParser a
@@ -342,7 +338,7 @@ defStart :: ElmVersion -> IParser (ASTNS Located [UppercaseIdentifier] 'PatternN
 defStart elmVersion =
     choice
       [ do  pattern <- try $ Pattern.term elmVersion
-            func $ pattern
+            func pattern
       , do  opPattern <- fmap I.Fix $ addLocation (OpPattern <$> parens' symOp)
             func opPattern
       ]
@@ -351,10 +347,10 @@ defStart elmVersion =
     func pattern =
         case extract $ I.unFix pattern of
           VarPattern _ ->
-              ((,) pattern) <$> spacePrefix (Pattern.term elmVersion)
+              (,) pattern <$> spacePrefix (Pattern.term elmVersion)
 
           OpPattern _ ->
-              ((,) pattern) <$> spacePrefix (Pattern.term elmVersion)
+              (,) pattern <$> spacePrefix (Pattern.term elmVersion)
 
           _ ->
               return (pattern, [])

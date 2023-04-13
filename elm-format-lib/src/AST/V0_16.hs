@@ -374,8 +374,10 @@ data AST typeRef ctorRef varRef (getType :: NodeKind -> Type) (kind :: NodeKind)
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
 
     Tuple ::
-        [C2 'BeforeTerm 'AfterTerm (getType 'ExpressionNK)]
-        -> Bool
+        { terms :: Sequence (getType 'ExpressionNK)
+        , trailingComments_t :: Comments
+        , forceMultiline_t :: ForceMultiline
+        }
         -> AST typeRef ctorRef varRef getType 'ExpressionNK
     TupleFunction ::
         Int -- will be 2 or greater, indicating the number of elements in the tuple
@@ -579,7 +581,7 @@ mapAll ftyp fctor fvar fast = \case
     Parens e -> Parens (fmap fast e)
     ExplicitList terms c ml -> ExplicitList (fmap fast terms) c ml
     Range left right ml -> Range (fmap fast left) (fmap fast right) ml
-    Tuple terms ml -> Tuple (fmap (fmap fast) terms) ml
+    Tuple terms c ml -> Tuple (fmap fast terms) c ml
     TupleFunction n -> TupleFunction n
     Record base fields c ml -> Record base (fmap (fmap fast) fields) c ml
     Access e field -> Access (fast e) field

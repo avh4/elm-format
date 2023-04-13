@@ -1,25 +1,26 @@
+{-# LANGUAGE OverloadedLists #-}
 {-# OPTIONS_GHC -Wall #-}
 module ElmFormat.Render.ElmStructure
-  ( spaceSepOrStack, forceableSpaceSepOrStack, forceableSpaceSepOrStack1
-  , forceableRowOrStack
-  , spaceSepOrIndented, forceableSpaceSepOrIndented, spaceSepOrPrefix, prefixOrIndented
+  ( spaceSepOrStack, spaceSepOrStackForce
+  , rowOrStackForce
+  , spaceSepOrIndented, spaceSepOrIndentedForce, spaceSepOrPrefix, prefixOrIndented
   , equalsPair, definition
-  , application, group, group', extensionGroup, extensionGroup' )
+  , application, group, group', extensionGroup' )
   where
 
 
-import Elm.Utils ((|>))
-import Box
 import AST.V0_16 (FunctionApplicationMultiline(..), Multiline(..))
+import Box.BlockAdapter (Block, space, Line)
+import Data.List.NonEmpty (NonEmpty(..))
 
-import qualified Data.List as List
+import qualified Box.BlockAdapter as Block
 
 
-{-| Same as `forceableSpaceSepOrStack False`
+{-| Same as `spaceSepOrStackForce False`
 -}
-spaceSepOrStack :: Box -> [Box] -> Box
+spaceSepOrStack :: NonEmpty Block -> Block
 spaceSepOrStack =
-    forceableSpaceSepOrStack False
+    spaceSepOrStackForce False
 
 
 {-|
@@ -31,42 +32,14 @@ Formats as:
     rest0
     rest1
 -}
-forceableSpaceSepOrStack :: Bool -> Box -> [Box] -> Box
-forceableSpaceSepOrStack forceMultiline first rest =
-    case
-      ( forceMultiline, first, allSingles rest, rest )
-    of
-      ( False, SingleLine first', Right rest', _ ) ->
-        line $ row $ List.intersperse space (first' : rest')
+spaceSepOrStackForce :: Bool -> NonEmpty Block -> Block
+spaceSepOrStackForce forceMultiline =
+    Block.rowOrStackForce forceMultiline (Just space)
 
 
-      _ ->
-        stack1 (first : rest)
-
-
-forceableRowOrStack :: Bool -> Box -> [Box] -> Box
-forceableRowOrStack forceMultiline first rest =
-    case
-      ( forceMultiline, first, allSingles rest, rest )
-    of
-      ( False, SingleLine first', Right rest', _ ) ->
-        line $ row (first' : rest')
-
-
-      _ ->
-        stack1 (first : rest)
-
-
-{-| Same as `forceableSpaceSepOrStack`
--}
-forceableSpaceSepOrStack1 :: Bool -> [Box] -> Box
-forceableSpaceSepOrStack1 forceMultiline boxes =
-    case boxes of
-        (first:rest) ->
-            forceableSpaceSepOrStack forceMultiline first rest
-
-        _ ->
-            error "forceableSpaceSepOrStack1 with empty list"
+rowOrStackForce :: Bool -> NonEmpty Block -> Block
+rowOrStackForce forceMultiline =
+    Block.rowOrStackForce forceMultiline Nothing
 
 
 {-|
@@ -79,23 +52,14 @@ Formats as:
       rest1
       rest2
 -}
-spaceSepOrIndented :: Box -> [Box] -> Box
+spaceSepOrIndented :: NonEmpty Block -> Block
 spaceSepOrIndented =
-    forceableSpaceSepOrIndented False
+    spaceSepOrIndentedForce False
 
 
-forceableSpaceSepOrIndented :: Bool -> Box -> [Box] -> Box
-forceableSpaceSepOrIndented forceMultiline first rest =
-  case
-    ( forceMultiline, first, allSingles rest, rest )
-  of
-    ( False, SingleLine first', Right rest', _ ) ->
-      line $ row $ List.intersperse space (first' : rest')
-
-
-    _ ->
-      stack1
-        ( first : map indent rest)
+spaceSepOrIndentedForce :: Bool -> NonEmpty Block -> Block
+spaceSepOrIndentedForce forceMultiline =
+    Block.rowOrIndentForce forceMultiline (Just space)
 
 
 {-|
@@ -109,30 +73,16 @@ Formats as:
     opLong
         rest
 -}
-spaceSepOrPrefix :: Box -> Box -> Box
-spaceSepOrPrefix op rest =
-    case ( op, rest) of
-        ( SingleLine op', SingleLine rest' ) ->
-            line $ row [ op', space, rest' ]
-
-        ( SingleLine op', _ ) | lineLength 0 op' < 4 ->
-            prefix (row [ op', space ]) rest
-
-        _ ->
-            stack1 [ op, indent rest ]
+spaceSepOrPrefix :: Word -> Line -> Block -> Block
+spaceSepOrPrefix opLen op rest =
+    if opLen >= 4
+        then Block.rowOrIndent (Just space) (Block.line op :| [ rest ])
+        else Block.prefix opLen (op <> space) rest
 
 
-prefixOrIndented :: Box -> Box -> Box
-prefixOrIndented a b =
-    case ( a, b ) of
-        ( SingleLine a', SingleLine b' ) ->
-            line $ row [ a', space, b' ]
-
-        ( SingleLine a', MustBreak b' ) ->
-            mustBreak $ row [ a', space, b' ]
-
-        _ ->
-            stack1 [ a, indent b ]
+prefixOrIndented :: Line -> Block -> Block
+prefixOrIndented =
+    Block.prefixOrIndent (Just space)
 
 
 {-|
@@ -147,45 +97,18 @@ Formats as:
       =
       right
 -}
-equalsPair :: String -> Bool -> Box -> Box -> Box
+equalsPair :: String -> Bool -> Block -> Block -> Block
 equalsPair symbol forceMultiline left right =
-  case (forceMultiline, left, right) of
-    ( False, SingleLine left', SingleLine right' ) ->
-      line $ row
-        [ left'
-        , space
-        , punc symbol
-        , space
-        , right'
-        ]
-
-    ( _, SingleLine left', MustBreak right' ) ->
-      mustBreak $ row
-        [ left'
-        , space
-        , punc symbol
-        , space
-        , right'
-        ]
-
-    ( _, SingleLine left', right' ) ->
-      stack1
-        [ line $ row [ left', space, punc symbol ]
-        , indent right'
-        ]
-
-    ( _, left', right' ) ->
-      stack1
-        [ left'
-        , indent $ line $ punc symbol
-        , indent right'
-        ]
+    Block.rowOrIndentForce forceMultiline (Just space)
+      [ Block.rowOrIndent (Just space) [ left, Block.line $ Block.string7 symbol ]
+      , right
+      ]
 
 
 {-|
 An equalsPair where the left side is an application
 -}
-definition :: String -> Bool -> Box -> [Box] -> Box -> Box
+definition :: String -> Bool -> Block -> [Block] -> Block -> Block
 definition symbol forceMultiline first rest =
   equalsPair symbol forceMultiline
     (application (FAJoinFirst JoinAll) first rest)
@@ -205,34 +128,27 @@ Formats as:
       rest1
       rest2
 -}
-application :: FunctionApplicationMultiline -> Box -> [Box] -> Box
+application :: FunctionApplicationMultiline -> Block -> [Block] -> Block
 application forceMultiline first args =
   case args of
     [] ->
       first
 
     arg0 : rest ->
-      case
-        ( forceMultiline
-        , first
-        , arg0
-        , allSingles rest
-        )
-      of
-        ( FAJoinFirst JoinAll, SingleLine first', SingleLine arg0', Right rest' ) ->
-          (first' : arg0' : rest' )
-            |> List.intersperse space
-            |> row
-            |> line
+      Block.rowOrIndentForce splitRest (Just space) $
+          Block.rowOrIndentForce splitFirst (Just space) [ first, arg0 ]
+          :| rest
+      where
+        (splitFirst, splitRest) =
+            case forceMultiline of
+                FASplitFirst -> (True, True)
+                FAJoinFirst forceRest ->
+                    ( False
+                    , case forceRest of
+                        SplitAll -> True
+                        JoinAll -> False
+                    )
 
-        ( FAJoinFirst _, SingleLine first', SingleLine arg0', _) ->
-          stack1
-            $ line ( row [ first', space, arg0' ])
-              : map indent rest
-
-        _ ->
-          stack1
-            $ first : map indent (arg0 : rest)
 
 {-|
 `group True '<' ';' '>'` formats as:
@@ -248,36 +164,43 @@ application forceMultiline first args =
     ; child2
     >
 -}
-group :: Bool -> String -> String -> String -> Bool -> [Box] -> Box
+group :: Bool -> String -> String -> String -> Bool -> [Block] -> Block
 group innerSpaces left sep right forceMultiline children =
   group' innerSpaces left sep [] right forceMultiline children
 
 
-group' :: Bool -> String -> String -> [Box] -> String -> Bool -> [Box] -> Box
-group' innerSpaces left sep extraFooter right forceMultiline children =
-  case (forceMultiline, allSingles children, allSingles extraFooter) of
-    (_, Right [], Right efs) ->
-      line $ row $ concat [[punc left], efs, [punc right]]
-
-    (False, Right ls, Right efs) ->
-      line $ row $ concat
-        [ if innerSpaces then [punc left, space] else [punc left]
-        , List.intersperse (row [punc sep, space]) (ls ++ efs)
-        , if innerSpaces then [space, punc right] else [punc right]
-        ]
-
-    _ ->
-      case children of
-        [] ->
-          -- TODO: might lose extraFooter in this case, but can that ever happen?
-          line $ row [ punc left, punc right]
-
-        (first:rest) ->
-          stack1 $
-            prefix (row [punc left, space]) first
-            : map (prefix $ row [punc sep, space]) rest
-            ++ extraFooter
-            ++ [ line $ punc right ]
+group' :: Bool -> String -> String -> [Block] -> String -> Bool -> [Block] -> Block
+group' _ open _ [] close _ [] =
+  Block.line $ Block.string7 open <> Block.string7 close
+group' innerSpaces open _ (extraFooter0 : extraFooter) close forceMultiline [] =
+  Block.rowOrStackForce
+    forceMultiline
+    (if innerSpaces then Just Block.space else Nothing)
+    [ Block.rowOrStackForce forceMultiline Nothing $
+        formatStart extraFooter0
+          :| extraFooter,
+      Block.line (Block.string7 close)
+    ]
+  where
+    formatStart =
+      if innerSpaces || forceMultiline
+        then Block.prefix 2 (Block.string7 open <> space)
+        else Block.prefix 1 (Block.string7 open)
+group' innerSpaces open sep extraFooter close forceMultiline (first : rest) =
+  Block.rowOrStackForce
+    forceMultiline
+    (if innerSpaces then Just Block.space else Nothing)
+    [ Block.rowOrStackForce forceMultiline Nothing $
+        formatEntry open (innerSpaces || forceMultiline) first
+          :| fmap (formatEntry sep True) rest
+          <> extraFooter,
+      Block.line (Block.string7 close)
+    ]
+  where
+    formatEntry char useSpace entry =
+      if useSpace
+        then Block.prefix 2 (Block.string7 char <> space) entry
+        else Block.prefix 1 (Block.string7 char) entry
 
 {-|
 Formats as:
@@ -292,57 +215,12 @@ Formats as:
       , rest1
     }
 -}
-extensionGroup :: Bool -> Box -> Box -> [Box] -> Box
-extensionGroup multiline base first rest =
-  case
-    ( multiline
-    , isLine base
-    , allSingles (first : rest)
-    )
-  of
-    (False, Right base', Right fields') ->
-      line $ row
-        [ punc "{"
-        , space
-        , base'
-        , space
-        , punc "|"
-        , space
-        , row (List.intersperse (row [punc ",", space]) fields')
-        , space
-        , punc "}"
-        ]
-
-    _ ->
-      stack1
-        [ prefix (row [punc "{", space]) base
-        , stack1
-            ( prefix (row [punc "|", space]) first
-            : map (prefix (row [punc ",", space])) rest)
-            |> indent
-        , line $ punc "}"
-        ]
-
-
-extensionGroup' :: Bool -> Box -> Box -> Box
-extensionGroup' multiline base fields =
-  case
-    ( multiline
-    , base
-    , fields
-    )
-  of
-    (False, SingleLine base', SingleLine fields') ->
-      line $ row $ List.intersperse space
-        [ punc "{"
-        , base'
-        , fields'
-        , punc "}"
-        ]
-
-    _ ->
-      stack1
-        [ prefix (row [punc "{", space]) base
-        , indent fields
-        , line $ punc "}"
+extensionGroup' :: Char -> Char -> Bool -> Block -> Block -> Block
+extensionGroup' open close multiline base fields =
+      Block.rowOrStackForce multiline (Just space)
+        [ Block.rowOrIndentForce multiline (Just space)
+            [ Block.prefix 2 (Block.char7 open <> Block.space) base,
+              fields
+            ],
+          Block.line $ Block.char7 close
         ]

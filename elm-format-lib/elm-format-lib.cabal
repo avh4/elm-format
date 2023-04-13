@@ -40,6 +40,7 @@ library
   other-modules:
       AST.Helpers
       Box
+      Box.BlockAdapter
       Data.Utf8
       Elm.String
       ElmFormat.AST.BinaryOperatorPrecedence
@@ -111,6 +112,7 @@ test-suite efl-tests
       BoxTest
       ElmFormat.AST.BinaryOperatorPrecedenceTest
       ElmFormat.ImportInfoTest
+      ElmFormat.Render.BoxTest
       ElmFormat.Render.ElmStructureTest
       Parse.ExpressionTest
       Parse.HelpersTest
@@ -126,6 +128,7 @@ test-suite efl-tests
       AST.Structure
       AST.V0_16
       Box
+      Box.BlockAdapter
       CommandLine.InfoFormatter
       CommandLine.Program
       CommandLine.ResolveFiles

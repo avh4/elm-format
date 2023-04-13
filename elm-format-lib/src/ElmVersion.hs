@@ -38,6 +38,14 @@ syntax_0_19_disallowApostropheInVars elmVersion =
         Elm_0_19 -> True
 
 
+syntax_0_19_disallowExplicitUnionListings :: ElmVersion -> Bool
+syntax_0_19_disallowExplicitUnionListings = \case
+    Elm_0_16 -> False
+    Elm_0_17 -> False
+    Elm_0_18 -> False
+    Elm_0_19 -> True
+
+
 style_0_19_stringEscape :: ElmVersion -> Bool
 style_0_19_stringEscape elmVersion =
     case elmVersion of

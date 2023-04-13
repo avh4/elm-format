@@ -53,6 +53,5 @@ requiredParensForTrailingCommentsInBinopsContext =
 
 
 requiredParensForTrailingCommentsInDefBodyContext =
-    (8
-     -- comment stay here
+    (8 -- comment stay here
     )
