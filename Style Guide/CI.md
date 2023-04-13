@@ -38,7 +38,7 @@ A FormattingError will be an object with the following fields:
 ### Example JSON
 
 ```json
-[{"path":"./src/Fifo.elm","message":"File is not formatted with elm-format-0.8.6 --elm-version=0.19"}
-,{"path":"./tests/Tests.elm","message":"File is not formatted with elm-format-0.8.6 --elm-version=0.19"}
+[{"path":"./src/Fifo.elm","message":"File is not formatted with elm-format-0.8.7 --elm-version=0.19"}
+,{"path":"./tests/Tests.elm","message":"File is not formatted with elm-format-0.8.7 --elm-version=0.19"}
 ]
 ```
