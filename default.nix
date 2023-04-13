@@ -1,4 +1,4 @@
-{ sources ? import ./nix/sources.nix, compiler ? "ghc925" }:
+{ sources ? import ./nix/sources.nix, compiler ? "ghc944" }:
 
 let
   gitignore = import sources."gitignore.nix" { };
@@ -7,8 +7,8 @@ let
   haskellPackageOverrides = pkgs: self: super:
     with pkgs.haskell.lib; rec {
       hedgehog = self.hedgehog_1_2;
-      relude = overrideCabal super.relude (orig: { doCheck = false; });
-      text = self.text_2_0_1;
+      relude = overrideCabal super.relude_1_2_0_0 (orig: { doCheck = false; });
+      text = self.text_2_0_2;
       unordered-containers =
         overrideCabal super.unordered-containers (orig: { doCheck = false; });
     };
@@ -18,8 +18,8 @@ let
     let
       inherit (pkgs) lib;
 
-      aeson = self.aeson_2_1_1_0;
-      text = self.text_2_0_1;
+      aeson = self.aeson_2_1_2_1;
+      text = self.text_2_0_2;
 
       mkPkg = name: path: args:
         overrideCabal (self.callCabal2nix name path args) (orig: {
@@ -51,9 +51,8 @@ let
       avh4-lib = mkPkg "avh4-lib" ./avh4-lib { inherit text; };
       elm-format-lib =
         mkPkg "elm-format-lib" ./elm-format-lib { inherit aeson text; };
-      elm-format-test-lib = mkPkg "elm-format-test-lib" ./elm-format-test-lib {
-        inherit text;
-      };
+      elm-format-test-lib =
+        mkPkg "elm-format-test-lib" ./elm-format-test-lib { inherit text; };
       elm-format-markdown =
         mkPkg "elm-format-markdown" ./elm-format-markdown { inherit text; };
     };
@@ -81,9 +80,9 @@ let
   # This is the haskell package set that includes elm-format and all its dependencies
   haskellPackages = mkHaskellPackages pkgs;
 
-  # This is a haskell package set for the same ghc version that does not have any package overries
+  # This is a haskell package set for the same ghc version that does not have our project package overries
   # (Because our override aren't compatible with haskell-language-server, etc)
-  haskellTools = pkgs.haskell.packages."${compiler}";
+  haskellTools = import ./nix/tools.nix { inherit sources compiler; };
 in {
   elm-format = haskellPackages.elm-format;
   dist = {

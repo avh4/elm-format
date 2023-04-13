@@ -4,7 +4,7 @@ Format changes:
   - Multi-line `import` statements are now formatted slightly different (and with less indentation)
 
 
-## main
+## 0.8.7
 
 New features:
   - `case ... then` is now auto-corrected to `case ... of`
@@ -12,6 +12,7 @@ New features:
 
 Bug fixes:
   - Top-level declarations named "infix" no longer make files unprocessable
+  - The npm installer should now work correctly on Windows (was broken for 0.8.6)
 
 
 ## 0.8.6

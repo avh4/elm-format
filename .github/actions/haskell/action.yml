@@ -9,13 +9,13 @@ runs:
       name: Setup Haskell
       id: setup-haskell
       with:
-        ghc-version: 9.2.5
+        ghc-version: 9.4.4
     - name: Verify Haskell version
       shell: bash
       run: |
         cabal --version
         ghc --version
-        [[ $(ghc --numeric-version) == 9.2.5 ]]
+        [[ $(ghc --numeric-version) == 9.4.4 ]]
         file "$(which cabal)"
         file "$(which ghc)"
     - name: Cache ~/.cabal/store

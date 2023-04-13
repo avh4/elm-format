@@ -19,7 +19,7 @@ jobs:
           runner: [ self-hosted, macOS, ARM64 ]
           archive-label: macOS-arm64
           ghc:
-            version: "9.2.5"
+            version: "9.4.4"
             build-platform: aarch64-apple-darwin
 
     name: release-${{ matrix.build.name }}

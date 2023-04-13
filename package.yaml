@@ -1,5 +1,5 @@
 name: elm-format
-version: 0.8.6
+version: 0.8.7
 
 synopsis: A source code formatter for Elm
 description: |
@@ -40,7 +40,7 @@ dependencies:
   base: ">= 4.15.0.0 && < 5"
   bytestring: ">= 0.11.3.0 && < 0.12"
   optparse-applicative: ">= 0.17.0.0 && < 0.18"
-  relude: ">= 1.1.0.0 && < 1.2"
+  relude: ">= 1.1.0.0 && < 1.3"
   text: ">= 2.0 && < 3"
   avh4-lib: {}
   elm-format-lib: {}

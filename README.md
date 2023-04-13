@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/avh4/elm-format.svg?branch=master)](https://travis-ci.org/avh4/elm-format)
-[![latest version: 0.8.6](https://img.shields.io/badge/version-0.8.6-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.6)
+[![latest version: 0.8.7](https://img.shields.io/badge/version-0.8.7-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.7)
 
 # elm-format
 
@@ -26,7 +26,7 @@ elm-format --help  # See other command line options
 ```
 
 
-## Installation [![(latest version: 0.8.6)](https://img.shields.io/badge/version-0.8.6-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.6)
+## Installation [![(latest version: 0.8.7)](https://img.shields.io/badge/version-0.8.7-orange.svg)](https://github.com/avh4/elm-format/releases/tag/0.8.7)
 
 To install `elm-format`:
 
@@ -34,7 +34,7 @@ To install `elm-format`:
 npm install -g elm-format
 ```
 
-or download the version appropriate for your OS from the [release page](https://github.com/avh4/elm-format/releases/tag/0.8.6),
+or download the version appropriate for your OS from the [release page](https://github.com/avh4/elm-format/releases/tag/0.8.7),
 unzip it,
 and place `elm-format` or `elm-format.exe` (windows) on your `PATH`.
 
@@ -305,8 +305,8 @@ git clone https://github.com/avh4/elm-format.git
 cd elm-format
 
 # initial setup
-ghcup install ghc 9.2.5
-ghcup set ghc 9.2.5
+ghcup install ghc 9.4.4
+ghcup set ghc 9.4.4
 cabal install hpack
 
 # build
