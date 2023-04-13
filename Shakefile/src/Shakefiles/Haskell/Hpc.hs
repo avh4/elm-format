@@ -15,10 +15,10 @@ mergeTixFiles tixs out = do
 rules :: String -> Rules ()
 rules gitSha = do
     let hpcConfig =
-            [ "--hpcdir=./dist-newstyle/_coverage/build/x86_64-linux/ghc-9.2.5/elm-format-0.8.7/hpc/vanilla/mix/elm-format"
-            , "--hpcdir=./dist-newstyle/_coverage/build/x86_64-linux/ghc-9.2.5/avh4-lib-0.0.0.1/hpc/vanilla/mix/avh4-lib-0.0.0.1"
-            , "--hpcdir=./dist-newstyle/_coverage/build/x86_64-linux/ghc-9.2.5/elm-format-lib-0.0.0.1/hpc/vanilla/mix/elm-format-lib-0.0.0.1"
-            , "--hpcdir=./dist-newstyle/_coverage/build/x86_64-linux/ghc-9.2.5/elm-format-markdown-0.0.0.1/hpc/vanilla/mix/elm-format-markdown-0.0.0.1"
+            [ "--hpcdir=./dist-newstyle/_coverage/build/x86_64-linux/ghc-9.4.4/elm-format-0.8.7/hpc/vanilla/mix/elm-format"
+            , "--hpcdir=./dist-newstyle/_coverage/build/x86_64-linux/ghc-9.4.4/avh4-lib-0.0.0.1/hpc/vanilla/mix/avh4-lib-0.0.0.1"
+            , "--hpcdir=./dist-newstyle/_coverage/build/x86_64-linux/ghc-9.4.4/elm-format-lib-0.0.0.1/hpc/vanilla/mix/elm-format-lib-0.0.0.1"
+            , "--hpcdir=./dist-newstyle/_coverage/build/x86_64-linux/ghc-9.4.4/elm-format-markdown-0.0.0.1/hpc/vanilla/mix/elm-format-markdown-0.0.0.1"
             , "--srcdir=."
             , "--srcdir=avh4-lib"
             , "--srcdir=elm-format-lib"

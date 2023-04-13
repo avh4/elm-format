@@ -23,8 +23,7 @@ else
 fi
 popd
 
-cabal2nix --no-haddock --flag='--ghc-option=-Wno-error=unused-packages' https://github.com/avh4/elm-format --revision "$REV" --subpath avh4-lib \
-  | sed -e 's#-f--ghc-option=#--ghc-option=#;s#-wno-#-Wno-#' \
+cabal2nix --no-haddock https://github.com/avh4/elm-format --revision "$REV" --subpath avh4-lib \
   > nixpkgs/pkgs/development/compilers/elm/packages/avh4-lib.nix
 cabal2nix --no-haddock https://github.com/avh4/elm-format --revision "$REV" --subpath elm-format-lib > nixpkgs/pkgs/development/compilers/elm/packages/elm-format-lib.nix
 cabal2nix --no-haddock https://github.com/avh4/elm-format --revision "$REV" --subpath elm-format-test-lib > nixpkgs/pkgs/development/compilers/elm/packages/elm-format-test-lib.nix
