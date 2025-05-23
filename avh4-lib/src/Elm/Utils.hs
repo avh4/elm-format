@@ -7,7 +7,8 @@ module Elm.Utils
     ) where
 
 import Prelude hiding ((>>))
-import Control.Monad.Except (MonadError, MonadIO, liftIO, throwError)
+import Control.Monad.Except (MonadError, throwError)
+import Control.Monad.IO.Class (MonadIO, liftIO)
 import System.Exit (ExitCode(ExitSuccess, ExitFailure))
 import System.Process (readProcessWithExitCode)
 

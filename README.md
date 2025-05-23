@@ -305,8 +305,8 @@ git clone https://github.com/avh4/elm-format.git
 cd elm-format
 
 # initial setup
-ghcup install ghc 9.4.4
-ghcup set ghc 9.4.4
+ghcup install ghc 9.6.7
+ghcup set ghc 9.6.7
 cabal install hpack
 
 # build

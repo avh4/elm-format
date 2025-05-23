@@ -31,7 +31,6 @@ dependencies:
   mtl: ">= 2.2.2 && < 3"
   text: ">= 2.0 && < 3"
 
-
 library:
   source-dirs:
     - .

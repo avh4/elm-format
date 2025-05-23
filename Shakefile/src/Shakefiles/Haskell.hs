@@ -112,7 +112,7 @@ cabalProject name sourceFiles sourcePatterns deps testPatterns testDeps =
 cabalBuildDir :: String -> Action FilePath
 cabalBuildDir projectName = do
     version <- readFile' ("_build/cabal" </> projectName </> "version")
-    return $ "dist-newstyle" </> "build" </> Shakefiles.Platform.cabalInstallOs </> "ghc-9.4.4" </> projectName ++ "-" ++ version
+    return $ "dist-newstyle" </> "build" </> Shakefiles.Platform.cabalInstallOs </> "ghc-9.6.7" </> projectName ++ "-" ++ version
 
 
 executable :: String -> String -> String -> Rules ()
