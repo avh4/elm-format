@@ -28,7 +28,7 @@
                 {
                     "pattern": {
                         "tag": "FloatLiteral",
-                        "value": 2
+                        "value": 2.0
                     }
                 },
                 {
