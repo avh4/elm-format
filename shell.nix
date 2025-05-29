@@ -25,7 +25,7 @@ in haskellPackages.shellFor {
     haskellTools.ghcid
     cabal2nix
     niv
-    nixfmt
+    nixfmt-rfc-style
     alejandra
     haskellTools.haskell-language-server
     unzip
