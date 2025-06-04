@@ -1,0 +1,6 @@
+avh4-lib/avh4-lib.cabal linguist-generated=true
+elm-format-lib/elm-format-lib.cabal linguist-generated=true
+elm-format-markdown/elm-format-markdown.cabal linguist-generated=true
+elm-format-test-lib/elm-format-test-lib.cabal linguist-generated=true
+elm-format.cabal linguist-generated=true
+Shakefile/build-elm-format.cabal linguist-generated=true
