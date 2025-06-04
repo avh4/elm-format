@@ -5,17 +5,17 @@ runs:
       if: ${{ runner.os == 'Linux' }}
       shell: bash
       run: sudo chown -R "$USER" /usr/local/.ghcup
-    - uses: haskell/actions/setup@v2
+    - uses: haskell-actions/setup@v2
       name: Setup Haskell
       id: setup-haskell
       with:
-        ghc-version: 9.4.4
+        ghc-version: 9.6.7
     - name: Verify Haskell version
       shell: bash
       run: |
         cabal --version
         ghc --version
-        [[ $(ghc --numeric-version) == 9.4.4 ]]
+        [[ $(ghc --numeric-version) == 9.6.7 ]]
         file "$(which cabal)"
         file "$(which ghc)"
     - name: Cache ~/.cabal/store

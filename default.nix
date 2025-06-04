@@ -1,25 +1,15 @@
-{ sources ? import ./nix/sources.nix, compiler ? "ghc944" }:
+{ sources ? import ./nix/sources.nix, compiler ? "ghc967" }:
 
 let
   gitignore = import sources."gitignore.nix" { };
-  inherit (gitignore) gitignoreSource gitignoreFilterWith;
+  inherit (gitignore) gitignoreFilterWith;
 
-  haskellPackageOverrides = pkgs: self: super:
-    with pkgs.haskell.lib; rec {
-      hedgehog = self.hedgehog_1_2;
-      relude = overrideCabal super.relude_1_2_0_0 (orig: { doCheck = false; });
-      text = self.text_2_0_2;
-      unordered-containers =
-        overrideCabal super.unordered-containers (orig: { doCheck = false; });
-    };
+  haskellPackageOverrides = pkgs: self: super: { };
 
   elmFormatPackages = self: super:
     with pkgs.haskell.lib;
     let
       inherit (pkgs) lib;
-
-      aeson = self.aeson_2_1_2_1;
-      text = self.text_2_0_2;
 
       mkPkg = name: path: args:
         overrideCabal (self.callCabal2nix name path args) (orig: {
@@ -47,19 +37,19 @@ let
         });
     in {
       elm-format-build = mkPkg "elm-format-build" ./Shakefile { };
-      elm-format = mkPkg "elm-format" ./. { inherit aeson text; };
-      avh4-lib = mkPkg "avh4-lib" ./avh4-lib { inherit text; };
+      elm-format = mkPkg "elm-format" ./. { };
+      avh4-lib = mkPkg "avh4-lib" ./avh4-lib { };
       elm-format-lib =
-        mkPkg "elm-format-lib" ./elm-format-lib { inherit aeson text; };
+        mkPkg "elm-format-lib" ./elm-format-lib { };
       elm-format-test-lib =
-        mkPkg "elm-format-test-lib" ./elm-format-test-lib { inherit text; };
+        mkPkg "elm-format-test-lib" ./elm-format-test-lib { };
       elm-format-markdown =
-        mkPkg "elm-format-markdown" ./elm-format-markdown { inherit text; };
+        mkPkg "elm-format-markdown" ./elm-format-markdown { };
     };
 
   pkgs = import sources.nixpkgs {
     config = {
-      packageOverrides = pkgs: rec {
+      packageOverrides = pkgs: {
         haskell = pkgs.haskell // {
           packages = pkgs.haskell.packages // {
             project = pkgs.haskell.packages."${compiler}".override {

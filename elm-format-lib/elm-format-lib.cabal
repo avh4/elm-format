@@ -1,6 +1,6 @@
 cabal-version: 2.2
 
--- This file has been generated from package.yaml by hpack version 0.35.2.
+-- This file has been generated from package.yaml by hpack version 0.37.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -89,16 +89,16 @@ library
       ScopedTypeVariables
   ghc-options: -O2 -Wall -Werror=unused-packages -Wno-name-shadowing
   build-depends:
-      aeson >=2.1.0.0 && <2.2
+      aeson >=2.1.0.0 && <2.3
     , avh4-lib
     , base >=4.15.0.0 && <5
     , bimap >=0.4.0 && <0.6
     , binary >=0.8.9.0 && <0.9
-    , bytestring >=0.11.3.0 && <0.12
+    , bytestring >=0.11.3.0 && <0.13
     , containers >=0.6.5.1 && <0.7
     , elm-format-markdown
     , mtl >=2.2.2 && <3
-    , optparse-applicative >=0.17.0.0 && <0.18
+    , optparse-applicative >=0.17.0.0 && <0.19
     , relude >=1.1.0.0 && <1.3
     , text >=2.0 && <3
   default-language: Haskell2010
@@ -194,18 +194,18 @@ test-suite efl-tests
   build-tool-depends:
       tasty-discover:tasty-discover >=4.2.1 && <5
   build-depends:
-      aeson >=2.1.0.0 && <2.2
+      aeson >=2.1.0.0 && <2.3
     , avh4-lib
     , base >=4.15.0.0 && <5
     , bimap >=0.4.0 && <0.6
     , binary >=0.8.9.0 && <0.9
-    , bytestring >=0.11.3.0 && <0.12
+    , bytestring >=0.11.3.0 && <0.13
     , containers >=0.6.5.1 && <0.7
     , elm-format-markdown
     , elm-format-test-lib
     , hspec >=2.7.4 && <3
     , mtl >=2.2.2 && <3
-    , optparse-applicative >=0.17.0.0 && <0.18
+    , optparse-applicative >=0.17.0.0 && <0.19
     , relude >=1.1.0.0 && <1.3
     , split >=0.2.3.4 && <0.3
     , tasty >=1.2 && <2

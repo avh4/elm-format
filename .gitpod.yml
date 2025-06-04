@@ -7,8 +7,8 @@ tasks:
     init: |
       curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 BOOTSTRAP_HASKELL_MINIMAL=1 sh
       source "$GHCUP_INSTALL_BASE_PREFIX/.ghcup/env"
-      ghcup install ghc 9.4.4
-      ghcup set ghc 9.4.4
+      ghcup install ghc 9.6.7
+      ghcup set ghc 9.6.7
       ghcup install cabal
       cabal update
       ./dev/build.sh

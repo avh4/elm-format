@@ -15,6 +15,7 @@ import qualified Data.Text as T
 import Data.Foldable (toList)
 import Data.Sequence ((|>), viewr, ViewR(..), singleton, Seq)
 import qualified Data.Sequence as Seq
+import Control.Monad (guard, replicateM, unless)
 import Control.Monad.RWS
 import Control.Applicative
 import qualified Data.Map as M

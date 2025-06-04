@@ -27,14 +27,14 @@ ghc-options:
   - -Wno-name-shadowing
 
 dependencies:
-  aeson: ">= 2.1.0.0 && < 2.2"
+  aeson: ">= 2.1.0.0 && < 2.3"
   base: ">= 4.15.0.0 && < 5"
   bimap: ">= 0.4.0 && < 0.6"
   binary: ">= 0.8.9.0 && < 0.9"
-  bytestring: ">= 0.11.3.0 && < 0.12"
+  bytestring: ">= 0.11.3.0 && < 0.13"
   containers: ">= 0.6.5.1 && < 0.7"
   mtl: ">= 2.2.2 && < 3"
-  optparse-applicative: ">= 0.17.0.0 && < 0.18"
+  optparse-applicative: ">= 0.17.0.0 && < 0.19"
   relude: ">= 1.1.0.0 && < 1.3"
   text: ">= 2.0 && < 3"
   avh4-lib: {}
