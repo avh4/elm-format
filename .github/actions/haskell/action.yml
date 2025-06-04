@@ -5,7 +5,7 @@ runs:
       if: ${{ runner.os == 'Linux' }}
       shell: bash
       run: sudo chown -R "$USER" /usr/local/.ghcup
-    - uses: haskell/actions/setup@v2
+    - uses: haskell-actions/setup@v2
       name: Setup Haskell
       id: setup-haskell
       with:
