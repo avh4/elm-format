@@ -1527,10 +1527,10 @@ formatExpression elmVersion importInfo aexpr =
                                    , indent body'
                                    ]
                         (_, _, pat', body') ->
-                            stack1 $
+                            stack1
                               [ pat'
-                              , line $ keyword "->"
-                              , indent body'
+                              , indent $ line $ keyword "->"
+                              , indent $ indent body'
                               ]
             in
                 (,) AmbiguousEnd $ -- TODO: not tested

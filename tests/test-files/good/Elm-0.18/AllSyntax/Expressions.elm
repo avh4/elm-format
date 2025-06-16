@@ -344,16 +344,16 @@ caseStatement =
                 {- O -}
                 Just x
                 {- P -}
-                ->
-                    {- Q -}
-                    x
+                    ->
+                        {- Q -}
+                        x
 
                 {- R -}
                 _
                 {- S -}
-                ->
-                    {- T -}
-                    2
+                    ->
+                        {- T -}
+                        2
 
         c =
             case
@@ -364,15 +364,15 @@ caseStatement =
                 --O
                 Just x
                 --P
-                ->
-                    --Q
-                    x
+                    ->
+                        --Q
+                        x
 
                 --R
                 _
                 --S
-                ->
-                    --T
-                    2
+                    ->
+                        --T
+                        2
     in
     {}
