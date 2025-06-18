@@ -19,8 +19,11 @@ jobs:
             runner: windows-latest
             archive-label: Windows
           - name: macOS-x86
-            runner: macOS-latest
+            runner: macOS-13
             archive-label: macOS-x86
+          - name: macOS-ARM64
+            runner: macOS-15
+            archive-label: macOS-arm64
 
     name: release-${{ matrix.build.name }}
     runs-on: ${{ matrix.build.runner }}
