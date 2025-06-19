@@ -35,7 +35,7 @@ runs:
         rm -v private.key
       env:
         MINISIGN_PRIVATE_KEY: ${{ inputs.minisign-key }}
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: elm-format-${{ github.sha }}-${{ matrix.build.archive-label }}
         path: dist/

@@ -1,3 +1,9 @@
+## 0.8.8
+
+Bug fixes:
+  - `case` expressions with multiline patterns are now formatted correctly
+
+
 ## 0.8.7
 
 New features:
