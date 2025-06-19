@@ -62,7 +62,7 @@ Then `cd elm-tooling`, push the resulting branch, and make a PR to <https://gith
         - `scope` is optional and will create a scoped top-level package (don't set it for normal releases)
         - `binaryPackageScope` is the scope that the binary packages will be published under
     - Fill out the `binaries` info for each supported platform
-        - To get the sha256, run `nix-prefetch fetchzip --url <release url>`
+        - To get the sha256, run `nix-prefetch-url --unpack <release url> | xargs nix hash convert --hash-algo sha256`
         - `v` is the sub-patch version for this binary and can be incremented as needed (but should be reset to `"1"` on each new elm-format version)
 1. Update `default.nix` to point to the new `elm-format-<new-version>.nix`
 1. `nix-shell --pure`
