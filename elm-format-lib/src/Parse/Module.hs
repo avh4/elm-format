@@ -17,6 +17,7 @@ import qualified Data.Indexed as I
 import ElmVersion
 import Parse.IParser
 import Parse.Whitespace
+import qualified Reporting.Annotation as A
 import Reporting.Annotation (Located)
 
 
@@ -31,25 +32,25 @@ elmModule elmVersion =
           , (,) <$> addLocation (return Nothing) <*> return []
           ]
       (preImportComments, imports', postImportComments) <- imports elmVersion
-      topLevels <-
-          fmap I.Fix $
-          addLocation $
-          fmap TopLevel $
+      (startPos, (allDecls, displacedImports), endPos) <-
+          located $
           do
-              decls <- topLevel $ Decl.declaration elmVersion
+              (decls, extraImports) <- topLevelWithImports elmVersion (Decl.declaration elmVersion)
               trailingComments <-
                   (++)
                       <$> option [] freshLine
                       <*> option [] spaces
               eof
-              return ((map BodyComment postImportComments) ++ decls ++ (map BodyComment trailingComments))
+              return ((map BodyComment postImportComments) ++ decls ++ (map BodyComment trailingComments), extraImports)
+      let topLevels = I.Fix $ A.at startPos endPos $ TopLevel allDecls
+      let mergedImports = mergeDisplacedImports imports' displacedImports
 
       return $
         Module.Module
           preModule
           h
           docs
-          (C (preDocsComments ++ postDocsComments ++ preImportComments) imports')
+          (C (preDocsComments ++ postDocsComments ++ preImportComments) mergedImports)
           topLevels
 
 
@@ -65,6 +66,43 @@ freshDef entry =
       do  comments <- freshLine
           decl <- Decl.topLevelStructure entry
           return $ (map BodyComment comments) ++ [decl]
+
+
+topLevelWithImports :: ElmVersion -> IParser a -> IParser ([TopLevelStructure a], [Module.UserImport])
+topLevelWithImports elmVersion entry =
+  do  firstEntry <- option ([], []) $
+          (\d -> ([d], [])) <$> Decl.topLevelStructure entry
+      restEntries <- many (freshDefOrImport elmVersion entry)
+      let (firstDecls, firstImports) = firstEntry
+      let (restDeclss, restImportss) = unzip restEntries
+      return (firstDecls ++ concat restDeclss, firstImports ++ concat restImportss)
+
+
+freshDefOrImport :: ElmVersion -> IParser a -> IParser ([TopLevelStructure a], [Module.UserImport])
+freshDefOrImport elmVersion entry =
+    commitIf (freshLine >> (letter <|> char '_')) $
+      do  comments <- freshLine
+          choice
+            [ do  imp <- import' elmVersion
+                  return (map BodyComment comments, [imp])
+            , do  decl <- Decl.topLevelStructure entry
+                  return ((map BodyComment comments) ++ [decl], [])
+            ]
+
+
+mergeDisplacedImports :: Map [UppercaseIdentifier] (C1 'BeforeTerm ImportMethod) -> [Module.UserImport] -> Map [UppercaseIdentifier] (C1 'BeforeTerm ImportMethod)
+mergeDisplacedImports existing displaced =
+    foldl step existing displaced
+  where
+    step m (C pre name, method) = insertWith mergeImport name (C pre method) m
+
+
+mergeImport :: C1 'BeforeTerm ImportMethod -> C1 'BeforeTerm ImportMethod -> C1 'BeforeTerm ImportMethod
+mergeImport (C comments1 import1) (C comments2 import2) =
+    C (comments1 ++ comments2) $
+        Module.ImportMethod
+            (Module.alias import1 Control.Applicative.<|> Module.alias import2)
+            (mergeC2 (mergeListing mergeDetailedListing) (Module.exposedVars import1) (Module.exposedVars import2))
 
 
 moduleDecl :: ElmVersion -> IParser (Maybe Module.Header)
@@ -151,16 +189,9 @@ mergeDetailedListing left right =
 imports :: ElmVersion -> IParser (Comments, Map [UppercaseIdentifier] (C1 'BeforeTerm ImportMethod), Comments)
 imports elmVersion =
     let
-        merge :: C1 'BeforeTerm ImportMethod -> C1 'BeforeTerm ImportMethod -> C1 'BeforeTerm ImportMethod
-        merge (C comments1 import1) (C comments2 import2) =
-            C (comments1 ++ comments2) $
-                Module.ImportMethod
-                    (Module.alias import1 Control.Applicative.<|> Module.alias import2)
-                    (mergeC2 (mergeListing mergeDetailedListing) (Module.exposedVars import1) (Module.exposedVars import2))
-
         step (comments, m, finalComments) (((C pre name), method), post) =
             ( comments ++ finalComments
-            , insertWith merge name (C pre method) m
+            , insertWith mergeImport name (C pre method) m
             , post
             )
 
