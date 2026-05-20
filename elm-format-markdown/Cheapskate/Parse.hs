@@ -238,8 +238,9 @@ processElts refmap (L _lineNumber lf : rest) =
     TextLine t | Just terms1 <- T.stripPrefix "@docs" t ->
         let
             docs = terms1 : map (cleanDoc . extractText) docLines
+            cleaned = filter ((/=) []) $ fmap (filter ((/=) "") . fmap T.strip . T.splitOn ",") docs
         in
-            singleton (ElmDocs $ filter ((/=) []) $ fmap (filter ((/=) ""). fmap T.strip . T.splitOn ",") docs) <>
+            (if null cleaned then mempty else singleton (ElmDocs cleaned)) <>
             processElts refmap rest'
         where
             (docLines, rest') = span isDocLine rest
